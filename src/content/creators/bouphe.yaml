@@ -1,0 +1,25 @@
+links:
+- name: Twitter
+  type: twitter
+  url: https://twitter.com/bouphe
+- name: Instagram
+  type: instagram
+  url: https://www.instagram.com/bouphemagic
+- name: Playlist
+  type: playlist
+  url: https://open.spotify.com/playlist/63rk76SKx6UvPMJ8AGu8zQ?si=t5aLee7xTPS6alAcUH5-WA&utm_source=copy-link
+- name: Patreon
+  type: patreon
+  url: http://www.patreon.com/bouphe
+- name: Merch
+  type: merch
+  url: https://store.yogscast.com/collections/bouphe
+name: Bouphe
+link: https://www.twitch.tv/bouphe
+profileImage:
+  large: https://static-cdn.jtvnw.net/jtv_user_pictures/2d1308fc-00b1-486e-9170-9084b8ddd12b-profile_image-300x300.png
+  small: https://static-cdn.jtvnw.net/jtv_user_pictures/2d1308fc-00b1-486e-9170-9084b8ddd12b-profile_image-70x70.png
+style:
+  accentColor: '#323070'
+  primaryColor: '#e8f028'
+twitchUser: bouphe

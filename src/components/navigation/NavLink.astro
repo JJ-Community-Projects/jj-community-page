@@ -1,0 +1,16 @@
+---
+interface Props {
+  href: string
+  class?: string
+  active?: string
+  inactive?: string
+}
+
+const pathname = new URL(Astro.request.url).pathname;
+const currentPath = pathname.slice(1);
+const {href, active, inactive} = Astro.props
+
+const isActive = href === `/${currentPath}` || (currentPath === '' && href === '/')
+const classes = `${Astro.props.class} ${isActive ? active : inactive}`
+---
+<a class={classes} href={href}><slot/></a>

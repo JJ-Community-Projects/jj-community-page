@@ -1,0 +1,16 @@
+links:
+- name: Twitter
+  type: twitter
+  url: https://twitter.com/Bedgarsan
+- name: Merch
+  type: merch
+  url: https://store.yogscast.com/collections/ben
+name: Ben
+link: https://www.twitch.tv/bedgars
+profileImage:
+  large: https://static-cdn.jtvnw.net/jtv_user_pictures/952928dc-14ba-4ff5-b52a-902ab39f9dff-profile_image-300x300.png
+  small: https://static-cdn.jtvnw.net/jtv_user_pictures/952928dc-14ba-4ff5-b52a-902ab39f9dff-profile_image-70x70.png
+style:
+  accentColor: '#dd2a27'
+  primaryColor: '#5878b8'
+twitchUser: bedgars

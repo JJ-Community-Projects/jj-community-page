@@ -1,0 +1,15 @@
+links:
+- name: Twitter
+  type: twitter
+  url: https://twitter.com/MiniMukaYT
+- name: Instagram
+  type: instagram
+  url: https://www.instagram.com/minimukayt/
+name: MiniMuka
+profileImage:
+  large: https://static-cdn.jtvnw.net/jtv_user_pictures/a827d102-9ce8-4ef5-9cec-759a97e0161a-profile_image-300x300.png
+  small: https://static-cdn.jtvnw.net/jtv_user_pictures/a827d102-9ce8-4ef5-9cec-759a97e0161a-profile_image-70x70.png
+style:
+  accentColor: '#b2636f'
+  primaryColor: '#5d10f8'
+twitchUser: minimuka

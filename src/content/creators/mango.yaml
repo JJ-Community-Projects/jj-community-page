@@ -1,0 +1,13 @@
+links:
+- name: Twitter
+  type: twitter
+  url: https://twitter.com/TheM4ng0
+name: Mango
+link: https://www.twitch.tv/m4ng0
+profileImage:
+  large: https://static-cdn.jtvnw.net/jtv_user_pictures/5c5e0ecd-418b-401a-ab80-4131f6622a43-profile_image-300x300.png
+  small: https://static-cdn.jtvnw.net/jtv_user_pictures/5c5e0ecd-418b-401a-ab80-4131f6622a43-profile_image-70x70.png
+style:
+  accentColor: '#47a69a'
+  primaryColor: '#eb6197'
+twitchUser: m4ng0

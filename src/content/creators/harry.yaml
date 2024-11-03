@@ -1,0 +1,16 @@
+links:
+- name: Twitter
+  type: twitter
+  url: https://twitter.com/barryharryy
+- name: Merch
+  type: merch
+  url: https://store.yogscast.com/collections/barry
+name: Harry
+link: https://www.twitch.tv/hrry
+profileImage:
+  large: https://static-cdn.jtvnw.net/jtv_user_pictures/b96b5bdb-7ae0-420e-b8ed-2410b14ed01e-profile_image-300x300.png
+  small: https://static-cdn.jtvnw.net/jtv_user_pictures/b96b5bdb-7ae0-420e-b8ed-2410b14ed01e-profile_image-70x70.png
+style:
+  accentColor: '#e882a9'
+  primaryColor: '#f8f060'
+twitchUser: hrry

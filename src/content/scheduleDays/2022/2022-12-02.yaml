@@ -1,0 +1,116 @@
+date: '2022-12-02'
+streams:
+- creators:
+  - lewis
+  - rtgame
+  - spiff
+  - boba
+  duration_hours: 3.0
+  end: '2022-12-02T14:00:00Z'
+  start: '2022-12-02T11:00:00Z'
+  style:
+    background:
+      colors:
+      - '#ffd900ff'
+      - '#ffcc00ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: RTGame Lewis Spiff Boba
+  title: Switch Sports
+  vods:
+  - label: Youtube VOD
+    link: https://www.youtube.com/watch?v=tI0tlNbX2Nw&list=PLvSp-8FGBzxk_D9LnE2aoAwKaEjc4ku8j&index=5
+    type: youtube
+  - label: Twitch VOD
+    link: https://www.twitch.tv/videos/1668134096?t=00h34m55s
+    type: twitch
+- creators:
+  - ravs
+  - pedguin
+  - fionn
+  - briony
+  - kirsty
+  - shadowatnoon
+  - mousie
+  - lolipopgi
+  - duncan
+  - harry
+  - lewis
+  - sips
+  - breeh
+  - osie
+  - rythian
+  duration_hours: 3.0
+  end: '2022-12-02T17:00:00Z'
+  start: '2022-12-02T14:00:00Z'
+  style:
+    background:
+      colors:
+      - '#ffcc00ff'
+      - '#ffbf00ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Massive Multiplayer
+  title: Plate Up
+  vods:
+  - label: Youtube VOD
+    link: https://www.youtube.com/watch?v=mt_sypaJ0t8&list=PLvSp-8FGBzxk_D9LnE2aoAwKaEjc4ku8j&index=6
+    type: youtube
+  - label: Twitch VOD
+    link: https://www.twitch.tv/videos/1668134096?t=03h38m54s
+    type: twitch
+- creators:
+  - ravs
+  - osie
+  - shadowatnoon
+  - lydia
+  - rtgame
+  - breeh
+  - duncan
+  - zylus
+  duration_hours: 3.0
+  end: '2022-12-02T20:00:00Z'
+  start: '2022-12-02T17:00:00Z'
+  style:
+    background:
+      colors:
+      - '#ffbf00ff'
+      - '#ffb300ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Hosted By Ravs
+  title: Mario Kart Tournament
+  vods:
+  - label: Youtube VOD
+    link: https://www.youtube.com/watch?v=N0IIBW0WaBU&list=PLvSp-8FGBzxk_D9LnE2aoAwKaEjc4ku8j&index=7
+    type: youtube
+  - label: Twitch VOD
+    link: https://www.twitch.tv/videos/1668134096?t=06h42m27s
+    type: twitch
+- creators:
+  - zylus
+  - nilesy
+  - rythian
+  - breeh
+  duration_hours: 3.0
+  end: '2022-12-02T23:00:00Z'
+  start: '2022-12-02T20:00:00Z'
+  style:
+    background:
+      colors:
+      - '#ffb300ff'
+      - '#ffa600ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Nilesy Zylus Rythian
+  title: Protessional Strem
+  vods:
+  - label: Youtube VOD
+    link: https://www.youtube.com/watch?v=4ef7-Zpehm4&list=PLvSp-8FGBzxk_D9LnE2aoAwKaEjc4ku8j&index=8
+    type: youtube
+  - label: Twitch VOD 1
+    link: https://www.twitch.tv/videos/1668469279
+    type: twitch
+  - label: Twitch VOD 1
+    link: https://www.twitch.tv/videos/1668524281
+    type: twitch

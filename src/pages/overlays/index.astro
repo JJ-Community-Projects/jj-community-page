@@ -1,0 +1,37 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import {OverlayOverview} from "../../components/overlay/overview/OverlayOverview";
+import {FeedbackButtons} from "../../components/footer/FeedbackButtons";
+import overlay2 from '#images/overlay/overlay2.png';
+import {Image} from "astro:assets";
+---
+<BaseLayout>
+    <div
+            class={'mx-auto flex w-fit flex-col items-center p-1 text-center text-base text-white md:w-[50%] md:text-2xl'}
+    >
+        <p class={'p-1 text-2xl font-bold md:p-2 md:text-4xl'}>JJ Community OBS Overlays</p>
+        <FeedbackButtons client:only="solid-js"/>
+        <p>
+            These are JJ related overlays are meant to be used in an <a href={'https://obsproject.com/'}>OBS</a> browser
+            sources. Configure the Overlays and use these links and add them to your{' '}
+            <a href={'https://obsproject.com/'}>OBS</a> scenes.
+        </p>
+        <p class={'text-xl font-bold'}>Feedback on these overlays is very much appreciated.</p>
+        <a href={'https://obsproject.com/kb/browser-source'}>How to add a Browser source</a>
+        <p class={'visible p-2 font-bold md:invisible'}>Use a desktop to configure the overlays</p>
+    </div>
+    <OverlayOverview client:only="solid-js"/>
+
+
+    <div
+            class={
+              'flex flex-col text-white gap-2 items-center mx-auto p-2 w-fit md:w-[50%] md:text-2xl md:p-4 md:items-start justify-center text-center'
+            }
+    >
+        <div class={'flex flex-col gap-2 p-2'}>
+            <Image src={overlay2} alt={'Screenshot from OBS'} loading={'lazy'}/>
+            <p class={'text-xs'}>Editing the Community Fundraiser scrolling overlay</p>
+        </div>
+    </div>
+
+</BaseLayout>

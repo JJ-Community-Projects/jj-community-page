@@ -1,0 +1,16 @@
+links:
+- name: Twitter
+  type: twitter
+  url: https://twitter.com/Angory_Tom
+- name: Merch
+  type: merch
+  url: https://store.yogscast.com/collections/angory-tom
+name: Tom
+link: https://www.twitch.tv/angorytom
+profileImage:
+  large: https://static-cdn.jtvnw.net/jtv_user_pictures/a554bebf-a383-4017-8842-fffc15fb2aa5-profile_image-300x300.jpg
+  small: https://static-cdn.jtvnw.net/jtv_user_pictures/a554bebf-a383-4017-8842-fffc15fb2aa5-profile_image-70x70.jpg
+style:
+  accentColor: '#f599d7'
+  primaryColor: '#391a54'
+twitchUser: angory_tom

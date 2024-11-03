@@ -1,0 +1,117 @@
+date: '2022-12-12'
+streams:
+- creators:
+  - ben
+  - sips
+  duration_hours: 3.0
+  end: '2022-12-12T14:00:00Z'
+  start: '2022-12-12T11:00:00Z'
+  style:
+    background:
+      colors:
+      - '#00e8c5ff'
+      - '#00e0b4ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Ben & Sips
+  title: Dad Town
+  vods:
+  - label: Youtube Vod
+    link: https://www.youtube.com/watch?v=dryAWFSaqTE&list=PLvSp-8FGBzxk_D9LnE2aoAwKaEjc4ku8j&index=69
+    type: youtube
+  - label: Twitch VOD
+    link: https://www.twitch.tv/videos/1677017533?t=00h27m56s
+    type: twitch
+- creators:
+  - lewis
+  - zylus
+  duration_hours: 3.0
+  end: '2022-12-12T17:00:00Z'
+  start: '2022-12-12T14:00:00Z'
+  style:
+    background:
+      colors:
+      - '#00e0b4ff'
+      - '#00d9a3ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Lewis & Zylus
+  title: Chillout Clundle
+  vods:
+  - label: Youtube Vod
+    link: https://www.youtube.com/watch?v=aejdSZ3UwQE&list=PLvSp-8FGBzxk_D9LnE2aoAwKaEjc4ku8j&index=73
+    type: youtube
+  - label: Twitch VOD
+    link: https://www.twitch.tv/videos/1677017533?t=03h32m52s
+    type: twitch
+- creators:
+  - ben
+  - fionn
+  - daf
+  - lolipopgi
+  - lydia
+  - pedguin
+  duration_hours: 3.0
+  end: '2022-12-12T20:00:00Z'
+  start: '2022-12-12T17:00:00Z'
+  style:
+    background:
+      colors:
+      - '#00d9a3ff'
+      - '#00d196ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Hosted by Ben & Fionn
+  title: IRL Plateup challenge
+  vods:
+  - label: Youtube Vod
+    link: https://www.youtube.com/watch?v=pRmXuC5gMkM&list=PLvSp-8FGBzxk_D9LnE2aoAwKaEjc4ku8j&index=76&t=2s
+    type: youtube
+  - label: Twitch VOD
+    link: https://www.twitch.tv/videos/1677200946?t=00h11m28s
+    type: twitch
+- creators:
+  - nilesy
+  - rythian
+  - breeh
+  duration_hours: 3.5
+  end: '2022-12-12T23:30:00'
+  start: '2022-12-12T20:00:00Z'
+  style:
+    background:
+      colors:
+      - '#00d196ff'
+      - '#00c986ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Nilesy Rythian Breeh
+  title: MSPaint Fighting Fantasy
+  vods:
+  - label: Youtube Vod
+    link: https://www.youtube.com/watch?v=CDdZ5IJglsY&list=PLvSp-8FGBzxk_D9LnE2aoAwKaEjc4ku8j&index=77
+    type: youtube
+  - label: Twitch VOD
+    link: https://www.twitch.tv/videos/1677340260
+    type: twitch
+- creators:
+  - daltos
+  - shadowatnoon
+  duration_hours: 3.0
+  end: '2022-12-13T02:30:00'
+  start: '2022-12-12T23:30:00'
+  style:
+    background:
+      colors:
+      - '#00c986ff'
+      - '#00c278ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Shadow & Daltos
+  title: Co-op Games
+  vods:
+  - label: Youtube Vod
+    link: https://www.youtube.com/watch?v=ruqEvIybwFQ&list=PLvSp-8FGBzxk_D9LnE2aoAwKaEjc4ku8j&index=78
+    type: youtube
+  - label: Twitch VOD
+    link: https://www.twitch.tv/videos/1677496900
+    type: twitch

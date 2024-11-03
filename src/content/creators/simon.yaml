@@ -1,0 +1,16 @@
+links:
+- name: Twitter
+  type: twitter
+  url: https://twitter.com/SimonHoneydew
+- name: Merch
+  type: merch
+  url: https://store.yogscast.com/collections/lewis-and-simon
+name: Simon
+link: https://www.twitch.tv/simonhoneydew
+profileImage:
+  large: https://static-cdn.jtvnw.net/jtv_user_pictures/87636eaa-0ec3-4d53-9564-d3d1e350de84-profile_image-300x300.png
+  small: https://static-cdn.jtvnw.net/jtv_user_pictures/87636eaa-0ec3-4d53-9564-d3d1e350de84-profile_image-70x70.png
+style:
+  accentColor: '#d1edee'
+  primaryColor: '#f38c3c'
+twitchUser: simonhoneydew

@@ -1,0 +1,22 @@
+---
+import jj_image from '../../images/Jingle_Jam_Logo_White_Large.png';
+import {Image} from "astro:assets";
+import YogsScheduleNavigation from "./YogsScheduleNavigation.astro";
+---
+<div class="flex flex-col gap-2 p-4 w-full items-center">
+    <div class="w-[20%] items-center flex flex-row justify-center">
+        <Image src={jj_image} alt="" height="96"/>
+    </div>
+    <div class="w-[40%] flex flex-row gap-4 text-white items-center justify-center">
+        <a href="/">Home</a>
+        <a href="/community">Community</a>
+        <div class="group relative">
+            <a href="/yogs" class="flex w-full flex-row items-center rounded-lg bg-transparent focus:outline-none md:inline md:w-auto">
+                <span>Yogs</span>
+            </a>
+            <YogsScheduleNavigation/>
+        </div>
+        <a href="/overlays">Stream Overlays</a>
+        <a href="/twitch-extension">Twitch Extension</a>
+    </div>
+</div>

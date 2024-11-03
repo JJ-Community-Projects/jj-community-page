@@ -1,0 +1,28 @@
+links:
+- name: Twitter
+  type: twitter
+  url: https://twitter.com/Geestargames
+- name: Tiktok
+  type: tiktok
+  url: https://www.tiktok.com/@geestargames
+- name: Instagram
+  type: instagram
+  url: https://www.instagram.com/geestargames/
+- name: Discord
+  type: discord
+  url: https://discord.com/invite/geestargames
+- name: Patreon
+  type: patreon
+  url: https://www.patreon.com/geestargames
+- name: Merch
+  type: merch
+  url: https://store.yogscast.com/collections/geestar
+name: Gee
+link: https://www.twitch.tv/geestargames
+profileImage:
+  large: https://static-cdn.jtvnw.net/jtv_user_pictures/d0c66997-ed03-491a-80e7-52b97a60a474-profile_image-300x300.png
+  small: https://static-cdn.jtvnw.net/jtv_user_pictures/d0c66997-ed03-491a-80e7-52b97a60a474-profile_image-70x70.png
+style:
+  accentColor: '#5e1466'
+  primaryColor: '#c858c6'
+twitchUser: geestargames

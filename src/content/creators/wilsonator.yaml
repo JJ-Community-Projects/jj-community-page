@@ -1,0 +1,12 @@
+links:
+- name: Twitter
+  type: twitter
+  url: https://twitter.com/WilsonatorYT
+name: Wilsonator
+profileImage:
+  large: https://static-cdn.jtvnw.net/jtv_user_pictures/15a07554-69ec-4876-99f1-cdb01dc0dda0-profile_image-300x300.jpg
+  small: https://static-cdn.jtvnw.net/jtv_user_pictures/15a07554-69ec-4876-99f1-cdb01dc0dda0-profile_image-70x70.jpg
+style:
+  accentColor: '#f8d000'
+  primaryColor: '#1b5587'
+twitchUser: wilsonatoryt

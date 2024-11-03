@@ -1,0 +1,16 @@
+links:
+- name: Twitter
+  type: twitter
+  url: https://twitter.com/PyrionFlax
+- name: Tiktok
+  type: tiktok
+  url: https://www.tiktok.com/@pyrionflax
+name: Pyrion
+link: https://www.twitch.tv/pyrionflax
+profileImage:
+  large: https://static-cdn.jtvnw.net/jtv_user_pictures/043c719f-542c-4504-bb7c-93d05feb4391-profile_image-300x300.png
+  small: https://static-cdn.jtvnw.net/jtv_user_pictures/043c719f-542c-4504-bb7c-93d05feb4391-profile_image-70x70.png
+style:
+  accentColor: '#f18237'
+  primaryColor: '#c50741'
+twitchUser: pyrionflax

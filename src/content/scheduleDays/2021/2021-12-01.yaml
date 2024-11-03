@@ -1,0 +1,91 @@
+date: '2021-12-01'
+streams:
+- creators:
+  - ben
+  - boba
+  - breeh
+  - harry
+  - joe
+  - lewis
+  - osie
+  - ravs
+  - spiff
+  - tom
+  duration_hours: 3.0
+  end: '2021-12-01T14:00:00Z'
+  start: '2021-12-01T11:00:00Z'
+  style:
+    background:
+      colors:
+      - '#00bbe0ff'
+      - '#009fd4ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Putting up the Christmas tree
+  title: Office Cam
+  vods:
+  - label: Youtube Vod
+    link: https://www.youtube.com/watch?v=Q8XBxk4XMxc
+    type: youtube
+- creators:
+  - ben
+  - tom
+  duration_hours: 3.0
+  end: '2021-12-01T17:00:00Z'
+  start: '2021-12-01T14:00:00Z'
+  style:
+    background:
+      colors:
+      - '#009fd4ff'
+      - '#0081c7ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Tom & Ben
+  title: Jingle Jam Hype Stream
+  vods:
+  - label: Youtube Vod
+    link: https://www.youtube.com/watch?v=z5ZkgedoQhI
+    type: youtube
+- creators:
+  - simon
+  - lewis
+  duration_hours: 3.0
+  end: '2021-12-01T20:00:00Z'
+  start: '2021-12-01T17:00:00Z'
+  style:
+    background:
+      colors:
+      - '#0081c7ff'
+      - '#0069baff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Lewis & Simon
+  title: Jingle Cats
+  vods:
+  - label: Youtube Vod
+    link: https://www.youtube.com/watch?v=VWE7SDdY0OU
+    type: youtube
+- creators:
+  - alex_the_rambler
+  - daltos
+  - ben
+  - duncan
+  - lewis
+  - rythian
+  - spiff
+  duration_hours: 3.0
+  end: '2021-12-01T23:00:00Z'
+  start: '2021-12-01T20:00:00Z'
+  style:
+    background:
+      colors:
+      - '#0069baff'
+      - '#0054adff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Lewis & Friends
+  title: Christmas Trains
+  vods:
+  - label: Youtube Vod
+    link: https://www.youtube.com/watch?v=793ucajZsro
+    type: youtube

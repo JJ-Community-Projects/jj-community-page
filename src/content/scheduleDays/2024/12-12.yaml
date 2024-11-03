@@ -1,0 +1,62 @@
+date: '2024-12-12'
+streams:
+  - creators:
+      - gee
+      - ravs
+      - rythian
+      - sips
+      - sherlock_hulmes
+    duration_hours: 3
+    end: '2024-12-12T14:00:00Z'
+    start: '2024-12-12T11:00:00Z'
+    style:
+      background:
+        colors:
+          - '#0CD4D2'
+          - '#09BDB4'
+        orientation: TD
+      tileSize: 1
+    subtitle: Ravs Sips Gee Rythian Mark
+    title: Sweaty Shooters
+    vods:
+      - label: Twitch Vod
+        link: https://www.twitch.tv/videos/2002052997?t=0h15m0s
+        type: twitch
+  - creators:
+      - lewis
+      - simon
+      - lydia
+    duration_hours: 3
+    end: '2024-12-12T17:00:00Z'
+    start: '2024-12-12T14:00:00Z'
+    style:
+      background:
+        colors:
+          - '#09BDB4'
+          - '#05A796'
+        orientation: TD
+      tileSize: 1
+    subtitle: Lewis Simon & Friends
+    title: Pecular Portions
+    vods:
+      - label: Twitch Vod
+        link: https://www.twitch.tv/videos/2002052997?t=3h19m47s
+        type: twitch
+  - creators:
+      - hat_films
+    duration_hours: 7
+    end: '2024-12-13T00:00:00Z'
+    start: '2024-12-12T17:00:00Z'
+    style:
+      background:
+        colors:
+          - '#05A796'
+          - '#029078'
+        orientation: TD
+      tileSize: 2
+    subtitle: ''
+    title: Hat Films Music Stream
+    vods:
+      - label: Twitch Vod
+        link: https://www.twitch.tv/videos/2002052997?t=6h32m46s
+        type: twitch

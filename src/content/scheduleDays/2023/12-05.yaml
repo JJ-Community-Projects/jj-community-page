@@ -1,0 +1,76 @@
+date: '2023-12-05'
+streams:
+- creators:
+  - martyn
+  duration_hours: 3.0
+  end: '2023-12-05T14:00:00Z'
+  start: '2023-12-05T11:00:00Z'
+  style:
+    background:
+      colors:
+      - '#00e8c5ff'
+      - '#00deb1ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Martyn Solidarity Sparkles
+  title: Chunklock Minecraft
+  vods:
+  - label: Twitch Vod
+    link: https://www.twitch.tv/videos/1995775421?t=0h5m46s
+    type: twitch
+  - label: Youtube Vod
+    link: https://www.youtube.com/watch?v=H10vk9PMT8o
+    type: youtube
+- creators:
+  - gee
+  - harry
+  - simon
+  - tom
+  - sarah
+  duration_hours: 3.0
+  end: '2023-12-05T17:00:00Z'
+  start: '2023-12-05T14:00:00Z'
+  style:
+    background:
+      colors:
+      - '#00deb1ff'
+      - '#00d49bff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Simon Gee Tom Harry Sarah
+  title: Simon's Important Videos
+  vods:
+  - label: Twitch Vod
+    link: https://www.twitch.tv/videos/1995775421?t=3h11m50s
+    type: twitch
+  - label: Youtube Vod
+    link: https://www.youtube.com/watch?v=6lb5LDhHsFM
+    type: youtube
+- creators:
+  - ben
+  - daltos
+  - duncan
+  - lewis
+  - potatomcwhisky
+  - rythian
+  - spiff
+  - alex_the_rambler
+  duration_hours: 9.0
+  end: '2023-12-06T02:00:00Z'
+  start: '2023-12-05T17:00:00Z'
+  style:
+    background:
+      colors:
+      - '#00d49bff'
+      - '#00c98aff'
+      orientation: TD
+    tileSize: 2
+  subtitle: ''
+  title: Civ 5 on the 5th
+  vods:
+  - label: Twitch Vod
+    link: https://www.twitch.tv/videos/1995775421?t=6h22m30s
+    type: twitch
+  - label: Youtube Vod
+    link: https://www.youtube.com/watch?v=fbOWBOxpjdI
+    type: youtube

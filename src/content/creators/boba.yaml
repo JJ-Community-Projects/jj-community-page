@@ -1,0 +1,25 @@
+links:
+- name: Twitter
+  type: twitter
+  url: https://twitter.com/boba_witch
+- name: Tiktok
+  type: tiktok
+  url: https://www.tiktok.com/@boba.witch
+- name: Instagram
+  type: instagram
+  url: https://www.instagram.com/boba.wtch/
+- name: Discord
+  type: discord
+  url: https://discord.com/invite/bobawitch
+- name: Merch
+  type: merch
+  url: https://my-store-7720046.creator-spring.com/
+name: Boba
+link: https://www.twitch.tv/boba
+profileImage:
+  large: https://static-cdn.jtvnw.net/jtv_user_pictures/c3a273e0-d131-4bda-a90e-7a84181f8251-profile_image-300x300.png
+  small: https://static-cdn.jtvnw.net/jtv_user_pictures/c3a273e0-d131-4bda-a90e-7a84181f8251-profile_image-70x70.png
+style:
+  accentColor: '#d33be8'
+  primaryColor: '#6936f8'
+twitchUser: boba

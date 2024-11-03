@@ -1,0 +1,16 @@
+links:
+- name: Twitter
+  type: twitter
+  url: https://twitter.com/Fionn_Riches
+- name: Patreon
+  type: patreon
+  url: https://www.patreon.com/Fionn_
+name: Fionn
+link: https://www.twitch.tv/fionn
+profileImage:
+  large: https://static-cdn.jtvnw.net/jtv_user_pictures/cedf53f6-c00d-4cbf-9d42-b23cb9b6135c-profile_image-300x300.png
+  small: https://static-cdn.jtvnw.net/jtv_user_pictures/cedf53f6-c00d-4cbf-9d42-b23cb9b6135c-profile_image-70x70.png
+style:
+  accentColor: '#aba3e2'
+  primaryColor: '#328094'
+twitchUser: fionn

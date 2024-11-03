@@ -1,0 +1,63 @@
+date: '2021-12-08'
+streams:
+- creators:
+  - briony
+  - rythian
+  duration_hours: 3.0
+  end: '2021-12-08T14:00:00Z'
+  start: '2021-12-08T11:00:00Z'
+  style:
+    background:
+      colors:
+      - '#00bbe0ff'
+      - '#0096d1ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Briony & Rythian
+  title: Hidden Gems
+  vods:
+  - label: Youtube Vod
+    link: https://www.youtube.com/watch?v=O8Pbkzq6oJQ
+    type: youtube
+- creators:
+  - ben
+  - duncan
+  - boba
+  - mango
+  - pedguin
+  - ravs
+  - zylus
+  duration_hours: 3.0
+  end: '2021-12-08T17:00:00Z'
+  start: '2021-12-08T14:00:00Z'
+  style:
+    background:
+      colors:
+      - '#0096d1ff'
+      - '#0078c2ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: ''
+  title: Main Channel Crew
+  vods:
+  - label: Twitch Vod
+    link: https://www.twitch.tv/videos/1228471592
+    type: twitch
+- creators:
+  - hat_films
+  duration_hours: 3.0
+  end: '2021-12-08T20:00:00Z'
+  start: '2021-12-08T17:00:00Z'
+  style:
+    background:
+      colors:
+      - '#0078c2ff'
+      - '#0059b3ff'
+      orientation: TD
+    tileSize: 2
+  subtitle: ''
+  title: Hat Films Christmas Album
+  vods:
+  - label: Twitch Vod
+    link: https://www.twitch.tv/videos/1228472378
+    type: twitch

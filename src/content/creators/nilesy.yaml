@@ -1,0 +1,13 @@
+links:
+- name: Twitter
+  type: twitter
+  url: https://twitter.com/twirlyswirly
+name: Nilesy
+link: https://www.twitch.tv/nilesy
+profileImage:
+  large: https://static-cdn.jtvnw.net/jtv_user_pictures/nilesy-profile_image-9c8a8e943fcbf317-300x300.png
+  small: https://static-cdn.jtvnw.net/jtv_user_pictures/nilesy-profile_image-9c8a8e943fcbf317-70x70.png
+style:
+  accentColor: '#a853a6'
+  primaryColor: '#264061'
+twitchUser: nilesy

@@ -1,0 +1,97 @@
+date: '2023-12-01'
+streams:
+- creators: []
+  duration_hours: 3.0
+  end: '2023-12-01T14:00:00Z'
+  start: '2023-12-01T11:00:00Z'
+  style:
+    background:
+      colors:
+      - '#00bbe0ff'
+      - '#009fd4ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Tree Decorating
+  title: Office Cam
+  vods:
+  - label: Twitch Vods
+    link: https://www.twitch.tv/videos/1991996876
+    type: twitch
+  - label: Youtube Vod
+    link: https://www.youtube.com/watch?v=MEwMZ1-tRY4
+    type: youtube
+- creators:
+  - ben
+  - tom
+  duration_hours: 3.0
+  end: '2023-12-01T17:00:00Z'
+  start: '2023-12-01T14:00:00Z'
+  style:
+    background:
+      colors:
+      - '#009fd4ff'
+      - '#0081c7ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Tom & Ben
+  title: Jingle Jam Hype Stream
+  vods:
+  - label: Twitch Vods
+    link: https://www.twitch.tv/videos/1991996876?t=3h1m55s
+    type: twitch
+  - label: Youtube Vod
+    link: https://www.youtube.com/watch?v=E3AbERyT1Xs
+    type: youtube
+- creators:
+  - lewis
+  - simon
+  duration_hours: 3.0
+  end: '2023-12-01T20:00:00Z'
+  start: '2023-12-01T17:00:00Z'
+  style:
+    background:
+      colors:
+      - '#0081c7ff'
+      - '#0069baff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Lewis & Simon
+  title: Jingle Cats
+  vods:
+  - label: Twitch Vod
+    link: https://www.twitch.tv/videos/1991996876?t=6h1m43s
+    type: twitch
+  - label: Youtube Vod
+    link: https://www.youtube.com/watch?v=G7RxR28Zbco
+    type: youtube
+- creators:
+  - daltos
+  - duncan
+  - lewis
+  - rythian
+  - spiff
+  - alex_the_rambler
+  - potatomcwhisky
+  - mango
+  duration_hours: 3.0
+  end: '2023-12-01T23:00:00Z'
+  start: '2023-12-01T20:00:00Z'
+  style:
+    background:
+      colors:
+      - '#0069baff'
+      - '#0054adff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Spiff Lewis & Friends
+  title: Christmas Trains
+  vods:
+  - label: Twitch Vod
+    link: https://www.twitch.tv/videos/1991996876?t=9h14m18s
+    type: twitch
+  - label: Classic Duncan
+    link: https://www.twitch.tv/yogscast/clip/UninterestedDirtyPineappleHeyGuys-ZqEQXI3KhzlZZEOG
+    type: twitch
+  - label: Youtube Vod
+    link: https://www.youtube.com/watch?v=P_w5aHTVnKM
+    type: youtube

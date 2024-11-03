@@ -1,0 +1,22 @@
+links:
+- name: Twitter
+  type: twitter
+  url: https://twitter.com/osiefish
+- name: Instagram
+  type: instagram
+  url: https://www.instagram.com/osiefish/
+- name: Discord
+  type: discord
+  url: https://discord.com/invite/UepA3Dy
+- name: Merch
+  type: merch
+  url: https://store.yogscast.com/collections/osiefish
+name: Osie
+link: https://www.twitch.tv/osie
+profileImage:
+  large: https://static-cdn.jtvnw.net/jtv_user_pictures/c12801cc-7c8a-4749-99e2-0756914f70e6-profile_image-300x300.png
+  small: https://static-cdn.jtvnw.net/jtv_user_pictures/c12801cc-7c8a-4749-99e2-0756914f70e6-profile_image-70x70.png
+style:
+  accentColor: '#5aecea'
+  primaryColor: '#c1b2da'
+twitchUser: osie

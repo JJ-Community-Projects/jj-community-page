@@ -1,0 +1,11 @@
+links: []
+name: RTGame
+type: friend
+link: https://www.twitch.tv/rtgame
+profileImage:
+  large: https://static-cdn.jtvnw.net/jtv_user_pictures/12f29a09-de89-4459-b826-6ce9a099ef7e-profile_image-300x300.png
+  small: https://static-cdn.jtvnw.net/jtv_user_pictures/12f29a09-de89-4459-b826-6ce9a099ef7e-profile_image-70x70.png
+style:
+  accentColor: '#2b30d6'
+  primaryColor: '#8eaee4'
+twitchUser: rtgame

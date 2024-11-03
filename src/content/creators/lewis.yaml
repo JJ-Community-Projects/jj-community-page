@@ -1,0 +1,13 @@
+links:
+- name: Twitter
+  type: twitter
+  url: https://twitter.com/YogscastLewis
+name: Lewis
+link: https://www.twitch.tv/yogscast
+profileImage:
+  large: https://pbs.twimg.com/profile_images/1224691578163343363/mcVMPVoG_400x400.jpg
+  small: https://pbs.twimg.com/profile_images/1224691578163343363/mcVMPVoG_80x80.jpg
+style:
+  accentColor: '#f8b3b5'
+  primaryColor: '#008cf2'
+twitchUser: yogscast

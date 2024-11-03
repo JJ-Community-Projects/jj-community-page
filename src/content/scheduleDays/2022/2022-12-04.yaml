@@ -1,0 +1,107 @@
+date: '2022-12-04'
+streams:
+- creators:
+  - daltos
+  - mango
+  duration_hours: 3.0
+  end: '2022-12-04T14:00:00Z'
+  start: '2022-12-04T11:00:00Z'
+  style:
+    background:
+      colors:
+      - '#fc7600ff'
+      - '#f76300ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Mango & Daltos
+  title: Game Hard
+  vods:
+  - label: Youtube VOD
+    link: https://www.youtube.com/watch?v=pZDb4isCBdU&list=PLvSp-8FGBzxk_D9LnE2aoAwKaEjc4ku8j&index=20
+    type: youtube
+  - label: Twitch VOD
+    link: https://www.twitch.tv/videos/1670020081?t=00h41m53s
+    type: twitch
+- creators:
+  - spiff
+  - potatomcwhisky
+  duration_hours: 3.0
+  end: '2022-12-04T17:00:00Z'
+  start: '2022-12-04T14:00:00Z'
+  style:
+    background:
+      colors:
+      - '#f76300ff'
+      - '#f25100ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Potato & Spiff
+  title: Map Master
+  vods:
+  - label: Youtube VOD
+    link: https://www.youtube.com/watch?v=ggvnLTZDpl4&list=PLvSp-8FGBzxk_D9LnE2aoAwKaEjc4ku8j&index=17
+    type: youtube
+  - label: Twitch VOD
+    link: https://www.twitch.tv/videos/1670020081?t=03h37m50s
+    type: twitch
+- creators:
+  - simon_clark
+  - duncan
+  - osie
+  - boba
+  - pedguin
+  - ben
+  - tom
+  - lewis
+  - pyrion
+  - harry
+  - ravs
+  - briony
+  - kirsty
+  - zylus
+  - mousie
+  - rtgame
+  - spiff
+  - lolipopgi
+  - mango
+  duration_hours: 3.0
+  end: '2022-12-04T20:00:00Z'
+  start: '2022-12-04T17:00:00Z'
+  style:
+    background:
+      colors:
+      - '#f25100ff'
+      - '#ed3b00ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: University Challenge Parody
+  title: Simon Clark's Yogs Challenges
+  vods:
+  - label: Youtube VOD
+    link: https://www.youtube.com/watch?v=1nPbTZ275n0&list=PLvSp-8FGBzxk_D9LnE2aoAwKaEjc4ku8j&index=24
+    type: youtube
+  - label: Twitch VOD
+    link: https://www.twitch.tv/videos/1670293623
+    type: twitch
+- creators:
+  - alex_the_rambler
+  - shadowatnoon
+  duration_hours: 3.0
+  end: '2022-12-04T23:00:00Z'
+  start: '2022-12-04T20:00:00Z'
+  style:
+    background:
+      colors:
+      - '#ed3b00ff'
+      - '#e82b00ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Shadow & Alex
+  title: Canadian Evening
+  vods:
+  - label: Youtube VOD
+    link: https://www.youtube.com/watch?v=-ive8iR030I&list=PLvSp-8FGBzxk_D9LnE2aoAwKaEjc4ku8j&index=25
+    type: youtube
+  - label: Twitch VOD
+    link: https://www.twitch.tv/videos/1670507089
+    type: twitch

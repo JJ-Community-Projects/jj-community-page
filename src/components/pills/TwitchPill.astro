@@ -1,0 +1,13 @@
+---
+import {type TwitchUser} from "../../lib/model/TwitchAPIModel";
+interface Props {
+  twitchUser: TwitchUser,
+  label?: string
+}
+const twitchUser = Astro.props.twitchUser
+const label = Astro.props.label ?? twitchUser.display_name
+---
+
+<div class="bg-twitch-200/70 hover:bg-twitch-200 p-2 rounded-full">
+    <a href={`https://twitch.tv/${twitchUser.login}`} class="text-white">{label}</a>
+</div>

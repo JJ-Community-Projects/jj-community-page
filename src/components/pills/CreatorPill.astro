@@ -1,0 +1,38 @@
+---
+import {Image} from "astro:assets";
+import {estimateBrightnessForColor, getTextColor} from "../../lib/utils/textColors";
+import {type FullCreator} from "../../lib/model/ContentTypes";
+interface Props {
+  creator: FullCreator,
+  label?: string,
+  url?: string,
+}
+const creator = Astro.props.creator
+const image = creator?.profileImage
+const url = Astro.props.url ?? creator.link
+const twitchUser = creator.twitchUser
+const bg = creator?.style?.primaryColor ?? '#1E95EF'
+const textColor = getTextColor(bg)
+
+const label = Astro.props.label ?? creator.name
+const imageUrl = image?.small ?? image?.medium ?? image?.large ?? twitchUser?.profile_image_url
+---
+<a
+        class="cursor-pointer p-2 rounded-full flex flex-row gap-2 items-center hover:scale-105 hover:brightness-105 transition-all duration-200"
+        style={{
+          'background-color': bg,
+          'color': textColor,
+        }}
+        href={url}
+>
+  {
+    imageUrl &&
+          <Image
+                  src={imageUrl}
+                  alt={label}
+                  height="32" width="32"
+                  class="rounded-full w-8 h-8"
+          />
+  }
+  <span>{label}</span>
+</a>

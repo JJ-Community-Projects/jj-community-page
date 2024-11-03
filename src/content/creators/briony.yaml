@@ -1,0 +1,19 @@
+links:
+- name: Twitter
+  type: twitter
+  url: https://twitter.com/brionybun
+- name: Discord
+  type: discord
+  url: https://discord.com/invite/swYBssA
+- name: Merch
+  type: merch
+  url: https://brionykay-shop.fourthwall.com/
+name: Briony
+link: https://www.twitch.tv/brionykay
+profileImage:
+  large: https://static-cdn.jtvnw.net/jtv_user_pictures/857f7224-84b2-4092-98a1-5a82f5dade99-profile_image-300x300.png
+  small: https://static-cdn.jtvnw.net/jtv_user_pictures/857f7224-84b2-4092-98a1-5a82f5dade99-profile_image-70x70.png
+style:
+  accentColor: '#dfa0a5'
+  primaryColor: '#cbe3f4'
+twitchUser: brionykay

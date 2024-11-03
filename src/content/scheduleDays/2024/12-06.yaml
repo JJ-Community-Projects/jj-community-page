@@ -1,0 +1,96 @@
+date: '2024-12-06'
+streams:
+  - creators:
+      - fionn
+      - lolipopgi
+    duration_hours: 3
+    end: '2024-12-06T14:00:00Z'
+    start: '2024-12-06T11:00:00Z'
+    style:
+      background:
+        colors:
+          - '#E455C7'
+          - '#D747AE'
+        orientation: TD
+      tileSize: 1
+    subtitle: Fionn & Lolip
+    title: 2-Player Coop
+    vods:
+      - label: Twitch Vod
+        link: https://www.twitch.tv/videos/1996634381?t=0h9m33s
+        type: twitch
+  - creators:
+      - daltos
+      - spiff
+      - potatomcwhisky
+    duration_hours: 3
+    end: '2024-12-06T17:00:00Z'
+    start: '2024-12-06T14:00:00Z'
+    style:
+      background:
+        colors:
+          - '#D747AE'
+          - '#CA3994'
+        orientation: TD
+      tileSize: 1
+    subtitle: ''
+    title: Civ 6 on the 6th
+    vods:
+      - label: Twitch Vod
+        link: https://www.twitch.tv/videos/1996634381?t=3h5m34s
+        type: twitch
+      - label: Youtube Vod
+        link: https://www.youtube.com/watch?v=j8rAMch1ZAQ
+        type: youtube
+  - creators:
+      - simon_clark
+      - shadowatnoon
+      - lydia
+      - martyn
+      - kirsty
+      - lewis
+      - osie
+      - mousie
+      - sherlock_hulmes
+      - sarah
+    duration_hours: 4.5
+    end: '2024-12-06T21:30:00'
+    start: '2024-12-06T17:00:00Z'
+    style:
+      background:
+        colors:
+          - '#CA3994'
+          - '#BD2B7B'
+        orientation: TD
+      tileSize: 1
+    subtitle: Hosted by Simon Clark
+    title: Who wants to be a Millionaire
+    vods:
+      - label: Twitch Vod
+        link: https://www.twitch.tv/videos/1996634381?t=6h44m52s
+        type: twitch
+      - label: Youtube Vod
+        link: https://www.youtube.com/watch?v=ipF5czCJLC0
+        type: youtube
+  - creators:
+      - rythian
+      - nilesy
+    duration_hours: 3
+    end: '2024-12-07T00:30:00'
+    start: '2024-12-06T21:30:00'
+    style:
+      background:
+        colors:
+          - '#BD2B7B'
+          - '#B01D61'
+        orientation: TD
+      tileSize: 1
+    subtitle: Rythian & Nilesy
+    title: Cats & more
+    vods:
+      - label: Twitch Vod
+        link: https://www.twitch.tv/videos/1996634381?t=10h37m54s
+        type: twitch
+      - label: Youtube Vod
+        link: https://www.youtube.com/watch?v=NH-hTnlA0eg
+        type: youtube

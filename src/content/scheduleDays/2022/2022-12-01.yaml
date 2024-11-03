@@ -1,0 +1,94 @@
+date: '2022-12-01'
+streams:
+- creators: []
+  duration_hours: 3.0
+  end: '2022-12-01T14:00:00Z'
+  start: '2022-12-01T11:00:00Z'
+  style:
+    background:
+      colors:
+      - '#00bbe0ff'
+      - '#009fd4ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Putting up the christmas tree
+  title: Office cam
+  vods:
+  - label: Youtube VOD
+    link: https://www.youtube.com/watch?v=AMRiW0Tvems&list=PLvSp-8FGBzxk_D9LnE2aoAwKaEjc4ku8j&index=1
+    type: youtube
+  - label: Twitch Vod
+    link: https://www.twitch.tv/videos/1667327674
+    type: twitch
+- creators:
+  - ben
+  - tom
+  duration_hours: 3.0
+  end: '2022-12-01T17:00:00Z'
+  start: '2022-12-01T14:00:00Z'
+  style:
+    background:
+      colors:
+      - '#009fd4ff'
+      - '#0081c7ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Tom & Ben
+  title: Jingle Jam Hype Stream
+  vods:
+  - label: Youtube VOD
+    link: https://www.youtube.com/watch?v=wxEktU0AYkk&list=PLvSp-8FGBzxk_D9LnE2aoAwKaEjc4ku8j&index=2
+    type: youtube
+  - label: Twitch Vod
+    link: https://www.twitch.tv/videos/1667327674?t=02h55m40s
+    type: twitch
+- creators:
+  - lewis
+  - simon
+  duration_hours: 3.0
+  end: '2022-12-01T20:00:00Z'
+  start: '2022-12-01T17:00:00Z'
+  style:
+    background:
+      colors:
+      - '#0081c7ff'
+      - '#0069baff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Lewis & Simon
+  title: Jingle Cats
+  vods:
+  - label: Youtube VOD
+    link: https://www.youtube.com/watch?v=SFjS5rFn1sM&list=PLvSp-8FGBzxk_D9LnE2aoAwKaEjc4ku8j&index=3&t=1228s
+    type: youtube
+  - label: Twitch VOD
+    link: https://www.twitch.tv/videos/1667327674?t=05h56m44s
+    type: twitch
+- creators:
+  - ben
+  - duncan
+  - lewis
+  - rythian
+  - potatomcwhisky
+  - spiff
+  - daltos
+  - alex_the_rambler
+  duration_hours: 3.0
+  end: '2022-12-01T23:00:00Z'
+  start: '2022-12-01T20:00:00Z'
+  style:
+    background:
+      colors:
+      - '#0069baff'
+      - '#0054adff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Lewis, Duncan & Friends
+  title: Christmas Trains
+  vods:
+  - label: Youtube VOD
+    link: https://www.youtube.com/watch?v=h6Cnk9LSbtc&list=PLvSp-8FGBzxk_D9LnE2aoAwKaEjc4ku8j&index=4
+    type: youtube
+  - label: Twitch VOD
+    link: https://www.twitch.tv/videos/1667327674?t=09h08m08s
+    type: twitch

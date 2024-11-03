@@ -1,0 +1,19 @@
+links:
+- name: Twitter
+  type: twitter
+  url: https://twitter.com/Sips_
+- name: Reddit
+  type: reddit
+  url: https://www.reddit.com/r/sips
+- name: Merch
+  type: merch
+  url: https://store.yogscast.com/collections/sips
+name: Sips
+link: https://twitch.tv/sips_
+profileImage:
+  large: https://static-cdn.jtvnw.net/jtv_user_pictures/46d1aba3-9341-4ead-ae27-81621feba921-profile_image-300x300.png
+  small: https://static-cdn.jtvnw.net/jtv_user_pictures/46d1aba3-9341-4ead-ae27-81621feba921-profile_image-70x70.png
+style:
+  accentColor: '#ef4d9d'
+  primaryColor: '#99adf1'
+twitchUser: sips_

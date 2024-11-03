@@ -1,0 +1,81 @@
+date: '2021-12-06'
+streams:
+- creators:
+  - bouphe
+  duration_hours: 3.0
+  end: '2021-12-06T14:00:00Z'
+  start: '2021-12-06T11:00:00Z'
+  style:
+    background:
+      colors:
+      - '#f74accff'
+      - '#ed39b7ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: ''
+  title: Retro Games with Bouphe
+  vods:
+  - label: Youtube Vod
+    link: https://www.youtube.com/watch?v=Q0Xm2wVNNW4
+    type: youtube
+- creators:
+  - ben
+  - boba
+  - joe
+  - pedguin
+  duration_hours: 3.0
+  end: '2021-12-06T17:00:00Z'
+  start: '2021-12-06T14:00:00Z'
+  style:
+    background:
+      colors:
+      - '#ed39b7ff'
+      - '#e329a2ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Sofa king fun
+  title: Couch Co-op
+  vods:
+  - label: Youtube Vod
+    link: https://www.youtube.com/watch?v=xIpPrCfB0HI
+    type: youtube
+- creators: []
+  duration_hours: 3.0
+  end: '2021-12-06T20:00:00Z'
+  start: '2021-12-06T17:00:00Z'
+  style:
+    background:
+      colors:
+      - '#e329a2ff'
+      - '#d91a89ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Music Stream
+  title: The Longest Johns
+  vods:
+  - label: Youtube Vod
+    link: https://www.youtube.com/watch?v=UxtdZquQt1A
+    type: youtube
+- creators:
+  - ben
+  - daltos
+  - best_bits
+  - duncan
+  - gee
+  - pedguin
+  duration_hours: 3.0
+  end: '2021-12-06T23:00:00Z'
+  start: '2021-12-06T20:00:00Z'
+  style:
+    background:
+      colors:
+      - '#d91a89ff'
+      - '#cf0c74ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Hosted by Pedguon
+  title: Project Winter
+  vods:
+  - label: Youtube Vod
+    link: https://www.youtube.com/watch?v=sllS5-xz7GA
+    type: youtube

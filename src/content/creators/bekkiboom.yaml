@@ -1,0 +1,22 @@
+links:
+- name: Twitter
+  type: twitter
+  url: https://twitter.com/Bekkiboom
+- name: Instagram
+  type: instagram
+  url: https://www.instagram.com/bekkiboom/
+- name: Discord
+  type: discord
+  url: https://www.discord.gg/qMuhATC3Sm
+- name: Merch
+  type: merch
+  url: https://store.yogscast.com/collections/bekkiboom
+link: https://www.twitch.tv/bekkiboom
+name: Bekkiboom
+profileImage:
+  large: https://yt3.ggpht.com/ytc/AKedOLQmSeZljfEWQl-C8DCakJ4riuK5chm7tOIGcVKocA=s800-c-k-c0xffffffff-no-rj-mo
+  small: https://yt3.ggpht.com/ytc/AKedOLQmSeZljfEWQl-C8DCakJ4riuK5chm7tOIGcVKocA=s88-c-k-c0xffffffff-no-rj-mo
+style:
+  accentColor: '#c9595e'
+  primaryColor: '#a2194d'
+twitchUser: bekkiboom

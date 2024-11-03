@@ -1,0 +1,79 @@
+date: '2021-12-02'
+streams:
+- creators:
+  - breeh
+  - briony
+  - ravs
+  - sips
+  duration_hours: 3.0
+  end: '2021-12-02T14:00:00Z'
+  start: '2021-12-02T11:00:00Z'
+  style:
+    background:
+      colors:
+      - '#ffd900ff'
+      - '#ffcc00ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Ravs Sips Briony Breeh
+  title: Extra Rips
+  vods:
+  - label: Youtube Vod
+    link: https://www.youtube.com/watch?v=ADzTXfiA_JQ
+    type: youtube
+- creators:
+  - boba
+  - duncan
+  - lydia
+  - osie
+  - harry
+  - pedguin
+  duration_hours: 3.0
+  end: '2021-12-02T17:00:00Z'
+  start: '2021-12-02T14:00:00Z'
+  style:
+    background:
+      colors:
+      - '#ffcc00ff'
+      - '#ffbf00ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Hosted by Harry & Lydia
+  title: Pokemon Tournament
+  vods: []
+- creators:
+  - lewis
+  - spiff
+  duration_hours: 3.0
+  end: '2021-12-02T20:00:00Z'
+  start: '2021-12-02T17:00:00Z'
+  style:
+    background:
+      colors:
+      - '#ffbf00ff'
+      - '#ffb300ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Oh No
+  title: Spiff & RT break Minecraft
+  vods:
+  - label: Youtube Vod
+    link: https://www.youtube.com/watch?v=bBKecF7riQ4
+    type: youtube
+- creators:
+  - zylus
+  - nilesy
+  - rythian
+  duration_hours: 3.0
+  end: '2021-12-02T14:00:00Z'
+  start: '2021-12-02T11:00:00Z'
+  style:
+    background:
+      colors:
+      - '#ffb300ff'
+      - '#ffa600ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Nilesy, Zylus & Rythian
+  title: Protessional Stream
+  vods: []

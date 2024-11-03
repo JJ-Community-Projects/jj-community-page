@@ -1,0 +1,109 @@
+date: '2023-12-08'
+streams:
+- creators:
+  - duncan
+  - osie
+  duration_hours: 3.0
+  end: '2023-12-08T14:00:00Z'
+  start: '2023-12-08T11:00:00Z'
+  style:
+    background:
+      colors:
+      - '#00bbe0ff'
+      - '#009fd4ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Duncan & Osie
+  title: Creature Collector
+  vods:
+  - label: Twitch Vod
+    link: https://www.twitch.tv/videos/1998414316?t=0h10m51s
+    type: twitch
+- creators:
+  - ravs
+  - boba
+  - harry
+  - shadowatnoon
+  - martyn
+  - duncan
+  - kirsty
+  - osie
+  - sarah
+  duration_hours: 3.0
+  end: '2023-12-08T17:00:00Z'
+  start: '2023-12-08T14:00:00Z'
+  style:
+    background:
+      colors:
+      - '#009fd4ff'
+      - '#0081c7ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Minecraft Tournament
+  title: MCC Island Bingo
+  vods:
+  - label: Twitch Vod
+    link: https://www.twitch.tv/videos/1998414316?t=3h12m37s
+    type: twitch
+  - label: Youtube Vod
+    link: https://www.youtube.com/watch?v=W5XIwzFcCSs
+    type: youtube
+  - label: Seapeekay
+    link: https://www.twitch.tv/seapeekay
+    type: twitch
+  - label: Krtzyy
+    link: https://www.twitch.tv/krtzyy
+    type: twitch
+  - label: soupforeloise
+    link: https://www.twitch.tv/soupforeloise
+    type: twitch
+  - label: OwengeJuiceTV
+    link: https://www.twitch.tv/OwengeJuiceTV
+    type: twitch
+- creators:
+  - lydia
+  - ravs
+  - lolipopgi
+  - breeh
+  - mango
+  - briony
+  - joe
+  - sherlock_hulmes
+  - rtgame
+  - zylus
+  - daf
+  - osie
+  - sarah
+  duration_hours: 4.0
+  end: '2023-12-08T21:00:00Z'
+  start: '2023-12-08T17:00:00Z'
+  style:
+    background:
+      colors:
+      - '#0081c7ff'
+      - '#0069baff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Modded Karaoke
+  title: Maraoke
+  vods:
+  - label: Youtube Vod
+    link: https://www.youtube.com/watch?v=Oli6lNT6c2c
+    type: youtube
+- creators: []
+  duration_hours: 2.0
+  end: '2023-12-08T23:00:00Z'
+  start: '2023-12-08T21:00:00Z'
+  style:
+    background:
+      colors:
+      - '#0069baff'
+      - '#0054adff'
+      orientation: TD
+    tileSize: 1
+  subtitle: ''
+  title: The Longest Johns
+  vods:
+  - label: Youtube Vod
+    link: https://www.youtube.com/watch?v=cbadO23fO4Y
+    type: youtube

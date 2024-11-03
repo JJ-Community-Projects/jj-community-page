@@ -1,0 +1,50 @@
+date: '2020-12-07'
+streams:
+- duration_hours: 3.0
+  end: '2020-12-07T14:00:00Z'
+  start: '2020-12-07T11:00:00Z'
+  style:
+    background:
+      colors:
+      - '#ffa600ff'
+      - '#ff7b00ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Pflax & Sips
+  title: Stocking Stuffers
+  vods:
+  - label: Youtube Vod
+    link: https://www.youtube.com/watch?v=NTiwrlznNoI&list=PLvSp-8FGBzxlj-m9I9Zm1TTNMRCnnmWqd&index=19&pp=iAQB
+    type: youtube
+- duration_hours: 3.0
+  end: '2020-12-07T17:00:00Z'
+  start: '2020-12-07T14:00:00Z'
+  style:
+    background:
+      colors:
+      - '#ff7b00ff'
+      - '#ff5500ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Briony & Bekki
+  title: Stocking Stuffers
+  vods:
+  - label: Youtube Vod
+    link: https://www.youtube.com/watch?v=4BPzCKGxqZM&list=PLvSp-8FGBzxlj-m9I9Zm1TTNMRCnnmWqd&index=20&pp=iAQB
+    type: youtube
+- duration_hours: 6.0
+  end: '2020-12-07T23:00:00Z'
+  start: '2020-12-07T17:00:00Z'
+  style:
+    background:
+      colors:
+      - '#ff5500ff'
+      - '#ff2a00ff'
+      orientation: TD
+    tileSize: 2
+  subtitle: Salt & 'Strategy'
+  title: Civ 5
+  vods:
+  - label: Twitch Vod
+    link: https://www.twitch.tv/videos/828847306?t=03h15m52s
+    type: twitch

@@ -1,0 +1,22 @@
+links:
+- name: Twitter
+  type: twitter
+  url: https://twitter.com/MissMousieMouse
+- name: Instagram
+  type: instagram
+  url: http://instagram.com/_mousie_mouse
+- name: Discord
+  type: discord
+  url: https://discord.gg/mousie
+- name: Merch
+  type: merch
+  url: https://store.yogscast.com/collections/mousie
+name: Mousie
+link: https://www.twitch.tv/mousie
+profileImage:
+  large: https://static-cdn.jtvnw.net/jtv_user_pictures/2c3ead1b-d850-4d1d-a274-dcadbaabe17f-profile_image-300x300.png
+  small: https://static-cdn.jtvnw.net/jtv_user_pictures/2c3ead1b-d850-4d1d-a274-dcadbaabe17f-profile_image-70x70.png
+style:
+  accentColor: '#599d3d'
+  primaryColor: '#3098e7'
+twitchUser: mousie

@@ -1,0 +1,12 @@
+links:
+- name: Twitter
+  type: twitter
+  url: https://twitter.com/nanosounds
+name: Kim
+profileImage:
+  large: https://static-cdn.jtvnw.net/jtv_user_pictures/51c2071a-5fdc-44b1-9c7b-c017ea13064e-profile_image-300x300.png
+  small: https://static-cdn.jtvnw.net/jtv_user_pictures/51c2071a-5fdc-44b1-9c7b-c017ea13064e-profile_image-70x70.png
+style:
+  accentColor: '#e1756f'
+  primaryColor: '#cf2322'
+twitchUser: nanokim

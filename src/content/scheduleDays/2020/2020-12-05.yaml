@@ -1,0 +1,66 @@
+date: '2020-12-05'
+streams:
+- duration_hours: 3.0
+  end: '2020-12-05T14:00:00Z'
+  start: '2020-12-05T11:00:00Z'
+  style:
+    background:
+      colors:
+      - '#00e8c5ff'
+      - '#00deb1ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Bouphe & Osie
+  title: Stocking Stuffers
+  vods:
+  - label: Youtube Vod
+    link: https://www.youtube.com/watch?v=FR9LQdU2brc&list=PLvSp-8FGBzxlj-m9I9Zm1TTNMRCnnmWqd&index=13&pp=iAQB
+    type: youtube
+- duration_hours: 3.0
+  end: '2020-12-05T17:00:00Z'
+  start: '2020-12-05T14:00:00Z'
+  style:
+    background:
+      colors:
+      - '#00deb1ff'
+      - '#00d49bff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Tabs Tourny
+  title: Tom Clark's Wheel of Wonder
+  vods:
+  - label: Youtube Vod
+    link: https://www.youtube.com/watch?v=EdXJiVgqxFM&list=PLvSp-8FGBzxlj-m9I9Zm1TTNMRCnnmWqd&index=14&t=5s&pp=iAQB
+    type: youtube
+- duration_hours: 3.0
+  end: '2020-12-05T20:00:00Z'
+  start: '2020-12-05T17:00:00Z'
+  style:
+    background:
+      colors:
+      - '#00d49bff'
+      - '#00c98aff'
+      orientation: TD
+    tileSize: 1
+  subtitle: ''
+  title: MCC
+  vods:
+  - label: Youtube Vod
+    link: https://www.youtube.com/watch?v=eDUcwsVaobE&list=PLvSp-8FGBzxlj-m9I9Zm1TTNMRCnnmWqd&index=15&pp=iAQB
+    type: youtube
+- duration_hours: 3.0
+  end: '2020-12-05T23:00:00Z'
+  start: '2020-12-05T20:00:00Z'
+  style:
+    background:
+      colors:
+      - '#00c98aff'
+      - '#00bf79ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: ''
+  title: Armchair Admirals TD
+  vods:
+  - label: Youtube Vod
+    link: https://www.youtube.com/watch?v=a75El8CUWgU&list=PLvSp-8FGBzxlj-m9I9Zm1TTNMRCnnmWqd&index=16&pp=iAQB
+    type: youtube

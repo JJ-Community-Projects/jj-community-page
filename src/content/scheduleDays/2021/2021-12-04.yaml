@@ -1,0 +1,84 @@
+date: '2021-12-04'
+streams:
+- creators:
+  - ben
+  - tom
+  duration_hours: 3.0
+  end: '2021-12-04T14:00:00Z'
+  start: '2021-12-04T11:00:00Z'
+  style:
+    background:
+      colors:
+      - '#fc7600ff'
+      - '#f76300ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Tom & Ben
+  title: Jerk Off
+  vods:
+  - label: Youtube Vod
+    link: https://www.youtube.com/watch?v=372fr-oiyW8
+    type: youtube
+- creators:
+  - boba
+  - kim
+  - lydia
+  - ravs
+  - zylus
+  duration_hours: 3.0
+  end: '2021-12-04T17:00:00Z'
+  start: '2021-12-04T14:00:00Z'
+  style:
+    background:
+      colors:
+      - '#f76300ff'
+      - '#f25100ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Feat. RT
+  title: Mario Kart Tournament
+  vods:
+  - label: Twitch Vod
+    link: https://www.twitch.tv/videos/1225690370
+    type: twitch
+- creators:
+  - duncan
+  - osie
+  - lewis
+  - pedguin
+  - ravs
+  duration_hours: 3.0
+  end: '2021-12-04T20:00:00Z'
+  start: '2021-12-04T17:00:00Z'
+  style:
+    background:
+      colors:
+      - '#f25100ff'
+      - '#ed3b00ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Lews & Duncan
+  title: Feed a Cow for Christmas
+  vods:
+  - label: Youtube Vod
+    link: https://www.youtube.com/watch?v=3XWdBC7JrrI
+    type: youtube
+- creators:
+  - breeh
+  - rythian
+  duration_hours: 3.0
+  end: '2021-12-04T23:00:00Z'
+  start: '2021-12-04T20:00:00Z'
+  style:
+    background:
+      colors:
+      - '#ed3b00ff'
+      - '#e82b00ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Breeh & Rythian
+  title: Pixel Perfect
+  vods:
+  - label: Youtube Vod
+    link: https://www.youtube.com/watch?v=8Jnrcv5ED94
+    type: youtube

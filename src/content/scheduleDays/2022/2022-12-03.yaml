@@ -1,0 +1,125 @@
+date: '2022-12-03'
+streams:
+- creators:
+  - bouphe
+  - osie
+  duration_hours: 3.0
+  end: '2022-12-03T14:00:00Z'
+  start: '2022-12-03T11:00:00Z'
+  style:
+    background:
+      colors:
+      - '#a7cc00ff'
+      - '#81bd00ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Bouphe & Osie
+  title: Puzzle Sisters
+  vods:
+  - label: Youtube VOD
+    link: https://www.youtube.com/watch?v=H3p3dHKP5Vs&list=PLvSp-8FGBzxk_D9LnE2aoAwKaEjc4ku8j&index=9
+    type: youtube
+  - label: Twitch VOD
+    link: https://www.twitch.tv/videos/1669027004?t=00h39m38s
+    type: twitch
+- creators:
+  - briony
+  - kirsty
+  duration_hours: 3.0
+  end: '2022-12-03T17:00:00Z'
+  start: '2022-12-03T14:00:00Z'
+  style:
+    background:
+      colors:
+      - '#81bd00ff'
+      - '#62ad00ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Briony & Kirsty
+  title: Cute Corner
+  vods:
+  - label: Youtube VOD
+    link: https://www.youtube.com/watch?v=NtlEUNbgArA&list=PLvSp-8FGBzxk_D9LnE2aoAwKaEjc4ku8j&index=12
+    type: youtube
+  - label: Twitch VOD
+    link: https://www.twitch.tv/videos/1669027004?t=03h38m00s
+    type: twitch
+- creators:
+  - gee
+  - harry
+  - simon
+  - tom
+  duration_hours: 3.0
+  end: '2022-12-03T20:00:00Z'
+  start: '2022-12-03T17:00:00Z'
+  style:
+    background:
+      colors:
+      - '#62ad00ff'
+      - '#479e00ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Simon Tom Harry Gee
+  title: Simon's Important Videos
+  vods:
+  - label: Youtube VOD
+    link: https://www.youtube.com/watch?v=ZJlJYUlu4SE&list=PLvSp-8FGBzxk_D9LnE2aoAwKaEjc4ku8j&index=19
+    type: youtube
+  - label: Twitch VOD
+    link: https://www.twitch.tv/videos/1669027004?t=06h37m19s
+    type: twitch
+- creators:
+  - harry
+  - shadowatnoon
+  - ravs
+  - simon
+  - osie
+  - briony
+  - lolipopgi
+  - ben
+  - duncan
+  - mango
+  - gee
+  - kirsty
+  - lewis
+  duration_hours: 3.0
+  end: '2022-12-03T23:00:00Z'
+  start: '2022-12-03T20:00:00Z'
+  style:
+    background:
+      colors:
+      - '#479e00ff'
+      - '#308f00ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Hosted by Harry & Shadow
+  title: Minecraft Bingo
+  vods:
+  - label: Youtube VOD (Simon POV)
+    link: https://www.youtube.com/watch?v=uRsJ3zdfjsw&list=PLvSp-8FGBzxk_D9LnE2aoAwKaEjc4ku8j&index=15
+    type: youtube
+  - label: Twitch VOD
+    link: https://www.twitch.tv/videos/1669423253
+    type: twitch
+- creators:
+  - ravs
+  - pedguin
+  duration_hours: 3.0
+  end: '2022-12-04T02:00:00Z'
+  start: '2022-12-03T23:00:00Z'
+  style:
+    background:
+      colors:
+      - '#308f00ff'
+      - '#1c8000ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Pedguin & Ravs
+  title: Jingleathon
+  vods:
+  - label: Youtube VOD
+    link: https://www.youtube.com/watch?v=zel6l9-bmrk&list=PLvSp-8FGBzxk_D9LnE2aoAwKaEjc4ku8j&index=16
+    type: youtube
+  - label: Twitch VOD
+    link: https://www.twitch.tv/videos/1669608016
+    type: twitch

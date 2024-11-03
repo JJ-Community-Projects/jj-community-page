@@ -1,0 +1,22 @@
+links:
+- name: Twitter
+  type: twitter
+  url: https://twitter.com/Korsty_
+- name: Instagram
+  type: instagram
+  url: https://www.instagram.com/korsty_/
+- name: Discord
+  type: discord
+  url: https://discord.com/invite/tabu
+- name: Merch
+  type: merch
+  url: https://kirsty-shop.fourthwall.com/
+name: Kirsty
+link: https://www.twitch.tv/kirsty
+profileImage:
+  large: https://static-cdn.jtvnw.net/jtv_user_pictures/cf380da9-8a5b-4b2c-bedf-9bc2e19f59ed-profile_image-300x300.png
+  small: https://static-cdn.jtvnw.net/jtv_user_pictures/cf380da9-8a5b-4b2c-bedf-9bc2e19f59ed-profile_image-70x70.png
+style:
+  accentColor: '#573f86'
+  primaryColor: '#fee4ff'
+twitchUser: kirsty

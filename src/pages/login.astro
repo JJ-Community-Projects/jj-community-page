@@ -1,0 +1,19 @@
+---
+import BaseLayout from "#layouts/BaseLayout.astro";
+const user = Astro.locals['user'];
+console.log('user', user)
+if (user) {
+  Astro.redirect('/profile')
+}
+---
+<BaseLayout>
+    <p class="text-white text-4xl">Login</p>
+  {!user && (
+
+          <a
+                  href="/api/auth/tiltify"
+                  class="bg-primary-300 text-white p-2 rounded">
+              Login With Tiltify
+          </a>
+  )}
+</BaseLayout>

@@ -1,0 +1,185 @@
+---
+import Navigation from '#components/navigation/Navigation.astro';
+import Footer from "../components/footer/Footer.astro";
+
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {title, description} = Astro.props;
+const t = title || 'Jingle Jam Community';
+---
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="description" content=`${description || ''}`/>
+    <meta name="viewport" content="width=device-width"/>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
+    <meta name="generator" content={Astro.generator}/>
+    <title>{t}</title>
+</head>
+<!--
+<body class="font-poppins from-primary-shade via-primary to-primary-shade bg-gradient-to-b h-screen overflow-hidden">
+<div class="flex flex-col justify-start items-center overflow-y-scroll h-[1000px]">
+    <Image class="p-4" src={jj_image} alt="" height="100"/>
+    <Navigation/>
+    <slot/>
+</div>
+</body>-->
+
+<body class="h-screen overflow-hidden font-poppins from-primary-shade via-primary to-primary-shade bg-gradient-to-b">
+<div class="h-full overflow-y-auto p-2">
+    <div class="flex flex-col justify-start min-h-screen">
+        <Navigation/>
+        <div class="mt-4 mx-4 xl:mx-20 flex flex-col justify-start items-center">
+            <slot/>
+        </div>
+    </div>
+    <Footer/>
+</div>
+</body>
+</html>
+<style>
+
+</style>
+
+<style is:global>
+    @font-face {
+        font-family: 'Bebas';
+        src: url('../fonts/BebasNeues/BebasNeue-Regular.ttf');
+        font-style: normal;
+        font-weight: 400;
+    }
+
+    @font-face {
+        font-family: 'Poppins';
+        src: url('../fonts/Poppins/Poppins-Bold.ttf');
+        font-style: normal;
+        font-weight: 700;
+    }
+
+    @font-face {
+        font-family: 'Poppins';
+        src: url('../fonts/Poppins/Poppins-BoldItalic.ttf');
+        font-style: italic;
+        font-weight: 700;
+    }
+
+    @font-face {
+        font-family: 'Poppins';
+        src: url('../fonts/Poppins/Poppins-ExtraBold.ttf');
+        font-style: normal;
+        font-weight: 800;
+    }
+
+    @font-face {
+        font-family: 'Poppins';
+        src: url('../fonts/Poppins/Poppins-ExtraBoldItalic.ttf');
+        font-style: italic;
+        font-weight: 800;
+    }
+
+    @font-face {
+        font-family: 'Poppins';
+        src: url('../fonts/Poppins/Poppins-ExtraLight.ttf');
+        font-style: normal;
+        font-weight: 300;
+    }
+
+    @font-face {
+        font-family: 'Poppins';
+        src: url('../fonts/Poppins/Poppins-ExtraLightItalic.ttf');
+        font-style: italic;
+        font-weight: 300;
+    }
+
+    @font-face {
+        font-family: 'Poppins';
+        src: url('../fonts/Poppins/Poppins-Italic.ttf');
+        font-style: italic;
+        font-weight: 400;
+    }
+
+    @font-face {
+        font-family: 'Poppins';
+        src: url('../fonts/Poppins/Poppins-Light.ttf');
+        font-style: normal;
+        font-weight: 300;
+    }
+
+    @font-face {
+        font-family: 'Poppins';
+        src: url('../fonts/Poppins/Poppins-LightItalic.ttf');
+        font-style: italic;
+        font-weight: 300;
+    }
+
+    @font-face {
+        font-family: 'Poppins';
+        src: url('../fonts/Poppins/Poppins-Medium.ttf');
+        font-style: normal;
+        font-weight: 500;
+    }
+
+    @font-face {
+        font-family: 'Poppins';
+        src: url('../fonts/Poppins/Poppins-MediumItalic.ttf');
+        font-style: italic;
+        font-weight: 500;
+    }
+
+    @font-face {
+        font-family: 'Poppins';
+        src: url('../fonts/Poppins/Poppins-Regular.ttf');
+        font-style: normal;
+        font-weight: 400;
+    }
+
+    @font-face {
+        font-family: 'Poppins';
+        src: url('../fonts/Poppins/Poppins-SemiBold.ttf');
+        font-style: normal;
+        font-weight: 700;
+    }
+
+    @font-face {
+        font-family: 'Poppins';
+        src: url('../fonts/Poppins/Poppins-SemiBoldItalic.ttf');
+        font-style: italic;
+        font-weight: 700;
+    }
+
+    @font-face {
+        font-family: 'Poppins';
+        src: url('../fonts/Poppins/Poppins-Thin.ttf');
+        font-style: normal;
+        font-weight: 100;
+    }
+
+    @font-face {
+        font-family: 'Poppins';
+        src: url('../fonts/Poppins/Poppins-ThinItalic.ttf');
+        font-style: italic;
+        font-weight: 100;
+    }
+
+    @font-face {
+        font-family: 'Poppins';
+        src: url('../fonts/Poppins/Poppins-Black.ttf');
+        font-style: normal;
+        font-weight: 900;
+    }
+
+    @font-face {
+        font-family: 'Poppins';
+        src: url('../fonts/Poppins/Poppins-BlackItalic.ttf');
+        font-style: italic;
+        font-weight: 900;
+    }
+
+    body {
+        font-family: 'Poppins', sans-serif;
+    }
+</style>

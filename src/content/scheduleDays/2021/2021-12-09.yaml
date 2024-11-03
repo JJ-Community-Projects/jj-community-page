@@ -1,0 +1,77 @@
+date: '2021-12-09'
+streams:
+- creators:
+  - breeh
+  - briony
+  duration_hours: 3.0
+  end: '2021-12-09T14:00:00Z'
+  start: '2021-12-09T11:00:00Z'
+  style:
+    background:
+      colors:
+      - '#ffd900ff'
+      - '#ffcc00ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Briony & Breeh
+  title: Good Vibes
+  vods:
+  - label: Youtube Vod
+    link: https://www.youtube.com/watch?v=4CLPdB_6S68
+    type: youtube
+- creators:
+  - hat_films
+  - lewis
+  duration_hours: 3.0
+  end: '2021-12-09T17:00:00Z'
+  start: '2021-12-09T14:00:00Z'
+  style:
+    background:
+      colors:
+      - '#ffcc00ff'
+      - '#ffbf00ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Feat Lewis
+  title: Hat Films Art Stream
+  vods:
+  - label: Hat Films Highlights
+    link: https://www.youtube.com/watch?v=CHbb2B_zL-o
+    type: youtube
+- creators:
+  - gee
+  - simon
+  duration_hours: 3.0
+  end: '2021-12-09T20:00:00Z'
+  start: '2021-12-09T17:00:00Z'
+  style:
+    background:
+      colors:
+      - '#ffbf00ff'
+      - '#ffb300ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Simon & Gee
+  title: Cursedcraft
+  vods:
+  - label: Youtube Vod
+    link: https://www.youtube.com/watch?v=RmUdEhLe5Mk
+    type: youtube
+- creators:
+  - boba
+  - duncan
+  - ravs
+  - pedguin
+  duration_hours: 3.0
+  end: '2021-12-09T23:00:00Z'
+  start: '2021-12-09T20:00:00Z'
+  style:
+    background:
+      colors:
+      - '#ffb300ff'
+      - '#ffa600ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Duncan Ravs Pedguin Boba
+  title: Pub Pals in Space
+  vods: []

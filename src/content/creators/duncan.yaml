@@ -1,0 +1,16 @@
+links:
+- name: Twitter
+  type: twitter
+  url: https://twitter.com/YogscastLalna
+- name: Merch
+  type: merch
+  url: https://store.yogscast.com/collections/duncan
+name: Duncan
+link: https://www.twitch.tv/lalna
+profileImage:
+  large: https://yt3.ggpht.com/ytc/AKedOLSSkihLxQXMkVZwLqvr_lyOVT05Q9hmozRCgvCDHA=s800-c-k-c0xffffffff-no-rj-mo
+  small: https://yt3.ggpht.com/ytc/AKedOLSSkihLxQXMkVZwLqvr_lyOVT05Q9hmozRCgvCDHA=s88-c-k-c0xffffffff-no-rj-mo
+style:
+  accentColor: '#ecbe53'
+  primaryColor: '#60b8e8'
+twitchUser: lalna

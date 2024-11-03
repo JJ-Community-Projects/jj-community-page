@@ -1,0 +1,66 @@
+date: '2020-12-13'
+streams:
+- duration_hours: 3.0
+  end: '2020-12-13T14:00:00Z'
+  start: '2020-12-13T11:00:00Z'
+  style:
+    background:
+      colors:
+      - '#f74accff'
+      - '#ed39b7ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Lewis & Spiff
+  title: Stocking Stuffers
+  vods:
+  - label: Youtube Vod
+    link: https://www.youtube.com/watch?v=Qawhhsg7aI4&list=PLvSp-8FGBzxlj-m9I9Zm1TTNMRCnnmWqd&index=38&pp=iAQB
+    type: youtube
+- duration_hours: 3.0
+  end: '2020-12-13T17:00:00Z'
+  start: '2020-12-13T14:00:00Z'
+  style:
+    background:
+      colors:
+      - '#ed39b7ff'
+      - '#e329a2ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Ped, Ravs Boba & Leo
+  title: Stocking Stuffers
+  vods:
+  - label: Youtube Vod
+    link: https://www.youtube.com/watch?v=f-5kAuQRy98&list=PLvSp-8FGBzxlj-m9I9Zm1TTNMRCnnmWqd&index=39&pp=iAQB
+    type: youtube
+- duration_hours: 3.0
+  end: '2020-12-13T20:00:00Z'
+  start: '2020-12-13T17:00:00Z'
+  style:
+    background:
+      colors:
+      - '#e329a2ff'
+      - '#d91a89ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: ''
+  title: High Rollers Christmas Special
+  vods:
+  - label: Twitch Vod
+    link: https://www.twitch.tv/videos/836155524
+    type: twitch
+- duration_hours: 3.0
+  end: '2020-12-13T23:00:00Z'
+  start: '2020-12-13T20:00:00Z'
+  style:
+    background:
+      colors:
+      - '#d91a89ff'
+      - '#cf0c74ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Ravs, Sips, Gee Rythian & Mark Hulmes
+  title: Sweaty Shooters
+  vods:
+  - label: Youtube Vod
+    link: https://www.youtube.com/watch?v=2dZ9B8uerEk&list=PLvSp-8FGBzxlj-m9I9Zm1TTNMRCnnmWqd&index=40&pp=iAQB
+    type: youtube

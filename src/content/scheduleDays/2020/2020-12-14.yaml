@@ -1,0 +1,66 @@
+date: '2020-12-14'
+streams:
+- duration_hours: 3.0
+  end: '2020-12-14T14:00:00Z'
+  start: '2020-12-14T11:00:00Z'
+  style:
+    background:
+      colors:
+      - '#ffa600ff'
+      - '#ff8400ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Breeh & Ravs
+  title: Stocking Stuffers
+  vods:
+  - label: Youtube Vod
+    link: https://www.youtube.com/watch?v=Z97SJinag2c&list=PLvSp-8FGBzxlj-m9I9Zm1TTNMRCnnmWqd&index=41&pp=iAQB
+    type: youtube
+- duration_hours: 3.0
+  end: '2020-12-14T17:00:00Z'
+  start: '2020-12-14T14:00:00Z'
+  style:
+    background:
+      colors:
+      - '#ff8400ff'
+      - '#ff6600ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Lewis, Tom, Ben & Alex
+  title: Warhammer Painting
+  vods:
+  - label: Youtube Vod
+    link: https://www.youtube.com/watch?v=MaUN100AHIk&list=PLvSp-8FGBzxlj-m9I9Zm1TTNMRCnnmWqd&index=42&pp=iAQB
+    type: youtube
+- duration_hours: 3.0
+  end: '2020-12-14T20:00:00Z'
+  start: '2020-12-14T17:00:00Z'
+  style:
+    background:
+      colors:
+      - '#ff6600ff'
+      - '#ff4400ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Lewis, Simon & Nina
+  title: Fighting Fantasy
+  vods:
+  - label: Youtube Vod
+    link: https://www.youtube.com/watch?v=1yqs-mg0PWw&list=PLvSp-8FGBzxlj-m9I9Zm1TTNMRCnnmWqd&index=43&t=3s&pp=iAQB
+    type: youtube
+- duration_hours: 3.0
+  end: '2020-12-14T23:00:00Z'
+  start: '2020-12-14T20:00:00Z'
+  style:
+    background:
+      colors:
+      - '#ff4400ff'
+      - '#ff2200ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Nilsey, Zylus & Friends
+  title: Late Late Show
+  vods:
+  - label: Youtube Vod
+    link: https://www.youtube.com/watch?v=C0s6e_Gg70M&list=PLvSp-8FGBzxlj-m9I9Zm1TTNMRCnnmWqd&index=44&pp=iAQB
+    type: youtube

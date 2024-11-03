@@ -1,0 +1,15 @@
+links:
+- name: Twitter
+  type: twitter
+  url: https://twitter.com/yogtok_
+- name: Tiktok
+  type: tiktok
+  url: https://www.tiktok.com/@yogtok
+name: Sarah
+type: staff
+profileImage:
+  large: https://static-cdn.jtvnw.net/jtv_user_pictures/1379b8af-4a95-4123-a2ed-05afcad0ae8e-profile_image-300x300.png
+  small: https://static-cdn.jtvnw.net/jtv_user_pictures/1379b8af-4a95-4123-a2ed-05afcad0ae8e-profile_image-70x70.png
+style:
+  accentColor: '#48aa93'
+  primaryColor: '#be4694'

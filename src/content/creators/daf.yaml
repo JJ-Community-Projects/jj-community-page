@@ -1,0 +1,14 @@
+links:
+- name: Twitter
+  type: twitter
+  url: https://twitter.com/DafnotDaff
+name: Daf
+link: https://www.twitch.tv/dafnotdaff
+type: staff
+profileImage:
+  large: https://static-cdn.jtvnw.net/jtv_user_pictures/9418c67f-1988-401c-8855-4a232e307bdc-profile_image-300x300.png
+  small: https://static-cdn.jtvnw.net/jtv_user_pictures/9418c67f-1988-401c-8855-4a232e307bdc-profile_image-70x70.png
+style:
+  accentColor: '#0e567b'
+  primaryColor: '#12a4e0'
+twitchUser: dafnotdaff

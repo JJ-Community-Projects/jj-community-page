@@ -1,0 +1,34 @@
+date: '2020-12-02'
+streams:
+- duration_hours: 9.0
+  end: '2020-12-02T20:00:00Z'
+  start: '2020-12-02T11:00:00Z'
+  style:
+    background:
+      colors:
+      - '#ffd900ff'
+      - '#ffae00ff'
+      orientation: TD
+    tileSize: 3
+  subtitle: ''
+  title: Christmas Colony
+  vods:
+  - label: Youtube Vod
+    link: https://www.youtube.com/watch?v=RrdRanAPe78&list=PLvSp-8FGBzxlj-m9I9Zm1TTNMRCnnmWqd&index=5&t=3s&pp=iAQB
+    type: youtube
+- duration_hours: 3.0
+  end: '2020-12-02T23:00:00Z'
+  start: '2020-12-02T20:00:00Z'
+  style:
+    background:
+      colors:
+      - '#ffa600ff'
+      - '#ff9d00ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: 'Zylus & Mousie '
+  title: Jackbox
+  vods:
+  - label: Youtube Vod
+    link: https://www.youtube.com/watch?v=1FxokLqutng&list=PLvSp-8FGBzxlj-m9I9Zm1TTNMRCnnmWqd&index=6&t=2s&pp=iAQB
+    type: youtube

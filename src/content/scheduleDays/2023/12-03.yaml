@@ -1,0 +1,94 @@
+date: '2023-12-03'
+streams:
+- creators:
+  - bouphe
+  - boba
+  - gee
+  duration_hours: 3.0
+  end: '2023-12-03T14:00:00Z'
+  start: '2023-12-03T11:00:00Z'
+  style:
+    background:
+      colors:
+      - '#a7cc00ff'
+      - '#81bd00ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Bouphe Boba Gee
+  title: Scream Queens
+  vods:
+  - label: Twitch Vod
+    link: https://www.twitch.tv/videos/1993995199?t=0h17m2s
+    type: twitch
+- creators:
+  - lewis
+  - tom
+  - lydia
+  - ravs
+  - bouphe
+  - osie
+  duration_hours: 3.0
+  end: '2023-12-03T17:00:00Z'
+  start: '2023-12-03T14:00:00Z'
+  style:
+    background:
+      colors:
+      - '#81bd00ff'
+      - '#62ad00ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Tom & Wheelboy
+  title: Tabs
+  vods:
+  - label: Twitch Vod
+    link: https://www.twitch.tv/videos/1993995199?t=3h11m4s
+    type: twitch
+  - label: Youtube Vod
+    link: https://www.youtube.com/watch?v=NLm5J5Q5Xow
+    type: youtube
+- creators:
+  - gee
+  - simon
+  - bouphe
+  duration_hours: 3.0
+  end: '2023-12-03T20:00:00Z'
+  start: '2023-12-03T17:00:00Z'
+  style:
+    background:
+      colors:
+      - '#62ad00ff'
+      - '#479e00ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Gee & Simon
+  title: Cursedcraft
+  vods:
+  - label: Twitch Vod
+    link: https://www.twitch.tv/videos/1993995199?t=6h18m17s
+    type: twitch
+  - label: Youtube Vod
+    link: https://www.youtube.com/watch?v=aW9vnhmSbC8
+    type: youtube
+- creators:
+  - briony
+  - kirsty
+  - rythian
+  duration_hours: 3.0
+  end: '2023-12-03T23:00:00Z'
+  start: '2023-12-03T20:00:00Z'
+  style:
+    background:
+      colors:
+      - '#479e00ff'
+      - '#308f00ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Rythian Kirsty & Briony
+  title: Kirbycraft Christmas
+  vods:
+  - label: Twitch Vod
+    link: https://www.twitch.tv/videos/1993995199?t=9h12m34s
+    type: twitch
+  - label: Youtube Vod
+    link: https://www.youtube.com/watch?v=zrEcQ4HSJsQ
+    type: youtube

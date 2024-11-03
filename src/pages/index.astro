@@ -1,0 +1,53 @@
+---
+import {Countdown} from "../components/Countdown";
+const prerender = true
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+<BaseLayout>
+    <div class="flex flex-col justify-center items-center text-white p-2">
+        <p class="text-4xl">The Jingle Jam Community</p>
+        <p class="text-2xl">A central place to showcase the streams of the Jingle Jam!</p>
+    </div>
+    <Countdown client:load/>
+
+    <div class="flex flex-col gap-4 pt-4">
+
+        <div class="text-white flex flex-col gap-2">
+            <p class="text-xl">How does it work</p>
+            <div>
+                <p>jinglejam.ostof.dev uses mostly publicly available information</p>
+                <p>and combines them so people have an easier time to find streamer.</p>
+                <p>In the past this only included the streaming schedule of the Yogscast and links to their socials and
+                    channels.</p>
+            </div>
+            <div>
+                <p><b>Last year</b>, with the help of <a href=""
+                                                         class="cursor-pointer underline hover:text-accent-50 transition-all">No1mann</a>
+                    we added:</p>
+                <ul class="list-disc">
+                    <li>
+                        A list of all registered Jingle Jam Fundraiser from Tiltify
+                    </li>
+                    <li>
+                        A list of all currently live Twitch Channels
+                    </li>
+                    <li>
+                        Up to date donation amounts
+                    </li>
+                </ul>
+            </div>
+
+            <div>
+                <p><b>This year</b>, due to personal reasons we had to change plans and focus more on internal updates</p>
+                <p>which will help to make it easier and cheaper to maintain this project</p>
+            </div>
+
+            <div>
+                <p>All this data is also available in the in the <a href="/twitch-extension"
+                                                                    class="cursor-pointer underline hover:text-accent-50 transition-all">Jingle
+                    Jam Community Twitch Extension</a></p>
+            </div>
+        </div>
+    </div>
+
+</BaseLayout>

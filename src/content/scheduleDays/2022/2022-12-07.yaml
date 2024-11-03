@@ -1,0 +1,105 @@
+date: '2022-12-07'
+streams:
+- creators:
+  - daf
+  - lewis
+  - joe
+  - pyrion
+  - sips
+  - briony
+  - rythian
+  - breeh
+  - zylus
+  - boba
+  - duncan
+  - harry
+  - mousie
+  - ravs
+  duration_hours: 3.0
+  end: '2022-12-07T14:00:00Z'
+  start: '2022-12-07T11:00:00Z'
+  style:
+    background:
+      colors:
+      - '#ffa600ff'
+      - '#ff8400ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Lewis Sips Joe Daf & Pyrion
+  title: Scrub Dota inhouse
+  vods:
+  - label: Youtube VOD
+    link: https://www.youtube.com/watch?v=88mixSmwbhw&list=PLvSp-8FGBzxk_D9LnE2aoAwKaEjc4ku8j&index=35
+    type: youtube
+  - label: Twitch Vod
+    link: https://www.twitch.tv/videos/1672594289?t=00h35m28s
+    type: twitch
+- creators:
+  - gee
+  - simon
+  duration_hours: 3.0
+  end: '2022-12-07T17:00:00Z'
+  start: '2022-12-07T14:00:00Z'
+  style:
+    background:
+      colors:
+      - '#ff8400ff'
+      - '#ff6600ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Simon & Gee
+  title: Cursedcraft
+  vods:
+  - label: Youtube VOD
+    link: https://www.youtube.com/watch?v=hNUJvBMJKBY&list=PLvSp-8FGBzxk_D9LnE2aoAwKaEjc4ku8j&index=34
+    type: youtube
+  - label: Twitch VOD
+    link: https://www.twitch.tv/videos/1672594289?t=03h42m21s
+    type: twitch
+- creators:
+  - duncan
+  - lewis
+  - ravs
+  - osie
+  duration_hours: 3.0
+  end: '2022-12-07T20:00:00Z'
+  start: '2022-12-07T17:00:00Z'
+  style:
+    background:
+      colors:
+      - '#ff6600ff'
+      - '#ff4400ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Farming sim
+  title: Feed a cow for christmas
+  vods:
+  - label: Twitch VOD
+    link: https://www.twitch.tv/videos/1672594289?t=06h42m01s
+    type: twitch
+- creators:
+  - fionn
+  - zoey
+  duration_hours: 3.0
+  end: '2022-12-07T23:00:00Z'
+  start: '2022-12-07T20:00:00Z'
+  style:
+    background:
+      colors:
+      - '#ffb1b0ff'
+      - '#ffdfbeff'
+      - '#ffffbfff'
+      - '#b4f0a7ff'
+      - '#a9d1f7ff'
+      - '#cc99ffff'
+      orientation: TD
+    tileSize: 1
+  subtitle: ''
+  title: Fizone After Dark
+  vods:
+  - label: Youtube VOD
+    link: https://www.youtube.com/watch?v=u4PJpFRkapM&list=PLvSp-8FGBzxk_D9LnE2aoAwKaEjc4ku8j&index=36
+    type: youtube
+  - label: Twitch VOD
+    link: https://www.twitch.tv/videos/1672938764
+    type: twitch

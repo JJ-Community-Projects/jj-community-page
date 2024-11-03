@@ -1,0 +1,25 @@
+links:
+- name: Twitter
+  type: twitter
+  url: https://twitter.com/inthelittlewood
+- name: Tiktok
+  type: tiktok
+  url: https://www.tiktok.com/@inthelittlewood
+- name: Instagram
+  type: instagram
+  url: https://www.instagram.com/inthelittlewoods/
+- name: Discord
+  type: discord
+  url: https://discord.gg/53BsHXGXc8
+- name: Merch
+  type: merch
+  url: https://store.yogscast.com/collections/martyn
+name: Martyn
+link: https://www.twitch.tv/inthelittlewood
+profileImage:
+  large: https://static-cdn.jtvnw.net/jtv_user_pictures/5c2bddb9-11e6-4ee4-8025-abc565891340-profile_image-300x300.png
+  small: https://static-cdn.jtvnw.net/jtv_user_pictures/5c2bddb9-11e6-4ee4-8025-abc565891340-profile_image-70x70.png
+style:
+  accentColor: '#42622a'
+  primaryColor: '#70c028'
+twitchUser: inthelittlewood

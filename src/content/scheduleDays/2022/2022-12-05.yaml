@@ -1,0 +1,76 @@
+date: '2022-12-05'
+streams:
+- creators:
+  - mousie
+  - zylus
+  duration_hours: 3.0
+  end: '2022-12-05T14:00:00Z'
+  start: '2022-12-05T11:00:00Z'
+  style:
+    background:
+      colors:
+      - '#00e8c5ff'
+      - '#00dbacff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Zylus & Mousie
+  title: Co-op Mayham
+  vods:
+  - label: Youtube VOD
+    link: https://www.youtube.com/watch?v=wVEiMeC39Ww&list=PLvSp-8FGBzxk_D9LnE2aoAwKaEjc4ku8j&index=26
+    type: youtube
+  - label: Twitch VOD
+    link: https://www.twitch.tv/videos/1670906792?t=00h36m46s
+    type: twitch
+- creators:
+  - gee
+  - kirsty
+  - lolipopgi
+  - mango
+  duration_hours: 3.0
+  end: '2022-12-05T17:00:00Z'
+  start: '2022-12-05T14:00:00Z'
+  style:
+    background:
+      colors:
+      - '#00dbacff'
+      - '#00cf94ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Gee Lolip Alex Lolies & more
+  title: Cozy Boardgames
+  vods:
+  - label: Youtube VOD
+    link: https://www.youtube.com/watch?v=Rin9zLRlQ3I&list=PLvSp-8FGBzxk_D9LnE2aoAwKaEjc4ku8j&index=27
+    type: youtube
+  - label: Twitch VOD
+    link: https://www.twitch.tv/videos/1670906792?t=03h47m02s
+    type: twitch
+- creators:
+  - ben
+  - duncan
+  - lewis
+  - rythian
+  - spiff
+  - alex_the_rambler
+  - potatomcwhisky
+  - pyrion
+  duration_hours: 6.0
+  end: '2022-12-05T23:00:00Z'
+  start: '2022-12-05T17:00:00Z'
+  style:
+    background:
+      colors:
+      - '#00cf94ff'
+      - '#00c27eff'
+      orientation: TD
+    tileSize: 2
+  subtitle: 'Lewis Duncan Spiff Ben Rythian, Pyrion Alex & Potato '
+  title: 'Civ: Salt & Strategy'
+  vods:
+  - label: Youtube VOD
+    link: https://www.youtube.com/watch?v=mN457FGQwmI&list=PLvSp-8FGBzxk_D9LnE2aoAwKaEjc4ku8j&index=28
+    type: youtube
+  - label: Twitch VOD
+    link: https://www.twitch.tv/videos/1670906792?t=06h37m42s
+    type: twitch

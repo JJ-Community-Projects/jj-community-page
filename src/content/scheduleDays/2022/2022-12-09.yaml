@@ -1,0 +1,102 @@
+date: '2022-12-09'
+streams:
+- creators:
+  - briony
+  - zylus
+  duration_hours: 3.0
+  end: '2022-12-09T14:00:00Z'
+  start: '2022-12-09T11:00:00Z'
+  style:
+    background:
+      colors:
+      - '#ffd900ff'
+      - '#ffcc00ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Briony & Zylus
+  title: Other Worlds
+  vods:
+  - label: Youtube VOD
+    link: https://www.youtube.com/watch?v=WO0Aq7AzMbE&list=PLvSp-8FGBzxk_D9LnE2aoAwKaEjc4ku8j&index=44
+    type: youtube
+  - label: Twitch VOD
+    link: https://www.twitch.tv/videos/1674336277?t=00h37m37s
+    type: twitch
+- creators:
+  - lewis
+  - simon
+  duration_hours: 3.0
+  end: '2022-12-09T17:00:00Z'
+  start: '2022-12-09T14:00:00Z'
+  style:
+    background:
+      colors:
+      - '#ffcc00ff'
+      - '#ffbf00ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Lewis Simon Nina & Jack
+  title: Fighting Fantasy
+  vods:
+  - label: Youtube VOD
+    link: https://www.youtube.com/watch?v=zT4bhzv5DvY&list=PLvSp-8FGBzxk_D9LnE2aoAwKaEjc4ku8j&index=47
+    type: youtube
+  - label: Twitch VOD
+    link: https://www.twitch.tv/videos/1674336277?t=03h46m32s
+    type: twitch
+- creators:
+  - boba
+  - briony
+  - osie
+  duration_hours: 3.0
+  end: '2022-12-09T20:00:00Z'
+  start: '2022-12-09T17:00:00Z'
+  style:
+    background:
+      colors:
+      - '#ffbf00ff'
+      - '#ffb300ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: With AARDMAN
+  title: Scultping the Yogscast
+  vods:
+  - label: Twitch VOD
+    link: https://www.twitch.tv/videos/1674336277?t=06h50m32s
+    type: twitch
+- creators:
+  - duncan
+  - boba
+  - ravs
+  - daltos
+  - zylus
+  - mousie
+  - mango
+  - breeh
+  - kirsty
+  - potatomcwhisky
+  - joe
+  - lolipopgi
+  - lewis
+  - briony
+  - rythian
+  - martyn
+  duration_hours: 3.0
+  end: '2022-12-09T23:00:00Z'
+  start: '2022-12-09T20:00:00Z'
+  style:
+    background:
+      colors:
+      - '#ffb300ff'
+      - '#ffa600ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Hosted by Spiff & Pyrion
+  title: CSGO Scrub Major
+  vods:
+  - label: Youtube VOD
+    link: https://www.youtube.com/watch?v=09Bm3YucugU&list=PLvSp-8FGBzxk_D9LnE2aoAwKaEjc4ku8j&index=48
+    type: youtube
+  - label: Twitch VOD
+    link: https://www.twitch.tv/videos/1674336277?t=09h43m33s
+    type: twitch

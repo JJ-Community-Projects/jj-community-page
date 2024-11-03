@@ -1,0 +1,22 @@
+links:
+- name: Tiktok
+  type: tiktok
+  url: https://www.tiktok.com/@ravstok
+- name: Twitter
+  type: twitter
+  url: https://twitter.com/Ravsy_
+- name: Instagram
+  type: instagram
+  url: https://www.instagram.com/ravsy1/
+- name: Merch
+  type: merch
+  url: https://store.yogscast.com/collections/ravs
+name: Ravs
+link: https://twitch.tv/ravs_
+profileImage:
+  large: https://static-cdn.jtvnw.net/jtv_user_pictures/25ac5f35-34ce-451a-a688-fe0fc9e630eb-profile_image-300x300.png
+  small: https://static-cdn.jtvnw.net/jtv_user_pictures/25ac5f35-34ce-451a-a688-fe0fc9e630eb-profile_image-70x70.png
+style:
+  accentColor: '#2b312f'
+  primaryColor: '#efe700'
+twitchUser: ravs_

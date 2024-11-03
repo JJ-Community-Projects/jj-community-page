@@ -1,0 +1,61 @@
+date: '2022-12-06'
+streams:
+- creators:
+  - lydia
+  - sips
+  duration_hours: 3.0
+  end: '2022-12-06T14:00:00Z'
+  start: '2022-12-06T11:00:00Z'
+  style:
+    background:
+      colors:
+      - '#f74accff'
+      - '#eb36b1ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Sips & Lydia
+  title: Dark Mysteries
+  vods:
+  - label: Youtube VOD
+    link: https://www.youtube.com/watch?v=hS6RizlEJ9E&list=PLvSp-8FGBzxk_D9LnE2aoAwKaEjc4ku8j&index=29
+    type: youtube
+- creators:
+  - lewis
+  - tom
+  - gee
+  - lydia
+  - mousie
+  duration_hours: 3.0
+  end: '2022-12-06T17:00:00Z'
+  start: '2022-12-06T14:00:00Z'
+  style:
+    background:
+      colors:
+      - '#eb36b1ff'
+      - '#de2396ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: The Boy Returns
+  title: Tom & Wheelboy
+  vods:
+  - label: Youtube VOD
+    link: https://www.youtube.com/watch?v=QfOVPEMcpx0&list=PLvSp-8FGBzxk_D9LnE2aoAwKaEjc4ku8j&index=32
+    type: youtube
+- creators:
+  - hat_films
+  duration_hours: 6.0
+  end: '2022-12-06T23:00:00Z'
+  start: '2022-12-06T17:00:00Z'
+  style:
+    background:
+      colors:
+      - '#de2396ff'
+      - '#d1137bff'
+      orientation: TD
+    tileSize: 2
+  subtitle: The boys spend six hours making 'music' for an 'album'
+  title: Hat Films Christmas Album
+  vods:
+  - label: Youtube VOD
+    link: https://www.youtube.com/watch?v=3IOv7i2QOek&list=PLvSp-8FGBzxk_D9LnE2aoAwKaEjc4ku8j&index=33
+    type: youtube

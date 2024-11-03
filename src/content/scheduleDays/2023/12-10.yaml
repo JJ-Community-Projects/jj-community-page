@@ -1,0 +1,95 @@
+date: '2023-12-10'
+streams:
+- creators:
+  - harry
+  - shadowatnoon
+  duration_hours: 3.0
+  end: '2023-12-10T14:00:00Z'
+  start: '2023-12-10T11:00:00Z'
+  style:
+    background:
+      colors:
+      - '#a7cc00ff'
+      - '#74b800ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Harry & Shadow
+  title: Tryhard Games
+  vods:
+  - label: Twitch Vod
+    link: https://www.twitch.tv/videos/2000317468?t=0h2m14s
+    type: twitch
+- creators:
+  - boba
+  - briony
+  - pedguin
+  - sarah
+  duration_hours: 3.0
+  end: '2023-12-10T17:00:00Z'
+  start: '2023-12-10T14:00:00Z'
+  style:
+    background:
+      colors:
+      - '#74b800ff'
+      - '#49a300ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Sarah Briony Boba & Ped
+  title: Pre-Poker Party
+  vods:
+  - label: Twitch Vod
+    link: https://www.twitch.tv/videos/2000317468?t=3h11m5s
+    type: twitch
+  - label: Youtube Vod
+    link: https://www.youtube.com/watch?v=_zsU69UCiiY
+    type: youtube
+- creators:
+  - pyrion
+  - tom
+  - breeh
+  - kirsty
+  - lydia
+  - nilesy
+  - ravs
+  - ben
+  - lewis
+  - lolipopgi
+  - harry
+  - joe
+  - mousie
+  - duncan
+  - osie
+  - mango
+  - zylus
+  - rtgame
+  duration_hours: 6.0
+  end: '2023-12-10T23:00:00Z'
+  start: '2023-12-10T17:00:00Z'
+  style:
+    background:
+      colors:
+      - '#49a300ff'
+      - '#288f00ff'
+      orientation: TD
+    tileSize: 2
+  subtitle: Hosted by Tom & Pyrion
+  title: Massive Poker
+  vods:
+  - label: Twitch Vod 1
+    link: https://www.twitch.tv/videos/2000317468?t=6h40m7s
+    type: twitch
+  - label: Twitch Vod 2
+    link: https://www.twitch.tv/videos/2000779980?t=0h4m58s
+    type: twitch
+  - label: Youtube Vod
+    link: https://www.youtube.com/watch?v=eHxbzA7TIy0
+    type: youtube
+  - label: Digby
+    link: https://www.twitch.tv/digbytathamwarter
+    type: twitch
+  - label: Toastie
+    link: https://www.twitch.tv/toastie
+    type: twitch
+  - label: RTGame
+    link: https://www.twitch.tv/rtgame
+    type: twitch

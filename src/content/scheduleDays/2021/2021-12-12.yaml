@@ -1,0 +1,82 @@
+date: '2021-12-12'
+streams:
+- creators:
+  - lewis
+  - pyrion
+  - sips
+  duration_hours: 3.0
+  end: '2021-12-12T14:00:00Z'
+  start: '2021-12-12T11:00:00Z'
+  style:
+    background:
+      colors:
+      - '#00e8c5ff'
+      - '#00deb1ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Scrub Dota Inhouse
+  title: Triforce Live
+  vods:
+  - label: Twitch Vod
+    link: https://www.twitch.tv/videos/1232263560
+    type: twitch
+- creators:
+  - harry
+  - ravs
+  - simon
+  - tom
+  duration_hours: 3.0
+  end: '2021-12-12T17:00:00Z'
+  start: '2021-12-12T14:00:00Z'
+  style:
+    background:
+      colors:
+      - '#00deb1ff'
+      - '#00d49bff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Hosted by Tom
+  title: Christmas Roleplay
+  vods:
+  - label: Twitch Vod
+    link: https://www.twitch.tv/videos/1232263560
+    type: twitch
+- creators:
+  - kim
+  - hat_films
+  - sherlock_hulmes
+  duration_hours: 3.0
+  end: '2021-12-12T20:00:00Z'
+  start: '2021-12-12T17:00:00Z'
+  style:
+    background:
+      colors:
+      - '#00d49bff'
+      - '#00c98aff'
+      orientation: TD
+    tileSize: 1
+  subtitle: subtitle
+  title: Highrollers Christmas Special
+  vods:
+  - label: Twitch Vod
+    link: https://www.twitch.tv/videos/1232332572
+    type: twitch
+- creators:
+  - spiff
+  - pyrion
+  duration_hours: 3.0
+  end: '2021-12-12T23:00:00Z'
+  start: '2021-12-12T20:00:00Z'
+  style:
+    background:
+      colors:
+      - '#00c98aff'
+      - '#00bf79ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: ''
+  title: Rust Roleplay
+  vods:
+  - label: Youtube Vod
+    link: https://www.youtube.com/watch?v=kWU9nQPo9_Q
+    type: youtube

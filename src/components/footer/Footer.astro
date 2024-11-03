@@ -1,0 +1,23 @@
+---
+
+import About from "./About.astro";
+import {DateTime} from "luxon";
+import Feedback from "./Feedback.astro";
+import Disclaimer from "./Disclaimer.astro";
+
+const date = import.meta.env.VITE_BUILD_DATE
+---
+
+<div class={'my-2 flex flex-col items-center justify-center'}>
+    <div class={'grid grid-cols-1 gap-8 px-4 text-white md:grid-cols-3 md:px-6 md:py-8'}>
+        <About/>
+        <Feedback />
+        <Disclaimer />
+    </div>
+
+    {date &&
+        <p class={'p-2 text-center text-white'}>
+            Website released, {DateTime.fromISO(date.toLocaleString(DateTime.DATETIME_FULL))}
+        </p>
+    }
+</div>

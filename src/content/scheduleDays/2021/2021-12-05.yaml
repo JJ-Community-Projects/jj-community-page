@@ -1,0 +1,65 @@
+date: '2021-12-05'
+streams:
+- creators:
+  - boba
+  - zylus
+  - mousie
+  duration_hours: 3.0
+  end: '2021-12-05T14:00:00Z'
+  start: '2021-12-05T11:00:00Z'
+  style:
+    background:
+      colors:
+      - '#00e8c5ff'
+      - '#00dbacff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Boba, Zylus & Mousie
+  title: Jingle Jam Exclusives
+  vods:
+  - label: Youtube Vod
+    link: https://www.youtube.com/watch?v=2MCqTU-_LR8
+    type: youtube
+- creators:
+  - briony
+  - kirsty
+  - breeh
+  duration_hours: 3.0
+  end: '2021-12-05T17:00:00Z'
+  start: '2021-12-05T14:00:00Z'
+  style:
+    background:
+      colors:
+      - '#00dbacff'
+      - '#00cf94ff'
+      orientation: TD
+    tileSize: 1
+  subtitle: Breeh, Briony & Kirsty
+  title: Christmas Crafts
+  vods:
+  - label: Youtube Vod
+    link: https://www.youtube.com/watch?v=lqQXxusMy3c
+    type: youtube
+- creators:
+  - alex_the_rambler
+  - daltos
+  - duncan
+  - lewis
+  - rythian
+  - spiff
+  duration_hours: 6.0
+  end: '2021-12-05T23:00:00Z'
+  start: '2021-12-05T17:00:00Z'
+  style:
+    background:
+      colors:
+      - '#00cf94ff'
+      - '#00c27eff'
+      orientation: TD
+    tileSize: 2
+  subtitle: Lewis, Duncan, Spiff & MORE
+  title: CIV SALT & STRATEGY
+  vods:
+  - label: Youtube Vod
+    link: https://www.youtube.com/watch?v=Uxsp_NkY020
+    type: youtube

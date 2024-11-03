@@ -1,0 +1,12 @@
+links:
+- name: Twitter
+  type: twitter
+  url: https://twitter.com/JoeHickson_
+name: Joe
+profileImage:
+  large: https://static-cdn.jtvnw.net/jtv_user_pictures/fe57d4c8-1620-4b08-a987-a4c1c795ad8d-profile_image-300x300.png
+  small: https://static-cdn.jtvnw.net/jtv_user_pictures/fe57d4c8-1620-4b08-a987-a4c1c795ad8d-profile_image-70x70.png
+style:
+  accentColor: '#615f5f'
+  primaryColor: '#f88800'
+twitchUser: joehickson

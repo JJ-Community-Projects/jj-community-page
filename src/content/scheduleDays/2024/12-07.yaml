@@ -1,0 +1,145 @@
+date: '2024-12-07'
+streams:
+  - creators:
+      - lewis
+      - sips
+    duration_hours: 3
+    end: '2024-12-07T14:00:00Z'
+    start: '2024-12-07T11:00:00Z'
+    style:
+      background:
+        colors:
+          - '#F9A900'
+          - '#F48C00'
+        orientation: TD
+      tileSize: 1
+    subtitle: Lewis & Sips
+    title: Your Dads
+    vods:
+      - label: Twitch Vod
+        link: https://www.twitch.tv/videos/1997524809?t=0h14m32s
+        type: twitch
+  - creators:
+      - lydia
+      - ravs
+      - shadowatnoon
+      - zylus
+      - martyn
+      - rtgame
+      - duncan
+      - osie
+    duration_hours: 3
+    end: '2024-12-07T17:00:00Z'
+    start: '2024-12-07T14:00:00Z'
+    style:
+      background:
+        colors:
+          - '#F48C00'
+          - '#EE7000'
+        orientation: TD
+      tileSize: 1
+    subtitle: ''
+    title: Mario Kart Mayham
+    vods:
+      - label: Twitch Vod
+        link: https://www.twitch.tv/videos/1997524809?t=3h18m3s
+        type: twitch
+      - label: Youtube Vod
+        link: https://www.youtube.com/watch?v=6J9LmfXaN4g
+        type: youtube
+  - creators:
+      - hat_films
+      - lydia
+      - ravs
+    duration_hours: 3
+    end: '2024-12-07T20:00:00Z'
+    start: '2024-12-07T17:00:00Z'
+    style:
+      background:
+        colors:
+          - '#EE7000'
+          - '#E95300'
+        orientation: TD
+      tileSize: 1
+    subtitle: Hosted by Craig
+    title: Hat Films Gameshow
+    vods:
+      - label: Twitch Vod
+        link: https://www.twitch.tv/videos/1997524809?t=6h25m53s
+        type: twitch
+  - creators:
+      - mousie
+      - nilesy
+      - briony
+      - daltos
+      - breeh
+      - kirsty
+      - rythian
+      - zylus
+    duration_hours: 4
+    end: '2024-12-08T00:00:00Z'
+    start: '2024-12-07T20:00:00Z'
+    style:
+      background:
+        colors:
+          - '#E95300'
+          - '#E33600'
+        orientation: TD
+      tileSize: 1
+    subtitle: Hosted By Mousie
+    title: Dead by Daylight
+    vods:
+      - label: Twitch Vod
+        link: https://www.twitch.tv/videos/1997524809?t=9h40m22s
+        type: twitch
+      - label: Youtube Vod
+        link: https://www.youtube.com/watch?v=_p3W-YxN_8I
+        type: youtube
+      - label: Mousie
+        link: https://www.twitch.tv/mousie
+        type: twitch
+      - label: Breeh
+        link: https://www.twitch.tv/breeh
+        type: twitch
+      - label: Melon
+        link: https://www.twitch.tv/meloncolliee
+        type: twitch
+      - label: Briony
+        link: https://www.twitch.tv/brionykay
+        type: twitch
+      - label: Kirsty
+        link: https://www.twitch.tv/Kirsty
+        type: twitch
+      - label: Nilesy
+        link: https://www.twitch.tv/nilesy
+        type: twitch
+      - label: Bepis
+        link: https://www.twitch.tv/bepis
+        type: twitch
+      - label: Daltos
+        link: https://www.twitch.tv/daltos
+        type: twitch
+      - label: Giddawid
+        link: https://www.twitch.tv/giddawid
+        type: twitch
+      - label: Pasta
+        link: https://www.twitch.tv/pastaroniravioli
+        type: twitch
+      - label: justbeeingsam
+        link: https://www.twitch.tv/justbeeingsam
+        type: twitch
+      - label: Rythian
+        link: https://www.twitch.tv/rythian
+        type: twitch
+      - label: Zylus
+        link: https://www.twitch.tv/zylush
+        type: twitch
+      - label: ImSeanBean
+        link: https://www.twitch.tv/ImSeanBean
+        type: twitch
+      - label: Symmetrikal
+        link: https://www.twitch.tv/symmetrikal
+        type: twitch
+      - label: KessieBear
+        link: https://www.twitch.tv/kessiebear
+        type: twitch

@@ -1,0 +1,19 @@
+links:
+- name: Twitter
+  type: twitter
+  url: https://twitter.com/TheRambler146
+- name: Instagram
+  type: instagram
+  url: https://www.instagram.com/therambler146/
+- name: Patreon
+  type: patreon
+  url: https://www.patreon.com/therambler146
+link: https://www.twitch.tv/therambler14
+name: Alex the Rambler
+profileImage:
+  large: https://yt3.ggpht.com/ytc/AKedOLRprHMxlAKNPs_0cTydVu6ArAroTeohuImsQ-BmZg=s800-c-k-c0xffffffff-no-rj-mo
+  small: https://yt3.ggpht.com/ytc/AKedOLRprHMxlAKNPs_0cTydVu6ArAroTeohuImsQ-BmZg=s88-c-k-c0xffffffff-no-rj-mo
+style:
+  accentColor: '#91a7c4'
+  primaryColor: '#70a760'
+twitchUser: therambler146
