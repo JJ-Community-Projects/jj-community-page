@@ -14,6 +14,11 @@ async function main() {
     console.log(`Current directory: ${process.cwd()}`);
 
     const year = 2024;
+    await update(year);
+}
+
+async function update(year) {
+
     const now = DateTime.now().setZone('Europe/London');
     try {
         const db = admin.firestore();
@@ -150,9 +155,16 @@ function creators(stream) {
             console.log(`No twitch user for ${creatorData.name}`)
         }
 
+        let label = name // twitchUser?.login ?? creatorData.name
+        if (creator === 'lewis') {
+            label = name
+        }
+        const color = creatorData?.style?.primaryColor ?? '#3584BF'
+
         return {
             id: creator,
-            label: name, // twitchUser?.login ?? creatorData.name,
+            label: label,
+            color: color,
             url: twitchUser ? `http://twitch.tv/${twitchUser?.login}` :
                 'http://twitch.tv/yogscast'
         }
