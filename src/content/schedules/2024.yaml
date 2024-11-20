@@ -1,6 +1,6 @@
 title: Yogscast Jingle Jam 2024
 timezone: "Europe/London"
-visible: true
+visible: false
 times:
   - start: 2024-12-01T11:00:00Z
     end: 2024-12-01T14:00:00Z
