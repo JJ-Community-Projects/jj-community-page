@@ -1,6 +1,11 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import {Countdown} from "../../components/Countdown";
+import {Disclaimer} from "../../components/Disclaimer";
 ---
 <BaseLayout>
     <p class="text-white text-4xl">Community</p>
+    <Countdown client:only="solid-js"/>
+    <p class="text-white">Community Fundraisers will be shown shortly after the Collection goes live</p>
+
 </BaseLayout>
