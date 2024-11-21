@@ -28,6 +28,7 @@ const schedule: FullSchedule = await contentScheduleToJs(Astro.props.schedule.da
 
 const creators = await loadAllCreatorsFromContent()
 
+const year = Astro.params.year
 
 ---
 
@@ -116,7 +117,10 @@ const creators = await loadAllCreatorsFromContent()
 </style>
 
 
-<BaseLayout>
+<BaseLayout
+        title={`The Yogscast Jingle Jam Schedule ${year}`}
+        description={`The Yogscast Jingle Jam Schedule ${year}`}
+>
     <!--Show MobileYogsScheduleComponent on mobile screens-->
 
 
