@@ -1,0 +1,18 @@
+---
+import {getCollection} from "astro:content";
+const faqs = await getCollection('faq', (entry) => entry.id.includes('other'))
+
+---
+<div class="flex flex-col justify-center text-white p-2 w-full">
+    <div class="flex flex-col gap-4">
+        {faqs.map(async (faq) => {
+            const{ Content }  = await faq.render();
+            return (
+              <div class="flex flex-col w-full">
+                  <p class="text-lg font-bold">{faq.data.question}</p>
+                  <Content />
+              </div>
+            )
+        })}
+    </div>
+</div>
