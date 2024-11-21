@@ -3,10 +3,13 @@ import {Countdown} from "../components/Countdown";
 const prerender = true
 import BaseLayout from "../layouts/BaseLayout.astro";
 ---
-<BaseLayout>
+<BaseLayout
+  title="Jingle Jam Community"
+  description="A central place to showcase the streams of the Jingle Jam!"
+>
     <div class="flex flex-col justify-center items-center text-white p-2">
-        <p class="text-4xl">The Jingle Jam Community</p>
-        <p class="text-2xl">A central place to showcase the streams of the Jingle Jam!</p>
+        <p class="~text-2xl/4xl w-full text-center">The Jingle Jam Community</p>
+        <p class="~text-xl/2xl text-center">A central place to showcase the streams of the Jingle Jam!</p>
     </div>
     <Countdown client:load/>
 

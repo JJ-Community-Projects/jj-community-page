@@ -1,15 +1,17 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import FeedbackButtons from "../components/footer/FeedbackButtons.astro";
-import screenshot from '#images/extension/screenshot.png';
+import screenshot from '#images/extension/JJCE_Banner.png';
 import ext_stats from '#images/extension/ext_stats.png';
 import {Image} from "astro:assets";
-
 ---
 
-<BaseLayout>
+<BaseLayout
+        title="The Jingle Jam Twitch Extension"
+        description="The Jingle Jam Community Twitch Extension is a Twitch Extension showing the Charities, Community Fundraisers and Yogs schedule"
+>
     <div class={'mx-auto flex flex-col items-center p-1 text-center text-white md:w-[75%]'}>
-        <p class={'p-2 text-2xl font-bold md:text-4xl'}>Jingle Jam Community Twitch Extension</p>
+        <p class={'p-2 ~text-2xl/4xl font-bold'}>Jingle Jam Community Twitch Extension</p>
         <a
                 class={'p-1 text-xl md:p-2 underline hover:text-twitch-100'}
                 href={'https://dashboard.twitch.tv/extensions/7m5fitr4o8raxn6fv59lndv2iy0uuz'}

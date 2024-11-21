@@ -15,9 +15,6 @@ const friends = creators.filter(creator => creator.type === 'friend');
 
 const fallbackSchedule = await loadScheduleFromContent('2024')
 
-
-const headers = Astro.request.headers
-const country = headers.get('CF-IPCountry')
 ---
 <style>
 
@@ -95,8 +92,10 @@ const country = headers.get('CF-IPCountry')
         height: var(--jj-schedule-available-height);
     }
 </style>
-
-<BaseLayout>
+<BaseLayout
+        title="The Yogscast Jingle Jam Schedule 2024"
+        description="The Yogscast Jingle Jam Schedule 2024"
+>
     <div class={'min-h-32'}>
         <CurrentScheduleLoader client:only="solid-js" creators={creators} fallbackSchedule={fallbackSchedule!}/>
     </div>
