@@ -1,7 +1,7 @@
 import fs from "fs";
 import yaml from "js-yaml";
 import {createColorGradient} from "./colorUtil.js";
-
+/*
 const colors = [
     {
         start: '#42bad5',
@@ -30,6 +30,37 @@ const colors = [
     {
         start: '#f9a900',
         end: '#e33600'
+    }
+]
+*/
+const colors = [
+    {
+        start: '#3484bf',
+        end: '#3484bf',
+    },
+    {
+        start: '#fb9900',
+        end: '#fb9900',
+    },
+    {
+        start: '#7aa70c',
+        end: '#7aa70c',
+    },
+    {
+        start: '#dd5501',
+        end: '#dd5501',
+    },
+    {
+        start: '#06b8aa',
+        end: '#06b8aa',
+    },
+    {
+        start: '#d23d99',
+        end: '#d23d99'
+    },
+    {
+        start: '#f07800',
+        end: '#f07800'
     }
 ]
 
