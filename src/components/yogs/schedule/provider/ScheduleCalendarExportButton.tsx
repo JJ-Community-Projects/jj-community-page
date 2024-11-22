@@ -25,12 +25,12 @@ export const CalendarExportButton: Component = () => {
             onclick={modalSignal.open}
           >
             <div class={'flex w-full flex-row items-center justify-around'}>
-              <p>Export</p> <FaRegularCalendar />
+              <p>Export</p> <FaRegularCalendar/>
             </div>
           </button>
         </div>
       </div>
-      <CalendarDialog modalSignal={modalSignal} />
+      <CalendarDialog modalSignal={modalSignal}/>
     </>
   )
 }
@@ -38,16 +38,17 @@ export const CalendarExportButton: Component = () => {
 interface CalendarDialogDialogProps {
   modalSignal: ModalSignal
 }
+
 export const CalendarDialog: Component<CalendarDialogDialogProps> = props => {
-  const { modalSignal } = props
+  const {modalSignal} = props
 
   return (
     <Dialog.Root open={modalSignal.isOpen()} onOpenChange={modalSignal.setOpen}>
       <Dialog.Portal>
-        <Dialog.Overlay class={'fixed inset-0 z-50 bg-black bg-opacity-20'} />
+        <Dialog.Overlay class={'fixed inset-0 z-50 bg-black bg-opacity-20'}/>
         <div class={'fixed inset-0 z-50 flex items-center justify-center'}>
           <Dialog.Content class={'h-full w-full max-w-[500px] p-2 lg:w-[min(calc(100vw_-_16px),_500px)] lg:p-16'}>
-            <CalendarDialogDialogBody onClose={modalSignal.close} />
+            <CalendarDialogDialogBody onClose={modalSignal.close}/>
           </Dialog.Content>
         </div>
       </Dialog.Portal>
@@ -60,18 +61,23 @@ interface CalendarDialogDialogBodyProps {
 }
 
 const CalendarDialogDialogBody: Component<CalendarDialogDialogBodyProps> = props => {
-  const { onClose } = props
+  const {onClose} = props
   const {schedule, streams, days} = useYogsSchedule()
-  const { filteredStreams, isSlotPartOfFilter } = useCreatorFilter()
+  const {filteredStreams, isSlotPartOfFilter} = useCreatorFilter()
   const [selectedSlots, setSelectedSlots] = createSignal<FullStream[]>([])
   const [search, setSearch] = createSignal('')
 
   const download = () => {
     const s = icalString()
-    const start = DateTime.fromJSDate(rangeFromData(schedule.streams).start)
-    downloadFile(`MyJJSchedule${start.year}.ics`, s)
-
+    const range = rangeFromData(schedule.streams)
+    if (range) {
+      const start = DateTime.fromJSDate(range.start)
+      downloadFile(`MyJJSchedule${start.year}.ics`, s)
+    } else {
+      downloadFile(`MyJJSchedule${DateTime.now().year}.ics`, s)
+    }
   }
+
   const downloadFile = (filename: string, text: string) => {
     const element = document.createElement('a')
     element.setAttribute('href', 'data:text/calendar;charset=utf8,' + encodeURIComponent(text))
@@ -97,7 +103,7 @@ const CalendarDialogDialogBody: Component<CalendarDialogDialogBodyProps> = props
   }
 
   const icalString = () => {
-    const calendar = ical({ name: 'My JJ Schedule' })
+    const calendar = ical({name: 'My JJ Schedule'})
     for (const slot of selectedSlots()) {
       const start = DateTime.fromJSDate(slot.start)
       const end = DateTime.fromJSDate(slot.end)
@@ -110,7 +116,7 @@ const CalendarDialogDialogBody: Component<CalendarDialogDialogBodyProps> = props
         alarms: [
           {
             type: ICalAlarmType.display,
-            triggerBefore: start.minus(Duration.fromObject({ minutes: 15 })),
+            triggerBefore: start.minus(Duration.fromObject({minutes: 15})),
           },
         ],
       })
@@ -135,7 +141,7 @@ const CalendarDialogDialogBody: Component<CalendarDialogDialogBodyProps> = props
     <div class={'flex h-full w-full flex-col rounded-3xl bg-white'}>
       <div class={`bg-primary flex h-[72px] items-center justify-center rounded-t-3xl p-2 text-white shadow-xl`}>
         <button onClick={onClose}>
-          <CgClose size={24} class={''} />
+          <CgClose size={24} class={''}/>
         </button>
         <div class={'flex-1'}></div>
         <h3 class={'text-2xl'}>Calendar Export</h3>
@@ -148,7 +154,7 @@ const CalendarDialogDialogBody: Component<CalendarDialogDialogBodyProps> = props
         href={'https://support.google.com/calendar/answer/37118?co=GENIE.Platform%3DDesktop'}
         target={'_blank'}
       >
-        <CgInfo /> How to import an .ics (iCal) file into Google Calendar
+        <CgInfo/> How to import an .ics (iCal) file into Google Calendar
       </a>
       <p class={'px-2 py-2'}>Filtered streams: {filteredStreams().length}</p>
       <p class={'px-2 py-2'}>This list of streams takes the creator filter into account</p>
@@ -173,7 +179,16 @@ const CalendarDialogDialogBody: Component<CalendarDialogDialogBodyProps> = props
       <div class={'flex w-full flex-1 flex-col gap-2 overflow-auto p-2'}>
         <For each={days()}>
           {day => {
-            const start = DateTime.fromJSDate(rangeFromData(day.streams).start)
+
+            const s = () => {
+              const range = rangeFromData(day.streams)
+              if (range) {
+                return DateTime.fromJSDate(range.start)
+              }
+              return DateTime.fromJSDate(day.date)
+            }
+
+            const start = s()
             const slots = day.streams
             const hasSlots = () => slots.some(s => isInSearch(s))
             return (
@@ -202,10 +217,10 @@ const CalendarDialogDialogBody: Component<CalendarDialogDialogBodyProps> = props
                                 </p>
                                 <div class={'text-accent-500'}>
                                   <Show when={includes(slot)}>
-                                    <FaSolidSquareCheck size={24} />
+                                    <FaSolidSquareCheck size={24}/>
                                   </Show>
                                   <Show when={!includes(slot)}>
-                                    <FaRegularSquare size={24} />
+                                    <FaRegularSquare size={24}/>
                                   </Show>
                                 </div>
                               </div>

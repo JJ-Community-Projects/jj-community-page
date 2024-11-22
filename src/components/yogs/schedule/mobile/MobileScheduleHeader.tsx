@@ -25,7 +25,12 @@ const MobileTitle: Component = () => {
   const {schedule, day} = useYogsSchedule()
 
   const start = () => {
-    return rangeFromData(day().streams).start
+    const d = day()
+    const range = rangeFromData(d.streams)
+    if (range) {
+      return range.start
+    }
+    return d.date
   }
 
   return (

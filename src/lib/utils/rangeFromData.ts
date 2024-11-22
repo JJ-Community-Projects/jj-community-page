@@ -1,7 +1,10 @@
 export function rangeFromData(streams: { start: Date, end: Date }[]): {
   start: Date,
   end: Date
-} {
+} | null {
+  if (streams.length === 0) {
+    return null
+  }
   const earliestStreamStart = streams.reduce((earliest, stream) => {
     if (earliest === null) {
       return stream

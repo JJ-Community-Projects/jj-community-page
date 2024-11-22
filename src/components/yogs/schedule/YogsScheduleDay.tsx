@@ -34,12 +34,18 @@ interface ScheduleDayHeaderProps {
 
 const ScheduleDayHeader: Component<ScheduleDayHeaderProps> = props => {
 
-
+  const dateString = () => {
+    const range = rangeFromData(props.day.streams)
+    if (range) {
+      return DateTime.fromJSDate(range.start).toFormat("EEE',' MMM d")
+    }
+    return DateTime.fromJSDate(props.day.date).toFormat("EEE',' MMM d")
+  }
 
   return (
     <div class={'day p-1'}>
       <div class={'w-full h-full bg-white rounded-2xl flex flex-row items-center justify-center'}>
-        <p class={'text-xl xl:text-2xl'}>{DateTime.fromJSDate(rangeFromData(props.day.streams).start).toFormat("EEE',' MMM d")}</p>
+        <p class={'text-xl xl:text-2xl'}>{dateString()}</p>
       </div>
     </div>
   )
