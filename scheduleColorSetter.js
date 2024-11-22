@@ -33,6 +33,7 @@ const colors = [
     }
 ]
 */
+const x = '#378AC8'
 const colors = [
     {
         start: '#3484bf',
@@ -85,8 +86,8 @@ async function main() {
                 // const control = controlG[1]
                 // const gradient2 = createColorGradientFromColor(control, dayData.streams.length)
                 for (let j = 0; j < dayData.streams.length; j++) {
-                    const color = gradient[j]
-                    const color2 = gradient[j + 1]
+                    const color = colors[i].start // gradient[j]
+                    const color2 = colors[i].start // gradient[j + 1]
                     if (!dayData.streams[j].style) {
                         dayData.streams[j].style = {
                             background: {
