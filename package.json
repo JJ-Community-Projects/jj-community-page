@@ -24,6 +24,7 @@
     "@astrojs/solid-js": "^4.4.1",
     "@astrojs/tailwind": "^5.1.0",
     "@kobalte/core": "^0.13.1",
+    "@tailwindcss/container-queries": "^0.1.1",
     "astro": "^4.15.1",
     "astro-zod-to-json-schema": "^0.0.2",
     "firebase": "^10.14.1",
@@ -58,8 +59,8 @@
   },
   "devDependencies": {
     "@types/luxon": "^3.4.2",
+    "fluid-tailwind": "^1.0.3",
     "ts-node": "^10.9.2",
-    "typescript": "^5.6.3",
-    "fluid-tailwind": "^1.0.3"
+    "typescript": "^5.6.3"
   }
 }

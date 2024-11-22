@@ -98,13 +98,13 @@ export const YogsStreamTile: Component<YogsStreamTileProps> = (props) => {
           disabled={!enable()}
           onClick={() => setIsDialogOpen(true)}
         >
-          <div class={'h-full flex flex-col items-center justify-center'}>
-            <p class={'text-sm lg:text-md font-bold tracking-widest uppercase'}>{title}</p>
+          <div class={'@container h-full flex flex-col items-center justify-center w-full'}>
+            <p class={'~text-sm/2xl font-bold tracking-widest uppercase'}>{title}</p>
             <Show when={subtitle}>
-              <p class={'text-xs lg:text-sm tracking-widest uppercase'}>{subtitle}</p>
+              <p class={'~text-xs/md tracking-widest uppercase'}>{subtitle}</p>
             </Show>
             <Show when={showCountdown()}>
-              <p class={'font-mono text-xxs xl:text-xs font-bold lowercase tracking-wide'}>{countdown()}</p>
+              <p class={'font-mono text-xs font-bold lowercase tracking-wide line-clamp-1'}>{countdown()}</p>
             </Show>
             <Show when={!showCountdown() && isLive()}>
               <LivePulseDot/>
