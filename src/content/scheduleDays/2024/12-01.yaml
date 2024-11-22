@@ -7,19 +7,13 @@ streams:
     style:
       background:
         colors:
-          - '#3484BF'
-          - '#3484BF'
+          - '#3484bf'
+          - '#3484bf'
         orientation: TD
       tileSize: 1
     subtitle: Tree Decorating
     title: Office Cam
-    vods:
-      - label: Twitch Vods
-        link: https://www.twitch.tv/videos/1991996876
-        type: twitch
-      - label: Youtube Vod
-        link: https://www.youtube.com/watch?v=MEwMZ1-tRY4
-        type: youtube
+    vods: []
   - creators:
       - ben
       - tom
@@ -29,8 +23,8 @@ streams:
     style:
       background:
         colors:
-          - '#3484BF'
-          - '#3484BF'
+          - '#3484bf'
+          - '#3484bf'
         orientation: TD
       tileSize: 1
     subtitle: Tom & Ben
@@ -45,8 +39,8 @@ streams:
     style:
       background:
         colors:
-          - '#3484BF'
-          - '#3484BF'
+          - '#3484bf'
+          - '#3484bf'
         orientation: TD
       tileSize: 1
     subtitle: Lewis & Simon
@@ -64,8 +58,8 @@ streams:
     style:
       background:
         colors:
-          - '#3484BF'
-          - '#3484BF'
+          - '#3484bf'
+          - '#3484bf'
         orientation: TD
       tileSize: 1
     subtitle: Spiff, Lewis & Friends

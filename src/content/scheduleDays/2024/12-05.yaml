@@ -9,8 +9,8 @@ streams:
     style:
       background:
         colors:
-          - '#06B8AA'
-          - '#06B8AA'
+          - '#06b8aa'
+          - '#06b8aa'
         orientation: TD
       tileSize: 1
     subtitle: Spiff & Lewis
@@ -25,8 +25,8 @@ streams:
     style:
       background:
         colors:
-          - '#06B8AA'
-          - '#06B8AA'
+          - '#06b8aa'
+          - '#06b8aa'
         orientation: TD
       tileSize: 1
     subtitle: Jingle Joust
@@ -47,8 +47,8 @@ streams:
     style:
       background:
         colors:
-          - '#06B8AA'
-          - '#06B8AA'
+          - '#06b8aa'
+          - '#06b8aa'
         orientation: TD
       tileSize: 2
     subtitle: 11th Anniversary

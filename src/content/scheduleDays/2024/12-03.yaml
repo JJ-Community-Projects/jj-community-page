@@ -9,8 +9,8 @@ streams:
     style:
       background:
         colors:
-          - '#7AA70C'
-          - '#7AA70C'
+          - '#7aa70c'
+          - '#7aa70c'
         orientation: TD
       tileSize: 1
     subtitle: Pedguin & Boba
@@ -26,8 +26,8 @@ streams:
     style:
       background:
         colors:
-          - '#7AA70C'
-          - '#7AA70C'
+          - '#7aa70c'
+          - '#7aa70c'
         orientation: TD
       tileSize: 1
     subtitle: Lewis, Duncan & Harry
@@ -41,8 +41,8 @@ streams:
     style:
       background:
         colors:
-          - '#7AA70C'
-          - '#7AA70C'
+          - '#7aa70c'
+          - '#7aa70c'
         orientation: TD
       tileSize: 2
     subtitle: Ross, Smith & Trott

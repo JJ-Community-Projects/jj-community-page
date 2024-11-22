@@ -11,8 +11,8 @@ streams:
     style:
       background:
         colors:
-          - '#D23D99'
-          - '#D23D99'
+          - '#d23d99'
+          - '#d23d99'
         orientation: TD
       tileSize: 1
     subtitle: Ravs, Sips & Pals
@@ -28,8 +28,8 @@ streams:
     style:
       background:
         colors:
-          - '#D23D99'
-          - '#D23D99'
+          - '#d23d99'
+          - '#d23d99'
         orientation: TD
       tileSize: 1
     subtitle: ''
@@ -45,8 +45,8 @@ streams:
     style:
       background:
         colors:
-          - '#D23D99'
-          - '#D23D99'
+          - '#d23d99'
+          - '#d23d99'
         orientation: TD
       tileSize: 1
     subtitle: Simon & Friends
@@ -57,14 +57,15 @@ streams:
       - rtgame
       - lydia
       - ravs
+      - shadowatnoon
     duration_hours: 3
     end: '2024-12-07T00:30:00'
     start: '2024-12-06T21:30:00'
     style:
       background:
         colors:
-          - '#D23D99'
-          - '#D23D99'
+          - '#d23d99'
+          - '#d23d99'
         orientation: TD
       tileSize: 1
     subtitle: Zylus, RTGame, Lydia, Ravs & More

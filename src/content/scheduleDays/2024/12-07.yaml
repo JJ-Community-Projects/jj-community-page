@@ -9,22 +9,24 @@ streams:
     style:
       background:
         colors:
-          - '#F07800'
-          - '#F07800'
+          - '#f07800'
+          - '#f07800'
         orientation: TD
       tileSize: 1
     subtitle: Lydia & Briony
     title: Stocking Stuffers
     vods: []
-  - creators: []
+  - creators: 
+      - martyn
+      - shadowatnoon
     duration_hours: 3
     end: '2024-12-07T17:00:00Z'
     start: '2024-12-07T14:00:00Z'
     style:
       background:
         colors:
-          - '#F07800'
-          - '#F07800'
+          - '#f07800'
+          - '#f07800'
         orientation: TD
       tileSize: 1
     subtitle: Yogs & Friends
@@ -38,8 +40,8 @@ streams:
     style:
       background:
         colors:
-          - '#F07800'
-          - '#F07800'
+          - '#f07800'
+          - '#f07800'
         orientation: TD
       tileSize: 2
     subtitle: Hosted by Zylus
@@ -53,8 +55,8 @@ streams:
     style:
       background:
         colors:
-          - '#F07800'
-          - '#F07800'
+          - '#f07800'
+          - '#f07800'
         orientation: TD
       tileSize: 1
     subtitle: ''
