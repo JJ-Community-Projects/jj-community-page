@@ -69,7 +69,7 @@ const ScheduleButtons: Component = () => {
           </div>
         </Show>
         <Show when={!isEmpty()}>
-          <div class={'schedule-card-white flex flex-row items-center justify-around'}>
+          <div class={'rounded-2xl bg-white shadow-xl flex flex-row items-center justify-around'}>
             <button onclick={reset}>
               <BiRegularReset />
             </button>
