@@ -1,101 +1,61 @@
 date: '2024-12-04'
 streams:
   - creators:
-      - boba
-      - pedguin
-      - sips
       - ben
+      - lolipopgi
     duration_hours: 3
     end: '2024-12-04T14:00:00Z'
     start: '2024-12-04T11:00:00Z'
     style:
       background:
         colors:
-          - '#EC7705'
-          - '#E66106'
+          - '#DD5501'
+          - '#DD5501'
         orientation: TD
       tileSize: 1
-    subtitle: Ben Boba Ped Sips
-    title: PlateUp Modded Madness
-    vods:
-      - label: Twitch Vod
-        link: https://www.twitch.tv/videos/1994927543?t=0h5m28s
-        type: twitch
-      - label: Youtube Vod
-        link: https://www.youtube.com/watch?v=FPX5VC5gqxA
-        type: youtube
+    subtitle: Ben & Lolip
+    title: Jingle Chums
+    vods: []
   - creators:
-      - briony
-      - gee
-      - lolipopgi
-      - breeh
+      - spiff
     duration_hours: 3
     end: '2024-12-04T17:00:00Z'
     start: '2024-12-04T14:00:00Z'
     style:
       background:
         colors:
-          - '#E66106'
-          - '#DF4B07'
+          - '#DD5501'
+          - '#DD5501'
         orientation: TD
       tileSize: 1
-    subtitle: Gee Briony Lolip & Breeh
-    title: 4-Player Collection Games
-    vods:
-      - label: Twitch Vod
-        link: https://www.twitch.tv/videos/1994927543?t=3h8m49s
-        type: twitch
-      - label: Youtube Vod
-        link: https://www.youtube.com/watch?v=pneGFtgMmjM
-        type: youtube
-  - creators:
-      - ben
-      - mousie
+    subtitle: With the Spiffing Brit
+    title: Minecraft Jingle Walls
+    vods: []
+  - creators: []
     duration_hours: 3
     end: '2024-12-04T20:00:00Z'
     start: '2024-12-04T17:00:00Z'
     style:
       background:
         colors:
-          - '#DF4B07'
-          - '#D93507'
+          - '#DD5501'
+          - '#DD5501'
         orientation: TD
       tileSize: 1
-    subtitle: Mousie & Ben
-    title: Collection Games
-    vods:
-      - label: Twitch Vod
-        link: https://www.twitch.tv/videos/1994927543?t=6h7m24s
-        type: twitch
-  - creators:
-      - briony
-      - simon_clark
-      - ravs
-      - osie
-      - breeh
-      - lolipopgi
-      - daf
-      - mousie
-      - drakon_astron
+    subtitle: Arcade Special
+    title: Minecraft Game Show
+    vods: []
+  - creators: []
     duration_hours: 4
     end: '2024-12-05T00:00:00Z'
     start: '2024-12-04T20:00:00Z'
     style:
       background:
         colors:
-          - '#D93507'
-          - '#D21F08'
+          - '#DD5501'
+          - '#DD5501'
         orientation: TD
       tileSize: 1
-    subtitle: ''
-    title: The Longest Johns
-    vods:
-      - label: Twitch Vod
-        link: https://www.twitch.tv/videos/1994927543?t=9h24m10s
-        type: twitch
-      - label: Youtube Vod 1
-        link: https://www.youtube.com/watch?v=53FAT8adDLs
-        type: youtube
-      - label: Youtube Vod 2
-        link: https://www.youtube.com/watch?v=0sJmYABWCcY
-        type: youtube
+    subtitle: The Longest Johns
+    title: XMas Carols
+    vods: []

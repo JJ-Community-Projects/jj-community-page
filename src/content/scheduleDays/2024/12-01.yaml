@@ -7,8 +7,8 @@ streams:
     style:
       background:
         colors:
-          - '#42BAD5'
-          - '#389BC6'
+          - '#3484BF'
+          - '#3484BF'
         orientation: TD
       tileSize: 1
     subtitle: Tree Decorating
@@ -29,19 +29,13 @@ streams:
     style:
       background:
         colors:
-          - '#389BC6'
-          - '#2E7CB6'
+          - '#3484BF'
+          - '#3484BF'
         orientation: TD
       tileSize: 1
     subtitle: Tom & Ben
     title: Jingle Jam Hype Stream
-    vods:
-      - label: Twitch Vods
-        link: https://www.twitch.tv/videos/1991996876?t=3h1m55s
-        type: twitch
-      - label: Youtube Vod
-        link: https://www.youtube.com/watch?v=E3AbERyT1Xs
-        type: youtube
+    vods: []
   - creators:
       - lewis
       - simon
@@ -51,48 +45,29 @@ streams:
     style:
       background:
         colors:
-          - '#2E7CB6'
-          - '#235DA7'
+          - '#3484BF'
+          - '#3484BF'
         orientation: TD
       tileSize: 1
     subtitle: Lewis & Simon
     title: Jingle Cats
-    vods:
-      - label: Twitch Vod
-        link: https://www.twitch.tv/videos/1991996876?t=6h1m43s
-        type: twitch
-      - label: Youtube Vod
-        link: https://www.youtube.com/watch?v=G7RxR28Zbco
-        type: youtube
+    vods: []
   - creators:
       - daltos
       - duncan
       - lewis
       - rythian
       - spiff
-      - alex_the_rambler
-      - potatomcwhisky
-      - mango
     duration_hours: 3
     end: '2024-12-01T23:00:00Z'
     start: '2024-12-01T20:00:00Z'
     style:
       background:
         colors:
-          - '#235DA7'
-          - '#193E97'
+          - '#3484BF'
+          - '#3484BF'
         orientation: TD
       tileSize: 1
-    subtitle: Spiff Lewis & Friends
+    subtitle: Spiff, Lewis & Friends
     title: Christmas Trains
-    vods:
-      - label: Twitch Vod
-        link: https://www.twitch.tv/videos/1991996876?t=9h14m18s
-        type: twitch
-      - label: Classic Duncan
-        link: >-
-          https://www.twitch.tv/yogscast/clip/UninterestedDirtyPineappleHeyGuys-ZqEQXI3KhzlZZEOG
-        type: twitch
-      - label: Youtube Vod
-        link: https://www.youtube.com/watch?v=P_w5aHTVnKM
-        type: youtube
+    vods: []
