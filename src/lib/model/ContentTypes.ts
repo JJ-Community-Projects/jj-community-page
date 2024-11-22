@@ -9,6 +9,7 @@ import {
   TwitchUserSchema,
   VodSchema
 } from "../../content/schema.ts";
+import type {DateTime} from "luxon";
 
 export type ContentScheduleDay = z.infer<typeof ScheduleDaySchema>;
 export type ContentScheduleWeek = z.infer<typeof ScheduleWeekSchema>;
@@ -28,4 +29,5 @@ export type FullWeek = Omit<ContentScheduleWeek, 'days'> & {
 export type FullSchedule = Omit<ContentSchedule, 'weeks'> & {
   weeks: FullWeek[],
   streams: FullStream[],
+  updatedAt: DateTime,
 };

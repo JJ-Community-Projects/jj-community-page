@@ -32,6 +32,7 @@ export function yogsScheduleFirestoreToFullSchedule(schedule: YogsScheduleFirest
     weeks: weeks,
     streams: streams,
     visible: true,
+    updatedAt: DateTime.fromISO(schedule.updatedAt)
     // creators: creators
   }
 }
@@ -69,6 +70,7 @@ export type YogsScheduleFirestore = {
   timezone: string
   times: Time[]
   title: string
+  updatedAt: string
 }
 
 type Week = {

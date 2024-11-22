@@ -7,6 +7,7 @@ import {useConfig} from "../../lib/useConfig.ts";
 import {Disclaimer} from "../Disclaimer.tsx";
 import {Countdown} from "../Countdown.tsx";
 import {MobileYogsScheduleComponent} from "./schedule/mobile/MobileYogsScheduleComponent.tsx";
+import {DateTime} from "luxon";
 
 
 interface CurrentScheduleLoaderProps {
@@ -54,6 +55,14 @@ const Body: Component<BodyProps> = (props) => {
               creators={props.creators}
             >
             </YogsScheduleComponent>
+            <p class={'text-center text-white pb-4'}>Last Updated {schedule()?.updatedAt.toLocaleString({
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric',
+              hour: 'numeric',
+              minute: 'numeric',
+              timeZoneName: 'short'
+            })}</p>
           </div>
           <div class="mobile-schedule w-full">
             <MobileYogsScheduleComponent
@@ -61,6 +70,13 @@ const Body: Component<BodyProps> = (props) => {
               creators={props.creators}
             >
             </MobileYogsScheduleComponent>
+            <p class={'text-center text-white pb-4'}>Last Updated {schedule()?.updatedAt.toLocaleString({
+              month: 'short',
+              day: 'numeric',
+              hour: 'numeric',
+              minute: 'numeric',
+              timeZoneName: 'short'
+            })}</p>
           </div>
         </>
       </Match>
