@@ -33,6 +33,7 @@ export async function contentScheduleToJs(schedule: ContentSchedule): Promise<Fu
     weeks: weeks,
     streams: streams,
     ...rangeFromData(streams),
+    updatedAt: DateTime.now()
   }
 }
 
