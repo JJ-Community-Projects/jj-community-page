@@ -20,7 +20,19 @@ const useYogsScheduleHook = (schedule: FullSchedule, _creators: FullCreator[]) =
   }
 
   const streams = () => schedule.streams
-  const  creators = () => _creators
+
+  const creators = (): FullCreator[] => {
+    const map: { [key: string]: FullCreator } = {}
+    for (const stream of streams()) {
+      for (const creator of stream.creators) {
+        if (!map[creator.id]) {
+          map[creator.id] = creator
+        }
+      }
+    }
+    return Object.values(map)
+  }
+
   return {
     schedule,
     streams,
