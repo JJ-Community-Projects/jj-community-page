@@ -16,7 +16,7 @@ const friends = creators.filter(creator => creator.type === 'friend');
 const fallbackSchedule = await loadScheduleFromContent('2024')
 
 ---
-<style>
+<style is:global>
 
     :root {
         --jj-schedule-available-height: max(85vh, 400px);
@@ -87,9 +87,16 @@ const fallbackSchedule = await loadScheduleFromContent('2024')
         width: calc(var(--jj-schedule-slot-size) * 3);
     }
 
-    .loading-container {
-        width: var(--jj-schedule-available-width);
-        height: var(--jj-schedule-available-height);
+    @media (max-width: 900px) {
+        .desktop-schedule {
+            display: none;
+        }
+    }
+
+    @media (min-width: 901px) {
+        .mobile-schedule {
+            display: none;
+        }
     }
 </style>
 <BaseLayout
