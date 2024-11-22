@@ -6,6 +6,7 @@ import {PlaceholderSchedule} from "../schedulePlaceholder/PlaceholderSchedule.ts
 import {useConfig} from "../../lib/useConfig.ts";
 import {Disclaimer} from "../Disclaimer.tsx";
 import {Countdown} from "../Countdown.tsx";
+import {MobileYogsScheduleComponent} from "./schedule/mobile/MobileYogsScheduleComponent.tsx";
 
 
 interface CurrentScheduleLoaderProps {
@@ -46,7 +47,22 @@ const Body: Component<BodyProps> = (props) => {
   return (
     <Switch>
       <Match when={schedule() !== undefined}>
-        <YogsScheduleComponent schedule={schedule()!} creators={props.creators}/>
+        <>
+          <div class="desktop-schedule w-full">
+            <YogsScheduleComponent
+              schedule={schedule()!}
+              creators={props.creators}
+            >
+            </YogsScheduleComponent>
+          </div>
+          <div class="mobile-schedule w-full">
+            <MobileYogsScheduleComponent
+              schedule={schedule()!}
+              creators={props.creators}
+            >
+            </MobileYogsScheduleComponent>
+          </div>
+        </>
       </Match>
       <Match when={schedule() === undefined}>
         <div class={'loading-container'}>
