@@ -8,6 +8,7 @@ import {YogsStreamUtils} from "../../../../lib/utils/YogsStreamUtils.ts";
 import {LivePulseDot} from "../../../common/LivePulseDot.tsx";
 import {BsPeopleFill} from "solid-icons/bs";
 import {YogsScheduleDetailDialog} from "../YogsScheduleDetailDialog.tsx";
+import {logSlotClick} from "../../../../lib/analytics.ts";
 
 interface MobileScheduleBodyProps {
   stream: FullStream
@@ -115,7 +116,7 @@ export const MobileYogsStreamTile: Component<MobileScheduleBodyProps> = (props) 
               //    ...background(),
             }}
             onclick={() => {
-              //     logstreamClick(stream)
+              logSlotClick(stream)
               setIsDialogOpen(true)
             }}
           >

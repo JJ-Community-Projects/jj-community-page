@@ -9,6 +9,7 @@ import {useCreatorFilter} from "./CreatorFilterProvider.tsx";
 import {useYogsSchedule} from "./YogsScheduleProvider.tsx";
 import {rangeFromData} from "../../../../lib/utils/rangeFromData.ts";
 import type {FullStream} from "../../../../lib/model/ContentTypes.ts";
+import {log} from "../../../../lib/analytics.ts";
 
 
 export const CalendarExportButton: Component = () => {
@@ -76,6 +77,9 @@ const CalendarDialogDialogBody: Component<CalendarDialogDialogBodyProps> = props
     } else {
       downloadFile(`MyJJSchedule${DateTime.now().year}.ics`, s)
     }
+    log('export_schedule', {
+      schedule: schedule.title,
+    })
   }
 
   const downloadFile = (filename: string, text: string) => {

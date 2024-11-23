@@ -10,6 +10,7 @@ import {useCreatorFilter} from "./provider/CreatorFilterProvider.tsx";
 import {twMerge} from "tailwind-merge";
 import {YogsStreamUtils} from "../../../lib/utils/YogsStreamUtils.ts";
 import type {FullStream} from "../../../lib/model/ContentTypes.ts";
+import {logSlotClick} from "../../../lib/analytics.ts";
 
 interface YogsStreamTileProps {
   stream: FullStream
@@ -96,7 +97,10 @@ export const YogsStreamTile: Component<YogsStreamTileProps> = (props) => {
             enable() ? 'hover:scale-105 hover:brightness-105' : '')}
           style={buttonStyle()}
           disabled={!enable()}
-          onClick={() => setIsDialogOpen(true)}
+          onClick={() => {
+            logSlotClick(stream)
+            setIsDialogOpen(true)
+          }}
         >
           <div class={'@container h-full flex flex-col items-center justify-center w-full'}>
             <p class={'~text-sm/2xl font-bold tracking-widest uppercase'}>{title}</p>

@@ -1,6 +1,7 @@
 import {createContext, createEffect, createSignal, onMount, type ParentComponent, useContext} from "solid-js";
 import {useYogsSchedule} from "./YogsScheduleProvider.tsx";
 import type {FullStream} from "../../../../lib/model/ContentTypes.ts";
+import { log } from "#lib/analytics.ts";
 
 const useCreatorFilterHook = () => {
 
@@ -102,6 +103,9 @@ const useCreatorFilterHook = () => {
         copyValue = url
       }
       await navigator.clipboard.writeText(copyValue)
+      log('filter_copy', {
+        filter_url: url,
+      })
     } catch (e: any) {
       console.log(e.toString())
     }
