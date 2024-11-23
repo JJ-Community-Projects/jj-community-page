@@ -47,7 +47,9 @@ streams:
     subtitle: Arcade Special
     title: Minecraft Game Show
     vods: []
-  - creators: []
+  - creators:
+      - longest_johns
+      - lewis
     duration_hours: 4
     end: '2024-12-05T00:00:00Z'
     start: '2024-12-04T20:00:00Z'

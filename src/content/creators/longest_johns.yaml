@@ -1,0 +1,13 @@
+link: https://www.youtube.com/@thelongestjohns
+name: The Longest Johns
+type: friend
+profileImage:
+  large: https://yt3.ggpht.com/HI3MXlSOX8aFQEhdV2M6krRVUUmGrdwHsa_gkqQ_J3Hcg5uNi_fNyYu25W4-E830Kxae4E55=s88-c-k-c0x00ffffff-no-rj
+  small: https://yt3.ggpht.com/HI3MXlSOX8aFQEhdV2M6krRVUUmGrdwHsa_gkqQ_J3Hcg5uNi_fNyYu25W4-E830Kxae4E55=s88-c-k-c0x00ffffff-no-rj
+links:
+  - name: Twitter
+    type: twitter
+    url: https://x.com/thelongestjohns
+  - name: Instagram
+    type: instagram
+    url: https://www.instagram.com/thelongestjohns/
