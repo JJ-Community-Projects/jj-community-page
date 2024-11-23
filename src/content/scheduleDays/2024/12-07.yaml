@@ -19,6 +19,7 @@ streams:
   - creators:
       - martyn
       - shadowatnoon
+      - ravs
     duration_hours: 3
     end: '2024-12-07T17:00:00Z'
     start: '2024-12-07T14:00:00Z'
@@ -34,6 +35,7 @@ streams:
     vods: []
   - creators:
       - zylus
+      - ravs
     duration_hours: 6
     end: '2024-12-07T23:00:00Z'
     start: '2024-12-07T17:00:00Z'
