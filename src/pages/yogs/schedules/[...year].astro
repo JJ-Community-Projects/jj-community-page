@@ -36,7 +36,7 @@ const year = Astro.params.year
 
     :root {
         --jj-schedule-available-height: max(85vh, 400px);
-        --jj-schedule-available-width: max(85vw, 600px);
+        --jj-schedule-available-width: min(max(85vw, 600px), 1600px);
         --jj-schedule-w-size: calc(var(--jj-schedule-available-width) / (7 * 3 + 1));
         --jj-schedule-h-size: calc(var(--jj-schedule-available-height) / (5 * 3 + 2));
         --jj-schedule-data-size: max(var(--jj-schedule-w-size), var(--jj-schedule-h-size));
