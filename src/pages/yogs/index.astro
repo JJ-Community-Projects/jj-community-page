@@ -14,13 +14,55 @@ const bestOf = creators.filter(creator => creator.type === 'best_of');
 const friends = creators.filter(creator => creator.type === 'friend');
 
 const fallbackSchedule = await loadScheduleFromContent('2024')
+const filter = Astro.url.searchParams.get('filter') || '';
+console.log(filter)
+const filterCreators = () => {
+  if (filter === '') {
+    return null;
+  }
+  const ids = filter.split(',')
+  return creators.filter(creator => ids.includes(creator.id));
+}
 
+const filteredCreators = filterCreators();
+
+let description = 'The Yogscast Jingle Jam Schedule 2024'
+
+if (filteredCreators) {
+  if (filteredCreators.length === 1) {
+    description = `The Yogscast Jingle Jam Schedule 2024 for ${filteredCreators[0].name}`
+  } else if (filteredCreators.length <= 3) {
+    let nameStr = ''
+    const filteredCreatorsLastIndex = filteredCreators.length - 1
+    for (let i = 0; i < filteredCreators.length; i++) {
+      nameStr += filteredCreators[i].name
+      if (i < filteredCreatorsLastIndex - 1) {
+        nameStr += ', '
+      } else if (i === filteredCreatorsLastIndex - 1) {
+        nameStr += ' and '
+      }
+    }
+    description = `The Yogscast Jingle Jam Schedule 2024 for ${nameStr}`
+  } else {
+      let nameStr = ''
+      for (let i = 0; i < 3; i++) {
+          nameStr += filteredCreators[i].name
+          if (i < 2) {
+              nameStr += ', '
+          } else {
+              nameStr += ' and more'
+          }
+      }
+      description = `The Yogscast Jingle Jam Schedule 2024 for ${nameStr}`
+  }
+}
 ---
+
 <style is:global>
 
     :root {
         --jj-schedule-available-height: max(85vh, 400px);
-        --jj-schedule-available-width: max(85vw, 600px);
+        --jj-schedule-available-width: min(max(85vw, 600px), 1600px);
         --jj-schedule-w-size: calc(var(--jj-schedule-available-width) / (7 * 3 + 1));
         --jj-schedule-h-size: calc(var(--jj-schedule-available-height) / (5 * 3 + 2));
         --jj-schedule-data-size: max(var(--jj-schedule-w-size), var(--jj-schedule-h-size));
@@ -101,7 +143,7 @@ const fallbackSchedule = await loadScheduleFromContent('2024')
 </style>
 <BaseLayout
         title="The Yogscast Jingle Jam Schedule 2024"
-        description="The Yogscast Jingle Jam Schedule 2024"
+        description={description}
 >
     <div class={'min-h-32'}>
         <CurrentScheduleLoader client:only="solid-js" creators={creators} fallbackSchedule={fallbackSchedule!}/>
