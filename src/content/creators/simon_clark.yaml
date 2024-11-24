@@ -2,3 +2,10 @@ name: Dr. Simon Clark
 link: https://www.twitch.tv/drsimonclark
 twitchUser: drsimonclark
 type: friend
+links:
+  - name: Twitter
+    type: twitter
+    url: https://twitter.com/simonoxfphys
+  - name: Twitch
+    type: twitch
+    url: https://www.twitch.tv/drsimonclark

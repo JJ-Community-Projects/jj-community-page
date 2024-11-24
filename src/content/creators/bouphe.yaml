@@ -1,19 +1,19 @@
 links:
-- name: Twitter
-  type: twitter
-  url: https://twitter.com/bouphe
-- name: Instagram
-  type: instagram
-  url: https://www.instagram.com/bouphemagic
-- name: Playlist
-  type: playlist
-  url: https://open.spotify.com/playlist/63rk76SKx6UvPMJ8AGu8zQ?si=t5aLee7xTPS6alAcUH5-WA&utm_source=copy-link
-- name: Patreon
-  type: patreon
-  url: http://www.patreon.com/bouphe
-- name: Merch
-  type: merch
-  url: https://store.yogscast.com/collections/bouphe
+  - name: Twitch
+    type: twitch
+    url: https://www.twitch.tv/bouphe
+  - name: Twitter
+    type: twitter
+    url: https://twitter.com/bouphe
+  - name: Instagram
+    type: instagram
+    url: https://www.instagram.com/bouphemagic
+  - name: Playlist
+    type: playlist
+    url: https://open.spotify.com/playlist/63rk76SKx6UvPMJ8AGu8zQ?si=t5aLee7xTPS6alAcUH5-WA&utm_source=copy-link
+  - name: Patreon
+    type: patreon
+    url: http://www.patreon.com/bouphe
 name: Bouphe
 link: https://www.twitch.tv/bouphe
 profileImage:

@@ -2,6 +2,9 @@ links:
 - name: Twitter
   type: twitter
   url: https://twitter.com/iamdaltos
+- name: Twitch
+  type: twitch
+  url: https://www.twitch.tv/daltos
 name: Daltos
 link: https://www.twitch.tv/daltos
 profileImage:

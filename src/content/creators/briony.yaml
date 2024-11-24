@@ -1,13 +1,13 @@
 links:
-- name: Twitter
-  type: twitter
-  url: https://twitter.com/brionybun
-- name: Discord
-  type: discord
-  url: https://discord.com/invite/swYBssA
-- name: Merch
-  type: merch
-  url: https://brionykay-shop.fourthwall.com/
+  - name: Twitter
+    type: twitter
+    url: https://twitter.com/brionybun
+  - name: Discord
+    type: discord
+    url: https://discord.com/invite/swYBssA
+  - name: Twitch
+    type: twitch
+    url: https://www.twitch.tv/brionykay
 name: Briony
 link: https://www.twitch.tv/brionykay
 profileImage:

@@ -1,16 +1,16 @@
 links:
-- name: Twitter
-  type: twitter
-  url: https://twitter.com/Bekkiboom
-- name: Instagram
-  type: instagram
-  url: https://www.instagram.com/bekkiboom/
-- name: Discord
-  type: discord
-  url: https://www.discord.gg/qMuhATC3Sm
-- name: Merch
-  type: merch
-  url: https://store.yogscast.com/collections/bekkiboom
+  - name: Twitch
+    type: twitch
+    url: https://www.twitch.tv/bekkiboom
+  - name: Twitter
+    type: twitter
+    url: https://twitter.com/Bekkiboom
+  - name: Instagram
+    type: instagram
+    url: https://www.instagram.com/bekkiboom/
+  - name: Discord
+    type: discord
+    url: https://www.discord.gg/qMuhATC3Sm
 link: https://www.twitch.tv/bekkiboom
 name: Bekkiboom
 profileImage:

@@ -1,10 +1,13 @@
 links:
-- name: Twitter
-  type: twitter
-  url: https://twitter.com/YogscastLalna
-- name: Merch
-  type: merch
-  url: https://store.yogscast.com/collections/duncan
+  - name: Twitter
+    type: twitter
+    url: https://twitter.com/YogscastLalna
+  - name: Twitch
+    type: twitch
+    url: https://www.twitch.tv/lalna
+  - name: Youtube
+    type: youtube
+    url: https://www.youtube.com/user/Yogscastlalna
 name: Duncan
 link: https://www.twitch.tv/lalna
 profileImage:

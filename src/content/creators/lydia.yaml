@@ -1,13 +1,16 @@
 links:
-- name: Twitter
-  type: twitter
-  url: https://twitter.com/SquidGaming
-- name: Instagram
-  type: instagram
-  url: https://www.instagram.com/squidgame/
-- name: Discord
-  type: discord
-  url: https://discord.com/invite/SquidGaming
+  - name: Twitter
+    type: twitter
+    url: https://twitter.com/SquidGaming
+  - name: Instagram
+    type: instagram
+    url: https://www.instagram.com/squidgame/
+  - name: Discord
+    type: discord
+    url: https://discord.com/invite/SquidGaming
+  - name: Twitch
+    type: twitch
+    url: https://www.twitch.tv/squidgame
 name: Lydia
 link: https://www.twitch.tv/squidgame
 profileImage:

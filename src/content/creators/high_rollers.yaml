@@ -1,7 +1,10 @@
 links:
-- name: Twitter
-  type: twitter
-  url: https://twitter.com/HighRollersDnD
+  - name: Twitter
+    type: twitter
+    url: https://twitter.com/HighRollersDnD
+  - name: Twitch
+    type: twitch
+    url: https://www.twitch.tv/highrollersdnd
 name: High Rollers
 profileImage:
   large: https://static-cdn.jtvnw.net/jtv_user_pictures/9005fcb8-2b5a-4c86-a625-e865a816f5cd-profile_image-300x300.png

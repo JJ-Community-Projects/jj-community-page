@@ -1,22 +1,25 @@
 links:
-- name: Twitter
-  type: twitter
-  url: https://twitter.com/Pedguin
-- name: Tiktok
-  type: tiktok
-  url: https://www.tiktok.com/@pedguinn
-- name: Instagram
-  type: instagram
-  url: http://instagram.com/pedguino/
-- name: Discord
-  type: discord
-  url: https://discord.com/invite/yVwkM8JJ
-- name: Steam Curator
-  type: steam curator
-  url: https://store.steampowered.com/curator/41485101
-- name: Merch
-  type: merch
-  url: https://store.yogscast.com/collections/pedguin
+  - name: Twitter
+    type: twitter
+    url: https://twitter.com/Pedguin
+  - name: Tiktok
+    type: tiktok
+    url: https://www.tiktok.com/@pedguinn
+  - name: Instagram
+    type: instagram
+    url: http://instagram.com/pedguino/
+  - name: Discord
+    type: discord
+    url: https://discord.com/invite/yVwkM8JJ
+  - name: Steam Curator
+    type: steam curator
+    url: https://store.steampowered.com/curator/41485101
+  - name: Twitch
+    type: twitch
+    url: https://www.twitch.tv/pedguin
+  - name: YouTube
+    type: youtube
+    url: https://www.youtube.com/@Pedguin
 name: Pedguin
 link: https://www.twitch.tv/pedguin
 profileImage:

@@ -1,16 +1,16 @@
 links:
-- name: Twitter
-  type: twitter
-  url: https://twitter.com/Korsty_
-- name: Instagram
-  type: instagram
-  url: https://www.instagram.com/korsty_/
-- name: Discord
-  type: discord
-  url: https://discord.com/invite/tabu
-- name: Merch
-  type: merch
-  url: https://kirsty-shop.fourthwall.com/
+  - name: Twitter
+    type: twitter
+    url: https://twitter.com/Korsty_
+  - name: Instagram
+    type: instagram
+    url: https://www.instagram.com/korsty_/
+  - name: Discord
+    type: discord
+    url: https://discord.com/invite/tabu
+  - name: Twitch
+    type: twitch
+    url: https://www.twitch.tv/kirsty
 name: Kirsty
 link: https://www.twitch.tv/kirsty
 profileImage:

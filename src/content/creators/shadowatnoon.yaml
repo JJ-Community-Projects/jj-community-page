@@ -1,3 +1,13 @@
 name: Shadow
 link: https://www.twitch.tv/shadowatnoon
 twitchUser: shadowatnoon
+links:
+  - name: Twitter
+    type: twitter
+    url: https://twitter.com/shadowatno0n
+  - name: Twitch
+    type: twitch
+    url: https://www.twitch.tv/shadowatnoon
+style:
+  primaryColor: '#FF90C0'
+  accentColor: '#49D9B5'

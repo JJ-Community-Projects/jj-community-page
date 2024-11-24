@@ -1,10 +1,10 @@
 links:
-- name: Twitter
-  type: twitter
-  url: https://twitter.com/Bedgarsan
-- name: Merch
-  type: merch
-  url: https://store.yogscast.com/collections/ben
+  - name: Twitch
+    type: twitch
+    url: https://www.twitch.tv/bedgars
+  - name: Twitter
+    type: twitter
+    url: https://twitter.com/Bedgarsan
 name: Ben
 link: https://www.twitch.tv/bedgars
 profileImage:

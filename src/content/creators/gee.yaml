@@ -1,22 +1,22 @@
 links:
-- name: Twitter
-  type: twitter
-  url: https://twitter.com/Geestargames
-- name: Tiktok
-  type: tiktok
-  url: https://www.tiktok.com/@geestargames
-- name: Instagram
-  type: instagram
-  url: https://www.instagram.com/geestargames/
-- name: Discord
-  type: discord
-  url: https://discord.com/invite/geestargames
-- name: Patreon
-  type: patreon
-  url: https://www.patreon.com/geestargames
-- name: Merch
-  type: merch
-  url: https://store.yogscast.com/collections/geestar
+  - name: Twitter
+    type: twitter
+    url: https://twitter.com/Geestargames
+  - name: Tiktok
+    type: tiktok
+    url: https://www.tiktok.com/@geestargames
+  - name: Instagram
+    type: instagram
+    url: https://www.instagram.com/geestargames/
+  - name: Discord
+    type: discord
+    url: https://discord.com/invite/geestargames
+  - name: Patreon
+    type: patreon
+    url: https://www.patreon.com/geestargames
+  - name: Twitch
+    type: twitch
+    url: https://www.twitch.tv/geestargames
 name: Gee
 link: https://www.twitch.tv/geestargames
 profileImage:

@@ -1,19 +1,19 @@
 links:
-- name: Twitter
-  type: twitter
-  url: https://twitter.com/boba_witch
-- name: Tiktok
-  type: tiktok
-  url: https://www.tiktok.com/@boba.witch
-- name: Instagram
-  type: instagram
-  url: https://www.instagram.com/boba.wtch/
-- name: Discord
-  type: discord
-  url: https://discord.com/invite/bobawitch
-- name: Merch
-  type: merch
-  url: https://my-store-7720046.creator-spring.com/
+  - name: Twitch
+    type: twitch
+    url: https://www.twitch.tv/boba
+  - name: Twitter
+    type: twitter
+    url: https://twitter.com/boba_witch
+  - name: Tiktok
+    type: tiktok
+    url: https://www.tiktok.com/@boba.witch
+  - name: Instagram
+    type: instagram
+    url: https://www.instagram.com/boba.wtch/
+  - name: Discord
+    type: discord
+    url: https://discord.com/invite/bobawitch
 name: Boba
 link: https://www.twitch.tv/boba
 profileImage:

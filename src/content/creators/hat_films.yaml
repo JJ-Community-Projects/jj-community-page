@@ -1,25 +1,29 @@
 links:
-- name: Twitter
-  type: twitter
-  url: https://twitter.com/hat_films
-- name: Tiktok
-  type: tiktok
-  url: https://www.tiktok.com/@hat_films
-- name: Instagram
-  type: instagram
-  url: https://www.instagram.com/hat.films/
-- name: Reddit
-  type: reddit
-  url: https://www.reddit.com/r/hatfilms/
-- name: Bandcamp
-  type: bandcamp
-  url: https://hatfilms.bandcamp.com/
-- name: Merch
-  type: merch
-  url: https://freshmerch.fm/collections/hat-films
-- name: Patreon
-  type: patreon
-  url: https://www.patreon.com/hatfilms
+  - name: Twitter
+    type: twitter
+    url: https://twitter.com/hat_films
+  - name: Tiktok
+    type: tiktok
+    url: https://www.tiktok.com/@hat_films
+  - name: Instagram
+    type: instagram
+    url: https://www.instagram.com/hat.films/
+  - name: Reddit
+    type: reddit
+    url: https://www.reddit.com/r/hatfilms/
+  - name: Bandcamp
+    type: bandcamp
+    url: https://hatfilms.bandcamp.com/
+  - name: Patreon
+    type: patreon
+    url: https://www.patreon.com/hatfilms
+  - name: YouTube
+    type: youtube
+    url: https://www.youtube.com/@hatfilms
+  - name: Twitch
+    type: twitch
+    url: https://www.twitch.tv/hatfilms
+
 name: Hat Films
 link: https://www.twitch.tv/hatfilms
 profileImage:

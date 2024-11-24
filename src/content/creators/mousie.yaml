@@ -1,16 +1,16 @@
 links:
-- name: Twitter
-  type: twitter
-  url: https://twitter.com/MissMousieMouse
-- name: Instagram
-  type: instagram
-  url: http://instagram.com/_mousie_mouse
-- name: Discord
-  type: discord
-  url: https://discord.gg/mousie
-- name: Merch
-  type: merch
-  url: https://store.yogscast.com/collections/mousie
+  - name: Twitter
+    type: twitter
+    url: https://twitter.com/MissMousieMouse
+  - name: Instagram
+    type: instagram
+    url: http://instagram.com/_mousie_mouse
+  - name: Discord
+    type: discord
+    url: https://discord.gg/mousie
+  - name: Twitch
+    type: twitch
+    url: https://www.twitch.tv/mousie
 name: Mousie
 link: https://www.twitch.tv/mousie
 profileImage:

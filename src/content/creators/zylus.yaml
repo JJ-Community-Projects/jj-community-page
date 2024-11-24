@@ -1,10 +1,10 @@
 links:
-- name: Twitter
-  type: twitter
-  url: https://twitter.com/IAmZylus
-- name: Merch
-  type: merch
-  url: https://store.yogscast.com/collections/zylus
+  - name: Twitter
+    type: twitter
+    url: https://twitter.com/IAmZylus
+  - name: Twitch
+    type: twitch
+    url: https://www.twitch.tv/zylush
 name: Zylus
 link: https://www.twitch.tv/zylush
 profileImage:

@@ -1,7 +1,10 @@
 links:
-- name: Twitter
-  type: twitter
-  url: https://twitter.com/Buhreeh
+  - name: Twitch
+    type: twitch
+    url: https://www.twitch.tv/breeh
+  - name: Twitter
+    type: twitter
+    url: https://twitter.com/Buhreeh
 name: Breeh
 link: https://www.twitch.tv/breeh
 profileImage:

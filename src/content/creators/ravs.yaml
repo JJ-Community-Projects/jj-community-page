@@ -1,16 +1,16 @@
 links:
-- name: Tiktok
-  type: tiktok
-  url: https://www.tiktok.com/@ravstok
-- name: Twitter
-  type: twitter
-  url: https://twitter.com/Ravsy_
-- name: Instagram
-  type: instagram
-  url: https://www.instagram.com/ravsy1/
-- name: Merch
-  type: merch
-  url: https://store.yogscast.com/collections/ravs
+  - name: Tiktok
+    type: tiktok
+    url: https://www.tiktok.com/@ravstok
+  - name: Twitter
+    type: twitter
+    url: https://twitter.com/Ravsy_
+  - name: Instagram
+    type: instagram
+    url: https://www.instagram.com/ravsy1/
+  - name: Twitch
+    type: twitch
+    url: https://www.twitch.tv/ravs_
 name: Ravs
 link: https://twitch.tv/ravs_
 profileImage:

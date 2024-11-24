@@ -1,14 +1,17 @@
 links:
-- name: Twitter
-  type: twitter
-  url: https://twitter.com/MiniMukaYT
-- name: Instagram
-  type: instagram
-  url: https://www.instagram.com/minimukayt/
+  - name: Twitter
+    type: twitter
+    url: https://twitter.com/MiniMukaYT
+  - name: Instagram
+    type: instagram
+    url: https://www.instagram.com/minimukayt/
+  - name: Twitch
+    type: twitch
+    url: https://www.twitch.tv/minimuka
 name: MiniMuka
 profileImage:
-  large: https://static-cdn.jtvnw.net/jtv_user_pictures/a827d102-9ce8-4ef5-9cec-759a97e0161a-profile_image-300x300.png
-  small: https://static-cdn.jtvnw.net/jtv_user_pictures/a827d102-9ce8-4ef5-9cec-759a97e0161a-profile_image-70x70.png
+  large: https://static-cdn.jtvnw.net/jtv_user_pictures/b13adadf-15da-4338-8bfe-d65497248c3a-profile_image-300x300.png
+  small: https://static-cdn.jtvnw.net/jtv_user_pictures/b13adadf-15da-4338-8bfe-d65497248c3a-profile_image-70x70.png
 style:
   accentColor: '#b2636f'
   primaryColor: '#5d10f8'

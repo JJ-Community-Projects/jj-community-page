@@ -1,13 +1,13 @@
 links:
-- name: Twitter
-  type: twitter
-  url: https://twitter.com/Sips_
-- name: Reddit
-  type: reddit
-  url: https://www.reddit.com/r/sips
-- name: Merch
-  type: merch
-  url: https://store.yogscast.com/collections/sips
+  - name: Twitter
+    type: twitter
+    url: https://twitter.com/Sips_
+  - name: Reddit
+    type: reddit
+    url: https://www.reddit.com/r/sips
+  - name: Twitch
+    type: twitch
+    url: https://www.twitch.tv/sips_
 name: Sips
 link: https://twitch.tv/sips_
 profileImage:

@@ -1,10 +1,13 @@
 links:
-- name: Twitter
-  type: twitter
-  url: https://twitter.com/Fionn_Riches
-- name: Patreon
-  type: patreon
-  url: https://www.patreon.com/Fionn_
+  - name: Twitter
+    type: twitter
+    url: https://twitter.com/Fionn_Riches
+  - name: Patreon
+    type: patreon
+    url: https://www.patreon.com/Fionn_
+  - name: Twitch
+    type: twitch
+    url: https://www.twitch.tv/fionn
 name: Fionn
 link: https://www.twitch.tv/fionn
 profileImage:

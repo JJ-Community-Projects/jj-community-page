@@ -1,10 +1,10 @@
 links:
-- name: Twitter
-  type: twitter
-  url: https://twitter.com/SimonHoneydew
-- name: Merch
-  type: merch
-  url: https://store.yogscast.com/collections/lewis-and-simon
+  - name: Twitter
+    type: twitter
+    url: https://twitter.com/SimonHoneydew
+  - name: Twitch
+    type: twitch
+    url: https://www.twitch.tv/simonhoneydew
 name: Simon
 link: https://www.twitch.tv/simonhoneydew
 profileImage:

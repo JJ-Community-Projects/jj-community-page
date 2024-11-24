@@ -1,7 +1,10 @@
 links:
-- name: Twitter
-  type: twitter
-  url: https://twitter.com/nanosounds
+  - name: Twitter
+    type: twitter
+    url: https://twitter.com/nanosounds
+  - name: Twitch
+    type: twitch
+    url: https://www.twitch.tv/nanokim
 name: Kim
 profileImage:
   large: https://static-cdn.jtvnw.net/jtv_user_pictures/51c2071a-5fdc-44b1-9c7b-c017ea13064e-profile_image-300x300.png

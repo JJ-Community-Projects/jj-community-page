@@ -1,10 +1,13 @@
 links:
-- name: Twitter
-  type: twitter
-  url: https://twitter.com/PyrionFlax
-- name: Tiktok
-  type: tiktok
-  url: https://www.tiktok.com/@pyrionflax
+  - name: Twitter
+    type: twitter
+    url: https://twitter.com/PyrionFlax
+  - name: Tiktok
+    type: tiktok
+    url: https://www.tiktok.com/@pyrionflax
+  - name: Twitch
+    type: twitch
+    url: https://www.twitch.tv/pyrionflax
 name: Pyrion
 link: https://www.twitch.tv/pyrionflax
 profileImage:

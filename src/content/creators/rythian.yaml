@@ -1,10 +1,10 @@
 links:
-- name: Twitter
-  type: twitter
-  url: https://twitter.com/IAmRythian
-- name: Merch
-  type: merch
-  url: https://store.yogscast.com/collections/rythian
+  - name: Twitter
+    type: twitter
+    url: https://twitter.com/IAmRythian
+  - name: Twitch
+    type: twitch
+    url: https://www.twitch.tv/rythian
 name: Rythian
 link: https://www.twitch.tv/rythian
 profileImage:

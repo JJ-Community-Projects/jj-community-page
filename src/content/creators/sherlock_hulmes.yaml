@@ -1,3 +1,10 @@
 name: Mark
 link: https://www.twitch.tv/sherlockhulmes_
 twitchUser: sherlockhulmes_
+links:
+  - name: Twitter
+    type: twitter
+    url: https://twitter.com/sherlock_hulmes
+  - name: Twitch
+    type: twitch
+    url: https://www.twitch.tv/sherlockhulmes_

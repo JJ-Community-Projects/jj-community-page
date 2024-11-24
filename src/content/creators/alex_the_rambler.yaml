@@ -1,13 +1,16 @@
 links:
-- name: Twitter
-  type: twitter
-  url: https://twitter.com/TheRambler146
-- name: Instagram
-  type: instagram
-  url: https://www.instagram.com/therambler146/
-- name: Patreon
-  type: patreon
-  url: https://www.patreon.com/therambler146
+  - name: Twitch
+    type: twitch
+    url: https://www.twitch.tv/therambler14
+  - name: Twitter
+    type: twitter
+    url: https://twitter.com/TheRambler146
+  - name: Instagram
+    type: instagram
+    url: https://www.instagram.com/therambler146/
+  - name: Patreon
+    type: patreon
+    url: https://www.patreon.com/therambler146
 link: https://www.twitch.tv/therambler14
 name: Alex the Rambler
 profileImage:

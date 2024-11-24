@@ -2,3 +2,13 @@ name: potatomcwhiskey
 link: https://www.twitch.tv/potatomcwhiskey
 twitchUser: potatomcwhiskey
 type: friend
+links:
+  - name: Twitter
+    type: twitter
+    url: https://twitter.com/PotatoMcWhiskey
+  - name: YouTube
+    type: youtube
+    url: https://www.youtube.com/@PotatoMcWhiskey
+  - name: Twitch
+    type: twitch
+    url: https://www.twitch.tv/potatomcwhiskey

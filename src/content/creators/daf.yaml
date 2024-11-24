@@ -2,6 +2,9 @@ links:
 - name: Twitter
   type: twitter
   url: https://twitter.com/DafnotDaff
+- name: Twitch
+  type: twitch
+  url: https://www.twitch.tv/dafnotdaff
 name: Daf
 link: https://www.twitch.tv/dafnotdaff
 type: staff

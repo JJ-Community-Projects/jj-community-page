@@ -1,16 +1,19 @@
 links:
-- name: Twitter
-  type: twitter
-  url: https://twitter.com/Proasheck
-- name: FAQ
-  type: faq
-  url: https://zoeyp.carrd.co/
-- name: Discord
-  type: discord
-  url: https://discord.gg/Tf5sSwpnwr
-- name: Patreon
-  type: patreon
-  url: https://www.patreon.com/zoeyp
+  - name: Twitter
+    type: twitter
+    url: https://twitter.com/Proasheck
+  - name: FAQ
+    type: faq
+    url: https://zoeyp.carrd.co/
+  - name: Discord
+    type: discord
+    url: https://discord.gg/Tf5sSwpnwr
+  - name: Patreon
+    type: patreon
+    url: https://www.patreon.com/zoeyp
+  - name: Twitch
+    type: twitch
+    url: https://www.twitch.tv/zoey
 name: Zoey
 link: https://www.twitch.tv/zoey
 profileImage:

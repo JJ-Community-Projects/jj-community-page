@@ -1,16 +1,16 @@
 links:
-- name: Twitter
-  type: twitter
-  url: https://twitter.com/osiefish
-- name: Instagram
-  type: instagram
-  url: https://www.instagram.com/osiefish/
-- name: Discord
-  type: discord
-  url: https://discord.com/invite/UepA3Dy
-- name: Merch
-  type: merch
-  url: https://store.yogscast.com/collections/osiefish
+  - name: Twitter
+    type: twitter
+    url: https://twitter.com/osiefish
+  - name: Instagram
+    type: instagram
+    url: https://www.instagram.com/osiefish/
+  - name: Discord
+    type: discord
+    url: https://discord.com/invite/UepA3Dy
+  - name: Twitch
+    type: twitch
+    url: https://www.twitch.tv/osie
 name: Osie
 link: https://www.twitch.tv/osie
 profileImage:

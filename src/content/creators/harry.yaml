@@ -1,10 +1,10 @@
 links:
-- name: Twitter
-  type: twitter
-  url: https://twitter.com/barryharryy
-- name: Merch
-  type: merch
-  url: https://store.yogscast.com/collections/barry
+  - name: Twitter
+    type: twitter
+    url: https://twitter.com/barryharryy
+  - name: Twitch
+    type: twitch
+    url: https://www.twitch.tv/hrry
 name: Harry
 link: https://www.twitch.tv/hrry
 profileImage:

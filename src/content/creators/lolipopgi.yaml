@@ -4,3 +4,10 @@ twitchUser: lolipopgi
 style:
   primaryColor: '#129670'
   accentColor: '#d96260'
+links:
+  - name: Twitter
+    type: twitter
+    url: https://twitter.com/lolipopgitv
+  - name: Twitch
+    type: twitch
+    url: https://www.twitch.tv/lolipopgi

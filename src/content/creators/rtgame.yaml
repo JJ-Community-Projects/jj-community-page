@@ -1,4 +1,7 @@
-links: []
+links:
+  - name: Twitch
+    type: twitch
+    url: https://www.twitch.tv/rtgame
 name: RTGame
 type: friend
 link: https://www.twitch.tv/rtgame

@@ -1,7 +1,10 @@
 links:
-- name: Twitter
-  type: twitter
-  url: https://twitter.com/TheSpiffingBrit
+  - name: Twitter
+    type: twitter
+    url: https://twitter.com/TheSpiffingBrit
+  - name: YouTube
+    type: youtube
+    url: https://www.youtube.com/@thespiffingbrit
 name: Spiff
 link: https://www.youtube.com/@thespiffingbrit
 profileImage:

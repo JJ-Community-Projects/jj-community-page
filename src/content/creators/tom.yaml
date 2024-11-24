@@ -1,10 +1,13 @@
 links:
-- name: Twitter
-  type: twitter
-  url: https://twitter.com/Angory_Tom
-- name: Merch
-  type: merch
-  url: https://store.yogscast.com/collections/angory-tom
+  - name: Twitter
+    type: twitter
+    url: https://twitter.com/Angory_Tom
+  - name: Twitch
+    type: twitch
+    url: https://www.twitch.tv/angorytom
+  - name: YouTube
+    type: youtube
+    url: https://www.youtube.com/c/AngoryTom
 name: Tom
 link: https://www.twitch.tv/angorytom
 profileImage:

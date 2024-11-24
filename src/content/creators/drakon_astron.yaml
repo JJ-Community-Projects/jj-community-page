@@ -1,2 +1,10 @@
 name: DrakonAstron
 type: best_of
+links:
+  - name: Youtube
+    type: youtube
+    url: https://www.youtube.com/@DrakonAstron
+
+profileImage:
+    large: https://yt3.ggpht.com/ytc/AIdro_nSCcV2ETWN87wkUOJzQ4Lc-m8OuvxcXANeeBCf9b_9nvc=s88-c-k-c0x00ffffff-no-rj
+    small: https://yt3.ggpht.com/ytc/AIdro_nSCcV2ETWN87wkUOJzQ4Lc-m8OuvxcXANeeBCf9b_9nvc=s88-c-k-c0x00ffffff-no-rj
