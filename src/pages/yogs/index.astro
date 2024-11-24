@@ -5,7 +5,7 @@ import {loadAllCreatorsFromContent} from "../../content/loadCreatorsFromContent"
 import {CurrentScheduleLoader} from "../../components/yogs/CurrentScheduleLoader.tsx";
 
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import CreatorPill from "../../components/pills/CreatorPill.astro";
+import {CreatorPill} from "../../components/pills/CreatorPill.tsx";
 
 const creators = await loadAllCreatorsFromContent();
 
@@ -44,16 +44,16 @@ if (filteredCreators) {
     }
     description = `The Yogscast Jingle Jam Schedule 2024 for ${nameStr}`
   } else {
-      let nameStr = ''
-      for (let i = 0; i < 3; i++) {
-          nameStr += filteredCreators[i].name
-          if (i < 2) {
-              nameStr += ', '
-          } else {
-              nameStr += ' and more'
-          }
+    let nameStr = ''
+    for (let i = 0; i < 3; i++) {
+      nameStr += filteredCreators[i].name
+      if (i < 2) {
+        nameStr += ', '
+      } else {
+        nameStr += ' and more'
       }
-      description = `The Yogscast Jingle Jam Schedule 2024 for ${nameStr}`
+    }
+    description = `The Yogscast Jingle Jam Schedule 2024 for ${nameStr}`
   }
 }
 ---
@@ -149,30 +149,32 @@ if (filteredCreators) {
         <CurrentScheduleLoader client:only="solid-js" creators={creators} fallbackSchedule={fallbackSchedule!}/>
     </div>
 
-    <p class="text-2xl text-white mb-4">Yogs & Friends</p>
-    <div class="flex flex-col items-center gap-2">
-        <p class="text-xl text-white mb-1">Yogs</p>
-        <div class="flex flex-wrap gap-2 items-center justify-center">
-          {
-            yogs && yogs.map(creator =>
-                          <CreatorPill creator={creator}/>)
-          }
-        </div>
-        <p class="text-xl text-white mb-1">Best Of</p>
-        <div class="flex flex-wrap gap-2 items-center justify-center">
-          {
-            bestOf && bestOf.map(creator =>
-                          <CreatorPill creator={creator}/>
-            )
-          }
-        </div>
-        <p class="text-xl text-white mb-1">Friends</p>
-        <div class="flex flex-wrap gap-2 items-center justify-center">
-          {
-            friends && friends.map(creator =>
-                          <CreatorPill creator={creator}/>
-            )
-          }
+    <div class="flex flex-col justify-center items-center p-4 gap-2">
+        <p class="text-2xl text-white text-center">Yogs & Friends</p>
+        <div class="flex flex-col items-center gap-2">
+            <p class="text-xl text-white mb-1">Yogs</p>
+            <div class="flex flex-wrap gap-2 items-center justify-center">
+              {
+                yogs && yogs.map(creator =>
+                              <CreatorPill creator={creator} client:only="solid-js"/>)
+              }
+            </div>
+            <p class="text-xl text-white mb-1">Best Of</p>
+            <div class="flex flex-wrap gap-2 items-center justify-center">
+              {
+                bestOf && bestOf.map(creator =>
+                              <CreatorPill creator={creator} client:only="solid-js"/>
+                )
+              }
+            </div>
+            <p class="text-xl text-white mb-1">Friends</p>
+            <div class="flex flex-wrap gap-2 items-center justify-center">
+              {
+                friends && friends.map(creator =>
+                              <CreatorPill creator={creator} client:only="solid-js"/>
+                )
+              }
+            </div>
         </div>
     </div>
 
