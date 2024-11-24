@@ -7,13 +7,15 @@ import {getTextColor} from "../../../lib/utils/textColors.ts";
 import type {ContentVod, FullCreator, FullStream} from "../../../lib/model/ContentTypes.ts";
 import {YogsStreamUtils} from "../../../lib/utils/YogsStreamUtils.ts";
 import {useNow} from "../../../lib/utils/useNow.ts";
-import {CreatorPill} from "../../pills/CreatorPill.tsx";
+import {log, logCreatorFromSlotClick, logCreatorSlotFilterClick} from "../../../lib/analytics.ts";
+import {CreatorDialog} from "../../creators/CreatorDialog.tsx";
+import {createModalSignal, type ModalSignal} from "../../../lib/createModalSignal.ts";
+import {useYogsSchedule} from "./provider/YogsScheduleProvider.tsx";
+import {useCreatorFilter} from "./provider/CreatorFilterProvider.tsx";
 
 interface YogsScheduleDetailDialogProps {
   stream: FullStream
-  isOpen: boolean;
-  onOpenChange: (isOpen: boolean) => void;
-  close: () => void;
+  modalSignal: ModalSignal
 }
 
 export const YogsScheduleDetailDialog: Component<YogsScheduleDetailDialogProps> = (props) => {
@@ -25,7 +27,7 @@ export const YogsScheduleDetailDialog: Component<YogsScheduleDetailDialogProps> 
   // <div class={'fixed inset-0 z-50 flex items-center justify-center'}>
   // <Dialog.Content class={'h-full w-full max-w-[500px] p-2 lg:w-[min(calc(100vw_-_16px),_500px)] lg:p-16'}>
   return (
-    <Dialog.Root open={props.isOpen} onOpenChange={props.onOpenChange}>
+    <Dialog.Root open={props.modalSignal.isOpen()} onOpenChange={props.modalSignal.setOpen}>
       <Dialog.Portal>
         <Dialog.Overlay class="fixed inset-0 bg-black/20 lg:p-16 p-2"/>
         <Dialog.Content
@@ -36,7 +38,8 @@ export const YogsScheduleDetailDialog: Component<YogsScheduleDetailDialogProps> 
               background: background(),
             }}
           >
-            <button class={'rounded-full hover:bg-accent-200/10 aspect-square'} onClick={() => props.close()}>
+            <button class={'rounded-full hover:bg-accent-200/10 aspect-square'}
+                    onClick={() => props.modalSignal.close()}>
               <AiOutlineClose size={24}/>
             </button>
             <div class={'flex flex-col'}>
@@ -44,7 +47,7 @@ export const YogsScheduleDetailDialog: Component<YogsScheduleDetailDialogProps> 
               <p>{props.stream.subtitle}</p>
             </div>
           </Dialog.Title>
-          <Body stream={props.stream}/>
+          <Body stream={props.stream} modalSignal={props.modalSignal}/>
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>
@@ -54,6 +57,7 @@ export const YogsScheduleDetailDialog: Component<YogsScheduleDetailDialogProps> 
 
 interface BodyProps {
   stream: FullStream
+  modalSignal: ModalSignal
 }
 
 const Body: Component<BodyProps> = (props) => {
@@ -106,7 +110,7 @@ const Body: Component<BodyProps> = (props) => {
         <div class={'flex flex-wrap gap-2'}>
           <For each={props.stream.creators}>
             {
-              creator => (<CreatorComponent creator={creator}/>)
+              creator => (<CreatorComponent creator={creator} modalSignal={props.modalSignal} stream={props.stream}/>)
             }
           </For>
         </div>
@@ -170,31 +174,65 @@ const VodComponent: Component<VodProps> = (props) => {
 
 interface CreatorComponentProps {
   creator: FullCreator
+  stream: FullStream
+  modalSignal: ModalSignal
 }
 
 const CreatorComponent: Component<CreatorComponentProps> = (props) => {
-
-  const bg = props.creator?.style?.primaryColor ?? '#1E95EF'
+  const creator = props.creator
+  const image = creator?.profileImage
+  const twitchUser = creator.twitchUser
+  const bg = creator?.style?.primaryColor ?? '#1E95EF'
   const textColor = getTextColor(bg)
 
-  return (<CreatorPill creator={props.creator}/>)
-  /*
+  const label = creator.name
+  const imageUrl = image?.small ?? image?.medium ?? image?.large ?? twitchUser?.profile_image_url
+
+  const modal = createModalSignal()
+
+  const {getCreatorStreams} = useYogsSchedule()
+
+  const streams = getCreatorStreams(creator.id)
+
+  const shouldShowJJStreams = streams.length > 1
+
+  const {reset, addFilter} = useCreatorFilter()
+
+  const onJJStreamsClick = () => {
+    reset()
+    modal.close()
+    props.modalSignal.close()
+    addFilter(creator.id)
+    logCreatorSlotFilterClick(creator, props.stream)
+  }
+
   return (
-    <div class={'flex flex-row py-1'}>
-      <a
-        target={'_blank'}
-        class={
-          'flex flex-row items-center gap-1 rounded-full px-2 py-0.5 text-black no-underline hover:cursor-pointer'
-        }
+    <>
+      <button
+        class="cursor-pointer p-2 rounded-full flex flex-row gap-2 items-center hover:scale-105 hover:brightness-105 transition-all duration-200"
         style={{
           'background-color': bg,
           'color': textColor,
         }}
-        href={props.creator.link}
+        onclick={() => {
+          modal.open()
+          logCreatorFromSlotClick(creator, props.stream)
+        }}
       >
-        {props.creator.name}
-      </a>
-    </div>
-  );*/
+        {
+          imageUrl &&
+            <img
+                src={imageUrl}
+                alt={label}
+                height="32" width="32"
+                class="rounded-full w-8 h-8"
+            />
+        }
+        <span>{label}</span>
+      </button>
+      <CreatorDialog creator={creator} modalSignal={modal}
+                     onJJStreamsClick={shouldShowJJStreams ? onJJStreamsClick : undefined}/>
+    </>
+  )
 
 }

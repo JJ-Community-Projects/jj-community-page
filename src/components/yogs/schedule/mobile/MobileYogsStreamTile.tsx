@@ -9,6 +9,7 @@ import {LivePulseDot} from "../../../common/LivePulseDot.tsx";
 import {BsPeopleFill} from "solid-icons/bs";
 import {YogsScheduleDetailDialog} from "../YogsScheduleDetailDialog.tsx";
 import {logSlotClick} from "../../../../lib/analytics.ts";
+import {createModalSignal} from "../../../../lib/createModalSignal.ts";
 
 interface MobileScheduleBodyProps {
   stream: FullStream
@@ -73,7 +74,7 @@ export const MobileYogsStreamTile: Component<MobileScheduleBodyProps> = (props) 
     return vodTypes().includes('twitch')
   }
 
-  const [isDialogOpen, setIsDialogOpen] = createSignal<boolean>(false)
+  const modal = createModalSignal()
   const style = stream.style
   const colors = style.background.colors ?? ['#ff0', '#f0f']
   const orientation = style.background.orientation
@@ -117,7 +118,7 @@ export const MobileYogsStreamTile: Component<MobileScheduleBodyProps> = (props) 
             }}
             onclick={() => {
               logSlotClick(stream)
-              setIsDialogOpen(true)
+              modal.open()
             }}
           >
             <p class={'text-md font-bold'}>{props.stream.title}</p>
@@ -145,9 +146,7 @@ export const MobileYogsStreamTile: Component<MobileScheduleBodyProps> = (props) 
       </div>
       <YogsScheduleDetailDialog
         stream={props.stream}
-        isOpen={isDialogOpen()}
-        onOpenChange={setIsDialogOpen}
-        close={() => setIsDialogOpen(false)}
+        modalSignal={modal}
       />
     </>
   )

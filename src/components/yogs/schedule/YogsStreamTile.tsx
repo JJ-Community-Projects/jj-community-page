@@ -11,6 +11,7 @@ import {twMerge} from "tailwind-merge";
 import {YogsStreamUtils} from "../../../lib/utils/YogsStreamUtils.ts";
 import type {FullStream} from "../../../lib/model/ContentTypes.ts";
 import {logSlotClick} from "../../../lib/analytics.ts";
+import {createModalSignal} from "../../../lib/createModalSignal.ts";
 
 interface YogsStreamTileProps {
   stream: FullStream
@@ -18,7 +19,7 @@ interface YogsStreamTileProps {
 
 export const YogsStreamTile: Component<YogsStreamTileProps> = (props) => {
 
-  const [isDialogOpen, setIsDialogOpen] = createSignal<boolean>(false)
+  const modal = createModalSignal()
 
   const {isSlotPartOfFilter} = useCreatorFilter()
 
@@ -99,7 +100,7 @@ export const YogsStreamTile: Component<YogsStreamTileProps> = (props) => {
           disabled={!enable()}
           onClick={() => {
             logSlotClick(stream)
-            setIsDialogOpen(true)
+            modal.open()
           }}
         >
           <div class={'@container h-full flex flex-col items-center justify-center w-full'}>
@@ -119,9 +120,7 @@ export const YogsStreamTile: Component<YogsStreamTileProps> = (props) => {
       </div>
       <YogsScheduleDetailDialog
         stream={props.stream}
-        isOpen={isDialogOpen()}
-        onOpenChange={setIsDialogOpen}
-        close={() => setIsDialogOpen(false)}
+        modalSignal={modal}
       />
     </>
   )
