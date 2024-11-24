@@ -15,21 +15,21 @@ export const YogsScheduleHeader: Component = () => {
   return (
     <div class={'data-height w-full flex flex-row'}>
       <div class={'data-height data-width'}/>
-      <div class={'p-2 header-title-card-width'}>
+      <div class={'p-1 header-title-card-width'}>
         <div class={'w-full h-full bg-white rounded-2xl flex flex-row justify-center items-center'}>
           <p class={'text-center text-xl xl:text-3xl'}>{schedule.title}</p>
         </div>
       </div>
       <div class={'stream-width flex flex-row justify-end data-height'}>
-        <div class={'p-2 w-full h-full flex flex-row justify-end items-end gap-2'}>
+        <div class={'p-1 w-full h-full flex flex-row justify-end items-end gap-2'}>
           <FilterShareButton/>
           <FilterResetButton/>
         </div>
       </div>
-      <div class={'p-2 stream-width'}>
+      <div class={'p-1 stream-width'}>
         <button
           class={
-            'w-full h-full bg-white hover:bg-accent-50 flex flex-1 flex-col items-center justify-center rounded-2xl transition-all hover:scale-105'
+            'w-full h-full bg-accent text-white flex flex-1 flex-col items-center justify-center rounded-2xl transition-all hover:scale-105 hover:brightness-105'
           }
           onClick={filterModal.open}
         >
@@ -41,10 +41,10 @@ export const YogsScheduleHeader: Component = () => {
         <FilterDialog modalSignal={filterModal}/>
       </div>
 
-      <div class={'p-2 stream-width'}>
+      <div class={'p-1 stream-width'}>
         <button
           class={
-            'w-full h-full bg-white hover:bg-accent-50 flex flex-1 flex-col items-center justify-center rounded-2xl transition-all hover:scale-105'
+            'w-full h-full text-white bg-accent-500 hover:brightness-105 flex flex-1 flex-col items-center justify-center rounded-2xl transition-all hover:scale-105'
           }
           onClick={calenderModal.open}
         >
@@ -56,12 +56,12 @@ export const YogsScheduleHeader: Component = () => {
       </div>
 
 
-      <div class={'p-2 stream-width'}>
+      <div class={'p-1 stream-width'}>
         <div class={'w-full h-full flex flex-row justify-center items-center'}>
           <Tooltip.Root openDelay={300} closeDelay={300}>
             <Tooltip.Trigger
               class={
-                'bg-white  hover:bg-accent-50 ripple flex flex-1 flex-col items-center justify-center rounded-l-2xl transition-all hover:scale-105 h-full'
+                'bg-accent-500 text-white hover:brightness-105 ripple flex flex-1 flex-col items-center justify-center rounded-l-2xl transition-all hover:scale-105 h-full'
               }
               onClick={prevWeek}
             >
@@ -77,7 +77,7 @@ export const YogsScheduleHeader: Component = () => {
           <Tooltip.Root openDelay={300} closeDelay={300}>
             <Tooltip.Trigger
               class={
-                'bg-white hover:bg-accent-50 ripple flex flex-1 flex-col items-center justify-center rounded-r-2xl transition-all hover:scale-105 h-full'
+                'bg-accent-500 text-white hover:brightness-105 ripple flex flex-1 flex-col items-center justify-center rounded-r-2xl transition-all hover:scale-105 h-full'
               }
               onClick={nextWeek}
             >

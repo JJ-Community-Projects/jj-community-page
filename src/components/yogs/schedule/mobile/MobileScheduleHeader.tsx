@@ -55,21 +55,21 @@ const ScheduleButtons: Component = () => {
 
   return (
     <>
-      <div class={'p-schedule h-data'}>
+      <div class={'h-data'}>
         <Show when={isEmpty()}>
-          <div class={'rounded-2xl bg-white shadow-xl flex flex-row items-center justify-between px-2'}>
-            <button class={'w-data ripple flex flex-col items-center justify-center rounded-2xl'} onclick={prevDay}>
+          <div class={'flex flex-row items-center justify-between px-2 gap-4'}>
+            <button class={'h-8 w-8 rounded-2xl bg-accent-500 text-white shadow-xl ripple flex flex-col items-center justify-center'} onclick={prevDay}>
               <FaSolidChevronLeft />
             </button>
-            <button onclick={filterModalSignal.open}>Filter</button>
-            <button onclick={exportModalSignal.open}>Export</button>
-            <button class={'w-data ripple flex flex-col items-center justify-center rounded-2xl'} onclick={nextDay}>
+            <button class={'h-8 rounded-2xl bg-accent-500 text-white shadow-xl flex-1'} onclick={filterModalSignal.open}>Filter</button>
+            <button class={'h-8 rounded-2xl bg-accent-500 text-white shadow-xl flex-1'} onclick={exportModalSignal.open}>Export</button>
+            <button class={'h-8 w-8 rounded-2xl bg-accent-500 text-white shadow-xl ripple flex flex-col items-center justify-center'} onclick={nextDay}>
               <FaSolidChevronRight />
             </button>
           </div>
         </Show>
         <Show when={!isEmpty()}>
-          <div class={'rounded-2xl bg-white shadow-xl flex flex-row items-center justify-around'}>
+          <div class={'rounded-2xl bg-accent-500 text-white shadow-xl flex flex-row items-center justify-around'}>
             <button onclick={reset}>
               <BiRegularReset />
             </button>
