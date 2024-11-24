@@ -7,6 +7,7 @@ import {getTextColor} from "../../../lib/utils/textColors.ts";
 import type {ContentVod, FullCreator, FullStream} from "../../../lib/model/ContentTypes.ts";
 import {YogsStreamUtils} from "../../../lib/utils/YogsStreamUtils.ts";
 import {useNow} from "../../../lib/utils/useNow.ts";
+import {CreatorPill} from "../../pills/CreatorPill.tsx";
 
 interface YogsScheduleDetailDialogProps {
   stream: FullStream
@@ -175,6 +176,9 @@ const CreatorComponent: Component<CreatorComponentProps> = (props) => {
 
   const bg = props.creator?.style?.primaryColor ?? '#1E95EF'
   const textColor = getTextColor(bg)
+
+  return (<CreatorPill creator={props.creator}/>)
+  /*
   return (
     <div class={'flex flex-row py-1'}>
       <a
@@ -191,5 +195,6 @@ const CreatorComponent: Component<CreatorComponentProps> = (props) => {
         {props.creator.name}
       </a>
     </div>
-  );
+  );*/
+
 }
