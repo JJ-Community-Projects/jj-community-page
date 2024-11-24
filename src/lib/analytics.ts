@@ -19,6 +19,26 @@ export const logSlotClick = (slot: FullStream) => {
   }
   log('click_slot', data)
 }
+export const logCreatorFromSlotClick = (creator: FullCreator, slot: FullStream) => {
+  const start = DateTime.fromJSDate(slot.start)
+  const data = {
+    slot_title: slot.title,
+    slot_year: start.year,
+    event_label: `${start.year}_${start.day}_${start.hour}`,
+    name: creator.name,
+  }
+  log('click_creator_slot', data)
+}
+export const logCreatorSlotFilterClick = (creator: FullCreator, slot: FullStream) => {
+  const start = DateTime.fromJSDate(slot.start)
+  const data = {
+    slot_title: slot.title,
+    slot_year: start.year,
+    event_label: `${start.year}_${start.day}_${start.hour}`,
+    name: creator.name,
+  }
+  log('creator_slot_filter', data)
+}
 
 export const logCreator = (creator: FullCreator) => {
   log('click_creator', {
