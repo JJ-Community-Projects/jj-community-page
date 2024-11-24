@@ -103,9 +103,9 @@ export const YogsStreamTile: Component<YogsStreamTileProps> = (props) => {
           }}
         >
           <div class={'@container h-full flex flex-col items-center justify-center w-full'}>
-            <p class={'~text-sm/2xl font-bold tracking-widest uppercase'}>{title}</p>
+            <p class={'~text-sm/2xl font-bold tracking-widest uppercase text-pretty'}>{title}</p>
             <Show when={subtitle}>
-              <p class={'~text-xs/md tracking-widest uppercase'}>{subtitle}</p>
+              <p class={'~text-xs/md tracking-widest uppercase text-pretty'}>{subtitle}</p>
             </Show>
             <Show when={showCountdown()}>
               <p class={'font-mono text-xs font-bold lowercase tracking-wide line-clamp-1'}>{countdown()}</p>
