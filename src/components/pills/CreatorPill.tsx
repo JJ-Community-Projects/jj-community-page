@@ -15,7 +15,6 @@ import {
   FaSolidLink
 } from "solid-icons/fa";
 import {AiOutlineClose} from "solid-icons/ai";
-import {Tooltip} from "@kobalte/core";
 import {twMerge} from "tailwind-merge";
 
 interface CreatorPillProps {
