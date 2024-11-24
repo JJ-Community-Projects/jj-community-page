@@ -33,6 +33,10 @@ const useYogsScheduleHook = (schedule: FullSchedule, _creators: FullCreator[]) =
     return Object.values(map)
   }
 
+  const getCreatorStreams = (id: string) => {
+    return streams().filter(stream => stream.creators.some(creator => creator.id === id))
+  }
+
   return {
     schedule,
     streams,
@@ -44,7 +48,8 @@ const useYogsScheduleHook = (schedule: FullSchedule, _creators: FullCreator[]) =
     prevWeek,
     nextDay,
     prevDay,
-    times
+    times,
+    getCreatorStreams
   }
 }
 
