@@ -19,6 +19,13 @@ const t = title || 'Jingle Jam Community';
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
+        gtag("consent", "default", {
+            ad_storage: "denied",
+            ad_user_data: "denied",
+            ad_personalization: "denied",
+            analytics_storage: "granted",
+            functionality_storage: "granted",
+        });
         gtag('config', 'G-P6MYGN62FW');
         window.gtag = gtag;
     </script>
