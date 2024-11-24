@@ -14,8 +14,8 @@ export const YogsScheduleTimeColumn: Component = (props) => {
           ({start, end}) => {
             const s = DateTime.fromJSDate(start)
             const e = DateTime.fromJSDate(end)
-            return <div class="time p-1">
-              <div class="w-full h-full flex flex-col justify-around items-center bg-white rounded-2xl p-1">
+            return <div class="time p-1 @container">
+              <div class="~text-xs/lg w-full h-full flex flex-col justify-around items-center bg-white rounded-2xl p-1">
                 <p>{s.toFormat('HH:mm')}</p>
                 <p>{e.toFormat('HH:mm')}</p>
               </div>
@@ -30,8 +30,8 @@ export const YogsScheduleTimeColumn: Component = (props) => {
 const Timezone: Component = () => {
   const nextJJStartDate = useNextJJStartDate()
   return (
-    <div class="timezone p-1">
-      <p class="w-full h-full bg-white rounded-2xl flex flex-row items-center justify-center">{
+    <div class="timezone p-1 @container">
+      <p class="~text-xs/lg w-full h-full bg-white rounded-2xl flex flex-row items-center justify-center">{
         nextJJStartDate().toLocal().offsetNameShort
       }</p>
     </div>
