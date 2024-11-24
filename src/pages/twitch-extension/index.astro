@@ -1,6 +1,6 @@
 ---
-import BaseLayout from "../layouts/BaseLayout.astro";
-import FeedbackButtons from "../components/footer/FeedbackButtons.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import FeedbackButtons from "../../components/footer/FeedbackButtons.astro";
 import screenshot from '#images/extension/JJCE_Banner.png';
 import ext_stats from '#images/extension/ext_stats.png';
 import {Image} from "astro:assets";
@@ -76,5 +76,9 @@ import {Image} from "astro:assets";
                 </ul>
             </div>
         </div>
+        <a
+                class="underline text-white"
+                href="/twitch-extension/privacy"
+        >Privacy Policy</a>
     </div>
 </BaseLayout>
