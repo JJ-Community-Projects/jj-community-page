@@ -7,7 +7,6 @@ import {useConfig} from "../../lib/useConfig.ts";
 import {Disclaimer} from "../Disclaimer.tsx";
 import {Countdown} from "../Countdown.tsx";
 import {MobileYogsScheduleComponent} from "./schedule/mobile/MobileYogsScheduleComponent.tsx";
-import {DateTime} from "luxon";
 
 
 interface CurrentScheduleLoaderProps {
@@ -49,7 +48,7 @@ const Body: Component<BodyProps> = (props) => {
     <Switch>
       <Match when={schedule() !== undefined}>
         <>
-          <div class="desktop-schedule w-full">
+          <div class="desktop-schedule w-full flex flex-col items-center justify-center">
             <YogsScheduleComponent
               schedule={schedule()!}
               creators={props.creators}
@@ -63,8 +62,20 @@ const Body: Component<BodyProps> = (props) => {
               minute: 'numeric',
               timeZoneName: 'short'
             })}</p>
+            <div class={'max-w-[30rem] text-white text-center text-pretty'}>
+              <p>
+                This site <strong>is maintained by the community</strong>.
+              </p>
+              <p>
+                If you find errors or see that a stream is missing use the contact info below or message @ostof on discord. Streams that appear here are not guaranteed to
+                happen or might be delayed. For more information visit the Jingle Jam's social media.
+              </p>
+              <p>
+                This site is a <strong>fan Project and not associated with the Jingle Jam, the Yogscast or their partners.</strong>
+              </p>
+            </div>
           </div>
-          <div class="mobile-schedule w-full">
+          <div class="mobile-schedule w-full flex flex-col items-center justify-center">
             <MobileYogsScheduleComponent
               schedule={schedule()!}
               creators={props.creators}
@@ -77,6 +88,20 @@ const Body: Component<BodyProps> = (props) => {
               minute: 'numeric',
               timeZoneName: 'short'
             })}</p>
+            <div class={'max-w-[30rem] text-white text-center text-pretty'}>
+              <p>
+                This site <strong>is maintained by the community</strong>.
+              </p>
+              <p>
+                If you find errors or see that a stream is missing use the contact info below or message @ostof on
+                discord. Streams that appear here are not guaranteed to
+                happen or might be delayed. For more information visit the Jingle Jam's social media.
+              </p>
+              <p>
+                This site is a <strong>fan Project and not associated with the Jingle Jam, the Yogscast or their
+                partners.</strong>
+              </p>
+            </div>
           </div>
         </>
       </Match>
