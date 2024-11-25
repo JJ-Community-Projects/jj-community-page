@@ -6,6 +6,7 @@ import ext_stats from '#images/extension/ext_stats.png';
 import overlay1 from '../../images/extension/JJ_Overlay_1_Small.png';
 import overlay2 from '../../images/extension/JJ_Overlay_2_Small.png';
 import overlay5 from '../../images/extension/JJ_Overlay_5.png';
+import overlay6 from '../../images/extension/JJ_Overlay_6.png';
 import {Image} from "astro:assets";
 ---
 
@@ -15,84 +16,63 @@ import {Image} from "astro:assets";
         canonical="https://jinglejam.ostof.dev/twitch-extension"
 >
     <div class={'mx-auto flex flex-col items-center p-1 text-center text-white md:w-[75%]'}>
-        <p class={'p-2 ~text-2xl/4xl font-bold'}>Jingle Jam Community Twitch Extension</p>
+        <p class={'p-2 ~text-2xl/4xl font-bold'}>Jingle Jam Community Twitch Extensions</p>
+        <p>These Extensions are for everyone who participates in the Jingle Jam and stream on Twitch.</p>
+        <p>They allow your viewers to see the charities and other community Fundraisers</p>
+        <p>Feedback regarding the extensions is always welcome.</p>
+        <FeedbackButtons/>
+    </div>
+
+
+    <div class={'flex flex-col items-center p-2 text-white'}>
+        <p class="~text-xl/2xl">Twitch Panel Extension</p>
         <a
                 class={'p-1 text-xl md:p-2 underline hover:text-twitch-100'}
                 href={'https://dashboard.twitch.tv/extensions/7m5fitr4o8raxn6fv59lndv2iy0uuz'}
                 target={'_blank'}
         >
-            Get the extension on Twitch
+            Get the Panel Extension on Twitch
         </a>
-        <FeedbackButtons/>
-        <div class={'flex flex-col items-center p-2'}>
-            <Image class={'md:w-[50%]'} src={screenshot} alt={'Discovery'}/>
-            <p>This Extension is for everyone who participates in the Jingle Jam.</p>
-            <p>It allow you to see the charities, community fundraiser & the Yogscast Jingle Jam Schedule</p>
-            <p>Streamers can rearrange or disable tabs.</p>
-            <p>This new version is also available in the Twitch mobile app.</p>
-            <p>
-                Thanks to <a href={'https://www.twitch.tv/nairdwoody'}>Nairdwood</a> for making the Extension assets.
-                And
-                thanks to <a href={'https://www.twitch.tv/no1mann'}>No1mann</a> for the access to the Jingle Jam
-                Donation
-                Tracker.
-            </p>
-            <a class={'p-1 text-xl md:p-2'}
-               href={'https://dashboard.twitch.tv/extensions/7m5fitr4o8raxn6fv59lndv2iy0uuz'}>
-                Get the current version of the extension on Twitch
-            </a>
-        </div>
+        <Image class={'md:w-[50%]'} src={screenshot} alt={'Discovery'}/>
+        <p>This is a Panel which sits below your stream.</p>
+        <p>Users can click on each charity to visit their websites or on Community fundraisers to visit their Twitch
+            pages.</p>
+        <p>The extension is customizable. You can change the color theme or the order of the tabs.</p>
 
-        <div class={'flex flex-col items-center p-2'}>
-            <h2 class={'text-2xl'}>Previous version</h2>
-            <p>
-                Development of the extension started in August 2022 and a first test version was released in early
-                September.
-            </p>
-            <p class={'font-bold'}>
-                The Extension was used by the <a href={'https://www.twitch.tv/yogscast'}>Yogscast</a> during the Jingle
-                Jam
-                2022.
-            </p>
-            <p>
-                It was tested by people from the community and <a href={'https://www.twitch.tv/wil_co'}>Wilco</a>,{' '}
-                <a href={'https://www.twitch.tv/brionykay'}>Briony</a> & <a
-                    href={'https://www.twitch.tv/fionn'}>Fionn</a>{' '}
-                allowed me to test it on their channel. And thanks to <a
-                    href={'https://www.twitch.tv/no1mann'}>No1mann</a>{' '}
-                for the access to the Jingle Jam Donation Tracker.
-            </p>
-            <Image class={'md:w-[50%]'} src={ext_stats} alt={'Extension statistics'}/>
-            <p>Stats from 2022</p>
-        </div>
         <a
                 class="underline text-white"
                 href="/twitch-extension/privacy"
         >Privacy Policy</a>
     </div>
-
-    <div class="h-10"/>
-    <div class={'mx-auto flex flex-col items-center p-1 text-center text-white md:w-[75%]'}>
-        <p class={'p-2 ~text-2xl/4xl font-bold'}>Jingle Jam Community Twitch Overlay Extension</p>
+    <div class="h-8"/>
+    <div class={'flex flex-col items-center p-2 text-white gap-2'}>
+        <p class="~text-xl/2xl">Twitch Overlay Extension</p>
         <a
                 class={'p-1 text-xl md:p-2 underline hover:text-twitch-100'}
                 href={'https://dashboard.twitch.tv/extensions/9urrg74yzq8di9hqr5prsto5lbmq3x'}
                 target={'_blank'}
         >
-            Get the extension on Twitch
+            Get the Overlay Extension on Twitch
         </a>
-        <FeedbackButtons/>
-        <div class={'flex flex-col items-center p-2 gap-2'}>
-            <p>This Overlay Extension is for everyone who participates in the Jingle Jam.</p>
-            <p>It has similar functionality to the Panel Extension</p>
-            <p>It allow you to see the charities & community fundraiser.</p>
-            <p>The Yogs schedule is only visible on specific channels.</p>
-            <Image src={overlay5} alt={'Overlay 5'} width={600}/>
-            <div class="flex flex-wrap gap-2">
-                <Image src={overlay1} alt={'Overlay 1'} width={300}/>
-                <Image src={overlay2} alt={'Overlay 2'} width={300}/>
-            </div>
+        <Image src={overlay5} alt={'Overlay on Stream'} width={600}/>
+        <div class="flex flex-wrap gap-4">
+            <Image src={overlay1} alt={'About JJ'} width={300}/>
+            <Image src={overlay2} alt={'Charities'} width={300}/>
         </div>
-
+        <Image src={overlay6} alt={'Chat integration'} width={600}/>
+        <div class="text-center">
+            <p>This is a Over which sits on top of the Twitch Video Player</p>
+            <p>It is only visible when users hover over the Video Player.</p>
+            <p>Users can also deactivate it.</p>
+            <p>It has similar functionality to the Panel Extension</p>
+            <p>Additionally Mods can use chat commands to show little banners on stream with links to the charities
+                website and tiltify page</p>
+        </div>
     </div>
+    <div class="h-8"/>
+
+    <div>
+        <p class="text-center text-white">Thanks to Nairdwood for making the Extension assets. And thanks to No1mann for the access to the Jingle Jam Donation Tracker.</p>
+    </div>
+
 </BaseLayout>
