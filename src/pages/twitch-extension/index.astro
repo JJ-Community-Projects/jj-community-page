@@ -3,12 +3,16 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import FeedbackButtons from "../../components/footer/FeedbackButtons.astro";
 import screenshot from '#images/extension/JJCE_Banner.png';
 import ext_stats from '#images/extension/ext_stats.png';
+import overlay1 from '../../images/extension/JJ_Overlay_1_Small.png';
+import overlay2 from '../../images/extension/JJ_Overlay_2_Small.png';
+import overlay5 from '../../images/extension/JJ_Overlay_5.png';
 import {Image} from "astro:assets";
 ---
 
 <BaseLayout
         title="The Jingle Jam Twitch Extension"
         description="The Jingle Jam Community Twitch Extension is a Twitch Extension showing the Charities, Community Fundraisers and Yogs schedule"
+        canonical="https://jinglejam.ostof.dev/twitch-extension"
 >
     <div class={'mx-auto flex flex-col items-center p-1 text-center text-white md:w-[75%]'}>
         <p class={'p-2 ~text-2xl/4xl font-bold'}>Jingle Jam Community Twitch Extension</p>
@@ -65,5 +69,30 @@ import {Image} from "astro:assets";
                 class="underline text-white"
                 href="/twitch-extension/privacy"
         >Privacy Policy</a>
+    </div>
+
+    <div class="h-10"/>
+    <div class={'mx-auto flex flex-col items-center p-1 text-center text-white md:w-[75%]'}>
+        <p class={'p-2 ~text-2xl/4xl font-bold'}>Jingle Jam Community Twitch Overlay Extension</p>
+        <a
+                class={'p-1 text-xl md:p-2 underline hover:text-twitch-100'}
+                href={'https://dashboard.twitch.tv/extensions/9urrg74yzq8di9hqr5prsto5lbmq3x'}
+                target={'_blank'}
+        >
+            Get the extension on Twitch
+        </a>
+        <FeedbackButtons/>
+        <div class={'flex flex-col items-center p-2 gap-2'}>
+            <p>This Overlay Extension is for everyone who participates in the Jingle Jam.</p>
+            <p>It has similar functionality to the Panel Extension</p>
+            <p>It allow you to see the charities & community fundraiser.</p>
+            <p>The Yogs schedule is only visible on specific channels.</p>
+            <Image src={overlay5} alt={'Overlay 5'} width={600}/>
+            <div class="flex flex-wrap gap-2">
+                <Image src={overlay1} alt={'Overlay 1'} width={300}/>
+                <Image src={overlay2} alt={'Overlay 2'} width={300}/>
+            </div>
+        </div>
+
     </div>
 </BaseLayout>
