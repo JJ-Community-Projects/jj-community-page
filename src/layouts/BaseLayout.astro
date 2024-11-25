@@ -6,9 +6,10 @@ import Footer from "../components/footer/Footer.astro";
 interface Props {
   title?: string;
   description?: string;
+  canonical?: string;
 }
 
-const {title, description} = Astro.props;
+const {title, description, canonical} = Astro.props;
 const t = title || 'Jingle Jam Community';
 ---
 <html lang="en">
@@ -16,24 +17,32 @@ const t = title || 'Jingle Jam Community';
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-P6MYGN62FW"/>
     <script is:inline>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag("consent", "default", {
-            ad_storage: "denied",
-            ad_user_data: "denied",
-            ad_personalization: "denied",
-            analytics_storage: "granted",
-            functionality_storage: "granted",
-        });
-        gtag('config', 'G-P6MYGN62FW');
-        window.gtag = gtag;
+      window.dataLayer = window.dataLayer || [];
+
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+
+      gtag('js', new Date());
+      gtag("consent", "default", {
+        ad_storage: "denied",
+        ad_user_data: "denied",
+        ad_personalization: "denied",
+        analytics_storage: "granted",
+        functionality_storage: "granted",
+      });
+      gtag('config', 'G-P6MYGN62FW');
+      window.gtag = gtag;
     </script>
-    <link rel="sitemap" href="/sitemap-index.xml" />
+    <link rel="sitemap" href="/sitemap-index.xml"/>
     <meta charset="UTF-8"/>
     <meta name="description" content=`${description || ''}`/>
     <meta name="viewport" content="width=device-width"/>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
+  {
+    canonical &&
+          <link rel="canonical" href={canonical}/>
+  }
     <meta name="generator" content={Astro.generator}/>
     <title>{t}</title>
 </head>
