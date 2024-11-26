@@ -50,7 +50,7 @@ export function useFundraiser() {
   const db = getFirestore(app);
 
   const coll = collection(db, 'Fundraiser') as CollectionReference<JJCommunityFundraiser>
-  const d = doc(coll, '2023')
+  const d = doc(coll, '2024')
   const [data, setData] = createStore<({ data: JJCommunityFundraiser | null })>({data: null})
   let unsubscribe: any;
   onMount(() => {
