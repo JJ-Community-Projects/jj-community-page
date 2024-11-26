@@ -1,12 +1,13 @@
 import {Match, type ParentComponent, Switch} from 'solid-js'
-import red from '../../images/overlay/Jingle_Jam_Logo_2023_Red.png'
-import blue from '../../images/overlay/Jingle_Jam_Logo_2023_Blue.png'
-import white from '../../images/overlay/Jingle_Jam_Logo_2023_White.png'
+import red from '../../images/overlay/Jingle_Jam_Logo_2024_Red.png'
+import blue from '../../images/overlay/Jingle_Jam_Logo_2024_Blue.png'
+import white from '../../images/overlay/Jingle_Jam_Logo_2024_White.png'
 
 interface TitleProps {
   theme: string
   titleLogo: string
 }
+
 export const JJTitleCard: ParentComponent<TitleProps> = props => {
   const background = () => {
     switch (props.theme) {
