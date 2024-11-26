@@ -178,15 +178,15 @@ function creators(stream) {
 export async function jjJob() {
     const fs = admin.firestore();
 
-    const url = "https://develop.jingle-jam-tracker.pages.dev/api/tiltify";
-    // const url = "https://dashboard.jinglejam.co.uk/api/tiltify";
+    // const url = "https://develop.jingle-jam-tracker.pages.dev/api/tiltify";
+    const url = "https://dashboard.jinglejam.co.uk/api/tiltify";
     const {jjData, fundraiserData} = await getYogsApiData(url);
     const batch = fs.batch();
     const jjDonationTrackerDoc = fs.collection("JJDonationTracker")
-        .doc("2023");
+        .doc("2024");
     const jjFundraiserDoc = fs.collection("Fundraiser")
-        .doc("2023");
-    batch.set(jjDonationTrackerDoc, jjData);
+        .doc("2024");
+    // batch.set(jjDonationTrackerDoc, jjData);
     batch.set(jjFundraiserDoc, fundraiserData);
     await batch.commit();
     return Promise.resolve();
@@ -440,4 +440,4 @@ async function getHeader() {
 // endregion
 
 main()
-// jjJob()
+/ jjJob()
