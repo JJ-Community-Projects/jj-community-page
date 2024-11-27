@@ -147,6 +147,12 @@ export default {
 					900: '#451B03',
 				},
 			},
+			backgroundImage: {
+				jj_background: "url('images/scheduleOverlay/Jingle_Jam_Background_Greyscale.png')",
+				jj_background_2: "url('images/scheduleOverlay/Jingle_Jam_Background_Greyscale_2.png')",
+				jj_background_3: "url('images/scheduleOverlay/Jingle_Jam_Background_Greyscale_3.png')",
+				jj_background_4: "url('images/scheduleOverlay/Jingle_Jam_Background_Greyscale_4.png')",
+			},
 		},
 	},
 	plugins: [fluid, require("@tailwindcss/container-queries")],

@@ -4,6 +4,7 @@ import {FundraiserOverviewComponent} from './FundraiserOverviewComponent'
 import {Accordion} from '@kobalte/core'
 import {BiRegularChevronDown} from 'solid-icons/bi'
 import {twMerge} from 'tailwind-merge'
+import {SimpleScheduleOverviewComponent} from "./SimpleScheduleOverviewComponent.tsx";
 // import { useAnalytics } from '../../AnalyticsProvider'
 
 export const OverlayOverview: Component = () => {
@@ -82,6 +83,26 @@ const Body = () => {
           </Accordion.Header>
           <Accordion.Content class={'max-w-[90vw] p-2'}>
             <CharitiesOverviewComponent2/>
+          </Accordion.Content>
+        </Accordion.Item>
+        <Accordion.Item value={'custom_schedule'} class={'flex flex-col items-center transition-all'}>
+          <Accordion.Header>
+            <Accordion.Trigger
+              class={
+                'hover:scale-102 hover:brightness-102 bg-primary-200/50 border-accent-500 border-1 group m-2 flex w-[30vw] flex-row items-center rounded p-2 text-xl text-white shadow transition-all'
+              }
+            >
+              <p class={'flex-1 text-left'}>Custom JJ Schedule</p>
+              <BiRegularChevronDown
+                class={twMerge(
+                  'transition-all group-hover:animate-none',
+                  customCchedule() && 'rotate-180 animate-none',
+                )}
+              />
+            </Accordion.Trigger>
+          </Accordion.Header>
+          <Accordion.Content class={'max-w-[90vw] p-2'}>
+            <SimpleScheduleOverviewComponent />
           </Accordion.Content>
         </Accordion.Item>
       </Accordion.Root>

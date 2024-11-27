@@ -1,12 +1,14 @@
-const useParam = (key: string) => {
+export const useParam = (key: string) => {
   // const [params] = useSearchParams()
   const searchParams = new URLSearchParams(window.location.search);
   return searchParams.get(key)
   // return undefined // location.query[key]
 }
+
 export const useHeader = () => {
   return (useParam('header') ?? 'upnext').split(',')
 }
+
 export const useCauses = () => {
   const c = useParam('causes')
   if (!c) {
