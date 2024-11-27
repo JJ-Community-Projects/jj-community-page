@@ -308,6 +308,7 @@ const Body = () => {
             <input
               class={'bg-transparent'}
               type={'date'}
+              // @ts-ignore
               value={date().toISODate()}
               onchange={e => {
                 const d = date()
