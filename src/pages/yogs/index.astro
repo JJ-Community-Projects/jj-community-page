@@ -26,11 +26,11 @@ const filterCreators = () => {
 
 const filteredCreators = filterCreators();
 
-let description = 'The Yogscast Jingle Jam Schedule 2024'
+let description = 'Yogscast Jingle Jam 2024 Interactive Schedule with additional information.'
 
 if (filteredCreators) {
   if (filteredCreators.length === 1) {
-    description = `The Yogscast Jingle Jam Schedule 2024 for ${filteredCreators[0].name}`
+    description = `The Yogscast Jingle Jam 2024 Schedule for ${filteredCreators[0].name}`
   } else if (filteredCreators.length <= 3) {
     let nameStr = ''
     const filteredCreatorsLastIndex = filteredCreators.length - 1
@@ -42,7 +42,7 @@ if (filteredCreators) {
         nameStr += ' and '
       }
     }
-    description = `The Yogscast Jingle Jam Schedule 2024 for ${nameStr}`
+    description = `The Yogscast Jingle Jam 2024 Schedule for ${nameStr}`
   } else {
     let nameStr = ''
     for (let i = 0; i < 3; i++) {
@@ -53,7 +53,7 @@ if (filteredCreators) {
         nameStr += ' and more'
       }
     }
-    description = `The Yogscast Jingle Jam Schedule 2024 for ${nameStr}`
+    description = `The Yogscast Jingle Jam 2024 Schedule for ${nameStr}`
   }
 }
 ---
@@ -142,7 +142,7 @@ if (filteredCreators) {
     }
 </style>
 <BaseLayout
-        title="The Yogscast Jingle Jam Schedule 2024"
+        title="The Yogscast Jingle Jam 2024 Schedule"
         description={description}
         canonical="https://jinglejam.ostof.dev/yogs"
 >
