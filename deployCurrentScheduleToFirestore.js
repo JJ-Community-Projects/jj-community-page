@@ -63,7 +63,9 @@ async function update(year) {
                                     twitchUser
                                 }
                             })*/
-                            return {...stream}
+                            const creators = stream.creators
+                            creators.sort()
+                            return {...stream, creators}
                         })
                         return {
                             date,
@@ -136,7 +138,7 @@ function twitchVodsFromStream(stream) {
 }
 
 function creators(stream) {
-    return stream.creators?.map(creator => {
+    let creators = stream.creators?.map(creator => {
         const path = `./src/content/creators/${creator}.yaml`
         const creatorData = yaml.load(fs.readFileSync(path, 'utf8'));
         const name = creatorData.name
@@ -179,6 +181,12 @@ function creators(stream) {
 
         return data
     })?.filter(c => c != undefined) ?? []
+
+    creators.sort((a, b) => {
+        return a.label.localeCompare(b.label)
+    })
+
+    return creators
 }
 
 // endregion
