@@ -77,8 +77,8 @@ const Body: Component<BodyProps> = (props) => {
 
   return (
     <div class={'p-2'}>
-      <Show when={props.stream.subtitle}>
-        <Dialog.Description class="mb-6">{props.stream.subtitle}</Dialog.Description>
+      <Show when={props.stream.description}>
+        <Dialog.Description class="mb-6">{props.stream.description}</Dialog.Description>
       </Show>
       <p>{DateTime.fromJSDate(props.stream.start).toLocaleString({
         weekday: 'short',
