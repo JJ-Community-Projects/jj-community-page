@@ -1,7 +1,6 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import {Countdown} from "../../components/Countdown";
-import {Disclaimer} from "../../components/Disclaimer";
+import {CommunityPage} from "../../components/community/CommunityPage.tsx";
 ---
 <BaseLayout
   title="The Jingle Jam Community"
@@ -9,7 +8,6 @@ import {Disclaimer} from "../../components/Disclaimer";
   canonical="https://jinglejam.ostof.dev/community"
 >
     <p class="text-white ~text-2xl/4xl">Community</p>
-    <Countdown client:only="solid-js"/>
-    <p class="text-white">Community Fundraisers will be shown shortly after the Collection goes live</p>
+    <CommunityPage client:only="solid-js"/>
 
 </BaseLayout>
