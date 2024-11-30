@@ -3,7 +3,6 @@ streams:
   - creators:
       - ravs
       - sips
-      - gee
       - sherlock_hulmes
     duration_hours: 3
     end: '2024-12-06T14:00:00Z'
