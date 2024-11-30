@@ -141,7 +141,7 @@ function creators(stream) {
         const creatorData = yaml.load(fs.readFileSync(path, 'utf8'));
         const name = creatorData.name
         if (!creatorData.twitchUser) {
-            return undefined
+            // return undefined
         }
         let twitchUser = null;
         if (creatorData.twitchUser) {
@@ -161,13 +161,23 @@ function creators(stream) {
         }
         const color = creatorData?.style?.primaryColor ?? '#3584BF'
 
-        return {
+        const imageUrl = twitchUser?.profile_image_url ?? creatorData?.profileImage?.small
+
+        console.log(label, twitchUser)
+
+        const data = {
             id: creator,
             label: label,
             color: color,
             url: twitchUser ? `http://twitch.tv/${twitchUser?.login}` :
-                'http://twitch.tv/yogscast'
+                'http://twitch.tv/yogscast',
         }
+
+        if (imageUrl) {
+            data['imageUrl'] = imageUrl
+        }
+
+        return data
     })?.filter(c => c != undefined) ?? []
 }
 
@@ -438,6 +448,8 @@ async function getHeader() {
 }
 
 // endregion
+
+
 
 main()
 //jjJob()
