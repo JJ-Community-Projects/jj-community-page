@@ -1,11 +1,11 @@
 ---
 export const prerender = false;
-import {loadScheduleFromContent} from "../../content/loadScheduleFromContent";
-import {loadAllCreatorsFromContent} from "../../content/loadCreatorsFromContent";
-import {CurrentScheduleLoader} from "../../components/yogs/CurrentScheduleLoader.tsx";
+import {CreatorPill} from "../../../components/creators/CreatorPill";
+import {loadScheduleFromContent} from "../../../content/loadScheduleFromContent";
+import {loadAllCreatorsFromContent} from "../../../content/loadCreatorsFromContent";
+import {CurrentScheduleLoader} from "../../../components/yogs/CurrentScheduleLoader";
 
-import BaseLayout from "../../layouts/BaseLayout.astro";
-import {CreatorPill} from "../../components/creators/CreatorPill.tsx";
+import PWABaseLayout from "../../../layouts/PWABaseLayout.astro";
 
 const creators = await loadAllCreatorsFromContent();
 
@@ -57,7 +57,6 @@ if (filteredCreators) {
   }
 }
 ---
-
 <style is:global>
 
     :root {
@@ -141,7 +140,7 @@ if (filteredCreators) {
         }
     }
 </style>
-<BaseLayout
+<PWABaseLayout
         title="The Yogscast Jingle Jam 2024 Schedule"
         description={description}
         canonical="https://jinglejam.ostof.dev/yogs"
@@ -179,4 +178,4 @@ if (filteredCreators) {
         </div>
     </div>
 
-</BaseLayout>
+</PWABaseLayout>

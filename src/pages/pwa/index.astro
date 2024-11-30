@@ -1,12 +1,12 @@
 ---
-import BaseLayout from "../../layouts/BaseLayout.astro";
-import {CommunityPage} from "../../components/community/CommunityPage.tsx";
+import PWABaseLayout from "../../layouts/PWABaseLayout.astro";
+import {CommunityPage} from "../../components/community/CommunityPage";
 ---
-<BaseLayout
+<PWABaseLayout
   title="The Jingle Jam Community"
   description="A central place to showcase the streams of the Jingle Jam!"
   canonical="https://jinglejam.ostof.dev/community"
 >
     <p class="text-white ~text-2xl/4xl">Community</p>
     <CommunityPage client:only="solid-js"/>
-</BaseLayout>
+</PWABaseLayout>

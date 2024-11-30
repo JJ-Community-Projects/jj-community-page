@@ -1,6 +1,6 @@
 ---
-import Navigation from '#components/navigation/Navigation.astro';
 import Footer from "../components/footer/Footer.astro";
+import PWANavigation from "../components/navigation/PWANavigation.astro";
 
 
 interface Props {
@@ -65,7 +65,7 @@ const t = title || 'Jingle Jam Community';
 <body class="h-screen overflow-hidden font-poppins from-primary-shade via-primary to-primary-shade bg-gradient-to-b">
 <div class="h-full overflow-y-auto p-2">
     <div class="flex flex-col justify-start min-h-screen">
-        <Navigation/>
+        <PWANavigation/>
         <div class="mt-4 mx-4 xl:mx-20 flex flex-col justify-start items-center">
             <slot/>
         </div>

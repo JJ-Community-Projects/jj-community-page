@@ -7,8 +7,6 @@ import {useConfig} from "../../lib/useConfig.ts";
 import {Countdown} from "../Countdown.tsx";
 import {MobileYogsScheduleComponent} from "./schedule/mobile/MobileYogsScheduleComponent.tsx";
 import {
-  DiscordIcon,
-  GlobeIcon,
   InstagramIcon,
   TiktokIcon,
   TwitchIcon,
