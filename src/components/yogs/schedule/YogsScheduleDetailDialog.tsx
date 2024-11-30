@@ -7,7 +7,7 @@ import {getTextColor} from "../../../lib/utils/textColors.ts";
 import type {ContentVod, FullCreator, FullStream} from "../../../lib/model/ContentTypes.ts";
 import {YogsStreamUtils} from "../../../lib/utils/YogsStreamUtils.ts";
 import {useNow} from "../../../lib/utils/useNow.ts";
-import {log, logCreatorFromSlotClick, logCreatorSlotFilterClick} from "../../../lib/analytics.ts";
+import {logCreatorFromSlotClick, logCreatorSlotFilterClick} from "../../../lib/analytics.ts";
 import {CreatorDialog} from "../../creators/CreatorDialog.tsx";
 import {createModalSignal, type ModalSignal} from "../../../lib/createModalSignal.ts";
 import {useYogsSchedule} from "./provider/YogsScheduleProvider.tsx";
@@ -23,9 +23,7 @@ export const YogsScheduleDetailDialog: Component<YogsScheduleDetailDialogProps> 
   const background = () => {
     return props.stream.style?.background?.colors?.at(0) ?? '#ff0000'
   }
-  // <Dialog.Overlay class={'fixed inset-0 z-50 bg-black bg-opacity-20'} />
-  // <div class={'fixed inset-0 z-50 flex items-center justify-center'}>
-  // <Dialog.Content class={'h-full w-full max-w-[500px] p-2 lg:w-[min(calc(100vw_-_16px),_500px)] lg:p-16'}>
+
   return (
     <Dialog.Root open={props.modalSignal.isOpen()} onOpenChange={props.modalSignal.setOpen}>
       <Dialog.Portal>
@@ -36,6 +34,7 @@ export const YogsScheduleDetailDialog: Component<YogsScheduleDetailDialogProps> 
             class="p-2 flex flex-row gap-4 rounded-t-2xl"
             style={{
               background: background(),
+              color: getTextColor(background())
             }}
           >
             <button class={'rounded-full hover:bg-accent-200/10 aspect-square'}
@@ -61,18 +60,18 @@ interface BodyProps {
 }
 
 const Body: Component<BodyProps> = (props) => {
-  const {stream} = props
+  const stream = () => props.stream
   const now = useNow()
 
   const countdownFormat = () => {
-    if (YogsStreamUtils.start(stream).diff(now()).as('day') < 1) {
-      return YogsStreamUtils.start(stream).diff(now()).toFormat("hh'h' mm'm' ss's'")
+    if (YogsStreamUtils.start(stream()).diff(now()).as('day') < 1) {
+      return YogsStreamUtils.start(stream()).diff(now()).toFormat("hh'h' mm'm' ss's'")
     }
-    return YogsStreamUtils.start(stream).diff(now()).toFormat("dd'd' hh'h' mm'm' ss's'")
+    return YogsStreamUtils.start(stream()).diff(now()).toFormat("dd'd' hh'h' mm'm' ss's'")
   }
 
   const isBefore = () => {
-    return YogsStreamUtils.isBefore(stream, now())
+    return YogsStreamUtils.isBefore(stream(), now())
   }
 
   return (

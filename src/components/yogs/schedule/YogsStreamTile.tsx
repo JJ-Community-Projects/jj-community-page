@@ -1,4 +1,4 @@
-import {type Component, createSignal, Show} from "solid-js";
+import {type Component, Show} from "solid-js";
 import {YogsScheduleDetailDialog} from "./YogsScheduleDetailDialog.tsx";
 import {getTextColor} from "../../../lib/utils/textColors.ts";
 import {BiLogosTwitch, BiLogosYoutube} from "solid-icons/bi";
@@ -23,17 +23,17 @@ export const YogsStreamTile: Component<YogsStreamTileProps> = (props) => {
 
   const {isSlotPartOfFilter} = useCreatorFilter()
 
-  const stream = props.stream
-  const title = stream.title
-  const subtitle = stream.subtitle
-  const style = stream.style
-  const tileSize = style.tileSize
-  const orientation = style.background.orientation
-  const colors = style.background.colors ?? ['#ff0', '#f0f']
-  const enable = () => isSlotPartOfFilter(stream)
+  const stream = () => props.stream
+  const title = () => stream().title
+  const subtitle = () => stream().subtitle
+  const style = () => stream().style
+  const tileSize = () => style().tileSize
+  const orientation = () => style().background.orientation
+  const colors = () => style().background.colors ?? ['#ff0', '#f0f']
+  const enable = () => isSlotPartOfFilter(stream())
 
   function orientationInCss() {
-    switch (orientation) {
+    switch (orientation()) {
       case 'TD':
         return 'to bottom'
       case 'LR':
@@ -51,18 +51,18 @@ export const YogsStreamTile: Component<YogsStreamTileProps> = (props) => {
     }
   }
 
-  const gradient = `linear-gradient(${orientationInCss()}, ${colors.join(', ')})`
+  const gradient = () => `linear-gradient(${orientationInCss()}, ${colors().join(', ')})`
 
   const buttonStyle = () => {
     if (enable()) {
       return {
-        'background-image': gradient,
-        color: getTextColor(colors[0]),
+        'background-image': gradient(),
+        color: getTextColor(colors()[0]),
       }
     } else {
       return {
-        'background-image': gradient,
-        color: getTextColor(colors[0]),
+        'background-image': gradient(),
+        color: getTextColor(colors()[0]),
         filter: 'brightness(0.5)',
       }
     }
@@ -72,23 +72,23 @@ export const YogsStreamTile: Component<YogsStreamTileProps> = (props) => {
 
 
   const showCountdown = () => {
-    return YogsStreamUtils.isBefore(stream, now())
+    return YogsStreamUtils.isBefore(stream(), now())
   }
 
-  const isLive = () => YogsStreamUtils.isLive(stream, now())
+  const isLive = () => YogsStreamUtils.isLive(stream(), now())
   const countdown = () => {
-    const diff = DateTime.fromJSDate(stream.start).diff(now())
+    const diff = DateTime.fromJSDate(stream().start).diff(now())
     if (diff.as('day') < 1) {
-      return DateTime.fromJSDate(stream.start).diff(now()).toFormat("h'h' mm'm' ss's'")
+      return DateTime.fromJSDate(stream().start).diff(now()).toFormat("h'h' mm'm' ss's'")
     }
-    return DateTime.fromJSDate(stream.start).diff(now()).toFormat("d'd' hh'h' mm'm' ss's'")
+    return DateTime.fromJSDate(stream().start).diff(now()).toFormat("d'd' hh'h' mm'm' ss's'")
   }
 
   return (
     <>
       <div
         style={{
-          height: `calc(${tileSize} * var(--jj-schedule-slot-size))`,
+          height: `calc(${tileSize()} * var(--jj-schedule-slot-size))`,
           width: '100%',
         }}
         class="p-1.5"
@@ -99,14 +99,14 @@ export const YogsStreamTile: Component<YogsStreamTileProps> = (props) => {
           style={buttonStyle()}
           disabled={!enable()}
           onClick={() => {
-            logSlotClick(stream)
+            logSlotClick(stream())
             modal.open()
           }}
         >
           <div class={'@container h-full flex flex-col items-center justify-center w-full'}>
-            <p class={'~text-sm/2xl font-bold tracking-widest uppercase text-pretty'}>{title}</p>
-            <Show when={subtitle}>
-              <p class={'~text-xs/md tracking-widest uppercase text-pretty'}>{subtitle}</p>
+            <p class={'~text-sm/2xl font-bold tracking-widest uppercase text-pretty'}>{title()}</p>
+            <Show when={subtitle()}>
+              <p class={'~text-xs/md tracking-widest uppercase text-pretty'}>{subtitle()}</p>
             </Show>
             <Show when={showCountdown()}>
               <p class={'font-mono text-xs font-bold lowercase tracking-wide line-clamp-1'}>{countdown()}</p>
