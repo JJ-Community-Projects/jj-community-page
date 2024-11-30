@@ -29,3 +29,4 @@ pnpm-debug.log*
 .wrangler/
 
 jingle-jam-firebase-adminsdk.json
+updateTwitchUser.js
