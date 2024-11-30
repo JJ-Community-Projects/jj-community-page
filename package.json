@@ -15,7 +15,8 @@
     "generate": "drizzle-kit generate",
     "migrate": "drizzle-kit migrate",
     "local:d1": "bash ./run_local_migration.sh",
-    "deployCurrentScheduletoFirestore": "node deployCurrentScheduleToFirestore.js"
+    "deployCurrentScheduletoFirestore": "node deployCurrentScheduleToFirestore.js",
+    "updateTwitchUser": "node updateTwitchUser.js"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.3",
