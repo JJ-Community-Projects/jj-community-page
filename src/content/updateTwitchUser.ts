@@ -4,6 +4,7 @@ import * as yaml from 'yaml';
 import {getToken, getTwitchDataByLogins} from "../lib/twitchAPI.ts";
 
 export async function updateTwitchUser() {
+  console.log("Updating twitch users");
   try {
     const creatorsDir = path.join(process.cwd(), "./src/content/creators");
     const creators = fs.readdirSync(creatorsDir);
