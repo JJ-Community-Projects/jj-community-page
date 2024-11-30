@@ -14,7 +14,7 @@ streams:
         orientation: TD
       tileSize: 1
     subtitle: Pedguin & Boba
-    title: Card Games
+    title: Card Cats
     vods: []
   - creators:
       - lewis
@@ -32,6 +32,7 @@ streams:
       tileSize: 1
     subtitle: Lewis, Duncan & Harry
     title: Jaffa Factory
+    description: And maybe a special guest...
     vods: []
   - creators:
       - hat_films
