@@ -1,4 +1,4 @@
-import {type Component, Match, Show, Switch} from "solid-js";
+import {type Component, createEffect, Match, Show, Switch} from "solid-js";
 import {YogsScheduleComponent} from "./schedule/YogsScheduleComponent.tsx";
 import {useYogsScheduleFirestore} from "../../lib/useYogsScheduleFirestore.ts";
 import type {FullCreator, FullSchedule} from "../../lib/model/ContentTypes.ts";
@@ -49,18 +49,20 @@ interface BodyProps {
 
 const Body: Component<BodyProps> = (props) => {
   const schedule = useYogsScheduleFirestore(props.creators);
-
+  createEffect(() => {
+    console.log('Schedule updated', schedule)
+  })
   return (
     <Switch>
-      <Match when={schedule() !== undefined}>
+      <Match when={schedule.data}>
         <>
           <div class="desktop-schedule w-full flex flex-col items-center justify-center">
             <YogsScheduleComponent
-              schedule={schedule()!}
+              schedule={schedule.data!}
               creators={props.creators}
             >
             </YogsScheduleComponent>
-            <p class={'text-center text-white pb-4'}>Last Updated {schedule()?.updatedAt.toLocaleString({
+            <p class={'text-center text-white pb-4'}>Last Updated {schedule.data!.updatedAt.toLocaleString({
               year: 'numeric',
               month: 'short',
               day: 'numeric',
@@ -72,11 +74,11 @@ const Body: Component<BodyProps> = (props) => {
           </div>
           <div class="mobile-schedule w-full flex flex-col items-center justify-center">
             <MobileYogsScheduleComponent
-              schedule={schedule()!}
+              schedule={schedule.data!}
               creators={props.creators}
             >
             </MobileYogsScheduleComponent>
-            <p class={'text-center text-white pb-4'}>Last Updated {schedule()?.updatedAt.toLocaleString({
+            <p class={'text-center text-white pb-4'}>Last Updated {schedule.data!.updatedAt.toLocaleString({
               month: 'short',
               day: 'numeric',
               hour: 'numeric',
@@ -87,10 +89,13 @@ const Body: Component<BodyProps> = (props) => {
           </div>
         </>
       </Match>
-      <Match when={schedule() === undefined}>
+      <Match when={schedule.loading}>
         <div class={'loading-container'}>
           <PlaceholderSchedule schedule={props.fallbackSchedule}/>
         </div>
+      </Match>
+      <Match when={schedule.error}>
+        <p>{schedule.error?.message}</p>
       </Match>
     </Switch>
   );
