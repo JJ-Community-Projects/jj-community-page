@@ -43,7 +43,7 @@ interface BodyProps {
 
 const Body: Component<BodyProps> = (props) => {
 
-  const fundraiser = () => props.fundraisers
+  const fundraiser = () => props.fundraisers.toSorted((a, b) => b.raised - a.raised)
 
   const top = () => fundraiser().at(0)
 
