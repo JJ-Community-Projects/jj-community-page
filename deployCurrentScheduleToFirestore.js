@@ -138,7 +138,9 @@ function twitchVodsFromStream(stream) {
 }
 
 function creators(stream) {
+    console.log('stream', stream)
     let creators = stream.creators?.map(creator => {
+        console.log('creator',creator)
         const path = `./src/content/creators/${creator}.yaml`
         const creatorData = yaml.load(fs.readFileSync(path, 'utf8'));
         const name = creatorData.name
