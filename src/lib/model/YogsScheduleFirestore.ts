@@ -61,7 +61,7 @@ function streamToFullStream(stream: Stream, creatorsMap: { [key: string]: FullCr
     id: DateTime.fromISO(stream.start).toFormat('yyyyMMddHHmm'),
     start: DateTime.fromISO(stream.start).toJSDate(),
     end: DateTime.fromISO(stream.end).toJSDate(),
-    creators: stream.creators.map(id => creatorsMap[id])
+    creators: stream.creators.filter(id => id in creatorsMap).map(id => creatorsMap[id])
   }
 }
 
