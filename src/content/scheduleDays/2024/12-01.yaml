@@ -3,6 +3,7 @@ streams:
   - creators: # todo add nina and jack later
       - pedguin
       - boba
+      - bekkiboom
       - briony
       - daf
     duration_hours: 3
