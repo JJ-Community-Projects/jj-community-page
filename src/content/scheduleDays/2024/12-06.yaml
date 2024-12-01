@@ -38,6 +38,7 @@ streams:
       - simon
       - harry
       - tom
+      - sarah
     duration_hours: 4.5
     end: '2024-12-06T20:00:00Z'
     start: '2024-12-06T17:00:00Z'
