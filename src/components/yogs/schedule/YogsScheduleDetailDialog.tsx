@@ -12,6 +12,7 @@ import {CreatorDialog} from "../../creators/CreatorDialog.tsx";
 import {createModalSignal, type ModalSignal} from "../../../lib/createModalSignal.ts";
 import {useYogsSchedule} from "./provider/YogsScheduleProvider.tsx";
 import {useCreatorFilter} from "./provider/CreatorFilterProvider.tsx";
+import {StreamDisclaimer} from "../ScheduleDisclaimer.tsx";
 
 interface YogsScheduleDetailDialogProps {
   stream: FullStream
@@ -29,7 +30,7 @@ export const YogsScheduleDetailDialog: Component<YogsScheduleDetailDialogProps> 
       <Dialog.Portal>
         <Dialog.Overlay class="fixed inset-0 bg-black/20 lg:p-16 p-2"/>
         <Dialog.Content
-          class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-2xl shadow-xl w-[calc(100vw_-_24px)] lg:w-[min(calc(100vw_-_16px),_386px)] h-[90vh]">
+          class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-2xl shadow-xl w-[calc(100vw_-_24px)] lg:w-[min(calc(100vw_-_16px),_386px)] h-[90vh] flex flex-col">
           <Dialog.Title
             class="p-2 flex flex-row gap-4 rounded-t-2xl"
             style={{
@@ -75,45 +76,53 @@ const Body: Component<BodyProps> = (props) => {
   }
 
   return (
-    <div class={'p-2'}>
-      <Show when={props.stream.description}>
-        <Dialog.Description class="mb-6">{props.stream.description}</Dialog.Description>
-      </Show>
-      <p>{DateTime.fromJSDate(props.stream.start).toLocaleString({
-        weekday: 'short',
-        month: 'short',
-        day: 'numeric',
-        hour: 'numeric',
-        minute: 'numeric',
-        timeZoneName: 'short'
-      })}</p>
-      <Show when={isBefore()}>
-        <p>{countdownFormat()}</p>
-      </Show>
-      <Show when={props.stream.vods && props.stream.vods.length > 0}>
-        <p>Vods</p>
-        <div class={'flex flex-wrap gap-2'}>
-          <For each={props.stream.vods}>
-            {
-              vod => (<VodComponent vod={vod}/>)
-            }
-          </For>
+    <div class="h-full flex flex-1 flex-col overflow-hidden overscroll-none">
+      <div
+        class={'h-full flex flex-col overflow-auto overflow-x-hidden scrollbar-thin scrollbar-corner-primary-100 scrollbar-thumb-accent-500 scrollbar-track-accent-100'}>
+        <div class={'h-full flex flex-col justify-between'}>
+          <div class={'flex flex-col'}>
+            <Show when={props.stream.description}>
+              <Dialog.Description class="mb-6">{props.stream.description}</Dialog.Description>
+            </Show>
+            <p>{DateTime.fromJSDate(props.stream.start).toLocaleString({
+              weekday: 'short',
+              month: 'short',
+              day: 'numeric',
+              hour: 'numeric',
+              minute: 'numeric',
+              timeZoneName: 'short'
+            })}</p>
+            <Show when={isBefore()}>
+              <p>{countdownFormat()}</p>
+            </Show>
+            <Show when={props.stream.vods && props.stream.vods.length > 0}>
+              <p>Vods</p>
+              <div class={'flex flex-wrap gap-2'}>
+                <For each={props.stream.vods}>
+                  {
+                    vod => (<VodComponent vod={vod}/>)
+                  }
+                </For>
+              </div>
+            </Show>
+            <Show when={props.stream.vods && props.stream.vods.length > 0 && props.stream.creators.length > 0}>
+              <div class={'h-2'}/>
+            </Show>
+            <Show when={props.stream.creators.length > 0}>
+              <p>Creators</p>
+              <div class={'flex flex-wrap gap-2'}>
+                <For each={props.stream.creators}>
+                  {
+                    creator => (
+                      <CreatorComponent creator={creator} modalSignal={props.modalSignal} stream={props.stream}/>)
+                  }
+                </For>
+              </div>
+            </Show>
+          </div>
+          <StreamDisclaimer/>
         </div>
-      </Show>
-
-      <Show when={props.stream.vods && props.stream.vods.length > 0 && props.stream.creators.length > 0}>
-        <div class={'h-2'}/>
-      </Show>
-      <Show when={props.stream.creators.length > 0}>
-        <p>Creators</p>
-        <div class={'flex flex-wrap gap-2'}>
-          <For each={props.stream.creators}>
-            {
-              creator => (<CreatorComponent creator={creator} modalSignal={props.modalSignal} stream={props.stream}/>)
-            }
-          </For>
-        </div>
-      </Show>
+      </div>
     </div>
   )
 }
@@ -208,7 +217,7 @@ const CreatorComponent: Component<CreatorComponentProps> = (props) => {
   return (
     <>
       <button
-        class="cursor-pointer p-2 rounded-full flex flex-row gap-2 items-center hover:scale-105 hover:brightness-105 transition-all duration-200"
+        class="~text-xs/base cursor-pointer p-2 rounded-full flex flex-row gap-2 items-center hover:scale-105 hover:brightness-105 transition-all duration-200"
         style={{
           'background-color': bg,
           'color': textColor,
@@ -223,8 +232,7 @@ const CreatorComponent: Component<CreatorComponentProps> = (props) => {
             <img
                 src={imageUrl}
                 alt={label}
-                height="32" width="32"
-                class="rounded-full w-8 h-8"
+                class="rounded-full ~w-5/8 ~h-5/8"
             />
         }
         <span>{label}</span>
