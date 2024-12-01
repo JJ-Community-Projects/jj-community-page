@@ -23,7 +23,10 @@ streams:
       tileSize: 1
     subtitle: Tree Decorating
     title: Office Cam
-    vods: []
+    vods:
+      - type: youtube
+        label: YouTube VOD
+        link: https://www.youtube.com/watch?v=0aysdrm_jvg
   - creators:
       - ben
       - tom
@@ -39,7 +42,10 @@ streams:
       tileSize: 1
     subtitle: Tom & Ben
     title: Jingle Jam Hype Stream
-    vods: []
+    vods:
+      - type: youtube
+        label: YouTube VOD
+        link: https://www.youtube.com/watch?v=9erz4gY9hmM
   - creators:
       - lewis
       - simon
@@ -55,7 +61,10 @@ streams:
       tileSize: 1
     subtitle: Lewis & Simon
     title: Jingle Cats
-    vods: []
+    vods:
+      - type: youtube
+        label: YouTube VOD
+        link: https://www.youtube.com/watch?v=I_OQ9tc_Xl8
   - creators:
       - daltos
       - duncan
@@ -76,4 +85,4 @@ streams:
       tileSize: 1
     subtitle: Spiff, Lewis & Friends
     title: Christmas Trains
-    vods: []
+    vods: [ ]
