@@ -17,6 +17,7 @@ streams:
     title: Spiff U
     vods: []
   - creators:
+      - ben
       - fionn
       - ravs
     duration_hours: 3
@@ -31,6 +32,7 @@ streams:
       tileSize: 1
     subtitle: Jingle Joust
     title: Games Night Special
+    description: Hosted by Ben & Alex
     vods: []
   - creators:
       - daltos
