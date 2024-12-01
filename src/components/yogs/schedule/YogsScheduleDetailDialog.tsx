@@ -79,7 +79,7 @@ const Body: Component<BodyProps> = (props) => {
     <div class="h-full flex flex-1 flex-col overflow-hidden overscroll-none">
       <div
         class={'h-full flex flex-col overflow-auto overflow-x-hidden scrollbar-thin scrollbar-corner-primary-100 scrollbar-thumb-accent-500 scrollbar-track-accent-100'}>
-        <div class={'h-full flex flex-col justify-between'}>
+        <div class={'px-2 pt-2 pb-4 h-full flex flex-col justify-between'}>
           <div class={'flex flex-col'}>
             <Show when={props.stream.description}>
               <Dialog.Description class="mb-6">{props.stream.description}</Dialog.Description>
@@ -109,7 +109,7 @@ const Body: Component<BodyProps> = (props) => {
               <div class={'h-2'}/>
             </Show>
             <Show when={props.stream.creators.length > 0}>
-              <p>Creators</p>
+              <p class={'text-lg'}>Creators</p>
               <div class={'flex flex-wrap gap-2'}>
                 <For each={props.stream.creators}>
                   {
