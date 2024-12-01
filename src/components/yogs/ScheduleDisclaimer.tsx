@@ -30,10 +30,7 @@ export const StreamDisclaimer: Component = () => {
   return (
     <div class={'max-w-[30rem] text-center text-pretty text-xs'}>
       <p>
-        The schedule is subject to change. Not all participants are confirmed and some streams might be moved or cancelled.
-      </p>
-      <p>
-        For more information visit the Yogscast's social media.
+        The schedule is subject to change and not all participants are confirmed. For more information visit the Yogscast's social media.
       </p>
       <ExternalLinks/>
     </div>
