@@ -85,4 +85,7 @@ streams:
       tileSize: 1
     subtitle: Spiff, Lewis & Friends
     title: Christmas Trains
-    vods: [ ]
+    vods:
+      - type: youtube
+        label: YouTube VOD
+        link: https://www.youtube.com/watch?v=KKxL4HK5i6c
