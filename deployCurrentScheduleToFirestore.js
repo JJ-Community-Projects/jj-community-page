@@ -242,6 +242,7 @@ export async function getYogsApiData(url) {
         .map((x) => {
             const c = x["livestream"]["channel"]?.toLowerCase();
             const user = x["user"]["slug"];
+            /*
             if (c === "yogscast") {
                 switch (user) {
                     case "crustydoggo":
@@ -257,7 +258,7 @@ export async function getYogsApiData(url) {
                         x["livestream"]["channel"] = "potatomcwhiskey";
                         break;
                 }
-            }
+            }*/
             return x;
         })
         .map((x) => x["livestream"]["channel"]?.toLowerCase())
@@ -326,6 +327,16 @@ export async function getYogsApiData(url) {
         ...notLiveChannel,
     ];
 
+    newCampaignList.sort((a, b) => {
+        if (a.isLive && b.isLive) {
+            return b.amount - a.amount;
+        } else if (a.isLive) {
+            return -1;
+        } else if (b.isLive) {
+            return 1;
+        }
+        return b.amount - a.amount;
+    });
     const jjData = {
         date,
         avgConversionRate,
@@ -339,17 +350,17 @@ export async function getYogsApiData(url) {
     const newNewCampaignList = []
 
     // remove duplicates from newCampaignList
-    newCampaignList.forEach((campaign) => {
+    /*newCampaignList.forEach((campaign) => {
         const campaignIndex = newNewCampaignList.findIndex((c) => c["causeId"] === campaign["causeId"]);
         if (campaignIndex === -1) {
             newNewCampaignList.push(campaign)
         }
-    })
+    })*/
 
     const fundraiserData = {
         date,
         avgConversionRate,
-        campaigns: newNewCampaignList,
+        campaigns: newCampaignList,
     };
     return {jjData, fundraiserData, data};
 }
@@ -461,5 +472,12 @@ async function getHeader() {
 
 
 
-main()
+// main()
 //jjJob()
+async function test() {
+    const url = "https://dashboard.jinglejam.co.uk/api/tiltify";
+    const data = await getYogsApiData(url)
+    console.log(data.fundraiserData.campaigns)
+}
+
+test()
