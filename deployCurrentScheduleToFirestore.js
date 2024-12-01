@@ -472,7 +472,7 @@ async function getHeader() {
 
 
 
-// main()
+main()
 //jjJob()
 async function test() {
     const url = "https://dashboard.jinglejam.co.uk/api/tiltify";
@@ -480,4 +480,4 @@ async function test() {
     console.log(data.fundraiserData.campaigns)
 }
 
-test()
+//test()
