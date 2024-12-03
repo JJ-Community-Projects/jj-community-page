@@ -5,7 +5,6 @@ import {BiLogosTwitch, BiLogosYoutube} from "solid-icons/bi";
 import {BsPeopleFill} from "solid-icons/bs";
 import {useNow} from "../../../lib/utils/useNow.ts";
 import {DateTime} from "luxon";
-import {LivePulseDot} from "../../common/LivePulseDot.tsx";
 import {useCreatorFilter} from "./provider/CreatorFilterProvider.tsx";
 import {twMerge} from "tailwind-merge";
 import {YogsStreamUtils} from "../../../lib/utils/YogsStreamUtils.ts";
@@ -125,7 +124,7 @@ export const YogsStreamTile: Component<YogsStreamTileProps> = (props) => {
                 <p class={'font-mono text-xs font-bold lowercase tracking-wide line-clamp-1'}>{countdown()}</p>
               </Show>
               <Show when={!showCountdown() && isLive()}>
-                <LivePulseDot/>
+                <p class={'~text-md/lg font-bold tracking-wide text-white'}>LIVE</p>
               </Show>
             </div>
             <Indicator stream={props.stream}/>

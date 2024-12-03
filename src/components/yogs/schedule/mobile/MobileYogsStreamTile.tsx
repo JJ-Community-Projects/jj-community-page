@@ -1,11 +1,10 @@
-import {type Component, createSignal, Match, type ParentComponent, Show, Switch} from "solid-js";
+import {type Component, Show} from "solid-js";
 import type {FullStream} from "../../../../lib/model/ContentTypes.ts";
 import {DateTime} from "luxon";
 import {useNow} from "../../../../lib/utils/useNow.ts";
 import {BiLogosTwitch, BiLogosYoutube} from "solid-icons/bi";
 import {getTextColor} from "../../../../lib/utils/textColors.ts";
 import {YogsStreamUtils} from "../../../../lib/utils/YogsStreamUtils.ts";
-import {LivePulseDot} from "../../../common/LivePulseDot.tsx";
 import {BsPeopleFill} from "solid-icons/bs";
 import {YogsScheduleDetailDialog} from "../YogsScheduleDetailDialog.tsx";
 import {logSlotClick} from "../../../../lib/analytics.ts";
@@ -88,6 +87,7 @@ export const MobileYogsStreamTile: Component<MobileScheduleBodyProps> = (props) 
   const style = stream.style
   const colors = style.background.colors ?? ['#ff0', '#f0f']
   const orientation = style.background.orientation
+
   function orientationInCss() {
     switch (orientation) {
       case 'TD':
@@ -137,7 +137,7 @@ export const MobileYogsStreamTile: Component<MobileScheduleBodyProps> = (props) 
               <p class={'font-mono text-xs'}>{countdown()}</p>
             </Show>
             <Show when={!showCountdown() && isLive()}>
-              <LivePulseDot/>
+              <p class={'~text-md/lg font-bold tracking-wide text-white'}>LIVE</p>
             </Show>
             <div class={'flex w-full flex-row justify-around'}>
               <Show when={hasTwitchVod()}>
@@ -153,7 +153,7 @@ export const MobileYogsStreamTile: Component<MobileScheduleBodyProps> = (props) 
             </div>
           </div>
         </div>
-      </div> 
+      </div>
       <YogsScheduleDetailDialog
         stream={props.stream}
         modalSignal={modal}
