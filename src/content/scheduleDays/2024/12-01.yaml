@@ -25,8 +25,11 @@ streams:
     title: Office Cam
     vods:
       - type: youtube
-        label: YouTube VOD
+        label: Youtube Live
         link: https://www.youtube.com/watch?v=0aysdrm_jvg
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2315572995
   - creators:
       - ben
       - tom
@@ -44,8 +47,11 @@ streams:
     title: Jingle Jam Hype Stream
     vods:
       - type: youtube
-        label: YouTube VOD
+        label: Youtube Live
         link: https://www.youtube.com/watch?v=9erz4gY9hmM
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2315572995?t=3h3m26s
   - creators:
       - lewis
       - simon
@@ -63,8 +69,11 @@ streams:
     title: Jingle Cats
     vods:
       - type: youtube
-        label: YouTube VOD
+        label: Youtube Live
         link: https://www.youtube.com/watch?v=I_OQ9tc_Xl8
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2315572995?t=6h1m35s
   - creators:
       - daltos
       - duncan
@@ -87,5 +96,8 @@ streams:
     title: Christmas Trains
     vods:
       - type: youtube
-        label: YouTube VOD
+        label: Youtube Live
         link: https://www.youtube.com/watch?v=KKxL4HK5i6c
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2315572995?t=9h11m45s

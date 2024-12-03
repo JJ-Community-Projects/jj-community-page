@@ -15,7 +15,13 @@ streams:
       tileSize: 1
     subtitle: Briony & Kirsty
     title: Cosy Games
-    vods: []
+    vods:
+      - type: youtube
+        label: Youtube Live
+        link: https://youtu.be/03T5z2F3LRM?t=76
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2316400059?t=0h1m32s
   - creators:
       - lewis
       - tom
@@ -36,7 +42,13 @@ streams:
       tileSize: 1
     subtitle: Wheelboy 2.0
     title: Tom's TABS
-    vods: []
+    vods:
+      - type: youtube
+        label: Youtube Live
+        link: https://youtu.be/SClTdM4suco?t=2
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2316400059?t=3h4m39s
   - creators:
       - duncan
       - osie
@@ -69,7 +81,13 @@ streams:
       - Team 2: Harry, Ravs, Shadow
       - Team 3: Ben, Fionn, Lolip
       - Team 4: Bekki, Mousie, Breeh
-    vods: []
+    vods:
+      - type: youtube
+        label: Youtube Live
+        link: https://www.youtube.com/watch?v=g4dZELB5cu8
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2316587415?t=0h1m17s
   - creators:
       - nilesy
       - zylus
@@ -88,4 +106,7 @@ streams:
       tileSize: 1
     subtitle: Nilesy, Zylus, Breeh, Rythian
     title: Protessional Strem
-    vods: []
+    vods:
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2316721826

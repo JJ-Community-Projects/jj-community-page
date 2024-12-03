@@ -15,7 +15,10 @@ streams:
       tileSize: 1
     subtitle: Pedguin & Boba
     title: Card Cats
-    vods: []
+    vods:
+      - type: youtube
+        label: Youtube Live
+        link: https://youtu.be/_TaEm3V4ib0?t=94
   - creators:
       - lewis
       - duncan
@@ -34,7 +37,10 @@ streams:
     subtitle: Lewis, Duncan & Harry
     title: Jaffa Factory
     description: And maybe a special guest...
-    vods: []
+    vods:
+      - type: youtube
+        label: Youtube Live
+        link: https://youtu.be/SQKRuveS4vg?t=127
   - creators:
       - hat_films
     duration_hours: 3
@@ -49,4 +55,4 @@ streams:
       tileSize: 2
     subtitle: Ross, Smith & Trott
     title: Hat Films Music Stream
-    vods: []
+    vods: [ ]
