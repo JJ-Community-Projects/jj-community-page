@@ -1,4 +1,4 @@
-import {type Component, createSignal, Show} from "solid-js";
+import {type Component, createSignal, Match, type ParentComponent, Show, Switch} from "solid-js";
 import type {FullStream} from "../../../../lib/model/ContentTypes.ts";
 import {DateTime} from "luxon";
 import {useNow} from "../../../../lib/utils/useNow.ts";
@@ -19,20 +19,30 @@ export const MobileYogsStreamTile: Component<MobileScheduleBodyProps> = (props) 
   const stream = props.stream
   const now = useNow()
 
+  const diff = () => {
+    return DateTime.fromJSDate(stream.start).diff(now())
+  }
 
   const countdown = () => {
-    const diff = DateTime.fromJSDate(stream.start).diff(now())
-    if (diff.as('day') < 1) {
-      return DateTime.fromJSDate(stream.start).diff(now()).toFormat("hh'h' mm'm' ss's'")
+    const d = diff()
+    if (d.as('hour') < 1) {
+      return d.toFormat("mm'm' ss's'")
     }
-    return DateTime.fromJSDate(stream.start).diff(now()).toFormat("dd'd' hh'h' mm'm' ss's'")
+    if (d.as('day') < 1) {
+      return d.toFormat("h'h' mm'm' ss's'")
+    }
+    return d.toFormat("d'd' hh'h' mm'm' ss's'")
   }
 
   const showCountdown = () => {
     return YogsStreamUtils.isBefore(stream, now())
   }
-  const isLive = () => YogsStreamUtils.isLive(stream, now())
 
+  const isLive = () => {
+    const start = DateTime.fromJSDate(stream.start)
+    const end = DateTime.fromJSDate(stream.end)
+    return start < now() && end > now()
+  }
 
   function textColor(background: string) {
     return getTextColor(background)
@@ -143,7 +153,7 @@ export const MobileYogsStreamTile: Component<MobileScheduleBodyProps> = (props) 
             </div>
           </div>
         </div>
-      </div>
+      </div> 
       <YogsScheduleDetailDialog
         stream={props.stream}
         modalSignal={modal}

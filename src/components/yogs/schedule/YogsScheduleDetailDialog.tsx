@@ -30,7 +30,7 @@ export const YogsScheduleDetailDialog: Component<YogsScheduleDetailDialogProps> 
       <Dialog.Portal>
         <Dialog.Overlay class="fixed inset-0 bg-black/20 lg:p-16 p-2"/>
         <Dialog.Content
-          class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-2xl shadow-xl w-[calc(100vw_-_24px)] lg:w-[min(calc(100vw_-_16px),_386px)] h-[90vh] flex flex-col">
+          class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-2xl shadow-xl w-[calc(100vw_-_24px)] lg:w-[min(calc(100vw_-_16px),_386px)] md:h-[90vh] h-[70vh] flex flex-col">
           <Dialog.Title
             class="p-2 flex flex-row gap-4 rounded-t-2xl"
             style={{
@@ -74,7 +74,11 @@ const Body: Component<BodyProps> = (props) => {
   const isBefore = () => {
     return YogsStreamUtils.isBefore(stream(), now())
   }
-
+  const isLive = () => {
+    const start = DateTime.fromJSDate(stream().start)
+    const end = DateTime.fromJSDate(stream().end)
+    return start < now() && end > now()
+  }
   return (
     <div class="h-full flex flex-1 flex-col overflow-hidden overscroll-none">
       <div
@@ -83,6 +87,9 @@ const Body: Component<BodyProps> = (props) => {
           <div class={'flex flex-col'}>
             <Show when={props.stream.description}>
               <Dialog.Description class="mb-6">{props.stream.description}</Dialog.Description>
+            </Show>
+            <Show when={isLive()}>
+              <LiveButton/>
             </Show>
             <p>{DateTime.fromJSDate(props.stream.start).toLocaleString({
               weekday: 'short',
@@ -140,7 +147,7 @@ const VodComponent: Component<VodProps> = (props) => {
         <a
           target={'_blank'}
           class={
-            'bg-youtube-100/50 hover:bg-youtube-100 flex flex-row items-center gap-1 rounded-full px-2 py-0.5 text-black no-underline hover:cursor-pointer'
+            'transition-all bg-youtube-100/50 hover:bg-youtube-100 flex flex-row items-center gap-1 rounded-full px-2 py-0.5 text-black no-underline hover:cursor-pointer'
           }
           href={props.vod.link}
         >
@@ -154,7 +161,7 @@ const VodComponent: Component<VodProps> = (props) => {
         <a
           target={'_blank'}
           class={
-            'bg-twitch-200/50 hover:bg-twitch-200 flex flex-row items-center gap-1 rounded-full px-2 py-0.5 text-black no-underline hover:cursor-pointer'
+            'transition-all bg-twitch-200/50 hover:bg-twitch-200 flex flex-row items-center gap-1 rounded-full px-2 py-0.5 text-black no-underline hover:cursor-pointer'
           }
           href={props.vod.link}
         >
@@ -168,7 +175,7 @@ const VodComponent: Component<VodProps> = (props) => {
         <a
           target={'_blank'}
           class={
-            'bg-twitch-200 hover:bg-twitch-200 hover:text-twitch flex flex-row items-center gap-1 rounded-full px-2 py-0.5 text-black no-underline hover:cursor-pointer'
+            'transition-all bg-twitch-200 hover:bg-twitch-200 hover:text-twitch flex flex-row items-center gap-1 rounded-full px-2 py-0.5 text-black no-underline hover:cursor-pointer'
           }
           href={props.vod.link}
         >
@@ -242,4 +249,28 @@ const CreatorComponent: Component<CreatorComponentProps> = (props) => {
     </>
   )
 
+}
+
+
+const LiveButton = () => {
+  return (
+    <div class={'flex flex-row py-1'}>
+      <a
+        target={'_blank'}
+        class={
+          'transition-all bg-twitch-200/50 hover:bg-twitch-200 flex flex-row items-center gap-1 rounded-full px-2 py-0.5 text-black no-underline hover:cursor-pointer'
+        }
+        href={'https://twitch.tv/yogscast'}
+      >
+        <BsTwitch/> Watch Live <div class={'h-2 w-2'}>
+                  <span class="relative flex h-2 w-2">
+                    <span
+                      class={'absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75 duration-700'}
+                    />
+                    <span class={'relative inline-flex h-full w-full rounded-full bg-red-500'}/>
+                  </span>
+      </div>
+      </a>
+    </div>
+  )
 }

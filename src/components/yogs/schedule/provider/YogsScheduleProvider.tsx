@@ -1,5 +1,6 @@
-import {createContext, createSignal, type ParentComponent, useContext} from "solid-js";
+import {createContext, createSignal, onMount, type ParentComponent, useContext} from "solid-js";
 import type {FullCreator, FullSchedule} from "../../../../lib/model/ContentTypes.ts";
+import {DateTime} from "luxon";
 
 const useYogsScheduleHook = (schedule: FullSchedule, _creators: FullCreator[]) => {
 
@@ -14,6 +15,30 @@ const useYogsScheduleHook = (schedule: FullSchedule, _creators: FullCreator[]) =
   const prevWeek = () => setWeekIndex((prev) => (prev - 1 + numberOfWeeks()) % numberOfWeeks())
   const nextDay = () => setDayIndex((prev) => (prev + 1) % numberOfDays())
   const prevDay = () => setDayIndex((prev) => (prev - 1 + numberOfDays()) % numberOfDays())
+
+  const firstDay = DateTime.fromJSDate(days()[0].date, {
+    zone: 'Europe/London'
+  })
+  const lastDay = DateTime.fromJSDate(days()[numberOfDays()-1].date, {
+    zone: 'Europe/London'
+  })
+  const now = DateTime.now().setZone('Europe/London')
+
+  const isNowBetween = now >= firstDay && now <= lastDay
+
+  onMount(() => {
+    if (!isNowBetween) {
+      return
+    }
+    for (let i = 0; i < numberOfDays(); i++) {
+      const day = days()[i]
+      const date = DateTime.fromJSDate(day.date)
+      if (date.hasSame(now, 'day')) {
+        setDayIndex(i)
+        break
+      }
+    }
+  })
 
   const times = () => {
     return schedule.times

@@ -1,4 +1,4 @@
-import {type Component, Show} from "solid-js";
+import {type Component, Match, type ParentComponent, Show, Switch} from "solid-js";
 import {YogsScheduleDetailDialog} from "./YogsScheduleDetailDialog.tsx";
 import {getTextColor} from "../../../lib/utils/textColors.ts";
 import {BiLogosTwitch, BiLogosYoutube} from "solid-icons/bi";
@@ -75,13 +75,25 @@ export const YogsStreamTile: Component<YogsStreamTileProps> = (props) => {
     return YogsStreamUtils.isBefore(stream(), now())
   }
 
-  const isLive = () => YogsStreamUtils.isLive(stream(), now())
+  const isLive = () => {
+    const start = DateTime.fromJSDate(stream().start)
+    const end = DateTime.fromJSDate(stream().end)
+    return start < now() && end > now()
+  }
+
+  const diff = () => {
+    return DateTime.fromJSDate(stream().start).diff(now())
+  }
+
   const countdown = () => {
-    const diff = DateTime.fromJSDate(stream().start).diff(now())
-    if (diff.as('day') < 1) {
-      return DateTime.fromJSDate(stream().start).diff(now()).toFormat("h'h' mm'm' ss's'")
+    const d = diff()
+    if (d.as('hour') < 1) {
+      return d.toFormat("mm'm' ss's'")
     }
-    return DateTime.fromJSDate(stream().start).diff(now()).toFormat("d'd' hh'h' mm'm' ss's'")
+    if (d.as('day') < 1) {
+      return d.toFormat("h'h' mm'm' ss's'")
+    }
+    return d.toFormat("d'd' hh'h' mm'm' ss's'")
   }
 
   return (
@@ -91,32 +103,34 @@ export const YogsStreamTile: Component<YogsStreamTileProps> = (props) => {
           height: `calc(${tileSize()} * var(--jj-schedule-slot-size))`,
           width: '100%',
         }}
-        class="p-1.5"
+        class="p-0.5"
       >
-        <button
-          class={twMerge("w-full h-full rounded-2xl p-1 flex flex-col text-center items-center justify-center transition-all",
-            enable() ? 'hover:scale-105 hover:brightness-105' : '')}
-          style={buttonStyle()}
-          disabled={!enable()}
-          onClick={() => {
-            logSlotClick(stream())
-            modal.open()
-          }}
-        >
-          <div class={'@container h-full flex flex-col items-center justify-center w-full'}>
-            <p class={'~text-sm/2xl font-bold tracking-widest uppercase text-pretty'}>{title()}</p>
-            <Show when={subtitle()}>
-              <p class={'~text-xs/md tracking-widest uppercase text-pretty'}>{subtitle()}</p>
-            </Show>
-            <Show when={showCountdown()}>
-              <p class={'font-mono text-xs font-bold lowercase tracking-wide line-clamp-1'}>{countdown()}</p>
-            </Show>
-            <Show when={!showCountdown() && isLive()}>
-              <LivePulseDot/>
-            </Show>
-          </div>
-          <Indicator stream={props.stream}/>
-        </button>
+        <LivePulse stream={stream()}>
+          <button
+            class={twMerge("w-full h-full rounded-2xl p-1 flex flex-col text-center items-center justify-center transition-all",
+              enable() ? 'hover:scale-105 hover:brightness-105' : '')}
+            style={buttonStyle()}
+            disabled={!enable()}
+            onClick={() => {
+              logSlotClick(stream())
+              modal.open()
+            }}
+          >
+            <div class={'@container h-full flex flex-col items-center justify-center w-full'}>
+              <p class={'~text-sm/2xl font-bold tracking-widest uppercase text-pretty'}>{title()}</p>
+              <Show when={subtitle()}>
+                <p class={'~text-xs/md tracking-widest uppercase text-pretty'}>{subtitle()}</p>
+              </Show>
+              <Show when={showCountdown()}>
+                <p class={'font-mono text-xs font-bold lowercase tracking-wide line-clamp-1'}>{countdown()}</p>
+              </Show>
+              <Show when={!showCountdown() && isLive()}>
+                <LivePulseDot/>
+              </Show>
+            </div>
+            <Indicator stream={props.stream}/>
+          </button>
+        </LivePulse>
       </div>
       <YogsScheduleDetailDialog
         stream={props.stream}
@@ -170,4 +184,37 @@ export const Indicator: Component<IndicatorProps> = (props) => {
       </div>
     </>
   );
+}
+
+interface LivePulseProps {
+  stream: FullStream
+}
+
+const LivePulse: ParentComponent<LivePulseProps> = (props) => {
+  const stream = () => props.stream
+  const now = useNow()
+
+  const isLive = () => {
+    const start = DateTime.fromJSDate(stream().start)
+    const end = DateTime.fromJSDate(stream().end)
+    return start < now() && end > now()
+  }
+  return (
+    <Switch>
+      <Match when={isLive()}>
+        <div class={'relative w-full h-full'}>
+          <div class={'absolute w-full h-full bg-accent-300 rounded-2xl animate-pulse duration-300'}>
+          </div>
+          <div class={'absolute p-1 w-full h-full'}>
+            {props.children}
+          </div>
+        </div>
+      </Match>
+      <Match when={!isLive()}>
+        <div class={'p-1 w-full h-full'}>
+          {props.children}
+        </div>
+      </Match>
+    </Switch>
+  )
 }

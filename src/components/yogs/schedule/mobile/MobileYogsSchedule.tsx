@@ -23,7 +23,7 @@ const MobileScheduleBody: Component = () => {
   }
 
   return (
-    <div class={'w-full flex flex-col gap-4'}>
+    <div class={'w-full flex flex-col gap-2'}>
       <Show when={isEmpty()}>
         <For each={slots()}>{slot => <MobileYogsStreamTile stream={slot} />}</For>
       </Show>
