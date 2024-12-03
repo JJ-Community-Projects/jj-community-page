@@ -53,28 +53,38 @@ const Body: Component<BodyProps> = (props) => {
 
 
   return (
-    <div class={'flex flex-col items-center gap-4'}>
-      <Show when={top()}>
-        <div class={'md:w-[50%]'}>
-          <Child campaign={top()!}/>
+    <>
+      <div class={'hidden sm:flex flex-col items-center gap-4'}>
+        <Show when={top()}>
+          <div class={'md:w-[50%]'}>
+            <Child campaign={top()!}/>
+          </div>
+        </Show>
+        <div class={'grid grid-cols-[repeat(auto-fit,_minmax(300px,_1fr))] content-center gap-4'}>
+          <For each={top10()}>
+            {(campaign: Campaign) => {
+              return <Child campaign={campaign}/>
+            }}
+          </For>
         </div>
-      </Show>
-      <div class={'grid grid-cols-[repeat(auto-fit,_minmax(300px,_1fr))] content-center gap-4'}>
-        <For each={top10()}>
+        <div class={'grid grid-cols-[repeat(auto-fit,_minmax(200px,_1fr))] content-center gap-2'}>
+          <For each={rest()}>
+            {(campaign: Campaign) => {
+              return <Child campaign={campaign}/>
+            }}
+          </For>
+        </div>
+      </div>
+      <div class={'flex sm:hidden flex-col items-center gap-4 w-full'}>
+        <For each={fundraiser()}>
           {(campaign: Campaign) => {
             return <Child campaign={campaign}/>
           }}
         </For>
       </div>
-      <div class={'grid grid-cols-[repeat(auto-fit,_minmax(200px,_1fr))] content-center gap-2'}>
-        <For each={rest()}>
-          {(campaign: Campaign) => {
-            return <Child campaign={campaign}/>
-          }}
-        </For>
-      </div>
-    </div>
-  );
+    </>
+  )
+    ;
 }
 
 
@@ -112,7 +122,7 @@ const Child: Component<{
   }
 
   return (
-    <div class={'min-h-24 flex flex-col'}>
+    <div class={'w-full min-h-24 flex flex-col'}>
       <div
         class={
           'min-h-24 flex h-full w-full flex-row items-start gap-2 rounded-2xl bg-gradient-to-br from-white to-gray-100 p-1.5 text-black shadow-xl transition-all'
