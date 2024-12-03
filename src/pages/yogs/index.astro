@@ -1,5 +1,6 @@
 ---
 export const prerender = false;
+import TVExtBanner from "../../components/TVExtBanner.astro";
 import {loadScheduleFromContent} from "../../content/loadScheduleFromContent";
 import {loadAllCreatorsFromContent} from "../../content/loadCreatorsFromContent";
 import {CurrentScheduleLoader} from "../../components/yogs/CurrentScheduleLoader.tsx";
@@ -146,6 +147,8 @@ if (filteredCreators) {
         description={description}
         canonical="https://jinglejam.ostof.dev/yogs"
 >
+    <TVExtBanner/>
+
     <div class={'min-h-32'}>
         <CurrentScheduleLoader client:only="solid-js" creators={creators} fallbackSchedule={fallbackSchedule!}/>
     </div>

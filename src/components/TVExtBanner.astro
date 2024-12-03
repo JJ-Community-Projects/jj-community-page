@@ -1,0 +1,48 @@
+---
+const now = new Date();
+const jjEnd = new Date('2024-12-14T23:59:59Z');
+const showBanner = true;// now < jjEnd;
+---
+{
+  showBanner && (
+  <div
+          id='tv-ext-banner'
+          class="md:max-w-[40%] m-2 hidden flex-col gap-2 justify-center items-center p-2 rounded-2xl shadow bg-white">
+      <p class="text-lg">Twitch Extension</p>
+      <div class="flex flex-col justify-center items-center text-center text-xs text-wrap">
+          <p>The Jingle Jam Community Twitch Extension is <b>now Live</b> on the <a href="http://twitch.tv/yogscast"
+                                                                                    target="_blank"
+                                                                                    class="underline font-bold">Yogscast
+              Twitch Channel!</a> On Desktop scroll down below the video player or on mobile click on the <i>Jingle Jam
+              Community
+              Extension</i> button above the chat. If you have a Fundraiser, you can <a
+                  href="https://dashboard.twitch.tv/extensions/7m5fitr4o8raxn6fv59lndv2iy0uuz" target="_blank"
+                  class="underline">add it to your stream as well</a>.</p>
+      </div>
+      <button
+              id={"tv-ext-banner-banner-got-it"}
+              class="bg-accent p-2 rounded-full text-white transition-all hover:bg-accent-400"
+      >
+          Got it
+      </button>
+  </div>
+    )
+  }
+
+<script is:inline>
+  console.log('init')
+  const localstorage = window.localStorage;
+  const button = document.getElementById("tv-ext-banner-banner-got-it");
+
+  const shouldShow = localstorage.getItem('tv-ext-banner') ?? 'true';
+  console.log('shouldShow', shouldShow);
+  if (shouldShow === 'true') {
+    document.getElementById('tv-ext-banner').classList.remove('hidden');
+    document.getElementById('tv-ext-banner').classList.add('flex');
+    button.addEventListener('click', () => {
+      localstorage.setItem('tv-ext-banner', 'false');
+      document.getElementById('tv-ext-banner').remove();
+      window.gtag('event', 'dismiss_' + 'tv-ext-banner');
+    });
+  }
+</script>
