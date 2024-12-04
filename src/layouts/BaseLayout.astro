@@ -1,6 +1,7 @@
 ---
 import Navigation from '#components/navigation/Navigation.astro';
 import Footer from "../components/footer/Footer.astro";
+import FeedbackBanner from "../components/FeedbackBanner.astro";
 
 
 interface Props {
@@ -66,6 +67,7 @@ const t = title || 'Jingle Jam Community';
 <div class="h-full overflow-y-auto p-2">
     <div class="flex flex-col justify-start min-h-screen">
         <Navigation/>
+        <FeedbackBanner/>
         <div class="mt-4 mx-4 xl:mx-20 flex flex-col justify-start items-center">
             <slot/>
         </div>
