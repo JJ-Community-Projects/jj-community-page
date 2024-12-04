@@ -18,6 +18,7 @@ streams:
     vods: []
   - creators:
       - spiff
+      - lewis
     duration_hours: 3
     end: '2024-12-04T17:00:00Z'
     start: '2024-12-04T14:00:00Z'
@@ -34,6 +35,8 @@ streams:
   - creators:
       - shadowatnoon
       - ravs
+      - mini-muka
+      - harry
     duration_hours: 3
     end: '2024-12-04T20:00:00Z'
     start: '2024-12-04T17:00:00Z'
@@ -49,7 +52,6 @@ streams:
     vods: []
   - creators:
       - longest_johns
-      - lewis
     duration_hours: 4
     end: '2024-12-05T00:00:00Z'
     start: '2024-12-04T20:00:00Z'
