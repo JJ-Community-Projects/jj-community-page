@@ -1,6 +1,7 @@
 import {createContext, createSignal, onMount, type ParentComponent, useContext} from "solid-js";
 import type {FullCreator, FullSchedule} from "../../../../lib/model/ContentTypes.ts";
 import {DateTime} from "luxon";
+import {useNextJJEndDate} from "../../../../lib/utils/jjDates.ts";
 
 const useYogsScheduleHook = (schedule: FullSchedule, _creators: FullCreator[]) => {
 
@@ -26,10 +27,20 @@ const useYogsScheduleHook = (schedule: FullSchedule, _creators: FullCreator[]) =
 
   const isNowBetween = now >= firstDay && now <= lastDay
 
+  const jjEnd = useNextJJEndDate()
+
   onMount(() => {
     if (!isNowBetween) {
       return
     }
+
+    const now = DateTime.now().setZone('Europe/London')
+    const startWeek2 = DateTime.fromISO(now.year+'-12-08T01:00:00.000Z')
+    const end = jjEnd()
+    if (now >= startWeek2 && now <= end) {
+      setWeekIndex(1)
+    }
+
     for (let i = 0; i < numberOfDays(); i++) {
       const day = days()[i]
       const date = DateTime.fromJSDate(day.date)
