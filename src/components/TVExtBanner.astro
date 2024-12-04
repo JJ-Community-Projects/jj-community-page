@@ -1,7 +1,7 @@
 ---
 const now = new Date();
 const jjEnd = new Date('2024-12-14T23:59:59Z');
-const showBanner = true;// now < jjEnd;
+const showBanner = now < jjEnd;
 ---
 {
   showBanner && (
