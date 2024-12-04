@@ -19,6 +19,9 @@ streams:
       - type: youtube
         label: Youtube Live
         link: https://youtu.be/_TaEm3V4ib0?t=94
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2317181259?t=0h1m53s
   - creators:
       - lewis
       - duncan
@@ -41,6 +44,9 @@ streams:
       - type: youtube
         label: Youtube Live
         link: https://youtu.be/SQKRuveS4vg?t=127
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2317181259?t=3h2m20s
   - creators:
       - hat_films
     duration_hours: 3
@@ -55,4 +61,10 @@ streams:
       tileSize: 2
     subtitle: Ross, Smith & Trott
     title: Hat Films Music Stream
-    vods: [ ]
+    vods:
+      - type: youtube
+        label: Youtube Live
+        link: https://youtu.be/67IDgngDrwc?t=459s
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2316400059?t=6h1m38s
