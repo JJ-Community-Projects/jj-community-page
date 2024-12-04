@@ -1,5 +1,7 @@
 import fluid, {extract, screens} from 'fluid-tailwind'
 
+const {fontFamily} = require('tailwindcss/defaultTheme');
+
 /** @type {import('tailwindcss').Config} */
 export default {
     content: ['./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}', extract],
@@ -10,6 +12,7 @@ export default {
             fontFamily: {
                 poppins: ['Poppins'],
                 babas: ['Bebas'],
+                sans: ['Inter', ...fontFamily.sans],
             },
 
             fontSize: {
@@ -159,5 +162,6 @@ export default {
         fluid,
         require("@tailwindcss/container-queries"),
         require('tailwind-scrollbar'),
+        require('@tailwindcss/typography')
     ],
 }

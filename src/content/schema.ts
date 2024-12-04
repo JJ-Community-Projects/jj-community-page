@@ -18,6 +18,7 @@ export const StreamSchema = z.object({
   title: z.string(),
   subtitle: z.string().optional(),
   description: z.string().optional(),
+  markdownDescription: z.string().optional(),
   start: DateSchema,
   end: DateSchema,
   creators: z.array(reference('creators')).optional(),

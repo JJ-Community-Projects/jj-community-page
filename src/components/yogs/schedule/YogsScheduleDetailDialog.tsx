@@ -13,6 +13,8 @@ import {createModalSignal, type ModalSignal} from "../../../lib/createModalSigna
 import {useYogsSchedule} from "./provider/YogsScheduleProvider.tsx";
 import {useCreatorFilter} from "./provider/CreatorFilterProvider.tsx";
 import {StreamDisclaimer} from "../ScheduleDisclaimer.tsx";
+import {SolidMarkdown} from "solid-markdown";
+import remarkGfm from "remark-gfm";
 
 interface YogsScheduleDetailDialogProps {
   stream: FullStream
@@ -71,6 +73,7 @@ const Body: Component<BodyProps> = (props) => {
     return YogsStreamUtils.start(stream()).diff(now()).toFormat("dd'd' hh'h' mm'm' ss's'")
   }
 
+
   const isBefore = () => {
     return YogsStreamUtils.isBefore(stream(), now())
   }
@@ -85,9 +88,21 @@ const Body: Component<BodyProps> = (props) => {
         class={'h-full flex flex-col overflow-auto overflow-x-hidden scrollbar-thin scrollbar-corner-primary-100 scrollbar-thumb-accent-500 scrollbar-track-accent-100'}>
         <div class={'px-2 pt-2 pb-4 h-full flex flex-col justify-between'}>
           <div class={'flex flex-col'}>
-            <Show when={props.stream.description}>
+            <Show when={props.stream.description && !props.stream.markdownDescription}>
               <Dialog.Description class="mb-6">{props.stream.description}</Dialog.Description>
             </Show>
+
+            <Show when={props.stream.markdownDescription}>
+              <div class='prose'>
+                <SolidMarkdown
+                  children={props.stream.markdownDescription}
+                  renderingStrategy={'reconcile'}
+                  remarkPlugins={[remarkGfm]}
+                  linkTarget={'_blank'}
+                />
+              </div>
+            </Show>
+
             <Show when={isLive()}>
               <LiveButton/>
             </Show>

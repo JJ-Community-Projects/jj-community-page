@@ -26,8 +26,10 @@
     "@astrojs/tailwind": "^5.1.0",
     "@kobalte/core": "^0.13.1",
     "@tailwindcss/container-queries": "^0.1.1",
+    "@tailwindcss/typography": "^0.5.15",
     "astro": "^4.15.1",
     "astro-zod-to-json-schema": "^0.0.2",
+    "debug": "^4.3.7",
     "firebase": "^10.14.1",
     "firebase-admin": "^12.6.0",
     "googleapis": "^143.0.0",
@@ -39,11 +41,12 @@
     "solid-i18n": "^1.1.0",
     "solid-icons": "^1.1.0",
     "solid-js": "^1.8.22",
+    "solid-markdown": "^2.0.14",
     "solid-qr-code": "^0.1.11",
     "solid-transition-group": "^0.2.3",
     "tailwind-merge": "^2.3.0",
-    "tailwindcss": "^3.4.10",
     "tailwind-scrollbar": "^3.1.0",
+    "tailwindcss": "^3.4.10",
     "yaml": "^2.6.0"
   },
   "imports": {
@@ -63,6 +66,7 @@
     "@types/luxon": "^3.4.2",
     "fluid-tailwind": "^1.0.3",
     "ts-node": "^10.9.2",
-    "typescript": "^5.6.3"
+    "typescript": "^5.6.3",
+    "vite-plugin-commonjs": "^0.10.4"
   }
 }
