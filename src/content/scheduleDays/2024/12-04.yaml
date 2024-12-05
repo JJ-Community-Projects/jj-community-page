@@ -15,7 +15,13 @@ streams:
       tileSize: 1
     subtitle: Ben & Lolip
     title: Jingle Chums
-    vods: []
+    vods:
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2317982977?t=0h2m13s
+      - type: youtube
+        label: Youtube Live
+        link: https://www.youtube.com/watch?v=t5utttH2VUQ
   - creators:
       - spiff
       - lewis
@@ -59,7 +65,13 @@ streams:
       - Team GREEN: Mark H, Mousie, Joe Hickson, [Digby](https://www.twitch.tv/digbytathamwarter)
     '
 
-    vods: []
+    vods:
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2317982977?t=3h2m39s
+      - type: youtube
+        label: Youtube Live
+        link: https://www.youtube.com/watch?v=_OnBqwMgb-Q
   - creators:
       - shadowatnoon
       - ravs
@@ -77,7 +89,13 @@ streams:
       tileSize: 1
     subtitle: Arcade Special
     title: Minecraft Game Show
-    vods: []
+    vods:
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2317982977?t=6h7m22s
+      - type: youtube
+        label: Youtube Live
+        link: https://www.youtube.com/watch?v=ZnTlJiDUlvw
   - creators:
       - longest_johns
     duration_hours: 4
@@ -92,4 +110,10 @@ streams:
       tileSize: 1
     subtitle: The Longest Johns
     title: XMas Carols
-    vods: []
+    vods:
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2317982977?t=9h7m19s
+      - type: youtube
+        label: Youtube Live
+        link: https://www.youtube.com/watch?v=s-TBbR7HwHs
