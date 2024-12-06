@@ -9,12 +9,12 @@ streams:
     style:
       background:
         colors:
-          - '#06b8aa'
-          - '#06b8aa'
+          - '#3484bf'
+          - '#3484bf'
         orientation: TD
       tileSize: 1
-    subtitle: 'Zylus & Kirsty'
-    title: 'The Yogs Games Special'
+    subtitle: Zylus & Kirsty
+    title: The Yogs Games Special
     vods: []
   - creators:
       - ravs
@@ -27,12 +27,12 @@ streams:
     style:
       background:
         colors:
-          - '#06b8aa'
-          - '#06b8aa'
+          - '#3484bf'
+          - '#3484bf'
         orientation: TD
       tileSize: 1
-    subtitle: 'Ravs, Sarah, Osie, Sips'
-    title: 'Pre-Poker Party Time'
+    subtitle: Ravs, Sarah, Osie, Sips
+    title: Pre-Poker Party Time
     vods: []
   - creators:
       - tom
@@ -43,8 +43,8 @@ streams:
     style:
       background:
         colors:
-          - '#06b8aa'
-          - '#06b8aa'
+          - '#3484bf'
+          - '#3484bf'
         orientation: TD
       tileSize: 2
     subtitle: Hosted by Tom & Pyrion

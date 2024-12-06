@@ -9,22 +9,22 @@ streams:
     style:
       background:
         colors:
-          - '#06b8aa'
-          - '#06b8aa'
+          - '#d23d99'
+          - '#d23d99'
         orientation: TD
       tileSize: 1
     subtitle: Boba & Pedguin
     title: Detective Duo
     vods: []
-  - creators: [ ]
+  - creators: []
     duration_hours: 3
     end: '2024-12-13T17:00:00Z'
     start: '2024-12-13T14:00:00Z'
     style:
       background:
         colors:
-          - '#06b8aa'
-          - '#06b8aa'
+          - '#d23d99'
+          - '#d23d99'
         orientation: TD
       tileSize: 1
     subtitle: Award Ceremony
@@ -38,14 +38,13 @@ streams:
     style:
       background:
         colors:
-          - '#06b8aa'
-          - '#06b8aa'
+          - '#d23d99'
+          - '#d23d99'
         orientation: TD
       tileSize: 1
     subtitle: Mark & Pals
     title: Shadow of Doubt Murder Mystery
     vods: []
-
   - creators:
       - pedguin
     duration_hours: 3
@@ -54,8 +53,8 @@ streams:
     style:
       background:
         colors:
-          - '#06b8aa'
-          - '#06b8aa'
+          - '#d23d99'
+          - '#d23d99'
         orientation: TD
       tileSize: 1
     subtitle: ''

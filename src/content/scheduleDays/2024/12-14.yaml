@@ -9,13 +9,13 @@ streams:
     style:
       background:
         colors:
-          - '#06b8aa'
-          - '#06b8aa'
+          - '#f07800'
+          - '#f07800'
         orientation: TD
       tileSize: 1
     subtitle: Pyrion & Zylus
     title: Frosty Bros
-    vods: [ ]
+    vods: []
   - creators:
       - simon
       - lewis
@@ -26,13 +26,13 @@ streams:
     style:
       background:
         colors:
-          - '#06b8aa'
-          - '#06b8aa'
+          - '#f07800'
+          - '#f07800'
         orientation: TD
       tileSize: 1
     subtitle: Simon, Lewis & Nina
     title: Fighting Fantasy
-    vods: [ ]
+    vods: []
   - creators:
       - boba
     duration_hours: 3
@@ -41,13 +41,13 @@ streams:
     style:
       background:
         colors:
-          - '#06b8aa'
-          - '#06b8aa'
+          - '#f07800'
+          - '#f07800'
         orientation: TD
       tileSize: 1
     subtitle: Feat. Special Guest
     title: Coffee with Boba
-    vods: [ ]
+    vods: []
   - creators:
       - breeh
     duration_hours: 3
@@ -56,10 +56,10 @@ streams:
     style:
       background:
         colors:
-          - '#06b8aa'
-          - '#06b8aa'
+          - '#f07800'
+          - '#f07800'
         orientation: TD
       tileSize: 1
     subtitle: Hosted By Breeh
     title: Late Late Crew
-    vods: [ ]
+    vods: []

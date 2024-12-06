@@ -9,8 +9,8 @@ streams:
     style:
       background:
         colors:
-          - '#06b8aa'
-          - '#06b8aa'
+          - '#fb9900'
+          - '#fb9900'
         orientation: TD
       tileSize: 1
     subtitle: Ben & Mousie
@@ -27,8 +27,8 @@ streams:
     style:
       background:
         colors:
-          - '#06b8aa'
-          - '#06b8aa'
+          - '#fb9900'
+          - '#fb9900'
         orientation: TD
       tileSize: 1
     subtitle: Briony, Kirsty & Rythian
@@ -46,8 +46,8 @@ streams:
     style:
       background:
         colors:
-          - '#06b8aa'
-          - '#06b8aa'
+          - '#fb9900'
+          - '#fb9900'
         orientation: TD
       tileSize: 2
     subtitle: The Pursuit

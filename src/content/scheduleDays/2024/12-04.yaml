@@ -48,23 +48,24 @@ streams:
     subtitle: With the Spiffing Brit
     title: Minecraft Jingle Walls
     description: >
-      Hosted by Lewis & Spiff
-      - Team RED: Harry, Chosenarchitect, Tangofrags, Beardstone 
-      - Team YELLOW: RT, mscupcakes, Ravs, Osie 
-      - Team BLUE: Ben, Duncan, Sparkles, Briony 
-      - Team GREEN: Mark H, Mousie, Joe Hickson, Digby
-    markdownDescription: '
-      Hosted by Lewis & Spiffing Brit.
+      Hosted by Lewis & Spiff - Team RED: Harry, Chosenarchitect, Tangofrags,
+      Beardstone  - Team YELLOW: RT, mscupcakes, Ravs, Osie  - Team BLUE: Ben,
+      Duncan, Sparkles, Briony  - Team GREEN: Mark H, Mousie, Joe Hickson, Digby
+    markdownDescription: >2-
+       Hosted by Lewis & Spiffing Brit.
+      - Team RED: Harry,
+      [Chosenarchitect](https://www.twitch.tv/chosenarchitect),
+      [Tangofrags](https://www.twitch.tv/tangofrags),
+      [Beardstone](https://www.twitch.tv/mrbeardstone)
 
-      - Team RED: Harry, [Chosenarchitect](https://www.twitch.tv/chosenarchitect), [Tangofrags](https://www.twitch.tv/tangofrags), [Beardstone](https://www.twitch.tv/mrbeardstone)
+      - Team YELLOW: RT, [mscupcakes](https://www.twitch.tv/mscupcakes), Ravs,
+      Osie 
 
-      - Team YELLOW: RT, [mscupcakes](https://www.twitch.tv/mscupcakes), Ravs, Osie 
+      - Team BLUE: Ben, Duncan,
+      [Sparkles*](https://www.instagram.com/ghostofsparkles/), Briony 
 
-      - Team BLUE: Ben, Duncan, [Sparkles*](https://www.instagram.com/ghostofsparkles/), Briony 
-
-      - Team GREEN: Mark H, Mousie, Joe Hickson, [Digby](https://www.twitch.tv/digbytathamwarter)
-    '
-
+      - Team GREEN: Mark H, Mousie, Joe Hickson,
+      [Digby](https://www.twitch.tv/digbytathamwarter) 
     vods:
       - type: twitch
         label: Twitch

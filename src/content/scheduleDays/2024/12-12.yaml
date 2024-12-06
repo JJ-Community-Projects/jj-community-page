@@ -33,7 +33,7 @@ streams:
     subtitle: RTGame & Friends
     title: WII Shit
     vods: []
-  - creators: [ ]
+  - creators: []
     duration_hours: 3
     end: '2024-12-12T20:00:00Z'
     start: '2024-12-12T17:00:00Z'
@@ -47,7 +47,7 @@ streams:
     subtitle: In Minecraft in Real Life feat NRB
     title: BOTC
     vods: []
-  - creators: [ ]
+  - creators: []
     duration_hours: 3
     end: '2024-12-12T23:00:00Z'
     start: '2024-12-12T20:00:00Z'

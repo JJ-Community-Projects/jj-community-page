@@ -1,28 +1,28 @@
 date: '2024-12-10'
 streams:
-  - creators: [ ]
+  - creators: []
     duration_hours: 3
     end: '2024-12-10T14:00:00Z'
     start: '2024-12-10T11:00:00Z'
     style:
       background:
         colors:
-          - '#06b8aa'
-          - '#06b8aa'
+          - '#7aa70c'
+          - '#7aa70c'
         orientation: TD
       tileSize: 1
     subtitle: Endless Challenge
     title: For the King II
     vods: []
-  - creators: [ ]
+  - creators: []
     duration_hours: 3
     end: '2024-12-10T23:00:00Z'
     start: '2024-12-10T14:00:00Z'
     style:
       background:
         colors:
-          - '#06b8aa'
-          - '#06b8aa'
+          - '#7aa70c'
+          - '#7aa70c'
         orientation: TD
       tileSize: 3
     subtitle: Loads of Yogs

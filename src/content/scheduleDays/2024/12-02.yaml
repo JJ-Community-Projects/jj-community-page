@@ -81,17 +81,12 @@ streams:
       - Team 2: Harry, Ravs, Shadow
       - Team 3: Ben, Fionn, Lolip
       - Team 4: Bekki, Mousie, Breeh
-    markdownDescription: >
+    markdownDescription: |
       Hosted by Duncan & Osie
-
       - Team 1: Hat Films
-      
       - Team 2: Harry, Ravs, Shadow
-      
       - Team 3: Ben, Fionn, Lolip
-      
       - Team 4: Bekki, Mousie, Breeh
-
     vods:
       - type: youtube
         label: Youtube Live
