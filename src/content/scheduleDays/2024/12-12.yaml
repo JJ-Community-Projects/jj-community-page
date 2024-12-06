@@ -1,2 +1,63 @@
 date: '2024-12-12'
-streams: []
+streams:
+  - creators:
+      - zylus
+      - sherlock_hulmes
+      - duncan
+      - osie
+    duration_hours: 3
+    end: '2024-12-12T14:00:00Z'
+    start: '2024-12-12T11:00:00Z'
+    style:
+      background:
+        colors:
+          - '#06b8aa'
+          - '#06b8aa'
+        orientation: TD
+      tileSize: 1
+    subtitle: Zylus, Mark, Duncan & Osie
+    title: Four Player Fun Times
+    vods: []
+  - creators:
+      - rtgame
+    duration_hours: 3
+    end: '2024-12-12T17:00:00Z'
+    start: '2024-12-12T14:00:00Z'
+    style:
+      background:
+        colors:
+          - '#06b8aa'
+          - '#06b8aa'
+        orientation: TD
+      tileSize: 1
+    subtitle: RTGame & Friends
+    title: WII Shit
+    vods: []
+  - creators: [ ]
+    duration_hours: 3
+    end: '2024-12-12T20:00:00Z'
+    start: '2024-12-12T17:00:00Z'
+    style:
+      background:
+        colors:
+          - '#06b8aa'
+          - '#06b8aa'
+        orientation: TD
+      tileSize: 1
+    subtitle: In Minecraft in Real Life feat NRB
+    title: BOTC
+    vods: []
+  - creators: [ ]
+    duration_hours: 3
+    end: '2024-12-12T23:00:00Z'
+    start: '2024-12-12T20:00:00Z'
+    style:
+      background:
+        colors:
+          - '#06b8aa'
+          - '#06b8aa'
+        orientation: TD
+      tileSize: 1
+    subtitle: Feat Ben Burns
+    title: BOTC Online
+    vods: []

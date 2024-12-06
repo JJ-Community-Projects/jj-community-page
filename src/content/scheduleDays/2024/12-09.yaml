@@ -1,2 +1,55 @@
 date: '2024-12-09'
-streams: []
+streams:
+  - creators:
+      - ben
+      - mousie
+    duration_hours: 3
+    end: '2024-12-09T14:00:00Z'
+    start: '2024-12-09T11:00:00Z'
+    style:
+      background:
+        colors:
+          - '#06b8aa'
+          - '#06b8aa'
+        orientation: TD
+      tileSize: 1
+    subtitle: Ben & Mousie
+    title: Sharky & Mouse
+    description: So Bold
+    vods: []
+  - creators:
+      - briony
+      - kirsty
+      - rythian
+    duration_hours: 3
+    end: '2024-12-09T17:00:00Z'
+    start: '2024-12-09T14:00:00Z'
+    style:
+      background:
+        colors:
+          - '#06b8aa'
+          - '#06b8aa'
+        orientation: TD
+      tileSize: 1
+    subtitle: Briony, Kirsty & Rythian
+    title: Kirby Fun
+    vods: []
+  - creators:
+      - simon_clark
+      - lewis
+      - pyrion
+      - hat_films
+      - lydia
+    duration_hours: 3
+    end: '2024-12-09T23:00:00Z'
+    start: '2024-12-09T17:00:00Z'
+    style:
+      background:
+        colors:
+          - '#06b8aa'
+          - '#06b8aa'
+        orientation: TD
+      tileSize: 2
+    subtitle: The Pursuit
+    title: Dr Simon Clark's Quiz Show
+    vods: []

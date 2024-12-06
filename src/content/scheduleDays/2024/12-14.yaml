@@ -1,2 +1,65 @@
 date: '2024-12-14'
-streams: []
+streams:
+  - creators:
+      - pyrion
+      - zylus
+    duration_hours: 3
+    end: '2024-12-14T14:00:00Z'
+    start: '2024-12-14T11:00:00Z'
+    style:
+      background:
+        colors:
+          - '#06b8aa'
+          - '#06b8aa'
+        orientation: TD
+      tileSize: 1
+    subtitle: Pyrion & Zylus
+    title: Frosty Bros
+    vods: [ ]
+  - creators:
+      - simon
+      - lewis
+      - nina
+    duration_hours: 3
+    end: '2024-12-14T17:00:00Z'
+    start: '2024-12-14T14:00:00Z'
+    style:
+      background:
+        colors:
+          - '#06b8aa'
+          - '#06b8aa'
+        orientation: TD
+      tileSize: 1
+    subtitle: Simon, Lewis & Nina
+    title: Fighting Fantasy
+    vods: [ ]
+  - creators:
+      - boba
+    duration_hours: 3
+    end: '2024-12-14T20:00:00Z'
+    start: '2024-12-14T17:00:00Z'
+    style:
+      background:
+        colors:
+          - '#06b8aa'
+          - '#06b8aa'
+        orientation: TD
+      tileSize: 1
+    subtitle: Feat. Special Guest
+    title: Coffee with Boba
+    vods: [ ]
+  - creators:
+      - breeh
+    duration_hours: 3
+    end: '2024-12-14T23:00:00Z'
+    start: '2024-12-14T20:00:00Z'
+    style:
+      background:
+        colors:
+          - '#06b8aa'
+          - '#06b8aa'
+        orientation: TD
+      tileSize: 1
+    subtitle: Hosted By Breeh
+    title: Late Late Crew
+    vods: [ ]

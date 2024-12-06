@@ -1,2 +1,63 @@
 date: '2024-12-13'
-streams: []
+streams:
+  - creators:
+      - pedguin
+      - boba
+    duration_hours: 3
+    end: '2024-12-13T14:00:00Z'
+    start: '2024-12-13T11:00:00Z'
+    style:
+      background:
+        colors:
+          - '#06b8aa'
+          - '#06b8aa'
+        orientation: TD
+      tileSize: 1
+    subtitle: Boba & Pedguin
+    title: Detective Duo
+    vods: []
+  - creators: [ ]
+    duration_hours: 3
+    end: '2024-12-13T17:00:00Z'
+    start: '2024-12-13T14:00:00Z'
+    style:
+      background:
+        colors:
+          - '#06b8aa'
+          - '#06b8aa'
+        orientation: TD
+      tileSize: 1
+    subtitle: Award Ceremony
+    title: Community Game Jam
+    vods: []
+  - creators:
+      - sherlock_hulmes
+    duration_hours: 3
+    end: '2024-12-13T20:00:00Z'
+    start: '2024-12-13T17:00:00Z'
+    style:
+      background:
+        colors:
+          - '#06b8aa'
+          - '#06b8aa'
+        orientation: TD
+      tileSize: 1
+    subtitle: Mark & Pals
+    title: Shadow of Doubt Murder Mystery
+    vods: []
+
+  - creators:
+      - pedguin
+    duration_hours: 3
+    end: '2024-12-13T23:00:00Z'
+    start: '2024-12-13T20:00:00Z'
+    style:
+      background:
+        colors:
+          - '#06b8aa'
+          - '#06b8aa'
+        orientation: TD
+      tileSize: 1
+    subtitle: ''
+    title: Pedguin's Massive Multiplayer Madness
+    vods: []

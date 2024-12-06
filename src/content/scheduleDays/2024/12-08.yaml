@@ -1,2 +1,52 @@
 date: '2024-12-08'
-streams: []
+streams:
+  - creators:
+      - zylus
+      - kirsty
+    duration_hours: 3
+    end: '2024-12-08T14:00:00Z'
+    start: '2024-12-08T11:00:00Z'
+    style:
+      background:
+        colors:
+          - '#06b8aa'
+          - '#06b8aa'
+        orientation: TD
+      tileSize: 1
+    subtitle: 'Zylus & Kirsty'
+    title: 'The Yogs Games Special'
+    vods: []
+  - creators:
+      - ravs
+      - sarah
+      - osie
+      - sips
+    duration_hours: 3
+    end: '2024-12-08T17:00:00Z'
+    start: '2024-12-08T14:00:00Z'
+    style:
+      background:
+        colors:
+          - '#06b8aa'
+          - '#06b8aa'
+        orientation: TD
+      tileSize: 1
+    subtitle: 'Ravs, Sarah, Osie, Sips'
+    title: 'Pre-Poker Party Time'
+    vods: []
+  - creators:
+      - tom
+      - pyrion
+    duration_hours: 3
+    end: '2024-12-08T23:00:00Z'
+    start: '2024-12-08T17:00:00Z'
+    style:
+      background:
+        colors:
+          - '#06b8aa'
+          - '#06b8aa'
+        orientation: TD
+      tileSize: 2
+    subtitle: Hosted by Tom & Pyrion
+    title: Poker Night
+    vods: []
