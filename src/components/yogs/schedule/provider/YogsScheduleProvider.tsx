@@ -82,6 +82,7 @@ const useYogsScheduleHook = (schedule: FullSchedule, _creators: FullCreator[]) =
     days,
     nextWeek,
     prevWeek,
+    weekIndex,
     nextDay,
     prevDay,
     times,

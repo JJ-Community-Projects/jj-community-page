@@ -8,16 +8,18 @@ import {CalendarDialog} from "../provider/ScheduleCalendarExportButton.tsx";
 import {Tooltip} from "@kobalte/core";
 
 export const YogsScheduleHeader: Component = () => {
-  const {schedule, nextWeek, prevWeek} = useYogsSchedule()
+  const {schedule, nextWeek, prevWeek, weekIndex} = useYogsSchedule()
   const filterModal = createModalSignal()
   const calenderModal = createModalSignal()
+
+  const week = () => weekIndex() + 1
 
   return (
     <div class={'data-height w-full flex flex-row'}>
       <div class={'data-height data-width'}/>
       <div class={'p-1 header-title-card-width'}>
         <div class={'w-full h-full bg-white rounded-2xl flex flex-row justify-center items-center'}>
-          <p class={'text-center text-xl xl:text-3xl'}>{schedule.title}</p>
+          <p class={'text-center text-xl xl:text-3xl'}>{schedule.title} | Week {week()}</p>
         </div>
       </div>
       <div class={'stream-width flex flex-row justify-end data-height'}>
@@ -65,11 +67,11 @@ export const YogsScheduleHeader: Component = () => {
               }
               onClick={prevWeek}
             >
-              <FaSolidChevronLeft />
+              <FaSolidChevronLeft/>
             </Tooltip.Trigger>
             <Tooltip.Portal>
               <Tooltip.Content class={'bg-accent rounded p-2 text-white'}>
-                <Tooltip.Arrow />
+                <Tooltip.Arrow/>
                 <p>Previous Week</p>
               </Tooltip.Content>
             </Tooltip.Portal>
@@ -81,11 +83,11 @@ export const YogsScheduleHeader: Component = () => {
               }
               onClick={nextWeek}
             >
-              <FaSolidChevronRight />
+              <FaSolidChevronRight/>
             </Tooltip.Trigger>
             <Tooltip.Portal>
               <Tooltip.Content class={'bg-accent rounded p-2 text-white'}>
-                <Tooltip.Arrow />
+                <Tooltip.Arrow/>
                 <p>Next Week</p>
               </Tooltip.Content>
             </Tooltip.Portal>
