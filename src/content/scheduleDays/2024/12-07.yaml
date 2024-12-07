@@ -1,7 +1,7 @@
 date: '2024-12-07'
 streams:
   - creators:
-      - lydia
+      - kirsty
       - briony
     duration_hours: 3
     end: '2024-12-07T14:00:00Z'
@@ -13,7 +13,7 @@ streams:
           - '#f07800'
         orientation: TD
       tileSize: 1
-    subtitle: Lydia & Briony
+    subtitle: Briony & Kirsty
     title: Stocking Stuffers
     vods: []
   - creators:
@@ -50,18 +50,18 @@ streams:
     subtitle: Hosted by Zylus
     title: Maraoke
     vods: []
-  - creators:
-      - pedguin
-    duration_hours: 4
-    end: '2024-12-08T11:00:00Z'
-    start: '2024-12-07T23:00:00Z'
-    style:
-      background:
-        colors:
-          - '#f07800'
-          - '#f07800'
-        orientation: TD
-      tileSize: 1
-    subtitle: ''
-    title: Pedguin's All Nighter
-    vods: []
+###   - creators:
+#      - pedguin
+#    duration_hours: 4
+#    end: '2024-12-08T11:00:00Z'
+#    start: '2024-12-07T23:00:00Z'
+#    style:
+#      background:
+#        colors:
+#          - '#f07800'
+#          - '#f07800'
+#        orientation: TD
+#      tileSize: 1
+#    subtitle: ''
+#    title: Pedguin's All Nighter
+#    vods: []
