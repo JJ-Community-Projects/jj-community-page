@@ -38,6 +38,7 @@ streams:
       - harry
       - tom
       - sarah
+      - lydia
     duration_hours: 4.5
     end: '2024-12-06T20:00:00Z'
     start: '2024-12-06T17:00:00Z'
@@ -57,6 +58,9 @@ streams:
       - lydia
       - ravs
       - shadowatnoon
+      - duncan
+      - daltos
+      - rythian
     duration_hours: 3
     end: '2024-12-06T23:00:00Z'
     start: '2024-12-06T20:00:00Z'
