@@ -49,4 +49,13 @@ streams:
       tileSize: 2
     subtitle: Hosted by Tom & Pyrion
     title: Poker Night
+    description: 'Hosted by Tom & Pyrion - Table 1: TBA - Table 2: TBA - ...'
+    markdownDescription: >
+      Hosted by Tom & Pyrion 
+      
+      - Table 1: TBA 
+      
+      - Table 2: TBA 
+      
+      - ...
     vods: []
