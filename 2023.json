@@ -1,0 +1,662 @@
+{
+  "title": "Yogscast Jingle Jam 2023",
+  "streams": [
+    {
+      "title": "Office Cam",
+      "start": "2023-12-01T11:00:00Z",
+      "end": "2023-12-01T14:00:00Z",
+      "color": "#00bbe0ff",
+      "creators": []
+    },
+    {
+      "title": "Jingle Jam Hype Stream",
+      "start": "2023-12-01T14:00:00Z",
+      "end": "2023-12-01T17:00:00Z",
+      "color": "#009fd4ff",
+      "creators": [
+        "ben",
+        "tom"
+      ]
+    },
+    {
+      "title": "Jingle Cats",
+      "start": "2023-12-01T17:00:00Z",
+      "end": "2023-12-01T20:00:00Z",
+      "color": "#0081c7ff",
+      "creators": [
+        "lewis",
+        "simon"
+      ]
+    },
+    {
+      "title": "Christmas Trains",
+      "start": "2023-12-01T20:00:00Z",
+      "end": "2023-12-01T23:00:00Z",
+      "color": "#0069baff",
+      "creators": [
+        "alex_the_rambler",
+        "daltos",
+        "duncan",
+        "lewis",
+        "mango",
+        "potatomcwhisky",
+        "rythian",
+        "spiff"
+      ]
+    },
+    {
+      "title": "Point & Click",
+      "start": "2023-12-02T11:00:00Z",
+      "end": "2023-12-02T14:00:00Z",
+      "color": "#ffd900ff",
+      "creators": [
+        "bouphe",
+        "osie"
+      ]
+    },
+    {
+      "title": "Multi-Game Bingo",
+      "start": "2023-12-02T14:00:00Z",
+      "end": "2023-12-02T17:00:00Z",
+      "color": "#ffcc00ff",
+      "creators": [
+        "alex_the_rambler",
+        "boba",
+        "breeh",
+        "lydia",
+        "pedguin",
+        "ravs",
+        "shadowatnoon"
+      ]
+    },
+    {
+      "title": "Feed A Cow for X-Mas",
+      "start": "2023-12-02T17:00:00Z",
+      "end": "2023-12-02T20:00:00Z",
+      "color": "#ffbf00ff",
+      "creators": [
+        "ben",
+        "duncan",
+        "ravs"
+      ]
+    },
+    {
+      "title": "Protessional Strem",
+      "start": "2023-12-02T20:00:00Z",
+      "end": "2023-12-02T23:40:00",
+      "color": "#ffb300ff",
+      "creators": [
+        "breeh",
+        "nilesy",
+        "rythian",
+        "zylus"
+      ]
+    },
+    {
+      "title": "Scream Queens",
+      "start": "2023-12-03T11:00:00Z",
+      "end": "2023-12-03T14:00:00Z",
+      "color": "#a7cc00ff",
+      "creators": [
+        "boba",
+        "bouphe",
+        "gee"
+      ]
+    },
+    {
+      "title": "Tabs",
+      "start": "2023-12-03T14:00:00Z",
+      "end": "2023-12-03T17:00:00Z",
+      "color": "#81bd00ff",
+      "creators": [
+        "bouphe",
+        "lewis",
+        "lydia",
+        "osie",
+        "ravs",
+        "tom"
+      ]
+    },
+    {
+      "title": "Cursedcraft",
+      "start": "2023-12-03T17:00:00Z",
+      "end": "2023-12-03T20:00:00Z",
+      "color": "#62ad00ff",
+      "creators": [
+        "bouphe",
+        "gee",
+        "simon"
+      ]
+    },
+    {
+      "title": "Kirbycraft Christmas",
+      "start": "2023-12-03T20:00:00Z",
+      "end": "2023-12-03T23:00:00Z",
+      "color": "#479e00ff",
+      "creators": [
+        "briony",
+        "kirsty",
+        "rythian"
+      ]
+    },
+    {
+      "title": "PlateUp Modded Madness",
+      "start": "2023-12-04T11:00:00Z",
+      "end": "2023-12-04T14:00:00Z",
+      "color": "#fc7600ff",
+      "creators": [
+        "ben",
+        "boba",
+        "pedguin",
+        "sips"
+      ]
+    },
+    {
+      "title": "4-Player Collection Games",
+      "start": "2023-12-04T14:00:00Z",
+      "end": "2023-12-04T17:00:00Z",
+      "color": "#f76300ff",
+      "creators": [
+        "breeh",
+        "briony",
+        "gee",
+        "lolipopgi"
+      ]
+    },
+    {
+      "title": "Collection Games",
+      "start": "2023-12-04T17:00:00Z",
+      "end": "2023-12-04T20:00:00Z",
+      "color": "#f25100ff",
+      "creators": [
+        "ben",
+        "mousie"
+      ]
+    },
+    {
+      "title": "The Longest Johns",
+      "start": "2023-12-04T20:00:00Z",
+      "end": "2023-12-05T00:00:00Z",
+      "color": "#ed3b00ff",
+      "creators": [
+        "breeh",
+        "briony",
+        "daf",
+        "simon_clark",
+        "drakon_astron",
+        "lolipopgi",
+        "mousie",
+        "osie",
+        "ravs"
+      ]
+    },
+    {
+      "title": "Chunklock Minecraft",
+      "start": "2023-12-05T11:00:00Z",
+      "end": "2023-12-05T14:00:00Z",
+      "color": "#00e8c5ff",
+      "creators": [
+        "martyn"
+      ]
+    },
+    {
+      "title": "Simon's Important Videos",
+      "start": "2023-12-05T14:00:00Z",
+      "end": "2023-12-05T17:00:00Z",
+      "color": "#00deb1ff",
+      "creators": [
+        "gee",
+        "harry",
+        "sarah",
+        "simon",
+        "tom"
+      ]
+    },
+    {
+      "title": "Civ 5 on the 5th",
+      "start": "2023-12-05T17:00:00Z",
+      "end": "2023-12-06T02:00:00Z",
+      "color": "#00d49bff",
+      "creators": [
+        "alex_the_rambler",
+        "ben",
+        "daltos",
+        "duncan",
+        "lewis",
+        "potatomcwhisky",
+        "rythian",
+        "spiff"
+      ]
+    },
+    {
+      "title": "2-Player Coop",
+      "start": "2023-12-06T11:00:00Z",
+      "end": "2023-12-06T14:00:00Z",
+      "color": "#f74accff",
+      "creators": [
+        "fionn",
+        "lolipopgi"
+      ]
+    },
+    {
+      "title": "Civ 6 on the 6th",
+      "start": "2023-12-06T14:00:00Z",
+      "end": "2023-12-06T17:00:00Z",
+      "color": "#ed39b7ff",
+      "creators": [
+        "daltos",
+        "potatomcwhisky",
+        "spiff"
+      ]
+    },
+    {
+      "title": "Who wants to be a Millionaire",
+      "start": "2023-12-06T17:00:00Z",
+      "end": "2023-12-06T21:30:00",
+      "color": "#e329a2ff",
+      "creators": [
+        "simon_clark",
+        "kirsty",
+        "lewis",
+        "lydia",
+        "sherlock_hulmes",
+        "martyn",
+        "mousie",
+        "osie",
+        "sarah",
+        "shadowatnoon"
+      ]
+    },
+    {
+      "title": "Cats & more",
+      "start": "2023-12-06T21:30:00",
+      "end": "2023-12-07T00:30:00",
+      "color": "#d91a89ff",
+      "creators": [
+        "nilesy",
+        "rythian"
+      ]
+    },
+    {
+      "title": "Your Dads",
+      "start": "2023-12-07T11:00:00Z",
+      "end": "2023-12-07T14:00:00Z",
+      "color": "#ffa600ff",
+      "creators": [
+        "lewis",
+        "sips"
+      ]
+    },
+    {
+      "title": "Mario Kart Mayham",
+      "start": "2023-12-07T14:00:00Z",
+      "end": "2023-12-07T17:00:00Z",
+      "color": "#ff8400ff",
+      "creators": [
+        "duncan",
+        "lydia",
+        "martyn",
+        "osie",
+        "ravs",
+        "rtgame",
+        "shadowatnoon",
+        "zylus"
+      ]
+    },
+    {
+      "title": "Hat Films Gameshow",
+      "start": "2023-12-07T17:00:00Z",
+      "end": "2023-12-07T20:00:00Z",
+      "color": "#ff6600ff",
+      "creators": [
+        "hat_films",
+        "lydia",
+        "ravs"
+      ]
+    },
+    {
+      "title": "Dead by Daylight",
+      "start": "2023-12-07T20:00:00Z",
+      "end": "2023-12-08T00:00:00Z",
+      "color": "#ff4400ff",
+      "creators": [
+        "breeh",
+        "briony",
+        "daltos",
+        "kirsty",
+        "mousie",
+        "nilesy",
+        "rythian",
+        "zylus"
+      ]
+    },
+    {
+      "title": "Creature Collector",
+      "start": "2023-12-08T11:00:00Z",
+      "end": "2023-12-08T14:00:00Z",
+      "color": "#00bbe0ff",
+      "creators": [
+        "duncan",
+        "osie"
+      ]
+    },
+    {
+      "title": "MCC Island Bingo",
+      "start": "2023-12-08T14:00:00Z",
+      "end": "2023-12-08T17:00:00Z",
+      "color": "#009fd4ff",
+      "creators": [
+        "boba",
+        "duncan",
+        "harry",
+        "kirsty",
+        "martyn",
+        "osie",
+        "ravs",
+        "sarah",
+        "shadowatnoon"
+      ]
+    },
+    {
+      "title": "Maraoke",
+      "start": "2023-12-08T17:00:00Z",
+      "end": "2023-12-08T21:00:00Z",
+      "color": "#0081c7ff",
+      "creators": [
+        "breeh",
+        "briony",
+        "daf",
+        "joe",
+        "lolipopgi",
+        "lydia",
+        "mango",
+        "sherlock_hulmes",
+        "osie",
+        "ravs",
+        "rtgame",
+        "sarah",
+        "zylus"
+      ]
+    },
+    {
+      "title": "The Longest Johns",
+      "start": "2023-12-08T21:00:00Z",
+      "end": "2023-12-08T23:00:00Z",
+      "color": "#0069baff",
+      "creators": []
+    },
+    {
+      "title": "Games for Ukraine",
+      "start": "2023-12-09T11:00:00Z",
+      "end": "2023-12-09T14:00:00Z",
+      "color": "#ffd900ff",
+      "creators": [
+        "lewis",
+        "mousie"
+      ]
+    },
+    {
+      "title": "Aardman Christmas Crafts",
+      "start": "2023-12-09T14:00:00Z",
+      "end": "2023-12-09T17:00:00Z",
+      "color": "#ffcc00ff",
+      "creators": [
+        "bekkiboom",
+        "briony",
+        "kirsty",
+        "lolipopgi",
+        "mango"
+      ]
+    },
+    {
+      "title": "Multiplayer Sillies",
+      "start": "2023-12-09T17:00:00Z",
+      "end": "2023-12-09T20:00:00Z",
+      "color": "#ffbf00ff",
+      "creators": [
+        "mango",
+        "rtgame",
+        "spiff"
+      ]
+    },
+    {
+      "title": "Rust Roleplay",
+      "start": "2023-12-09T20:00:00Z",
+      "end": "2023-12-10T00:45:00",
+      "color": "#ffb300ff",
+      "creators": [
+        "lewis",
+        "lolipopgi",
+        "mousie",
+        "pyrion",
+        "ravs",
+        "simon",
+        "spiff"
+      ]
+    },
+    {
+      "title": "Tryhard Games",
+      "start": "2023-12-10T11:00:00Z",
+      "end": "2023-12-10T14:00:00Z",
+      "color": "#a7cc00ff",
+      "creators": [
+        "harry",
+        "shadowatnoon"
+      ]
+    },
+    {
+      "title": "Pre-Poker Party",
+      "start": "2023-12-10T14:00:00Z",
+      "end": "2023-12-10T17:00:00Z",
+      "color": "#74b800ff",
+      "creators": [
+        "boba",
+        "briony",
+        "pedguin",
+        "sarah"
+      ]
+    },
+    {
+      "title": "Massive Poker",
+      "start": "2023-12-10T17:00:00Z",
+      "end": "2023-12-10T23:00:00Z",
+      "color": "#49a300ff",
+      "creators": [
+        "ben",
+        "breeh",
+        "duncan",
+        "harry",
+        "joe",
+        "kirsty",
+        "lewis",
+        "lolipopgi",
+        "lydia",
+        "mango",
+        "mousie",
+        "nilesy",
+        "osie",
+        "pyrion",
+        "ravs",
+        "rtgame",
+        "tom",
+        "zylus"
+      ]
+    },
+    {
+      "title": "Cute Games",
+      "start": "2023-12-11T11:00:00Z",
+      "end": "2023-12-11T14:00:00Z",
+      "color": "#fc7600ff",
+      "creators": [
+        "boba",
+        "briony"
+      ]
+    },
+    {
+      "title": "WII Shit",
+      "start": "2023-12-11T14:00:00Z",
+      "end": "2023-12-11T17:00:00Z",
+      "color": "#f76300ff",
+      "creators": [
+        "briony",
+        "lewis",
+        "rtgame",
+        "sarah"
+      ]
+    },
+    {
+      "title": "Titan Battle",
+      "start": "2023-12-11T17:00:00Z",
+      "end": "2023-12-11T20:00:00Z",
+      "color": "#f25100ff",
+      "creators": [
+        "ben",
+        "simon_clark"
+      ]
+    },
+    {
+      "title": "CS 1.6",
+      "start": "2023-12-11T20:00:00Z",
+      "end": "2023-12-11T23:30:00",
+      "color": "#ed3b00ff",
+      "creators": [
+        "lolipopgi",
+        "pyrion",
+        "ravs",
+        "spiff"
+      ]
+    },
+    {
+      "title": "Sweaty Shooters",
+      "start": "2023-12-12T11:00:00Z",
+      "end": "2023-12-12T14:00:00Z",
+      "color": "#00e8c5ff",
+      "creators": [
+        "gee",
+        "sherlock_hulmes",
+        "ravs",
+        "rythian",
+        "sips"
+      ]
+    },
+    {
+      "title": "Pecular Portions",
+      "start": "2023-12-12T14:00:00Z",
+      "end": "2023-12-12T17:00:00Z",
+      "color": "#00dbacff",
+      "creators": [
+        "lewis",
+        "lydia",
+        "simon"
+      ]
+    },
+    {
+      "title": "Hat Films Music Stream",
+      "start": "2023-12-12T17:00:00Z",
+      "end": "2023-12-13T00:00:00Z",
+      "color": "#00cf94ff",
+      "creators": [
+        "hat_films"
+      ]
+    },
+    {
+      "title": "Save the World",
+      "start": "2023-12-13T11:00:00Z",
+      "end": "2023-12-13T14:00:00Z",
+      "color": "#f74accff",
+      "creators": [
+        "ben",
+        "boba"
+      ]
+    },
+    {
+      "title": "Hat Films Pottery",
+      "start": "2023-12-13T14:00:00Z",
+      "end": "2023-12-13T20:00:00Z",
+      "color": "#eb36b1ff",
+      "creators": [
+        "boba",
+        "hat_films",
+        "lewis",
+        "lydia",
+        "pyrion",
+        "ravs"
+      ]
+    },
+    {
+      "title": "A Night in With Pedguin",
+      "start": "2023-12-13T20:00:00Z",
+      "end": "2023-12-13T23:30:00",
+      "color": "#de2396ff",
+      "creators": [
+        "boba",
+        "bouphe",
+        "breeh",
+        "daltos",
+        "duncan",
+        "gee",
+        "mousie",
+        "osie",
+        "pedguin",
+        "ravs",
+        "rtgame",
+        "sarah",
+        "tom"
+      ]
+    },
+    {
+      "title": "Gearbox Games",
+      "start": "2023-12-14T11:00:00Z",
+      "end": "2023-12-14T14:00:00Z",
+      "color": "#ffa600ff",
+      "creators": [
+        "ben",
+        "daf"
+      ]
+    },
+    {
+      "title": "Fighting Fantasy",
+      "start": "2023-12-14T14:00:00Z",
+      "end": "2023-12-14T17:00:00Z",
+      "color": "#ff8400ff",
+      "creators": [
+        "lewis",
+        "simon"
+      ]
+    },
+    {
+      "title": "Mystery Quest",
+      "start": "2023-12-14T17:00:00Z",
+      "end": "2023-12-14T20:00:00Z",
+      "color": "#ff6600ff",
+      "creators": [
+        "lydia",
+        "pyrion",
+        "ravs",
+        "simon",
+        "tom"
+      ]
+    },
+    {
+      "title": "Late Late Crew",
+      "start": "2023-12-14T20:00:00Z",
+      "end": "2023-12-15T00:10:00",
+      "color": "#ff4400ff",
+      "creators": [
+        "boba",
+        "bouphe",
+        "breeh",
+        "briony",
+        "daltos",
+        "kirsty",
+        "mango",
+        "mousie",
+        "nilesy",
+        "pedguin",
+        "rythian",
+        "sarah",
+        "zylus"
+      ]
+    }
+  ]
+}

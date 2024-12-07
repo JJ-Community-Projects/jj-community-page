@@ -30,6 +30,8 @@
     "astro": "^4.15.1",
     "astro-zod-to-json-schema": "^0.0.2",
     "debug": "^4.3.7",
+    "echarts": "^5.5.1",
+    "echarts-solid": "^0.2.0",
     "firebase": "^10.14.1",
     "firebase-admin": "^12.6.0",
     "googleapis": "^143.0.0",

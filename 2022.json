@@ -1,0 +1,734 @@
+{
+  "title": "Yogscast Jingle Jam 2022",
+  "streams": [
+    {
+      "title": "Office cam",
+      "start": "2022-12-01T11:00:00Z",
+      "end": "2022-12-01T14:00:00Z",
+      "color": "#00bbe0ff",
+      "creators": []
+    },
+    {
+      "title": "Jingle Jam Hype Stream",
+      "start": "2022-12-01T14:00:00Z",
+      "end": "2022-12-01T17:00:00Z",
+      "color": "#009fd4ff",
+      "creators": [
+        "ben",
+        "tom"
+      ]
+    },
+    {
+      "title": "Jingle Cats",
+      "start": "2022-12-01T17:00:00Z",
+      "end": "2022-12-01T20:00:00Z",
+      "color": "#0081c7ff",
+      "creators": [
+        "lewis",
+        "simon"
+      ]
+    },
+    {
+      "title": "Christmas Trains",
+      "start": "2022-12-01T20:00:00Z",
+      "end": "2022-12-01T23:00:00Z",
+      "color": "#0069baff",
+      "creators": [
+        "alex_the_rambler",
+        "ben",
+        "daltos",
+        "duncan",
+        "lewis",
+        "potatomcwhisky",
+        "rythian",
+        "spiff"
+      ]
+    },
+    {
+      "title": "Switch Sports",
+      "start": "2022-12-02T11:00:00Z",
+      "end": "2022-12-02T14:00:00Z",
+      "color": "#ffd900ff",
+      "creators": [
+        "boba",
+        "lewis",
+        "rtgame",
+        "spiff"
+      ]
+    },
+    {
+      "title": "Plate Up",
+      "start": "2022-12-02T14:00:00Z",
+      "end": "2022-12-02T17:00:00Z",
+      "color": "#ffcc00ff",
+      "creators": [
+        "breeh",
+        "briony",
+        "duncan",
+        "fionn",
+        "harry",
+        "kirsty",
+        "lewis",
+        "lolipopgi",
+        "mousie",
+        "osie",
+        "pedguin",
+        "ravs",
+        "rythian",
+        "shadowatnoon",
+        "sips"
+      ]
+    },
+    {
+      "title": "Mario Kart Tournament",
+      "start": "2022-12-02T17:00:00Z",
+      "end": "2022-12-02T20:00:00Z",
+      "color": "#ffbf00ff",
+      "creators": [
+        "breeh",
+        "duncan",
+        "lydia",
+        "osie",
+        "ravs",
+        "rtgame",
+        "shadowatnoon",
+        "zylus"
+      ]
+    },
+    {
+      "title": "Protessional Strem",
+      "start": "2022-12-02T20:00:00Z",
+      "end": "2022-12-02T23:00:00Z",
+      "color": "#ffb300ff",
+      "creators": [
+        "breeh",
+        "nilesy",
+        "rythian",
+        "zylus"
+      ]
+    },
+    {
+      "title": "Puzzle Sisters",
+      "start": "2022-12-03T11:00:00Z",
+      "end": "2022-12-03T14:00:00Z",
+      "color": "#a7cc00ff",
+      "creators": [
+        "bouphe",
+        "osie"
+      ]
+    },
+    {
+      "title": "Cute Corner",
+      "start": "2022-12-03T14:00:00Z",
+      "end": "2022-12-03T17:00:00Z",
+      "color": "#81bd00ff",
+      "creators": [
+        "briony",
+        "kirsty"
+      ]
+    },
+    {
+      "title": "Simon's Important Videos",
+      "start": "2022-12-03T17:00:00Z",
+      "end": "2022-12-03T20:00:00Z",
+      "color": "#62ad00ff",
+      "creators": [
+        "gee",
+        "harry",
+        "simon",
+        "tom"
+      ]
+    },
+    {
+      "title": "Minecraft Bingo",
+      "start": "2022-12-03T20:00:00Z",
+      "end": "2022-12-03T23:00:00Z",
+      "color": "#479e00ff",
+      "creators": [
+        "ben",
+        "briony",
+        "duncan",
+        "gee",
+        "harry",
+        "kirsty",
+        "lewis",
+        "lolipopgi",
+        "mango",
+        "osie",
+        "ravs",
+        "shadowatnoon",
+        "simon"
+      ]
+    },
+    {
+      "title": "Jingleathon",
+      "start": "2022-12-03T23:00:00Z",
+      "end": "2022-12-04T02:00:00Z",
+      "color": "#308f00ff",
+      "creators": [
+        "pedguin",
+        "ravs"
+      ]
+    },
+    {
+      "title": "Game Hard",
+      "start": "2022-12-04T11:00:00Z",
+      "end": "2022-12-04T14:00:00Z",
+      "color": "#fc7600ff",
+      "creators": [
+        "daltos",
+        "mango"
+      ]
+    },
+    {
+      "title": "Map Master",
+      "start": "2022-12-04T14:00:00Z",
+      "end": "2022-12-04T17:00:00Z",
+      "color": "#f76300ff",
+      "creators": [
+        "potatomcwhisky",
+        "spiff"
+      ]
+    },
+    {
+      "title": "Simon Clark's Yogs Challenges",
+      "start": "2022-12-04T17:00:00Z",
+      "end": "2022-12-04T20:00:00Z",
+      "color": "#f25100ff",
+      "creators": [
+        "ben",
+        "boba",
+        "briony",
+        "simon_clark",
+        "duncan",
+        "harry",
+        "kirsty",
+        "lewis",
+        "lolipopgi",
+        "mango",
+        "mousie",
+        "osie",
+        "pedguin",
+        "pyrion",
+        "ravs",
+        "rtgame",
+        "spiff",
+        "tom",
+        "zylus"
+      ]
+    },
+    {
+      "title": "Canadian Evening",
+      "start": "2022-12-04T20:00:00Z",
+      "end": "2022-12-04T23:00:00Z",
+      "color": "#ed3b00ff",
+      "creators": [
+        "alex_the_rambler",
+        "shadowatnoon"
+      ]
+    },
+    {
+      "title": "Co-op Mayham",
+      "start": "2022-12-05T11:00:00Z",
+      "end": "2022-12-05T14:00:00Z",
+      "color": "#00e8c5ff",
+      "creators": [
+        "mousie",
+        "zylus"
+      ]
+    },
+    {
+      "title": "Cozy Boardgames",
+      "start": "2022-12-05T14:00:00Z",
+      "end": "2022-12-05T17:00:00Z",
+      "color": "#00dbacff",
+      "creators": [
+        "gee",
+        "kirsty",
+        "lolipopgi",
+        "mango"
+      ]
+    },
+    {
+      "title": "Civ: Salt & Strategy",
+      "start": "2022-12-05T17:00:00Z",
+      "end": "2022-12-05T23:00:00Z",
+      "color": "#00cf94ff",
+      "creators": [
+        "alex_the_rambler",
+        "ben",
+        "duncan",
+        "lewis",
+        "potatomcwhisky",
+        "pyrion",
+        "rythian",
+        "spiff"
+      ]
+    },
+    {
+      "title": "Dark Mysteries",
+      "start": "2022-12-06T11:00:00Z",
+      "end": "2022-12-06T14:00:00Z",
+      "color": "#f74accff",
+      "creators": [
+        "lydia",
+        "sips"
+      ]
+    },
+    {
+      "title": "Tom & Wheelboy",
+      "start": "2022-12-06T14:00:00Z",
+      "end": "2022-12-06T17:00:00Z",
+      "color": "#eb36b1ff",
+      "creators": [
+        "gee",
+        "lewis",
+        "lydia",
+        "mousie",
+        "tom"
+      ]
+    },
+    {
+      "title": "Hat Films Christmas Album",
+      "start": "2022-12-06T17:00:00Z",
+      "end": "2022-12-06T23:00:00Z",
+      "color": "#de2396ff",
+      "creators": [
+        "hat_films"
+      ]
+    },
+    {
+      "title": "Scrub Dota inhouse",
+      "start": "2022-12-07T11:00:00Z",
+      "end": "2022-12-07T14:00:00Z",
+      "color": "#ffa600ff",
+      "creators": [
+        "boba",
+        "breeh",
+        "briony",
+        "daf",
+        "duncan",
+        "harry",
+        "joe",
+        "lewis",
+        "mousie",
+        "pyrion",
+        "ravs",
+        "rythian",
+        "sips",
+        "zylus"
+      ]
+    },
+    {
+      "title": "Cursedcraft",
+      "start": "2022-12-07T14:00:00Z",
+      "end": "2022-12-07T17:00:00Z",
+      "color": "#ff8400ff",
+      "creators": [
+        "gee",
+        "simon"
+      ]
+    },
+    {
+      "title": "Feed a cow for christmas",
+      "start": "2022-12-07T17:00:00Z",
+      "end": "2022-12-07T20:00:00Z",
+      "color": "#ff6600ff",
+      "creators": [
+        "duncan",
+        "lewis",
+        "osie",
+        "ravs"
+      ]
+    },
+    {
+      "title": "Fizone After Dark",
+      "start": "2022-12-07T20:00:00Z",
+      "end": "2022-12-07T23:00:00Z",
+      "color": "#ffb1b0ff",
+      "creators": [
+        "fionn",
+        "zoey"
+      ]
+    },
+    {
+      "title": "Hangover Hangout",
+      "start": "2022-12-08T11:00:00Z",
+      "end": "2022-12-08T14:00:00Z",
+      "color": "#00bbe0ff",
+      "creators": [
+        "duncan",
+        "osie"
+      ]
+    },
+    {
+      "title": "Pedguin's Pre Poker Party",
+      "start": "2022-12-08T14:00:00Z",
+      "end": "2022-12-08T17:00:00Z",
+      "color": "#0096d1ff",
+      "creators": [
+        "boba",
+        "gee",
+        "pedguin"
+      ]
+    },
+    {
+      "title": "Poker Night",
+      "start": "2022-12-08T17:30:00",
+      "end": "2022-12-08T23:30:00",
+      "color": "#0078c2ff",
+      "creators": [
+        "boba",
+        "breeh",
+        "daf",
+        "duncan",
+        "harry",
+        "joe",
+        "kirsty",
+        "lewis",
+        "lolipopgi",
+        "lydia",
+        "mousie",
+        "nilesy",
+        "osie",
+        "pyrion",
+        "ravs",
+        "rythian",
+        "tom",
+        "zylus"
+      ]
+    },
+    {
+      "title": "Other Worlds",
+      "start": "2022-12-09T11:00:00Z",
+      "end": "2022-12-09T14:00:00Z",
+      "color": "#ffd900ff",
+      "creators": [
+        "briony",
+        "zylus"
+      ]
+    },
+    {
+      "title": "Fighting Fantasy",
+      "start": "2022-12-09T14:00:00Z",
+      "end": "2022-12-09T17:00:00Z",
+      "color": "#ffcc00ff",
+      "creators": [
+        "lewis",
+        "simon"
+      ]
+    },
+    {
+      "title": "Scultping the Yogscast",
+      "start": "2022-12-09T17:00:00Z",
+      "end": "2022-12-09T20:00:00Z",
+      "color": "#ffbf00ff",
+      "creators": [
+        "boba",
+        "briony",
+        "osie"
+      ]
+    },
+    {
+      "title": "CSGO Scrub Major",
+      "start": "2022-12-09T20:00:00Z",
+      "end": "2022-12-09T23:00:00Z",
+      "color": "#ffb300ff",
+      "creators": [
+        "boba",
+        "breeh",
+        "briony",
+        "daltos",
+        "duncan",
+        "joe",
+        "kirsty",
+        "lewis",
+        "lolipopgi",
+        "mango",
+        "martyn",
+        "mousie",
+        "potatomcwhisky",
+        "ravs",
+        "rythian",
+        "zylus"
+      ]
+    },
+    {
+      "title": "Breakfest Mixup",
+      "start": "2022-12-10T11:00:00Z",
+      "end": "2022-12-10T14:00:00Z",
+      "color": "#a7cc00ff",
+      "creators": [
+        "breeh",
+        "mousie"
+      ]
+    },
+    {
+      "title": "Tactic games",
+      "start": "2022-12-10T14:00:00Z",
+      "end": "2022-12-10T17:00:00Z",
+      "color": "#81bd00ff",
+      "creators": [
+        "kirsty",
+        "rythian",
+        "zylus"
+      ]
+    },
+    {
+      "title": "Everyone is santa",
+      "start": "2022-12-10T17:00:00Z",
+      "end": "2022-12-10T20:00:00Z",
+      "color": "#62ad00ff",
+      "creators": [
+        "lewis",
+        "lydia",
+        "ravs",
+        "simon",
+        "tom"
+      ]
+    },
+    {
+      "title": "Longest John Singalong",
+      "start": "2022-12-10T20:00:00Z",
+      "end": "2022-12-11T00:00:00Z",
+      "color": "#479e00ff",
+      "creators": [
+        "pyrion",
+        "spiff",
+        "wilsonator"
+      ]
+    },
+    {
+      "title": "Harry's Vault Hunters Marathon",
+      "start": "2022-12-11T00:00:00Z",
+      "end": "2022-12-11T12:00:00Z",
+      "color": "#308f00ff",
+      "creators": [
+        "harry"
+      ]
+    },
+    {
+      "title": "Cutesy Chums",
+      "start": "2022-12-11T11:00:00Z",
+      "end": "2022-12-11T14:00:00Z",
+      "color": "#fc7600ff",
+      "creators": [
+        "daf",
+        "pedguin"
+      ]
+    },
+    {
+      "title": "Friend Time",
+      "start": "2022-12-11T14:00:00Z",
+      "end": "2022-12-11T17:00:00Z",
+      "color": "#f76300ff",
+      "creators": [
+        "bekkiboom",
+        "pedguin"
+      ]
+    },
+    {
+      "title": "High rollers",
+      "start": "2022-12-11T17:00:00Z",
+      "end": "2022-12-11T20:00:00Z",
+      "color": "#f25500ff",
+      "creators": [
+        "hat_films",
+        "high_rollers",
+        "kim",
+        "sherlock_hulmes",
+        "ravs"
+      ]
+    },
+    {
+      "title": "Lolip's Satisfactory",
+      "start": "2022-12-11T20:00:00Z",
+      "end": "2022-12-11T23:00:00Z",
+      "color": "#ed4300ff",
+      "creators": [
+        "daltos",
+        "lolipopgi",
+        "ravs",
+        "shadowatnoon"
+      ]
+    },
+    {
+      "title": "Late Night Ranch Sim",
+      "start": "2022-12-11T23:00:00Z",
+      "end": "2022-12-12T02:00:00Z",
+      "color": "#e83600ff",
+      "creators": [
+        "duncan",
+        "osie",
+        "pedguin",
+        "ravs"
+      ]
+    },
+    {
+      "title": "Dad Town",
+      "start": "2022-12-12T11:00:00Z",
+      "end": "2022-12-12T14:00:00Z",
+      "color": "#00e8c5ff",
+      "creators": [
+        "ben",
+        "sips"
+      ]
+    },
+    {
+      "title": "Chillout Clundle",
+      "start": "2022-12-12T14:00:00Z",
+      "end": "2022-12-12T17:00:00Z",
+      "color": "#00e0b4ff",
+      "creators": [
+        "lewis",
+        "zylus"
+      ]
+    },
+    {
+      "title": "IRL Plateup challenge",
+      "start": "2022-12-12T17:00:00Z",
+      "end": "2022-12-12T20:00:00Z",
+      "color": "#00d9a3ff",
+      "creators": [
+        "ben",
+        "daf",
+        "fionn",
+        "lolipopgi",
+        "lydia",
+        "pedguin"
+      ]
+    },
+    {
+      "title": "MSPaint Fighting Fantasy",
+      "start": "2022-12-12T20:00:00Z",
+      "end": "2022-12-12T23:30:00",
+      "color": "#00d196ff",
+      "creators": [
+        "breeh",
+        "nilesy",
+        "rythian"
+      ]
+    },
+    {
+      "title": "Co-op Games",
+      "start": "2022-12-12T23:30:00",
+      "end": "2022-12-13T02:30:00",
+      "color": "#00c986ff",
+      "creators": [
+        "daltos",
+        "shadowatnoon"
+      ]
+    },
+    {
+      "title": "Save the world",
+      "start": "2022-12-13T11:00:00Z",
+      "end": "2022-12-13T14:00:00Z",
+      "color": "#f74accff",
+      "creators": [
+        "ben",
+        "lewis"
+      ]
+    },
+    {
+      "title": "4 Player co-op games",
+      "start": "2022-12-13T14:00:00Z",
+      "end": "2022-12-13T17:00:00Z",
+      "color": "#f03cbaff",
+      "creators": [
+        "fionn",
+        "lolipopgi",
+        "mousie",
+        "pedguin"
+      ]
+    },
+    {
+      "title": "Hatfilms gameshow",
+      "start": "2022-12-13T17:00:00Z",
+      "end": "2022-12-13T20:00:00Z",
+      "color": "#e82eaaff",
+      "creators": [
+        "hat_films",
+        "lewis",
+        "lydia",
+        "ravs"
+      ]
+    },
+    {
+      "title": "Terraria Hangout",
+      "start": "2022-12-13T20:00:00Z",
+      "end": "2022-12-13T23:00:00Z",
+      "color": "#e02297ff",
+      "creators": [
+        "ben",
+        "boba",
+        "daf",
+        "pedguin"
+      ]
+    },
+    {
+      "title": "Elden Ring Co-op",
+      "start": "2022-12-13T23:00:00Z",
+      "end": "2022-12-14T02:00:00Z",
+      "color": "#d91684ff",
+      "creators": [
+        "osie",
+        "shadowatnoon"
+      ]
+    },
+    {
+      "title": "Space wars",
+      "start": "2022-12-14T11:00:00Z",
+      "end": "2022-12-14T14:00:00Z",
+      "color": "#ffa600ff",
+      "creators": [
+        "ben",
+        "lewis"
+      ]
+    },
+    {
+      "title": "Tech 'em up",
+      "start": "2022-12-14T14:00:00Z",
+      "end": "2022-12-14T17:00:00Z",
+      "color": "#ff8400ff",
+      "creators": [
+        "ben",
+        "harry",
+        "lewis"
+      ]
+    },
+    {
+      "title": "Martyn's Minecraft",
+      "start": "2022-12-14T17:00:00Z",
+      "end": "2022-12-14T20:00:00Z",
+      "color": "#ff6600ff",
+      "creators": [
+        "boba",
+        "mango",
+        "martyn",
+        "ravs"
+      ]
+    },
+    {
+      "title": "Late Late Show",
+      "start": "2022-12-14T20:00:00Z",
+      "end": "2022-12-14T23:00:00Z",
+      "color": "#ff4400ff",
+      "creators": [
+        "boba",
+        "breeh",
+        "briony",
+        "daltos",
+        "kirsty",
+        "lewis",
+        "mango",
+        "mousie",
+        "nilesy",
+        "pedguin",
+        "ravs",
+        "rythian",
+        "zoey",
+        "zylus"
+      ]
+    }
+  ]
+}

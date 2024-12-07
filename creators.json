@@ -1,0 +1,247 @@
+[
+  {
+    "id": "alex_the_rambler",
+    "name": "Alex the Rambler",
+    "color": "#70a760"
+  },
+  {
+    "id": "bekkiboom",
+    "name": "Bekkiboom",
+    "color": "#a2194d"
+  },
+  {
+    "id": "ben",
+    "name": "Ben",
+    "color": "#5878b8"
+  },
+  {
+    "id": "best_bits",
+    "name": "Best Bits Weekly",
+    "color": "#3584BF"
+  },
+  {
+    "id": "boba",
+    "name": "Boba",
+    "color": "#6936f8"
+  },
+  {
+    "id": "bouphe",
+    "name": "Bouphe",
+    "color": "#e8f028"
+  },
+  {
+    "id": "breeh",
+    "name": "Breeh",
+    "color": "#91043a"
+  },
+  {
+    "id": "briony",
+    "name": "Briony",
+    "color": "#cbe3f4"
+  },
+  {
+    "id": "daf",
+    "name": "Daf",
+    "color": "#12a4e0"
+  },
+  {
+    "id": "daltos",
+    "name": "Daltos",
+    "color": "#3b5882"
+  },
+  {
+    "id": "simon_clark",
+    "name": "Dr. Simon Clark",
+    "color": "#3584BF"
+  },
+  {
+    "id": "drakon_astron",
+    "name": "DrakonAstron",
+    "color": "#3584BF"
+  },
+  {
+    "id": "duncan",
+    "name": "Duncan",
+    "color": "#60b8e8"
+  },
+  {
+    "id": "fionn",
+    "name": "Fionn",
+    "color": "#328094"
+  },
+  {
+    "id": "gee",
+    "name": "Gee",
+    "color": "#c858c6"
+  },
+  {
+    "id": "harry",
+    "name": "Harry",
+    "color": "#f8f060"
+  },
+  {
+    "id": "hat_films",
+    "name": "Hat Films",
+    "color": "#40c8e8"
+  },
+  {
+    "id": "high_rollers",
+    "name": "High Rollers",
+    "color": "#282828"
+  },
+  {
+    "id": "jack",
+    "name": "Jack",
+    "color": "#3584BF"
+  },
+  {
+    "id": "joe",
+    "name": "Joe",
+    "color": "#f88800"
+  },
+  {
+    "id": "kim",
+    "name": "Kim",
+    "color": "#cf2322"
+  },
+  {
+    "id": "kirsty",
+    "name": "Kirsty",
+    "color": "#fee4ff"
+  },
+  {
+    "id": "lewis",
+    "name": "Lewis",
+    "color": "#008cf2"
+  },
+  {
+    "id": "lolipopgi",
+    "name": "Lolip",
+    "color": "#129670"
+  },
+  {
+    "id": "lydia",
+    "name": "Lydia",
+    "color": "#262626"
+  },
+  {
+    "id": "mango",
+    "name": "Mango",
+    "color": "#eb6197"
+  },
+  {
+    "id": "sherlock_hulmes",
+    "name": "Mark",
+    "color": "#3584BF"
+  },
+  {
+    "id": "martyn",
+    "name": "Martyn",
+    "color": "#70c028"
+  },
+  {
+    "id": "mini-muka",
+    "name": "MiniMuka",
+    "color": "#5d10f8"
+  },
+  {
+    "id": "mousie",
+    "name": "Mousie",
+    "color": "#3098e7"
+  },
+  {
+    "id": "nilesy",
+    "name": "Nilesy",
+    "color": "#264061"
+  },
+  {
+    "id": "nina",
+    "name": "Nina",
+    "color": "#3584BF"
+  },
+  {
+    "id": "osie",
+    "name": "Osie",
+    "color": "#c1b2da"
+  },
+  {
+    "id": "pedguin",
+    "name": "Pedguin",
+    "color": "#5babc7"
+  },
+  {
+    "id": "potatomcwhisky",
+    "name": "potatomcwhiskey",
+    "color": "#3584BF"
+  },
+  {
+    "id": "pyrion",
+    "name": "Pyrion",
+    "color": "#c50741"
+  },
+  {
+    "id": "ravs",
+    "name": "Ravs",
+    "color": "#efe700"
+  },
+  {
+    "id": "rtgame",
+    "name": "RTGame",
+    "color": "#8eaee4"
+  },
+  {
+    "id": "rythian",
+    "name": "Rythian",
+    "color": "#6e22a7"
+  },
+  {
+    "id": "sarah",
+    "name": "Sarah",
+    "color": "#be4694"
+  },
+  {
+    "id": "shadowatnoon",
+    "name": "Shadow",
+    "color": "#FF90C0"
+  },
+  {
+    "id": "simon",
+    "name": "Simon",
+    "color": "#f38c3c"
+  },
+  {
+    "id": "sips",
+    "name": "Sips",
+    "color": "#99adf1"
+  },
+  {
+    "id": "spiff",
+    "name": "Spiff",
+    "color": "#3880c8"
+  },
+  {
+    "id": "longest_johns",
+    "name": "The Longest Johns",
+    "color": "#3584BF"
+  },
+  {
+    "id": "tom",
+    "name": "Tom",
+    "color": "#391a54"
+  },
+  {
+    "id": "wilsonator",
+    "name": "Wilsonator",
+    "color": "#1b5587"
+  },
+  {
+    "id": "zoey",
+    "name": "Zoey",
+    "color": "#f68d02"
+  },
+  {
+    "id": "zylus",
+    "name": "Zylus",
+    "color": "#58a800"
+  }
+]
