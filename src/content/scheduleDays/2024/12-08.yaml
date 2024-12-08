@@ -52,6 +52,12 @@ streams:
       - ravs
       - mousie
       - lolipopgi
+      - spiff
+      - breeh
+      - bekkiboom
+      - zylus
+      - harry
+      - mango
     duration_hours: 3
     end: '2024-12-08T23:00:00Z'
     start: '2024-12-08T17:00:00Z'
@@ -68,7 +74,7 @@ streams:
     - Table 1: Briony, Lydia, Duncan, Kirsty, Boba, Digby 
     - Table 2: Sarah, Sophie, Ben, RTGame, Lewis, Osie  
     - Table 3: Joe, Toastie, Ped, Ravs, Mousie, Lolip 
-  
+    - Table 4: Spiff, Breeh, Bekki, Zylus, Harry, Mango
     - ...'
     markdownDescription: >
       Hosted by Tom & Pyrion 
@@ -78,6 +84,8 @@ streams:
       - Table 2: Sarah, [Sophie](https://www.twitch.tv/mscupcakes), Ben, RTGame, Lewis, Osie 
       
       - Table 3: Joe, [Toastie](https://www.twitch.tv/toastie), Ped, Ravs, Mousie, Lolip 
+      
+      - Table 4: Spiff, Breeh, Bekki, Zylus, Harry, Mango
       
       - ...
     vods: []
