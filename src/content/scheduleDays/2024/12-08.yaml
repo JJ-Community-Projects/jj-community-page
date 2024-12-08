@@ -37,6 +37,21 @@ streams:
   - creators:
       - tom
       - pyrion
+      - briony
+      - lydia
+      - duncan
+      - kirsty
+      - boba
+      - sarah
+      - ben
+      - rtgame
+      - lewis
+      - osie
+      - joe
+      - pedguin
+      - ravs
+      - mousie
+      - lolipopgi
     duration_hours: 3
     end: '2024-12-08T23:00:00Z'
     start: '2024-12-08T17:00:00Z'
@@ -49,13 +64,20 @@ streams:
       tileSize: 2
     subtitle: Hosted by Tom & Pyrion
     title: Poker Night
-    description: 'Hosted by Tom & Pyrion - Table 1: TBA - Table 2: TBA - ...'
+    description: 'Hosted by Tom & Pyrion 
+    - Table 1: Briony, Lydia, Duncan, Kirsty, Boba, Digby 
+    - Table 2: Sarah, Sophie, Ben, RTGame, Lewis, Osie  
+    - Table 3: Joe, Toastie, Ped, Ravs, Mousie, Lolip 
+  
+    - ...'
     markdownDescription: >
       Hosted by Tom & Pyrion 
       
-      - Table 1: TBA 
+      - Table 1: Briony, Lydia, Duncan, Kirsty, Boba, [Digby](https://www.twitch.tv/digbytathamwarter) 
       
-      - Table 2: TBA 
+      - Table 2: Sarah, [Sophie](https://www.twitch.tv/mscupcakes), Ben, RTGame, Lewis, Osie 
+      
+      - Table 3: Joe, [Toastie](https://www.twitch.tv/toastie), Ped, Ravs, Mousie, Lolip 
       
       - ...
     vods: []
