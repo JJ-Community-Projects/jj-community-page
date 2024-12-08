@@ -15,7 +15,13 @@ streams:
       tileSize: 1
     subtitle: Spiff & Lewis
     title: Spiff U
-    vods: []
+    vods:
+      - type: youtube
+        label: Youtube Live
+        link: https://www.youtube.com/watch?v=OCk9OlBH4Kk
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2318784271?t=0h0m52s
   - creators:
       - ben
       - ravs
@@ -45,7 +51,13 @@ streams:
     subtitle: Jingle Joust
     title: Games Night Special
     description: Hosted by Ben & Alex
-    vods: []
+    vods:
+      - type: youtube
+        label: Youtube Live
+        link: https://www.youtube.com/watch?v=klqI0Xf1src
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2318857545?t=0h6m29s
   - creators:
       - daltos
       - duncan
@@ -70,4 +82,10 @@ streams:
       Lekmod 32.8 - Spiff = Babylon | Duncan = Bolivia | Kirsty = Switzerland |
       Daltos = Byzantium | AlexTheRambler = Korea | Lewis = Morocco | Rythian =
       Venice
-    vods: []
+    vods:
+      - type: youtube
+        label: Youtube Live
+        link: https://www.youtube.com/watch?v=A1MXNZHpQ4M
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2318857545?t=3h3m0s

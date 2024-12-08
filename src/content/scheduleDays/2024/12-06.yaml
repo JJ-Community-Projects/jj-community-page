@@ -15,7 +15,13 @@ streams:
       tileSize: 1
     subtitle: Ravs & Sips
     title: Big Rips
-    vods: []
+    vods:
+      - type: youtube
+        label: Youtube Live
+        link: https://www.youtube.com/watch?v=QeCoft1Nkbo
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2319607327?t=0h13m27s
   - creators:
       - daltos
       - spiff
@@ -32,7 +38,13 @@ streams:
       tileSize: 1
     subtitle: ''
     title: Civ 6 on the 6th
-    vods: []
+    vods:
+      - type: youtube
+        label: Youtube Live
+        link: https://www.youtube.com/watch?v=-zRlwrOKM-Y
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2319607327?t=3h16m14s
   - creators:
       - simon
       - harry
@@ -51,7 +63,13 @@ streams:
       tileSize: 1
     subtitle: Simon & Friends
     title: Important Videos
-    vods: []
+    vods:
+      - type: youtube
+        label: Youtube Live
+        link: https://www.youtube.com/watch?v=0yJIFRXZ6jA
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2319607327?t=6h15m54s
   - creators:
       - zylus
       - rtgame
@@ -73,4 +91,10 @@ streams:
       tileSize: 1
     subtitle: Zylus, RTGame, Lydia, Ravs & More
     title: MARIO KART TOURNAMENT
-    vods: []
+    vods:
+      - type: youtube
+        label: Youtube Live
+        link: https://www.youtube.com/watch?v=mDF2gQWneDc
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2319607327?t=9h25m0s
