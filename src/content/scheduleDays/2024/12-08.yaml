@@ -20,7 +20,7 @@ streams:
       - ravs
       - sarah
       - osie
-      - sips
+      - Duncan
     duration_hours: 3
     end: '2024-12-08T17:00:00Z'
     start: '2024-12-08T14:00:00Z'
@@ -31,7 +31,7 @@ streams:
           - '#3484bf'
         orientation: TD
       tileSize: 1
-    subtitle: Ravs, Sarah, Osie, Sips
+    subtitle: Ravs, Sarah, Osie, Duncan
     title: Pre-Poker Party Time
     vods: []
   - creators:
