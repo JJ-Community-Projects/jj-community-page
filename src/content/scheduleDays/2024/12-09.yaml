@@ -18,7 +18,13 @@ streams:
     description: So Bold
     markdownDescription: >
       [So Bold](https://www.youtube.com/watch?v=aPj5FI1wygg)
-    vods: []
+    vods:
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2322302741?t=0h0m34s
+      - type: youtube
+        label: Youtube Live
+        link: https://www.youtube.com/watch?v=5mR3D5tc_q0
   - creators:
       - briony
       - kirsty
@@ -35,7 +41,13 @@ streams:
       tileSize: 1
     subtitle: Briony, Kirsty & Rythian
     title: Kirby Fun
-    vods: []
+    vods:
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2322302741?t=2h37m55s
+      - type: youtube
+        label: Youtube Live
+        link: https://www.youtube.com/watch?v=A0ONWQ12v6w
   - creators:
       - simon_clark
       - lewis
@@ -70,4 +82,10 @@ streams:
       tileSize: 2
     subtitle: The Pursuit
     title: Dr Simon Clark's Quiz Show
-    vods: []
+    vods:
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2322302741?t=5h44m51s
+      - type: youtube
+        label: Youtube Live
+        link: https://www.youtube.com/watch?v=7hhoyAibxAk
