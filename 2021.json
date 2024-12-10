@@ -1,601 +1,671 @@
 {
   "title": "Yogscast Jingle Jam 2021",
-  "streams": [
+  "days": [
     {
-      "title": "Office Cam",
-      "start": "2021-12-01T11:00:00Z",
-      "end": "2021-12-01T14:00:00Z",
-      "color": "#00bbe0ff",
-      "creators": [
-        "ben",
-        "boba",
-        "breeh",
-        "harry",
-        "joe",
-        "lewis",
-        "osie",
-        "ravs",
-        "spiff",
-        "tom"
+      "date": "2021-12-01",
+      "streams": [
+        {
+          "title": "Office Cam",
+          "start": "2021-12-01T11:00:00Z",
+          "end": "2021-12-01T14:00:00Z",
+          "color": "#00bbe0ff",
+          "creators": [
+            "ben",
+            "boba",
+            "breeh",
+            "harry",
+            "joe",
+            "lewis",
+            "osie",
+            "ravs",
+            "spiff",
+            "tom"
+          ]
+        },
+        {
+          "title": "Jingle Jam Hype Stream",
+          "start": "2021-12-01T14:00:00Z",
+          "end": "2021-12-01T17:00:00Z",
+          "color": "#009fd4ff",
+          "creators": [
+            "ben",
+            "tom"
+          ]
+        },
+        {
+          "title": "Jingle Cats",
+          "start": "2021-12-01T17:00:00Z",
+          "end": "2021-12-01T20:00:00Z",
+          "color": "#0081c7ff",
+          "creators": [
+            "lewis",
+            "simon"
+          ]
+        },
+        {
+          "title": "Christmas Trains",
+          "start": "2021-12-01T20:00:00Z",
+          "end": "2021-12-01T23:00:00Z",
+          "color": "#0069baff",
+          "creators": [
+            "alex_the_rambler",
+            "ben",
+            "daltos",
+            "duncan",
+            "lewis",
+            "rythian",
+            "spiff"
+          ]
+        }
       ]
     },
     {
-      "title": "Jingle Jam Hype Stream",
-      "start": "2021-12-01T14:00:00Z",
-      "end": "2021-12-01T17:00:00Z",
-      "color": "#009fd4ff",
-      "creators": [
-        "ben",
-        "tom"
+      "date": "2021-12-02",
+      "streams": [
+        {
+          "title": "Extra Rips",
+          "start": "2021-12-02T11:00:00Z",
+          "end": "2021-12-02T14:00:00Z",
+          "color": "#ffd900ff",
+          "creators": [
+            "breeh",
+            "briony",
+            "ravs",
+            "sips"
+          ]
+        },
+        {
+          "title": "Pokemon Tournament",
+          "start": "2021-12-02T14:00:00Z",
+          "end": "2021-12-02T17:00:00Z",
+          "color": "#ffcc00ff",
+          "creators": [
+            "boba",
+            "duncan",
+            "harry",
+            "lydia",
+            "osie",
+            "pedguin"
+          ]
+        },
+        {
+          "title": "Spiff & RT break Minecraft",
+          "start": "2021-12-02T17:00:00Z",
+          "end": "2021-12-02T20:00:00Z",
+          "color": "#ffbf00ff",
+          "creators": [
+            "lewis",
+            "spiff"
+          ]
+        },
+        {
+          "title": "Protessional Stream",
+          "start": "2021-12-02T11:00:00Z",
+          "end": "2021-12-02T14:00:00Z",
+          "color": "#ffb300ff",
+          "creators": [
+            "nilesy",
+            "rythian",
+            "zylus"
+          ]
+        }
       ]
     },
     {
-      "title": "Jingle Cats",
-      "start": "2021-12-01T17:00:00Z",
-      "end": "2021-12-01T20:00:00Z",
-      "color": "#0081c7ff",
-      "creators": [
-        "lewis",
-        "simon"
+      "date": "2021-12-03",
+      "streams": [
+        {
+          "title": "Big Rips",
+          "start": "2021-12-03T11:00:00Z",
+          "end": "2021-12-03T14:00:00Z",
+          "color": "#a7cc00ff",
+          "creators": [
+            "ravs",
+            "sips"
+          ]
+        },
+        {
+          "title": "Gold Medal Games",
+          "start": "2021-12-03T14:00:00Z",
+          "end": "2021-12-03T17:00:00Z",
+          "color": "#7cba00ff",
+          "creators": [
+            "ben",
+            "lewis"
+          ]
+        },
+        {
+          "title": "Simon's Important Videos",
+          "start": "2021-12-03T17:00:00Z",
+          "end": "2021-12-03T20:00:00Z",
+          "color": "#5aa800ff",
+          "creators": [
+            "boba",
+            "harry",
+            "simon",
+            "tom"
+          ]
+        },
+        {
+          "title": "B.O.R.P.",
+          "start": "2021-12-03T20:00:00Z",
+          "end": "2021-12-03T23:00:00Z",
+          "color": "#3a9600ff",
+          "creators": [
+            "boba",
+            "osie",
+            "pedguin",
+            "ravs"
+          ]
+        }
       ]
     },
     {
-      "title": "Christmas Trains",
-      "start": "2021-12-01T20:00:00Z",
-      "end": "2021-12-01T23:00:00Z",
-      "color": "#0069baff",
-      "creators": [
-        "alex_the_rambler",
-        "ben",
-        "daltos",
-        "duncan",
-        "lewis",
-        "rythian",
-        "spiff"
+      "date": "2021-12-04",
+      "streams": [
+        {
+          "title": "Jerk Off",
+          "start": "2021-12-04T11:00:00Z",
+          "end": "2021-12-04T14:00:00Z",
+          "color": "#fc7600ff",
+          "creators": [
+            "ben",
+            "tom"
+          ]
+        },
+        {
+          "title": "Mario Kart Tournament",
+          "start": "2021-12-04T14:00:00Z",
+          "end": "2021-12-04T17:00:00Z",
+          "color": "#f76300ff",
+          "creators": [
+            "boba",
+            "kim",
+            "lydia",
+            "ravs",
+            "zylus"
+          ]
+        },
+        {
+          "title": "Feed a Cow for Christmas",
+          "start": "2021-12-04T17:00:00Z",
+          "end": "2021-12-04T20:00:00Z",
+          "color": "#f25100ff",
+          "creators": [
+            "duncan",
+            "lewis",
+            "osie",
+            "pedguin",
+            "ravs"
+          ]
+        },
+        {
+          "title": "Pixel Perfect",
+          "start": "2021-12-04T20:00:00Z",
+          "end": "2021-12-04T23:00:00Z",
+          "color": "#ed3b00ff",
+          "creators": [
+            "breeh",
+            "rythian"
+          ]
+        }
       ]
     },
     {
-      "title": "Extra Rips",
-      "start": "2021-12-02T11:00:00Z",
-      "end": "2021-12-02T14:00:00Z",
-      "color": "#ffd900ff",
-      "creators": [
-        "breeh",
-        "briony",
-        "ravs",
-        "sips"
+      "date": "2021-12-05",
+      "streams": [
+        {
+          "title": "Jingle Jam Exclusives",
+          "start": "2021-12-05T11:00:00Z",
+          "end": "2021-12-05T14:00:00Z",
+          "color": "#00e8c5ff",
+          "creators": [
+            "boba",
+            "mousie",
+            "zylus"
+          ]
+        },
+        {
+          "title": "Christmas Crafts",
+          "start": "2021-12-05T14:00:00Z",
+          "end": "2021-12-05T17:00:00Z",
+          "color": "#00dbacff",
+          "creators": [
+            "breeh",
+            "briony",
+            "kirsty"
+          ]
+        },
+        {
+          "title": "CIV SALT & STRATEGY",
+          "start": "2021-12-05T17:00:00Z",
+          "end": "2021-12-05T23:00:00Z",
+          "color": "#00cf94ff",
+          "creators": [
+            "alex_the_rambler",
+            "daltos",
+            "duncan",
+            "lewis",
+            "rythian",
+            "spiff"
+          ]
+        }
       ]
     },
     {
-      "title": "Pokemon Tournament",
-      "start": "2021-12-02T14:00:00Z",
-      "end": "2021-12-02T17:00:00Z",
-      "color": "#ffcc00ff",
-      "creators": [
-        "boba",
-        "duncan",
-        "harry",
-        "lydia",
-        "osie",
-        "pedguin"
+      "date": "2021-12-06",
+      "streams": [
+        {
+          "title": "Retro Games with Bouphe",
+          "start": "2021-12-06T11:00:00Z",
+          "end": "2021-12-06T14:00:00Z",
+          "color": "#f74accff",
+          "creators": [
+            "bouphe"
+          ]
+        },
+        {
+          "title": "Couch Co-op",
+          "start": "2021-12-06T14:00:00Z",
+          "end": "2021-12-06T17:00:00Z",
+          "color": "#ed39b7ff",
+          "creators": [
+            "ben",
+            "boba",
+            "joe",
+            "pedguin"
+          ]
+        },
+        {
+          "title": "The Longest Johns",
+          "start": "2021-12-06T17:00:00Z",
+          "end": "2021-12-06T20:00:00Z",
+          "color": "#e329a2ff",
+          "creators": []
+        },
+        {
+          "title": "Project Winter",
+          "start": "2021-12-06T20:00:00Z",
+          "end": "2021-12-06T23:00:00Z",
+          "color": "#d91a89ff",
+          "creators": [
+            "ben",
+            "best_bits",
+            "daltos",
+            "duncan",
+            "gee",
+            "pedguin"
+          ]
+        }
       ]
     },
     {
-      "title": "Spiff & RT break Minecraft",
-      "start": "2021-12-02T17:00:00Z",
-      "end": "2021-12-02T20:00:00Z",
-      "color": "#ffbf00ff",
-      "creators": [
-        "lewis",
-        "spiff"
+      "date": "2021-12-07",
+      "streams": [
+        {
+          "title": "Trucking Tuesday",
+          "start": "2021-12-07T11:00:00Z",
+          "end": "2021-12-07T14:00:00Z",
+          "color": "#ffa600ff",
+          "creators": [
+            "ben",
+            "ravs"
+          ]
+        },
+        {
+          "title": "Tom Clark's Wheel of wonders",
+          "start": "2021-12-07T14:00:00Z",
+          "end": "2021-12-07T17:00:00Z",
+          "color": "#ff8400ff",
+          "creators": [
+            "briony",
+            "kirsty",
+            "lewis",
+            "tom"
+          ]
+        },
+        {
+          "title": "Pub Pals Underwater",
+          "start": "2021-12-07T17:00:00Z",
+          "end": "2021-12-07T20:00:00Z",
+          "color": "#ff6600ff",
+          "creators": [
+            "boba",
+            "duncan",
+            "pedguin",
+            "ravs"
+          ]
+        },
+        {
+          "title": "FiZone After Dark",
+          "start": "2021-12-07T20:00:00Z",
+          "end": "2021-12-07T23:00:00Z",
+          "color": "#ffb1b0ff",
+          "creators": [
+            "fionn",
+            "zoey"
+          ]
+        }
       ]
     },
     {
-      "title": "Protessional Stream",
-      "start": "2021-12-02T11:00:00Z",
-      "end": "2021-12-02T14:00:00Z",
-      "color": "#ffb300ff",
-      "creators": [
-        "nilesy",
-        "rythian",
-        "zylus"
+      "date": "2021-12-08",
+      "streams": [
+        {
+          "title": "Hidden Gems",
+          "start": "2021-12-08T11:00:00Z",
+          "end": "2021-12-08T14:00:00Z",
+          "color": "#00bbe0ff",
+          "creators": [
+            "briony",
+            "rythian"
+          ]
+        },
+        {
+          "title": "Main Channel Crew",
+          "start": "2021-12-08T14:00:00Z",
+          "end": "2021-12-08T17:00:00Z",
+          "color": "#0096d1ff",
+          "creators": [
+            "ben",
+            "boba",
+            "duncan",
+            "mango",
+            "pedguin",
+            "ravs",
+            "zylus"
+          ]
+        },
+        {
+          "title": "Hat Films Christmas Album",
+          "start": "2021-12-08T17:00:00Z",
+          "end": "2021-12-08T20:00:00Z",
+          "color": "#0078c2ff",
+          "creators": [
+            "hat_films"
+          ]
+        }
       ]
     },
     {
-      "title": "Big Rips",
-      "start": "2021-12-03T11:00:00Z",
-      "end": "2021-12-03T14:00:00Z",
-      "color": "#a7cc00ff",
-      "creators": [
-        "ravs",
-        "sips"
+      "date": "2021-12-09",
+      "streams": [
+        {
+          "title": "Good Vibes",
+          "start": "2021-12-09T11:00:00Z",
+          "end": "2021-12-09T14:00:00Z",
+          "color": "#ffd900ff",
+          "creators": [
+            "breeh",
+            "briony"
+          ]
+        },
+        {
+          "title": "Hat Films Art Stream",
+          "start": "2021-12-09T14:00:00Z",
+          "end": "2021-12-09T17:00:00Z",
+          "color": "#ffcc00ff",
+          "creators": [
+            "hat_films",
+            "lewis"
+          ]
+        },
+        {
+          "title": "Cursedcraft",
+          "start": "2021-12-09T17:00:00Z",
+          "end": "2021-12-09T20:00:00Z",
+          "color": "#ffbf00ff",
+          "creators": [
+            "gee",
+            "simon"
+          ]
+        },
+        {
+          "title": "Pub Pals in Space",
+          "start": "2021-12-09T20:00:00Z",
+          "end": "2021-12-09T23:00:00Z",
+          "color": "#ffb300ff",
+          "creators": [
+            "boba",
+            "duncan",
+            "pedguin",
+            "ravs"
+          ]
+        }
       ]
     },
     {
-      "title": "Gold Medal Games",
-      "start": "2021-12-03T14:00:00Z",
-      "end": "2021-12-03T17:00:00Z",
-      "color": "#7cba00ff",
-      "creators": [
-        "ben",
-        "lewis"
+      "date": "2021-12-10",
+      "streams": [
+        {
+          "title": "Jump Die Repeat",
+          "start": "2021-12-10T11:00:00Z",
+          "end": "2021-12-10T14:00:00Z",
+          "color": "#a7cc00ff",
+          "creators": [
+            "zylus"
+          ]
+        },
+        {
+          "title": "Parsec Pals",
+          "start": "2021-12-10T14:00:00Z",
+          "end": "2021-12-10T17:00:00Z",
+          "color": "#74b800ff",
+          "creators": [
+            "boba",
+            "pedguin"
+          ]
+        },
+        {
+          "title": "Poker Tournament",
+          "start": "2021-12-10T16:30:00",
+          "end": "2021-12-10T19:30:00",
+          "color": "#49a300ff",
+          "creators": [
+            "bekkiboom",
+            "ben",
+            "boba",
+            "breeh",
+            "daf",
+            "duncan",
+            "harry",
+            "lewis",
+            "lydia",
+            "sherlock_hulmes",
+            "mousie",
+            "osie",
+            "pyrion",
+            "ravs",
+            "spiff",
+            "tom",
+            "zylus"
+          ]
+        }
       ]
     },
     {
-      "title": "Simon's Important Videos",
-      "start": "2021-12-03T17:00:00Z",
-      "end": "2021-12-03T20:00:00Z",
-      "color": "#5aa800ff",
-      "creators": [
-        "boba",
-        "harry",
-        "simon",
-        "tom"
+      "date": "2021-12-11",
+      "streams": [
+        {
+          "title": "I Love Eggs",
+          "start": "2021-12-11T11:00:00Z",
+          "end": "2021-12-11T14:00:00Z",
+          "color": "#fc7600ff",
+          "creators": [
+            "boba",
+            "lewis"
+          ]
+        },
+        {
+          "title": "Cooking Christmas Dinner",
+          "start": "2021-12-11T14:00:00Z",
+          "end": "2021-12-11T17:00:00Z",
+          "color": "#f55e00ff",
+          "creators": [
+            "breeh",
+            "briony",
+            "kim",
+            "kirsty"
+          ]
+        },
+        {
+          "title": "Minecraft MCC 19",
+          "start": "2021-12-11T17:00:00Z",
+          "end": "2021-12-11T20:00:00Z",
+          "color": "#ed4300ff",
+          "creators": [
+            "martyn",
+            "mini-muka"
+          ]
+        }
       ]
     },
     {
-      "title": "B.O.R.P.",
-      "start": "2021-12-03T20:00:00Z",
-      "end": "2021-12-03T23:00:00Z",
-      "color": "#3a9600ff",
-      "creators": [
-        "boba",
-        "osie",
-        "pedguin",
-        "ravs"
+      "date": "2021-12-12",
+      "streams": [
+        {
+          "title": "Triforce Live",
+          "start": "2021-12-12T11:00:00Z",
+          "end": "2021-12-12T14:00:00Z",
+          "color": "#00e8c5ff",
+          "creators": [
+            "lewis",
+            "pyrion",
+            "sips"
+          ]
+        },
+        {
+          "title": "Christmas Roleplay",
+          "start": "2021-12-12T14:00:00Z",
+          "end": "2021-12-12T17:00:00Z",
+          "color": "#00deb1ff",
+          "creators": [
+            "harry",
+            "ravs",
+            "simon",
+            "tom"
+          ]
+        },
+        {
+          "title": "Highrollers Christmas Special",
+          "start": "2021-12-12T17:00:00Z",
+          "end": "2021-12-12T20:00:00Z",
+          "color": "#00d49bff",
+          "creators": [
+            "hat_films",
+            "kim",
+            "sherlock_hulmes"
+          ]
+        },
+        {
+          "title": "Rust Roleplay",
+          "start": "2021-12-12T20:00:00Z",
+          "end": "2021-12-12T23:00:00Z",
+          "color": "#00c98aff",
+          "creators": [
+            "pyrion",
+            "spiff"
+          ]
+        }
       ]
     },
     {
-      "title": "Jerk Off",
-      "start": "2021-12-04T11:00:00Z",
-      "end": "2021-12-04T14:00:00Z",
-      "color": "#fc7600ff",
-      "creators": [
-        "ben",
-        "tom"
+      "date": "2021-12-13",
+      "streams": [
+        {
+          "title": "Games",
+          "start": "2021-12-13T11:00:00Z",
+          "end": "2021-12-13T14:00:00Z",
+          "color": "#f74accff",
+          "creators": [
+            "lydia",
+            "mousie",
+            "zylus"
+          ]
+        },
+        {
+          "title": "Game Jam Final",
+          "start": "2021-12-13T14:00:00Z",
+          "end": "2021-12-13T17:00:00Z",
+          "color": "#ed39b7ff",
+          "creators": []
+        },
+        {
+          "title": "Big Fat Quiz",
+          "start": "2021-12-13T17:00:00Z",
+          "end": "2021-12-13T20:00:00Z",
+          "color": "#e329a2ff",
+          "creators": [
+            "ben",
+            "boba",
+            "briony",
+            "daf",
+            "simon_clark",
+            "lydia",
+            "ravs",
+            "zylus"
+          ]
+        },
+        {
+          "title": "Terraria",
+          "start": "2021-12-13T20:00:00Z",
+          "end": "2021-12-13T23:00:00Z",
+          "color": "#d91a89ff",
+          "creators": [
+            "boba",
+            "lewis",
+            "pedguin"
+          ]
+        }
       ]
     },
     {
-      "title": "Mario Kart Tournament",
-      "start": "2021-12-04T14:00:00Z",
-      "end": "2021-12-04T17:00:00Z",
-      "color": "#f76300ff",
-      "creators": [
-        "boba",
-        "kim",
-        "lydia",
-        "ravs",
-        "zylus"
-      ]
-    },
-    {
-      "title": "Feed a Cow for Christmas",
-      "start": "2021-12-04T17:00:00Z",
-      "end": "2021-12-04T20:00:00Z",
-      "color": "#f25100ff",
-      "creators": [
-        "duncan",
-        "lewis",
-        "osie",
-        "pedguin",
-        "ravs"
-      ]
-    },
-    {
-      "title": "Pixel Perfect",
-      "start": "2021-12-04T20:00:00Z",
-      "end": "2021-12-04T23:00:00Z",
-      "color": "#ed3b00ff",
-      "creators": [
-        "breeh",
-        "rythian"
-      ]
-    },
-    {
-      "title": "Jingle Jam Exclusives",
-      "start": "2021-12-05T11:00:00Z",
-      "end": "2021-12-05T14:00:00Z",
-      "color": "#00e8c5ff",
-      "creators": [
-        "boba",
-        "mousie",
-        "zylus"
-      ]
-    },
-    {
-      "title": "Christmas Crafts",
-      "start": "2021-12-05T14:00:00Z",
-      "end": "2021-12-05T17:00:00Z",
-      "color": "#00dbacff",
-      "creators": [
-        "breeh",
-        "briony",
-        "kirsty"
-      ]
-    },
-    {
-      "title": "CIV SALT & STRATEGY",
-      "start": "2021-12-05T17:00:00Z",
-      "end": "2021-12-05T23:00:00Z",
-      "color": "#00cf94ff",
-      "creators": [
-        "alex_the_rambler",
-        "daltos",
-        "duncan",
-        "lewis",
-        "rythian",
-        "spiff"
-      ]
-    },
-    {
-      "title": "Retro Games with Bouphe",
-      "start": "2021-12-06T11:00:00Z",
-      "end": "2021-12-06T14:00:00Z",
-      "color": "#f74accff",
-      "creators": [
-        "bouphe"
-      ]
-    },
-    {
-      "title": "Couch Co-op",
-      "start": "2021-12-06T14:00:00Z",
-      "end": "2021-12-06T17:00:00Z",
-      "color": "#ed39b7ff",
-      "creators": [
-        "ben",
-        "boba",
-        "joe",
-        "pedguin"
-      ]
-    },
-    {
-      "title": "The Longest Johns",
-      "start": "2021-12-06T17:00:00Z",
-      "end": "2021-12-06T20:00:00Z",
-      "color": "#e329a2ff",
-      "creators": []
-    },
-    {
-      "title": "Project Winter",
-      "start": "2021-12-06T20:00:00Z",
-      "end": "2021-12-06T23:00:00Z",
-      "color": "#d91a89ff",
-      "creators": [
-        "ben",
-        "best_bits",
-        "daltos",
-        "duncan",
-        "gee",
-        "pedguin"
-      ]
-    },
-    {
-      "title": "Trucking Tuesday",
-      "start": "2021-12-07T11:00:00Z",
-      "end": "2021-12-07T14:00:00Z",
-      "color": "#ffa600ff",
-      "creators": [
-        "ben",
-        "ravs"
-      ]
-    },
-    {
-      "title": "Tom Clark's Wheel of wonders",
-      "start": "2021-12-07T14:00:00Z",
-      "end": "2021-12-07T17:00:00Z",
-      "color": "#ff8400ff",
-      "creators": [
-        "briony",
-        "kirsty",
-        "lewis",
-        "tom"
-      ]
-    },
-    {
-      "title": "Pub Pals Underwater",
-      "start": "2021-12-07T17:00:00Z",
-      "end": "2021-12-07T20:00:00Z",
-      "color": "#ff6600ff",
-      "creators": [
-        "boba",
-        "duncan",
-        "pedguin",
-        "ravs"
-      ]
-    },
-    {
-      "title": "FiZone After Dark",
-      "start": "2021-12-07T20:00:00Z",
-      "end": "2021-12-07T23:00:00Z",
-      "color": "#ffb1b0ff",
-      "creators": [
-        "fionn",
-        "zoey"
-      ]
-    },
-    {
-      "title": "Hidden Gems",
-      "start": "2021-12-08T11:00:00Z",
-      "end": "2021-12-08T14:00:00Z",
-      "color": "#00bbe0ff",
-      "creators": [
-        "briony",
-        "rythian"
-      ]
-    },
-    {
-      "title": "Main Channel Crew",
-      "start": "2021-12-08T14:00:00Z",
-      "end": "2021-12-08T17:00:00Z",
-      "color": "#0096d1ff",
-      "creators": [
-        "ben",
-        "boba",
-        "duncan",
-        "mango",
-        "pedguin",
-        "ravs",
-        "zylus"
-      ]
-    },
-    {
-      "title": "Hat Films Christmas Album",
-      "start": "2021-12-08T17:00:00Z",
-      "end": "2021-12-08T20:00:00Z",
-      "color": "#0078c2ff",
-      "creators": [
-        "hat_films"
-      ]
-    },
-    {
-      "title": "Good Vibes",
-      "start": "2021-12-09T11:00:00Z",
-      "end": "2021-12-09T14:00:00Z",
-      "color": "#ffd900ff",
-      "creators": [
-        "breeh",
-        "briony"
-      ]
-    },
-    {
-      "title": "Hat Films Art Stream",
-      "start": "2021-12-09T14:00:00Z",
-      "end": "2021-12-09T17:00:00Z",
-      "color": "#ffcc00ff",
-      "creators": [
-        "hat_films",
-        "lewis"
-      ]
-    },
-    {
-      "title": "Cursedcraft",
-      "start": "2021-12-09T17:00:00Z",
-      "end": "2021-12-09T20:00:00Z",
-      "color": "#ffbf00ff",
-      "creators": [
-        "gee",
-        "simon"
-      ]
-    },
-    {
-      "title": "Pub Pals in Space",
-      "start": "2021-12-09T20:00:00Z",
-      "end": "2021-12-09T23:00:00Z",
-      "color": "#ffb300ff",
-      "creators": [
-        "boba",
-        "duncan",
-        "pedguin",
-        "ravs"
-      ]
-    },
-    {
-      "title": "Jump Die Repeat",
-      "start": "2021-12-10T11:00:00Z",
-      "end": "2021-12-10T14:00:00Z",
-      "color": "#a7cc00ff",
-      "creators": [
-        "zylus"
-      ]
-    },
-    {
-      "title": "Parsec Pals",
-      "start": "2021-12-10T14:00:00Z",
-      "end": "2021-12-10T17:00:00Z",
-      "color": "#74b800ff",
-      "creators": [
-        "boba",
-        "pedguin"
-      ]
-    },
-    {
-      "title": "Poker Tournament",
-      "start": "2021-12-10T16:30:00",
-      "end": "2021-12-10T19:30:00",
-      "color": "#49a300ff",
-      "creators": [
-        "bekkiboom",
-        "ben",
-        "boba",
-        "breeh",
-        "daf",
-        "duncan",
-        "harry",
-        "lewis",
-        "lydia",
-        "sherlock_hulmes",
-        "mousie",
-        "osie",
-        "pyrion",
-        "ravs",
-        "spiff",
-        "tom",
-        "zylus"
-      ]
-    },
-    {
-      "title": "I Love Eggs",
-      "start": "2021-12-11T11:00:00Z",
-      "end": "2021-12-11T14:00:00Z",
-      "color": "#fc7600ff",
-      "creators": [
-        "boba",
-        "lewis"
-      ]
-    },
-    {
-      "title": "Cooking Christmas Dinner",
-      "start": "2021-12-11T14:00:00Z",
-      "end": "2021-12-11T17:00:00Z",
-      "color": "#f55e00ff",
-      "creators": [
-        "breeh",
-        "briony",
-        "kim",
-        "kirsty"
-      ]
-    },
-    {
-      "title": "Minecraft MCC 19",
-      "start": "2021-12-11T17:00:00Z",
-      "end": "2021-12-11T20:00:00Z",
-      "color": "#ed4300ff",
-      "creators": [
-        "martyn",
-        "mini-muka"
-      ]
-    },
-    {
-      "title": "Triforce Live",
-      "start": "2021-12-12T11:00:00Z",
-      "end": "2021-12-12T14:00:00Z",
-      "color": "#00e8c5ff",
-      "creators": [
-        "lewis",
-        "pyrion",
-        "sips"
-      ]
-    },
-    {
-      "title": "Christmas Roleplay",
-      "start": "2021-12-12T14:00:00Z",
-      "end": "2021-12-12T17:00:00Z",
-      "color": "#00deb1ff",
-      "creators": [
-        "harry",
-        "ravs",
-        "simon",
-        "tom"
-      ]
-    },
-    {
-      "title": "Highrollers Christmas Special",
-      "start": "2021-12-12T17:00:00Z",
-      "end": "2021-12-12T20:00:00Z",
-      "color": "#00d49bff",
-      "creators": [
-        "hat_films",
-        "kim",
-        "sherlock_hulmes"
-      ]
-    },
-    {
-      "title": "Rust Roleplay",
-      "start": "2021-12-12T20:00:00Z",
-      "end": "2021-12-12T23:00:00Z",
-      "color": "#00c98aff",
-      "creators": [
-        "pyrion",
-        "spiff"
-      ]
-    },
-    {
-      "title": "Games",
-      "start": "2021-12-13T11:00:00Z",
-      "end": "2021-12-13T14:00:00Z",
-      "color": "#f74accff",
-      "creators": [
-        "lydia",
-        "mousie",
-        "zylus"
-      ]
-    },
-    {
-      "title": "Game Jam Final",
-      "start": "2021-12-13T14:00:00Z",
-      "end": "2021-12-13T17:00:00Z",
-      "color": "#ed39b7ff",
-      "creators": []
-    },
-    {
-      "title": "Big Fat Quiz",
-      "start": "2021-12-13T17:00:00Z",
-      "end": "2021-12-13T20:00:00Z",
-      "color": "#e329a2ff",
-      "creators": [
-        "ben",
-        "boba",
-        "briony",
-        "daf",
-        "simon_clark",
-        "lydia",
-        "ravs",
-        "zylus"
-      ]
-    },
-    {
-      "title": "Terraria",
-      "start": "2021-12-13T20:00:00Z",
-      "end": "2021-12-13T23:00:00Z",
-      "color": "#d91a89ff",
-      "creators": [
-        "boba",
-        "lewis",
-        "pedguin"
-      ]
-    },
-    {
-      "title": "Adventure Together",
-      "start": "2021-12-14T11:00:00Z",
-      "end": "2021-12-14T14:00:00Z",
-      "color": "#ffa600ff",
-      "creators": [
-        "ben",
-        "pyrion"
-      ]
-    },
-    {
-      "title": "Fighting Fantasy",
-      "start": "2021-12-14T14:00:00Z",
-      "end": "2021-12-14T17:00:00Z",
-      "color": "#ff8400ff",
-      "creators": [
-        "lewis",
-        "simon"
-      ]
-    },
-    {
-      "title": "Song of Thieves",
-      "start": "2021-12-14T17:00:00Z",
-      "end": "2021-12-14T20:00:00Z",
-      "color": "#ff6600ff",
-      "creators": []
-    },
-    {
-      "title": "Late Late Show",
-      "start": "2021-12-14T20:00:00Z",
-      "end": "2021-12-14T23:00:00Z",
-      "color": "#ff4400ff",
-      "creators": [
-        "breeh",
-        "briony",
-        "daltos",
-        "duncan",
-        "kirsty",
-        "nilesy",
-        "pedguin",
-        "rythian",
-        "zylus"
+      "date": "2021-12-14",
+      "streams": [
+        {
+          "title": "Adventure Together",
+          "start": "2021-12-14T11:00:00Z",
+          "end": "2021-12-14T14:00:00Z",
+          "color": "#ffa600ff",
+          "creators": [
+            "ben",
+            "pyrion"
+          ]
+        },
+        {
+          "title": "Fighting Fantasy",
+          "start": "2021-12-14T14:00:00Z",
+          "end": "2021-12-14T17:00:00Z",
+          "color": "#ff8400ff",
+          "creators": [
+            "lewis",
+            "simon"
+          ]
+        },
+        {
+          "title": "Song of Thieves",
+          "start": "2021-12-14T17:00:00Z",
+          "end": "2021-12-14T20:00:00Z",
+          "color": "#ff6600ff",
+          "creators": []
+        },
+        {
+          "title": "Late Late Show",
+          "start": "2021-12-14T20:00:00Z",
+          "end": "2021-12-14T23:00:00Z",
+          "color": "#ff4400ff",
+          "creators": [
+            "breeh",
+            "briony",
+            "daltos",
+            "duncan",
+            "kirsty",
+            "nilesy",
+            "pedguin",
+            "rythian",
+            "zylus"
+          ]
+        }
       ]
     }
   ]

@@ -1,4 +1,4 @@
-import {type Stats, type StatsStream, StatsValueType} from "../../lib/model/Stats.ts";
+import {type Stats, type StatsStream, StatsValueType} from "../../../lib/model/Stats.ts";
 import {DateTime} from "luxon";
 import {useStatsSettings} from "./StatsSettings.tsx";
 

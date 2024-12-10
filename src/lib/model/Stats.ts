@@ -1,13 +1,16 @@
 import {type BarSeriesOption, type EChartsOption} from "echarts";
+import type {RegisteredSeriesOption} from "echarts/types/dist/echarts";
 
 export interface Stats {
   streams: StatsStream[]
-  creators: {
-    [key: string]: {
-      appearance: number,
-      minutes: number,
-    }
-  }
+  hours: StatsStream[]
+  creators: StatsCreator[]
+}
+
+export interface StatsCreator {
+  id: string
+  appearance: number,
+  minutes: number,
 }
 
 export interface StatsStream {
@@ -26,8 +29,8 @@ export interface StatsStream {
   fundraiser_per_minute: number,
   total_per_minute: number,
   collections_per_minute: number,
-  donations_per_minute:number
-  avg_donation_amount:number
+  donations_per_minute: number
+  avg_donation_amount: number
 }
 
 declare type Values<T> = T[keyof T]
@@ -45,7 +48,7 @@ const _VS = () => {
   return b!.data![0]
 }
 
-export type Series = ReturnType<typeof _Series>
+export type Series = Values<RegisteredSeriesOption>//ReturnType<typeof _Series>
 type Data = ReturnType<typeof _V>
 export type SingleData = ReturnType<typeof _VS>
 
@@ -63,6 +66,11 @@ export enum StatsValueType {
   AvgDonationAmount = 'AvgDonationAmount',
 }
 
+export enum StatsValueTypeCreator {
+  Appearance = 'Appearance',
+  Minutes = 'Minutes',
+}
+
 export interface StatsSettings {
   show2021: boolean
   show2022: boolean
@@ -71,6 +79,16 @@ export interface StatsSettings {
   order: 'date' | 'amount'
   value: StatsValueType
   showDay1: boolean
+  showNights: boolean
+  bar: 'hours' | 'streams'
+}
+
+export interface CreatorStatsSettings {
+  show2021: boolean
+  show2022: boolean
+  show2023: boolean
+  onlyTop15: boolean
+  value: StatsValueTypeCreator
 }
 
 const _XAxis = () => {

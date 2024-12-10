@@ -538,8 +538,10 @@ async function test() {
 function statsSchedule(year) {
     const s = fullScheduleToTESSchedule(loadSchedule(year))
     const title = s.title
-    const streams = []
+    const days = []
     for(const day of s.days) {
+        const date = day.date
+        const streams = []
         for(const stream of day.streams) {
             const title = stream.title
             const start = stream.start
@@ -554,10 +556,14 @@ function statsSchedule(year) {
                 creators
             })
         }
+        days.push({
+            date,
+            streams
+        })
     }
     return {
         title,
-        streams
+        days
     }
 }
 
@@ -585,6 +591,6 @@ function statsSchedules() {
 }
 
 //test()
- main()
+// main()
 //jjJob()
-// statsSchedules()
+statsSchedules()

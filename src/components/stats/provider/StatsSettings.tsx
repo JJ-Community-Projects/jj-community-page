@@ -1,17 +1,19 @@
 import type {StatsSettings} from "#lib/model/Stats.ts";
 import {createContext, type ParentComponent, useContext} from "solid-js";
 import {createStore} from "solid-js/store";
-import {StatsValueType} from "../../lib/model/Stats.ts";
+import {StatsValueType} from "../../../lib/model/Stats.ts";
 
 export const useStatsSettingsHook = (initSettings?: StatsSettings) => {
   const [settings, setSettings] = createStore<StatsSettings>(initSettings ?? {
     show2021: true,
     show2022: true,
     show2023: true,
-    onlyTop15: false,
-    order: 'date',
-    showDay1: true,
-    value: StatsValueType.Total,
+    onlyTop15: true,
+    order: 'amount',
+    showDay1: false,
+    value: StatsValueType.Yogs,
+    showNights: false,
+    bar: 'streams',
   })
 
   const toggleShow2021 = () => setSettings('show2021', s => !s)

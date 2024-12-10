@@ -6,7 +6,7 @@ import {
   type StatsStream,
   StatsValueType,
   type XAxis
-} from "../../lib/model/Stats.ts";
+} from "../../../lib/model/Stats.ts";
 import {useStatsSettings} from "./StatsSettings.tsx";
 import {type EChartsOption} from "echarts";
 import {useTooltipFormatter} from "./useTooltipFormatter.ts";
@@ -46,6 +46,7 @@ const useStatsHook = (
         return stream.donations_per_minute
       case StatsValueType.AvgDonationAmount:
         return stream.avg_donation_amount
+
     }
   }
 
@@ -91,14 +92,35 @@ const useStatsHook = (
   }
 
   const data = () => {
-    let s = stats.streams
+    let s: StatsStream[] = []
+    if (settings.bar === 'streams') {
+      s = stats.streams
+    } else {
+      s = stats.hours
+    }
+
+    const nightStart = 23
+    const nightEnd = 11
+
+    if (!settings.showNights) {
+      s = s.filter(stream => !stream.title.includes('Night'))
+
+     /*   .filter(stream => {
+          const start = DateTime.fromISO(stream.start)
+          const end = DateTime.fromISO(stream.end)
+          const startHour = start.hour
+          const endHour = end.hour
+        })
+      */
+    }
+
     if (!settings.showDay1) {
       s = s.filter(filterDay1)
     }
     if (settings.onlyTop15) {
       s = s.sort(sortByValue).slice(0, 15)
     }
-    if (settings.order==='date') {
+    if (settings.order === 'date') {
       s = s.sort(sortByStartDate)
     } else {
       s = s.sort(sortByValue)
@@ -119,7 +141,7 @@ const useStatsHook = (
       },
       tooltip: {
         show: true,
-         formatter: formatter(),
+        formatter: formatter(),
       },
       data: data().map(streamToData),
     }
@@ -159,7 +181,7 @@ const useStatsHook = (
         trigger: 'item',
       },
       dataZoom: {
-        show: data().length > (4 * 14),
+        show: data().length > (8 * 14),
         // show: dataType() === ChartTimeType.hourly,
       },
       // legend: legend(),

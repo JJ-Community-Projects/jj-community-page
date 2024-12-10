@@ -1,25 +1,19 @@
 import {Select, ToggleButton} from "@kobalte/core";
 import {type Component} from "solid-js";
 import {twMerge} from "tailwind-merge";
-import {useStatsSettings} from "./StatsSettings.tsx";
-import {StatsValueType} from "../../lib/model/Stats.ts";
 import {AiOutlineCheck} from "solid-icons/ai";
+import {useCreatorStatsSettings} from "../provider/CreatorStatsSettings.tsx";
+import {StatsValueTypeCreator} from "../../../lib/model/Stats.ts";
 
 
-export const StatsControls: Component = () => {
+export const CreatorStatsControls: Component = () => {
 
-  const {settings, setSettings} = useStatsSettings()
+  const {settings, setSettings} = useCreatorStatsSettings()
   return (
     <div class={'flex flex-1 flex-row items-center gap-4 p-2 text-white'}>
       <DataSelector/>
       <JJToggle enabledTitle={'Top 15'} disabledTitle={'All'} pressed={settings.onlyTop15} onChange={() => {
         setSettings('onlyTop15', (v) => !v)
-      }}/>
-      <JJToggle enabledTitle={'Amount'} disabledTitle={'Date'} pressed={settings.order === 'amount'} onChange={() => {
-        setSettings('order', (v) => v === 'date' ? 'amount' : 'date')
-      }}/>
-      <JJToggle enabledTitle={'Exclude Day 1'} disabledTitle={'Include Day 1'} pressed={settings.showDay1} onChange={() => {
-        setSettings('showDay1', (v) => !v)
       }}/>
     </div>
   );
@@ -28,63 +22,27 @@ export const StatsControls: Component = () => {
 
 const DataSelector: Component = () => {
 
-  const {settings, setSettings} = useStatsSettings()
+  const {settings, setSettings} = useCreatorStatsSettings()
 
-  const label = (v: StatsValueType) => {
+  const label = (v: StatsValueTypeCreator) => {
     switch (v) {
-      case StatsValueType.Total:
-        return 'Total'
-      case StatsValueType.TotalPerMinute:
-        return 'Total Per Minute'
-      case StatsValueType.Yogs:
-        return 'Yogs'
-      case StatsValueType.YogsPerMinute:
-        return 'Yogs Per Minute'
-      case StatsValueType.Fundraiser:
-        return 'Fundraiser'
-      case StatsValueType.FundraiserPerMinute:
-        return 'Fundraiser Per Minute'
-      case StatsValueType.Collections:
-        return 'Collections'
-      case StatsValueType.CollectionsPerMinute:
-        return 'Collections Per Minute'
-      case StatsValueType.Donations:
-        return 'Donations'
-      case StatsValueType.DonationsPerMinute:
-        return 'Donations Per Minute'
-      case StatsValueType.AvgDonationAmount:
-        return 'Avg Donation Amount'
+      case StatsValueTypeCreator.Appearance:
+        return 'Appearance'
+      case StatsValueTypeCreator.Minutes:
+        return 'Minutes'
     }
   }
   const label2 = (v: string) => {
     switch (v) {
-      case StatsValueType.Total:
-        return 'Total'
-      case StatsValueType.TotalPerMinute:
-        return 'Total Per Minute'
-      case StatsValueType.Yogs:
-        return 'Yogs'
-      case StatsValueType.YogsPerMinute:
-        return 'Yogs Per Minute'
-      case StatsValueType.Fundraiser:
-        return 'Fundraiser'
-      case StatsValueType.FundraiserPerMinute:
-        return 'Fundraiser Per Minute'
-      case StatsValueType.Collections:
-        return 'Collections'
-      case StatsValueType.CollectionsPerMinute:
-        return 'Collections Per Minute'
-      case StatsValueType.Donations:
-        return 'Donations'
-      case StatsValueType.DonationsPerMinute:
-        return 'Donations Per Minute'
-      case StatsValueType.AvgDonationAmount:
-        return 'Avg Donation Amount'
+      case StatsValueTypeCreator.Appearance:
+        return 'Appearance'
+      case StatsValueTypeCreator.Minutes:
+        return 'Minutes'
     }
   }
 
   return (
-    <Select.Root<StatsValueType>
+    <Select.Root<StatsValueTypeCreator>
       class="row col w-32 gap-4 p-2"
       value={settings.value}
       placeholder="Select a Data"
@@ -95,17 +53,8 @@ const DataSelector: Component = () => {
         }
       }}
       options={[
-        StatsValueType.Total,
-        StatsValueType.TotalPerMinute,
-        StatsValueType.Yogs,
-        StatsValueType.YogsPerMinute,
-        StatsValueType.Fundraiser,
-        StatsValueType.FundraiserPerMinute,
-        StatsValueType.Collections,
-        StatsValueType.CollectionsPerMinute,
-        StatsValueType.Donations,
-        StatsValueType.DonationsPerMinute,
-        StatsValueType.AvgDonationAmount,
+        StatsValueTypeCreator.Appearance,
+        StatsValueTypeCreator.Minutes,
       ]}
       itemComponent={props => (
         <Select.Item
