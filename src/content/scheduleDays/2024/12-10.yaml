@@ -31,7 +31,7 @@ streams:
       - boba
       - lewis
     duration_hours: 3
-    end: '2024-12-10T23:00:00Z'
+    end: '2024-12-10T22:00:00Z'
     start: '2024-12-10T14:00:00Z'
     style:
       background:
@@ -47,7 +47,7 @@ streams:
       - pedguin
     duration_hours: 4
     end: '2024-12-10T11:00:00Z'
-    start: '2024-12-10T23:00:00Z'
+    start: '2024-12-10T22:00:00Z'
     style:
       background:
         colors:
