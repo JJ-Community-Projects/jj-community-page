@@ -17,7 +17,7 @@ streams:
       tileSize: 1
     subtitle: Endless Challenge
     title: For the King II
-    vods: [ ]
+    vods: []
   - creators:
       - breeh
       - osie
@@ -42,4 +42,19 @@ streams:
       tileSize: 3
     subtitle: Loads of Yogs
     title: Yogsfast speedrun day
-    vods: [ ]
+    vods: []
+  - creators:
+      - pedguin
+    duration_hours: 4
+    end: '2024-12-10T11:00:00Z'
+    start: '2024-12-10T23:00:00Z'
+    style:
+      background:
+        colors:
+          - '#7aa70c'
+          - '#7aa70c'
+        orientation: TD
+      tileSize: 1
+    subtitle: ''
+    title: Pedguin's All Nighter
+    vods: []

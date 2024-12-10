@@ -82,23 +82,25 @@ streams:
       tileSize: 2
     subtitle: Hosted by Tom & Pyrion
     title: Poker Night
-    description: 'Hosted by Tom & Pyrion 
-    - Table 1: Briony, Lydia, Duncan, Kirsty, Boba, Digby 
-    - Table 2: Sarah, Sophie, Ben, RTGame, Lewis, Osie  
-    - Table 3: Joe, Toastie, Ped, Ravs, Mousie, Lolip 
-    - Table 4: Spiff, Breeh, Bekki, Zylus, Harry, Mango
-    - ...'
+    description: >-
+      Hosted by Tom & Pyrion  - Table 1: Briony, Lydia, Duncan, Kirsty, Boba,
+      Digby  - Table 2: Sarah, Sophie, Ben, RTGame, Lewis, Osie   - Table 3:
+      Joe, Toastie, Ped, Ravs, Mousie, Lolip  - Table 4: Spiff, Breeh, Bekki,
+      Zylus, Harry, Mango - ...
     markdownDescription: >
       Hosted by Tom & Pyrion 
-      
-      - Table 1: Briony, Lydia, Duncan, Kirsty, Boba, [Digby](https://www.twitch.tv/digbytathamwarter) 
-      
-      - Table 2: Sarah, [Sophie](https://www.twitch.tv/mscupcakes), Ben, RTGame, Lewis, Osie 
-      
-      - Table 3: Joe, [Toastie](https://www.twitch.tv/toastie), Ped, Ravs, Mousie, Lolip 
-      
+
+      - Table 1: Briony, Lydia, Duncan, Kirsty, Boba,
+      [Digby](https://www.twitch.tv/digbytathamwarter) 
+
+      - Table 2: Sarah, [Sophie](https://www.twitch.tv/mscupcakes), Ben, RTGame,
+      Lewis, Osie 
+
+      - Table 3: Joe, [Toastie](https://www.twitch.tv/toastie), Ped, Ravs,
+      Mousie, Lolip 
+
       - Table 4: Spiff, Breeh, Bekki, Zylus, Harry, Mango
-      
+
       - ...
     vods:
       - type: twitch

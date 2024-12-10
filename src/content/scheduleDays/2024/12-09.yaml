@@ -16,7 +16,7 @@ streams:
     subtitle: Ben & Mousie
     title: Sharky & Mouse
     description: So Bold
-    markdownDescription: >
+    markdownDescription: |
       [So Bold](https://www.youtube.com/watch?v=aPj5FI1wygg)
     vods:
       - type: twitch
