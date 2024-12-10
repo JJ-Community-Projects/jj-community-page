@@ -1,6 +1,10 @@
 date: '2024-12-10'
 streams:
-  - creators: []
+  - creators:
+      - pedguin
+      - boba
+      - duncan
+      - osie
     duration_hours: 3
     end: '2024-12-10T14:00:00Z'
     start: '2024-12-10T11:00:00Z'
@@ -13,8 +17,19 @@ streams:
       tileSize: 1
     subtitle: Endless Challenge
     title: For the King II
-    vods: []
-  - creators: []
+    vods: [ ]
+  - creators:
+      - breeh
+      - osie
+      - harry
+      - pedguin
+      - mousie
+      - briony
+      - ben
+      - ravs
+      - duncan
+      - boba
+      - lewis
     duration_hours: 3
     end: '2024-12-10T23:00:00Z'
     start: '2024-12-10T14:00:00Z'
@@ -27,4 +42,4 @@ streams:
       tileSize: 3
     subtitle: Loads of Yogs
     title: Yogsfast speedrun day
-    vods: []
+    vods: [ ]
