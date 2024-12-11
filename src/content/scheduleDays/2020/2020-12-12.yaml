@@ -1,50 +1,61 @@
 date: '2020-12-12'
 streams:
-- duration_hours: 3.0
-  end: '2020-12-12T14:00:00Z'
-  start: '2020-12-12T11:00:00Z'
-  style:
-    background:
-      colors:
-      - '#00e8c5ff'
-      - '#00dbacff'
-      orientation: TD
-    tileSize: 1
-  subtitle: Lewis
-  title: Stocking Stuffers
-  vods:
-  - label: Youtube Vod
-    link: https://www.youtube.com/watch?v=ySqHUvpEaPo&list=PLvSp-8FGBzxlj-m9I9Zm1TTNMRCnnmWqd&index=35&pp=iAQB
-    type: youtube
-- duration_hours: 6.0
-  end: '2020-12-12T20:00:00Z'
-  start: '2020-12-12T14:00:00Z'
-  style:
-    background:
-      colors:
-      - '#00dbacff'
-      - '#00cf94ff'
-      orientation: TD
-    tileSize: 2
-  subtitle: Spiff, Lewis & RTGame
-  title: Minecraft Community Build
-  vods:
-  - label: Youtube Vod
-    link: https://www.youtube.com/watch?v=yb53Rf9BEP0&list=PLvSp-8FGBzxlj-m9I9Zm1TTNMRCnnmWqd&index=36&pp=iAQB
-    type: youtube
-- duration_hours: 3.0
-  end: '2020-12-12T23:00:00Z'
-  start: '2020-12-12T20:00:00Z'
-  style:
-    background:
-      colors:
-      - '#00cf94ff'
-      - '#00c27eff'
-      orientation: TD
-    tileSize: 1
-  subtitle: ''
-  title: PFlax Rust RP
-  vods:
-  - label: Youtube Vod
-    link: https://www.youtube.com/watch?v=0wXhYOzfciA&list=PLvSp-8FGBzxlj-m9I9Zm1TTNMRCnnmWqd&index=37&pp=iAQB
-    type: youtube
+  - duration_hours: 3.0
+    end: '2020-12-12T14:00:00Z'
+    start: '2020-12-12T11:00:00Z'
+    style:
+      background:
+        colors:
+          - '#00e8c5ff'
+          - '#00dbacff'
+        orientation: TD
+      tileSize: 1
+    subtitle: Lewis
+    title: Stocking Stuffers
+    creators:
+      - lewis
+    vods:
+      - label: Youtube Vod
+        link: https://www.youtube.com/watch?v=ySqHUvpEaPo&list=PLvSp-8FGBzxlj-m9I9Zm1TTNMRCnnmWqd&index=35&pp=iAQB
+        type: youtube
+  - duration_hours: 6.0
+    end: '2020-12-12T20:00:00Z'
+    start: '2020-12-12T14:00:00Z'
+    style:
+      background:
+        colors:
+          - '#00dbacff'
+          - '#00cf94ff'
+        orientation: TD
+      tileSize: 2
+    subtitle: Spiff, Lewis & RTGame
+    title: Minecraft Community Build
+    creators:
+      - spiff
+      - lewis
+      - rtgame
+      - ben
+    vods:
+      - label: Youtube Vod
+        link: https://www.youtube.com/watch?v=yb53Rf9BEP0&list=PLvSp-8FGBzxlj-m9I9Zm1TTNMRCnnmWqd&index=36&pp=iAQB
+        type: youtube
+  - duration_hours: 3.0
+    end: '2020-12-12T23:00:00Z'
+    start: '2020-12-12T20:00:00Z'
+    style:
+      background:
+        colors:
+          - '#00cf94ff'
+          - '#00c27eff'
+        orientation: TD
+      tileSize: 1
+    subtitle: ''
+    title: PFlax Rust RP
+    creators:
+      - pyrion
+      - spiff
+      - wilsonator
+    vods:
+      - label: Youtube Vod
+        link: https://www.youtube.com/watch?v=0wXhYOzfciA&list=PLvSp-8FGBzxlj-m9I9Zm1TTNMRCnnmWqd&index=37&pp=iAQB
+        type: youtube

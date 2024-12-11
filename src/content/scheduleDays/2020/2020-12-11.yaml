@@ -1,66 +1,97 @@
 date: '2020-12-11'
 streams:
-- duration_hours: 3.0
-  end: '2020-12-11T14:00:00Z'
-  start: '2020-12-11T11:00:00Z'
-  style:
-    background:
-      colors:
-      - '#fc7600ff'
-      - '#f76300ff'
-      orientation: TD
-    tileSize: 1
-  subtitle: Kim, Tom H & Rhiannon
-  title: Stocking Stuffers
-  vods:
-  - label: Youtube Vod
-    link: https://www.youtube.com/watch?v=V05G34AH-Ck&list=PLvSp-8FGBzxlj-m9I9Zm1TTNMRCnnmWqd&index=32&pp=iAQB
-    type: youtube
-- duration_hours: 3.0
-  end: '2020-12-11T17:00:00Z'
-  start: '2020-12-11T14:00:00Z'
-  style:
-    background:
-      colors:
-      - '#f76300ff'
-      - '#f25100ff'
-      orientation: TD
-    tileSize: 1
-  subtitle: ''
-  title: Yogs Game Jam Finals
-  vods:
-  - label: Youtube Vod
-    link: https://www.youtube.com/watch?v=rffL6NGL3Qk&list=PLvSp-8FGBzxlj-m9I9Zm1TTNMRCnnmWqd&index=33&pp=iAQB
-    type: youtube
-- duration_hours: 3.0
-  end: '2020-12-11T20:00:00Z'
-  start: '2020-12-11T17:00:00Z'
-  style:
-    background:
-      colors:
-      - '#f25100ff'
-      - '#ed3b00ff'
-      orientation: TD
-    tileSize: 1
-  subtitle: ''
-  title: Simon's Important Videos
-  vods:
-  - label: Twitch Vod
-    link: https://www.twitch.tv/videos/833638338?t=00h01m28s
-    type: twitch
-- duration_hours: 3.0
-  end: '2020-12-11T23:00:00Z'
-  start: '2020-12-11T20:00:00Z'
-  style:
-    background:
-      colors:
-      - '#ed3b00ff'
-      - '#e82b00ff'
-      orientation: TD
-    tileSize: 1
-  subtitle: subtitle
-  title: Spiff & PFlax CSGO Scrub Tourny
-  vods:
-  - label: Youtube Vod
-    link: https://www.youtube.com/watch?v=PREBgS7Ilfk&list=PLvSp-8FGBzxlj-m9I9Zm1TTNMRCnnmWqd&index=34&pp=iAQB
-    type: youtube
+  - duration_hours: 3.0
+    end: '2020-12-11T14:00:00Z'
+    start: '2020-12-11T11:00:00Z'
+    style:
+      background:
+        colors:
+          - '#fc7600ff'
+          - '#f76300ff'
+        orientation: TD
+      tileSize: 1
+    subtitle: Kim, Tom H & Rhiannon
+    title: Stocking Stuffers
+    creators:
+      - kim
+      - high_rollers
+    vods:
+      - label: Youtube Vod
+        link: https://www.youtube.com/watch?v=V05G34AH-Ck&list=PLvSp-8FGBzxlj-m9I9Zm1TTNMRCnnmWqd&index=32&pp=iAQB
+        type: youtube
+  - duration_hours: 3.0
+    end: '2020-12-11T17:00:00Z'
+    start: '2020-12-11T14:00:00Z'
+    style:
+      background:
+        colors:
+          - '#f76300ff'
+          - '#f25100ff'
+        orientation: TD
+      tileSize: 1
+    subtitle: ''
+    title: Yogs Game Jam Finals
+    creators:
+      - ben
+      - lewis
+    vods:
+      - label: Youtube Vod
+        link: https://www.youtube.com/watch?v=rffL6NGL3Qk&list=PLvSp-8FGBzxlj-m9I9Zm1TTNMRCnnmWqd&index=33&pp=iAQB
+        type: youtube
+  - duration_hours: 3.0
+    end: '2020-12-11T20:00:00Z'
+    start: '2020-12-11T17:00:00Z'
+    style:
+      background:
+        colors:
+          - '#f25100ff'
+          - '#ed3b00ff'
+        orientation: TD
+      tileSize: 1
+    subtitle: ''
+    title: Simon's Important Videos
+    creators:
+      - simon
+      - harry
+      - tom
+    vods:
+      - label: Twitch Vod
+        link: https://www.twitch.tv/videos/833638338?t=00h01m28s
+        type: twitch
+  - duration_hours: 3.0
+    end: '2020-12-11T23:00:00Z'
+    start: '2020-12-11T20:00:00Z'
+    style:
+      background:
+        colors:
+          - '#ed3b00ff'
+          - '#e82b00ff'
+        orientation: TD
+      tileSize: 1
+    subtitle: subtitle
+    title: Spiff & PFlax CSGO Scrub Tourny
+    creators:
+      - spiff
+      - pyrion
+      - alex_the_rambler
+      - ben
+      - boba
+      - breeh
+      - duncan
+      - harry
+      - lydia
+      - lewis
+      - mango
+      - martyn
+      - mousie
+      - pedguin
+      - ravs
+      - rtgame
+      - rythian
+      - tom
+      - zylus
+      - wilsonator
+    vods:
+      - label: Youtube Vod
+        link: https://www.youtube.com/watch?v=PREBgS7Ilfk&list=PLvSp-8FGBzxlj-m9I9Zm1TTNMRCnnmWqd&index=34&pp=iAQB
+        type: youtube

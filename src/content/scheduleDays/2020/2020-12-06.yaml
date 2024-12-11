@@ -1,50 +1,77 @@
 date: '2020-12-06'
 streams:
-- duration_hours: 3.0
-  end: '2020-12-06T14:00:00Z'
-  start: '2020-12-06T11:00:00Z'
-  style:
-    background:
-      colors:
-      - '#f74accff'
-      - '#eb36b1ff'
-      orientation: TD
-    tileSize: 1
-  subtitle: Leo & Spiff
-  title: Stocking Stuffers
-  vods:
-  - label: Youtube Vod
-    link: https://www.youtube.com/watch?v=xFB5-FJCWQY&list=PLvSp-8FGBzxlj-m9I9Zm1TTNMRCnnmWqd&index=17&pp=iAQB
-    type: youtube
-- duration_hours: 3.0
-  end: '2020-12-06T17:00:00Z'
-  start: '2020-12-06T14:00:00Z'
-  style:
-    background:
-      colors:
-      - '#eb36b1ff'
-      - '#de2396ff'
-      orientation: TD
-    tileSize: 1
-  subtitle: Rythian vs Zylus vs Duncan
-  title: Hades Challange
-  vods:
-  - label: Youtube Vod
-    link: https://www.youtube.com/watch?v=xC241YkLNAY&list=PLvSp-8FGBzxlj-m9I9Zm1TTNMRCnnmWqd&index=18&pp=iAQB
-    type: youtube
-- duration_hours: 6.0
-  end: '2020-12-06T23:00:00Z'
-  start: '2020-12-06T17:00:00Z'
-  style:
-    background:
-      colors:
-      - '#de2396ff'
-      - '#d1137bff'
-      orientation: TD
-    tileSize: 2
-  subtitle: Hosted by Pflax & Tom C
-  title: Poker Tournament
-  vods:
-  - label: Twitch Vod
-    link: https://www.twitch.tv/videos/827877883?t=00h03m53s
-    type: twitch
+  - duration_hours: 3.0
+    end: '2020-12-06T14:00:00Z'
+    start: '2020-12-06T11:00:00Z'
+    style:
+      background:
+        colors:
+          - '#f74accff'
+          - '#eb36b1ff'
+        orientation: TD
+      tileSize: 1
+    subtitle: Leo & Spiff
+    title: Stocking Stuffers
+    creators:
+      -spiff
+    vods:
+      - label: Youtube Vod
+        link: https://www.youtube.com/watch?v=xFB5-FJCWQY&list=PLvSp-8FGBzxlj-m9I9Zm1TTNMRCnnmWqd&index=17&pp=iAQB
+        type: youtube
+  - duration_hours: 3.0
+    end: '2020-12-06T17:00:00Z'
+    start: '2020-12-06T14:00:00Z'
+    style:
+      background:
+        colors:
+          - '#eb36b1ff'
+          - '#de2396ff'
+        orientation: TD
+      tileSize: 1
+    subtitle: Rythian vs Zylus vs Duncan
+    title: Hades Challange
+    creators:
+      - rythian
+      - zylus
+      - duncan
+      - breeh
+      - nilesy
+    vods:
+      - label: Youtube Vod
+        link: https://www.youtube.com/watch?v=xC241YkLNAY&list=PLvSp-8FGBzxlj-m9I9Zm1TTNMRCnnmWqd&index=18&pp=iAQB
+        type: youtube
+  - duration_hours: 6.0
+    end: '2020-12-06T23:00:00Z'
+    start: '2020-12-06T17:00:00Z'
+    style:
+      background:
+        colors:
+          - '#de2396ff'
+          - '#d1137bff'
+        orientation: TD
+      tileSize: 2
+    subtitle: Hosted by Pflax & Tom C
+    title: Poker Tournament
+    creators:
+      - pyrion
+      - tom
+      - alex_the_rambler
+      - bouphe
+      - breeh
+      - daltos
+      - simon_clark
+      - duncan
+      - harry
+      - hat_films
+      - lewis
+      - mango
+      - mousie
+      - nilesy
+      - rtgame
+      - ravs
+      - spiff
+      - zylus
+    vods:
+      - label: Twitch Vod
+        link: https://www.twitch.tv/videos/827877883?t=00h03m53s
+        type: twitch
