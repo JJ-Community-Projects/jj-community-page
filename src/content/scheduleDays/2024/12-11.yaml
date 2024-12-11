@@ -15,7 +15,7 @@ streams:
       tileSize: 1
     subtitle: Pyrion & Ben
     title: Save the World
-    vods: []
+    vods: [ ]
   - creators:
       - hat_films
       - lydia
@@ -33,8 +33,10 @@ streams:
       tileSize: 1
     subtitle: Hat Films vs Zero Degree
     title: Hat Films Game Show
-    vods: []
-  - creators: []
+    vods: [ ]
+  - creators:
+      - lewis
+      - rtgame
     duration_hours: 3
     end: '2024-12-11T20:00:00Z'
     start: '2024-12-11T17:00:00Z'
@@ -47,8 +49,9 @@ streams:
       tileSize: 1
     subtitle: Early Access
     title: Two Point Museum
-    vods: []
-  - creators: []
+    vods: [ ]
+  - creators:
+      - tom
     duration_hours: 3
     end: '2024-12-11T23:00:00Z'
     start: '2024-12-11T20:00:00Z'
@@ -61,4 +64,4 @@ streams:
       tileSize: 1
     subtitle: Hosted By Tom Clark Feat NRB
     title: Mystery Quest
-    vods: []
+    vods: [ ]

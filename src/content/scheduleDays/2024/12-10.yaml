@@ -17,7 +17,13 @@ streams:
       tileSize: 1
     subtitle: Endless Challenge
     title: For the King II
-    vods: []
+    vods:
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2323106032?t=0h11m16s
+      - type: youtube
+        label: Youtube Live
+        link: https://www.youtube.com/watch?v=6JXViQl0m_o
   - creators:
       - breeh
       - osie
@@ -42,11 +48,17 @@ streams:
       tileSize: 3
     subtitle: Loads of Yogs
     title: Yogsfast speedrun day
-    vods: []
+    vods:
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2323106032?t=3h27m38s
+      - type: youtube
+        label: Youtube Live
+        link: https://www.youtube.com/watch?v=RdoYz0OlwOw
   - creators:
       - pedguin
     duration_hours: 4
-    end: '2024-12-10T11:00:00Z'
+    end: '2024-12-11T11:00:00Z'
     start: '2024-12-10T22:00:00Z'
     style:
       background:
@@ -57,4 +69,7 @@ streams:
       tileSize: 1
     subtitle: ''
     title: Pedguin's All Nighter
-    vods: []
+    vods:
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2323505398
