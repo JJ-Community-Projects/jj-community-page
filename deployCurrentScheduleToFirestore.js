@@ -59,7 +59,8 @@ function loadSchedule(year) {
                                 twitchUser
                             }
                         })*/
-                        const creators = stream.creators ?? []
+                        const creators = stream?.creators ?? []
+                        console.log(creators)
                         creators.sort()
                         return {...stream, creators}
                     })
@@ -120,7 +121,7 @@ async function update(year) {
                                     twitchUser
                                 }
                             })*/
-                            const creators = stream.creators
+                            const creators = stream.creators ?? []
                             creators.sort()
                             return {...stream, creators}
                         })

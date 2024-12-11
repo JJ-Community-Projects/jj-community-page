@@ -9,28 +9,46 @@
           "start": "2020-12-01T11:00:00Z",
           "end": "2020-12-01T14:00:00Z",
           "color": "#00bbe0ff",
-          "creators": []
+          "creators": [
+            "lewis"
+          ]
         },
         {
           "title": "Pre Jingle Jangle",
           "start": "2020-12-01T14:00:00Z",
           "end": "2020-12-01T17:00:00Z",
           "color": "#009fd4ff",
-          "creators": []
+          "creators": [
+            "ben",
+            "tom"
+          ]
         },
         {
           "title": "Jingle Cats",
           "start": "2020-12-01T17:00:00Z",
           "end": "2020-12-01T20:00:00Z",
           "color": "#0081c7ff",
-          "creators": []
+          "creators": [
+            "lewis",
+            "simon"
+          ]
         },
         {
           "title": "OpenTTD",
           "start": "2020-12-01T21:00:00Z",
           "end": "2020-12-02T00:00:00Z",
           "color": "#0069baff",
-          "creators": []
+          "creators": [
+            "ben",
+            "daltos",
+            "daltos",
+            "simon_clark",
+            "duncan",
+            "lewis",
+            "pedguin",
+            "rythian",
+            "spiff"
+          ]
         }
       ]
     },
@@ -42,14 +60,34 @@
           "start": "2020-12-02T11:00:00Z",
           "end": "2020-12-02T20:00:00Z",
           "color": "#ffd900ff",
-          "creators": []
+          "creators": [
+            "ben",
+            "bouphe",
+            "duncan",
+            "lewis",
+            "pedguin",
+            "ravs",
+            "tom"
+          ]
         },
         {
           "title": "Jackbox",
           "start": "2020-12-02T20:00:00Z",
           "end": "2020-12-02T23:00:00Z",
           "color": "#ffa600ff",
-          "creators": []
+          "creators": [
+            "bouphe",
+            "breeh",
+            "briony",
+            "gee",
+            "lydia",
+            "mango",
+            "mousie",
+            "nilesy",
+            "osie",
+            "rythian",
+            "zylus"
+          ]
         }
       ]
     },
@@ -61,21 +99,32 @@
           "start": "2020-12-03T11:00:00Z",
           "end": "2020-12-03T14:00:00Z",
           "color": "#a7cc00ff",
-          "creators": []
+          "creators": [
+            "boba",
+            "gee",
+            "pedguin",
+            "ravs"
+          ]
         },
         {
           "title": "Would you go on a date",
           "start": "2020-12-03T14:00:00Z",
           "end": "2020-12-03T17:00:00Z",
           "color": "#74b800ff",
-          "creators": []
+          "creators": [
+            "bouphe",
+            "lydia",
+            "simon"
+          ]
         },
         {
           "title": "Hat Films Christmas Album",
           "start": "2020-12-03T17:00:00Z",
           "end": "2020-12-03T23:00:00Z",
           "color": "#49a300ff",
-          "creators": []
+          "creators": [
+            "hat_films"
+          ]
         }
       ]
     },
@@ -87,21 +136,36 @@
           "start": "2020-12-04T11:00:00Z",
           "end": "2020-12-04T14:00:00Z",
           "color": "#fc7600ff",
-          "creators": []
+          "creators": [
+            "ravs",
+            "sips"
+          ]
         },
         {
           "title": "Jerk Off",
           "start": "2020-12-04T14:00:00Z",
           "end": "2020-12-04T17:00:00Z",
           "color": "#f55e00ff",
-          "creators": []
+          "creators": [
+            "ben",
+            "tom"
+          ]
         },
         {
           "title": "Farming Sim",
           "start": "2020-12-04T17:00:00Z",
           "end": "2020-12-04T23:00:00Z",
           "color": "#ed4300ff",
-          "creators": []
+          "creators": [
+            "breeh",
+            "duncan",
+            "lewis",
+            "pedguin",
+            "ravs",
+            "rtgame",
+            "rythian",
+            "spiff"
+          ]
         }
       ]
     },
@@ -113,28 +177,78 @@
           "start": "2020-12-05T11:00:00Z",
           "end": "2020-12-05T14:00:00Z",
           "color": "#00e8c5ff",
-          "creators": []
+          "creators": [
+            "bouphe",
+            "osie"
+          ]
         },
         {
           "title": "Tom Clark's Wheel of Wonder",
           "start": "2020-12-05T14:00:00Z",
           "end": "2020-12-05T17:00:00Z",
           "color": "#00deb1ff",
-          "creators": []
+          "creators": [
+            "briony",
+            "gee",
+            "lewis",
+            "tom"
+          ]
         },
         {
           "title": "MCC",
           "start": "2020-12-05T17:00:00Z",
           "end": "2020-12-05T20:00:00Z",
           "color": "#00d49bff",
-          "creators": []
+          "creators": [
+            "alex_the_rambler",
+            "bekkiboom",
+            "ben",
+            "boba",
+            "bouphe",
+            "breeh",
+            "briony",
+            "daltos",
+            "simon_clark",
+            "duncan",
+            "fionn",
+            "gee",
+            "harry",
+            "joe",
+            "kim",
+            "lewis",
+            "lydia",
+            "mango",
+            "mango",
+            "sherlock_hulmes",
+            "martyn",
+            "mini-muka",
+            "mousie",
+            "pedguin",
+            "ravs",
+            "rtgame",
+            "rythian",
+            "simon",
+            "spiff",
+            "zoey",
+            "zylus"
+          ]
         },
         {
           "title": "Armchair Admirals TD",
           "start": "2020-12-05T20:00:00Z",
           "end": "2020-12-05T23:00:00Z",
           "color": "#00c98aff",
-          "creators": []
+          "creators": [
+            "alex_the_rambler",
+            "daltos",
+            "simon_clark",
+            "duncan",
+            "gee",
+            "lewis",
+            "rythian",
+            "spiff",
+            "zylus"
+          ]
         }
       ]
     },
@@ -146,21 +260,48 @@
           "start": "2020-12-06T11:00:00Z",
           "end": "2020-12-06T14:00:00Z",
           "color": "#f74accff",
-          "creators": []
+          "creators": [
+            "spiff"
+          ]
         },
         {
           "title": "Hades Challange",
           "start": "2020-12-06T14:00:00Z",
           "end": "2020-12-06T17:00:00Z",
           "color": "#eb36b1ff",
-          "creators": []
+          "creators": [
+            "breeh",
+            "duncan",
+            "nilesy",
+            "rythian",
+            "zylus"
+          ]
         },
         {
           "title": "Poker Tournament",
           "start": "2020-12-06T17:00:00Z",
           "end": "2020-12-06T23:00:00Z",
           "color": "#de2396ff",
-          "creators": []
+          "creators": [
+            "alex_the_rambler",
+            "bouphe",
+            "breeh",
+            "daltos",
+            "simon_clark",
+            "duncan",
+            "harry",
+            "hat_films",
+            "lewis",
+            "mango",
+            "mousie",
+            "nilesy",
+            "pyrion",
+            "ravs",
+            "rtgame",
+            "spiff",
+            "tom",
+            "zylus"
+          ]
         }
       ]
     },
@@ -172,21 +313,35 @@
           "start": "2020-12-07T11:00:00Z",
           "end": "2020-12-07T14:00:00Z",
           "color": "#ffa600ff",
-          "creators": []
+          "creators": [
+            "pyrion",
+            "sips"
+          ]
         },
         {
           "title": "Stocking Stuffers",
           "start": "2020-12-07T14:00:00Z",
           "end": "2020-12-07T17:00:00Z",
           "color": "#ff7b00ff",
-          "creators": []
+          "creators": [
+            "bekkiboom",
+            "briony"
+          ]
         },
         {
           "title": "Civ 5",
           "start": "2020-12-07T17:00:00Z",
           "end": "2020-12-07T23:00:00Z",
           "color": "#ff5500ff",
-          "creators": []
+          "creators": [
+            "alex_the_rambler",
+            "ben",
+            "daltos",
+            "duncan",
+            "lewis",
+            "rythian",
+            "spiff"
+          ]
         }
       ]
     },
@@ -198,14 +353,47 @@
           "start": "2020-12-08T11:00:00Z",
           "end": "2020-12-08T14:00:00Z",
           "color": "#00bbe0ff",
-          "creators": []
+          "creators": [
+            "alex_the_rambler",
+            "ben",
+            "breeh",
+            "duncan",
+            "lewis",
+            "rythian"
+          ]
         },
         {
           "title": "Among Us",
           "start": "2020-12-08T14:00:00Z",
           "end": "2020-12-08T23:00:00Z",
           "color": "#008bccff",
-          "creators": []
+          "creators": [
+            "alex_the_rambler",
+            "bekkiboom",
+            "ben",
+            "boba",
+            "breeh",
+            "briony",
+            "daltos",
+            "duncan",
+            "gee",
+            "hat_films",
+            "kim",
+            "lewis",
+            "lydia",
+            "mango",
+            "sherlock_hulmes",
+            "martyn",
+            "nilesy",
+            "osie",
+            "pedguin",
+            "ravs",
+            "rythian",
+            "sips",
+            "spiff",
+            "tom",
+            "zylus"
+          ]
         }
       ]
     },
@@ -217,35 +405,53 @@
           "start": "2020-12-09T11:00:00Z",
           "end": "2020-12-09T14:00:00Z",
           "color": "#ffd900ff",
-          "creators": []
+          "creators": [
+            "mousie",
+            "zylus"
+          ]
         },
         {
           "title": "Don't Starve",
           "start": "2020-12-09T14:00:00Z",
           "end": "2020-12-09T17:00:00Z",
           "color": "#ffcc00ff",
-          "creators": []
+          "creators": [
+            "pedguin",
+            "ravs",
+            "sips"
+          ]
         },
         {
           "title": "Slag Sleepover",
           "start": "2020-12-09T17:00:00Z",
           "end": "2020-12-09T20:00:00Z",
           "color": "#ffc400ff",
-          "creators": []
+          "creators": [
+            "boba",
+            "bouphe",
+            "lydia"
+          ]
         },
         {
           "title": "Protessional Strem",
           "start": "2020-12-09T20:00:00Z",
           "end": "2020-12-09T23:00:00Z",
           "color": "#ffb700ff",
-          "creators": []
+          "creators": [
+            "breeh",
+            "nilesy",
+            "rythian",
+            "zylus"
+          ]
         },
         {
           "title": "PoxNora",
           "start": "2020-12-09T23:00:00Z",
           "end": "2020-12-10T02:00:00Z",
           "color": "#ffae00ff",
-          "creators": []
+          "creators": [
+            "daltos"
+          ]
         }
       ]
     },
@@ -257,14 +463,20 @@
           "start": "2020-12-10T11:00:00Z",
           "end": "2020-12-10T14:00:00Z",
           "color": "#a7cc00ff",
-          "creators": []
+          "creators": [
+            "boba",
+            "pedguin"
+          ]
         },
         {
           "title": "Hat Films Art Stream",
           "start": "2020-12-10T14:00:00Z",
           "end": "2020-12-10T17:00:00Z",
           "color": "#7cba00ff",
-          "creators": []
+          "creators": [
+            "hat_films",
+            "lewis"
+          ]
         },
         {
           "title": "ISP's Wheel of Sorrow",
@@ -278,7 +490,10 @@
           "start": "2020-12-10T20:00:00Z",
           "end": "2020-12-10T23:00:00Z",
           "color": "#3a9600ff",
-          "creators": []
+          "creators": [
+            "fionn",
+            "zoey"
+          ]
         }
       ]
     },
@@ -290,28 +505,59 @@
           "start": "2020-12-11T11:00:00Z",
           "end": "2020-12-11T14:00:00Z",
           "color": "#fc7600ff",
-          "creators": []
+          "creators": [
+            "high_rollers",
+            "kim"
+          ]
         },
         {
           "title": "Yogs Game Jam Finals",
           "start": "2020-12-11T14:00:00Z",
           "end": "2020-12-11T17:00:00Z",
           "color": "#f76300ff",
-          "creators": []
+          "creators": [
+            "ben",
+            "lewis"
+          ]
         },
         {
           "title": "Simon's Important Videos",
           "start": "2020-12-11T17:00:00Z",
           "end": "2020-12-11T20:00:00Z",
           "color": "#f25100ff",
-          "creators": []
+          "creators": [
+            "harry",
+            "simon",
+            "tom"
+          ]
         },
         {
           "title": "Spiff & PFlax CSGO Scrub Tourny",
           "start": "2020-12-11T20:00:00Z",
           "end": "2020-12-11T23:00:00Z",
           "color": "#ed3b00ff",
-          "creators": []
+          "creators": [
+            "alex_the_rambler",
+            "ben",
+            "boba",
+            "breeh",
+            "duncan",
+            "harry",
+            "lewis",
+            "lydia",
+            "mango",
+            "martyn",
+            "mousie",
+            "pedguin",
+            "pyrion",
+            "ravs",
+            "rtgame",
+            "rythian",
+            "spiff",
+            "tom",
+            "wilsonator",
+            "zylus"
+          ]
         }
       ]
     },
@@ -323,21 +569,32 @@
           "start": "2020-12-12T11:00:00Z",
           "end": "2020-12-12T14:00:00Z",
           "color": "#00e8c5ff",
-          "creators": []
+          "creators": [
+            "lewis"
+          ]
         },
         {
           "title": "Minecraft Community Build",
           "start": "2020-12-12T14:00:00Z",
           "end": "2020-12-12T20:00:00Z",
           "color": "#00dbacff",
-          "creators": []
+          "creators": [
+            "ben",
+            "lewis",
+            "rtgame",
+            "spiff"
+          ]
         },
         {
           "title": "PFlax Rust RP",
           "start": "2020-12-12T20:00:00Z",
           "end": "2020-12-12T23:00:00Z",
           "color": "#00cf94ff",
-          "creators": []
+          "creators": [
+            "pyrion",
+            "spiff",
+            "wilsonator"
+          ]
         }
       ]
     },
@@ -349,28 +606,45 @@
           "start": "2020-12-13T11:00:00Z",
           "end": "2020-12-13T14:00:00Z",
           "color": "#f74accff",
-          "creators": []
+          "creators": [
+            "lewis",
+            "spiff"
+          ]
         },
         {
           "title": "Stocking Stuffers",
           "start": "2020-12-13T14:00:00Z",
           "end": "2020-12-13T17:00:00Z",
           "color": "#ed39b7ff",
-          "creators": []
+          "creators": [
+            "boba",
+            "pedguin",
+            "ravs"
+          ]
         },
         {
           "title": "High Rollers Christmas Special",
           "start": "2020-12-13T17:00:00Z",
           "end": "2020-12-13T20:00:00Z",
           "color": "#e329a2ff",
-          "creators": []
+          "creators": [
+            "high_rollers",
+            "kim",
+            "sherlock_hulmes"
+          ]
         },
         {
           "title": "Sweaty Shooters",
           "start": "2020-12-13T20:00:00Z",
           "end": "2020-12-13T23:00:00Z",
           "color": "#d91a89ff",
-          "creators": []
+          "creators": [
+            "gee",
+            "sherlock_hulmes",
+            "ravs",
+            "rythian",
+            "sips"
+          ]
         }
       ]
     },
@@ -382,28 +656,47 @@
           "start": "2020-12-14T11:00:00Z",
           "end": "2020-12-14T14:00:00Z",
           "color": "#ffa600ff",
-          "creators": []
+          "creators": [
+            "breeh",
+            "ravs"
+          ]
         },
         {
           "title": "Warhammer Painting",
           "start": "2020-12-14T14:00:00Z",
           "end": "2020-12-14T17:00:00Z",
           "color": "#ff8400ff",
-          "creators": []
+          "creators": [
+            "ben",
+            "lewis",
+            "tom"
+          ]
         },
         {
           "title": "Fighting Fantasy",
           "start": "2020-12-14T17:00:00Z",
           "end": "2020-12-14T20:00:00Z",
           "color": "#ff6600ff",
-          "creators": []
+          "creators": [
+            "lewis",
+            "nina",
+            "simon"
+          ]
         },
         {
           "title": "Late Late Show",
           "start": "2020-12-14T20:00:00Z",
           "end": "2020-12-14T23:00:00Z",
           "color": "#ff4400ff",
-          "creators": []
+          "creators": [
+            "breeh",
+            "briony",
+            "daltos",
+            "mousie",
+            "nilesy",
+            "rythian",
+            "zylus"
+          ]
         }
       ]
     }
