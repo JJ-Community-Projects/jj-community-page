@@ -59,7 +59,7 @@ function loadSchedule(year) {
                                 twitchUser
                             }
                         })*/
-                        const creators = stream.creators
+                        const creators = stream.creators ?? []
                         creators.sort()
                         return {...stream, creators}
                     })
@@ -568,6 +568,7 @@ function statsSchedule(year) {
 }
 
 function statsSchedules() {
+    fs.writeFileSync('2020.json', JSON.stringify(statsSchedule(2020), null, 2))
     fs.writeFileSync('2021.json', JSON.stringify(statsSchedule(2021), null, 2))
     fs.writeFileSync('2022.json', JSON.stringify(statsSchedule(2022), null, 2))
     fs.writeFileSync('2023.json', JSON.stringify(statsSchedule(2023), null, 2))
