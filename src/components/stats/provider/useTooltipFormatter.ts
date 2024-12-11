@@ -8,7 +8,7 @@ export const useTooltipFormatter = (streams: () => StatsStream[]) => {
     const dataIndex = params.dataIndex
     const slot = streams().at(dataIndex)!
     const date = DateTime.fromISO(slot.start)
-    const f = date.toFormat('MMM dd, HH:mm')
+    const f = date.toFormat('MMM dd yy, HH:mm')
     return `
                   ${params.seriesName}
                   <br>${params.marker}${slot.title} ${f} ${date.offsetNameShort}
@@ -18,7 +18,7 @@ export const useTooltipFormatter = (streams: () => StatsStream[]) => {
     const dataIndex = params.dataIndex
     const slot = streams().at(dataIndex)!
     const date = DateTime.fromISO(slot.start)
-    const f = date.toFormat('MMM dd, HH:mm')
+    const f = date.toFormat('MMM dd yy, HH:mm')
     return `
                   ${params.seriesName}
                   <br>${params.marker}${slot.title} ${f} ${date.offsetNameShort}
@@ -28,7 +28,7 @@ export const useTooltipFormatter = (streams: () => StatsStream[]) => {
     const dataIndex = params.dataIndex
     const slot = streams().at(dataIndex)!
     const date = DateTime.fromISO(slot.start)
-    const f = date.toFormat('yy MMM dd, HH:mm')
+    const f = date.toFormat('MMM dd yy, HH:mm')
     return `
                   ${params.seriesName}
                   <br>${params.marker}${slot.title} ${f} ${date.offsetNameShort}

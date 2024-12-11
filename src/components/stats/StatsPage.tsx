@@ -35,6 +35,7 @@ export const StatsPageRoot: Component<StreamStatsProps> = (props) => {
         <Year stats={stats2021} key={'2021'} title={'2021'} expandedItem={expandedItem}/>
         <Year stats={stats2020} key={'2020'} title={'2020'} expandedItem={expandedItem}/>
       </Accordion.Root>
+      <p class={'text-center text-white'}>Some of the statistics regarding appearance might not be accurate.</p>
     </CreatorProvider>
 
   );

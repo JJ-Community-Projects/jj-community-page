@@ -60,6 +60,16 @@ const useStatsHook = (
     }
   }
 
+  const labels = () => {
+    return data().map(stream => {
+      const title = stream.title
+      if (title.length > 15) {
+        return title.substring(0, 15) + '...'
+      }
+      return title
+    })
+  }
+
   const xAxis = (): XAxis => {
     return {
       axisLabel: {
@@ -74,7 +84,7 @@ const useStatsHook = (
         },
       },
       type: 'category',
-      // data: labels(),
+      data: labels(),
     }
   }
 
@@ -105,13 +115,13 @@ const useStatsHook = (
     if (!settings.showNights) {
       s = s.filter(stream => !stream.title.includes('Night'))
 
-     /*   .filter(stream => {
-          const start = DateTime.fromISO(stream.start)
-          const end = DateTime.fromISO(stream.end)
-          const startHour = start.hour
-          const endHour = end.hour
-        })
-      */
+      /*   .filter(stream => {
+           const start = DateTime.fromISO(stream.start)
+           const end = DateTime.fromISO(stream.end)
+           const startHour = start.hour
+           const endHour = end.hour
+         })
+       */
     }
 
     if (!settings.showDay1) {
