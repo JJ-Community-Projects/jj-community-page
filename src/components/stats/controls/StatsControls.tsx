@@ -56,11 +56,11 @@ const DataSelector: Component = () => {
       case StatsValueType.Yogs:
         return 'Yogs'
       case StatsValueType.YogsPerMinute:
-        return 'Yogs Per Minute'
+        return 'Donations Per Minute to Yogs'
       case StatsValueType.Fundraiser:
         return 'Fundraiser'
       case StatsValueType.FundraiserPerMinute:
-        return 'Fundraiser Per Minute'
+        return 'Donations Per Minute to Fundraisers'
       case StatsValueType.Collections:
         return 'Collections'
       case StatsValueType.CollectionsPerMinute:
@@ -82,11 +82,11 @@ const DataSelector: Component = () => {
       case StatsValueType.Yogs:
         return 'Yogs'
       case StatsValueType.YogsPerMinute:
-        return 'Yogs Per Minute'
+        return 'Donations Per Minute to Yogs'
       case StatsValueType.Fundraiser:
         return 'Fundraiser'
       case StatsValueType.FundraiserPerMinute:
-        return 'Fundraiser Per Minute'
+        return 'Donations Per Minute to Fundraisers'
       case StatsValueType.Collections:
         return 'Collections'
       case StatsValueType.CollectionsPerMinute:

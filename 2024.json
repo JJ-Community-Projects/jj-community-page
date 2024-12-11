@@ -1,0 +1,687 @@
+{
+  "title": "Yogscast Jingle Jam 2024",
+  "days": [
+    {
+      "date": "2024-12-01",
+      "streams": [
+        {
+          "title": "Office Cam",
+          "start": "2024-12-01T11:00:00Z",
+          "end": "2024-12-01T14:00:00Z",
+          "color": "#3484bf",
+          "creators": [
+            "bekkiboom",
+            "boba",
+            "briony",
+            "daf",
+            "duncan",
+            "lewis",
+            "osie",
+            "pedguin",
+            "sarah",
+            "tom"
+          ]
+        },
+        {
+          "title": "Jingle Jam Hype Stream",
+          "start": "2024-12-01T14:00:00Z",
+          "end": "2024-12-01T17:00:00Z",
+          "color": "#3484bf",
+          "creators": [
+            "ben",
+            "tom"
+          ]
+        },
+        {
+          "title": "Jingle Cats",
+          "start": "2024-12-01T17:00:00Z",
+          "end": "2024-12-01T20:00:00Z",
+          "color": "#3484bf",
+          "creators": [
+            "lewis",
+            "simon"
+          ]
+        },
+        {
+          "title": "Christmas Trains",
+          "start": "2024-12-01T20:00:00Z",
+          "end": "2024-12-01T23:00:00Z",
+          "color": "#3484bf",
+          "creators": [
+            "daltos",
+            "duncan",
+            "lewis",
+            "mango",
+            "potatomcwhisky",
+            "rythian",
+            "spiff"
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2024-12-02",
+      "streams": [
+        {
+          "title": "Cosy Games",
+          "start": "2024-12-02T11:00:00Z",
+          "end": "2024-12-02T14:00:00Z",
+          "color": "#fb9900",
+          "creators": [
+            "briony",
+            "kirsty"
+          ]
+        },
+        {
+          "title": "Tom's TABS",
+          "start": "2024-12-02T14:00:00Z",
+          "end": "2024-12-02T17:00:00Z",
+          "color": "#fb9900",
+          "creators": [
+            "ben",
+            "boba",
+            "daf",
+            "lewis",
+            "lydia",
+            "sarah",
+            "tom"
+          ]
+        },
+        {
+          "title": "Feed A Cow for X-Mas",
+          "start": "2024-12-02T17:00:00Z",
+          "end": "2024-12-02T20:00:00Z",
+          "color": "#fb9900",
+          "creators": [
+            "bekkiboom",
+            "ben",
+            "breeh",
+            "breeh",
+            "duncan",
+            "fionn",
+            "harry",
+            "hat_films",
+            "lolipopgi",
+            "mousie",
+            "osie",
+            "ravs",
+            "shadowatnoon"
+          ]
+        },
+        {
+          "title": "Protessional Strem",
+          "start": "2024-12-02T20:00:00Z",
+          "end": "2024-12-02T23:00:00",
+          "color": "#fb9900",
+          "creators": [
+            "breeh",
+            "kirsty",
+            "nilesy",
+            "rythian",
+            "zylus"
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2024-12-03",
+      "streams": [
+        {
+          "title": "Card Cats",
+          "start": "2024-12-03T11:00:00Z",
+          "end": "2024-12-03T14:00:00Z",
+          "color": "#7aa70c",
+          "creators": [
+            "boba",
+            "pedguin"
+          ]
+        },
+        {
+          "title": "Jaffa Factory",
+          "start": "2024-12-03T14:00:00Z",
+          "end": "2024-12-03T17:00:00Z",
+          "color": "#7aa70c",
+          "creators": [
+            "duncan",
+            "harry",
+            "lewis",
+            "simon"
+          ]
+        },
+        {
+          "title": "Hat Films Music Stream",
+          "start": "2024-12-03T17:00:00Z",
+          "end": "2024-12-03T23:00:00Z",
+          "color": "#7aa70c",
+          "creators": [
+            "hat_films"
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2024-12-04",
+      "streams": [
+        {
+          "title": "Jingle Chums",
+          "start": "2024-12-04T11:00:00Z",
+          "end": "2024-12-04T14:00:00Z",
+          "color": "#dd5501",
+          "creators": [
+            "ben",
+            "lolipopgi"
+          ]
+        },
+        {
+          "title": "Minecraft Jingle Walls",
+          "start": "2024-12-04T14:00:00Z",
+          "end": "2024-12-04T17:00:00Z",
+          "color": "#dd5501",
+          "creators": [
+            "ben",
+            "briony",
+            "duncan",
+            "harry",
+            "joe",
+            "lewis",
+            "sherlock_hulmes",
+            "mousie",
+            "osie",
+            "ravs",
+            "rtgame",
+            "spiff"
+          ]
+        },
+        {
+          "title": "Minecraft Game Show",
+          "start": "2024-12-04T17:00:00Z",
+          "end": "2024-12-04T20:00:00Z",
+          "color": "#dd5501",
+          "creators": [
+            "breeh",
+            "mini-muka",
+            "ravs",
+            "shadowatnoon"
+          ]
+        },
+        {
+          "title": "XMas Carols",
+          "start": "2024-12-04T20:00:00Z",
+          "end": "2024-12-05T00:00:00Z",
+          "color": "#dd5501",
+          "creators": [
+            "longest_johns"
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2024-12-05",
+      "streams": [
+        {
+          "title": "Spiff U",
+          "start": "2024-12-05T11:00:00Z",
+          "end": "2024-12-05T14:00:00Z",
+          "color": "#06b8aa",
+          "creators": [
+            "lewis",
+            "spiff"
+          ]
+        },
+        {
+          "title": "Games Night Special",
+          "start": "2024-12-05T14:00:00Z",
+          "end": "2024-12-05T17:00:00Z",
+          "color": "#06b8aa",
+          "creators": [
+            "ben",
+            "boba",
+            "briony",
+            "duncan",
+            "lewis",
+            "lolipopgi",
+            "lydia",
+            "sherlock_hulmes",
+            "osie",
+            "pedguin",
+            "ravs",
+            "spiff",
+            "longest_johns",
+            "tom",
+            "zylus"
+          ]
+        },
+        {
+          "title": "Civ 5",
+          "start": "2024-12-05T17:00:00Z",
+          "end": "2024-12-05T23:00:00Z",
+          "color": "#06b8aa",
+          "creators": [
+            "alex_the_rambler",
+            "daltos",
+            "duncan",
+            "kirsty",
+            "lewis",
+            "rythian",
+            "spiff"
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2024-12-06",
+      "streams": [
+        {
+          "title": "Big Rips",
+          "start": "2024-12-06T11:00:00Z",
+          "end": "2024-12-06T14:00:00Z",
+          "color": "#d23d99",
+          "creators": [
+            "ravs",
+            "sips"
+          ]
+        },
+        {
+          "title": "Civ 6 on the 6th",
+          "start": "2024-12-06T14:00:00Z",
+          "end": "2024-12-06T17:00:00Z",
+          "color": "#d23d99",
+          "creators": [
+            "daltos",
+            "potatomcwhisky",
+            "spiff"
+          ]
+        },
+        {
+          "title": "Important Videos",
+          "start": "2024-12-06T17:00:00Z",
+          "end": "2024-12-06T20:00:00Z",
+          "color": "#d23d99",
+          "creators": [
+            "harry",
+            "lydia",
+            "sarah",
+            "simon",
+            "tom"
+          ]
+        },
+        {
+          "title": "MARIO KART TOURNAMENT",
+          "start": "2024-12-06T20:00:00Z",
+          "end": "2024-12-06T23:00:00Z",
+          "color": "#d23d99",
+          "creators": [
+            "daltos",
+            "duncan",
+            "lydia",
+            "ravs",
+            "rtgame",
+            "rythian",
+            "shadowatnoon",
+            "zylus"
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2024-12-07",
+      "streams": [
+        {
+          "title": "Stocking Stuffers",
+          "start": "2024-12-07T11:00:00Z",
+          "end": "2024-12-07T14:00:00Z",
+          "color": "#f07800",
+          "creators": [
+            "briony",
+            "kirsty"
+          ]
+        },
+        {
+          "title": "MCC Island Bingo",
+          "start": "2024-12-07T14:00:00Z",
+          "end": "2024-12-07T17:00:00Z",
+          "color": "#f07800",
+          "creators": [
+            "harry",
+            "ravs",
+            "sarah",
+            "shadowatnoon"
+          ]
+        },
+        {
+          "title": "Maraoke",
+          "start": "2024-12-07T17:00:00Z",
+          "end": "2024-12-07T23:00:00Z",
+          "color": "#f07800",
+          "creators": [
+            "ravs",
+            "zylus"
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2024-12-08",
+      "streams": [
+        {
+          "title": "The Yogs Games Special",
+          "start": "2024-12-08T11:00:00Z",
+          "end": "2024-12-08T14:00:00Z",
+          "color": "#3484bf",
+          "creators": [
+            "kirsty",
+            "zylus"
+          ]
+        },
+        {
+          "title": "Pre-Poker Party Time",
+          "start": "2024-12-08T14:00:00Z",
+          "end": "2024-12-08T17:00:00Z",
+          "color": "#3484bf",
+          "creators": [
+            "Duncan",
+            "osie",
+            "ravs",
+            "sarah"
+          ]
+        },
+        {
+          "title": "Poker Night",
+          "start": "2024-12-08T17:00:00Z",
+          "end": "2024-12-08T23:00:00Z",
+          "color": "#3484bf",
+          "creators": [
+            "bekkiboom",
+            "ben",
+            "boba",
+            "breeh",
+            "briony",
+            "duncan",
+            "harry",
+            "joe",
+            "kirsty",
+            "lewis",
+            "lolipopgi",
+            "lydia",
+            "mango",
+            "mousie",
+            "osie",
+            "pedguin",
+            "pyrion",
+            "ravs",
+            "rtgame",
+            "sarah",
+            "spiff",
+            "tom",
+            "zylus"
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2024-12-09",
+      "streams": [
+        {
+          "title": "Sharky & Mouse",
+          "start": "2024-12-09T11:00:00Z",
+          "end": "2024-12-09T14:00:00Z",
+          "color": "#fb9900",
+          "creators": [
+            "ben",
+            "mousie"
+          ]
+        },
+        {
+          "title": "Kirby Fun",
+          "start": "2024-12-09T14:00:00Z",
+          "end": "2024-12-09T17:00:00Z",
+          "color": "#fb9900",
+          "creators": [
+            "briony",
+            "kirsty",
+            "rythian"
+          ]
+        },
+        {
+          "title": "Dr Simon Clark's Quiz Show",
+          "start": "2024-12-09T17:00:00Z",
+          "end": "2024-12-09T23:00:00Z",
+          "color": "#fb9900",
+          "creators": [
+            "bekkiboom",
+            "ben",
+            "breeh",
+            "briony",
+            "simon_clark",
+            "duncan",
+            "harry",
+            "hat_films",
+            "kirsty",
+            "lewis",
+            "lolipopgi",
+            "lydia",
+            "sherlock_hulmes",
+            "mousie",
+            "osie",
+            "pyrion",
+            "ravs",
+            "rtgame",
+            "sarah",
+            "tom",
+            "zylus"
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2024-12-10",
+      "streams": [
+        {
+          "title": "For the King II",
+          "start": "2024-12-10T11:00:00Z",
+          "end": "2024-12-10T14:00:00Z",
+          "color": "#7aa70c",
+          "creators": [
+            "boba",
+            "duncan",
+            "osie",
+            "pedguin"
+          ]
+        },
+        {
+          "title": "Yogsfast speedrun day",
+          "start": "2024-12-10T14:00:00Z",
+          "end": "2024-12-10T22:00:00Z",
+          "color": "#7aa70c",
+          "creators": [
+            "ben",
+            "boba",
+            "breeh",
+            "briony",
+            "duncan",
+            "harry",
+            "lewis",
+            "mousie",
+            "osie",
+            "pedguin",
+            "ravs"
+          ]
+        },
+        {
+          "title": "Pedguin's All Nighter",
+          "start": "2024-12-10T22:00:00Z",
+          "end": "2024-12-11T11:00:00Z",
+          "color": "#7aa70c",
+          "creators": [
+            "pedguin"
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2024-12-11",
+      "streams": [
+        {
+          "title": "Save the World",
+          "start": "2024-12-11T11:00:00Z",
+          "end": "2024-12-11T14:00:00Z",
+          "color": "#dd5501",
+          "creators": [
+            "ben",
+            "pyrion"
+          ]
+        },
+        {
+          "title": "Hat Films Game Show",
+          "start": "2024-12-11T14:00:00Z",
+          "end": "2024-12-11T17:00:00Z",
+          "color": "#dd5501",
+          "creators": [
+            "harry",
+            "hat_films",
+            "lydia",
+            "ravs"
+          ]
+        },
+        {
+          "title": "Two Point Museum",
+          "start": "2024-12-11T17:00:00Z",
+          "end": "2024-12-11T20:00:00Z",
+          "color": "#dd5501",
+          "creators": []
+        },
+        {
+          "title": "Mystery Quest",
+          "start": "2024-12-11T20:00:00Z",
+          "end": "2024-12-11T23:00:00Z",
+          "color": "#dd5501",
+          "creators": []
+        }
+      ]
+    },
+    {
+      "date": "2024-12-12",
+      "streams": [
+        {
+          "title": "Four Player Fun Times",
+          "start": "2024-12-12T11:00:00Z",
+          "end": "2024-12-12T14:00:00Z",
+          "color": "#06b8aa",
+          "creators": [
+            "duncan",
+            "sherlock_hulmes",
+            "osie",
+            "zylus"
+          ]
+        },
+        {
+          "title": "WII Shit",
+          "start": "2024-12-12T14:00:00Z",
+          "end": "2024-12-12T17:00:00Z",
+          "color": "#06b8aa",
+          "creators": [
+            "rtgame"
+          ]
+        },
+        {
+          "title": "BOTC",
+          "start": "2024-12-12T17:00:00Z",
+          "end": "2024-12-12T20:00:00Z",
+          "color": "#06b8aa",
+          "creators": []
+        },
+        {
+          "title": "BOTC Online",
+          "start": "2024-12-12T20:00:00Z",
+          "end": "2024-12-12T23:00:00Z",
+          "color": "#06b8aa",
+          "creators": []
+        }
+      ]
+    },
+    {
+      "date": "2024-12-13",
+      "streams": [
+        {
+          "title": "Detective Duo",
+          "start": "2024-12-13T11:00:00Z",
+          "end": "2024-12-13T14:00:00Z",
+          "color": "#d23d99",
+          "creators": [
+            "boba",
+            "pedguin"
+          ]
+        },
+        {
+          "title": "Community Game Jam",
+          "start": "2024-12-13T14:00:00Z",
+          "end": "2024-12-13T17:00:00Z",
+          "color": "#d23d99",
+          "creators": []
+        },
+        {
+          "title": "Shadow of Doubt Murder Mystery",
+          "start": "2024-12-13T17:00:00Z",
+          "end": "2024-12-13T20:00:00Z",
+          "color": "#d23d99",
+          "creators": [
+            "sherlock_hulmes"
+          ]
+        },
+        {
+          "title": "Pedguin's Massive Multiplayer Madness",
+          "start": "2024-12-13T20:00:00Z",
+          "end": "2024-12-13T23:00:00Z",
+          "color": "#d23d99",
+          "creators": [
+            "pedguin"
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2024-12-14",
+      "streams": [
+        {
+          "title": "Frosty Bros",
+          "start": "2024-12-14T11:00:00Z",
+          "end": "2024-12-14T14:00:00Z",
+          "color": "#f07800",
+          "creators": [
+            "pyrion",
+            "zylus"
+          ]
+        },
+        {
+          "title": "Fighting Fantasy",
+          "start": "2024-12-14T14:00:00Z",
+          "end": "2024-12-14T17:00:00Z",
+          "color": "#f07800",
+          "creators": [
+            "lewis",
+            "nina",
+            "simon"
+          ]
+        },
+        {
+          "title": "Coffee with Boba",
+          "start": "2024-12-14T17:00:00Z",
+          "end": "2024-12-14T20:00:00Z",
+          "color": "#f07800",
+          "creators": [
+            "boba"
+          ]
+        },
+        {
+          "title": "Late Late Crew",
+          "start": "2024-12-14T20:00:00Z",
+          "end": "2024-12-14T23:00:00Z",
+          "color": "#f07800",
+          "creators": [
+            "breeh"
+          ]
+        }
+      ]
+    }
+  ]
+}

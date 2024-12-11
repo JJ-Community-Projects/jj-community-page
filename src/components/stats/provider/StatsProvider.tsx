@@ -160,17 +160,39 @@ const useStatsHook = (
   const yAxisName = () => {
     switch (settings.value) {
       case StatsValueType.Total:
+      case StatsValueType.Yogs:
+      case StatsValueType.Fundraiser:
+        return 'GBP'
+      case StatsValueType.TotalPerMinute:
+      case StatsValueType.YogsPerMinute:
+      case StatsValueType.FundraiserPerMinute:
+        return 'GBP'
+      case StatsValueType.Collections:
+        return 'Collections'
+      case StatsValueType.CollectionsPerMinute:
+        return 'Collections per minute'
+      case StatsValueType.Donations:
+        return 'Donations'
+      case StatsValueType.DonationsPerMinute:
+        return 'Donations per minute'
+      case StatsValueType.AvgDonationAmount:
+        return 'Average donation amount (GBP)'
+    }
+  }
+  const title = () => {
+    switch (settings.value) {
+      case StatsValueType.Total:
         return 'Total'
       case StatsValueType.TotalPerMinute:
-        return 'Total per minute'
+        return 'Total donations per minute'
       case StatsValueType.Yogs:
-        return 'Yogs'
+        return 'Donations to Yogs'
       case StatsValueType.YogsPerMinute:
-        return 'Yogs per minute'
+        return 'Donations per minute to Yogs'
       case StatsValueType.Fundraiser:
         return 'Fundraiser'
       case StatsValueType.FundraiserPerMinute:
-        return 'Fundraiser per minute'
+        return 'Donations per minute to Fundraisers'
       case StatsValueType.Collections:
         return 'Collections'
       case StatsValueType.CollectionsPerMinute:
@@ -187,6 +209,10 @@ const useStatsHook = (
   const chartOptions = (): EChartsOption => {
     return {
       backgroundColor: '#fff',
+      title: {
+        text: title(),
+        left: 'center',
+      },
       tooltip: {
         trigger: 'item',
       },

@@ -1,4 +1,5 @@
 import {type Accessor, type Component, createSignal} from "solid-js";
+import Stats2024 from '../../stats/2024.json'
 import Stats2023 from '../../stats/2023.json'
 import Stats2022 from '../../stats/2021.json'
 import Stats2021 from '../../stats/2021.json'
@@ -18,6 +19,7 @@ interface StreamStatsProps {
 }
 
 export const StatsPageRoot: Component<StreamStatsProps> = (props) => {
+  const stats2024: Stats = Stats2024
   const stats2023: Stats = Stats2023
   const stats2022: Stats = Stats2022
   const stats2021: Stats = Stats2021
@@ -29,7 +31,8 @@ export const StatsPageRoot: Component<StreamStatsProps> = (props) => {
   return (
     <CreatorProvider creatorMap={props.creatorMap}>
       <Accordion.Root collapsible={true} value={expandedItem()} onChange={setExpandedItem} class={'hidden md:block'}>
-        <Year stats={all} key={'all'} title={'2020-2023'} expandedItem={expandedItem}/>
+        <Year stats={all} key={'all'} title={'2020-2024'} expandedItem={expandedItem}/>
+        <Year stats={stats2024} key={'2024'} title={'2024'} expandedItem={expandedItem}/>
         <Year stats={stats2023} key={'2023'} title={'2023'} expandedItem={expandedItem}/>
         <Year stats={stats2022} key={'2022'} title={'2022'} expandedItem={expandedItem}/>
         <Year stats={stats2021} key={'2021'} title={'2021'} expandedItem={expandedItem}/>

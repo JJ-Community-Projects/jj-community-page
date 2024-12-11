@@ -178,8 +178,8 @@ function fullStreamToTESStream(fullStream) {
         creators: creators(fullStream),
         style: {
             background: {
-                colors: fullStream.style.background.colors,
-                orientation: fullStream.style.background.orientation
+                colors: fullStream?.style?.background?.colors,
+                orientation: fullStream?.style?.background?.orientation
             }
         }
     }
@@ -544,6 +544,7 @@ function statsSchedule(year) {
         const date = day.date
         const streams = []
         for(const stream of day.streams) {
+            console.log(stream)
             const title = stream.title
             const start = stream.start
             const end = stream.end
@@ -573,6 +574,7 @@ function statsSchedules() {
     fs.writeFileSync('2021.json', JSON.stringify(statsSchedule(2021), null, 2))
     fs.writeFileSync('2022.json', JSON.stringify(statsSchedule(2022), null, 2))
     fs.writeFileSync('2023.json', JSON.stringify(statsSchedule(2023), null, 2))
+    fs.writeFileSync('2024.json', JSON.stringify(statsSchedule(2024), null, 2))
 
     const creators = []
 

@@ -25,7 +25,7 @@ const Chart: Component = () => {
     <div>
       <CreatorStatsControls/>
       <div class={'bg-white'}>
-        <ECharts height={400} width={800} option={chartOptions()}/>
+        <ECharts height={400} width={1000} option={chartOptions()}/>
       </div>
     </div>
   );
