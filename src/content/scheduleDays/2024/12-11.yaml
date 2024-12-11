@@ -52,6 +52,8 @@ streams:
     vods: [ ]
   - creators:
       - tom
+      - ben
+      - lydia
     duration_hours: 3
     end: '2024-12-11T23:00:00Z'
     start: '2024-12-11T20:00:00Z'
