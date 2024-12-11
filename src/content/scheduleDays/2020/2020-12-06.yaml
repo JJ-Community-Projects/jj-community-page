@@ -13,7 +13,7 @@ streams:
     subtitle: Leo & Spiff
     title: Stocking Stuffers
     creators:
-      -spiff
+      - spiff
     vods:
       - label: Youtube Vod
         link: https://www.youtube.com/watch?v=xFB5-FJCWQY&list=PLvSp-8FGBzxlj-m9I9Zm1TTNMRCnnmWqd&index=17&pp=iAQB

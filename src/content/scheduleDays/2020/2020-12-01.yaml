@@ -49,9 +49,9 @@ streams:
       tileSize: 1
     subtitle: Bundle Live
     title: Jingle Cats
-             - creators:
-             - lewis
-             - simon
+    creators:
+      - lewis
+      - simon
     vods:
       - label: Youtube Vod
         link: https://www.youtube.com/watch?v=fO9Wf36WV4M&list=PLvSp-8FGBzxlj-m9I9Zm1TTNMRCnnmWqd&index=3&pp=iAQB
