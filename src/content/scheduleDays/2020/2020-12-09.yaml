@@ -1,82 +1,100 @@
 date: '2020-12-09'
 streams:
-- duration_hours: 3.0
-  end: '2020-12-09T14:00:00Z'
-  start: '2020-12-09T11:00:00Z'
-  style:
-    background:
-      colors:
-      - '#ffd900ff'
-      - '#ffcc00ff'
-      orientation: TD
-    tileSize: 1
-  subtitle: Mousie & Zylus
-  title: Stocking Stuffers
-  vods:
-  - label: Youtube Vod
-    link: https://www.youtube.com/watch?v=sdivbqtO4-o&list=PLvSp-8FGBzxlj-m9I9Zm1TTNMRCnnmWqd&index=23&pp=iAQB
-    type: youtube
-- duration_hours: 3.0
-  end: '2020-12-09T17:00:00Z'
-  start: '2020-12-09T14:00:00Z'
-  style:
-    background:
-      colors:
-      - '#ffcc00ff'
-      - '#ffc400ff'
-      orientation: TD
-    tileSize: 1
-  subtitle: Sips Ravs Ped Glermz
-  title: Don't Starve
-  vods:
-  - label: Youtube Vod
-    link: https://www.youtube.com/watch?v=jzM2nqWgzRc&list=PLvSp-8FGBzxlj-m9I9Zm1TTNMRCnnmWqd&index=24&pp=iAQB
-    type: youtube
-- duration_hours: 3.0
-  end: '2020-12-09T20:00:00Z'
-  start: '2020-12-09T17:00:00Z'
-  style:
-    background:
-      colors:
-      - '#ffc400ff'
-      - '#ffb700ff'
-      orientation: TD
-    tileSize: 1
-  subtitle: Bouphe Lydia Boba Gemma
-  title: Slag Sleepover
-  vods:
-  - label: Youtube Vod
-    link: https://www.youtube.com/watch?v=YvMo-CbFHHM&list=PLvSp-8FGBzxlj-m9I9Zm1TTNMRCnnmWqd&index=25&pp=iAQB
-    type: youtube
-- duration_hours: 3.0
-  end: '2020-12-09T23:00:00Z'
-  start: '2020-12-09T20:00:00Z'
-  style:
-    background:
-      colors:
-      - '#ffb700ff'
-      - '#ffae00ff'
-      orientation: TD
-    tileSize: 1
-  subtitle: Nilsey, Zylus & Friends
-  title: Protessional Strem
-  vods:
-  - label: Youtube Vod
-    link: https://www.youtube.com/watch?v=PUr7kNz0up8&list=PLvSp-8FGBzxlj-m9I9Zm1TTNMRCnnmWqd&index=26&pp=iAQB
-    type: youtube
-- duration_hours: 3.0
-  end: '2020-12-10T02:00:00Z'
-  start: '2020-12-09T23:00:00Z'
-  style:
-    background:
-      colors:
-      - '#ffae00ff'
-      - '#ffa200ff'
-      orientation: TD
-    tileSize: 1
-  subtitle: With Daltos
-  title: PoxNora
-  vods:
-  - label: Youtube Vod
-    link: https://www.youtube.com/watch?v=VFxXd7tHWVA&list=PLvSp-8FGBzxlj-m9I9Zm1TTNMRCnnmWqd&index=27&pp=iAQB
-    type: youtube
+  - duration_hours: 3.0
+    end: '2020-12-09T14:00:00Z'
+    start: '2020-12-09T11:00:00Z'
+    style:
+      background:
+        colors:
+          - '#ffd900ff'
+          - '#ffcc00ff'
+        orientation: TD
+      tileSize: 1
+    subtitle: Mousie & Zylus
+    title: Stocking Stuffers
+    creators:
+      - mousie
+      - zylus
+    vods:
+      - label: Youtube Vod
+        link: https://www.youtube.com/watch?v=sdivbqtO4-o&list=PLvSp-8FGBzxlj-m9I9Zm1TTNMRCnnmWqd&index=23&pp=iAQB
+        type: youtube
+  - duration_hours: 3.0
+    end: '2020-12-09T17:00:00Z'
+    start: '2020-12-09T14:00:00Z'
+    style:
+      background:
+        colors:
+          - '#ffcc00ff'
+          - '#ffc400ff'
+        orientation: TD
+      tileSize: 1
+    subtitle: Sips Ravs Ped Glermz
+    title: Don't Starve
+    creators:
+      - sips
+      - ravs
+      - pedguin
+    vods:
+      - label: Youtube Vod
+        link: https://www.youtube.com/watch?v=jzM2nqWgzRc&list=PLvSp-8FGBzxlj-m9I9Zm1TTNMRCnnmWqd&index=24&pp=iAQB
+        type: youtube
+  - duration_hours: 3.0
+    end: '2020-12-09T20:00:00Z'
+    start: '2020-12-09T17:00:00Z'
+    style:
+      background:
+        colors:
+          - '#ffc400ff'
+          - '#ffb700ff'
+        orientation: TD
+      tileSize: 1
+    subtitle: Bouphe Lydia Boba Gemma
+    title: Slag Sleepover
+    creators:
+      - bouphe
+      - lydia
+      - boba
+    vods:
+      - label: Youtube Vod
+        link: https://www.youtube.com/watch?v=YvMo-CbFHHM&list=PLvSp-8FGBzxlj-m9I9Zm1TTNMRCnnmWqd&index=25&pp=iAQB
+        type: youtube
+  - duration_hours: 3.0
+    end: '2020-12-09T23:00:00Z'
+    start: '2020-12-09T20:00:00Z'
+    style:
+      background:
+        colors:
+          - '#ffb700ff'
+          - '#ffae00ff'
+        orientation: TD
+      tileSize: 1
+    subtitle: Nilsey, Zylus & Friends
+    title: Protessional Strem
+    creators:
+      - nilsey
+      - zylus
+      - breeh
+      - rythian
+    vods:
+      - label: Youtube Vod
+        link: https://www.youtube.com/watch?v=PUr7kNz0up8&list=PLvSp-8FGBzxlj-m9I9Zm1TTNMRCnnmWqd&index=26&pp=iAQB
+        type: youtube
+  - duration_hours: 3.0
+    end: '2020-12-10T02:00:00Z'
+    start: '2020-12-09T23:00:00Z'
+    style:
+      background:
+        colors:
+          - '#ffae00ff'
+          - '#ffa200ff'
+        orientation: TD
+      tileSize: 1
+    subtitle: With Daltos
+    title: PoxNora
+    creators:
+      - daltos
+    vods:
+      - label: Youtube Vod
+        link: https://www.youtube.com/watch?v=VFxXd7tHWVA&list=PLvSp-8FGBzxlj-m9I9Zm1TTNMRCnnmWqd&index=27&pp=iAQB
+        type: youtube

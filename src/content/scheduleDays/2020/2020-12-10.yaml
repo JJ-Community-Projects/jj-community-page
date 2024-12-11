@@ -1,66 +1,75 @@
 date: '2020-12-10'
 streams:
-- duration_hours: 3.0
-  end: '2020-12-10T14:00:00Z'
-  start: '2020-12-10T11:00:00Z'
-  style:
-    background:
-      colors:
-      - '#a7cc00ff'
-      - '#7cba00ff'
-      orientation: TD
-    tileSize: 1
-  subtitle: Ped & Boba
-  title: Stocking Stuffers
-  vods:
-  - label: Youtube Vod
-    link: https://www.youtube.com/watch?v=9V7Rnortjpg&list=PLvSp-8FGBzxlj-m9I9Zm1TTNMRCnnmWqd&index=28&pp=iAQB
-    type: youtube
-- duration_hours: 3.0
-  end: '2020-12-10T17:00:00Z'
-  start: '2020-12-10T14:00:00Z'
-  style:
-    background:
-      colors:
-      - '#7cba00ff'
-      - '#5aa800ff'
-      orientation: TD
-    tileSize: 1
-  subtitle: Hat Films & Lewis
-  title: Hat Films Art Stream
-  vods:
-  - label: Youtube Vod
-    link: https://www.youtube.com/watch?v=KhsXL6SVEqU&list=PLvSp-8FGBzxlj-m9I9Zm1TTNMRCnnmWqd&index=29&pp=iAQB
-    type: youtube
-- duration_hours: 3.0
-  end: '2020-12-10T20:00:00Z'
-  start: '2020-12-10T17:00:00Z'
-  style:
-    background:
-      colors:
-      - '#5aa800ff'
-      - '#3a9600ff'
-      orientation: TD
-    tileSize: 1
-  subtitle: ISP & Bo
-  title: ISP's Wheel of Sorrow
-  vods:
-  - label: Youtube Vod
-    link: https://www.youtube.com/watch?v=KapZiih4OSs&list=PLvSp-8FGBzxlj-m9I9Zm1TTNMRCnnmWqd&index=30&t=88s&pp=iAQB
-    type: youtube
-- duration_hours: 3.0
-  end: '2020-12-10T23:00:00Z'
-  start: '2020-12-10T20:00:00Z'
-  style:
-    background:
-      colors:
-      - '#3a9600ff'
-      - '#218500ff'
-      orientation: TD
-    tileSize: 1
-  subtitle: Zoey & Fionn
-  title: Fizone Christmas Special
-  vods:
-  - label: Youtube Vod
-    link: https://www.youtube.com/watch?v=ZXtsNQgjxoQ&list=PLvSp-8FGBzxlj-m9I9Zm1TTNMRCnnmWqd&index=31&t=6s&pp=iAQB
-    type: youtube
+  - duration_hours: 3.0
+    end: '2020-12-10T14:00:00Z'
+    start: '2020-12-10T11:00:00Z'
+    style:
+      background:
+        colors:
+          - '#a7cc00ff'
+          - '#7cba00ff'
+        orientation: TD
+      tileSize: 1
+    subtitle: Ped & Boba
+    title: Stocking Stuffers
+    creators:
+      - pedguin
+      - boba
+    vods:
+      - label: Youtube Vod
+        link: https://www.youtube.com/watch?v=9V7Rnortjpg&list=PLvSp-8FGBzxlj-m9I9Zm1TTNMRCnnmWqd&index=28&pp=iAQB
+        type: youtube
+  - duration_hours: 3.0
+    end: '2020-12-10T17:00:00Z'
+    start: '2020-12-10T14:00:00Z'
+    style:
+      background:
+        colors:
+          - '#7cba00ff'
+          - '#5aa800ff'
+        orientation: TD
+      tileSize: 1
+    subtitle: Hat Films & Lewis
+    title: Hat Films Art Stream
+    creators:
+      - hat_films
+      - lewis
+    vods:
+      - label: Youtube Vod
+        link: https://www.youtube.com/watch?v=KhsXL6SVEqU&list=PLvSp-8FGBzxlj-m9I9Zm1TTNMRCnnmWqd&index=29&pp=iAQB
+        type: youtube
+  - duration_hours: 3.0
+    end: '2020-12-10T20:00:00Z'
+    start: '2020-12-10T17:00:00Z'
+    style:
+      background:
+        colors:
+          - '#5aa800ff'
+          - '#3a9600ff'
+        orientation: TD
+      tileSize: 1
+    subtitle: ISP & Bo
+    title: ISP's Wheel of Sorrow
+    vods:
+      - label: Youtube Vod
+        link: https://www.youtube.com/watch?v=KapZiih4OSs&list=PLvSp-8FGBzxlj-m9I9Zm1TTNMRCnnmWqd&index=30&t=88s&pp=iAQB
+        type: youtube
+  - duration_hours: 3.0
+    end: '2020-12-10T23:00:00Z'
+    start: '2020-12-10T20:00:00Z'
+    style:
+      background:
+        colors:
+          - '#3a9600ff'
+          - '#218500ff'
+        orientation: TD
+      tileSize: 1
+    subtitle: Zoey & Fionn
+    title: Fizone Christmas Special
+    creators:
+      - zoey
+      - fionn
+    vods:
+      - label: Youtube Vod
+        link: https://www.youtube.com/watch?v=ZXtsNQgjxoQ&list=PLvSp-8FGBzxlj-m9I9Zm1TTNMRCnnmWqd&index=31&t=6s&pp=iAQB
+        type: youtube
