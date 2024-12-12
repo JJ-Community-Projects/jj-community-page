@@ -36,7 +36,14 @@ streams:
     subtitle: RTGame & Friends
     title: WII Shit
     vods: [ ]
-  - creators: [ ]
+  - creators:
+      - lewis
+      - zylus
+      - rtgame
+      - breeh
+      - ravs
+      - sherlock_hulmes
+      - tom
     duration_hours: 3
     end: '2024-12-12T20:00:00Z'
     start: '2024-12-12T17:00:00Z'
@@ -49,14 +56,7 @@ streams:
       tileSize: 1
     subtitle: In Minecraft in Real Life feat NRB
     title: BOTC
-    vods:
-      - lewis
-      - zylus
-      - rtgame
-      - breeh
-      - ravs
-      - sherlock_hulmes
-      - tom
+    vods: [ ]
   - creators: [ ]
     duration_hours: 3
     end: '2024-12-12T23:00:00Z'
