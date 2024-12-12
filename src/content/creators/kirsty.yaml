@@ -11,6 +11,9 @@ links:
   - name: Twitch
     type: twitch
     url: https://www.twitch.tv/kirsty
+  - name: BlueSky
+    type: bsky
+    url: https://bsky.app/profile/korsty.bsky.social
 name: Kirsty
 link: https://www.twitch.tv/kirsty
 profileImage:

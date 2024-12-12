@@ -11,3 +11,6 @@ links:
   - name: Twitch
     type: twitch
     url: https://www.twitch.tv/lolipopgi
+  - name: BlueSky
+    type: bsky
+    url: https://bsky.app/profile/lolipopgi.bsky.social

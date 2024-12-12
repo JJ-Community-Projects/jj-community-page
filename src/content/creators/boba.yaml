@@ -14,6 +14,9 @@ links:
   - name: Discord
     type: discord
     url: https://discord.com/invite/bobawitch
+  - name: BlueSky
+    type: bsky
+    url: https://bsky.app/profile/boba-witch.bsky.social
 name: Boba
 link: https://www.twitch.tv/boba
 profileImage:

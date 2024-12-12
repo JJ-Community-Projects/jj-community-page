@@ -8,6 +8,9 @@ links:
   - name: Twitch
     type: twitch
     url: https://www.twitch.tv/shadowatnoon
+  - name: BlueSky
+    type: bsky
+    url: https://bsky.app/profile/shadowatnoon.bsky.social
 style:
   primaryColor: '#FF90C0'
   accentColor: '#49D9B5'

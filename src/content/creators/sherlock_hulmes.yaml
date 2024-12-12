@@ -8,3 +8,6 @@ links:
   - name: Twitch
     type: twitch
     url: https://www.twitch.tv/sherlockhulmes_
+  - name: BlueSky
+    type: bsky
+    url: https://bsky.app/profile/sherlockhulmes.bsky.social

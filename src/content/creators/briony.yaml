@@ -8,6 +8,9 @@ links:
   - name: Twitch
     type: twitch
     url: https://www.twitch.tv/brionykay
+  - name: BlueSky
+    type: bsky
+    url: https://bsky.app/profile/brionykay.bsky.social
 name: Briony
 link: https://www.twitch.tv/brionykay
 profileImage:

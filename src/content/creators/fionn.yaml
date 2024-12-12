@@ -8,6 +8,9 @@ links:
   - name: Twitch
     type: twitch
     url: https://www.twitch.tv/fionn
+  - name: BlueSky
+    type: bsky
+    url: https://bsky.app/profile/itfionn.bsky.social
 name: Fionn
 link: https://www.twitch.tv/fionn
 profileImage:

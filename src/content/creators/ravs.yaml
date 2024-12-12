@@ -11,6 +11,9 @@ links:
   - name: Twitch
     type: twitch
     url: https://www.twitch.tv/ravs_
+  - name: BlueSky
+    type: bsky
+    url: https://bsky.app/profile/ravs.bsky.social
 name: Ravs
 link: https://twitch.tv/ravs_
 profileImage:

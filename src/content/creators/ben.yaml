@@ -5,6 +5,9 @@ links:
   - name: Twitter
     type: twitter
     url: https://twitter.com/Bedgarsan
+  - name: BlueSky
+    type: bsky
+    url: https://bsky.app/profile/bedgar.bsky.social
 name: Ben
 link: https://www.twitch.tv/bedgars
 profileImage:

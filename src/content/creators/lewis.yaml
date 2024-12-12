@@ -2,6 +2,9 @@ links:
 - name: Twitter
   type: twitter
   url: https://twitter.com/YogscastLewis
+- name: BlueSky
+  type: bsky
+  url: https://bsky.app/profile/yogscast.bsky.social
 name: Lewis
 link: https://www.twitch.tv/yogscast
 profileImage:

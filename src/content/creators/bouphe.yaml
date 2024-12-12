@@ -14,6 +14,9 @@ links:
   - name: Patreon
     type: patreon
     url: http://www.patreon.com/bouphe
+  - name: BlueSky
+    type: bsky
+    url: https://bsky.app/profile/bouphe.bsky.social
 name: Bouphe
 link: https://www.twitch.tv/bouphe
 profileImage:

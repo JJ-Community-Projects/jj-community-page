@@ -17,6 +17,9 @@ links:
   - name: Twitch
     type: twitch
     url: https://www.twitch.tv/geestargames
+  - name: BlueSky
+    type: bsky
+    url: https://bsky.app/profile/geestargames.bsky.social
 name: Gee
 link: https://www.twitch.tv/geestargames
 profileImage:

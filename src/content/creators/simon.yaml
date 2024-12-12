@@ -5,6 +5,9 @@ links:
   - name: Twitch
     type: twitch
     url: https://www.twitch.tv/simonhoneydew
+  - name: BlueSky
+    type: bsky
+    url: https://bsky.app/profile/simonhoneydew.bsky.social
 name: Simon
 link: https://www.twitch.tv/simonhoneydew
 profileImage:

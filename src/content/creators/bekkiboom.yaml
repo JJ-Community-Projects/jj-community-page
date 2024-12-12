@@ -11,6 +11,9 @@ links:
   - name: Discord
     type: discord
     url: https://www.discord.gg/qMuhATC3Sm
+  - name: BlueSky
+    type: bsky
+    url: https://www.blueskycommunity.co.uk/
 link: https://www.twitch.tv/bekkiboom
 name: Bekkiboom
 profileImage:
