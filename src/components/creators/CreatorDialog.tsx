@@ -16,7 +16,7 @@ import {
   FaBrandsYoutube,
   FaSolidLink
 } from "solid-icons/fa";
-import {JJIcon} from "../common/JJIcons.tsx";
+import {BskyIcon, JJIcon} from "../common/JJIcons.tsx";
 
 interface CreatorDialogProps {
   creator: FullCreator,
@@ -74,7 +74,7 @@ export const Links: Component<LinksProps> = (props) => {
   const linkOrder = [
     'twitch',
     'youtube',
-    'bluesky',
+    'bsky',
     'twitter',
     'tiktok',
     'instagram',
@@ -94,7 +94,7 @@ export const Links: Component<LinksProps> = (props) => {
         return 'hover:text-[#6441A4]'
       case 'youtube':
         return 'hover:text-[#FF0000]'
-      case 'bluesky':
+      case 'bsky':
         return 'hover:text-[#1E95EF]'
       case 'twitter':
         return 'hover:text-[#1DA1F2]'
@@ -112,7 +112,7 @@ export const Links: Component<LinksProps> = (props) => {
         return 'hover:bg-[#6441A4]/10'
       case 'youtube':
         return 'hover:bg-[#FF0000]/10'
-      case 'bluesky':
+      case 'bsky':
         return 'hover:bg-[#1E95EF]/10'
       case 'twitter':
         return 'hover:bg-[#1DA1F2]/10'
@@ -194,6 +194,9 @@ const SocialMediaIcon: Component<SocialMediaIconProps> = (props) => {
       </Match>
       <Match when={props.type === 'twitch'}>
         <FaBrandsTwitch size={size}/>
+      </Match>
+      <Match when={props.type === 'bsky'}>
+        <BskyIcon class={'size-[24px]'}/>
       </Match>
     </Switch>
   );
