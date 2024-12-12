@@ -17,7 +17,7 @@ streams:
       tileSize: 1
     subtitle: Mark, Duncan, Osie & Nina
     title: Four Player Fun Times
-    vods: []
+    vods: [ ]
   - creators:
       - rtgame
       - boba
@@ -35,8 +35,8 @@ streams:
       tileSize: 1
     subtitle: RTGame & Friends
     title: WII Shit
-    vods: []
-  - creators: []
+    vods: [ ]
+  - creators: [ ]
     duration_hours: 3
     end: '2024-12-12T20:00:00Z'
     start: '2024-12-12T17:00:00Z'
@@ -49,8 +49,15 @@ streams:
       tileSize: 1
     subtitle: In Minecraft in Real Life feat NRB
     title: BOTC
-    vods: []
-  - creators: []
+    vods:
+      - lewis
+      - zylus
+      - rtgame
+      - breeh
+      - ravs
+      - sherlock_hulmes
+      - tom
+  - creators: [ ]
     duration_hours: 3
     end: '2024-12-12T23:00:00Z'
     start: '2024-12-12T20:00:00Z'
@@ -63,4 +70,4 @@ streams:
       tileSize: 1
     subtitle: Feat Ben Burns
     title: BOTC Online
-    vods: []
+    vods: [ ]
