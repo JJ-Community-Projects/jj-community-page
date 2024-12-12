@@ -1,7 +1,7 @@
 date: '2024-12-12'
 streams:
   - creators:
-      - zylus
+      - nina
       - sherlock_hulmes
       - duncan
       - osie
@@ -15,7 +15,7 @@ streams:
           - '#06b8aa'
         orientation: TD
       tileSize: 1
-    subtitle: Zylus, Mark, Duncan & Osie
+    subtitle: Mark, Duncan, Osie & Nina
     title: Four Player Fun Times
     vods: []
   - creators:

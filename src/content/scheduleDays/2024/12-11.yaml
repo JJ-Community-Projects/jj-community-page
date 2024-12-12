@@ -15,7 +15,13 @@ streams:
       tileSize: 1
     subtitle: Pyrion & Ben
     title: Save the World
-    vods: [ ]
+    vods:
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2323928361?t=0h7m27s
+      - type: youtube
+        label: Youtube Live
+        link: https://www.youtube.com/watch?v=x2L2RJHVikU
   - creators:
       - hat_films
       - lydia
@@ -33,7 +39,13 @@ streams:
       tileSize: 1
     subtitle: Hat Films vs Zero Degree
     title: Hat Films Game Show
-    vods: [ ]
+    vods:
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2323928361?t=3h8m22s
+      - type: youtube
+        label: Youtube Live
+        link: https://www.youtube.com/watch?v=eqo59gwwkfA
   - creators:
       - lewis
       - rtgame
@@ -49,7 +61,13 @@ streams:
       tileSize: 1
     subtitle: Early Access
     title: Two Point Museum
-    vods: [ ]
+    vods:
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2323928361?t=6h4m32s
+      - type: youtube
+        label: Youtube Live
+        link: https://www.youtube.com/watch?v=HmRzf5SDbEE
   - creators:
       - tom
       - ben
@@ -66,4 +84,10 @@ streams:
       tileSize: 1
     subtitle: Hosted By Tom Clark Feat NRB
     title: Mystery Quest
-    vods: [ ]
+    vods:
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2323928361?t=9h5m41s
+      - type: youtube
+        label: Youtube Live
+        link: https://www.youtube.com/watch?v=Asd1PneIP6s
