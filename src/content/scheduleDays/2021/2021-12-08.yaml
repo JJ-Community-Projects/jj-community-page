@@ -46,7 +46,7 @@ streams:
 - creators:
   - hat_films
   duration_hours: 3.0
-  end: '2021-12-08T20:00:00Z'
+  end: '2021-12-08T23:00:00Z'
   start: '2021-12-08T17:00:00Z'
   style:
     background:

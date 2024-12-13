@@ -2,7 +2,7 @@ date: '2024-12-13'
 streams:
   - creators:
       - pedguin
-      - boba
+      - daf
     duration_hours: 3
     end: '2024-12-13T14:00:00Z'
     start: '2024-12-13T11:00:00Z'
@@ -13,7 +13,7 @@ streams:
           - '#d23d99'
         orientation: TD
       tileSize: 1
-    subtitle: Boba & Pedguin
+    subtitle: Daf & Pedguin
     title: Detective Duo
     vods: []
   - creators: []
