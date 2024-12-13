@@ -47,6 +47,8 @@ streams:
     vods: []
   - creators:
       - pedguin
+      - ravs
+      - daltos
     duration_hours: 3
     end: '2024-12-13T23:00:00Z'
     start: '2024-12-13T20:00:00Z'
