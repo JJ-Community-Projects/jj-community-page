@@ -109,11 +109,12 @@ const useStatsHook = (
       s = stats.hours
     }
 
-    const nightStart = 23
-    const nightEnd = 11
-
+    const nightRegex = /night \d/
     if (!settings.showNights) {
-      s = s.filter(stream => !stream.title.includes('Night'))
+      s = s.filter(stream => {
+        const title = stream.title.toLowerCase()
+        return !nightRegex.test(title)
+      })
 
       /*   .filter(stream => {
            const start = DateTime.fromISO(stream.start)
