@@ -15,8 +15,17 @@ streams:
       tileSize: 1
     subtitle: Daf & Pedguin
     title: Detective Duo
-    vods: []
-  - creators: []
+    vods:
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2325588388?t=0h3m48s
+      - type: youtube
+        label: Youtube Live
+        link: https://www.youtube.com/watch?v=RFu_hWHpVDY
+  - creators:
+      - lewis
+      - pedguin
+      -
     duration_hours: 3
     end: '2024-12-13T17:00:00Z'
     start: '2024-12-13T14:00:00Z'
@@ -29,9 +38,18 @@ streams:
       tileSize: 1
     subtitle: Award Ceremony
     title: Community Game Jam
-    vods: []
+    vods:
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2325654108?t=0h6m4s
   - creators:
       - sherlock_hulmes
+      - pyrion
+      - zylus
+      - tom
+      - briony
+      - daf
+      - lewis
     duration_hours: 3
     end: '2024-12-13T20:00:00Z'
     start: '2024-12-13T17:00:00Z'
@@ -44,7 +62,13 @@ streams:
       tileSize: 1
     subtitle: Mark & Pals
     title: Shadow of Doubt Murder Mystery
-    vods: []
+    vods:
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2325654108?t=3h11m0s
+      - type: youtube
+        label: Youtube Live
+        link: https://www.youtube.com/watch?v=v69Qq9k7HRk
   - creators:
       - pedguin
       - ravs
@@ -61,4 +85,4 @@ streams:
       tileSize: 1
     subtitle: ''
     title: Pedguin's Massive Multiplayer Madness
-    vods: []
+    vods: [ ]

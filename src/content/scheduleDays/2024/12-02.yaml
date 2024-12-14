@@ -101,7 +101,7 @@ streams:
       - rythian
       - kirsty
     duration_hours: 3
-    end: '2024-12-02T23:00:00'
+    end: '2024-12-02T23:23:00'
     start: '2024-12-02T20:00:00Z'
     style:
       background:

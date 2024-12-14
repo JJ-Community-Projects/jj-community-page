@@ -21,7 +21,7 @@ streams:
         link: https://youtu.be/_TaEm3V4ib0?t=94
       - type: twitch
         label: Twitch
-        link: https://www.twitch.tv/videos/2317181259?t=0h1m53s
+        link: https://www.twitch.tv/videos/2317662646?t=0h0m0s
   - creators:
       - lewis
       - duncan
@@ -46,11 +46,11 @@ streams:
         link: https://youtu.be/SQKRuveS4vg?t=127
       - type: twitch
         label: Twitch
-        link: https://www.twitch.tv/videos/2317181259?t=3h2m20s
+        link: https://www.twitch.tv/videos/2317662646?t=3h0m26s
   - creators:
       - hat_films
     duration_hours: 3
-    end: '2024-12-03T23:00:00Z'
+    end: '2024-12-04T00:00:00Z'
     start: '2024-12-03T17:00:00Z'
     style:
       background:
@@ -67,4 +67,4 @@ streams:
         link: https://youtu.be/67IDgngDrwc?t=459s
       - type: twitch
         label: Twitch
-        link: https://www.twitch.tv/videos/2316400059?t=6h1m38s
+        link: https://www.twitch.tv/videos/2317662646?t=5h59m34s

@@ -50,6 +50,16 @@ streams:
     vods: []
   - creators:
       - breeh
+      - kirsty
+      - rythian
+      - mousie
+      - duncan
+      - daltos
+      - briony
+      - nilesy
+      - pedguin
+      - zylus
+      - osie
     duration_hours: 3
     end: '2024-12-14T23:00:00Z'
     start: '2024-12-14T20:00:00Z'

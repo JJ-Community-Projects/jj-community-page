@@ -17,7 +17,13 @@ streams:
       tileSize: 1
     subtitle: Mark, Duncan, Osie & Nina
     title: Four Player Fun Times
-    vods: [ ]
+    vods:
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2324765582?t=0h11m37s
+      - type: youtube
+        label: Youtube Live
+        link: https://www.youtube.com/watch?v=uUQIsHuvkyY
   - creators:
       - rtgame
       - boba
@@ -35,7 +41,13 @@ streams:
       tileSize: 1
     subtitle: RTGame & Friends
     title: WII Shit
-    vods: [ ]
+    vods:
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2324765582?t=3h22m59s
+      - type: youtube
+        label: Youtube Live
+        link: https://www.youtube.com/watch?v=ZgoZ3PFYHso
   - creators:
       - lewis
       - zylus
@@ -61,7 +73,10 @@ streams:
       tileSize: 1
     subtitle: In Minecraft in Real Life feat NRB
     title: BOTC
-    vods: [ ]
+    vods:
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2324943471?t=0h14m29s
   - creators:
       - zylus
       - lolipopgi
@@ -88,4 +103,7 @@ streams:
       tileSize: 1
     subtitle: Feat Ben Burns
     title: BOTC Online
-    vods: [ ]
+    vods:
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2325090378?t=0h5m30s

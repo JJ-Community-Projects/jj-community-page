@@ -71,7 +71,7 @@ streams:
       - harry
       - mango
     duration_hours: 3
-    end: '2024-12-08T23:00:00Z'
+    end: '2024-12-09T00:30:00Z'
     start: '2024-12-08T17:00:00Z'
     style:
       background:
