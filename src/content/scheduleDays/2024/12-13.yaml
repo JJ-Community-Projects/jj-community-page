@@ -84,4 +84,7 @@ streams:
       tileSize: 1
     subtitle: ''
     title: Pedguin's Massive Multiplayer Madness
-    vods: [ ]
+    vods:
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2325891159?t=0h7m42s
