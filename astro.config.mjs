@@ -53,4 +53,7 @@ export default defineConfig({
 
         },
     },
+    build: {
+        exclude: ['.cache', 'node_modules'],
+    },
 });
