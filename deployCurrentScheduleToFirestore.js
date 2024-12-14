@@ -595,6 +595,6 @@ function statsSchedules() {
 }
 
 //test()
-// main()
+main()
 //jjJob()
-statsSchedules()
+// statsSchedules()
