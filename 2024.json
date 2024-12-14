@@ -255,7 +255,7 @@
           "title": "Civ 5",
           "start": "2024-12-05T17:00:00Z",
           "end": "2024-12-05T23:00:00Z",
-          "color": "#06b8aa",
+          "color": "#3584BF",
           "creators": [
             "alex_the_rambler",
             "daltos",
@@ -379,7 +379,7 @@
           "end": "2024-12-08T17:00:00Z",
           "color": "#3484bf",
           "creators": [
-            "Duncan",
+            "duncan",
             "osie",
             "ravs",
             "sarah"
@@ -548,14 +548,21 @@
           "start": "2024-12-11T17:00:00Z",
           "end": "2024-12-11T20:00:00Z",
           "color": "#dd5501",
-          "creators": []
+          "creators": [
+            "lewis",
+            "rtgame"
+          ]
         },
         {
           "title": "Mystery Quest",
           "start": "2024-12-11T20:00:00Z",
           "end": "2024-12-11T23:00:00Z",
           "color": "#dd5501",
-          "creators": []
+          "creators": [
+            "ben",
+            "lydia",
+            "tom"
+          ]
         }
       ]
     },
@@ -570,8 +577,8 @@
           "creators": [
             "duncan",
             "sherlock_hulmes",
-            "osie",
-            "zylus"
+            "nina",
+            "osie"
           ]
         },
         {
@@ -580,6 +587,9 @@
           "end": "2024-12-12T17:00:00Z",
           "color": "#06b8aa",
           "creators": [
+            "boba",
+            "briony",
+            "pedguin",
             "rtgame"
           ]
         },
@@ -588,14 +598,41 @@
           "start": "2024-12-12T17:00:00Z",
           "end": "2024-12-12T20:00:00Z",
           "color": "#06b8aa",
-          "creators": []
+          "creators": [
+            "ben",
+            "breeh",
+            "briony",
+            "duncan",
+            "lewis",
+            "sherlock_hulmes",
+            "osie",
+            "pyrion",
+            "ravs",
+            "rtgame",
+            "tom",
+            "zylus"
+          ]
         },
         {
           "title": "BOTC Online",
           "start": "2024-12-12T20:00:00Z",
           "end": "2024-12-12T23:00:00Z",
           "color": "#06b8aa",
-          "creators": []
+          "creators": [
+            "ben",
+            "breeh",
+            "briony",
+            "daltos",
+            "kirsty",
+            "lolipopgi",
+            "sherlock_hulmes",
+            "mousie",
+            "nilesy",
+            "ravs",
+            "rtgame",
+            "rythian",
+            "zylus"
+          ]
         }
       ]
     },
@@ -608,7 +645,7 @@
           "end": "2024-12-13T14:00:00Z",
           "color": "#d23d99",
           "creators": [
-            "boba",
+            "daf",
             "pedguin"
           ]
         },
@@ -634,7 +671,9 @@
           "end": "2024-12-13T23:00:00Z",
           "color": "#d23d99",
           "creators": [
-            "pedguin"
+            "daltos",
+            "pedguin",
+            "ravs"
           ]
         }
       ]
