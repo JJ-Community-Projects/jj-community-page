@@ -7,6 +7,7 @@ const useYogsScheduleHook = (schedule: FullSchedule, _creators: FullCreator[]) =
 
   const [weekIndex, setWeekIndex] = createSignal<number>(0)
   const [dayIndex, setDayIndex] = createSignal<number>(0)
+  const end = useNextJJEndDate()
   const week = () => schedule.weeks[weekIndex()]
   const days = () => schedule.weeks.map(week => week.days).flat()
   const day = () => days()[dayIndex()]
@@ -20,11 +21,14 @@ const useYogsScheduleHook = (schedule: FullSchedule, _creators: FullCreator[]) =
   const firstDay = DateTime.fromJSDate(days()[0].date, {
     zone: 'Europe/London'
   })
-  const lastDay = DateTime.fromJSDate(days()[numberOfDays()-1].date, {
-    zone: 'Europe/London'
-  })
+  const lastDay = end()
   const now = DateTime.now().setZone('Europe/London')
 
+  console.log('numberOfDays', numberOfDays())
+  console.log('date', days()[numberOfDays() - 1].date)
+  console.log('firstDay', firstDay)
+  console.log('lastDay', lastDay)
+  console.log('now', now)
   const isNowBetween = now >= firstDay && now <= lastDay
 
   const jjEnd = useNextJJEndDate()
@@ -35,8 +39,12 @@ const useYogsScheduleHook = (schedule: FullSchedule, _creators: FullCreator[]) =
     }
 
     const now = DateTime.now().setZone('Europe/London')
-    const startWeek2 = DateTime.fromISO(now.year+'-12-08T01:00:00.000Z')
+    const startWeek2 = DateTime.fromISO(now.year + '-12-08T01:00:00.000Z')
     const end = jjEnd()
+    console.log('dates', now, startWeek2, end)
+    console.log('now >= startWeek2', now >= startWeek2)
+    console.log('now <= end', now <= end)
+
     if (now >= startWeek2 && now <= end) {
       setWeekIndex(1)
     }
