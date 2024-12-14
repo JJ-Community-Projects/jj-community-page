@@ -548,7 +548,7 @@ function statsSchedule(year) {
             const title = stream.title
             const start = stream.start
             const end = stream.end
-            const color = stream.style.background.colors[0]
+            const color = stream.style?.background?.colors?.at(0) ?? '#3584BF'
             const creators = stream.creators.map(c => c.id)
             streams.push({
                 title,
