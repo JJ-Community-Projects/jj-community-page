@@ -45,6 +45,7 @@ export const MobileNav: Component<MobileNavProps> = (props) => {
             <a class="nav" href={`/yogs/schedules/${path}`}>Yogs {path}</a>
           )}
         </For>
+        <a href="/yogs/stats">Statistics</a>
         <a href="/overlays">Stream Overlays</a>
         <a href="/twitch-extension">Twitch Extension</a>
         <a href="/faq">FAQ</a>

@@ -17,6 +17,64 @@ async function main() {
     await update(year);
 }
 
+function loadSchedule(year) {
+
+    // Read the YAML file
+    const fileContents = fs.readFileSync(`./src/content/schedules/${year}.yaml`, 'utf8');
+
+    // Parse the YAML file
+    const scheduleData = yaml.load(fileContents);
+
+    const times = scheduleData.times.map(time => {
+        return {
+            start: time.start.toISOString(),
+            end: time.end.toISOString(),
+        }
+    })
+
+    const schedule = {
+        ...scheduleData,
+        times,
+        weeks: scheduleData.weeks.map(week => {
+            return {
+                ...week,
+                days: week.days.map(day => {
+                    const path = `./src/content/scheduleDays/${day}.yaml`
+                    const dayData = yaml.load(fs.readFileSync(path, 'utf8'));
+                    const date = dayData.date
+                    const streams = dayData.streams.map(stream => {
+                        /*
+                        const creators = stream.creators.map(creator => {
+                            const path = `src/content/creators/${creator}.yaml`
+                            const creatorData = yaml.load(fs.readFileSync(path, 'utf8'));
+                            let twitchUser = null;
+
+                            const twitchUserPath = `src/content/twitchUsers/${creatorData.twitch}.yaml`
+                            if (fs.existsSync(twitchUserPath)) {
+                                const yaml = fs.readFileSync(twitchUserPath, 'utf8');
+                                twitchUser = yaml.load(yaml);
+                            }
+                            return {
+                                ...creatorData,
+                                twitchUser
+                            }
+                        })*/
+                        const creators = stream?.creators ?? []
+                        console.log(creators)
+                        creators.sort()
+                        return {...stream, creators}
+                    })
+                    return {
+                        date,
+                        streams
+                    }
+                })
+            }
+        })
+    }
+    return schedule
+}
+
 async function update(year) {
 
     const now = DateTime.now().setZone('Europe/London');
@@ -63,7 +121,7 @@ async function update(year) {
                                     twitchUser
                                 }
                             })*/
-                            const creators = stream.creators
+                            const creators = stream.creators ?? []
                             creators.sort()
                             return {...stream, creators}
                         })
@@ -120,8 +178,8 @@ function fullStreamToTESStream(fullStream) {
         creators: creators(fullStream),
         style: {
             background: {
-                colors: fullStream.style.background.colors,
-                orientation: fullStream.style.background.orientation
+                colors: fullStream?.style?.background?.colors,
+                orientation: fullStream?.style?.background?.orientation
             }
         }
     }
@@ -472,12 +530,71 @@ async function getHeader() {
 
 
 
-main()
-//jjJob()
 async function test() {
     const url = "https://dashboard.jinglejam.co.uk/api/tiltify";
     const data = await getYogsApiData(url)
     console.log(data.fundraiserData.campaigns)
 }
 
+function statsSchedule(year) {
+    const s = fullScheduleToTESSchedule(loadSchedule(year))
+    const title = s.title
+    const days = []
+    for(const day of s.days) {
+        const date = day.date
+        const streams = []
+        for(const stream of day.streams) {
+            console.log(stream)
+            const title = stream.title
+            const start = stream.start
+            const end = stream.end
+            const color = stream.style.background.colors[0]
+            const creators = stream.creators.map(c => c.id)
+            streams.push({
+                title,
+                start,
+                end,
+                color,
+                creators
+            })
+        }
+        days.push({
+            date,
+            streams
+        })
+    }
+    return {
+        title,
+        days
+    }
+}
+
+function statsSchedules() {
+    fs.writeFileSync('2020.json', JSON.stringify(statsSchedule(2020), null, 2))
+    fs.writeFileSync('2021.json', JSON.stringify(statsSchedule(2021), null, 2))
+    fs.writeFileSync('2022.json', JSON.stringify(statsSchedule(2022), null, 2))
+    fs.writeFileSync('2023.json', JSON.stringify(statsSchedule(2023), null, 2))
+    fs.writeFileSync('2024.json', JSON.stringify(statsSchedule(2024), null, 2))
+
+    const creators = []
+
+    const files = fs.readdirSync('./src/content/creators')
+    console.log(files)
+    for(const file of files) {
+        const path = `./src/content/creators/${file}`
+        const creatorData = yaml.load(fs.readFileSync(path, 'utf8'));
+        console.log(creatorData)
+        creators.push({
+            id: file.replace('.yaml', ''),
+            name: creatorData.name,
+            color: creatorData.style?.primaryColor ?? '#3584BF',
+        })
+    }
+    creators.sort((a, b) => a.name.localeCompare(b.name))
+    fs.writeFileSync('creators.json', JSON.stringify(creators, null, 2))
+}
+
 //test()
+// main()
+//jjJob()
+statsSchedules()

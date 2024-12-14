@@ -1,0 +1,704 @@
+{
+  "title": "Yogscast Jingle Jam 2020",
+  "days": [
+    {
+      "date": "2020-12-01",
+      "streams": [
+        {
+          "title": "Office Cam",
+          "start": "2020-12-01T11:00:00Z",
+          "end": "2020-12-01T14:00:00Z",
+          "color": "#00bbe0ff",
+          "creators": [
+            "lewis"
+          ]
+        },
+        {
+          "title": "Pre Jingle Jangle",
+          "start": "2020-12-01T14:00:00Z",
+          "end": "2020-12-01T17:00:00Z",
+          "color": "#009fd4ff",
+          "creators": [
+            "ben",
+            "tom"
+          ]
+        },
+        {
+          "title": "Jingle Cats",
+          "start": "2020-12-01T17:00:00Z",
+          "end": "2020-12-01T20:00:00Z",
+          "color": "#0081c7ff",
+          "creators": [
+            "lewis",
+            "simon"
+          ]
+        },
+        {
+          "title": "OpenTTD",
+          "start": "2020-12-01T21:00:00Z",
+          "end": "2020-12-02T00:00:00Z",
+          "color": "#0069baff",
+          "creators": [
+            "ben",
+            "daltos",
+            "daltos",
+            "simon_clark",
+            "duncan",
+            "lewis",
+            "pedguin",
+            "rythian",
+            "spiff"
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2020-12-02",
+      "streams": [
+        {
+          "title": "Christmas Colony",
+          "start": "2020-12-02T11:00:00Z",
+          "end": "2020-12-02T20:00:00Z",
+          "color": "#ffd900ff",
+          "creators": [
+            "ben",
+            "bouphe",
+            "duncan",
+            "lewis",
+            "pedguin",
+            "ravs",
+            "tom"
+          ]
+        },
+        {
+          "title": "Jackbox",
+          "start": "2020-12-02T20:00:00Z",
+          "end": "2020-12-02T23:00:00Z",
+          "color": "#ffa600ff",
+          "creators": [
+            "bouphe",
+            "breeh",
+            "briony",
+            "gee",
+            "lydia",
+            "mango",
+            "mousie",
+            "nilesy",
+            "osie",
+            "rythian",
+            "zylus"
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2020-12-03",
+      "streams": [
+        {
+          "title": "Stocking Stuffers",
+          "start": "2020-12-03T11:00:00Z",
+          "end": "2020-12-03T14:00:00Z",
+          "color": "#a7cc00ff",
+          "creators": [
+            "boba",
+            "gee",
+            "pedguin",
+            "ravs"
+          ]
+        },
+        {
+          "title": "Would you go on a date",
+          "start": "2020-12-03T14:00:00Z",
+          "end": "2020-12-03T17:00:00Z",
+          "color": "#74b800ff",
+          "creators": [
+            "bouphe",
+            "lydia",
+            "simon"
+          ]
+        },
+        {
+          "title": "Hat Films Christmas Album",
+          "start": "2020-12-03T17:00:00Z",
+          "end": "2020-12-03T23:00:00Z",
+          "color": "#49a300ff",
+          "creators": [
+            "hat_films"
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2020-12-04",
+      "streams": [
+        {
+          "title": "Big Rips Big Fishing",
+          "start": "2020-12-04T11:00:00Z",
+          "end": "2020-12-04T14:00:00Z",
+          "color": "#fc7600ff",
+          "creators": [
+            "ravs",
+            "sips"
+          ]
+        },
+        {
+          "title": "Jerk Off",
+          "start": "2020-12-04T14:00:00Z",
+          "end": "2020-12-04T17:00:00Z",
+          "color": "#f55e00ff",
+          "creators": [
+            "ben",
+            "tom"
+          ]
+        },
+        {
+          "title": "Farming Sim",
+          "start": "2020-12-04T17:00:00Z",
+          "end": "2020-12-04T23:00:00Z",
+          "color": "#ed4300ff",
+          "creators": [
+            "breeh",
+            "duncan",
+            "lewis",
+            "pedguin",
+            "ravs",
+            "rtgame",
+            "rythian",
+            "spiff"
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2020-12-05",
+      "streams": [
+        {
+          "title": "Stocking Stuffers",
+          "start": "2020-12-05T11:00:00Z",
+          "end": "2020-12-05T14:00:00Z",
+          "color": "#00e8c5ff",
+          "creators": [
+            "bouphe",
+            "osie"
+          ]
+        },
+        {
+          "title": "Tom Clark's Wheel of Wonder",
+          "start": "2020-12-05T14:00:00Z",
+          "end": "2020-12-05T17:00:00Z",
+          "color": "#00deb1ff",
+          "creators": [
+            "briony",
+            "gee",
+            "lewis",
+            "tom"
+          ]
+        },
+        {
+          "title": "MCC",
+          "start": "2020-12-05T17:00:00Z",
+          "end": "2020-12-05T20:00:00Z",
+          "color": "#00d49bff",
+          "creators": [
+            "alex_the_rambler",
+            "bekkiboom",
+            "ben",
+            "boba",
+            "bouphe",
+            "breeh",
+            "briony",
+            "daltos",
+            "simon_clark",
+            "duncan",
+            "fionn",
+            "gee",
+            "harry",
+            "joe",
+            "kim",
+            "lewis",
+            "lydia",
+            "mango",
+            "mango",
+            "sherlock_hulmes",
+            "martyn",
+            "mini-muka",
+            "mousie",
+            "pedguin",
+            "ravs",
+            "rtgame",
+            "rythian",
+            "simon",
+            "spiff",
+            "zoey",
+            "zylus"
+          ]
+        },
+        {
+          "title": "Armchair Admirals TD",
+          "start": "2020-12-05T20:00:00Z",
+          "end": "2020-12-05T23:00:00Z",
+          "color": "#00c98aff",
+          "creators": [
+            "alex_the_rambler",
+            "daltos",
+            "simon_clark",
+            "duncan",
+            "gee",
+            "lewis",
+            "rythian",
+            "spiff",
+            "zylus"
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2020-12-06",
+      "streams": [
+        {
+          "title": "Stocking Stuffers",
+          "start": "2020-12-06T11:00:00Z",
+          "end": "2020-12-06T14:00:00Z",
+          "color": "#f74accff",
+          "creators": [
+            "spiff"
+          ]
+        },
+        {
+          "title": "Hades Challange",
+          "start": "2020-12-06T14:00:00Z",
+          "end": "2020-12-06T17:00:00Z",
+          "color": "#eb36b1ff",
+          "creators": [
+            "breeh",
+            "duncan",
+            "nilesy",
+            "rythian",
+            "zylus"
+          ]
+        },
+        {
+          "title": "Poker Tournament",
+          "start": "2020-12-06T17:00:00Z",
+          "end": "2020-12-06T23:00:00Z",
+          "color": "#de2396ff",
+          "creators": [
+            "alex_the_rambler",
+            "bouphe",
+            "breeh",
+            "daltos",
+            "simon_clark",
+            "duncan",
+            "harry",
+            "hat_films",
+            "lewis",
+            "mango",
+            "mousie",
+            "nilesy",
+            "pyrion",
+            "ravs",
+            "rtgame",
+            "spiff",
+            "tom",
+            "zylus"
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2020-12-07",
+      "streams": [
+        {
+          "title": "Stocking Stuffers",
+          "start": "2020-12-07T11:00:00Z",
+          "end": "2020-12-07T14:00:00Z",
+          "color": "#ffa600ff",
+          "creators": [
+            "pyrion",
+            "sips"
+          ]
+        },
+        {
+          "title": "Stocking Stuffers",
+          "start": "2020-12-07T14:00:00Z",
+          "end": "2020-12-07T17:00:00Z",
+          "color": "#ff7b00ff",
+          "creators": [
+            "bekkiboom",
+            "briony"
+          ]
+        },
+        {
+          "title": "Civ 5",
+          "start": "2020-12-07T17:00:00Z",
+          "end": "2020-12-07T23:00:00Z",
+          "color": "#ff5500ff",
+          "creators": [
+            "alex_the_rambler",
+            "ben",
+            "daltos",
+            "duncan",
+            "lewis",
+            "rythian",
+            "spiff"
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2020-12-08",
+      "streams": [
+        {
+          "title": "Stocking Stuffers",
+          "start": "2020-12-08T11:00:00Z",
+          "end": "2020-12-08T14:00:00Z",
+          "color": "#00bbe0ff",
+          "creators": [
+            "alex_the_rambler",
+            "ben",
+            "breeh",
+            "duncan",
+            "lewis",
+            "rythian"
+          ]
+        },
+        {
+          "title": "Among Us",
+          "start": "2020-12-08T14:00:00Z",
+          "end": "2020-12-08T23:00:00Z",
+          "color": "#008bccff",
+          "creators": [
+            "alex_the_rambler",
+            "bekkiboom",
+            "ben",
+            "boba",
+            "breeh",
+            "briony",
+            "daltos",
+            "duncan",
+            "gee",
+            "hat_films",
+            "kim",
+            "lewis",
+            "lydia",
+            "mango",
+            "sherlock_hulmes",
+            "martyn",
+            "nilesy",
+            "osie",
+            "pedguin",
+            "ravs",
+            "rythian",
+            "sips",
+            "spiff",
+            "tom",
+            "zylus"
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2020-12-09",
+      "streams": [
+        {
+          "title": "Stocking Stuffers",
+          "start": "2020-12-09T11:00:00Z",
+          "end": "2020-12-09T14:00:00Z",
+          "color": "#ffd900ff",
+          "creators": [
+            "mousie",
+            "zylus"
+          ]
+        },
+        {
+          "title": "Don't Starve",
+          "start": "2020-12-09T14:00:00Z",
+          "end": "2020-12-09T17:00:00Z",
+          "color": "#ffcc00ff",
+          "creators": [
+            "pedguin",
+            "ravs",
+            "sips"
+          ]
+        },
+        {
+          "title": "Slag Sleepover",
+          "start": "2020-12-09T17:00:00Z",
+          "end": "2020-12-09T20:00:00Z",
+          "color": "#ffc400ff",
+          "creators": [
+            "boba",
+            "bouphe",
+            "lydia"
+          ]
+        },
+        {
+          "title": "Protessional Strem",
+          "start": "2020-12-09T20:00:00Z",
+          "end": "2020-12-09T23:00:00Z",
+          "color": "#ffb700ff",
+          "creators": [
+            "breeh",
+            "nilesy",
+            "rythian",
+            "zylus"
+          ]
+        },
+        {
+          "title": "PoxNora",
+          "start": "2020-12-09T23:00:00Z",
+          "end": "2020-12-10T02:00:00Z",
+          "color": "#ffae00ff",
+          "creators": [
+            "daltos"
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2020-12-10",
+      "streams": [
+        {
+          "title": "Stocking Stuffers",
+          "start": "2020-12-10T11:00:00Z",
+          "end": "2020-12-10T14:00:00Z",
+          "color": "#a7cc00ff",
+          "creators": [
+            "boba",
+            "pedguin"
+          ]
+        },
+        {
+          "title": "Hat Films Art Stream",
+          "start": "2020-12-10T14:00:00Z",
+          "end": "2020-12-10T17:00:00Z",
+          "color": "#7cba00ff",
+          "creators": [
+            "hat_films",
+            "lewis"
+          ]
+        },
+        {
+          "title": "ISP's Wheel of Sorrow",
+          "start": "2020-12-10T17:00:00Z",
+          "end": "2020-12-10T20:00:00Z",
+          "color": "#5aa800ff",
+          "creators": []
+        },
+        {
+          "title": "Fizone Christmas Special",
+          "start": "2020-12-10T20:00:00Z",
+          "end": "2020-12-10T23:00:00Z",
+          "color": "#3a9600ff",
+          "creators": [
+            "fionn",
+            "zoey"
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2020-12-11",
+      "streams": [
+        {
+          "title": "Stocking Stuffers",
+          "start": "2020-12-11T11:00:00Z",
+          "end": "2020-12-11T14:00:00Z",
+          "color": "#fc7600ff",
+          "creators": [
+            "high_rollers",
+            "kim"
+          ]
+        },
+        {
+          "title": "Yogs Game Jam Finals",
+          "start": "2020-12-11T14:00:00Z",
+          "end": "2020-12-11T17:00:00Z",
+          "color": "#f76300ff",
+          "creators": [
+            "ben",
+            "lewis"
+          ]
+        },
+        {
+          "title": "Simon's Important Videos",
+          "start": "2020-12-11T17:00:00Z",
+          "end": "2020-12-11T20:00:00Z",
+          "color": "#f25100ff",
+          "creators": [
+            "harry",
+            "simon",
+            "tom"
+          ]
+        },
+        {
+          "title": "Spiff & PFlax CSGO Scrub Tourny",
+          "start": "2020-12-11T20:00:00Z",
+          "end": "2020-12-11T23:00:00Z",
+          "color": "#ed3b00ff",
+          "creators": [
+            "alex_the_rambler",
+            "ben",
+            "boba",
+            "breeh",
+            "duncan",
+            "harry",
+            "lewis",
+            "lydia",
+            "mango",
+            "martyn",
+            "mousie",
+            "pedguin",
+            "pyrion",
+            "ravs",
+            "rtgame",
+            "rythian",
+            "spiff",
+            "tom",
+            "wilsonator",
+            "zylus"
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2020-12-12",
+      "streams": [
+        {
+          "title": "Stocking Stuffers",
+          "start": "2020-12-12T11:00:00Z",
+          "end": "2020-12-12T14:00:00Z",
+          "color": "#00e8c5ff",
+          "creators": [
+            "lewis"
+          ]
+        },
+        {
+          "title": "Minecraft Community Build",
+          "start": "2020-12-12T14:00:00Z",
+          "end": "2020-12-12T20:00:00Z",
+          "color": "#00dbacff",
+          "creators": [
+            "ben",
+            "lewis",
+            "rtgame",
+            "spiff"
+          ]
+        },
+        {
+          "title": "PFlax Rust RP",
+          "start": "2020-12-12T20:00:00Z",
+          "end": "2020-12-12T23:00:00Z",
+          "color": "#00cf94ff",
+          "creators": [
+            "pyrion",
+            "spiff",
+            "wilsonator"
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2020-12-13",
+      "streams": [
+        {
+          "title": "Stocking Stuffers",
+          "start": "2020-12-13T11:00:00Z",
+          "end": "2020-12-13T14:00:00Z",
+          "color": "#f74accff",
+          "creators": [
+            "lewis",
+            "spiff"
+          ]
+        },
+        {
+          "title": "Stocking Stuffers",
+          "start": "2020-12-13T14:00:00Z",
+          "end": "2020-12-13T17:00:00Z",
+          "color": "#ed39b7ff",
+          "creators": [
+            "boba",
+            "pedguin",
+            "ravs"
+          ]
+        },
+        {
+          "title": "High Rollers Christmas Special",
+          "start": "2020-12-13T17:00:00Z",
+          "end": "2020-12-13T20:00:00Z",
+          "color": "#e329a2ff",
+          "creators": [
+            "high_rollers",
+            "kim",
+            "sherlock_hulmes"
+          ]
+        },
+        {
+          "title": "Sweaty Shooters",
+          "start": "2020-12-13T20:00:00Z",
+          "end": "2020-12-13T23:00:00Z",
+          "color": "#d91a89ff",
+          "creators": [
+            "gee",
+            "sherlock_hulmes",
+            "ravs",
+            "rythian",
+            "sips"
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2020-12-14",
+      "streams": [
+        {
+          "title": "Stocking Stuffers",
+          "start": "2020-12-14T11:00:00Z",
+          "end": "2020-12-14T14:00:00Z",
+          "color": "#ffa600ff",
+          "creators": [
+            "breeh",
+            "ravs"
+          ]
+        },
+        {
+          "title": "Warhammer Painting",
+          "start": "2020-12-14T14:00:00Z",
+          "end": "2020-12-14T17:00:00Z",
+          "color": "#ff8400ff",
+          "creators": [
+            "ben",
+            "lewis",
+            "tom"
+          ]
+        },
+        {
+          "title": "Fighting Fantasy",
+          "start": "2020-12-14T17:00:00Z",
+          "end": "2020-12-14T20:00:00Z",
+          "color": "#ff6600ff",
+          "creators": [
+            "lewis",
+            "nina",
+            "simon"
+          ]
+        },
+        {
+          "title": "Late Late Show",
+          "start": "2020-12-14T20:00:00Z",
+          "end": "2020-12-14T23:00:00Z",
+          "color": "#ff4400ff",
+          "creators": [
+            "breeh",
+            "briony",
+            "daltos",
+            "mousie",
+            "nilesy",
+            "rythian",
+            "zylus"
+          ]
+        }
+      ]
+    }
+  ]
+}
