@@ -32,18 +32,19 @@ export const StatsPageRoot: Component<StreamStatsProps> = (props) => {
     <CreatorProvider creatorMap={props.creatorMap}>
       <Accordion.Root collapsible={true} value={expandedItem()} onChange={setExpandedItem} class={'hidden md:block'}>
         <Year stats={all} key={'all'} title={'2020-2024'} expandedItem={expandedItem}/>
-        <Year stats={stats2024} key={'2024'} title={'2024'} expandedItem={expandedItem}/>
+        <Year stats={stats2024} key={'2024'} title={'2024 (Incomplete)'} expandedItem={expandedItem}/>
         <Year stats={stats2023} key={'2023'} title={'2023'} expandedItem={expandedItem}/>
         <Year stats={stats2022} key={'2022'} title={'2022'} expandedItem={expandedItem}/>
         <Year stats={stats2021} key={'2021'} title={'2021'} expandedItem={expandedItem}/>
         <Year stats={stats2020} key={'2020'} title={'2020'} expandedItem={expandedItem}/>
       </Accordion.Root>
+      <p class={'block md:hidden text-center text-white'}>The statistics are not visible on mobile.</p>
       <p class={'text-center text-white'}>Some of the statistics regarding appearance might not be accurate.</p>
     </CreatorProvider>
 
   );
 }
-
+// <Year stats={stats2024} key={'2024'} title={'2024'} expandedItem={expandedItem}/>
 
 const Year: Component<{ stats: Stats, key: string, title: string, expandedItem: Accessor<string[]> }> = (props) => {
 
