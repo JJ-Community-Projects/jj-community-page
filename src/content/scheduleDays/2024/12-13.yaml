@@ -41,6 +41,9 @@ streams:
       - type: twitch
         label: Twitch
         link: https://www.twitch.tv/videos/2325654108?t=0h6m4s
+      - type: youtube
+        label: Youtube Live
+        link: https://www.youtube.com/watch?v=-ifV0qqdR5o
   - creators:
       - sherlock_hulmes
       - pyrion

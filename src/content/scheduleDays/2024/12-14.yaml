@@ -15,7 +15,13 @@ streams:
       tileSize: 1
     subtitle: Pyrion & Zylus
     title: Frosty Bros
-    vods: []
+    vods:
+      - type: twitch
+        label: Twitch VOD
+        link: https://www.twitch.tv/videos/2326455319?t=0h0m24s
+      - type: youtube
+        label: Youtube VOD
+        link: https://www.youtube.com/watch?v=ANRpEHikSqM
   - creators:
       - simon
       - lewis
@@ -32,9 +38,17 @@ streams:
       tileSize: 1
     subtitle: Simon, Lewis & Nina
     title: Fighting Fantasy
-    vods: []
+    vods:
+      - type: twitch
+        label: Twitch VOD
+        link: https://www.twitch.tv/videos/2326455319?t=2h40m34s
+      - type: youtube
+        label: Youtube VOD
+        link: https://www.youtube.com/watch?v=F1RdyzKiz7k
   - creators:
       - pyrion
+      - sarah
+      - daf
     duration_hours: 3
     end: '2024-12-14T20:00:00Z'
     start: '2024-12-14T17:00:00Z'
@@ -47,7 +61,13 @@ streams:
       tileSize: 1
     subtitle: Feat. Jack Manifold
     title: Coffee with Pyrion
-    vods: []
+    vods:
+      - type: twitch
+        label: Twitch VOD
+        link: https://www.twitch.tv/videos/2326455319?t=5h53m6s
+      - type: youtube
+        label: Youtube VOD
+        link: https://www.youtube.com/watch?v=s7j3jqbjc08
   - creators:
       - breeh
       - kirsty
@@ -74,4 +94,10 @@ streams:
       tileSize: 1
     subtitle: Hosted By Breeh
     title: Late Late Crew
-    vods: []
+    vods:
+      - type: twitch
+        label: Twitch VOD 1
+        link: https://www.twitch.tv/videos/2326823821?t=0h0m3s
+      - type: twitch
+        label: Twitch VOD 2
+        link: https://www.twitch.tv/videos/2326910357?t=0h0m2s
