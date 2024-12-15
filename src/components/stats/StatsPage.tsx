@@ -32,7 +32,7 @@ export const StatsPageRoot: Component<StreamStatsProps> = (props) => {
     <CreatorProvider creatorMap={props.creatorMap}>
       <Accordion.Root collapsible={true} value={expandedItem()} onChange={setExpandedItem} class={'hidden md:block'}>
         <Year stats={all} key={'all'} title={'2020-2024'} expandedItem={expandedItem}/>
-        <Year stats={stats2024} key={'2024'} title={'2024 (Incomplete)'} expandedItem={expandedItem}/>
+        <Year stats={stats2024} key={'2024'} title={'2024'} expandedItem={expandedItem}/>
         <Year stats={stats2023} key={'2023'} title={'2023'} expandedItem={expandedItem}/>
         <Year stats={stats2022} key={'2022'} title={'2022'} expandedItem={expandedItem}/>
         <Year stats={stats2021} key={'2021'} title={'2021'} expandedItem={expandedItem}/>

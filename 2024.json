@@ -111,7 +111,7 @@
         {
           "title": "Protessional Strem",
           "start": "2024-12-02T20:00:00Z",
-          "end": "2024-12-02T23:00:00",
+          "end": "2024-12-02T23:23:00",
           "color": "#fb9900",
           "creators": [
             "breeh",
@@ -151,7 +151,7 @@
         {
           "title": "Hat Films Music Stream",
           "start": "2024-12-03T17:00:00Z",
-          "end": "2024-12-03T23:00:00Z",
+          "end": "2024-12-04T00:00:00Z",
           "color": "#7aa70c",
           "creators": [
             "hat_films"
@@ -254,7 +254,7 @@
         {
           "title": "Civ 5",
           "start": "2024-12-05T17:00:00Z",
-          "end": "2024-12-05T23:00:00Z",
+          "end": "2024-12-05T23:26:00Z",
           "color": "#06b8aa",
           "creators": [
             "alex_the_rambler",
@@ -388,7 +388,7 @@
         {
           "title": "Poker Night",
           "start": "2024-12-08T17:00:00Z",
-          "end": "2024-12-08T23:00:00Z",
+          "end": "2024-12-09T00:30:00Z",
           "color": "#3484bf",
           "creators": [
             "bekkiboom",
@@ -654,7 +654,10 @@
           "start": "2024-12-13T14:00:00Z",
           "end": "2024-12-13T17:00:00Z",
           "color": "#d23d99",
-          "creators": []
+          "creators": [
+            "lewis",
+            "pedguin"
+          ]
         },
         {
           "title": "Shadow of Doubt Murder Mystery",
@@ -662,7 +665,13 @@
           "end": "2024-12-13T20:00:00Z",
           "color": "#d23d99",
           "creators": [
-            "sherlock_hulmes"
+            "briony",
+            "daf",
+            "lewis",
+            "sherlock_hulmes",
+            "pyrion",
+            "tom",
+            "zylus"
           ]
         },
         {
@@ -708,16 +717,30 @@
           "end": "2024-12-14T20:00:00Z",
           "color": "#f07800",
           "creators": [
-            "pyrion"
+            "daf",
+            "pyrion",
+            "sarah"
           ]
         },
         {
           "title": "Late Late Crew",
           "start": "2024-12-14T20:00:00Z",
-          "end": "2024-12-14T23:00:00Z",
+          "end": "2024-12-15T00:00:00Z",
           "color": "#f07800",
           "creators": [
-            "breeh"
+            "breeh",
+            "briony",
+            "daltos",
+            "duncan",
+            "kirsty",
+            "sherlock_hulmes",
+            "mousie",
+            "nilesy",
+            "osie",
+            "pedguin",
+            "rythian",
+            "sarah",
+            "zylus"
           ]
         }
       ]
