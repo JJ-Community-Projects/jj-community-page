@@ -1,7 +1,7 @@
 import {type Accessor, type Component, createSignal} from "solid-js";
 import Stats2024 from '../../stats/2024.json'
 import Stats2023 from '../../stats/2023.json'
-import Stats2022 from '../../stats/2021.json'
+import Stats2022 from '../../stats/2022.json'
 import Stats2021 from '../../stats/2021.json'
 import Stats2020 from '../../stats/2020.json'
 import All from '../../stats/all.json'
@@ -40,7 +40,7 @@ export const StatsPageRoot: Component<StreamStatsProps> = (props) => {
       </Accordion.Root>
       <p class={'block md:hidden text-center text-white'}>The statistics are not visible on mobile.</p>
       <p class={'text-center text-white'}>Some of the statistics regarding appearance might not be accurate.</p>
-      <p class={'text-center text-white'}>Some donation statistics .</p>
+      <p class={'text-center text-white'}>Some donation statistics for late streams might not be accurate as they may not take overrun stream time into account.</p>
       <a class={'underline text-white'} href={'https://docs.google.com/spreadsheets/d/11Ua2EVlmLCtMKSwKDHnLI8jGvkgJV8BMMHZ1sWowRn0/edit?gid=528381217#gid=528381217'} target={'_blank'}>
         Jingle Jam Donation Tracker
       </a>
