@@ -1,4 +1,4 @@
-import {useNextJJStartDate} from "#lib/utils/jjDates.ts"
+import {useNextJJStartDate} from "../lib/utils/jjDates.ts"
 import {useJJStartCountdown} from "../lib/utils/jjDates.ts";
 import {type Component, Show} from "solid-js";
 

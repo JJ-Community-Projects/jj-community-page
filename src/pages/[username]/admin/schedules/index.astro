@@ -1,0 +1,14 @@
+---
+import {actions} from 'astro:actions';
+import BaseLayout from "../../../../layouts/BaseLayout.astro";
+import {AccountsList} from "../../../../components/auth/AccountsList";
+import {SchedulesList} from "../../../../components/admin/schedules/SchedulesList";
+
+const {session, user} = Astro.locals
+if (session === null) {
+  return Astro.redirect("/");
+}
+---
+<BaseLayout>
+    <SchedulesList client:only="solid-js" user={user} />
+</BaseLayout>

@@ -1,0 +1,19 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import {actions} from 'astro:actions';
+import {AdminPage} from "../../../components/admin/AdminPage.tsx";
+
+const {session, user} = Astro.locals
+if (session === null) {
+  return Astro.redirect("/");
+}
+
+const {data, error} = await Astro.callAction(actions.users.getTiltifyAccount)
+if (error) {
+  console.error(error)
+  return Astro.redirect("/");
+}
+---
+<BaseLayout>
+    <AdminPage user={user} client:only="solid-js" />
+</BaseLayout>

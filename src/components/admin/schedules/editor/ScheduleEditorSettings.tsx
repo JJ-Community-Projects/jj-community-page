@@ -1,0 +1,307 @@
+import {Show, type Component, createSignal, For, createEffect} from "solid-js";
+import {useScheduleEditor} from "../../providers/ScheduleEditorProvider.tsx";
+import {debounce} from "@solid-primitives/scheduled";
+import {TextField} from "@kobalte/core/text-field";
+import {Checkbox} from "@kobalte/core/checkbox";
+import {FaRegularCircle, FaRegularCircleCheck, FaRegularCircleXmark} from "solid-icons/fa";
+import {actions} from "astro:actions";
+import {createStore} from "solid-js/store";
+
+const Correct = () => {
+  return (
+    <FaRegularCircleCheck class={'text-green-500'} size={20}/>
+  )
+}
+const Wrong = () => {
+  return (
+    <FaRegularCircleXmark class={'text-red-500'} size={20}/>
+  )
+}
+const Loading = () => {
+  return (
+    <FaRegularCircle class={'text-blue-500'} size={20}/>
+  )
+}
+
+// Title field component
+const ScheduleTitleField: Component = () => {
+  const {
+    local,
+    updateScheduleTitle,
+    action
+  } = useScheduleEditor();
+
+  // Handler to update the schedule title
+  const onChangeScheduleTitle = debounce((value: string) => {
+    updateScheduleTitle(value);
+  }, 200);
+
+  return (
+    <TextField
+      name="title"
+      class="flex flex-col flex-grow"
+      value={local.title}
+      onChange={onChangeScheduleTitle}
+      disabled={action.updateScheduleTitle.actionInProgress}
+    >
+      <TextField.Label class="text-sm font-medium mb-1">Title: </TextField.Label>
+      <div class="relative">
+        <TextField.Input
+          class="border border-gray-300 rounded-lg px-3 py-2 w-full disabled:opacity-50 disabled:cursor-not-allowed"
+        />
+        <Show when={action.updateScheduleTitle.actionInProgress}>
+          <div class="absolute right-3 top-1/2 transform -translate-y-1/2">
+            <div class="animate-spin h-4 w-4 border-2 border-accent border-t-transparent rounded-full"></div>
+          </div>
+        </Show>
+      </div>
+    </TextField>
+  );
+};
+
+// Year field component
+const ScheduleYearField: Component = () => {
+  const {
+    local,
+    updateScheduleYear
+  } = useScheduleEditor();
+
+  // Handler to update the schedule year
+  const onChangeScheduleYear = debounce((value: string) => {
+    updateScheduleYear(parseInt(value));
+  }, 200);
+
+  return (
+    <TextField
+      name="year"
+      class="flex flex-col w-1/3"
+      value={local.year.toString()}
+      onChange={onChangeScheduleYear}
+    >
+      <TextField.Label class="text-sm font-medium mb-1">Year: </TextField.Label>
+      <TextField.Input
+        type="number"
+        class="border border-gray-300 rounded-lg px-3 py-2"
+      />
+    </TextField>
+  );
+};
+
+// Slug field component
+const ScheduleSlugField: Component = () => {
+  const {
+    local,
+    updateScheduleSlug
+  } = useScheduleEditor();
+
+  const [state, setState] = createStore<{
+    slug: string,
+    slugValid: boolean,
+    errorMessage?: string,
+    isCheckingSlug: boolean,
+    suggestions: string[]
+  }>({
+    slug: local.slug,
+    slugValid: true,
+    isCheckingSlug: false,
+    suggestions: []
+  });
+
+  createEffect(() => {
+    setState('slug', local.slug);
+    setState('suggestions', []);
+    setState('slugValid', true);
+  })
+  // Function to get error message
+  const slugErrorMessage = () => {
+    if (state.errorMessage) {
+      return state.errorMessage;
+    } else if (!state.slugValid) {
+      return 'This slug is not available. Try one of these suggestions:';
+    }
+    return undefined;
+  };
+
+  // Create debounced function for slug validation
+  const checkSlugUnique = debounce(async (slug: string) => {
+    // If slug hasn't changed, it's valid
+    if (slug === local.slug) {
+      return;
+    }
+
+    if (!slug) {
+      setState('errorMessage', 'Slug is required');
+      setState('suggestions', []);
+      setState('slugValid', false);
+      return;
+    }
+
+    setState('isCheckingSlug', true);
+    setState('errorMessage', undefined);
+    setState('suggestions', []);
+
+    try {
+      const result = await actions.schedules.isSlugValid({
+        id: local.id,
+        slug: slug,
+        title: local.title
+      });
+
+      if (result.error) {
+        console.error(result.error);
+        setState('slugValid', false);
+        setState('errorMessage', 'Error checking slug availability');
+      } else {
+        setState('slugValid', result.data.isValid);
+        setState('suggestions', result.data.suggestions || []);
+        setState('errorMessage', result.data.isValid ? undefined : 'This slug is not available. Try one of these suggestions:');
+
+        // If valid, update the schedule slug
+        if (result.data.isValid) {
+          updateScheduleSlug(slug);
+        }
+      }
+    } catch (error) {
+      console.error("Error checking slug:", error);
+      setState('slugValid', false);
+      setState('errorMessage', 'Error checking slug availability');
+      setState('suggestions', []);
+    } finally {
+      setState('isCheckingSlug', false);
+    }
+  }, 500);
+
+  // Handler for slug change
+  const handleSlugChange = (value: string) => {
+    const sanitizedSlug = value.toLowerCase().replace(/[^a-z0-9-]/g, "-");
+    setState('slug', sanitizedSlug);
+    setState('isCheckingSlug', true);
+    checkSlugUnique(sanitizedSlug);
+  };
+
+  return (
+    <TextField
+      name="slug"
+      class="flex flex-col"
+      value={state.slug}
+      onChange={handleSlugChange}
+      validationState={state.slugValid ? "valid" : "invalid"}
+    >
+      <TextField.Label class="text-sm font-medium mb-1">Slug: </TextField.Label>
+      <div class="w-full flex flex-row items-center gap-4">
+        <TextField.Input
+          class="w-full border border-gray-300 rounded-lg px-3 py-2"
+        />
+        <div>
+          <Show when={state.isCheckingSlug}>
+            <Loading/>
+          </Show>
+          <Show when={!state.isCheckingSlug && state.slugValid && state.slug !== ''}>
+            <Correct/>
+          </Show>
+          <Show when={!state.isCheckingSlug && !state.slugValid && state.slug !== ''}>
+            <Wrong/>
+          </Show>
+        </div>
+      </div>
+      <TextField.Description class="text-xs text-gray-500 mt-1">
+        This will be used in the URL: /schedules/{state.slug}
+      </TextField.Description>
+      <TextField.ErrorMessage class="text-red-500 text-sm mt-1">
+        {slugErrorMessage()}
+      </TextField.ErrorMessage>
+
+      <Show when={state.suggestions.length > 0}>
+        <div class="mt-2">
+          <ul class="flex flex-wrap gap-2">
+            <For each={state.suggestions}>
+              {(suggestion) => (
+                <li>
+                  <button
+                    type="button"
+                    class="px-2 py-1 text-sm bg-accent/10 text-accent hover:bg-accent/20 rounded-md transition-colors"
+                    onClick={() => {
+                      setState('slug', suggestion);
+                      checkSlugUnique(suggestion);
+                    }}
+                  >
+                    {suggestion}
+                  </button>
+                </li>
+              )}
+            </For>
+          </ul>
+        </div>
+      </Show>
+    </TextField>
+  );
+};
+
+// Visibility checkbox component
+const ScheduleVisibilityCheckbox: Component = () => {
+  const {
+    local,
+    updateScheduleVisibility
+  } = useScheduleEditor();
+
+  // Handler to update the schedule visibility
+  const onChangeScheduleVisibility = debounce((checked: boolean) => {
+    updateScheduleVisibility(checked);
+  }, 200);
+
+  return (
+    <Checkbox
+      name="visible"
+      class="items-center inline-flex cursor-pointer"
+      checked={local.visible}
+      onChange={onChangeScheduleVisibility}
+    >
+      <Checkbox.Input class="sr-only"/>
+      <Checkbox.Control
+        class="h-5 w-5 rounded border border-gray-300 bg-white text-blue-600 focus:ring-blue-500 data-[checked]:bg-blue-600 data-[checked]:border-blue-600">
+        <Checkbox.Indicator>
+          <svg class="h-4 w-4 text-white" viewBox="0 0 8 8">
+            <path stroke="currentColor" stroke-width="1.5" fill="none" d="M1,4 L3,6 L7,2"/>
+          </svg>
+        </Checkbox.Indicator>
+      </Checkbox.Control>
+      <Checkbox.Label class="ml-2 text-sm font-medium">Schedule Visible</Checkbox.Label>
+      <Checkbox.Description class="text-xs text-gray-500 ml-2">
+        When checked, this schedule will be publicly visible.
+      </Checkbox.Description>
+    </Checkbox>
+  );
+};
+
+export const ScheduleEditorSettings: Component = () => {
+  const {
+    action
+  } = useScheduleEditor();
+
+  return (
+    <div class="bg-white rounded-2xl shadow-xl p-6 mb-6">
+      <h2 class="text-xl font-bold mb-4">Schedule Settings</h2>
+
+      <Show when={action.updateScheduleTitle.lastErrorMessage ||
+                  action.updateScheduleYear.lastErrorMessage ||
+                  action.updateScheduleSlug.lastErrorMessage ||
+                  action.updateScheduleVisibility.lastErrorMessage}>
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-4">
+          {action.updateScheduleTitle.lastErrorMessage ||
+           action.updateScheduleYear.lastErrorMessage ||
+           action.updateScheduleSlug.lastErrorMessage ||
+           action.updateScheduleVisibility.lastErrorMessage}
+        </div>
+      </Show>
+
+      <div class="grid grid-cols-1 gap-4">
+        <div class="flex gap-4">
+          <ScheduleTitleField />
+          <ScheduleYearField />
+        </div>
+        <ScheduleSlugField />
+        <ScheduleVisibilityCheckbox />
+      </div>
+    </div>
+  );
+}

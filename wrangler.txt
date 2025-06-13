@@ -4,6 +4,26 @@ compatibility_date = "2024-09-23"
 pages_build_output_dir = "./dist"
 compatibility_flags = [ "nodejs_compat_v2" ]
 
+[[durable_objects.bindings]]
+name = "SCHEDULE_DO"
+class_name = "ScheduleDO"
+script_name = 'schedule-do'
+
+[[durable_objects.bindings]]
+name = "SCHEDULE_EDITOR_DO"
+class_name = "ScheduleEditorDO"
+script_name = 'schedule-do'
+
+[[d1_databases]]
+binding = "DB"
+database_name = "prod-d1-jj"
+database_id = "7385a91b-14db-4254-8906-edf20d6bb68c"
+migrations_dir = "drizzle"
+
+[[kv_namespaces]]
+binding = "KV"
+id = "9f2c6f601baf4a07a89a5887a641e4fb"
+
 # Automatically place your workloads in an optimal location to minimize latency.
 # If you are running back-end logic in a Pages Function, running it closer to your back-end infrastructure
 # rather than the end user may result in better performance.

@@ -10,7 +10,7 @@ import type {
   FullWeek
 } from "../lib/model/ContentTypes.ts";
 import {DateTime} from "luxon";
-import {rangeFromData} from '#lib/utils/rangeFromData.ts';
+import {rangeFromData} from '../lib/utils/rangeFromData.ts';
 
 export async function loadScheduleFromContent(year: string) {
   const scheduleEntry = await getEntry('schedules', year);

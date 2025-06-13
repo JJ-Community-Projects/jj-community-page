@@ -1,7 +1,7 @@
 import {createContext, createEffect, createSignal, onMount, type ParentComponent, useContext} from "solid-js";
 import {useYogsSchedule} from "./YogsScheduleProvider.tsx";
 import type {FullStream} from "../../../../lib/model/ContentTypes.ts";
-import { log } from "#lib/analytics.ts";
+import { log } from "../../../../lib/analytics.ts";
 
 const useCreatorFilterHook = () => {
 

@@ -1,0 +1,37 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+// Get the error message from the URL query parameter
+const { searchParams } = new URL(Astro.request.url);
+const errorMessage = searchParams.get('error') || 'default';
+
+// Map error codes to user-friendly messages
+const errorMessages = new Map([
+  ['missing-code', 'Authentication code is missing. Please try again.'],
+  ['missing-state', 'Authentication state is missing. Please try again.'],
+  ['state-mismatch', 'Authentication state is not matching. Please try again.'],
+  ['token-exchange-failed', 'Failed to exchange authentication token. Please try again.'],
+  ['user-fetch-failed', 'Failed to fetch user information. Please try again.'],
+  ['default', 'An authentication error occurred. Please try again.']
+]);
+
+// Get the appropriate error message
+const displayMessage = errorMessages.get(errorMessage) || errorMessages.get('default')
+---
+
+<BaseLayout title="Authentication Error">
+  <div class="flex flex-col items-center justify-center w-full max-w-md mx-auto mt-10 p-6 bg-red-900/30 rounded-lg shadow-lg">
+    <h1 class="text-3xl font-bold text-white mb-4">Authentication Error</h1>
+    <div class="text-white text-center mb-6">
+      <p>{displayMessage}</p>
+    </div>
+    <div class="flex space-x-4">
+      <a href="/login" class="px-4 py-2 bg-primary-tint text-white rounded hover:bg-primary-shade transition-colors">
+        Try Again
+      </a>
+      <a href="/" class="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors">
+        Go Home
+      </a>
+    </div>
+  </div>
+</BaseLayout>

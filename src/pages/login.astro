@@ -1,19 +1,48 @@
 ---
-import BaseLayout from "#layouts/BaseLayout.astro";
-const user = Astro.locals['user'];
-console.log('user', user)
-if (user) {
-  Astro.redirect('/profile')
+import BaseLayout from "../layouts/BaseLayout.astro";
+import {TiltifyLoginButton} from "../components/auth/TiltifyLoginButton";
+const {user, session} = Astro.locals
+if (session) {
+  return Astro.redirect(`/${user.tiltifyName}/admin`);
 }
 ---
 <BaseLayout>
-    <p class="text-white text-4xl">Login</p>
-  {!user && (
+    <div class="flex flex-col items-center justify-center max-w-2xl mx-auto px-4 py-8 gap-4">
+        <h1 class="text-white text-4xl font-bold mb-8">Login</h1>
 
-          <a
-                  href="/api/auth/tiltify"
-                  class="bg-primary-300 text-white p-2 rounded">
-              Login With Tiltify
-          </a>
-  )}
+        <div class="bg-white/10 backdrop-blur-sm rounded-lg p-6 text-white">
+            <h2 class="text-2xl font-bold mb-4">Important Information</h2>
+
+            <ul class="space-y-4 list-disc">
+
+                <li>This website is a community-run project and is <strong>not</strong> officially affiliated with the
+                    Jingle Jam.
+                </li>
+                <li>You don’t need an account to view the schedule or donation details.</li>
+                <li>Accounts are only for those actively participating in the community fundraiser.</li>
+            </ul>
+        </div>
+
+        <div class="bg-white/10 backdrop-blur-sm rounded-lg p-6 text-white">
+            <h3 class="text-xl font-bold mb-4">If you sign up you agree to the following.</h3>
+            <ul class="space-y-4 list-disc">
+
+                <li>Admins may <strong>edit or remove</strong> content (e.g. Schedule or Stream titles) if it’s found to
+                    be extremely
+                    offensive or inappropriate. If that happens, we’ll make sure to notify the user.
+                </li>
+                <li>Impersonating someone else will result in an <strong>immediate ban</strong>, and you won’t be able
+                    to register again
+                    using the same Tiltify account.
+                </li>
+                <li>Users who abuse the trust of the admins may also be banned from the site.</li>
+                <li>If you have any questions, feel free to reach out to <strong>@Ostof</strong> on Discord.</li>
+            </ul>
+        </div>
+
+        <div class="mt-4">
+            <TiltifyLoginButton client:only="solid-js"/>
+        </div>
+
+    </div>
 </BaseLayout>

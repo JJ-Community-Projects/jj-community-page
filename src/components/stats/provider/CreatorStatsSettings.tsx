@@ -1,4 +1,3 @@
-import type {StatsSettings} from "#lib/model/Stats.ts";
 import {createContext, type ParentComponent, useContext} from "solid-js";
 import {createStore} from "solid-js/store";
 import {type CreatorStatsSettings, StatsValueType, StatsValueTypeCreator} from "../../../lib/model/Stats.ts";

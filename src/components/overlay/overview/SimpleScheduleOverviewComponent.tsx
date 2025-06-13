@@ -5,7 +5,7 @@ import { ScheduleOverlayDateProviderProvider } from '../schedule/ScheduleOverlay
 import { SimpleScheduleOverlayComponent } from '../schedule/SimpleScheduleOverlay.tsx'
 import { ScheduleDataStringProvider, useScheduleDataString } from '../schedule/ScheduleDataStringProvider.tsx'
 import { ScheduleDataStringEditor } from './ScheduleDataStringEditor'
-import { useNow } from '#lib/utils/useNow.ts'
+import { useNow } from '../../../lib/utils/useNow.ts'
 import {log} from "../../../lib/analytics.ts";
 
 export const SimpleScheduleOverviewComponent = () => {
