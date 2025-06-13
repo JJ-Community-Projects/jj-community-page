@@ -9,6 +9,13 @@ import {getTags} from "../functions/getTags.ts";
 
 
 export const schedules = {
+  /**
+   * Creates a new schedule for the authenticated user.
+   * Input: None
+   * Action: Creates a new schedule for the current year, initializes the ScheduleEditorDO,
+   *         and adds the schedule to the UserDO.
+   * Returns: An object containing the created schedule.
+   */
   create: defineAction({
     handler: async (_, ctx) => {
       const {session, user} = ctx.locals
@@ -51,6 +58,12 @@ export const schedules = {
       return {schedule}
     }
   }),
+  /**
+   * Saves the current state of a schedule to the database.
+   * Input: scheduleId (number) - The ID of the schedule to save
+   * Action: Verifies the user owns the schedule and then saves the schedule's current state from the ScheduleEditorDO to the database.
+   * Returns: An object with a success message.
+   */
   save: defineAction({
     input: z.number(),
     handler: async (scheduleId, ctx) => {
@@ -87,6 +100,12 @@ export const schedules = {
       return {message: "Schedule saved successfully"}
     }
   }),
+  /**
+   * Deletes a schedule owned by the authenticated user.
+   * Input: scheduleId (number) - The ID of the schedule to delete
+   * Action: Verifies the user owns the schedule, deletes it from the database, and removes it from the UserDO.
+   * Returns: An object with a success message.
+   */
   delete: defineAction({
     input: z.number(),
     handler: async (scheduleId, ctx) => {
@@ -124,6 +143,15 @@ export const schedules = {
     }
   }),
 
+  /**
+   * Checks if a slug is valid and available for use.
+   * Input: An object containing:
+   *   - id (number) - The ID of the schedule
+   *   - slug (string) - The slug to validate
+   *   - title (string, optional) - The title of the schedule
+   * Action: Validates if the provided slug is available for use and generates alternatives if not.
+   * Returns: An object with isValid flag and an array of suggested alternatives if the slug is not valid.
+   */
   isSlugValid: defineAction({
     input: z.object({
       id: z.number(),
@@ -171,6 +199,12 @@ export const schedules = {
     }
   }),
 
+  /**
+   * Retrieves the most popular tags used across all schedules.
+   * Input: limit (number, default: 5) - The maximum number of popular tags to return
+   * Action: Queries the database for the most frequently used tags and supplements with default tags if needed.
+   * Returns: An object containing popular tags, default tags, and charity tags with their usage counts.
+   */
   getPopularTags: defineAction({
     input: z.number().default(5),
     handler: async (limit, ctx) => {
@@ -233,6 +267,15 @@ export const schedules = {
       };
     }
   }),
+  /**
+   * Retrieves suggested tags for a specific stream.
+   * Input: An object containing:
+   *   - streamId (number) - The ID of the stream
+   *   - scheduleId (number) - The ID of the schedule
+   *   - limit (number, default: 5) - The maximum number of suggested tags to return
+   * Action: Finds popular tags that aren't already used in the stream.
+   * Returns: An object containing suggested tags, default tags, and charity tags that aren't already used in the stream.
+   */
   getSuggestedTagsForStream: defineAction({
     input: z.object({
       streamId: z.number(),
@@ -307,6 +350,16 @@ export const schedules = {
       };
     }
   }),
+  /**
+   * Retrieves suggested tags for a stream that match a search term.
+   * Input: An object containing:
+   *   - streamId (number) - The ID of the stream
+   *   - scheduleId (number) - The ID of the schedule
+   *   - term (string) - The search term to match against tags
+   *   - limit (number, default: 5) - The maximum number of suggested tags to return
+   * Action: Finds tags that match the search term and aren't already used in the stream.
+   * Returns: An object containing matching tags from the database, default tags, and charity tags.
+   */
   getSuggestedTagsForStreamBySearchTerm: defineAction({
     input: z.object({
       streamId: z.number(),
@@ -415,6 +468,12 @@ export const schedules = {
     }
   }),
 
+  /**
+   * Retrieves the tables data from a schedule's ScheduleEditorDO.
+   * Input: scheduleId (number) - The ID of the schedule
+   * Action: Gets the tables data from the ScheduleEditorDO for the specified schedule.
+   * Returns: The tables data from the ScheduleEditorDO.
+   */
   getTables: defineAction({
     input: z.number(),
     handler: async (scheduleId, ctx) => {

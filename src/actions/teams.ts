@@ -8,6 +8,14 @@ import {createSlug, generateTeamSlugAlternatives} from "../functions/slug.ts";
 
 
 export const teams = {
+  /**
+   * Creates a new team with the authenticated user as owner.
+   * Input: An object containing:
+   *   - name (string) - The name of the team
+   *   - slug (string) - The slug for the team URL
+   * Action: Creates a team in the database, initializes the TeamDO, and adds the creator as a member.
+   * Returns: The ID of the created team.
+   */
   create: defineAction({
     input: z.object({
       name: z.string(),
@@ -98,6 +106,15 @@ export const teams = {
       return team.id
     }
   }),
+  /**
+   * Updates an existing team's information.
+   * Input: An object containing:
+   *   - id (number) - The ID of the team to update
+   *   - name (string) - The new name for the team
+   *   - slug (string) - The new slug for the team URL
+   * Action: Verifies the user is the team owner and updates the team information in the database and TeamDO.
+   * Returns: The updated team object.
+   */
   update: defineAction({
     input: z.object({
       id: z.number(),
@@ -189,6 +206,12 @@ export const teams = {
       return updatedTeam
     }
   }),
+  /**
+   * Deletes a team owned by the authenticated user.
+   * Input: teamId (number) - The ID of the team to delete
+   * Action: Verifies the user is the team owner, deletes the team from the database, and updates all team members' UserDOs.
+   * Returns: An object with a success flag.
+   */
   deleteTeam: defineAction({
     input: z.number(),
     handler: async (teamId, ctx) => {
@@ -272,6 +295,12 @@ export const teams = {
       return {success: true}
     }
   }),
+  /**
+   * Allows a team member to leave a team.
+   * Input: teamId (number) - The ID of the team to leave
+   * Action: Verifies the user is not the team owner, removes them from the team in the database, and updates both TeamDO and UserDO.
+   * Returns: An object with a success flag.
+   */
   leaveTeam: defineAction({
     input: z.number(),
     handler: async (teamId, ctx) => {
@@ -347,6 +376,14 @@ export const teams = {
       return {success: true}
     }
   }),
+  /**
+   * Allows a team owner to remove a user from their team.
+   * Input: An object containing:
+   *   - userId (number) - The ID of the user to remove
+   *   - teamId (number) - The ID of the team
+   * Action: Verifies the authenticated user is the team owner, removes the specified user from the team, and updates both TeamDO and UserDO.
+   * Returns: An object with a success flag.
+   */
   removeUser: defineAction({
     input: z.object({
       userId: z.number(),
@@ -427,6 +464,14 @@ export const teams = {
       return {success: true}
     }
   }),
+  /**
+   * Checks if a slug is valid and available for use with a team.
+   * Input: An object containing:
+   *   - slug (string) - The slug to validate
+   *   - tiltifyName (string, optional) - The Tiltify username to generate alternative suggestions
+   * Action: Validates if the provided slug is available for use and generates alternatives if not.
+   * Returns: An object with isValid flag and an array of suggested alternatives if the slug is not valid.
+   */
   isSlugValid: defineAction({
     input: z.object({
       slug: z.string(),
@@ -483,6 +528,14 @@ export const teams = {
 }
 
 export const teamInvites = {
+  /**
+   * Invites a user to join a team.
+   * Input: An object containing:
+   *   - invitedUserId (number) - The ID of the user to invite
+   *   - teamId (number) - The ID of the team
+   * Action: Verifies the authenticated user is the team owner, creates an invitation in the database, and updates both TeamDO and UserDO.
+   * Returns: An object with a success flag.
+   */
   invite: defineAction({
     input: z.object({
       invitedUserId: z.number(),
@@ -583,6 +636,14 @@ export const teamInvites = {
       return {success: true}
     }
   }),
+  /**
+   * Removes an invitation to a team.
+   * Input: An object containing:
+   *   - invitedUserId (number) - The ID of the user whose invitation is being removed
+   *   - teamId (number) - The ID of the team
+   * Action: Verifies the authenticated user is the team owner, removes the invitation from the database, and updates both TeamDO and UserDO.
+   * Returns: An object with a success flag.
+   */
   removeInvite: defineAction({
     input: z.object({
       invitedUserId: z.number(),
@@ -679,6 +740,12 @@ export const teamInvites = {
       return {success: true}
     }
   }),
+  /**
+   * Accepts an invitation to join a team.
+   * Input: teamId (number) - The ID of the team whose invitation is being accepted
+   * Action: Verifies the authenticated user has an invitation, adds them as a team member, and updates both TeamDO and UserDO.
+   * Returns: An object with a success flag.
+   */
   acceptInvite: defineAction({
     input: z.number(),
     handler: async (teamId, ctx) => {
@@ -772,6 +839,12 @@ export const teamInvites = {
       return {success: true}
     }
   }),
+  /**
+   * Rejects an invitation to join a team.
+   * Input: teamId (number) - The ID of the team whose invitation is being rejected
+   * Action: Verifies the authenticated user has an invitation, removes the invitation from the database, and updates both TeamDO and UserDO.
+   * Returns: An object with a success flag.
+   */
   rejectInvite: defineAction({
     input: z.number(),
     handler: async (teamId, ctx) => {

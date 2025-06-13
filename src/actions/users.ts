@@ -8,6 +8,12 @@ import {socialUrlRegex} from "../functions/socialUrlRegex.ts";
 import {getTiltifyTokenFromContext, getTiltifyUser} from "../functions/tiltify.ts";
 
 export const users = {
+  /**
+   * Fetches social media links from the user's Tiltify account and adds them to their profile.
+   * Input: None
+   * Action: Retrieves the user's Tiltify token, fetches their social media links from Tiltify, and adds them to the UserDO.
+   * Returns: An object with success status and results for each social media platform.
+   */
   fetchSocialsFromTiltify: defineAction({
     handler: async (_, context) => {
       // 1. Check if user is authenticated
@@ -194,6 +200,14 @@ export const users = {
     }
   }),
 
+  /**
+   * Adds a social media link to the user's profile.
+   * Input: An object containing:
+   *   - provider (string) - The social media platform (twitch, twitter, bsky, youtube, instagram, tiktok)
+   *   - url (string) - The URL of the user's social media profile
+   * Action: Validates the URL format and adds the social media link to the UserDO.
+   * Returns: An object with a success flag.
+   */
   addSocial: defineAction({
     input: z.object({
       provider: z.string().refine(val => ['twitch', 'twitter', 'bsky', 'youtube', 'instagram', 'tiktok'].includes(val.toLowerCase()), {
@@ -322,6 +336,13 @@ export const users = {
     }
   }),
 
+  /**
+   * Removes a social media link from the user's profile.
+   * Input: An object containing:
+   *   - provider (string) - The social media platform to remove (twitch, twitter, bsky, youtube, instagram, tiktok)
+   * Action: Removes the specified social media link from the UserDO.
+   * Returns: An object with a success flag.
+   */
   removeSocial: defineAction({
     input: z.object({
       provider: z.string().refine(val => ['twitch', 'twitter', 'bsky', 'youtube', 'instagram', 'tiktok'].includes(val.toLowerCase()), {
@@ -403,6 +424,14 @@ export const users = {
       }
     }
   }),
+  /**
+   * Adds a tag to the user's profile.
+   * Input: An object containing:
+   *   - tag (string) - The tag to add
+   *   - label (string, optional) - The display label for the tag
+   * Action: Adds the specified tag to the UserDO.
+   * Returns: An object with a success flag.
+   */
   addTag: defineAction({
     input: z.object({
       tag: z.string(),
@@ -484,6 +513,13 @@ export const users = {
     }
   }),
 
+  /**
+   * Removes a tag from the user's profile.
+   * Input: An object containing:
+   *   - tag (string) - The tag to remove
+   * Action: Removes the specified tag from the UserDO.
+   * Returns: An object with a success flag.
+   */
   removeTag: defineAction({
     input: z.object({
       tag: z.string()
@@ -564,6 +600,12 @@ export const users = {
     }
   }),
 
+  /**
+   * Retrieves all tags associated with the authenticated user.
+   * Input: None
+   * Action: Queries the database for all tags belonging to the authenticated user.
+   * Returns: An array of user tags.
+   */
   getUserTags: defineAction({
     handler: async (_, context) => {
       // Check if user is authenticated
@@ -601,6 +643,12 @@ export const users = {
     }
   }),
 
+  /**
+   * Refreshes the user's Durable Object by reloading schedules from the database.
+   * Input: None
+   * Action: Loads the user's schedules into their UserDO from the database.
+   * Returns: A string indicating completion.
+   */
   refreshDO: defineAction({
     handler: async (_, context) => {
       // Check if user is authenticated
@@ -665,6 +713,12 @@ export const users = {
     }
   }),
 
+  /**
+   * Searches for users by username.
+   * Input: searchTerm (string) - The term to search for in usernames
+   * Action: Performs a fuzzy search on usernames in the database.
+   * Returns: An array of matching user accounts.
+   */
   search: defineAction({
     input: z.string(),
     handler: async (searchTerm, context) => {
@@ -722,6 +776,12 @@ export const users = {
     }
   }),
 
+  /**
+   * Retrieves the authenticated user's Tiltify account information.
+   * Input: None
+   * Action: Queries the database for the user's Tiltify account.
+   * Returns: The user's Tiltify account information.
+   */
   getTiltifyAccount: defineAction({
     handler: async (_, context) => {
       // Check if user is authenticated
@@ -758,6 +818,12 @@ export const users = {
     }
   }),
 
+  /**
+   * Retrieves the tables data from the authenticated user's UserDO.
+   * Input: None
+   * Action: Gets the tables data from the UserDO for the authenticated user.
+   * Returns: The tables data from the UserDO.
+   */
   getTables: defineAction({
     handler: async (_, context) => {
 
@@ -810,6 +876,12 @@ export const users = {
     }
   }),
 
+  /**
+   * Retrieves the most popular user tags.
+   * Input: limit (number, default: 5) - The maximum number of popular tags to return
+   * Action: Queries the database for the most frequently used user tags and supplements with default tags if needed.
+   * Returns: An object containing popular tags, default tags, and charity tags with their usage counts.
+   */
   getPopularTags: defineAction({
     input: z.number().default(5),
     handler: async (limit, ctx) => {
@@ -892,6 +964,14 @@ export const users = {
     }
   }),
 
+  /**
+   * Retrieves suggested tags for a specific user.
+   * Input: An object containing:
+   *   - userId (number) - The ID of the user
+   *   - limit (number, default: 5) - The maximum number of suggested tags to return
+   * Action: Finds popular tags that aren't already used by the specified user.
+   * Returns: An object containing suggested tags, default tags, and charity tags that aren't already used by the user.
+   */
   getSuggestedTagsForUser: defineAction({
     input: z.object({
       userId: z.number(),
@@ -988,6 +1068,15 @@ export const users = {
     }
   }),
 
+  /**
+   * Retrieves suggested tags for a user that match a search term.
+   * Input: An object containing:
+   *   - userId (number) - The ID of the user
+   *   - term (string) - The search term to match against tags
+   *   - limit (number, default: 5) - The maximum number of suggested tags to return
+   * Action: Finds tags that match the search term and aren't already used by the specified user.
+   * Returns: An object containing matching tags from the database, default tags, and charity tags.
+   */
   getSuggestedTagsForUserBySearchTerm: defineAction({
     input: z.object({
       userId: z.number(),
