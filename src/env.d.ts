@@ -8,6 +8,5 @@ declare namespace App {
   interface Locals extends Runtime {
     user: import("/lib/auth/User").User | null;
     session: import("/lib/auth/Session").Session | null;
-    repos: import("/lib/db/repos/Repos").Repos | null;
   }
 }

@@ -1,7 +1,5 @@
 import {defineMiddleware} from "astro:middleware";
 import {deleteSessionTokenCookie, setSessionTokenCookie, validateSessionToken} from "./functions/session.ts";
-import type {AstroContext} from "./lib/AstroContext.ts";
-import {createRepos} from "./lib/db/repos/createRepos.ts";
 
 /**
  * Middleware that handles session validation and user authentication.
@@ -62,11 +60,6 @@ export const onRequest = defineMiddleware(async (context, next) => {
     context.locals.user = null;
   }
 
-  try {
-    context.locals.repos = createRepos(context);
-  } catch (e) {
-    console.error('middleware', 'createRepos', e);
-  }
 
   return next();
 });
