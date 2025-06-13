@@ -1,11 +1,9 @@
 import {ActionError, defineAction} from "astro:actions";
 import {z} from "astro:content";
-import {getDB} from "../lib/db/db.ts";
-import {accounts, userTags} from "../lib/db/schema/auth-schema.ts";
-import {and, desc, eq, like, not, notInArray, sql} from "drizzle-orm";
 import {getTags} from "../functions/getTags.ts";
 import {socialUrlRegex} from "../functions/socialUrlRegex.ts";
 import {getTiltifyTokenFromContext, getTiltifyUser} from "../functions/tiltify.ts";
+import {UserRepo} from "../lib/db/repos/UserRepo.ts";
 
 export const users = {
   /**
@@ -614,32 +612,10 @@ export const users = {
         throw new ActionError({code: 'UNAUTHORIZED'});
       }
 
-      // Get database instance
-      let db;
-      try {
-        db = getDB(context);
-      } catch (error) {
-        console.error('Database connection error:', error);
-        throw new ActionError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to connect to the database'
-        });
-      }
-
-      // Get user tags
-      try {
-        const tags = await db.select()
-          .from(userTags)
-          .where(eq(userTags.userId, user.id))
-          .all();
-        return tags;
-      } catch (error) {
-        console.error('Error getting user tags:', error);
-        throw new ActionError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to get user tags'
-        });
-      }
+      // Get user tags using UserRepo
+      const users = UserRepo.action(context);
+      const tags = await users.getUserTags(user.id);
+      return tags;
     }
   }),
 
@@ -728,50 +704,11 @@ export const users = {
         throw new ActionError({code: 'UNAUTHORIZED'});
       }
 
-      // Get database instance
-      let db;
-      try {
-        db = getDB(context);
-      } catch (error) {
-        console.error('Database connection error:', error);
-        throw new ActionError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to connect to the database'
-        });
-      }
+      console.log(`Searching ${searchTerm}`);
 
-      // Create search pattern for fuzzy search
-      const searchPattern = `%${searchTerm}%`;
-      console.log(`Searching ${searchTerm}, ${searchPattern}`);
-
-      // Perform fuzzy search on multiple fields
-      let foundAccounts;
-      try {
-        foundAccounts = await db.select({
-          userId: accounts.userId,
-          provider: accounts.provider,
-          providerName: accounts.providerUsername
-        })
-          .from(accounts)
-          .where(
-            and(
-              like(accounts.providerUsername, searchPattern),
-              not(
-                eq(accounts.userId, user.id)
-              )
-            )
-          )
-          .limit(5)
-          .all();
-      } catch (error) {
-        console.error('Database query error:', error);
-        throw new ActionError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to search for accounts in the database'
-        });
-      }
-
-      // Return the results
+      // Perform search using UserRepo
+      const users = UserRepo.action(context);
+      const foundAccounts = await users.searchUser(searchTerm, user.id, 5);
       return foundAccounts;
     }
   }),
@@ -790,31 +727,10 @@ export const users = {
         throw new ActionError({code: 'UNAUTHORIZED'});
       }
 
-      // Get database instance
-      let db;
-      try {
-        db = getDB(context);
-      } catch (error) {
-        console.error('Database connection error:', error);
-        throw new ActionError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to connect to the database'
-        });
-      }
-
-      // Query for Tiltify account
-      try {
-        return await db.select()
-          .from(accounts)
-          .where(and(eq(accounts.userId, user.id), eq(accounts.provider, 'tiltify')))
-          .get();
-      } catch (error) {
-        console.error('Database query error:', error);
-        throw new ActionError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to retrieve Tiltify account information'
-        });
-      }
+      // Query for Tiltify account using UserRepo
+      const users = UserRepo.action(context);
+      const accounts = await users.getAccounts(user.id);
+      return accounts.find(account => account.provider === 'tiltify');
     }
   }),
 
@@ -884,83 +800,56 @@ export const users = {
    */
   getPopularTags: defineAction({
     input: z.number().default(5),
-    handler: async (limit, ctx) => {
-      // Get database instance
-      let db;
+    handler: async (limit, context) => {
       try {
-        db = getDB(ctx);
-      } catch (error) {
-        console.error('Database connection error:', error);
-        throw new ActionError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to connect to the database'
-        });
-      }
+        const users = UserRepo.action(context);
+        const popularTags = await users.getPopularTags(limit);
 
-      // 1. Get all tags from the database, ordered by count
-      let popularTags;
-      try {
-        popularTags = await db
-          .select({
-            tag: userTags.tag,
-            label: userTags.label,
-            count: sql<number>`count(
-            ${userTags.tag}
-            )`.as('count')
-          })
-          .from(userTags)
-          .groupBy(userTags.tag)
-          .orderBy((s) => {
-            return desc(s.count)
-          })
-          .limit(limit)
-          .all();
-      } catch (error) {
-        console.error('Database query error:', error);
-        throw new ActionError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to retrieve popular tags from the database'
-        });
-      }
+        // If there are not enough tags found, supplement with tags from getTags function
+        if (popularTags.length < limit) {
+          // Get default tags and charity tags
+          const {tags: defaultTags, charityTags} = getTags();
 
-      // 2. If there are not enough tags found, supplement with tags from getTags function
-      if (popularTags.length < limit) {
-        // Get default tags and charity tags
-        const {tags: defaultTags, charityTags} = getTags();
+          // Convert default tags to the same format as database tags
+          const formattedDefaultTags = defaultTags.map(tag => ({
+            ...tag,
+            count: 0 // Default count since we're not querying the database
+          }));
 
-        // Convert default tags to the same format as database tags
-        const formattedDefaultTags = defaultTags.map(tag => ({
-          ...tag,
-          count: 0 // Default count since we're not querying the database
-        }));
+          // Convert charity tags to the same format as database tags
+          const formattedCharityTags = charityTags.map(tag => ({
+            ...tag,
+            count: 0 // Default count since we're not querying the database
+          }));
 
-        // Convert charity tags to the same format as database tags
-        const formattedCharityTags = charityTags.map(tag => ({
-          ...tag,
-          count: 0 // Default count since we're not querying the database
-        }));
+          // Filter out default tags that are already in the popular tags
+          const existingTags = popularTags.map(t => t.tag);
+          const filteredDefaultTags = formattedDefaultTags.filter(tag => !existingTags.includes(tag.tag));
 
-        // Filter out default tags that are already in the popular tags
-        const existingTags = popularTags.map(t => t.tag);
-        const filteredDefaultTags = formattedDefaultTags.filter(tag => !existingTags.includes(tag.tag));
+          // Add enough default tags to reach the limit
+          const additionalTags = filteredDefaultTags.slice(0, limit - popularTags.length);
 
-        // Add enough default tags to reach the limit
-        const additionalTags = filteredDefaultTags.slice(0, limit - popularTags.length);
+          // Return combined results
+          return {
+            tags: popularTags,
+            defaultTags: additionalTags,
+            charityTags: formattedCharityTags
+          };
+        }
 
-        // Return combined results
+        // If we have enough popular tags, just return them
         return {
           tags: popularTags,
-          defaultTags: additionalTags,
-          charityTags: formattedCharityTags
+          defaultTags: [],
+          charityTags: []
         };
+      } catch (error) {
+        console.error('Error retrieving popular tags:', error);
+        throw new ActionError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to retrieve popular tags'
+        });
       }
-
-      // If we have enough popular tags, just return them
-      return {
-        tags: popularTags,
-        defaultTags: [],
-        charityTags: []
-      };
     }
   }),
 
@@ -977,94 +866,48 @@ export const users = {
       userId: z.number(),
       limit: z.number().default(5),
     }),
-    handler: async ({userId, limit}, ctx) => {
-      // Get database instance
-      let db;
+    handler: async ({userId, limit}, context) => {
       try {
-        db = getDB(ctx);
+        const users = UserRepo.action(context);
+        // Get user's existing tags to filter out from suggestions
+        const userTagsList = await users.getUserTags(userId);
+        // Get suggested tags for the user
+        const popularTags = await users.getSuggestedTagsForUser(userId, limit);
+
+        // Get the default tags from the getTags function
+        const {tags: defaultTags, charityTags} = getTags();
+
+        // Extract user tags to filter default and charity tags
+        const userTagValues = userTagsList.map(t => t.tag);
+
+        // Filter charity tags that aren't already part of the user's tags
+        const filteredCharityTags = charityTags
+          .filter(tag => !userTagValues.includes(tag.tag))
+          .map(tag => ({
+            ...tag,
+            count: 0 // Default count since we're not querying the database
+          }));
+
+        // Filter default tags that aren't already part of the user's tags
+        const filteredDefaultTags = defaultTags
+          .filter(tag => !userTagValues.includes(tag.tag))
+          .map(tag => ({
+            ...tag,
+            count: 0 // Default count since we're not querying the database
+          }));
+
+        return {
+          tags: popularTags,
+          defaultTags: filteredDefaultTags,
+          charityTags: filteredCharityTags
+        };
       } catch (error) {
-        console.error('Database connection error:', error);
+        console.error('Error retrieving suggested tags:', error);
         throw new ActionError({
           code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to connect to the database'
+          message: 'Failed to retrieve suggested tags'
         });
       }
-
-      // 1. Search all tags of the user
-      let userTagsList;
-      try {
-        userTagsList = await db
-          .select({
-            tag: userTags.tag,
-          })
-          .from(userTags)
-          .where(eq(userTags.userId, userId))
-          .all();
-      } catch (error) {
-        console.error('Database query error:', error);
-        throw new ActionError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to retrieve user tags from the database'
-        });
-      }
-
-      const userTagValues = userTagsList.map(t => t.tag);
-
-      // 2. Find the most used tags that aren't part of the user's tags
-      let popularTags;
-      try {
-        popularTags = await db
-          .select({
-            tag: userTags.tag,
-            label: userTags.label,
-            count: sql<number>`count(
-            ${userTags.tag}
-            )`.as('count')
-          })
-          .from(userTags)
-          .where(
-            and(
-              // Exclude tags that are already part of the user's tags
-              notInArray(userTags.tag, userTagValues)
-            )
-          )
-          .groupBy(userTags.tag)
-          .orderBy((s) => {
-            return desc(s.count)
-          })
-          .limit(limit)
-          .all();
-      } catch (error) {
-        console.error('Database query error:', error);
-        throw new ActionError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to retrieve popular tags from the database'
-        });
-      }
-
-      // 3. Get the default tags from the getTags function
-      const {tags: defaultTags, charityTags} = getTags();
-
-      // 4. Return an object with charityTags and tags, excluding tags already part of the user's tags
-      const filteredCharityTags = charityTags
-        .filter(tag => !userTagValues.includes(tag.tag))
-        .map(tag => ({
-          ...tag,
-          count: 0 // Default count since we're not querying the database
-        }));
-
-      const filteredDefaultTags = defaultTags
-        .filter(tag => !userTagValues.includes(tag.tag))
-        .map(tag => ({
-          ...tag,
-          count: 0 // Default count since we're not querying the database
-        }));
-
-      return {
-        tags: popularTags,
-        defaultTags: filteredDefaultTags,
-        charityTags: filteredCharityTags
-      };
     }
   }),
 
@@ -1083,128 +926,80 @@ export const users = {
       term: z.string(),
       limit: z.number().default(5),
     }),
-    handler: async ({userId, term, limit}, ctx) => {
-      // Get database instance
-      let db;
+    handler: async ({userId, term, limit}, context) => {
       try {
-        db = getDB(ctx);
-      } catch (error) {
-        console.error('Database connection error:', error);
-        throw new ActionError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to connect to the database'
-        });
-      }
+        const users = UserRepo.action(context);
+        // Get user's existing tags to filter out from suggestions
+        const userTagsList = await users.getUserTags(userId);
+        // Get matching tags based on search term
+        const matchingTags = await users.getSuggestedTagsForUserBySearchTerm(userId, term, limit);
 
-      // 1. Search all tags of the user
-      let userTagsList;
-      try {
-        userTagsList = await db
-          .select({
-            tag: userTags.tag,
-          })
-          .from(userTags)
-          .where(eq(userTags.userId, userId))
-          .all();
-      } catch (error) {
-        console.error('Database query error:', error);
-        throw new ActionError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to retrieve user tags from the database'
-        });
-      }
+        // Get the default tags from the getTags function
+        const {tags: defaultTags, charityTags} = getTags();
 
-      const userTagValues = userTagsList.map(t => t.tag);
+        // Extract user tags to filter default and charity tags
+        const userTagValues = userTagsList.map(t => t.tag);
 
-      // 2. Find the most used tags that aren't part of the user's tags and match the search term
-      let databaseTags;
-      try {
-        databaseTags = await db
-          .select({
-            tag: userTags.tag,
-            label: userTags.label,
-            count: sql<number>`count(
-            ${userTags.tag}
-            )`.as('count')
-          })
-          .from(userTags)
-          .where(
-            and(
-              // Exclude tags that are already part of the user's tags
-              notInArray(userTags.tag, userTagValues),
-              like(userTags.tag, `%${term.toLowerCase()}%`)
-            )
-          )
-          .groupBy(userTags.tag)
-          .orderBy((s) => {
-            return desc(s.count)
-          })
-          .limit(limit)
-          .all();
-      } catch (error) {
-        console.error('Database query error:', error);
-        throw new ActionError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to retrieve matching tags from the database'
-        });
-      }
+        // Get the search term in lowercase
+        const searchTermLower = term.toLowerCase();
 
-      // 3. Get the default tags from the getTags function
-      const {tags: defaultTags, charityTags} = getTags();
-
-      // 4. If we don't have enough tags from the database, supplement with default tags
-      const searchTermLower = term.toLowerCase();
-
-      // Filter default tags that match the search term and aren't already in the user's tags
-      const filteredDefaultTags = defaultTags
-        .filter(tag =>
-          !userTagValues.includes(tag.tag) &&
-          tag.tag.includes(searchTermLower)
-        )
-        .map(tag => ({
-          ...tag,
-          count: 0 // Default count since we're not querying the database
-        }));
-
-      // Filter charity tags that match the search term and aren't already in the user's tags
-      const filteredCharityTags = charityTags
-        .filter(tag =>
-          !userTagValues.includes(tag.tag) &&
-          tag.tag.includes(searchTermLower)
-        )
-        .map(tag => ({
-          ...tag,
-          count: 0 // Default count since we're not querying the database
-        }));
-
-      // 5. If we still don't have enough tags, add more default tags that aren't in the user's tags
-      // (regardless of whether they match the search term)
-      let additionalDefaultTags: {
-        label: string,
-        tag: string
-        count: number
-      }[] = [];
-      if (databaseTags.length + filteredDefaultTags.length + filteredCharityTags.length < limit) {
-        additionalDefaultTags = defaultTags
+        // Filter default tags that match the search term and aren't already in the user's tags
+        const filteredDefaultTags = defaultTags
           .filter(tag =>
             !userTagValues.includes(tag.tag) &&
-            !tag.tag.includes(searchTermLower) // Only include tags that haven't been included yet
+            tag.tag.includes(searchTermLower)
           )
           .map(tag => ({
             ...tag,
-            count: 0
-          }))
-          .slice(0, limit - (databaseTags.length + filteredDefaultTags.length + filteredCharityTags.length));
+            count: 0 // Default count since we're not querying the database
+          }));
+
+        // Filter charity tags that match the search term and aren't already in the user's tags
+        const filteredCharityTags = charityTags
+          .filter(tag =>
+            !userTagValues.includes(tag.tag) &&
+            tag.tag.includes(searchTermLower)
+          )
+          .map(tag => ({
+            ...tag,
+            count: 0 // Default count since we're not querying the database
+          }));
+
+        // If we still don't have enough tags, add more default tags that aren't in the user's tags
+        // (regardless of whether they match the search term)
+        let additionalDefaultTags: {
+          label: string,
+          tag: string
+          count: number
+        }[] = [];
+        if (matchingTags.length + filteredDefaultTags.length + filteredCharityTags.length < limit) {
+          additionalDefaultTags = defaultTags
+            .filter(tag =>
+              !userTagValues.includes(tag.tag) &&
+              !tag.tag.includes(searchTermLower) // Only include tags that haven't been included yet
+            )
+            .map(tag => ({
+              ...tag,
+              count: 0
+            }))
+            .slice(0, limit - (matchingTags.length + filteredDefaultTags.length + filteredCharityTags.length));
+        }
+
+        // Combine all filtered default tags
+        const allFilteredDefaultTags = [...filteredDefaultTags, ...additionalDefaultTags];
+
+        return {
+          tags: matchingTags,
+          defaultTags: allFilteredDefaultTags,
+          charityTags: filteredCharityTags
+        };
+      } catch (error) {
+        console.error('Error retrieving suggested tags by search term:', error);
+        throw new ActionError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to retrieve suggested tags'
+        });
       }
-
-      // Combine all filtered default tags
-      const allFilteredDefaultTags = [...filteredDefaultTags, ...additionalDefaultTags];
-
-      return {
-        tags: databaseTags,
-        defaultTags: allFilteredDefaultTags,
-        charityTags: filteredCharityTags
-      };
     }
   }),
 }

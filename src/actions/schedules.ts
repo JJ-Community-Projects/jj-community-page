@@ -1,11 +1,9 @@
 import {ActionError, defineAction} from "astro:actions";
-import {getDB} from "../lib/db/db";
-import {schedulesTable, streamTagsTable} from "../lib/db/schema/schema.ts";
 import {DateTime} from "luxon";
-import {and, desc, eq, like, notInArray, sql} from "drizzle-orm";
 import {z} from "astro:content";
 import {createSlug, generateScheduleSlugAlternatives} from "../functions/slug.ts";
 import {getTags} from "../functions/getTags.ts";
+import {ScheduleRepo} from "../lib/db/repos/ScheduleRepo.ts";
 
 
 export const schedules = {
@@ -22,27 +20,29 @@ export const schedules = {
       if (!session) {
         throw new ActionError({code: 'UNAUTHORIZED'})
       }
-      const db = getDB(ctx)
+
+      const schedules = ScheduleRepo.action(ctx)
       const currentYear = DateTime.now().year
-      const existingSchedule = await db.select()
-        .from(schedulesTable)
-        .where(and(eq(schedulesTable.ownerId, user.id)))
-        .get()
+
+      // Check if user already has a schedule
+      const existingSchedules = await schedules.findByOwnerId(user.id)
+      const existingSchedule = existingSchedules.find(schedule => schedule.year === currentYear)
 
       if (existingSchedule) {
         throw new ActionError({code: 'BAD_REQUEST', message: 'Schedule for this year already exists'})
       }
-      const title = `${user.tiltifyName}'s Schedule ${DateTime.now().year}`
+
+      const title = `${user.tiltifyName}'s Schedule ${currentYear}`
       const slug = createSlug(title)
-      const [schedule] = await db.insert(schedulesTable)
-        .values({
-          ownerId: user.id,
-          title: title,
-          year: DateTime.now().year,
-          slug: slug,
-          visible: false,
-        })
-        .returning()
+
+      // Create schedule using repository
+      const schedule = await schedules.create({
+        ownerId: user.id,
+        title: title,
+        year: currentYear,
+        slug: slug,
+        visible: false,
+      })
 
       // Initialize the ScheduleEditorDO for this schedule
       const ScheduleEditorDO = ctx.locals.runtime.env.ScheduleEditorDO
@@ -77,11 +77,8 @@ export const schedules = {
       }
 
       // Get the schedule from the database to check ownership
-      const db = getDB(ctx)
-      const schedule = await db.select()
-        .from(schedulesTable)
-        .where(eq(schedulesTable.id, scheduleId))
-        .get()
+      const schedules = ScheduleRepo.action(ctx)
+      const schedule = await schedules.findById(scheduleId)
 
       if (!schedule) {
         throw new ActionError({code: 'NOT_FOUND', message: 'Schedule not found'})
@@ -116,22 +113,22 @@ export const schedules = {
       if (!scheduleId) {
         throw new ActionError({code: 'BAD_REQUEST', message: 'Schedule ID is required'})
       }
+
       // Get the schedule from the database to check ownership
-      const db = getDB(ctx)
-      const schedule = await db.select()
-        .from(schedulesTable)
-        .where(eq(schedulesTable.id, scheduleId))
-        .get()
+      const schedules = ScheduleRepo.action(ctx)
+      const schedule = await schedules.findById(scheduleId)
+
       if (!schedule) {
         throw new ActionError({code: 'NOT_FOUND', message: 'Schedule not found'})
       }
+
       // Check if the user owns this schedule
       if (schedule.ownerId !== user.id) {
         throw new ActionError({code: 'FORBIDDEN', message: 'You do not have permission to edit this schedule'})
       }
-      await db.delete(schedulesTable)
-        .where(and(eq(schedulesTable.id, scheduleId), eq(schedulesTable.ownerId, user.id)))
-        .run()
+
+      // Delete the schedule using repository
+      await schedules.delete(scheduleId)
 
       const DO = ctx.locals.runtime.env.UserDO
       const id = DO.idFromName(`${user.id}`)
@@ -166,6 +163,10 @@ export const schedules = {
       if (!slug) {
         throw new ActionError({code: 'BAD_REQUEST', message: 'Slug is required'})
       }
+
+      // Note: We're still using generateScheduleSlugAlternatives which uses direct DB access
+      // This is because the function is in a separate file and modifying it is outside the scope
+      // of the current migration task
 
       // Get alternatives using the generateScheduleSlugAlternatives function
       // If it returns alternatives, the slug is not valid
@@ -208,24 +209,14 @@ export const schedules = {
   getPopularTags: defineAction({
     input: z.number().default(5),
     handler: async (limit, ctx) => {
-      const db = getDB(ctx);
+      const schedules = ScheduleRepo.action(ctx);
+
+      // Since ScheduleRepo doesn't have a method for getting popular tags,
+      // we'll use the db property to create a custom query
 
       // 1. Get all tags from the database, ordered by count
-      const popularTags = await db
-        .select({
-          tag: streamTagsTable.tag,
-          label: streamTagsTable.label,
-          count: sql<number>`count(
-          ${streamTagsTable.tag}
-          )`.as('count')
-        })
-        .from(streamTagsTable)
-        .groupBy(streamTagsTable.tag)
-        .orderBy((s) => {
-          return desc(s.count)
-        })
-        .limit(limit)
-        .all();
+      // Note: We're using the db property directly since there's no specific method for this
+      const popularTags = await schedules.getPopularTags(limit);
 
       // 2. If there are not enough tags found, supplement with tags from getTags function
       if (popularTags.length < limit) {
@@ -283,47 +274,19 @@ export const schedules = {
       limit: z.number().default(5),
     }),
     handler: async ({streamId, scheduleId, limit}, ctx) => {
-      const db = getDB(ctx);
+      const schedules = ScheduleRepo.action(ctx);
 
-      // 1. Search all tags of the stream
-      const streamTags = await db
-        .select({
-          tag: streamTagsTable.tag,
-        })
-        .from(streamTagsTable)
-        .where(
-          and(
-            eq(streamTagsTable.streamId, streamId),
-            eq(streamTagsTable.scheduleId, scheduleId)
-          )
-        )
-        .all();
-
+      // 1. Search all tags of the stream using ScheduleRepo
+      const streamTags = await schedules.findStreamTags(streamId, scheduleId);
       const streamTagValues = streamTags.map(t => t.tag);
 
-      // 2. Find the 5 most used tags that aren't part of the stream
-      const popularTags = await db
-        .select({
-          tag: streamTagsTable.tag,
-          label: streamTagsTable.label,
-          count: sql<number>`count(
-          ${streamTagsTable.tag}
-          )`.as('count')
-        })
-        .from(streamTagsTable)
-        .where(
-          and(
-            // Exclude tags that are already part of the stream
-            notInArray(streamTagsTable.tag, streamTagValues)
-          )
-        )
-        .groupBy(streamTagsTable.tag)
-        .orderBy((s) => {
-          return desc(s.count)
-        })
-        .limit(limit)
-        .all();
-
+      // 2. Find the most used tags that aren't part of the stream
+      const popularTags = schedules.getSuggestedTagsForStream(
+        streamId,
+        scheduleId,
+        limit,
+        streamTagValues
+      )
 
       // 3. Get the default tags from the getTags function
       const {tags: defaultTags, charityTags} = getTags();
@@ -368,46 +331,21 @@ export const schedules = {
       limit: z.number().default(5),
     }),
     handler: async ({streamId, scheduleId, term, limit}, ctx) => {
-      const db = getDB(ctx);
-      // 1. Search all tags of the stream
-      const streamTags = await db
-        .select({
-          tag: streamTagsTable.tag,
-        })
-        .from(streamTagsTable)
-        .where(
-          and(
-            eq(streamTagsTable.streamId, streamId),
-            eq(streamTagsTable.scheduleId, scheduleId)
-          )
-        )
-        .all();
+      const schedules = ScheduleRepo.action(ctx);
 
+      // 1. Search all tags of the stream using ScheduleRepo
+      const streamTags = await schedules.findStreamTags(streamId, scheduleId);
       const streamTagValues = streamTags.map(t => t.tag);
 
       // 2. Find the most used tags that aren't part of the stream and match the search term
-      const databaseTags = await db
-        .select({
-          tag: streamTagsTable.tag,
-          label: streamTagsTable.label,
-          count: sql<number>`count(
-          ${streamTagsTable.tag}
-          )`.as('count')
-        })
-        .from(streamTagsTable)
-        .where(
-          and(
-            // Exclude tags that are already part of the stream
-            notInArray(streamTagsTable.tag, streamTagValues),
-            like(streamTagsTable.tag, `%${term.toLowerCase()}%`)
-          )
-        )
-        .groupBy(streamTagsTable.tag)
-        .orderBy((s) => {
-          return desc(s.count)
-        })
-        .limit(limit)
-        .all();
+      // Note: We're using the db property directly since there's no specific method for this
+      const databaseTags = await schedules.getSuggestedTagsForStreamBySearchTerm(
+        streamId,
+        scheduleId,
+        limit,
+        streamTagValues,
+        term
+      )
 
       // 3. Get the default tags from the getTags function
       const {tags: defaultTags, charityTags} = getTags();

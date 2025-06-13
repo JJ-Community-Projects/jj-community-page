@@ -1,10 +1,10 @@
 import {ActionError, defineAction} from "astro:actions";
 import {z} from "astro:content";
-import {getDB} from "../lib/db/db.ts";
-import {teamInvitesTable, teamMembersTable, teamsTable} from "../lib/db/schema/schema.ts";
 import {and, eq} from "drizzle-orm";
 import {accounts} from "../lib/db/schema/auth-schema.ts";
 import {createSlug, generateTeamSlugAlternatives} from "../functions/slug.ts";
+import {TeamRepo} from "../lib/db/repos/TeamRepo.ts";
+import {UserRepo} from "../lib/db/repos/UserRepo.ts";
 
 
 export const teams = {
@@ -40,37 +40,20 @@ export const teams = {
         throw new ActionError({code: 'BAD_REQUEST', message: 'Invalid slug'})
       }
 
-      const db = getDB(ctx)
+      const teams = TeamRepo.action(ctx);
 
       // Check if slug is available
-      let dbResult;
-      try {
-        dbResult = await db.select()
-          .from(teamsTable)
-          .where(eq(teamsTable.slug, slug))
-      } catch (e: any) {
-        console.error('Error checking slug availability:', e);
-        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
-      }
-
-      const isSlugAvailable = dbResult.length === 0;
-      if (!isSlugAvailable) {
+      const existingTeam = await teams.findBySlug(slug);
+      if (existingTeam) {
         throw new ActionError({code: 'BAD_REQUEST', message: 'slug is used'})
       }
 
       // Create team in database
-      let team;
-      try {
-        [team] = await db.insert(teamsTable)
-          .values({
-            name: name,
-            slug: slug,
-            ownerId: user.id,
-          }).returning()
-      } catch (e: any) {
-        console.error('Error creating team:', e);
-        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
-      }
+      const team = await teams.create({
+        name: name,
+        slug: slug,
+        ownerId: user.id,
+      });
 
       // Initialize TeamDO and add creator as a member
       try {
@@ -133,19 +116,10 @@ export const teams = {
         throw new ActionError({code: 'BAD_REQUEST', message: 'name is required'})
       }
 
-      const db = getDB(ctx)
+      const teams = TeamRepo.action(ctx);
 
       // Check if team exists and user is the owner
-      let team;
-      try {
-        team = await db.select()
-          .from(teamsTable)
-          .where(eq(teamsTable.id, id))
-          .get()
-      } catch (e: any) {
-        console.error('Error fetching team:', e);
-        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
-      }
+      const team = await teams.findById(id);
 
       if (!team) {
         throw new ActionError({code: 'NOT_FOUND', message: 'Team not found'})
@@ -158,36 +132,17 @@ export const teams = {
 
       // Check if slug is available (if it's changed)
       if (slug !== team.slug) {
-        let dbResult;
-        try {
-          dbResult = await db.select()
-            .from(teamsTable)
-            .where(eq(teamsTable.slug, slug))
-        } catch (e: any) {
-          console.error('Error checking slug availability:', e);
-          throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
-        }
-
-        const isSlugAvailable = dbResult.length === 0;
-        if (!isSlugAvailable) {
+        const existingTeam = await teams.findBySlug(slug);
+        if (existingTeam) {
           throw new ActionError({code: 'BAD_REQUEST', message: 'slug is already in use'})
         }
       }
 
       // Update team in database
-      let updatedTeam;
-      try {
-        [updatedTeam] = await db.update(teamsTable)
-          .set({
-            name: name,
-            slug: slug,
-          })
-          .where(eq(teamsTable.id, id))
-          .returning()
-      } catch (e: any) {
-        console.error('Error updating team:', e);
-        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
-      }
+      const updatedTeam = await teams.update(id, {
+        name: name,
+        slug: slug,
+      });
 
       // Update TeamDO
       try {
@@ -220,19 +175,10 @@ export const teams = {
         throw new ActionError({code: 'UNAUTHORIZED'})
       }
 
-      const db = getDB(ctx)
+      const teams = TeamRepo.action(ctx);
 
       // Check if team exists and user is the owner
-      let team;
-      try {
-        team = await db.select()
-          .from(teamsTable)
-          .where(eq(teamsTable.id, teamId))
-          .get()
-      } catch (e: any) {
-        console.error('Error fetching team:', e);
-        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
-      }
+      const team = await teams.findById(teamId);
 
       if (!team) {
         throw new ActionError({code: 'NOT_FOUND', message: 'Team not found'})
@@ -244,18 +190,8 @@ export const teams = {
       }
 
       // Get all team members from the database
-      let memberIds: number[] = [];
-      try {
-        const members = await db.select()
-          .from(teamMembersTable)
-          .where(eq(teamMembersTable.teamId, teamId))
-          .all();
-
-        memberIds = members.map(member => member.userId);
-      } catch (e: any) {
-        console.error('Error fetching team members:', e);
-        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
-      }
+      const members = await teams.getTeamMembers(teamId);
+      const memberIds = members.map(member => member.userId);
 
       // Initialize TeamDO
       let teamStub;
@@ -309,19 +245,10 @@ export const teams = {
         throw new ActionError({code: 'UNAUTHORIZED'})
       }
 
-      const db = getDB(ctx)
+      const teams = TeamRepo.action(ctx);
 
       // Check if team exists
-      let team;
-      try {
-        team = await db.select()
-          .from(teamsTable)
-          .where(eq(teamsTable.id, teamId))
-          .get()
-      } catch (e: any) {
-        console.error('Error fetching team:', e);
-        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
-      }
+      const team = await teams.findById(teamId);
 
       if (!team) {
         throw new ActionError({code: 'NOT_FOUND', message: 'Team not found'})
@@ -395,19 +322,10 @@ export const teams = {
         throw new ActionError({code: 'UNAUTHORIZED'})
       }
 
-      const db = getDB(ctx)
+      const teams = TeamRepo.action(ctx);
 
       // Check if team exists and user is the owner
-      let team;
-      try {
-        team = await db.select()
-          .from(teamsTable)
-          .where(eq(teamsTable.id, teamId))
-          .get()
-      } catch (e: any) {
-        console.error('Error fetching team:', e);
-        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
-      }
+      const team = await teams.findById(teamId);
 
       if (!team) {
         throw new ActionError({code: 'NOT_FOUND', message: 'Team not found'})
@@ -486,6 +404,10 @@ export const teams = {
         throw new ActionError({code: 'BAD_REQUEST', message: 'slug is required'})
       }
 
+      // Note: We're still using generateTeamSlugAlternatives which uses direct DB access
+      // This is because the function is in a separate file and modifying it is outside the scope
+      // of the current migration task
+
       // Get alternatives using the generateTeamSlugAlternatives function
       // If it returns alternatives, the slug is not valid
       const alternatives = await generateTeamSlugAlternatives(ctx, slug, 3);
@@ -547,19 +469,11 @@ export const teamInvites = {
         throw new ActionError({code: 'UNAUTHORIZED'})
       }
 
-      const db = getDB(ctx)
+      const teams = TeamRepo.action(ctx);
+      const users = UserRepo.action(ctx);
 
       // Check if team exists and user is the owner
-      let team;
-      try {
-        team = await db.select()
-          .from(teamsTable)
-          .where(eq(teamsTable.id, teamId))
-          .get()
-      } catch (e: any) {
-        console.error('Error fetching team:', e);
-        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
-      }
+      const team = await teams.findById(teamId);
 
       if (!team) {
         throw new ActionError({code: 'NOT_FOUND', message: 'Team not found'})
@@ -582,19 +496,8 @@ export const teamInvites = {
       }
 
       console.log('invitedUserId', invitedUserId)
-      let userToInvite
-      try {
-        userToInvite = await db.select()
-          .from(accounts)
-          .where(and(
-            eq(accounts.userId, invitedUserId),
-            eq(accounts.provider, 'tiltify')
-          ))
-          .get()
-      } catch (e: any) {
-        console.error('Error initializing UserToInvite:', e);
-        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
-      }
+
+      const userToInvite = await users.getAccountByProvider(invitedUserId, 'tiltify')
 
       console.log('userToInvite', userToInvite)
 
@@ -655,19 +558,10 @@ export const teamInvites = {
         throw new ActionError({code: 'UNAUTHORIZED'})
       }
 
-      const db = getDB(ctx)
+      const teams = TeamRepo.action(ctx);
 
       // Check if team exists and user is the owner
-      let team;
-      try {
-        team = await db.select()
-          .from(teamsTable)
-          .where(eq(teamsTable.id, teamId))
-          .get()
-      } catch (e: any) {
-        console.error('Error fetching team:', e);
-        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
-      }
+      const team = await teams.findById(teamId);
 
       if (!team) {
         throw new ActionError({code: 'NOT_FOUND', message: 'Team not found'})
@@ -679,23 +573,9 @@ export const teamInvites = {
       }
 
       // Check if invite exists
-      let invite;
-      try {
-        invite = await db.select()
-          .from(teamInvitesTable)
-          .where(
-            and(
-              eq(teamInvitesTable.teamId, teamId),
-              eq(teamInvitesTable.invitedUserId, invitedUserId)
-            )
-          )
-          .get()
-      } catch (e: any) {
-        console.error('Error fetching invite:', e);
-        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
-      }
+      const hasInvite = await teams.hasInvite(teamId, invitedUserId);
 
-      if (!invite) {
+      if (!hasInvite) {
         throw new ActionError({code: 'NOT_FOUND', message: 'Invite not found'})
       }
 
@@ -754,42 +634,19 @@ export const teamInvites = {
         throw new ActionError({code: 'UNAUTHORIZED'})
       }
 
-      const db = getDB(ctx)
+      const teams = TeamRepo.action(ctx);
 
       // Check if team exists
-      let team;
-      try {
-        team = await db.select()
-          .from(teamsTable)
-          .where(eq(teamsTable.id, teamId))
-          .get()
-      } catch (e: any) {
-        console.error('Error fetching team:', e);
-        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
-      }
+      const team = await teams.findById(teamId);
 
       if (!team) {
         throw new ActionError({code: 'NOT_FOUND', message: 'Team not found'})
       }
 
       // Check if user has an invite
-      let invite;
-      try {
-        invite = await db.select()
-          .from(teamInvitesTable)
-          .where(
-            and(
-              eq(teamInvitesTable.teamId, teamId),
-              eq(teamInvitesTable.invitedUserId, user.id)
-            )
-          )
-          .get()
-      } catch (e: any) {
-        console.error('Error fetching invite:', e);
-        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
-      }
+      const hasInvite = await teams.hasInvite(teamId, user.id);
 
-      if (!invite) {
+      if (!hasInvite) {
         throw new ActionError({code: 'NOT_FOUND', message: 'Invite not found'})
       }
 
@@ -853,42 +710,19 @@ export const teamInvites = {
         throw new ActionError({code: 'UNAUTHORIZED'})
       }
 
-      const db = getDB(ctx)
+      const teams = TeamRepo.action(ctx);
 
       // Check if team exists
-      let team;
-      try {
-        team = await db.select()
-          .from(teamsTable)
-          .where(eq(teamsTable.id, teamId))
-          .get()
-      } catch (e: any) {
-        console.error('Error fetching team:', e);
-        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
-      }
+      const team = await teams.findById(teamId);
 
       if (!team) {
         throw new ActionError({code: 'NOT_FOUND', message: 'Team not found'})
       }
 
       // Check if user has an invite
-      let invite;
-      try {
-        invite = await db.select()
-          .from(teamInvitesTable)
-          .where(
-            and(
-              eq(teamInvitesTable.teamId, teamId),
-              eq(teamInvitesTable.invitedUserId, user.id)
-            )
-          )
-          .get()
-      } catch (e: any) {
-        console.error('Error fetching invite:', e);
-        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
-      }
+      const hasInvite = await teams.hasInvite(teamId, user.id);
 
-      if (!invite) {
+      if (!hasInvite) {
         throw new ActionError({code: 'NOT_FOUND', message: 'Invite not found'})
       }
 
