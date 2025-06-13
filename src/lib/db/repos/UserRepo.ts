@@ -1,17 +1,22 @@
-import {DrizzleD1Database} from "drizzle-orm/d1";
-import {Repo} from "./Repo";
-import {users, userTags, userSocials, accounts} from "../schema/auth-schema";
-import {eq, and, like, not, notInArray, desc, sql} from "drizzle-orm";
-import {DatabaseError} from "./DatabaseError";
+import {drizzle, DrizzleD1Database} from "drizzle-orm/d1";
+import {Repo, type RepoEnv} from "./Repo";
+import {accounts, users, userSocials, userTags} from "../schema/auth-schema";
 import type {InferSelectModel} from "drizzle-orm";
-import {getTiltifyTokenFromContext, getTiltifyUser} from "../../../functions/tiltify";
+import {and, desc, eq, like, not, notInArray, sql} from "drizzle-orm";
+import {DatabaseError} from "./DatabaseError";
+import {getTiltifyUser} from "../../../functions/tiltify";
+import type {ActionAPIContext} from "astro:actions";
 
 /**
  * Repository for working with users
  */
 export class UserRepo extends Repo<typeof users._['config']> {
-  constructor(db: DrizzleD1Database) {
-    super(db, users);
+  constructor(db: DrizzleD1Database, env: RepoEnv) {
+    super(db, users, env);
+  }
+
+  static action(ctx: ActionAPIContext) {
+    return new UserRepo(drizzle(ctx.locals.runtime.env.DB), 'action')
   }
 
   // region Basic User Operations
@@ -32,7 +37,11 @@ export class UserRepo extends Repo<typeof users._['config']> {
 
       return result || null;
     } catch (error) {
-      throw new DatabaseError(`Failed to find user by id: ${id}`, error);
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to find user by id: ${id}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to find user by id: ${id}`, error);
+      }
     }
   }
 
@@ -48,7 +57,11 @@ export class UserRepo extends Repo<typeof users._['config']> {
         .from(this.table)
         .all();
     } catch (error) {
-      throw new DatabaseError("Failed to find all users", error);
+      if (this.env === 'action') {
+        throw new DatabaseError("Failed to find all users", error).toActionError();
+      } else {
+        throw new DatabaseError("Failed to find all users", error);
+      }
     }
   }
 
@@ -67,7 +80,11 @@ export class UserRepo extends Repo<typeof users._['config']> {
 
       return result;
     } catch (error) {
-      throw new DatabaseError("Failed to create user", error);
+      if (this.env === 'action') {
+        throw new DatabaseError("Failed to create user", error).toActionError();
+      } else {
+        throw new DatabaseError("Failed to create user", error);
+      }
     }
   }
 
@@ -90,7 +107,11 @@ export class UserRepo extends Repo<typeof users._['config']> {
 
       return result;
     } catch (error) {
-      throw new DatabaseError(`Failed to update user with id: ${id}`, error);
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to update user with id: ${id}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to update user with id: ${id}`, error);
+      }
     }
   }
 
@@ -110,9 +131,14 @@ export class UserRepo extends Repo<typeof users._['config']> {
 
       return result.results.length > 0;
     } catch (error) {
-      throw new DatabaseError(`Failed to delete user with id: ${id}`, error);
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to delete user with id: ${id}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to delete user with id: ${id}`, error);
+      }
     }
   }
+
   // endregion Basic User Operations
 
   /**
@@ -129,7 +155,29 @@ export class UserRepo extends Repo<typeof users._['config']> {
         .where(eq(accounts.userId, userId))
         .all();
     } catch (error) {
-      throw new DatabaseError(`Failed to get accounts for user with id: ${userId}`, error);
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to get accounts for user with id: ${userId}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to get accounts for user with id: ${userId}`, error);
+      }
+    }
+  }
+
+  async getAccountByProvider(userId: number, provider: string) {
+    try {
+      return this.db.select()
+        .from(accounts)
+        .where(and(
+          eq(accounts.userId, userId),
+          eq(accounts.provider, provider)
+        ))
+        .get();
+    } catch (error) {
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to get accounts for user with id: ${userId} with provider ${provider}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to get accounts for user with id: ${userId} with provider ${provider}`, error);
+      }
     }
   }
 
@@ -139,12 +187,19 @@ export class UserRepo extends Repo<typeof users._['config']> {
    * @param userId The user ID
    * @returns Promise resolving to an object with the results of adding each social media link
    */
-  async fetchSocialsFromTiltify(tiltifyToken: string, userId: number): Promise<{ success: boolean, results: { provider: string, success: boolean }[] }> {
+  async fetchSocialsFromTiltify(tiltifyToken: string, userId: number): Promise<{
+    success: boolean,
+    results: { provider: string, success: boolean }[]
+  }> {
     try {
       // Get the Tiltify user data
       const tiltifyUser = await getTiltifyUser(tiltifyToken);
       if (!tiltifyUser) {
-        throw new DatabaseError('Failed to get Tiltify user data', null);
+        if (this.env === 'action') {
+          throw new DatabaseError('Failed to get Tiltify user data', null).toActionError();
+        } else {
+          throw new DatabaseError('Failed to get Tiltify user data', null);
+        }
       }
 
       const socials = tiltifyUser.data.social;
@@ -158,10 +213,10 @@ export class UserRepo extends Repo<typeof users._['config']> {
 
         try {
           const result = await this.addSocial(userId, 'twitch', twitchUrl);
-          results.push({ provider: 'twitch', success: !!result });
+          results.push({provider: 'twitch', success: !!result});
         } catch (error) {
           console.error('Error adding Twitch social:', error);
-          results.push({ provider: 'twitch', success: false });
+          results.push({provider: 'twitch', success: false});
         }
       }
 
@@ -173,10 +228,10 @@ export class UserRepo extends Repo<typeof users._['config']> {
 
         try {
           const result = await this.addSocial(userId, 'twitter', twitterUrl);
-          results.push({ provider: 'twitter', success: !!result });
+          results.push({provider: 'twitter', success: !!result});
         } catch (error) {
           console.error('Error adding Twitter social:', error);
-          results.push({ provider: 'twitter', success: false });
+          results.push({provider: 'twitter', success: false});
         }
       }
 
@@ -194,10 +249,10 @@ export class UserRepo extends Repo<typeof users._['config']> {
 
         try {
           const result = await this.addSocial(userId, 'youtube', youtubeUrl);
-          results.push({ provider: 'youtube', success: !!result });
+          results.push({provider: 'youtube', success: !!result});
         } catch (error) {
           console.error('Error adding YouTube social:', error);
-          results.push({ provider: 'youtube', success: false });
+          results.push({provider: 'youtube', success: false});
         }
       }
 
@@ -209,10 +264,10 @@ export class UserRepo extends Repo<typeof users._['config']> {
 
         try {
           const result = await this.addSocial(userId, 'instagram', instagramUrl);
-          results.push({ provider: 'instagram', success: !!result });
+          results.push({provider: 'instagram', success: !!result});
         } catch (error) {
           console.error('Error adding Instagram social:', error);
-          results.push({ provider: 'instagram', success: false });
+          results.push({provider: 'instagram', success: false});
         }
       }
 
@@ -224,10 +279,10 @@ export class UserRepo extends Repo<typeof users._['config']> {
 
         try {
           const result = await this.addSocial(userId, 'tiktok', tiktokUrl);
-          results.push({ provider: 'tiktok', success: !!result });
+          results.push({provider: 'tiktok', success: !!result});
         } catch (error) {
           console.error('Error adding TikTok social:', error);
-          results.push({ provider: 'tiktok', success: false });
+          results.push({provider: 'tiktok', success: false});
         }
       }
 
@@ -236,7 +291,11 @@ export class UserRepo extends Repo<typeof users._['config']> {
         results
       };
     } catch (error) {
-      throw new DatabaseError('Failed to fetch socials from Tiltify', error);
+      if (this.env === 'action') {
+        throw new DatabaseError('Failed to fetch socials from Tiltify', error).toActionError();
+      } else {
+        throw new DatabaseError('Failed to fetch socials from Tiltify', error);
+      }
     }
   }
 
@@ -250,7 +309,11 @@ export class UserRepo extends Repo<typeof users._['config']> {
    *
    * SQL: `SELECT "accounts"."userId", "accounts"."provider", "accounts"."providerUsername" FROM "accounts" WHERE ("accounts"."providerUsername" LIKE ? AND "accounts"."userId" != ?) LIMIT ?`
    */
-  async searchUser(searchTerm: string, currentUserId: number, limit: number = 5): Promise<{ userId: number, provider: string, providerName: string }[]> {
+  async searchUser(searchTerm: string, currentUserId: number, limit: number = 5): Promise<{
+    userId: number,
+    provider: string,
+    providerName: string
+  }[]> {
     try {
       const searchPattern = `%${searchTerm}%`;
 
@@ -269,9 +332,14 @@ export class UserRepo extends Repo<typeof users._['config']> {
         .limit(limit)
         .all();
     } catch (error) {
-      throw new DatabaseError(`Failed to search users with term: ${searchTerm}`, error);
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to search users with term: ${searchTerm}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to search users with term: ${searchTerm}`, error);
+      }
     }
   }
+
   // endregion User Search Operations
 
   // region User Tags Operations
@@ -289,7 +357,11 @@ export class UserRepo extends Repo<typeof users._['config']> {
         .where(eq(userTags.userId, userId))
         .all();
     } catch (error) {
-      throw new DatabaseError(`Failed to get tags for user with id: ${userId}`, error);
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to get tags for user with id: ${userId}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to get tags for user with id: ${userId}`, error);
+      }
     }
   }
 
@@ -315,7 +387,11 @@ export class UserRepo extends Repo<typeof users._['config']> {
 
       return result;
     } catch (error) {
-      throw new DatabaseError(`Failed to add tag ${tag} to user with id: ${userId}`, error);
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to add tag ${tag} to user with id: ${userId}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to add tag ${tag} to user with id: ${userId}`, error);
+      }
     }
   }
 
@@ -340,7 +416,11 @@ export class UserRepo extends Repo<typeof users._['config']> {
 
       return result.results.length > 0;
     } catch (error) {
-      throw new DatabaseError(`Failed to remove tag ${tag} from user with id: ${userId}`, error);
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to remove tag ${tag} from user with id: ${userId}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to remove tag ${tag} from user with id: ${userId}`, error);
+      }
     }
   }
 
@@ -357,7 +437,9 @@ export class UserRepo extends Repo<typeof users._['config']> {
         .select({
           tag: userTags.tag,
           label: userTags.label,
-          count: sql<number>`count(${userTags.tag})`.as('count')
+          count: sql<number>`count(
+          ${userTags.tag}
+          )`.as('count')
         })
         .from(userTags)
         .groupBy(userTags.tag)
@@ -367,7 +449,11 @@ export class UserRepo extends Repo<typeof users._['config']> {
         .limit(limit)
         .all();
     } catch (error) {
-      throw new DatabaseError(`Failed to get popular tags`, error);
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to get popular tags`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to get popular tags`, error);
+      }
     }
   }
 
@@ -381,7 +467,11 @@ export class UserRepo extends Repo<typeof users._['config']> {
    * 1. `SELECT "userTags"."tag" FROM "userTags" WHERE "userTags"."userId" = ?`
    * 2. `SELECT "userTags"."tag", "userTags"."label", count("userTags"."tag") as "count" FROM "userTags" WHERE "userTags"."tag" NOT IN (?) GROUP BY "userTags"."tag" ORDER BY "count" DESC LIMIT ?`
    */
-  async getSuggestedTagsForUser(userId: number, limit: number = 5): Promise<{ tag: string, label: string, count: number }[]> {
+  async getSuggestedTagsForUser(userId: number, limit: number = 5): Promise<{
+    tag: string,
+    label: string,
+    count: number
+  }[]> {
     try {
       // Get user's existing tags
       const userTagsList = await this.db
@@ -399,7 +489,9 @@ export class UserRepo extends Repo<typeof users._['config']> {
         .select({
           tag: userTags.tag,
           label: userTags.label,
-          count: sql<number>`count(${userTags.tag})`.as('count')
+          count: sql<number>`count(
+          ${userTags.tag}
+          )`.as('count')
         })
         .from(userTags)
         .where(
@@ -412,7 +504,11 @@ export class UserRepo extends Repo<typeof users._['config']> {
         .limit(limit)
         .all();
     } catch (error) {
-      throw new DatabaseError(`Failed to get suggested tags for user with id: ${userId}`, error);
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to get suggested tags for user with id: ${userId}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to get suggested tags for user with id: ${userId}`, error);
+      }
     }
   }
 
@@ -427,7 +523,11 @@ export class UserRepo extends Repo<typeof users._['config']> {
    * 1. `SELECT "userTags"."tag" FROM "userTags" WHERE "userTags"."userId" = ?`
    * 2. `SELECT "userTags"."tag", "userTags"."label", count("userTags"."tag") as "count" FROM "userTags" WHERE ("userTags"."tag" NOT IN (?) AND "userTags"."tag" LIKE ?) GROUP BY "userTags"."tag" ORDER BY "count" DESC LIMIT ?`
    */
-  async getSuggestedTagsForUserBySearchTerm(userId: number, term: string, limit: number = 5): Promise<{ tag: string, label: string, count: number }[]> {
+  async getSuggestedTagsForUserBySearchTerm(userId: number, term: string, limit: number = 5): Promise<{
+    tag: string,
+    label: string,
+    count: number
+  }[]> {
     try {
       // Get user's existing tags
       const userTagsList = await this.db
@@ -445,7 +545,9 @@ export class UserRepo extends Repo<typeof users._['config']> {
         .select({
           tag: userTags.tag,
           label: userTags.label,
-          count: sql<number>`count(${userTags.tag})`.as('count')
+          count: sql<number>`count(
+          ${userTags.tag}
+          )`.as('count')
         })
         .from(userTags)
         .where(
@@ -461,9 +563,14 @@ export class UserRepo extends Repo<typeof users._['config']> {
         .limit(limit)
         .all();
     } catch (error) {
-      throw new DatabaseError(`Failed to get suggested tags for user with id: ${userId} and term: ${term}`, error);
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to get suggested tags for user with id: ${userId} and term: ${term}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to get suggested tags for user with id: ${userId} and term: ${term}`, error);
+      }
     }
   }
+
   // endregion User Tags Operations
 
   // region User Socials Operations
@@ -481,7 +588,11 @@ export class UserRepo extends Repo<typeof users._['config']> {
         .where(eq(userSocials.userId, userId))
         .all();
     } catch (error) {
-      throw new DatabaseError(`Failed to get social media links for user with id: ${userId}`, error);
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to get social media links for user with id: ${userId}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to get social media links for user with id: ${userId}`, error);
+      }
     }
   }
 
@@ -513,7 +624,7 @@ export class UserRepo extends Repo<typeof users._['config']> {
       if (existingSocial) {
         // Update existing social media link
         const [result] = await this.db.update(userSocials)
-          .set({ url })
+          .set({url})
           .where(
             and(
               eq(userSocials.userId, userId),
@@ -534,7 +645,11 @@ export class UserRepo extends Repo<typeof users._['config']> {
         return result;
       }
     } catch (error) {
-      throw new DatabaseError(`Failed to add social media link for provider ${provider} to user with id: ${userId}`, error);
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to add social media link for provider ${provider} to user with id: ${userId}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to add social media link for provider ${provider} to user with id: ${userId}`, error);
+      }
     }
   }
 
@@ -559,8 +674,13 @@ export class UserRepo extends Repo<typeof users._['config']> {
 
       return result.results.length > 0;
     } catch (error) {
-      throw new DatabaseError(`Failed to remove social media link for provider ${provider} from user with id: ${userId}`, error);
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to remove social media link for provider ${provider} from user with id: ${userId}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to remove social media link for provider ${provider} from user with id: ${userId}`, error);
+      }
     }
   }
+
   // endregion User Socials Operations
 }

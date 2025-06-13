@@ -6,16 +6,19 @@ import {eq} from "drizzle-orm";
 import {DatabaseError} from "./DatabaseError";
 import type {InferInsertModel, InferSelectModel} from "drizzle-orm";
 
+export type RepoEnv = 'action' | 'do'
 
 export abstract class Repo<
   T extends TableConfig
 > {
   protected db: DrizzleD1Database;
   protected table: SQLiteTableWithColumns<T>;
+  protected env: RepoEnv
 
-  protected constructor(db: DrizzleD1Database, table: SQLiteTableWithColumns<T>) {
+  protected constructor(db: DrizzleD1Database, table: SQLiteTableWithColumns<T>, env: RepoEnv) {
     this.db = db;
     this.table = table;
+    this.env = env;
   }
 
   /**

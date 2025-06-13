@@ -1,16 +1,21 @@
-import {DrizzleD1Database} from "drizzle-orm/d1";
-import {Repo} from "./Repo";
+import {drizzle, DrizzleD1Database} from "drizzle-orm/d1";
+import {Repo, type RepoEnv} from "./Repo";
 import {teamInvitesTable, teamMembersTable, teamsTable} from "../schema/schema";
 import type {InferInsertModel, InferSelectModel} from "drizzle-orm";
 import {and, eq} from "drizzle-orm";
 import {DatabaseError} from "./DatabaseError";
+import type {ActionAPIContext} from "astro:actions";
 
 /**
  * Repository for working with teams
  */
 export class TeamRepo extends Repo<typeof teamsTable._['config']> {
-  constructor(db: DrizzleD1Database) {
-    super(db, teamsTable);
+  constructor(db: DrizzleD1Database, env: RepoEnv) {
+    super(db, teamsTable, env);
+  }
+
+  static action(ctx: ActionAPIContext) {
+    return new TeamRepo(drizzle(ctx.locals.runtime.env.DB), 'action')
   }
 
   // region Basic Team Operations
@@ -30,7 +35,11 @@ export class TeamRepo extends Repo<typeof teamsTable._['config']> {
 
       return result || null;
     } catch (error) {
-      throw new DatabaseError(`Failed to find team by id: ${id}`, error);
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to find team by id: ${id}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to find team by id: ${id}`, error);
+      }
     }
   }
 
@@ -50,7 +59,11 @@ export class TeamRepo extends Repo<typeof teamsTable._['config']> {
 
       return result || null;
     } catch (error) {
-      throw new DatabaseError(`Failed to find team by slug: ${slug}`, error);
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to find team by slug: ${slug}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to find team by slug: ${slug}`, error);
+      }
     }
   }
 
@@ -68,7 +81,11 @@ export class TeamRepo extends Repo<typeof teamsTable._['config']> {
         .where(eq(this.table.ownerId, ownerId))
         .all();
     } catch (error) {
-      throw new DatabaseError(`Failed to find teams by owner ID: ${ownerId}`, error);
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to find teams by owner ID: ${ownerId}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to find teams by owner ID: ${ownerId}`, error);
+      }
     }
   }
 
@@ -85,7 +102,11 @@ export class TeamRepo extends Repo<typeof teamsTable._['config']> {
         .where(eq(this.table.visible, true))
         .all();
     } catch (error) {
-      throw new DatabaseError("Failed to find visible teams", error);
+      if (this.env === 'action') {
+        throw new DatabaseError("Failed to find visible teams", error).toActionError();
+      } else {
+        throw new DatabaseError("Failed to find visible teams", error);
+      }
     }
   }
 
@@ -101,7 +122,11 @@ export class TeamRepo extends Repo<typeof teamsTable._['config']> {
         .from(this.table)
         .all();
     } catch (error) {
-      throw new DatabaseError("Failed to find all teams", error);
+      if (this.env === 'action') {
+        throw new DatabaseError("Failed to find all teams", error).toActionError();
+      } else {
+        throw new DatabaseError("Failed to find all teams", error);
+      }
     }
   }
 
@@ -120,7 +145,11 @@ export class TeamRepo extends Repo<typeof teamsTable._['config']> {
 
       return result;
     } catch (error) {
-      throw new DatabaseError("Failed to create team", error);
+      if (this.env === 'action') {
+        throw new DatabaseError("Failed to create team", error).toActionError();
+      } else {
+        throw new DatabaseError("Failed to create team", error);
+      }
     }
   }
 
@@ -141,7 +170,11 @@ export class TeamRepo extends Repo<typeof teamsTable._['config']> {
 
       return result;
     } catch (error) {
-      throw new DatabaseError(`Failed to update team with id: ${id}`, error);
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to update team with id: ${id}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to update team with id: ${id}`, error);
+      }
     }
   }
 
@@ -160,7 +193,11 @@ export class TeamRepo extends Repo<typeof teamsTable._['config']> {
 
       return result.results.length > 0;
     } catch (error) {
-      throw new DatabaseError(`Failed to delete team with id: ${id}`, error);
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to delete team with id: ${id}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to delete team with id: ${id}`, error);
+      }
     }
   }
 
@@ -181,7 +218,11 @@ export class TeamRepo extends Repo<typeof teamsTable._['config']> {
         .where(eq(teamMembersTable.teamId, teamId))
         .all();
     } catch (error) {
-      throw new DatabaseError(`Failed to get members for team with id: ${teamId}`, error);
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to get members for team with id: ${teamId}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to get members for team with id: ${teamId}`, error);
+      }
     }
   }
 
@@ -204,7 +245,11 @@ export class TeamRepo extends Repo<typeof teamsTable._['config']> {
 
       return result;
     } catch (error) {
-      throw new DatabaseError(`Failed to add user ${userId} to team with id: ${teamId}`, error);
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to add user ${userId} to team with id: ${teamId}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to add user ${userId} to team with id: ${teamId}`, error);
+      }
     }
   }
 
@@ -229,7 +274,11 @@ export class TeamRepo extends Repo<typeof teamsTable._['config']> {
 
       return result.results.length > 0;
     } catch (error) {
-      throw new DatabaseError(`Failed to remove user ${userId} from team with id: ${teamId}`, error);
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to remove user ${userId} from team with id: ${teamId}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to remove user ${userId} from team with id: ${teamId}`, error);
+      }
     }
   }
 
@@ -255,7 +304,11 @@ export class TeamRepo extends Repo<typeof teamsTable._['config']> {
 
       return !!result;
     } catch (error) {
-      throw new DatabaseError(`Failed to check if user ${userId} is a member of team with id: ${teamId}`, error);
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to check if user ${userId} is a member of team with id: ${teamId}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to check if user ${userId} is a member of team with id: ${teamId}`, error);
+      }
     }
   }
 
@@ -276,7 +329,11 @@ export class TeamRepo extends Repo<typeof teamsTable._['config']> {
         .where(eq(teamInvitesTable.teamId, teamId))
         .all();
     } catch (error) {
-      throw new DatabaseError(`Failed to get invites for team with id: ${teamId}`, error);
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to get invites for team with id: ${teamId}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to get invites for team with id: ${teamId}`, error);
+      }
     }
   }
 
@@ -294,7 +351,11 @@ export class TeamRepo extends Repo<typeof teamsTable._['config']> {
         .where(eq(teamInvitesTable.invitedUserId, userId))
         .all();
     } catch (error) {
-      throw new DatabaseError(`Failed to get invites for user with id: ${userId}`, error);
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to get invites for user with id: ${userId}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to get invites for user with id: ${userId}`, error);
+      }
     }
   }
 
@@ -317,7 +378,11 @@ export class TeamRepo extends Repo<typeof teamsTable._['config']> {
 
       return result;
     } catch (error) {
-      throw new DatabaseError(`Failed to add invite for user ${invitedUserId} to team with id: ${teamId}`, error);
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to add invite for user ${invitedUserId} to team with id: ${teamId}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to add invite for user ${invitedUserId} to team with id: ${teamId}`, error);
+      }
     }
   }
 
@@ -342,7 +407,11 @@ export class TeamRepo extends Repo<typeof teamsTable._['config']> {
 
       return result.results.length > 0;
     } catch (error) {
-      throw new DatabaseError(`Failed to delete invite for user ${invitedUserId} from team with id: ${teamId}`, error);
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to delete invite for user ${invitedUserId} from team with id: ${teamId}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to delete invite for user ${invitedUserId} from team with id: ${teamId}`, error);
+      }
     }
   }
 
@@ -368,7 +437,11 @@ export class TeamRepo extends Repo<typeof teamsTable._['config']> {
 
       return !!result;
     } catch (error) {
-      throw new DatabaseError(`Failed to check if user ${invitedUserId} has been invited to team with id: ${teamId}`, error);
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to check if user ${invitedUserId} has been invited to team with id: ${teamId}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to check if user ${invitedUserId} has been invited to team with id: ${teamId}`, error);
+      }
     }
   }
 
@@ -399,7 +472,11 @@ export class TeamRepo extends Repo<typeof teamsTable._['config']> {
 
       return true;
     } catch (error) {
-      throw new DatabaseError(`Failed to accept invite for user ${invitedUserId} to team with id: ${teamId}`, error);
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to accept invite for user ${invitedUserId} to team with id: ${teamId}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to accept invite for user ${invitedUserId} to team with id: ${teamId}`, error);
+      }
     }
   }
 
@@ -415,7 +492,11 @@ export class TeamRepo extends Repo<typeof teamsTable._['config']> {
     try {
       return await this.deleteInvite(teamId, invitedUserId);
     } catch (error) {
-      throw new DatabaseError(`Failed to reject invite for user ${invitedUserId} to team with id: ${teamId}`, error);
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to reject invite for user ${invitedUserId} to team with id: ${teamId}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to reject invite for user ${invitedUserId} to team with id: ${teamId}`, error);
+      }
     }
   }
 

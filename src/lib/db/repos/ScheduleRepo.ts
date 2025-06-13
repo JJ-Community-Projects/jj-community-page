@@ -1,17 +1,21 @@
-import {DrizzleD1Database} from "drizzle-orm/d1";
-import {Repo} from "./Repo";
+import {drizzle, DrizzleD1Database} from "drizzle-orm/d1";
+import {Repo, type RepoEnv} from "./Repo";
 import {schedulesTable, streamParticipantsTable, streamsTable, streamTagsTable} from "../schema/schema";
-import type {InferInsertModel, InferSelectModel} from "drizzle-orm";
-import {and, eq} from "drizzle-orm";
+import {and, desc, eq, type InferInsertModel, type InferSelectModel, like, notInArray, sql} from "drizzle-orm";
 import {DatabaseError} from "./DatabaseError";
 import {DateTime} from "luxon";
+import type {ActionAPIContext} from "astro:actions";
 
 /**
  * Repository for working with schedules
  */
 export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
-  constructor(db: DrizzleD1Database) {
-    super(db, schedulesTable);
+  constructor(db: DrizzleD1Database, env: RepoEnv) {
+    super(db, schedulesTable, env);
+  }
+
+  static action(ctx: ActionAPIContext) {
+    return new ScheduleRepo(drizzle(ctx.locals.runtime.env.DB), 'action')
   }
 
   // region Schedule Operations
@@ -32,7 +36,11 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
 
       return result || null;
     } catch (error) {
-      throw new DatabaseError(`Failed to find record by id: ${id}`, error);
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to find record by id: ${id}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to find record by id: ${id}`, error);
+      }
     }
   }
 
@@ -52,7 +60,11 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
 
       return result || null;
     } catch (error) {
-      throw new DatabaseError(`Failed to find schedule by slug: ${slug}`, error);
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to find schedule by slug: ${slug}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to find schedule by slug: ${slug}`, error);
+      }
     }
   }
 
@@ -70,7 +82,11 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
         .where(eq(this.table.ownerId, ownerId))
         .all();
     } catch (error) {
-      throw new DatabaseError(`Failed to find schedules by owner ID: ${ownerId}`, error);
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to find schedules by owner ID: ${ownerId}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to find schedules by owner ID: ${ownerId}`, error);
+      }
     }
   }
 
@@ -87,7 +103,11 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
         .where(eq(this.table.visible, true))
         .all();
     } catch (error) {
-      throw new DatabaseError("Failed to find visible schedules", error);
+      if (this.env === 'action') {
+        throw new DatabaseError("Failed to find visible schedules", error).toActionError();
+      } else {
+        throw new DatabaseError("Failed to find visible schedules", error);
+      }
     }
   }
 
@@ -103,7 +123,11 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
         .from(this.table)
         .all();
     } catch (error) {
-      throw new DatabaseError("Failed to find all records", error);
+      if (this.env === 'action') {
+        throw new DatabaseError("Failed to find all records", error).toActionError();
+      } else {
+        throw new DatabaseError("Failed to find all records", error);
+      }
     }
   }
 
@@ -122,7 +146,11 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
 
       return result;
     } catch (error) {
-      throw new DatabaseError("Failed to create record", error);
+      if (this.env === 'action') {
+        throw new DatabaseError("Failed to create record", error).toActionError();
+      } else {
+        throw new DatabaseError("Failed to create record", error);
+      }
     }
   }
 
@@ -146,7 +174,11 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
 
       return result;
     } catch (error) {
-      throw new DatabaseError(`Failed to update record with id: ${id}`, error);
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to update record with id: ${id}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to update record with id: ${id}`, error);
+      }
     }
   }
 
@@ -168,7 +200,11 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
 
       return result.length > 0;
     } catch (error) {
-      throw new DatabaseError(`Failed to delete record with id: ${id}`, error);
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to delete record with id: ${id}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to delete record with id: ${id}`, error);
+      }
     }
   }
 
@@ -239,7 +275,11 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
 
       return result;
     } catch (error) {
-      throw new DatabaseError(`Failed to find streams with details for schedule ID: ${scheduleId}`, error);
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to find streams with details for schedule ID: ${scheduleId}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to find streams with details for schedule ID: ${scheduleId}`, error);
+      }
     }
   }
 
@@ -257,7 +297,11 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
         .where(eq(streamsTable.scheduleId, scheduleId))
         .all();
     } catch (error) {
-      throw new DatabaseError(`Failed to find streams by schedule ID: ${scheduleId}`, error);
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to find streams by schedule ID: ${scheduleId}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to find streams by schedule ID: ${scheduleId}`, error);
+      }
     }
   }
 
@@ -281,7 +325,11 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
 
       return result || null;
     } catch (error) {
-      throw new DatabaseError(`Failed to find stream by ID: ${streamId} in schedule: ${scheduleId}`, error);
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to find stream by ID: ${streamId} in schedule: ${scheduleId}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to find stream by ID: ${streamId} in schedule: ${scheduleId}`, error);
+      }
     }
   }
 
@@ -307,7 +355,11 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
 
       return result;
     } catch (error) {
-      throw new DatabaseError(`Failed to create stream for schedule: ${data.scheduleId}`, error);
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to create stream for schedule: ${data.scheduleId}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to create stream for schedule: ${data.scheduleId}`, error);
+      }
     }
   }
 
@@ -341,7 +393,11 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
 
       return result;
     } catch (error) {
-      throw new DatabaseError(`Failed to update stream with ID: ${streamId} in schedule: ${scheduleId}`, error);
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to update stream with ID: ${streamId} in schedule: ${scheduleId}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to update stream with ID: ${streamId} in schedule: ${scheduleId}`, error);
+      }
     }
   }
 
@@ -364,7 +420,11 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
 
       return result.length > 0;
     } catch (error) {
-      throw new DatabaseError(`Failed to delete stream with ID: ${streamId} in schedule: ${scheduleId}`, error);
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to delete stream with ID: ${streamId} in schedule: ${scheduleId}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to delete stream with ID: ${streamId} in schedule: ${scheduleId}`, error);
+      }
     }
   }
 
@@ -390,7 +450,11 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
         ))
         .all();
     } catch (error) {
-      throw new DatabaseError(`Failed to find tags for stream: ${streamId} in schedule: ${scheduleId}`, error);
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to find tags for stream: ${streamId} in schedule: ${scheduleId}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to find tags for stream: ${streamId} in schedule: ${scheduleId}`, error);
+      }
     }
   }
 
@@ -421,7 +485,11 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
 
       return result;
     } catch (error) {
-      throw new DatabaseError(`Failed to add tag: ${tag} to stream: ${streamId} in schedule: ${scheduleId}`, error);
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to add tag: ${tag} to stream: ${streamId} in schedule: ${scheduleId}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to add tag: ${tag} to stream: ${streamId} in schedule: ${scheduleId}`, error);
+      }
     }
   }
 
@@ -448,7 +516,98 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
 
       return result.length > 0;
     } catch (error) {
-      throw new DatabaseError(`Failed to remove tag: ${tag} from stream: ${streamId} in schedule: ${scheduleId}`, error);
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to remove tag: ${tag} from stream: ${streamId} in schedule: ${scheduleId}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to remove tag: ${tag} from stream: ${streamId} in schedule: ${scheduleId}`, error);
+      }
+    }
+  }
+
+  async getPopularTags(limit: number) {
+    try {
+      return this.db
+        .select({
+          tag: streamTagsTable.tag,
+          label: streamTagsTable.label,
+          count: sql<number>`count(
+          ${streamTagsTable.tag}
+          )`.as('count')
+        })
+        .from(streamTagsTable)
+        .groupBy(streamTagsTable.tag)
+        .orderBy((s) => {
+          return desc(s.count)
+        })
+        .limit(limit)
+        .all();
+    } catch (error) {
+      if (this.env === 'action') {
+        throw new DatabaseError('Failed to get popular tags', error).toActionError()
+      } else {
+        throw new DatabaseError('Failed to get popular tags', error);
+      }
+    }
+  }
+
+  async getSuggestedTagsForStream(streamId: number, scheduleId: number, limit: number, tags: string[]) {
+    try {
+      return this.db
+        .select({
+          tag: streamTagsTable.tag,
+          label: streamTagsTable.label,
+          count: sql<number>`count(
+          ${streamTagsTable.tag}
+          )`.as('count')
+        })
+        .from(streamTagsTable)
+        .where(
+          notInArray(streamTagsTable.tag, tags)
+        )
+        .groupBy(streamTagsTable.tag)
+        .orderBy((s) => {
+          return desc(s.count)
+        })
+        .limit(limit)
+        .all();
+    } catch (error) {
+      if (this.env === 'action') {
+        throw new DatabaseError('Failed to get suggested tags', error).toActionError()
+      } else {
+        throw new DatabaseError('Failed to get suggested tags', error);
+      }
+    }
+  }
+
+  async getSuggestedTagsForStreamBySearchTerm(streamId: number, scheduleId: number, limit: number, tags: string[], term: string) {
+    try {
+      return this.db
+        .select({
+          tag: streamTagsTable.tag,
+          label: streamTagsTable.label,
+          count: sql<number>`count(
+          ${streamTagsTable.tag}
+          )`.as('count')
+        })
+        .from(streamTagsTable)
+        .where(
+          and(
+            notInArray(streamTagsTable.tag, tags),
+            like(streamTagsTable.tag, `%${term.toLowerCase()}%`)
+          )
+        )
+        .groupBy(streamTagsTable.tag)
+        .orderBy((s) => {
+          return desc(s.count)
+        })
+        .limit(limit)
+        .all();
+    } catch (error) {
+      if (this.env === 'action') {
+        throw new DatabaseError('Failed to get suggested tags', error).toActionError()
+      } else {
+        throw new DatabaseError('Failed to get suggested tags', error);
+      }
     }
   }
 
@@ -474,7 +633,11 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
         ))
         .all();
     } catch (error) {
-      throw new DatabaseError(`Failed to find participants for stream: ${streamId} in schedule: ${scheduleId}`, error);
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to find participants for stream: ${streamId} in schedule: ${scheduleId}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to find participants for stream: ${streamId} in schedule: ${scheduleId}`, error);
+      }
     }
   }
 
@@ -499,7 +662,11 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
 
       return result;
     } catch (error) {
-      throw new DatabaseError(`Failed to add participant: ${userId} to stream: ${streamId} in schedule: ${scheduleId}`, error);
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to add participant: ${userId} to stream: ${streamId} in schedule: ${scheduleId}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to add participant: ${userId} to stream: ${streamId} in schedule: ${scheduleId}`, error);
+      }
     }
   }
 
@@ -524,7 +691,11 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
 
       return result.length > 0;
     } catch (error) {
-      throw new DatabaseError(`Failed to remove participant: ${userId} from stream: ${streamId} in schedule: ${scheduleId}`, error);
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to remove participant: ${userId} from stream: ${streamId} in schedule: ${scheduleId}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to remove participant: ${userId} from stream: ${streamId} in schedule: ${scheduleId}`, error);
+      }
     }
   }
 
