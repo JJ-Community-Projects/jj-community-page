@@ -1,6 +1,19 @@
 import {type ActionAPIContext, ActionError} from "astro:actions";
 
-
+/**
+ * Retrieves a UserDO Durable Object stub for a given user ID.
+ *
+ * IMPORTANT: This function can only be called inside Astro actions.
+ * It requires the ActionAPIContext which is only available within action handlers.
+ *
+ * @param context - The Astro action context containing runtime environment
+ * @param userId - The numeric ID of the user to get the Durable Object for
+ * @returns A Durable Object stub that can be used to interact with the UserDO
+ * @throws ActionError with INTERNAL_SERVER_ERROR code if:
+ *   - The UserDO is not accessible in the environment
+ *   - There's an error creating the Durable Object ID
+ *   - There's an error getting the Durable Object stub
+ */
 export function getUserDO(context: ActionAPIContext, userId: number) {
   // Get Durable Object reference
   let DO;
@@ -14,7 +27,10 @@ export function getUserDO(context: ActionAPIContext, userId: number) {
     });
   }
   if (!DO) {
-    throw new Error('UserDO not available');
+    throw new ActionError({
+      code: 'INTERNAL_SERVER_ERROR',
+      message: 'UserDO not available'
+    });
   }
   // Create Durable Object ID
   let id;
@@ -40,6 +56,20 @@ export function getUserDO(context: ActionAPIContext, userId: number) {
   }
 }
 
+/**
+ * Retrieves a ScheduleEditorDO Durable Object stub for a given schedule ID.
+ *
+ * IMPORTANT: This function can only be called inside Astro actions.
+ * It requires the ActionAPIContext which is only available within action handlers.
+ *
+ * @param context - The Astro action context containing runtime environment
+ * @param scheduleId - The numeric ID of the schedule to get the Durable Object for
+ * @returns A Durable Object stub that can be used to interact with the ScheduleEditorDO
+ * @throws ActionError with INTERNAL_SERVER_ERROR code if:
+ *   - The ScheduleEditorDO is not accessible in the environment
+ *   - There's an error creating the Durable Object ID
+ *   - There's an error getting the Durable Object stub
+ */
 export function getScheduleEditorDO(context: ActionAPIContext, scheduleId: number) {
   // Get Durable Object reference
   let DO;
@@ -53,7 +83,10 @@ export function getScheduleEditorDO(context: ActionAPIContext, scheduleId: numbe
     });
   }
   if (!DO) {
-    throw new Error('ScheduleEditorDO not available');
+    throw new ActionError({
+      code: 'INTERNAL_SERVER_ERROR',
+      message: 'ScheduleEditorDO not available'
+    });
   }
   // Create Durable Object ID
   let id;
@@ -79,6 +112,20 @@ export function getScheduleEditorDO(context: ActionAPIContext, scheduleId: numbe
   }
 }
 
+/**
+ * Retrieves a TeamDO Durable Object stub for a given team ID.
+ *
+ * IMPORTANT: This function can only be called inside Astro actions.
+ * It requires the ActionAPIContext which is only available within action handlers.
+ *
+ * @param context - The Astro action context containing runtime environment
+ * @param teamId - The numeric ID of the team to get the Durable Object for
+ * @returns A Durable Object stub that can be used to interact with the TeamDO
+ * @throws ActionError with INTERNAL_SERVER_ERROR code if:
+ *   - The TeamDO is not accessible in the environment
+ *   - There's an error creating the Durable Object ID
+ *   - There's an error getting the Durable Object stub
+ */
 export function getTeamDO(context: ActionAPIContext, teamId: number) {
   // Get Durable Object reference
   let DO;
@@ -92,7 +139,10 @@ export function getTeamDO(context: ActionAPIContext, teamId: number) {
     });
   }
   if (!DO) {
-    throw new Error('TeamDO not available');
+    throw new ActionError({
+      code: 'INTERNAL_SERVER_ERROR',
+      message: 'TeamDO not available'
+    });
   }
   // Create Durable Object ID
   let id;
