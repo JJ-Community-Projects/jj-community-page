@@ -4,6 +4,7 @@ import {getTags} from "../functions/getTags.ts";
 import {socialUrlRegex} from "../functions/socialUrlRegex.ts";
 import {getTiltifyTokenFromContext, getTiltifyUser} from "../functions/tiltify.ts";
 import {UserRepo} from "../lib/db/repos/UserRepo.ts";
+import {getUserDO} from "./getDO.ts";
 
 export const users = {
   /**
@@ -57,46 +58,8 @@ export const users = {
       }
 
       // 4. Set the user socials using the Tiltify data
-      // Get Durable Object reference
-      let DO;
-      try {
-        DO = context.locals.runtime.env.UserDO;
-      } catch (error) {
-        console.error('Error accessing UserDO:', error);
-        throw new ActionError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to access user data object'
-        });
-      }
-      if (!DO) {
-        throw new Error('UserDO not available');
-      }
-
       const userId = user.id;
-
-      // Create Durable Object ID
-      let id;
-      try {
-        id = DO.idFromName(`${userId}`);
-      } catch (error) {
-        console.error('Error creating DO ID:', error);
-        throw new ActionError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to create user identifier'
-        });
-      }
-
-      // Get Durable Object stub
-      let stub;
-      try {
-        stub = DO.get(id);
-      } catch (error) {
-        console.error('Error getting DO stub:', error);
-        throw new ActionError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to access user data'
-        });
-      }
+      const stub = getUserDO(context, userId);
 
       // Add socials from Tiltify data
       const socials = tiltifyUser.data.social;
@@ -265,46 +228,8 @@ export const users = {
         throw new ActionError({code: 'UNAUTHORIZED'});
       }
 
-      // Get Durable Object reference
-      let DO;
-      try {
-        DO = context.locals.runtime.env.UserDO;
-      } catch (error) {
-        console.error('Error accessing UserDO:', error);
-        throw new ActionError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to access user data object'
-        });
-      }
-      if (!DO) {
-        throw new Error('UserDO not available');
-      }
-
       const userId = user.id;
-
-      // Create Durable Object ID
-      let id;
-      try {
-        id = DO.idFromName(`${userId}`);
-      } catch (error) {
-        console.error('Error creating DO ID:', error);
-        throw new ActionError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to create user identifier'
-        });
-      }
-
-      // Get Durable Object stub
-      let stub;
-      try {
-        stub = DO.get(id);
-      } catch (error) {
-        console.error('Error getting DO stub:', error);
-        throw new ActionError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to access user data'
-        });
-      }
+      const stub = getUserDO(context, userId);
 
       // Add social
       try {
@@ -354,46 +279,8 @@ export const users = {
         throw new ActionError({code: 'UNAUTHORIZED'});
       }
 
-      // Get Durable Object reference
-      let DO;
-      try {
-        DO = context.locals.runtime.env.UserDO;
-      } catch (error) {
-        console.error('Error accessing UserDO:', error);
-        throw new ActionError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to access user data object'
-        });
-      }
-      if (!DO) {
-        throw new Error('UserDO not available');
-      }
-
       const userId = user.id;
-
-      // Create Durable Object ID
-      let id;
-      try {
-        id = DO.idFromName(`${userId}`);
-      } catch (error) {
-        console.error('Error creating DO ID:', error);
-        throw new ActionError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to create user identifier'
-        });
-      }
-
-      // Get Durable Object stub
-      let stub;
-      try {
-        stub = DO.get(id);
-      } catch (error) {
-        console.error('Error getting DO stub:', error);
-        throw new ActionError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to access user data'
-        });
-      }
+      const stub = getUserDO(context, userId);
 
       // Remove social
       try {
@@ -442,46 +329,8 @@ export const users = {
         throw new ActionError({code: 'UNAUTHORIZED'});
       }
 
-      // Get Durable Object reference
-      let DO;
-      try {
-        DO = context.locals.runtime.env.UserDO;
-      } catch (error) {
-        console.error('Error accessing UserDO:', error);
-        throw new ActionError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to access user data object'
-        });
-      }
-      if (!DO) {
-        throw new Error('UserDO not available');
-      }
-
       const userId = user.id;
-
-      // Create Durable Object ID
-      let id;
-      try {
-        id = DO.idFromName(`${userId}`);
-      } catch (error) {
-        console.error('Error creating DO ID:', error);
-        throw new ActionError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to create user identifier'
-        });
-      }
-
-      // Get Durable Object stub
-      let stub;
-      try {
-        stub = DO.get(id);
-      } catch (error) {
-        console.error('Error getting DO stub:', error);
-        throw new ActionError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to access user data'
-        });
-      }
+      const stub = getUserDO(context, userId);
 
       // Add tag
       try {
@@ -529,46 +378,8 @@ export const users = {
         throw new ActionError({code: 'UNAUTHORIZED'});
       }
 
-      // Get Durable Object reference
-      let DO;
-      try {
-        DO = context.locals.runtime.env.UserDO;
-      } catch (error) {
-        console.error('Error accessing UserDO:', error);
-        throw new ActionError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to access user data object'
-        });
-      }
-      if (!DO) {
-        throw new Error('UserDO not available');
-      }
-
       const userId = user.id;
-
-      // Create Durable Object ID
-      let id;
-      try {
-        id = DO.idFromName(userId);
-      } catch (error) {
-        console.error('Error creating DO ID:', error);
-        throw new ActionError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to create user identifier'
-        });
-      }
-
-      // Get Durable Object stub
-      let stub;
-      try {
-        stub = DO.get(id);
-      } catch (error) {
-        console.error('Error getting DO stub:', error);
-        throw new ActionError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to access user data'
-        });
-      }
+      const stub = getUserDO(context, userId);
 
       // Remove tag
       try {
@@ -633,46 +444,8 @@ export const users = {
         throw new ActionError({code: 'UNAUTHORIZED'});
       }
 
-      // Get Durable Object reference
-      let DO;
-      try {
-        DO = context.locals.runtime.env.UserDO;
-      } catch (error) {
-        console.error('Error accessing UserDO:', error);
-        throw new ActionError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to access user data object'
-        });
-      }
-      if (!DO) {
-        throw new Error('UserDO not available');
-      }
-
       const userId = user.id;
-
-      // Create Durable Object ID
-      let id;
-      try {
-        id = DO.idFromName(userId);
-      } catch (error) {
-        console.error('Error creating DO ID:', error);
-        throw new ActionError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to create user identifier'
-        });
-      }
-
-      // Get Durable Object stub
-      let stub;
-      try {
-        stub = DO.get(id);
-      } catch (error) {
-        console.error('Error getting DO stub:', error);
-        throw new ActionError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to access user data'
-        });
-      }
+      const stub = getUserDO(context, userId);
 
       // Load user schedules
       try {
@@ -742,53 +515,22 @@ export const users = {
    */
   getTables: defineAction({
     handler: async (_, context) => {
-
       // Check if user is authenticated
       const {session, user} = context.locals
       if (!session || !user) {
         throw new ActionError({code: 'UNAUTHORIZED'});
       }
 
-      // Get Durable Object reference
-      let DO;
-      try {
-        DO = context.locals.runtime.env.UserDO;
-      } catch (error) {
-        console.error('Error accessing UserDO:', error);
-        throw new ActionError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to access user data object'
-        });
-      }
-      if (!DO) {
-        throw new Error('UserDO not available');
-      }
-
       const userId = user.id;
-      // Create Durable Object ID
-      let id;
-      try {
-        id = DO.idFromName(userId);
-      } catch (error) {
-        console.error('Error creating DO ID:', error);
-        throw new ActionError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to create user identifier'
-        });
-      }
-      // Get Durable Object stub
-      let stub;
-      try {
-        stub = DO.get(id);
-      } catch (error) {
-        console.error('Error getting DO stub:', error);
-        throw new ActionError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to access user data'
-        });
-      }
+      const stub = getUserDO(context, userId);
+
       console.log('getting table data')
-      return stub.getTables()
+      try {
+        return await stub.getTables()
+      } catch (e) {
+        console.error('Error getting tables from UserDO:', e);
+        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
+      }
     }
   }),
 

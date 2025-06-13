@@ -5,6 +5,7 @@ import {accounts} from "../lib/db/schema/auth-schema.ts";
 import {createSlug, generateTeamSlugAlternatives} from "../functions/slug.ts";
 import {TeamRepo} from "../lib/db/repos/TeamRepo.ts";
 import {UserRepo} from "../lib/db/repos/UserRepo.ts";
+import {getTeamDO} from "./getDO.ts";
 
 
 export const teams = {
@@ -56,10 +57,9 @@ export const teams = {
       });
 
       // Initialize TeamDO and add creator as a member
+      const teamStub = getTeamDO(ctx, team.id);
+
       try {
-        const TeamDO = ctx.locals.runtime.env.TeamDO
-        const teamDoId = TeamDO.idFromName(`${team.id}`)
-        const teamStub = TeamDO.get(teamDoId)
         teamStub.setTeam(team)
         // Add team creator as a member
         await teamStub.addTeamMember(user.id, user.tiltifyName)
@@ -145,10 +145,9 @@ export const teams = {
       });
 
       // Update TeamDO
+      const teamStub = getTeamDO(ctx, id);
+
       try {
-        const TeamDO = ctx.locals.runtime.env.TeamDO
-        const teamDoId = TeamDO.idFromName(`${id}`)
-        const teamStub = TeamDO.get(teamDoId)
         await teamStub.updateTeam({
           name: name,
           slug: slug,
@@ -194,15 +193,7 @@ export const teams = {
       const memberIds = members.map(member => member.userId);
 
       // Initialize TeamDO
-      let teamStub;
-      try {
-        const TeamDO = ctx.locals.runtime.env.TeamDO
-        const teamDoId = TeamDO.idFromName(`${teamId}`)
-        teamStub = TeamDO.get(teamDoId)
-      } catch (e: any) {
-        console.error('Error initializing TeamDO:', e);
-        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
-      }
+      const teamStub = getTeamDO(ctx, teamId);
 
       // Delete team
       try {
@@ -263,15 +254,7 @@ export const teams = {
       }
 
       // Initialize TeamDO
-      let teamStub;
-      try {
-        const TeamDO = ctx.locals.runtime.env.TeamDO
-        const teamDoId = TeamDO.idFromName(`${teamId}`)
-        teamStub = TeamDO.get(teamDoId)
-      } catch (e: any) {
-        console.error('Error initializing TeamDO:', e);
-        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
-      }
+      const teamStub = getTeamDO(ctx, teamId);
 
       // Remove user from team
       try {
@@ -342,15 +325,7 @@ export const teams = {
       }
 
       // Initialize TeamDO
-      let teamStub;
-      try {
-        const TeamDO = ctx.locals.runtime.env.TeamDO
-        const teamDoId = TeamDO.idFromName(`${teamId}`)
-        teamStub = TeamDO.get(teamDoId)
-      } catch (e: any) {
-        console.error('Error initializing TeamDO:', e);
-        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
-      }
+      const teamStub = getTeamDO(ctx, teamId);
 
       // Remove user from team
       try {
@@ -485,15 +460,7 @@ export const teamInvites = {
       }
 
       // Initialize TeamDO and add invite
-      let teamStub;
-      try {
-        const TeamDO = ctx.locals.runtime.env.TeamDO
-        const teamDoId = TeamDO.idFromName(`${teamId}`)
-        teamStub = TeamDO.get(teamDoId)
-      } catch (e: any) {
-        console.error('Error initializing TeamDO:', e);
-        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
-      }
+      const teamStub = getTeamDO(ctx, teamId);
 
       console.log('invitedUserId', invitedUserId)
 
@@ -580,15 +547,7 @@ export const teamInvites = {
       }
 
       // Initialize TeamDO
-      let teamStub;
-      try {
-        const TeamDO = ctx.locals.runtime.env.TeamDO
-        const teamDoId = TeamDO.idFromName(`${teamId}`)
-        teamStub = TeamDO.get(teamDoId)
-      } catch (e: any) {
-        console.error('Error initializing TeamDO:', e);
-        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
-      }
+      const teamStub = getTeamDO(ctx, teamId);
 
       // Delete invite from TeamDO
       try {
@@ -651,15 +610,7 @@ export const teamInvites = {
       }
 
       // Initialize TeamDO
-      let teamStub;
-      try {
-        const TeamDO = ctx.locals.runtime.env.TeamDO
-        const teamDoId = TeamDO.idFromName(`${teamId}`)
-        teamStub = TeamDO.get(teamDoId)
-      } catch (e: any) {
-        console.error('Error initializing TeamDO:', e);
-        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
-      }
+      const teamStub = getTeamDO(ctx, teamId);
 
       // Add user as team member and delete invite
       try {
@@ -727,15 +678,7 @@ export const teamInvites = {
       }
 
       // Initialize TeamDO
-      let teamStub;
-      try {
-        const TeamDO = ctx.locals.runtime.env.TeamDO
-        const teamDoId = TeamDO.idFromName(`${teamId}`)
-        teamStub = TeamDO.get(teamDoId)
-      } catch (e: any) {
-        console.error('Error initializing TeamDO:', e);
-        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
-      }
+      const teamStub = getTeamDO(ctx, teamId);
 
       // Delete invite from TeamDO
       try {

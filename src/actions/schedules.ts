@@ -4,6 +4,7 @@ import {z} from "astro:content";
 import {createSlug, generateScheduleSlugAlternatives} from "../functions/slug.ts";
 import {getTags} from "../functions/getTags.ts";
 import {ScheduleRepo} from "../lib/db/repos/ScheduleRepo.ts";
+import {getScheduleEditorDO, getUserDO} from "./getDO.ts";
 
 
 export const schedules = {
@@ -45,15 +46,24 @@ export const schedules = {
       })
 
       // Initialize the ScheduleEditorDO for this schedule
-      const ScheduleEditorDO = ctx.locals.runtime.env.ScheduleEditorDO
-      const stubScheduleEditorDO = ScheduleEditorDO.get(ScheduleEditorDO.idFromName(`${schedule.id}`))
-      await stubScheduleEditorDO.loadFromDB()
+      const stubScheduleEditorDO = getScheduleEditorDO(ctx, schedule.id);
+
+      try {
+        await stubScheduleEditorDO.loadFromDB()
+      } catch (e: any) {
+        console.error('Error loading schedule from DB:', e);
+        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
+      }
 
       // Add the schedule to the UserDO
-      const DO = ctx.locals.runtime.env.UserDO
-      const id = DO.idFromName(`${user.id}`)
-      const stubUserDO = DO.get(id)
-      await stubUserDO.addSchedule(schedule)
+      const stubUserDO = getUserDO(ctx, user.id);
+
+      try {
+        await stubUserDO.addSchedule(schedule)
+      } catch (e: any) {
+        console.error('Error adding schedule to UserDO:', e);
+        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
+      }
 
       return {schedule}
     }
@@ -90,9 +100,14 @@ export const schedules = {
       }
 
       // Get the ScheduleEditorDO and save to DB
-      const ScheduleEditorDO = ctx.locals.runtime.env.ScheduleEditorDO
-      const stubScheduleEditorDO = ScheduleEditorDO.get(ScheduleEditorDO.idFromName(`${scheduleId}`))
-      await stubScheduleEditorDO.saveToDB()
+      const stubScheduleEditorDO = getScheduleEditorDO(ctx, scheduleId);
+
+      try {
+        await stubScheduleEditorDO.saveToDB()
+      } catch (e: any) {
+        console.error('Error saving schedule to DB:', e);
+        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
+      }
 
       return {message: "Schedule saved successfully"}
     }
@@ -130,10 +145,14 @@ export const schedules = {
       // Delete the schedule using repository
       await schedules.delete(scheduleId)
 
-      const DO = ctx.locals.runtime.env.UserDO
-      const id = DO.idFromName(`${user.id}`)
-      const stubUserDO = DO.get(id)
-      await stubUserDO.deleteSchedule(schedule.id)
+      const stubUserDO = getUserDO(ctx, user.id);
+
+      try {
+        await stubUserDO.deleteSchedule(schedule.id)
+      } catch (e: any) {
+        console.error('Error deleting schedule from UserDO:', e);
+        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
+      }
 
 
       return {message: "Schedule successfully deleted"}
@@ -415,9 +434,14 @@ export const schedules = {
   getTables: defineAction({
     input: z.number(),
     handler: async (scheduleId, ctx) => {
-      const ScheduleEditorDO = ctx.locals.runtime.env.ScheduleEditorDO
-      const stubScheduleEditorDO = ScheduleEditorDO.get(ScheduleEditorDO.idFromName(`${scheduleId}`))
-      return stubScheduleEditorDO.getTables()
+      const stubScheduleEditorDO = getScheduleEditorDO(ctx, scheduleId);
+
+      try {
+        return await stubScheduleEditorDO.getTables()
+      } catch (e: any) {
+        console.error('Error getting tables from ScheduleEditorDO:', e);
+        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
+      }
     }
   })
 }
