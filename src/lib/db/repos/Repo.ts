@@ -18,6 +18,12 @@ export abstract class Repo<
     this.table = table;
   }
 
+  /**
+   * Creates a default SELECT query for the table
+   * @returns A query builder for selecting from the table
+   *
+   * SQL: `SELECT * FROM "table_name"`
+   */
   protected defaultSelect() {
     return this.db.select().from(this.table);
   }

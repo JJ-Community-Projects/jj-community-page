@@ -19,6 +19,8 @@ export class UserRepo extends Repo<typeof users._['config']> {
    * Find a user by its primary key
    * @param id The primary key value
    * @returns Promise resolving to the user or null if not found
+   *
+   * SQL: `SELECT * FROM "users" WHERE "users"."id" = ?`
    */
   async findById(id: number): Promise<InferSelectModel<typeof users> | null> {
     try {
@@ -37,6 +39,8 @@ export class UserRepo extends Repo<typeof users._['config']> {
   /**
    * Find all users in the table
    * @returns Promise resolving to an array of users
+   *
+   * SQL: `SELECT * FROM "users"`
    */
   async findAll(): Promise<InferSelectModel<typeof users>[]> {
     try {
@@ -52,6 +56,8 @@ export class UserRepo extends Repo<typeof users._['config']> {
    * Create a new user
    * @param data The data to insert
    * @returns Promise resolving to the created user
+   *
+   * SQL: `INSERT INTO "users" (...) VALUES (...) RETURNING *`
    */
   async create(data: Partial<InferSelectModel<typeof users>>): Promise<InferSelectModel<typeof users>> {
     try {
@@ -70,6 +76,8 @@ export class UserRepo extends Repo<typeof users._['config']> {
    * @param id The primary key value
    * @param data The data to update
    * @returns Promise resolving to the updated user
+   *
+   * SQL: `UPDATE "users" SET ... WHERE "users"."id" = ? RETURNING *`
    */
   async update(id: number, data: Partial<InferSelectModel<typeof users>>): Promise<InferSelectModel<typeof users>> {
     try {
@@ -90,6 +98,8 @@ export class UserRepo extends Repo<typeof users._['config']> {
    * Delete a user by its primary key
    * @param id The primary key value
    * @returns Promise resolving to a boolean indicating if the user was deleted
+   *
+   * SQL: `DELETE FROM "users" WHERE "users"."id" = ?`
    */
   async delete(id: number): Promise<boolean> {
     try {
@@ -109,6 +119,8 @@ export class UserRepo extends Repo<typeof users._['config']> {
    * Get all accounts for a user
    * @param userId The user ID
    * @returns Promise resolving to an array of accounts
+   *
+   * SQL: `SELECT * FROM "accounts" WHERE "accounts"."userId" = ?`
    */
   async getAccounts(userId: number): Promise<InferSelectModel<typeof accounts>[]> {
     try {
@@ -235,6 +247,8 @@ export class UserRepo extends Repo<typeof users._['config']> {
    * @param currentUserId The ID of the current user to exclude from results
    * @param limit Maximum number of results to return
    * @returns Promise resolving to an array of matching accounts
+   *
+   * SQL: `SELECT "accounts"."userId", "accounts"."provider", "accounts"."providerUsername" FROM "accounts" WHERE ("accounts"."providerUsername" LIKE ? AND "accounts"."userId" != ?) LIMIT ?`
    */
   async searchUser(searchTerm: string, currentUserId: number, limit: number = 5): Promise<{ userId: number, provider: string, providerName: string }[]> {
     try {
@@ -265,6 +279,8 @@ export class UserRepo extends Repo<typeof users._['config']> {
    * Get all tags for a user
    * @param userId The user ID
    * @returns Promise resolving to an array of user tags
+   *
+   * SQL: `SELECT * FROM "userTags" WHERE "userTags"."userId" = ?`
    */
   async getUserTags(userId: number): Promise<InferSelectModel<typeof userTags>[]> {
     try {
@@ -283,6 +299,8 @@ export class UserRepo extends Repo<typeof users._['config']> {
    * @param tag The tag to add
    * @param label The label for the tag
    * @returns Promise resolving to the created tag
+   *
+   * SQL: `INSERT INTO "userTags" ("userId", "tag", "label", "addedAt") VALUES (?, ?, ?, ?) RETURNING *`
    */
   async addTag(userId: number, tag: string, label: string): Promise<InferSelectModel<typeof userTags>> {
     try {
@@ -306,6 +324,8 @@ export class UserRepo extends Repo<typeof users._['config']> {
    * @param userId The user ID
    * @param tag The tag to remove
    * @returns Promise resolving to a boolean indicating if the tag was removed
+   *
+   * SQL: `DELETE FROM "userTags" WHERE ("userTags"."userId" = ? AND "userTags"."tag" = ?)`
    */
   async removeTag(userId: number, tag: string): Promise<boolean> {
     try {
@@ -328,6 +348,8 @@ export class UserRepo extends Repo<typeof users._['config']> {
    * Get popular tags across all users
    * @param limit Maximum number of tags to return
    * @returns Promise resolving to an array of popular tags with counts
+   *
+   * SQL: `SELECT "userTags"."tag", "userTags"."label", count("userTags"."tag") as "count" FROM "userTags" GROUP BY "userTags"."tag" ORDER BY "count" DESC LIMIT ?`
    */
   async getPopularTags(limit: number = 5): Promise<{ tag: string, label: string, count: number }[]> {
     try {
@@ -354,6 +376,10 @@ export class UserRepo extends Repo<typeof users._['config']> {
    * @param userId The user ID
    * @param limit Maximum number of tags to return
    * @returns Promise resolving to an array of suggested tags
+   *
+   * SQL:
+   * 1. `SELECT "userTags"."tag" FROM "userTags" WHERE "userTags"."userId" = ?`
+   * 2. `SELECT "userTags"."tag", "userTags"."label", count("userTags"."tag") as "count" FROM "userTags" WHERE "userTags"."tag" NOT IN (?) GROUP BY "userTags"."tag" ORDER BY "count" DESC LIMIT ?`
    */
   async getSuggestedTagsForUser(userId: number, limit: number = 5): Promise<{ tag: string, label: string, count: number }[]> {
     try {
@@ -396,6 +422,10 @@ export class UserRepo extends Repo<typeof users._['config']> {
    * @param term The search term
    * @param limit Maximum number of tags to return
    * @returns Promise resolving to an array of suggested tags matching the search term
+   *
+   * SQL:
+   * 1. `SELECT "userTags"."tag" FROM "userTags" WHERE "userTags"."userId" = ?`
+   * 2. `SELECT "userTags"."tag", "userTags"."label", count("userTags"."tag") as "count" FROM "userTags" WHERE ("userTags"."tag" NOT IN (?) AND "userTags"."tag" LIKE ?) GROUP BY "userTags"."tag" ORDER BY "count" DESC LIMIT ?`
    */
   async getSuggestedTagsForUserBySearchTerm(userId: number, term: string, limit: number = 5): Promise<{ tag: string, label: string, count: number }[]> {
     try {
@@ -441,6 +471,8 @@ export class UserRepo extends Repo<typeof users._['config']> {
    * Get all social media links for a user
    * @param userId The user ID
    * @returns Promise resolving to an array of user social media links
+   *
+   * SQL: `SELECT * FROM "userSocials" WHERE "userSocials"."userId" = ?`
    */
   async getUserSocials(userId: number): Promise<InferSelectModel<typeof userSocials>[]> {
     try {
@@ -459,6 +491,11 @@ export class UserRepo extends Repo<typeof users._['config']> {
    * @param provider The social media provider
    * @param url The social media URL
    * @returns Promise resolving to the created social media link
+   *
+   * SQL:
+   * 1. `SELECT * FROM "userSocials" WHERE ("userSocials"."userId" = ? AND "userSocials"."provider" = ?)`
+   * 2. If exists: `UPDATE "userSocials" SET "url" = ? WHERE ("userSocials"."userId" = ? AND "userSocials"."provider" = ?) RETURNING *`
+   * 3. If not exists: `INSERT INTO "userSocials" ("userId", "provider", "url") VALUES (?, ?, ?) RETURNING *`
    */
   async addSocial(userId: number, provider: string, url: string): Promise<InferSelectModel<typeof userSocials>> {
     try {
@@ -506,6 +543,8 @@ export class UserRepo extends Repo<typeof users._['config']> {
    * @param userId The user ID
    * @param provider The social media provider
    * @returns Promise resolving to a boolean indicating if the social media link was removed
+   *
+   * SQL: `DELETE FROM "userSocials" WHERE ("userSocials"."userId" = ? AND "userSocials"."provider" = ?)`
    */
   async removeSocial(userId: number, provider: string): Promise<boolean> {
     try {

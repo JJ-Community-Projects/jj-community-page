@@ -20,6 +20,8 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
    * Find a record by its primary key
    * @param id The primary key value
    * @returns Promise resolving to the record or null if not found
+   *
+   * SQL: `SELECT * FROM "schedules" WHERE "schedules"."id" = ?`
    */
   async findById(id: number): Promise<InferSelectModel<typeof schedulesTable> | null> {
     try {
@@ -38,6 +40,8 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
    * Find a schedule by its slug
    * @param slug The schedule slug
    * @returns Promise resolving to the schedule or null if not found
+   *
+   * SQL: `SELECT * FROM "schedules" WHERE "schedules"."slug" = ?`
    */
   async findBySlug(slug: string): Promise<InferSelectModel<typeof schedulesTable> | null> {
     try {
@@ -56,6 +60,8 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
    * Find schedules by owner ID
    * @param ownerId The owner ID
    * @returns Promise resolving to an array of schedules
+   *
+   * SQL: `SELECT * FROM "schedules" WHERE "schedules"."ownerId" = ?`
    */
   async findByOwnerId(ownerId: number): Promise<InferSelectModel<typeof schedulesTable>[]> {
     try {
@@ -71,6 +77,8 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
   /**
    * Find visible schedules
    * @returns Promise resolving to an array of visible schedules
+   *
+   * SQL: `SELECT * FROM "schedules" WHERE "schedules"."visible" = ?`
    */
   async findVisible(): Promise<InferSelectModel<typeof schedulesTable>[]> {
     try {
@@ -86,6 +94,8 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
   /**
    * Find all records in the table
    * @returns Promise resolving to an array of records
+   *
+   * SQL: `SELECT * FROM "schedules"`
    */
   async findAll(): Promise<InferSelectModel<typeof schedulesTable>[]> {
     try {
@@ -101,6 +111,8 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
    * Create a new record
    * @param data The data to insert
    * @returns Promise resolving to the created record
+   *
+   * SQL: `INSERT INTO "schedules" (...) VALUES (...) RETURNING *`
    */
   async create(data: any): Promise<InferSelectModel<typeof schedulesTable>> {
     try {
@@ -119,6 +131,8 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
    * @param id The primary key value
    * @param data The data to update
    * @returns Promise resolving to the updated record
+   *
+   * SQL: `UPDATE "schedules" SET ... WHERE "schedules"."id" = ? RETURNING *`
    */
   async update(id: number | string, data: any): Promise<InferSelectModel<typeof schedulesTable>> {
     try {
@@ -140,6 +154,8 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
    * Delete a record by its primary key
    * @param id The primary key value
    * @returns Promise resolving to a boolean indicating if the record was deleted
+   *
+   * SQL: `DELETE FROM "schedules" WHERE "schedules"."id" = ?`
    */
   async delete(id: number | string): Promise<boolean> {
     try {
@@ -164,6 +180,11 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
    * Find streams by schedule ID with their tags and participants
    * @param scheduleId The schedule ID
    * @returns Promise resolving to an array of streams with their tags and participants
+   *
+   * SQL:
+   * 1. `SELECT * FROM "streams" WHERE "streams"."scheduleId" = ?`
+   * 2. `SELECT * FROM "streamTags" WHERE "streamTags"."scheduleId" = ?`
+   * 3. `SELECT * FROM "streamParticipants" WHERE "streamParticipants"."scheduleId" = ?`
    */
   async findStreamsWithDetails(scheduleId: number): Promise<Array<InferSelectModel<typeof streamsTable> & {
     tags: InferSelectModel<typeof streamTagsTable>[],
@@ -226,6 +247,8 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
    * Find streams by schedule ID
    * @param scheduleId The schedule ID
    * @returns Promise resolving to an array of streams
+   *
+   * SQL: `SELECT * FROM "streams" WHERE "streams"."scheduleId" = ?`
    */
   async findStreamsByScheduleId(scheduleId: number): Promise<InferSelectModel<typeof streamsTable>[]> {
     try {
@@ -243,6 +266,8 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
    * @param streamId The stream ID
    * @param scheduleId The schedule ID
    * @returns Promise resolving to the stream or null if not found
+   *
+   * SQL: `SELECT * FROM "streams" WHERE ("streams"."id" = ? AND "streams"."scheduleId" = ?)`
    */
   async findStreamById(streamId: number, scheduleId: number): Promise<InferSelectModel<typeof streamsTable> | null> {
     try {
@@ -264,6 +289,8 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
    * Create a new stream
    * @param data The stream data to insert
    * @returns Promise resolving to the created stream
+   *
+   * SQL: `INSERT INTO "streams" (...) VALUES (...) RETURNING *`
    */
   async createStream(data: InferInsertModel<typeof streamsTable>): Promise<InferSelectModel<typeof streamsTable>> {
     try {
@@ -290,6 +317,8 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
    * @param scheduleId The schedule ID
    * @param data The data to update
    * @returns Promise resolving to the updated stream
+   *
+   * SQL: `UPDATE "streams" SET ... WHERE ("streams"."id" = ? AND "streams"."scheduleId" = ?) RETURNING *`
    */
   async updateStream(streamId: number, scheduleId: number, data: Partial<InferInsertModel<typeof streamsTable>>): Promise<InferSelectModel<typeof streamsTable>> {
     try {
@@ -321,6 +350,8 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
    * @param streamId The stream ID
    * @param scheduleId The schedule ID
    * @returns Promise resolving to a boolean indicating if the stream was deleted
+   *
+   * SQL: `DELETE FROM "streams" WHERE ("streams"."id" = ? AND "streams"."scheduleId" = ?) RETURNING *`
    */
   async deleteStream(streamId: number, scheduleId: number): Promise<boolean> {
     try {
@@ -346,6 +377,8 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
    * @param streamId The stream ID
    * @param scheduleId The schedule ID
    * @returns Promise resolving to an array of stream tags
+   *
+   * SQL: `SELECT * FROM "streamTags" WHERE ("streamTags"."streamId" = ? AND "streamTags"."scheduleId" = ?)`
    */
   async findStreamTags(streamId: number, scheduleId: number): Promise<InferSelectModel<typeof streamTagsTable>[]> {
     try {
@@ -368,6 +401,8 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
    * @param tag The tag to add
    * @param label The label for the tag (defaults to the tag itself)
    * @returns Promise resolving to the created tag
+   *
+   * SQL: `INSERT INTO "streamTags" ("streamId", "scheduleId", "tag", "label", "addedAt") VALUES (?, ?, ?, ?, ?) RETURNING *`
    */
   async addStreamTag(streamId: number, scheduleId: number, tag: string, label?: string): Promise<InferSelectModel<typeof streamTagsTable>> {
     try {
@@ -396,6 +431,8 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
    * @param scheduleId The schedule ID
    * @param tag The tag to remove
    * @returns Promise resolving to a boolean indicating if the tag was removed
+   *
+   * SQL: `DELETE FROM "streamTags" WHERE ("streamTags"."streamId" = ? AND "streamTags"."scheduleId" = ? AND "streamTags"."tag" = ?) RETURNING *`
    */
   async removeStreamTag(streamId: number, scheduleId: number, tag: string): Promise<boolean> {
     try {
@@ -424,6 +461,8 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
    * @param streamId The stream ID
    * @param scheduleId The schedule ID
    * @returns Promise resolving to an array of stream participants
+   *
+   * SQL: `SELECT * FROM "streamParticipants" WHERE ("streamParticipants"."streamId" = ? AND "streamParticipants"."scheduleId" = ?)`
    */
   async findStreamParticipants(streamId: number, scheduleId: number): Promise<InferSelectModel<typeof streamParticipantsTable>[]> {
     try {
@@ -445,6 +484,8 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
    * @param scheduleId The schedule ID
    * @param userId The user ID to add as a participant
    * @returns Promise resolving to the created participant
+   *
+   * SQL: `INSERT INTO "streamParticipants" ("streamId", "scheduleId", "userId") VALUES (?, ?, ?) RETURNING *`
    */
   async addStreamParticipant(streamId: number, scheduleId: number, userId: number): Promise<InferSelectModel<typeof streamParticipantsTable>> {
     try {
@@ -468,6 +509,8 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
    * @param scheduleId The schedule ID
    * @param userId The user ID to remove as a participant
    * @returns Promise resolving to a boolean indicating if the participant was removed
+   *
+   * SQL: `DELETE FROM "streamParticipants" WHERE ("streamParticipants"."streamId" = ? AND "streamParticipants"."scheduleId" = ? AND "streamParticipants"."userId" = ?) RETURNING *`
    */
   async removeStreamParticipant(streamId: number, scheduleId: number, userId: number): Promise<boolean> {
     try {
