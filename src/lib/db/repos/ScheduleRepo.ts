@@ -5,6 +5,7 @@ import {and, desc, eq, type InferInsertModel, type InferSelectModel, like, notIn
 import {DatabaseError} from "./DatabaseError";
 import {DateTime} from "luxon";
 import type {ActionAPIContext} from "astro:actions";
+import type {BatchItem} from "drizzle-orm/batch";
 
 /**
  * Repository for working with schedules
@@ -138,7 +139,7 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
    *
    * SQL: `INSERT INTO "schedules" (...) VALUES (...) RETURNING *`
    */
-  async create(data: any): Promise<InferSelectModel<typeof schedulesTable>> {
+  async create(data: InferInsertModel<typeof schedulesTable>): Promise<InferSelectModel<typeof schedulesTable>> {
     try {
       const [result] = await this.db.insert(this.table)
         .values(data as any)
@@ -206,6 +207,140 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
         throw new DatabaseError(`Failed to delete record with id: ${id}`, error);
       }
     }
+  }
+
+  /**
+   * Bulk write streams (create, update, delete) in a single batch operation
+   *
+   * This method combines stream creation, updates, and deletions into a single batch operation
+   * for improved performance and atomicity. It uses the helper methods getStreamCreateOps,
+   * getStreamUpdateOps, and getStreamDeleteOps to generate the database operations.
+   *
+   * @param writes Object containing scheduleId, streams to create, update, and delete
+   * @returns Promise resolving when the operation is complete
+   */
+  async bulkWriteStreams(writes: {
+    scheduleId: number,
+    createStreams: InferInsertModel<typeof streamsTable>[],
+    updateStreams: Array<{ id: number } & Partial<InferInsertModel<typeof streamsTable>>>,
+    deleteStreams: number[],
+  }): Promise<void> {
+    try {
+      const {scheduleId, createStreams, updateStreams, deleteStreams} = writes;
+
+      // Collect all operations using the helper methods
+      const operations: BatchItem<'sqlite'>[] = [
+        ...this.getStreamCreateOps(scheduleId, createStreams),
+        ...this.getStreamUpdateOps(scheduleId, updateStreams),
+        ...this.getStreamDeleteOps(scheduleId, deleteStreams)
+      ];
+
+      // Execute all operations in a single batch
+      await this.executeBatch(operations);
+    } catch (error) {
+      if (this.env === 'action') {
+        throw new DatabaseError("Failed to bulk write streams", error).toActionError();
+      } else {
+        throw new DatabaseError("Failed to bulk write streams", error);
+      }
+    }
+  }
+
+  /**
+   * Generates database operations for creating streams
+   *
+   * This function takes an array of stream objects to create and generates the corresponding
+   * database operations. It handles date conversion from ISO strings to Date objects and
+   * ensures the correct scheduleId is set for each stream.
+   *
+   * @param scheduleId The ID of the schedule these streams belong to
+   * @param createStreams Array of stream objects to create
+   * @returns Array of database operations for batch execution
+   */
+  private getStreamCreateOps(scheduleId: number, createStreams: InferInsertModel<typeof streamsTable>[]): BatchItem<'sqlite'>[] {
+    const operations: BatchItem<'sqlite'>[] = [];
+
+    // Process stream creations
+    for (const stream of createStreams) {
+      // Process dates if they are strings
+      const processedData = {
+        ...stream,
+        scheduleId, // Ensure scheduleId is set correctly
+        start: stream.start instanceof Date ? stream.start : DateTime.fromISO(stream.start as unknown as string).toUTC().toJSDate(),
+        end: stream.end instanceof Date ? stream.end : DateTime.fromISO(stream.end as unknown as string).toUTC().toJSDate()
+      };
+
+      operations.push(
+        this.db.insert(streamsTable).values(processedData)
+      );
+    }
+    return operations;
+  }
+
+  /**
+   * Generates database operations for updating streams
+   *
+   * This function takes an array of stream objects to update and generates the corresponding
+   * database operations. It handles date conversion from ISO strings to Date objects and
+   * ensures updates are applied only to streams with the correct scheduleId.
+   *
+   * @param scheduleId The ID of the schedule these streams belong to
+   * @param updateStreams Array of stream objects with ID and fields to update
+   * @returns Array of database operations for batch execution
+   */
+  private getStreamUpdateOps(scheduleId: number, updateStreams: Array<{ id: number } & Partial<InferInsertModel<typeof streamsTable>>>): BatchItem<'sqlite'>[] {
+    const operations: BatchItem<'sqlite'>[] = [];
+
+    // Process stream updates
+    for (const stream of updateStreams) {
+      const {id, ...updateData} = stream;
+
+      // Process dates if they are strings
+      const processedData: any = {...updateData};
+      if (updateData.start && !(updateData.start instanceof Date)) {
+        processedData.start = DateTime.fromISO(updateData.start as unknown as string).toUTC().toJSDate();
+      }
+      if (updateData.end && !(updateData.end instanceof Date)) {
+        processedData.end = DateTime.fromISO(updateData.end as unknown as string).toUTC().toJSDate();
+      }
+
+      operations.push(
+        this.db.update(streamsTable)
+          .set(processedData)
+          .where(and(
+            eq(streamsTable.id, id),
+            eq(streamsTable.scheduleId, scheduleId)
+          ))
+      );
+    }
+    return operations;
+  }
+
+  /**
+   * Generates database operations for deleting streams
+   *
+   * This function takes an array of stream IDs to delete and generates the corresponding
+   * database operations. It ensures deletions are applied only to streams with the correct
+   * scheduleId to prevent accidental deletion of streams from other schedules.
+   *
+   * @param scheduleId The ID of the schedule these streams belong to
+   * @param deleteStreams Array of stream IDs to delete
+   * @returns Array of database operations for batch execution
+   */
+  private getStreamDeleteOps(scheduleId: number, deleteStreams: number[]): BatchItem<'sqlite'>[] {
+    const operations: BatchItem<'sqlite'>[] = [];
+
+    // Process stream deletions
+    for (const streamId of deleteStreams) {
+      operations.push(
+        this.db.delete(streamsTable)
+          .where(and(
+            eq(streamsTable.id, streamId),
+            eq(streamsTable.scheduleId, scheduleId)
+          ))
+      );
+    }
+    return operations;
   }
 
   // endregion
@@ -611,6 +746,172 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
     }
   }
 
+  /**
+   * Add multiple tags to streams in a single batch operation
+   * @param tags Array of tag objects with streamId, scheduleId, tag, and optional label
+   * @returns Promise resolving when the operation is complete
+   */
+  async bulkAddStreamTags(tags: Array<{
+    streamId: number,
+    scheduleId: number,
+    tag: string,
+    label?: string
+  }>): Promise<void> {
+    try {
+      if (tags.length === 0) return;
+
+      const operations: BatchItem<'sqlite'>[] = tags.map(tagObj => {
+        const normalizedTag = tagObj.tag.toLowerCase();
+        const tagLabel = tagObj.label || normalizedTag;
+
+        return this.db.insert(streamTagsTable)
+          .values({
+            streamId: tagObj.streamId,
+            scheduleId: tagObj.scheduleId,
+            tag: normalizedTag,
+            label: tagLabel,
+            addedAt: DateTime.now().toUTC().toJSDate()
+          });
+      });
+
+      await this.executeBatch(operations);
+    } catch (error) {
+      if (this.env === 'action') {
+        throw new DatabaseError("Failed to bulk add stream tags", error).toActionError();
+      } else {
+        throw new DatabaseError("Failed to bulk add stream tags", error);
+      }
+    }
+  }
+
+  /**
+   * Remove multiple tags from streams in a single batch operation
+   * @param tags Array of tag objects with streamId, scheduleId, and tag
+   * @returns Promise resolving when the operation is complete
+   */
+  async bulkRemoveStreamTags(tags: Array<{ streamId: number, scheduleId: number, tag: string }>): Promise<void> {
+    try {
+      if (tags.length === 0) return;
+
+      const operations: BatchItem<'sqlite'>[] = tags.map(tagObj => {
+        const normalizedTag = tagObj.tag.toLowerCase();
+
+        return this.db.delete(streamTagsTable)
+          .where(and(
+            eq(streamTagsTable.streamId, tagObj.streamId),
+            eq(streamTagsTable.scheduleId, tagObj.scheduleId),
+            eq(streamTagsTable.tag, normalizedTag)
+          ));
+      });
+
+      await this.executeBatch(operations);
+    } catch (error) {
+      if (this.env === 'action') {
+        throw new DatabaseError("Failed to bulk remove stream tags", error).toActionError();
+      } else {
+        throw new DatabaseError("Failed to bulk remove stream tags", error);
+      }
+    }
+  }
+
+  /**
+   * Bulk write tags (create, delete) in a single batch operation
+   *
+   * This method combines tag creation and deletion into a single batch operation
+   * for improved performance and atomicity. It uses the helper methods getTagCreateOps
+   * and getTagDeleteOps to generate the database operations.
+   *
+   * @param writes Object containing scheduleId, tags to create and delete
+   * @returns Promise resolving when the operation is complete
+   */
+  async bulkWriteTags(writes: {
+    scheduleId: number,
+    createTags: Array<{ streamId: number, tag: string, label?: string }>,
+    deleteTags: Array<{ streamId: number, tag: string }>,
+  }): Promise<void> {
+    try {
+      const {scheduleId, createTags, deleteTags} = writes;
+
+      // Collect all operations using the helper methods
+      const operations: BatchItem<'sqlite'>[] = [
+        ...this.getTagCreateOps(scheduleId, createTags),
+        ...this.getTagDeleteOps(scheduleId, deleteTags)
+      ];
+
+      // Execute all operations in a single batch
+      await this.executeBatch(operations);
+    } catch (error) {
+      if (this.env === 'action') {
+        throw new DatabaseError("Failed to bulk write tags", error).toActionError();
+      } else {
+        throw new DatabaseError("Failed to bulk write tags", error);
+      }
+    }
+  }
+
+  /**
+   * Generates database operations for creating tags
+   *
+   * This function takes an array of tag objects to create and generates the corresponding
+   * database operations. It normalizes tag names to lowercase and ensures the correct
+   * scheduleId is set for each tag.
+   *
+   * @param scheduleId The ID of the schedule these tags belong to
+   * @param createTags Array of tag objects to create
+   * @returns Array of database operations for batch execution
+   */
+  private getTagCreateOps(scheduleId: number, createTags: Array<{ streamId: number, tag: string, label?: string }>): BatchItem<'sqlite'>[] {
+    const operations: BatchItem<'sqlite'>[] = [];
+
+    // Process tag creations
+    for (const tag of createTags) {
+      const normalizedTag = tag.tag.toLowerCase();
+      const tagLabel = tag.label || normalizedTag;
+
+      operations.push(
+        this.db.insert(streamTagsTable)
+          .values({
+            streamId: tag.streamId,
+            scheduleId,
+            tag: normalizedTag,
+            label: tagLabel,
+            addedAt: DateTime.now().toUTC().toJSDate()
+          })
+      );
+    }
+    return operations;
+  }
+
+  /**
+   * Generates database operations for deleting tags
+   *
+   * This function takes an array of tag objects to delete and generates the corresponding
+   * database operations. It normalizes tag names to lowercase and ensures deletions are
+   * applied only to tags with the correct scheduleId and streamId.
+   *
+   * @param scheduleId The ID of the schedule these tags belong to
+   * @param deleteTags Array of tag objects to delete
+   * @returns Array of database operations for batch execution
+   */
+  private getTagDeleteOps(scheduleId: number, deleteTags: Array<{ streamId: number, tag: string }>): BatchItem<'sqlite'>[] {
+    const operations: BatchItem<'sqlite'>[] = [];
+
+    // Process tag deletions
+    for (const tag of deleteTags) {
+      const normalizedTag = tag.tag.toLowerCase();
+
+      operations.push(
+        this.db.delete(streamTagsTable)
+          .where(and(
+            eq(streamTagsTable.streamId, tag.streamId),
+            eq(streamTagsTable.scheduleId, scheduleId),
+            eq(streamTagsTable.tag, normalizedTag)
+          ))
+      );
+    }
+    return operations;
+  }
+
   // endregion
 
   // region Stream Participant Operations
@@ -699,5 +1000,232 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
     }
   }
 
+  /**
+   * Add multiple participants to streams in a single batch operation
+   * @param participants Array of participant objects with streamId, scheduleId, and userId
+   * @returns Promise resolving when the operation is complete
+   */
+  async bulkAddStreamParticipants(participants: Array<{
+    streamId: number,
+    scheduleId: number,
+    userId: number
+  }>): Promise<void> {
+    try {
+      if (participants.length === 0) return;
+
+      const operations: BatchItem<'sqlite'>[] = participants.map(participant => {
+        return this.db.insert(streamParticipantsTable)
+          .values({
+            streamId: participant.streamId,
+            scheduleId: participant.scheduleId,
+            userId: participant.userId
+          });
+      });
+
+      await this.executeBatch(operations);
+    } catch (error) {
+      if (this.env === 'action') {
+        throw new DatabaseError("Failed to bulk add stream participants", error).toActionError();
+      } else {
+        throw new DatabaseError("Failed to bulk add stream participants", error);
+      }
+    }
+  }
+
+  /**
+   * Remove multiple participants from streams in a single batch operation
+   * @param participants Array of participant objects with streamId, scheduleId, and userId
+   * @returns Promise resolving when the operation is complete
+   */
+  async bulkRemoveStreamParticipants(participants: Array<{
+    streamId: number,
+    scheduleId: number,
+    userId: number
+  }>): Promise<void> {
+    try {
+      if (participants.length === 0) return;
+
+      const operations: BatchItem<'sqlite'>[] = participants.map(participant => {
+        return this.db.delete(streamParticipantsTable)
+          .where(and(
+            eq(streamParticipantsTable.streamId, participant.streamId),
+            eq(streamParticipantsTable.scheduleId, participant.scheduleId),
+            eq(streamParticipantsTable.userId, participant.userId)
+          ));
+      });
+
+      await this.executeBatch(operations);
+    } catch (error) {
+      if (this.env === 'action') {
+        throw new DatabaseError("Failed to bulk remove stream participants", error).toActionError();
+      } else {
+        throw new DatabaseError("Failed to bulk remove stream participants", error);
+      }
+    }
+  }
+
+  /**
+   * Bulk write participants (create, delete) in a single batch operation
+   *
+   * This method combines participant creation and deletion into a single batch operation
+   * for improved performance and atomicity. It uses the helper methods getParticipantCreateOps
+   * and getParticipantDeleteOps to generate the database operations.
+   *
+   * @param writes Object containing scheduleId, participants to create and delete
+   * @returns Promise resolving when the operation is complete
+   */
+  async bulkWriteParticipants(writes: {
+    scheduleId: number,
+    createParticipants: Array<{ streamId: number, userId: number }>,
+    deleteParticipants: Array<{ streamId: number, userId: number }>,
+  }): Promise<void> {
+    try {
+      const {scheduleId, createParticipants, deleteParticipants} = writes;
+
+      // Collect all operations using the helper methods
+      const operations: BatchItem<'sqlite'>[] = [
+        ...this.getParticipantCreateOps(scheduleId, createParticipants),
+        ...this.getParticipantDeleteOps(scheduleId, deleteParticipants)
+      ];
+
+      // Execute all operations in a single batch
+      await this.executeBatch(operations);
+    } catch (error) {
+      if (this.env === 'action') {
+        throw new DatabaseError("Failed to bulk write participants", error).toActionError();
+      } else {
+        throw new DatabaseError("Failed to bulk write participants", error);
+      }
+    }
+  }
+
+  /**
+   * Generates database operations for creating participants
+   *
+   * This function takes an array of participant objects to create and generates the corresponding
+   * database operations. It ensures the correct scheduleId is set for each participant.
+   *
+   * @param scheduleId The ID of the schedule these participants belong to
+   * @param createParticipants Array of participant objects to create
+   * @returns Array of database operations for batch execution
+   */
+  private getParticipantCreateOps(scheduleId: number, createParticipants: Array<{ streamId: number, userId: number }>): BatchItem<'sqlite'>[] {
+    const operations: BatchItem<'sqlite'>[] = [];
+
+    // Process participant creations
+    for (const participant of createParticipants) {
+      operations.push(
+        this.db.insert(streamParticipantsTable)
+          .values({
+            streamId: participant.streamId,
+            scheduleId,
+            userId: participant.userId
+          })
+      );
+    }
+    return operations;
+  }
+
+  /**
+   * Generates database operations for deleting participants
+   *
+   * This function takes an array of participant objects to delete and generates the corresponding
+   * database operations. It ensures deletions are applied only to participants with the correct
+   * scheduleId, streamId, and userId.
+   *
+   * @param scheduleId The ID of the schedule these participants belong to
+   * @param deleteParticipants Array of participant objects to delete
+   * @returns Array of database operations for batch execution
+   */
+  private getParticipantDeleteOps(scheduleId: number, deleteParticipants: Array<{ streamId: number, userId: number }>): BatchItem<'sqlite'>[] {
+    const operations: BatchItem<'sqlite'>[] = [];
+
+    // Process participant deletions
+    for (const participant of deleteParticipants) {
+      operations.push(
+        this.db.delete(streamParticipantsTable)
+          .where(and(
+            eq(streamParticipantsTable.streamId, participant.streamId),
+            eq(streamParticipantsTable.scheduleId, scheduleId),
+            eq(streamParticipantsTable.userId, participant.userId)
+          ))
+      );
+    }
+    return operations;
+  }
+
   // endregion
+
+
+  /**
+   * Updates a schedule with all related streams, participants, and tags in a single batch operation
+   *
+   * This function handles multiple database operations in a single atomic batch:
+   * - Creating new streams
+   * - Updating existing streams
+   * - Deleting streams
+   * - Adding participants to streams
+   * - Removing participants from streams
+   * - Adding tags to streams
+   * - Removing tags from streams
+   *
+   * Using a batch operation ensures that all changes are applied together or not at all,
+   * maintaining database consistency.
+   *
+   * @param data Object containing all the changes to apply:
+   *   - scheduleId: The ID of the schedule being updated
+   *   - streams: Object containing streams to create, update, and delete
+   *   - participants: Object containing participants to add and remove
+   *   - tags: Object containing tags to add and remove
+   * @returns Promise resolving when the operation is complete
+   */
+  async updateSchedule(data: {
+    scheduleId: number;
+    streams: {
+      creates: InferInsertModel<typeof streamsTable>[],
+      updates: Array<{ id: number } & Partial<InferInsertModel<typeof streamsTable>>>,
+      deletes: number[],
+    }
+    participants: {
+      creates: Array<{ streamId: number, userId: number }>;
+      deletes: Array<{ streamId: number, userId: number }>;
+    },
+    tags: {
+      creates: Array<{ streamId: number, tag: string, label: string }>;
+      deletes: Array<{ streamId: number, tag: string }>;
+    }
+  }): Promise<void> {
+    try {
+      const { scheduleId, streams, participants, tags } = data;
+
+      // Collect all operations using the helper methods
+      const operations: BatchItem<'sqlite'>[] = [
+        // Stream operations
+        ...this.getStreamCreateOps(scheduleId, streams.creates),
+        ...this.getStreamUpdateOps(scheduleId, streams.updates),
+        ...this.getStreamDeleteOps(scheduleId, streams.deletes),
+
+        // Participant operations
+        ...this.getParticipantCreateOps(scheduleId, participants.creates),
+        ...this.getParticipantDeleteOps(scheduleId, participants.deletes),
+
+        // Tag operations
+        ...this.getTagCreateOps(scheduleId, tags.creates),
+        ...this.getTagDeleteOps(scheduleId, tags.deletes)
+      ];
+
+      // Execute all operations in a single batch
+      await this.executeBatch(operations);
+    } catch (error) {
+      if (this.env === 'action') {
+        throw new DatabaseError("Failed to update schedule", error).toActionError();
+      } else {
+        throw new DatabaseError("Failed to update schedule", error);
+      }
+    }
+  }
+
+
+
+
 }
