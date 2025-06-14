@@ -527,7 +527,7 @@ export const users = {
       console.log('getting table data')
       try {
         return await stub.getTables()
-      } catch (e) {
+      } catch (e: any) {
         console.error('Error getting tables from UserDO:', e);
         throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
       }
