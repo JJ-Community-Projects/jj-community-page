@@ -5,6 +5,7 @@ import {createSlug, generateScheduleSlugAlternatives} from "../functions/slug.ts
 import {getTags} from "../functions/getTags.ts";
 import {ScheduleRepo} from "../lib/db/repos/ScheduleRepo.ts";
 import {getScheduleEditorDO, getUserDO} from "./getDO.ts";
+import {StreamTagRepo} from "../lib/db/repos/StreamTagRepo.ts";
 
 
 export const schedules = {
@@ -228,14 +229,14 @@ export const schedules = {
   getPopularTags: defineAction({
     input: z.number().default(5),
     handler: async (limit, ctx) => {
-      const schedules = ScheduleRepo.action(ctx);
+      const tagsRepo = StreamTagRepo.action(ctx);
 
       // Since ScheduleRepo doesn't have a method for getting popular tags,
       // we'll use the db property to create a custom query
 
       // 1. Get all tags from the database, ordered by count
       // Note: We're using the db property directly since there's no specific method for this
-      const popularTags = await schedules.getPopularTags(limit);
+      const popularTags = await tagsRepo.getPopularTags(limit);
 
       // 2. If there are not enough tags found, supplement with tags from getTags function
       if (popularTags.length < limit) {
@@ -293,14 +294,14 @@ export const schedules = {
       limit: z.number().default(5),
     }),
     handler: async ({streamId, scheduleId, limit}, ctx) => {
-      const schedules = ScheduleRepo.action(ctx);
+      const tagsRepo = StreamTagRepo.action(ctx);
 
       // 1. Search all tags of the stream using ScheduleRepo
-      const streamTags = await schedules.findStreamTags(streamId, scheduleId);
+      const streamTags = await tagsRepo.findStreamTags(streamId, scheduleId);
       const streamTagValues = streamTags.map(t => t.tag);
 
       // 2. Find the most used tags that aren't part of the stream
-      const popularTags = schedules.getSuggestedTagsForStream(
+      const popularTags = tagsRepo.getSuggestedTagsForStream(
         streamId,
         scheduleId,
         limit,
@@ -350,15 +351,15 @@ export const schedules = {
       limit: z.number().default(5),
     }),
     handler: async ({streamId, scheduleId, term, limit}, ctx) => {
-      const schedules = ScheduleRepo.action(ctx);
+      const tagsRepo = StreamTagRepo.action(ctx);
 
       // 1. Search all tags of the stream using ScheduleRepo
-      const streamTags = await schedules.findStreamTags(streamId, scheduleId);
+      const streamTags = await tagsRepo.findStreamTags(streamId, scheduleId);
       const streamTagValues = streamTags.map(t => t.tag);
 
       // 2. Find the most used tags that aren't part of the stream and match the search term
       // Note: We're using the db property directly since there's no specific method for this
-      const databaseTags = await schedules.getSuggestedTagsForStreamBySearchTerm(
+      const databaseTags = await tagsRepo.getSuggestedTagsForStreamBySearchTerm(
         streamId,
         scheduleId,
         limit,
