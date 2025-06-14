@@ -221,9 +221,9 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
    */
   async bulkWriteStreams(writes: {
     scheduleId: number,
-    createStreams: InferInsertModel<typeof streamsTable>[],
-    updateStreams: Array<{ id: number } & Partial<InferInsertModel<typeof streamsTable>>>,
-    deleteStreams: number[],
+    createStreams?: InferInsertModel<typeof streamsTable>[],
+    updateStreams?: Array<{ id: number } & Partial<InferInsertModel<typeof streamsTable>>>,
+    deleteStreams?: number[],
   }): Promise<void> {
     try {
       const {scheduleId, createStreams, updateStreams, deleteStreams} = writes;
@@ -257,7 +257,9 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
    * @param createStreams Array of stream objects to create
    * @returns Array of database operations for batch execution
    */
-  private getStreamCreateOps(scheduleId: number, createStreams: InferInsertModel<typeof streamsTable>[]): BatchItem<'sqlite'>[] {
+  private getStreamCreateOps(scheduleId: number, createStreams?: InferInsertModel<typeof streamsTable>[]): BatchItem<'sqlite'>[] {
+    if (!createStreams) return [];
+
     const operations: BatchItem<'sqlite'>[] = [];
 
     // Process stream creations
@@ -288,7 +290,9 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
    * @param updateStreams Array of stream objects with ID and fields to update
    * @returns Array of database operations for batch execution
    */
-  private getStreamUpdateOps(scheduleId: number, updateStreams: Array<{ id: number } & Partial<InferInsertModel<typeof streamsTable>>>): BatchItem<'sqlite'>[] {
+  private getStreamUpdateOps(scheduleId: number, updateStreams?: Array<{ id: number } & Partial<InferInsertModel<typeof streamsTable>>>): BatchItem<'sqlite'>[] {
+    if (!updateStreams) return [];
+
     const operations: BatchItem<'sqlite'>[] = [];
 
     // Process stream updates
@@ -327,7 +331,9 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
    * @param deleteStreams Array of stream IDs to delete
    * @returns Array of database operations for batch execution
    */
-  private getStreamDeleteOps(scheduleId: number, deleteStreams: number[]): BatchItem<'sqlite'>[] {
+  private getStreamDeleteOps(scheduleId: number, deleteStreams?: number[]): BatchItem<'sqlite'>[] {
+    if (!deleteStreams) return [];
+
     const operations: BatchItem<'sqlite'>[] = [];
 
     // Process stream deletions
@@ -751,14 +757,14 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
    * @param tags Array of tag objects with streamId, scheduleId, tag, and optional label
    * @returns Promise resolving when the operation is complete
    */
-  async bulkAddStreamTags(tags: Array<{
+  async bulkAddStreamTags(tags?: Array<{
     streamId: number,
     scheduleId: number,
     tag: string,
     label?: string
   }>): Promise<void> {
     try {
-      if (tags.length === 0) return;
+      if (!tags || tags.length === 0) return;
 
       const operations: BatchItem<'sqlite'>[] = tags.map(tagObj => {
         const normalizedTag = tagObj.tag.toLowerCase();
@@ -789,9 +795,9 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
    * @param tags Array of tag objects with streamId, scheduleId, and tag
    * @returns Promise resolving when the operation is complete
    */
-  async bulkRemoveStreamTags(tags: Array<{ streamId: number, scheduleId: number, tag: string }>): Promise<void> {
+  async bulkRemoveStreamTags(tags?: Array<{ streamId: number, scheduleId: number, tag: string }>): Promise<void> {
     try {
-      if (tags.length === 0) return;
+      if (!tags || tags.length === 0) return;
 
       const operations: BatchItem<'sqlite'>[] = tags.map(tagObj => {
         const normalizedTag = tagObj.tag.toLowerCase();
@@ -826,8 +832,8 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
    */
   async bulkWriteTags(writes: {
     scheduleId: number,
-    createTags: Array<{ streamId: number, tag: string, label?: string }>,
-    deleteTags: Array<{ streamId: number, tag: string }>,
+    createTags?: Array<{ streamId: number, tag: string, label?: string }>,
+    deleteTags?: Array<{ streamId: number, tag: string }>,
   }): Promise<void> {
     try {
       const {scheduleId, createTags, deleteTags} = writes;
@@ -860,7 +866,9 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
    * @param createTags Array of tag objects to create
    * @returns Array of database operations for batch execution
    */
-  private getTagCreateOps(scheduleId: number, createTags: Array<{ streamId: number, tag: string, label?: string }>): BatchItem<'sqlite'>[] {
+  private getTagCreateOps(scheduleId: number, createTags?: Array<{ streamId: number, tag: string, label?: string }>): BatchItem<'sqlite'>[] {
+    if (!createTags) return [];
+
     const operations: BatchItem<'sqlite'>[] = [];
 
     // Process tag creations
@@ -893,7 +901,9 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
    * @param deleteTags Array of tag objects to delete
    * @returns Array of database operations for batch execution
    */
-  private getTagDeleteOps(scheduleId: number, deleteTags: Array<{ streamId: number, tag: string }>): BatchItem<'sqlite'>[] {
+  private getTagDeleteOps(scheduleId: number, deleteTags?: Array<{ streamId: number, tag: string }>): BatchItem<'sqlite'>[] {
+    if (!deleteTags) return [];
+
     const operations: BatchItem<'sqlite'>[] = [];
 
     // Process tag deletions
@@ -1005,13 +1015,13 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
    * @param participants Array of participant objects with streamId, scheduleId, and userId
    * @returns Promise resolving when the operation is complete
    */
-  async bulkAddStreamParticipants(participants: Array<{
+  async bulkAddStreamParticipants(participants?: Array<{
     streamId: number,
     scheduleId: number,
     userId: number
   }>): Promise<void> {
     try {
-      if (participants.length === 0) return;
+      if (!participants || participants.length === 0) return;
 
       const operations: BatchItem<'sqlite'>[] = participants.map(participant => {
         return this.db.insert(streamParticipantsTable)
@@ -1037,13 +1047,13 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
    * @param participants Array of participant objects with streamId, scheduleId, and userId
    * @returns Promise resolving when the operation is complete
    */
-  async bulkRemoveStreamParticipants(participants: Array<{
+  async bulkRemoveStreamParticipants(participants?: Array<{
     streamId: number,
     scheduleId: number,
     userId: number
   }>): Promise<void> {
     try {
-      if (participants.length === 0) return;
+      if (!participants || participants.length === 0) return;
 
       const operations: BatchItem<'sqlite'>[] = participants.map(participant => {
         return this.db.delete(streamParticipantsTable)
@@ -1076,8 +1086,8 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
    */
   async bulkWriteParticipants(writes: {
     scheduleId: number,
-    createParticipants: Array<{ streamId: number, userId: number }>,
-    deleteParticipants: Array<{ streamId: number, userId: number }>,
+    createParticipants?: Array<{ streamId: number, userId: number }>,
+    deleteParticipants?: Array<{ streamId: number, userId: number }>,
   }): Promise<void> {
     try {
       const {scheduleId, createParticipants, deleteParticipants} = writes;
@@ -1109,7 +1119,9 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
    * @param createParticipants Array of participant objects to create
    * @returns Array of database operations for batch execution
    */
-  private getParticipantCreateOps(scheduleId: number, createParticipants: Array<{ streamId: number, userId: number }>): BatchItem<'sqlite'>[] {
+  private getParticipantCreateOps(scheduleId: number, createParticipants?: Array<{ streamId: number, userId: number }>): BatchItem<'sqlite'>[] {
+    if (!createParticipants) return [];
+
     const operations: BatchItem<'sqlite'>[] = [];
 
     // Process participant creations
@@ -1137,7 +1149,9 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
    * @param deleteParticipants Array of participant objects to delete
    * @returns Array of database operations for batch execution
    */
-  private getParticipantDeleteOps(scheduleId: number, deleteParticipants: Array<{ streamId: number, userId: number }>): BatchItem<'sqlite'>[] {
+  private getParticipantDeleteOps(scheduleId: number, deleteParticipants?: Array<{ streamId: number, userId: number }>): BatchItem<'sqlite'>[] {
+    if (!deleteParticipants) return [];
+
     const operations: BatchItem<'sqlite'>[] = [];
 
     // Process participant deletions
@@ -1224,8 +1238,4 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
       }
     }
   }
-
-
-
-
 }
