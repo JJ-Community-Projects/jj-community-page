@@ -5,6 +5,7 @@ import type {SQLiteTableWithColumns, TableConfig} from "drizzle-orm/sqlite-core"
 import {eq} from "drizzle-orm";
 import {DatabaseError} from "./DatabaseError";
 import type {InferInsertModel, InferSelectModel} from "drizzle-orm";
+import type {BatchItem} from "drizzle-orm/batch";
 
 export type RepoEnv = 'action' | 'do'
 
@@ -29,5 +30,20 @@ export abstract class Repo<
    */
   protected defaultSelect() {
     return this.db.select().from(this.table);
+  }
+
+  protected async executeBatch(operations: BatchItem<'sqlite'>[]) {
+    try {
+      if (operations.length === 0) return;
+
+      const [firstOp, ...restOps] = operations;
+      await this.db.batch([firstOp, ...restOps] as const);
+    } catch (error) {
+      if (this.env === 'action') {
+        throw new DatabaseError("Failed to execute batch operations", error).toActionError();
+      } else {
+        throw new DatabaseError("Failed to execute batch operations", error);
+      }
+    }
   }
 }
