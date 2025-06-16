@@ -6,6 +6,7 @@ import {DatabaseError} from "./DatabaseError.ts";
 import {DateTime} from "luxon";
 import type {BatchItem} from "drizzle-orm/batch";
 import type {ActionAPIContext} from "astro:actions";
+import {type DetailedStream} from "./ScheduleRepo.ts";
 
 export class StreamRepo extends Repo<typeof streamsTable._['config']> {
   constructor(db: DrizzleD1Database, env: RepoEnv) {
@@ -26,10 +27,7 @@ export class StreamRepo extends Repo<typeof streamsTable._['config']> {
    * 2. `SELECT * FROM "streamTags" WHERE "streamTags"."scheduleId" = ?`
    * 3. `SELECT * FROM "streamParticipants" WHERE "streamParticipants"."scheduleId" = ?`
    */
-  async findStreamsWithDetails(scheduleId: number): Promise<Array<InferSelectModel<typeof streamsTable> & {
-    tags: InferSelectModel<typeof streamTagsTable>[],
-    participants: InferSelectModel<typeof streamParticipantsTable>[]
-  }>> {
+  async findStreamsWithDetails(scheduleId: number): Promise<DetailedStream[]> {
     try {
 
       // Get all streams for the schedule in one query

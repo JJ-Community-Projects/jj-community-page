@@ -1,6 +1,6 @@
 import {type Component, createResource, Match, Suspense, Switch} from "solid-js";
 import {actions} from "astro:actions";
-import {useUser} from "../../../components/admin/providers/UserProvider.tsx";
+import {useUser} from "../../../components/users/admin/providers/UserProvider.tsx";
 
 export const UserDODebug: Component = () => {
 

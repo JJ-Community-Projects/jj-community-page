@@ -26,7 +26,7 @@ export class StreamTagRepo extends Repo<typeof streamTagsTable._['config']> {
    */
   async findStreamTags(streamId: number, scheduleId: number): Promise<InferSelectModel<typeof streamTagsTable>[]> {
     try {
-      return await this.db.select()
+      return this.db.select()
         .from(streamTagsTable)
         .where(and(
           eq(streamTagsTable.streamId, streamId),
@@ -38,6 +38,35 @@ export class StreamTagRepo extends Repo<typeof streamTagsTable._['config']> {
         throw new DatabaseError(`Failed to find tags for stream: ${streamId} in schedule: ${scheduleId}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to find tags for stream: ${streamId} in schedule: ${scheduleId}`, error);
+      }
+    }
+  }
+
+  async findTagsGroupedByStream(scheduleId: number): Promise<Record<number, InferSelectModel<typeof streamTagsTable>[]>> {
+    try {
+      // Get all tags for all streams in the schedule in one query
+      const allTags = await this.db.select()
+        .from(streamTagsTable)
+        .where(eq(streamTagsTable.scheduleId, scheduleId))
+        .all();
+
+      // Organize tags by streamId for efficient lookup
+      const tagsByStreamId: Record<number, InferSelectModel<typeof streamTagsTable>[]> = {};
+
+      // Group tags by streamId
+      for (const tag of allTags) {
+        if (!tagsByStreamId[tag.streamId]) {
+          tagsByStreamId[tag.streamId] = [];
+        }
+        tagsByStreamId[tag.streamId].push(tag);
+      }
+
+      return tagsByStreamId;
+    } catch (error) {
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to find tags grouped by stream for schedule ID: ${scheduleId}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to find tags grouped by stream for schedule ID: ${scheduleId}`, error);
       }
     }
   }

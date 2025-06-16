@@ -1,0 +1,27 @@
+---
+interface Props {
+  tags: {
+    userId: number;
+    tag: string;
+    label: string;
+    addedAt: Date;
+  }[];
+}
+
+const { tags } = Astro.props;
+---
+
+<div class="w-full bg-white rounded-lg p-6 mb-4 shadow-md">
+  <h2 class="text-xl font-bold mb-4">Tags</h2>
+  {tags.length > 0 ? (
+    <div class="flex flex-wrap gap-2">
+      {tags.map((tag) => (
+        <span class="bg-accent text-white px-3 py-1 rounded-full text-sm">
+          {tag.label}
+        </span>
+      ))}
+    </div>
+  ) : (
+    <p class="text-gray-500">No tags added yet</p>
+  )}
+</div>

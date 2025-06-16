@@ -5,6 +5,8 @@ import type {InferInsertModel, InferSelectModel} from "drizzle-orm";
 import {and, eq} from "drizzle-orm";
 import {DatabaseError} from "./DatabaseError";
 import type {ActionAPIContext} from "astro:actions";
+import {UserRepo} from "./UserRepo.ts";
+import {accounts} from "../schema/auth-schema";
 
 /**
  * Repository for working with teams
@@ -106,6 +108,143 @@ export class TeamRepo extends Repo<typeof teamsTable._['config']> {
         throw new DatabaseError("Failed to find visible teams", error).toActionError();
       } else {
         throw new DatabaseError("Failed to find visible teams", error);
+      }
+    }
+  }
+
+  /**
+   * Find visible teams where the user is a member or owner
+   * @param userId The user ID
+   * @returns Promise resolving to an array of visible teams where the user is a member or owner
+   *
+   * SQL: `SELECT DISTINCT t.* FROM "teams" t
+   *       LEFT JOIN "team_members" tm ON t."team_id" = tm."team_id"
+   *       WHERE t."team_visibility" = true AND (tm."user_id" = ? OR t."owner_id" = ?)`
+   */
+  async findVisibleByUserId(userId: number): Promise<InferSelectModel<typeof teamsTable>[]> {
+    try {
+      // Find teams where the user is a member
+      const memberTeams = await this.db.select({
+          id: teamsTable.id,
+          ownerId: teamsTable.ownerId,
+          name: teamsTable.name,
+          description: teamsTable.description,
+          slug: teamsTable.slug,
+          visible: teamsTable.visible
+        })
+        .from(teamsTable)
+        .innerJoin(teamMembersTable, eq(teamsTable.id, teamMembersTable.teamId))
+        .where(
+          and(
+            eq(teamsTable.visible, true),
+            eq(teamMembersTable.userId, userId)
+          )
+        )
+        .all();
+
+      // Find teams where the user is the owner
+      const ownerTeams = await this.db.select()
+        .from(teamsTable)
+        .where(
+          and(
+            eq(teamsTable.visible, true),
+            eq(teamsTable.ownerId, userId)
+          )
+        )
+        .all();
+
+      // Combine the results, removing duplicates
+      const allTeams = [...memberTeams];
+
+      // Add owner teams if they're not already in the result
+      for (const ownerTeam of ownerTeams) {
+        if (!allTeams.some(team => team.id === ownerTeam.id)) {
+          allTeams.push(ownerTeam);
+        }
+      }
+
+      return allTeams;
+    } catch (error) {
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to find visible teams for user with id: ${userId}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to find visible teams for user with id: ${userId}`, error);
+      }
+    }
+  }
+
+  /**
+   * Find visible teams where the user with the given Tiltify username is a member or owner
+   * @param username The Tiltify username (accounts.providerUsername)
+   * @returns Promise resolving to an array of visible teams where the user is a member or owner
+   *
+   * SQL: `SELECT DISTINCT t.* FROM "teams" t
+   *       LEFT JOIN "team_members" tm ON t."team_id" = tm."team_id"
+   *       LEFT JOIN "accounts" a ON tm."user_id" = a."user_id"
+   *       WHERE t."team_visibility" = true AND a."provider_username" = ?`
+   */
+  async findVisibleByTiltifyUsername(username: string): Promise<InferSelectModel<typeof teamsTable>[]> {
+    try {
+      // Find the user with the given Tiltify username
+      const account = await this.db.select({
+          userId: accounts.userId
+        })
+        .from(accounts)
+        .where(and(eq(accounts.providerUsername, username), eq(accounts.provider, 'tiltify')))
+        .get();
+
+      if (!account) {
+        return [];
+      }
+
+      const userId = account.userId;
+
+      // Find teams where the user is a member
+      const memberTeams = await this.db.select({
+          id: teamsTable.id,
+          ownerId: teamsTable.ownerId,
+          name: teamsTable.name,
+          description: teamsTable.description,
+          slug: teamsTable.slug,
+          visible: teamsTable.visible
+        })
+        .from(teamsTable)
+        .innerJoin(teamMembersTable, eq(teamsTable.id, teamMembersTable.teamId))
+        .where(
+          and(
+            eq(teamsTable.visible, true),
+            eq(teamMembersTable.userId, userId)
+          )
+        )
+        .all();
+
+      // Find teams where the user is the owner
+      const ownerTeams = await this.db.select()
+        .from(teamsTable)
+        .where(
+          and(
+            eq(teamsTable.visible, true),
+            eq(teamsTable.ownerId, userId)
+          )
+        )
+        .all();
+
+      // Combine the results, removing duplicates
+      const allTeams = [...memberTeams];
+
+      // Add owner teams if they're not already in the result
+      for (const ownerTeam of ownerTeams) {
+        if (!allTeams.some(team => team.id === ownerTeam.id)) {
+          allTeams.push(ownerTeam);
+        }
+      }
+
+      return allTeams;
+    } catch (error) {
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to find visible teams for user with Tiltify username: ${username}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to find visible teams for user with Tiltify username: ${username}`, error);
       }
     }
   }
@@ -501,4 +640,59 @@ export class TeamRepo extends Repo<typeof teamsTable._['config']> {
   }
 
   // endregion Team Invites Operations
+
+  /**
+   * Find all teams a user is a member of given a tiltify username
+   *
+   * This function performs the following operations:
+   * 1. Finds the user with the given tiltify username
+   * 2. If found, retrieves all teams owned by that user
+   * 3. Finds all visible teams where the user is a member (but not owner)
+   * 4. Combines and returns both sets of teams
+   *
+   * @param tiltifyUsername - The tiltify username to find teams for
+   * @returns Promise resolving to an array of teams the user is a member of
+   */
+  async findTeamsByTiltifyUsername(tiltifyUsername: string): Promise<InferSelectModel<typeof teamsTable>[]> {
+    try {
+      // Create a UserRepo instance to find the user by tiltify username
+      const userRepo = new UserRepo(this.db, this.env);
+
+      // Get the user data by tiltify username
+      const userData = await userRepo.getUserByTiltifyUsername(tiltifyUsername);
+
+      // If no user found, return empty array
+      if (!userData) {
+        return [];
+      }
+
+      const userId = userData.user.id;
+
+      // Get teams owned by the user
+      const ownedTeams = await this.findByOwnerId(userId);
+
+      // Get all visible teams
+      const allVisibleTeams = await this.findVisible();
+
+      // Get teams where user is a member (but not owner)
+      const memberTeams = [];
+      for (const team of allVisibleTeams) {
+        if (team.ownerId !== userId) {
+          const isMember = await this.isTeamMember(team.id, userId);
+          if (isMember) {
+            memberTeams.push(team);
+          }
+        }
+      }
+
+      // Combine owned and member teams
+      return [...ownedTeams, ...memberTeams];
+    } catch (error) {
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to find teams for tiltify username: ${tiltifyUsername}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to find teams for tiltify username: ${tiltifyUsername}`, error);
+      }
+    }
+  }
 }

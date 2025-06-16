@@ -1,3 +1,31 @@
 ---
+import {actions} from 'astro:actions';
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import UserHeader from "../../components/users/public/UserHeader.astro";
+import UserSchedule from "../../components/users/public/UserSchedule.astro";
+import UserTeams from "../../components/users/public/UserTeams.astro";
 
+const {username} = Astro.params;
+if (!username) {
+  return Astro.redirect('/user-not-found')
+}
+const {data, error} = await Astro.callAction(actions.users.getUserByTiltifyUsername, username)
+
+
+if (error) {
+  return Astro.redirect(`/${username}/error`)
+}
+
+if (!data) {
+  return Astro.redirect('/user-not-found')
+}
+
+const { user, account, tags, socials } = data;
 ---
+<BaseLayout title={`${account.providerUsername} | Jingle Jam Community`}>
+  <div class="w-full max-w-4xl mx-auto">
+    <UserHeader user={user} account={account} tags={tags} socials={socials} />
+    <UserSchedule tiltifyUsername={username} />
+    <UserTeams tiltifyUsername={username} userId={user.id} />
+  </div>
+</BaseLayout>

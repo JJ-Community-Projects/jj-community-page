@@ -1,4 +1,4 @@
-import {ACTION_ERROR_CODES, ActionError, type ActionErrorCode} from "astro:actions";
+import {ACTION_ERROR_CODES, ActionError, type ActionErrorCode} from "astro/actions/runtime/virtual/server.js";
 
 export class DatabaseError extends Error {
   constructor(

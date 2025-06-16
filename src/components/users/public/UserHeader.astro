@@ -1,0 +1,100 @@
+---
+interface Props {
+  user: {
+    id: number;
+    createdAt: Date;
+    role: string;
+  };
+  account: {
+    userId: number;
+    provider: string;
+    providerId: string;
+    providerUsername: string;
+    createdAt: Date;
+    updatedAt: Date;
+    meta: any;
+  };
+  tags: {
+    userId: number;
+    tag: string;
+    label: string;
+    addedAt: Date;
+  }[];
+  socials: {
+    userId: number;
+    provider: string;
+    url: string;
+  }[];
+}
+
+const {user, account, tags, socials} = Astro.props;
+
+// Import social media components
+import Twitch from "./social/Twitch.astro";
+import Youtube from "./social/Youtube.astro";
+import Twitter from "./social/Twitter.astro";
+import Instagram from "./social/Instagram.astro";
+import TikTok from "./social/TikTok.astro";
+import BlueSky from "./social/BlueSky.astro";
+import {GlobeIcon} from "../../common/JJIcons";
+---
+
+<div class="bg-white rounded-lg p-6 mb-4 shadow-md">
+    <div class="text-center mb-4">
+        <h1 class="text-3xl font-bold text-primary">{account.providerUsername}</h1>
+    </div>
+
+    <div class="mt-4">
+      {tags.length > 0 ? (
+              <div class="flex flex-wrap gap-2 justify-center">
+                {tags.map((tag) => (
+                        <span class="bg-accent text-white px-3 py-1 rounded-full text-xs">
+            {tag.label}
+          </span>
+                ))}
+              </div>
+      ) : (
+              <p class="text-gray-500 text-center">No tags added yet</p>
+      )}
+    </div>
+
+    <div class="mt-6">
+      {socials && socials.length > 0 ? (
+              <div class="flex flex-wrap justify-center gap-4">
+                {socials.map((social) => {
+                  const provider = social.provider.toLowerCase();
+                  switch (provider) {
+                    case 'twitch':
+                      return <Twitch url={social.url} name={provider.charAt(0).toUpperCase() + provider.slice(1)}/>;
+                    case 'youtube':
+                      return <Youtube url={social.url} name={provider.charAt(0).toUpperCase() + provider.slice(1)}/>;
+                    case 'twitter':
+                    case 'x':
+                      return <Twitter url={social.url} name="Twitter"/>;
+                    case 'instagram':
+                      return <Instagram url={social.url} name={provider.charAt(0).toUpperCase() + provider.slice(1)}/>;
+                    case 'tiktok':
+                      return <TikTok url={social.url} name="TikTok"/>;
+                    case 'bsky':
+                    case 'bluesky':
+                      return <BlueSky url={social.url} name="BlueSky"/>;
+                    default:
+                      return (
+                              <a
+                                      href={social.url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      class="flex flex-col items-center justify-center hover:scale-105 transition-all rounded-full p-2 hover:text-[#000000] hover:bg-[#000000]/10"
+                              >
+                                  <GlobeIcon class="size-6"/>
+                                  <p class="text-xxs">{provider.charAt(0).toUpperCase() + provider.slice(1)}</p>
+                              </a>
+                      );
+                  }
+                })}
+              </div>
+      ) : (
+              <p class="text-gray-500 text-center">No social media links added yet</p>
+      )}
+    </div>
+</div>

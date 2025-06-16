@@ -2,10 +2,10 @@ import {index, integer, primaryKey, sqliteTable, text, uniqueIndex,} from "drizz
 import {sql} from "drizzle-orm";
 
 export const users = sqliteTable("users", {
-  // id: text("id").primaryKey(),
   id: integer({mode: 'number'}).primaryKey({autoIncrement: true}),
   createdAt: integer('created_at', {mode: 'timestamp'}).notNull()
     .default(sql`(current_timestamp)`),
+  role: text('role').$type<"user" | "admin">().notNull().default('user'),
 });
 
 export const accounts =
@@ -13,7 +13,7 @@ export const accounts =
       userId: integer({mode: 'number'}).notNull()
         .references(() => users.id, {onDelete: 'cascade'}),
       provider: text('provider').notNull(),
-      providerId: text('provider_id').notNull(),
+      providerId: text('provider_id').notNull().unique(),
       providerUsername: text("provider_username").notNull(),
       createdAt: integer('created_at', {mode: 'timestamp'})
         .default(sql`(current_timestamp)`).notNull(),
@@ -70,3 +70,11 @@ export const userSocials = sqliteTable("userSocials", {
   primaryKey({name: 'user_url_provider_pk', columns: [table.userId, table.provider]}),
   uniqueIndex('unique_user_url_provider').on(table.userId, table.provider)
 ])
+
+export const blockedAccounts = sqliteTable("blockedAccounts", {
+  providerId: text('provider_id').notNull().notNull().references(() => accounts.providerId, {onDelete: 'cascade'}),
+  provider: text('provider').notNull(),
+  reason: text('reason'),
+  createdAt: integer('created_at', {mode: 'timestamp'})
+    .default(sql`(current_timestamp)`).notNull(),
+})

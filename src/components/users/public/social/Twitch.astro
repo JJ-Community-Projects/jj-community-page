@@ -1,0 +1,20 @@
+---
+interface Props {
+  url: string;
+  name?: string;
+}
+
+const { url, name = "Twitch" } = Astro.props;
+
+import { TwitchIcon } from "../../../common/JJIcons";
+---
+
+<a
+  href={url}
+  target="_blank"
+  rel="noopener noreferrer"
+  class="flex flex-col items-center justify-center hover:scale-105 transition-all rounded-full p-2 hover:text-twitch hover:bg-twitch/10"
+>
+  <TwitchIcon class="size-6" />
+  <p class="text-xxs">{name}</p>
+</a>

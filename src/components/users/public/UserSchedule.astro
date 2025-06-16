@@ -1,0 +1,38 @@
+---
+import { actions } from 'astro:actions';
+
+interface Props {
+  tiltifyUsername: string;
+}
+
+const { tiltifyUsername } = Astro.props;
+
+// Get user's schedules using the new action
+const { data: schedules, error } = await Astro.callAction(actions.schedules.getSchedulesByTiltifyUsername, tiltifyUsername);
+---
+
+<div class="w-full bg-white rounded-lg p-6 mb-4 shadow-md">
+  <h2 class="text-xl font-bold mb-4">Schedules</h2>
+  {schedules && schedules.length > 0 ? (
+    <div class="space-y-4">
+      {schedules.map((schedule) => (
+        <div class="border border-gray-200 rounded-md p-4">
+          <div class="flex justify-between items-center mb-2">
+            <h3 class="text-lg font-semibold">{schedule.title}</h3>
+            <span class="text-sm bg-primary-shade text-white px-2 py-1 rounded">
+              {schedule.year}
+            </span>
+          </div>
+          <a
+            href={`/schedule/${schedule.slug}`}
+            class="text-accent hover:underline inline-block mt-2"
+          >
+            View Schedule
+          </a>
+        </div>
+      ))}
+    </div>
+  ) : (
+    <p class="text-gray-500">No public schedules available</p>
+  )}
+</div>

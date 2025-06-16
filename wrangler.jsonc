@@ -62,9 +62,18 @@
     }
   ],
   "vars": {
-    "BETTER_AUTH_SECRET": "Bahjoannsj0Cuzjgp7E2l0lLGICqb8to8YiCZymn2W",
     "JJ_DASHBOARD_URL": "https://dashboard.jinglejam.co.uk/api/tiltify"
+  },
+  "env": {
+    "prod": {
+      "route": "jinglejam.ostof.dev"
+    },
+    "beta": {
+      "route": "beta.jinglejam.ostof.dev"
+    }
   }
+
+
   /**
    * Smart Placement
    * Docs: https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement

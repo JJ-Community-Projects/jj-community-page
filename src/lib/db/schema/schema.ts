@@ -30,8 +30,8 @@ export const schedulesTable = sqliteTable('schedules', {
 );
 
 export const editorsTable = sqliteTable('editors', {
-    scheduleId: text('schedule_id').references(() => schedulesTable.id),
-    userId: text('user_id').references(() => users.id),
+    scheduleId: integer('schedule_id').references(() => schedulesTable.id),
+    userId: integer('user_id').references(() => users.id),
   },
   (table) => [
     uniqueIndex('editors_pk').on(table.scheduleId, table.userId),

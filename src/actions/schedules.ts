@@ -444,5 +444,47 @@ export const schedules = {
         throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
       }
     }
-  })
+  }),
+
+  /**
+   * Retrieves all schedules owned by a user with a given tiltify username.
+   * Input: tiltifyUsername (string) - The tiltify username to find schedules for
+   * Action: Uses the ScheduleRepo to find all schedules owned by the user with the given tiltify username.
+   * Returns: An array of schedules owned by the user.
+   */
+  getSchedulesByTiltifyUsername: defineAction({
+    input: z.string(),
+    handler: async (tiltifyUsername, ctx) => {
+      try {
+        const schedulesRepo = ScheduleRepo.action(ctx);
+        const schedules = await schedulesRepo.findSchedulesByTiltifyUsername(tiltifyUsername);
+
+        return schedules;
+      } catch (e: any) {
+        console.error('Error getting schedules by tiltify username:', e);
+        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message});
+      }
+    }
+  }),
+
+  /**
+   * Retrieves the next schedule for a user with a given tiltify username.
+   * Input: tiltifyUsername (string) - The tiltify username to find the next schedule for
+   * Action: Uses the ScheduleRepo to find the next schedule for the user with the given tiltify username.
+   * Returns: An object containing the schedule and its streams, or null if none found.
+   */
+  getNextScheduleByTiltifyUsername: defineAction({
+    input: z.string(),
+    handler: async (tiltifyUsername, ctx) => {
+      try {
+        const schedules = ScheduleRepo.action(ctx);
+        const nextSchedule = await schedules.findNextScheduleByTiltifyUsername(tiltifyUsername);
+
+        return { nextSchedule };
+      } catch (e: any) {
+        console.error('Error getting next schedule by tiltify username:', e);
+        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message});
+      }
+    }
+  }),
 }

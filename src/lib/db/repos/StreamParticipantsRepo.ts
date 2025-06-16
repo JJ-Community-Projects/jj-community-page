@@ -279,4 +279,33 @@ export class StreamParticipantsRepo extends Repo<typeof streamParticipantsTable.
       ...this.getParticipantDeleteOps(scheduleId, ops?.deletes)
     ];
   }
+
+  async findParticipantsGroupedByStream(scheduleId: number): Promise<Record<number, InferSelectModel<typeof streamParticipantsTable>[]>> {
+    try {
+      // Get all participants for all streams in the schedule in one query
+      const allParticipants = await this.db.select()
+        .from(streamParticipantsTable)
+        .where(eq(streamParticipantsTable.scheduleId, scheduleId))
+        .all();
+
+      // Organize participants by streamId for efficient lookup
+      const participantsByStreamId: Record<number, InferSelectModel<typeof streamParticipantsTable>[]> = {};
+
+      // Group participants by streamId
+      for (const participant of allParticipants) {
+        if (!participantsByStreamId[participant.streamId]) {
+          participantsByStreamId[participant.streamId] = [];
+        }
+        participantsByStreamId[participant.streamId].push(participant);
+      }
+
+      return participantsByStreamId;
+    } catch (error) {
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to find participants grouped by stream for schedule ID: ${scheduleId}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to find participants grouped by stream for schedule ID: ${scheduleId}`, error);
+      }
+    }
+  }
 }

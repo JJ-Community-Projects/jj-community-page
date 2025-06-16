@@ -1,6 +1,6 @@
 import {drizzle, DrizzleD1Database} from "drizzle-orm/d1";
 import {Repo, type RepoEnv} from "./Repo";
-import {accounts, users, userSocials, userTags} from "../schema/auth-schema";
+import {accounts, blockedAccounts, users, userSocials, userTags} from "../schema/auth-schema";
 import type {InferSelectModel} from "drizzle-orm";
 import {and, desc, eq, like, not, notInArray, sql} from "drizzle-orm";
 import {DatabaseError} from "./DatabaseError";
@@ -683,4 +683,171 @@ export class UserRepo extends Repo<typeof users._['config']> {
   }
 
   // endregion User Socials Operations
+
+
+  /**
+   * Get user data, tiltify account data, user socials, and user tags for a given tiltify username
+   * @param tiltifyUsername The tiltify username to look up
+   * @returns Promise resolving to an object containing user data, tiltify account data, user socials, and user tags, or null if not found
+   *
+   * SQL: `SELECT * FROM "accounts"
+   *      JOIN "users" ON "accounts"."userId" = "users"."id"
+   *      WHERE "accounts"."provider" = 'tiltify' AND "accounts"."providerUsername" = ?`
+   */
+  async getUserByTiltifyUsername(tiltifyUsername: string): Promise<{
+    user: InferSelectModel<typeof users>,
+    account: InferSelectModel<typeof accounts>,
+    socials: InferSelectModel<typeof userSocials>[],
+    tags: InferSelectModel<typeof userTags>[]
+  } | null> {
+    try {
+      // Query the accounts table to find the account with the given tiltify username
+      const result = await this.db.select({
+        user: users,
+        account: accounts
+      })
+        .from(accounts)
+        .innerJoin(users, eq(accounts.userId, users.id))
+        .where(
+          and(
+            eq(accounts.provider, 'tiltify'),
+            eq(accounts.providerUsername, tiltifyUsername)
+          )
+        )
+        .get();
+
+      if (!result) {
+        return null;
+      }
+
+      // Get user socials and tags
+      const socials = await this.getUserSocials(result.user.id);
+      const tags = await this.getUserTags(result.user.id);
+
+      return {
+        ...result,
+        socials,
+        tags
+      };
+    } catch (error) {
+      console.error('Error in getUserByTiltifyUsername:', error);
+
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to get user by tiltify username: ${tiltifyUsername}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to get user by tiltify username: ${tiltifyUsername}`, error);
+      }
+    }
+  }
+
+  /**
+   * Check if a tiltify account is blocked
+   * @param tiltifyUsername The tiltify username to check
+   * @returns Promise resolving to a boolean indicating if the account is blocked
+   *
+   * SQL: `SELECT * FROM "accounts"
+   *      LEFT JOIN "blockedAccounts" ON "accounts"."providerId" = "blockedAccounts"."providerId" AND "blockedAccounts"."provider" = 'tiltify'
+   *      WHERE "accounts"."provider" = 'tiltify' AND "accounts"."providerUsername" = ?`
+   */
+  async isTiltifyAccountBlocked(tiltifyUsername: string): Promise<boolean> {
+    try {
+      // Query accounts and join with blockedAccounts in a single query
+      const result = await this.db.select({
+        blockedAccount: blockedAccounts
+      })
+        .from(accounts)
+        .leftJoin(blockedAccounts, and(
+          eq(accounts.providerId, blockedAccounts.providerId),
+          eq(blockedAccounts.provider, 'tiltify')
+        ))
+        .where(
+          and(
+            eq(accounts.provider, 'tiltify'),
+            eq(accounts.providerUsername, tiltifyUsername)
+          )
+        )
+        .get();
+
+      // If no result or no blockedAccount found, the account is not blocked
+      return !!result?.blockedAccount;
+    } catch (error) {
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to check if tiltify account is blocked for username: ${tiltifyUsername}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to check if tiltify account is blocked for username: ${tiltifyUsername}`, error);
+      }
+    }
+  }
+
+
+  /**
+   * Get recommended users based on shared tags with the current user
+   *
+   * This method finds other users who share tags with the current user,
+   * counts how many tags they have in common, and returns a list of
+   * recommended users sorted by the number of common tags in descending order.
+   *
+   * The algorithm works as follows:
+   * 1. Start with the current user's tags
+   * 2. Find other users who have the same tags
+   * 3. Count how many tags each user has in common with the current user
+   * 4. Sort users by the number of common tags (highest first)
+   * 5. Return the top N users as recommendations
+   *
+   * @param currentUserId The ID of the current user
+   * @param limit Maximum number of recommended users to return (default: 10)
+   * @returns Promise resolving to an array of recommended users with their common tag count
+   *
+   * SQL equivalent:
+   * ```sql
+   * SELECT users.id, users.role, COUNT(*) as commonTagCount
+   * FROM userTags
+   * INNER JOIN userTags AS theirs ON userTags.tag = theirs.tag
+   * INNER JOIN users ON users.id = theirs.userId
+   * WHERE userTags.userId = ? AND theirs.userId != ?
+   * GROUP BY users.id
+   * ORDER BY commonTagCount DESC
+   * LIMIT ?
+   * ```
+   */
+  async getRecommendedUsers(currentUserId: number, limit = 10) {
+    try {
+      // Query to find users who share tags with the current user
+      const recommendations = await this.db
+        .select({
+          id: users.id,
+          role: users.role,
+          commonTagCount: sql<number>`COUNT(*)`
+        })
+        .from(userTags)
+        // Join to other users' tags on the same tag value
+        .innerJoin(
+          userTags,
+          eq(userTags.tag, userTags.tag)
+        )
+        // Join to users table to get user information
+        .innerJoin(
+          users,
+          eq(users.id, userTags.userId)
+        )
+        // Filter: only include tags belonging to the current user
+        // Exclude the current user from recommendations
+        .where(and(eq(userTags.userId, currentUserId), not(eq(userTags.userId, currentUserId))))
+        // Group by user to count common tags per user
+        .groupBy(users.id)
+        // Sort by number of common tags (highest first)
+        .orderBy(desc(sql`commonTagCount`))
+        // Limit the number of results
+        .limit(limit)
+        .all();
+
+      return recommendations;
+    } catch (error) {
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to get recommended users for user with id: ${currentUserId}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to get recommended users for user with id: ${currentUserId}`, error);
+      }
+    }
+  }
 }

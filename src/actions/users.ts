@@ -744,4 +744,63 @@ export const users = {
       }
     }
   }),
+
+  /**
+   * Retrieves user data, tiltify account data, user socials, and user tags for a given tiltify username.
+   * Input: tiltifyUserName (string) - The tiltify username to look up
+   * Action: Queries the database for user, account, socials, and tags information associated with the tiltify username.
+   * Returns: An object containing user data, tiltify account data, user socials, and user tags, or null if not found.
+   */
+  getUserByTiltifyUsername: defineAction({
+    input: z.string(),
+    handler: async (providerUsername, context) => {
+      try {
+        // Create UserRepo instance
+        const userRepo = UserRepo.action(context);
+
+        // Call the getUserByTiltifyUsername method
+        const tiltifyUser = await userRepo.getUserByTiltifyUsername(providerUsername);
+
+        if (!tiltifyUser) {
+          return null;
+        }
+
+        return tiltifyUser;
+      } catch (error) {
+        console.error('Error getting user by Tiltify username:', error);
+        throw new ActionError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to get user data by Tiltify username'
+        });
+      }
+    }
+  }),
+
+  /**
+   * Checks if a tiltify account is blocked.
+   * Input: tiltifyUserName (string) - The tiltify username to check
+   * Action: Queries the database to determine if the tiltify account is in the blockedAccounts table.
+   * Returns: A boolean indicating if the account is blocked.
+   */
+  isTiltifyAccountBlocked: defineAction({
+    input: z.string(),
+    handler: async (providerUsername, context) => {
+      try {
+        // Create UserRepo instance
+        const userRepo = UserRepo.action(context);
+
+        // Call the isTiltifyAccountBlocked method
+        const isBlocked = await userRepo.isTiltifyAccountBlocked(providerUsername);
+
+        return isBlocked;
+      } catch (error) {
+        console.error('Error checking if Tiltify account is blocked:', error);
+        throw new ActionError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to check if Tiltify account is blocked'
+        });
+      }
+    }
+  }),
+
 }

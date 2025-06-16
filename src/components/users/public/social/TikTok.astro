@@ -1,0 +1,20 @@
+---
+interface Props {
+  url: string;
+  name?: string;
+}
+
+const { url, name = "TikTok" } = Astro.props;
+
+import { TiktokIcon } from "../../../common/JJIcons";
+---
+
+<a
+  href={url}
+  target="_blank"
+  rel="noopener noreferrer"
+  class="flex flex-col items-center justify-center hover:scale-105 transition-all rounded-full p-2 hover:text-tiktok hover:bg-tiktok/10"
+>
+  <TiktokIcon class="size-6" />
+  <p class="text-xxs">{name}</p>
+</a>

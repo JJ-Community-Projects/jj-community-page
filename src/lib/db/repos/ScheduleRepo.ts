@@ -1,13 +1,18 @@
 import {drizzle, DrizzleD1Database} from "drizzle-orm/d1";
 import {Repo, type RepoEnv} from "./Repo";
-import {schedulesTable, streamsTable} from "../schema/schema";
-import {eq, type InferInsertModel, type InferSelectModel} from "drizzle-orm";
+import {schedulesTable, streamParticipantsTable, streamsTable, streamTagsTable} from "../schema/schema";
+import {and, eq, type InferInsertModel, type InferSelectModel} from "drizzle-orm";
 import {DatabaseError} from "./DatabaseError";
 import type {ActionAPIContext} from "astro:actions";
 import type {BatchItem} from "drizzle-orm/batch";
 import {StreamRepo} from "./StreamRepo.ts";
 import {StreamTagRepo} from "./StreamTagRepo.ts";
 import {StreamParticipantsRepo} from "./StreamParticipantsRepo.ts";
+import {accounts, users} from "../schema/auth-schema";
+import {DateTime} from "luxon";
+import type {Prettify} from "../../Prettify.ts";
+import type {DetailedStream} from "./ScheduleModel.ts";
+
 
 /**
  * Repository for working with schedules
@@ -271,4 +276,271 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
       }
     }
   }
+
+
+  /**
+   * Find the schedule with the stream that has the earliest start time within the current year for a given user
+   * and return all streams of that schedule in order of start time
+   *
+   * This function performs the following operations:
+   * 1. Finds the schedule with the earliest stream in the current year
+   * 2. Retrieves all streams for that schedule
+   * 3. Orders the streams by start time
+   * 4. Returns both the schedule and its streams
+   *
+   * The function is optimized to reduce database reads by:
+   * - Using efficient queries with joins
+   * - Filtering data at the database level rather than in application code
+   * - Using appropriate indexes for efficient filtering and sorting
+   *
+   * @param userId - The ID of the user to find schedules for
+   * @returns Promise resolving to an object containing the schedule and its streams, or null if none found
+   */
+  async findNextSchedule(
+    userId: number,
+  ): Promise<{
+    schedule: InferSelectModel<typeof schedulesTable>,
+    streams: InferSelectModel<typeof streamsTable>[]
+  } | null> {
+    try {
+      // Get the current year for filtering
+      const currentYear = new Date().getFullYear();
+
+      // Import the and function for combining conditions
+      const {and} = await import("drizzle-orm");
+
+      // First, find the schedule with the earliest stream
+      const scheduleResult = await this.db.select({
+        schedule: schedulesTable
+      })
+        .from(schedulesTable)
+        .innerJoin(streamsTable, eq(schedulesTable.id, streamsTable.scheduleId))
+        .where(
+          and(
+            eq(schedulesTable.ownerId, userId),
+            eq(schedulesTable.year, currentYear),
+            eq(streamsTable.visible, true)
+          )
+        )
+        .orderBy(streamsTable.start)
+        .limit(1)
+        .get();
+
+      // If no schedule found, return null
+      if (!scheduleResult) {
+        return null;
+      }
+
+      // Get all streams for this schedule, ordered by start time
+      const streams = await this.db.select()
+        .from(streamsTable)
+        .where(
+          and(
+            eq(streamsTable.scheduleId, scheduleResult.schedule.id),
+            eq(streamsTable.visible, true)
+          )
+        )
+        .orderBy(streamsTable.start)
+        .all();
+
+      // Return both the schedule and its streams
+      return {
+        schedule: scheduleResult.schedule,
+        streams: streams
+      };
+    } catch (error) {
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to find next schedule for user: ${userId}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to find next schedule for user: ${userId}`, error);
+      }
+    }
+  }
+
+  /**
+   * Find schedules owned by a user with a given tiltify username
+   *
+   * This function performs the following operations in a single database query:
+   * 1. Joins the accounts, users, and schedules tables
+   * 2. Filters by tiltify username and provider
+   * 3. Returns all schedules owned by that user
+   *
+   * @param tiltifyUsername - The tiltify username to find schedules for
+   * @returns Promise resolving to an array of schedules owned by the user with the given tiltify username
+   */
+  async findSchedulesByTiltifyUsername(
+    tiltifyUsername: string
+  ): Promise<InferSelectModel<typeof schedulesTable>[]> {
+    try {
+      // Import the and function for combining conditions
+      const {and} = await import("drizzle-orm");
+
+      // Find all schedules for the user with the given tiltify username using a join query
+      const schedules = await this.db.select({
+        schedule: schedulesTable
+      })
+        .from(schedulesTable)
+        .innerJoin(users, eq(schedulesTable.ownerId, users.id))
+        .innerJoin(accounts, eq(users.id, accounts.userId))
+        .where(
+          and(
+            eq(accounts.provider, 'tiltify'),
+            eq(accounts.providerUsername, tiltifyUsername)
+          )
+        )
+        .all();
+
+      // If no schedules found, return empty array
+      if (!schedules || schedules.length === 0) {
+        return [];
+      }
+
+      // Extract and return the schedules
+      return schedules.map(result => result.schedule);
+    } catch (error) {
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to find schedules for tiltify username: ${tiltifyUsername}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to find schedules for tiltify username: ${tiltifyUsername}`, error);
+      }
+    }
+  }
+
+  /**
+   * Find the next schedule for a user with a given tiltify username
+   *
+   * This function performs the following operations in a single database query:
+   * 1. Joins the accounts, users, schedules, and streams tables
+   * 2. Filters by tiltify username, provider, and current year
+   * 3. Gets the schedule with the earliest stream
+   * 4. Then gets all visible streams for that schedule
+   *
+   * @param tiltifyUsername - The tiltify username to find the next schedule for
+   * @returns Promise resolving to an object containing the schedule and its streams, or null if none found
+   */
+  async findNextScheduleByTiltifyUsername(
+    tiltifyUsername: string
+  ): Promise<{
+    schedule: InferSelectModel<typeof schedulesTable>,
+    streams: InferSelectModel<typeof streamsTable>[]
+  } | null> {
+    try {
+      // Get the current year for filtering
+      const currentYear = new Date().getFullYear();
+
+      // Import the and function for combining conditions
+      const {and} = await import("drizzle-orm");
+
+      // Find the schedule with the earliest stream using a join query
+      const scheduleResult = await this.db.select({
+        schedule: schedulesTable
+      })
+        .from(schedulesTable)
+        .innerJoin(users, eq(schedulesTable.ownerId, users.id))
+        .innerJoin(accounts, eq(users.id, accounts.userId))
+        .innerJoin(streamsTable, eq(schedulesTable.id, streamsTable.scheduleId))
+        .where(
+          and(
+            eq(accounts.provider, 'tiltify'),
+            eq(accounts.providerUsername, tiltifyUsername),
+            eq(schedulesTable.year, currentYear),
+            eq(streamsTable.visible, true)
+          )
+        )
+        .orderBy(streamsTable.start)
+        .limit(1)
+        .get();
+
+      // If no schedule found, return null
+      if (!scheduleResult) {
+        return null;
+      }
+
+      // Get all streams for this schedule, ordered by start time
+      const streams = await this.db.select()
+        .from(streamsTable)
+        .where(
+          and(
+            eq(streamsTable.scheduleId, scheduleResult.schedule.id),
+            eq(streamsTable.visible, true)
+          )
+        )
+        .orderBy(streamsTable.start)
+        .all();
+
+      // Return both the schedule and its streams
+      return {
+        schedule: scheduleResult.schedule,
+        streams: streams
+      };
+    } catch (error) {
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to find next schedule for tiltify username: ${tiltifyUsername}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to find next schedule for tiltify username: ${tiltifyUsername}`, error);
+      }
+    }
+  }
+
+  /**
+   * Find the next schedule for a user with a given tiltify username, including full details
+   *
+   * This function is similar to findNextScheduleByTiltifyUsername but also fetches
+   * the tags and participants for each stream. The returned streams array contains
+   * stream objects with two additional keys: tags and participants.
+   *
+   * @param tiltifyUsername - The tiltify username to find the next schedule for
+   * @returns Promise resolving to an object containing the schedule and its streams with full details, or null if none found
+   */
+  async findNextScheduleByTiltifyUsernameWithFullDetails(
+    tiltifyUsername: string
+  ): Promise<{
+    schedule: InferSelectModel<typeof schedulesTable>,
+    streams: DetailedStream[]
+  } | null> {
+    try {
+      // First, get the basic schedule and streams using the existing method
+      const basicResult = await this.findNextScheduleByTiltifyUsername(tiltifyUsername);
+
+      // If no schedule found, return null
+      if (!basicResult) {
+        return null;
+      }
+
+      // Create instances of the repos we need
+      const tagRepo = new StreamTagRepo(this.db, this.env);
+      const participantRepo = new StreamParticipantsRepo(this.db, this.env);
+
+      // Get the schedule ID
+      const scheduleId = basicResult.schedule.id;
+
+      // Fetch all tags and participants for all streams in the schedule at once
+      const tagsByStreamId = await tagRepo.findTagsGroupedByStream(scheduleId);
+      const participantsByStreamId = await participantRepo.findParticipantsGroupedByStream(scheduleId);
+
+      // Enhance each stream with its tags and participants
+      const enhancedStreams = basicResult.streams.map(stream => {
+        return {
+          ...stream,
+          tags: tagsByStreamId[stream.id] || [],
+          participants: participantsByStreamId[stream.id] || []
+        };
+      });
+
+      // Return the schedule and enhanced streams
+      return {
+        schedule: basicResult.schedule,
+        streams: enhancedStreams
+      };
+    } catch (error) {
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to find next schedule with full details for tiltify username: ${tiltifyUsername}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to find next schedule with full details for tiltify username: ${tiltifyUsername}`, error);
+      }
+    }
+  }
+
+
+
 }

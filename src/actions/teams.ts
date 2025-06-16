@@ -1,7 +1,5 @@
 import {ActionError, defineAction} from "astro:actions";
 import {z} from "astro:content";
-import {and, eq} from "drizzle-orm";
-import {accounts} from "../lib/db/schema/auth-schema.ts";
 import {createSlug, generateTeamSlugAlternatives} from "../functions/slug.ts";
 import {TeamRepo} from "../lib/db/repos/TeamRepo.ts";
 import {UserRepo} from "../lib/db/repos/UserRepo.ts";
@@ -420,6 +418,27 @@ export const teams = {
         isValid: false,
         suggestions: allAlternatives
       };
+    }
+  }),
+
+  /**
+   * Retrieves all teams a user is a member of given a tiltify username.
+   * Input: tiltifyUsername (string) - The tiltify username to find teams for
+   * Action: Uses the TeamRepo to find all teams the user is a member of.
+   * Returns: An array of teams the user is a member of.
+   */
+  getTeamsByTiltifyUsername: defineAction({
+    input: z.string(),
+    handler: async (tiltifyUsername, ctx) => {
+      try {
+        const teamsRepo = TeamRepo.action(ctx);
+        const teams = await teamsRepo.findVisibleByTiltifyUsername(tiltifyUsername);
+
+        return {teams};
+      } catch (e: any) {
+        console.error('Error getting teams by tiltify username:', e);
+        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message});
+      }
     }
   }),
 }
