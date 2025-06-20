@@ -108,6 +108,7 @@ export class UserDO extends TinybaseDO {
           title: schedule.title,
           year: schedule.year,
           visible: schedule.visible,
+          primary: schedule.primary!,
           slug: schedule.slug,
         });
       });
@@ -154,6 +155,8 @@ export class UserDO extends TinybaseDO {
             title: schedule.title,
             year: schedule.year,
             visible: schedule.visible,
+            primary: schedule.primary,
+            slug: schedule.slug,
           });
         }
       });
@@ -215,6 +218,7 @@ export class UserDO extends TinybaseDO {
           title: schedule.title,
           year: schedule.year,
           visible: schedule.visible,
+          primary: schedule.primary,
           slug: schedule.slug,
         })
       }
@@ -572,6 +576,80 @@ export class UserDO extends TinybaseDO {
 
     this.log('deleteSchedule', 'Schedule removed successfully', scheduleId);
     return true;
+  }
+
+  /**
+   * Set a schedule as primary and all other schedules with the same year as non-primary
+   *
+   * @param scheduleId - The ID of the schedule to set as primary
+   * @returns Promise resolving to a boolean indicating success
+   */
+  async setPrimarySchedule(scheduleId: number) {
+    if (!this.store) {
+      this.error('setPrimarySchedule', 'Store not initialized');
+      return false;
+    }
+
+    try {
+      // Get database connection
+      const db = drizzle(this.env.DB);
+
+      // Get the schedule to find its year
+      const schedule = await db.select()
+        .from(schedulesTable)
+        .where(eq(schedulesTable.id, scheduleId))
+        .get();
+
+      if (!schedule) {
+        this.error('setPrimarySchedule', 'Schedule not found', scheduleId);
+        return false;
+      }
+
+      // Import the and function for combining conditions
+      const {and, not} = await import("drizzle-orm");
+
+      // 1. Set the target schedule as primary
+      await db.update(schedulesTable)
+        .set({ primary: true })
+        .where(eq(schedulesTable.id, scheduleId));
+
+      // 2. Set all other schedules with the same year as non-primary
+      await db.update(schedulesTable)
+        .set({ primary: false })
+        .where(
+          and(
+            eq(schedulesTable.year, schedule.year),
+            eq(schedulesTable.ownerId, this.userId),
+            not(eq(schedulesTable.id, scheduleId))
+          )
+        );
+
+      // Update the store
+      await this.store.transaction(async () => {
+        // Update the target schedule
+        if (this.store!.hasRow('schedules', `${scheduleId}`)) {
+          this.store!.setCell('schedules', `${scheduleId}`, 'primary', true);
+        }
+
+        // Update all other schedules with the same year
+        const scheduleIds = this.store!.getRowIds('schedules');
+        console.log(scheduleIds)
+        for (const id of scheduleIds) {
+          const storeSchedule = this.store!.getRow('schedules', id);
+          if (storeSchedule &&
+              storeSchedule.year === schedule.year &&
+              parseInt(id) !== scheduleId) {
+            this.store!.setCell('schedules', id, 'primary', false);
+          }
+        }
+      });
+
+      this.log('setPrimarySchedule', 'Schedule set as primary successfully', scheduleId);
+      return true;
+    } catch (e) {
+      this.error('setPrimarySchedule error:', e);
+      return false;
+    }
   }
 
 

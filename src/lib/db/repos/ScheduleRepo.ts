@@ -599,4 +599,59 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
     }
   }
 
+  /**
+   * Set a schedule as primary and all other schedules with the same year as non-primary
+   *
+   * This function performs the following operations:
+   * 1. Finds the schedule by ID to get its year
+   * 2. Updates that schedule to set primary=true
+   * 3. Updates all other schedules with the same year and owner to set primary=false
+   *
+   * @param scheduleId - The ID of the schedule to set as primary
+   * @returns Promise resolving to the updated primary schedule
+   */
+  async setPrimarySchedule(scheduleId: number): Promise<Schedule> {
+    try {
+      // First, get the schedule to find its year and owner
+      const schedule = await this.findById(scheduleId);
+
+      if (!schedule) {
+        throw new Error(`Schedule with ID ${scheduleId} not found`);
+      }
+
+      // Import the and function for combining conditions
+      const {and, not} = await import("drizzle-orm");
+
+      // Create a batch of operations
+      const operations: BatchItem<'sqlite'>[] = [
+        // 1. Set the target schedule as primary
+        this.db.update(this.table)
+          .set({ primary: true })
+          .where(eq(this.table.id, scheduleId)),
+
+        // 2. Set all other schedules with the same year and owner as non-primary
+        this.db.update(this.table)
+          .set({ primary: false })
+          .where(
+            and(
+              eq(this.table.year, schedule.year),
+              eq(this.table.ownerId, schedule.ownerId),
+              not(eq(this.table.id, scheduleId))
+            )
+          )
+      ];
+
+      // Execute the batch
+      await this.executeBatch(operations);
+
+      // Return the updated schedule
+      return await this.findById(scheduleId) as Schedule;
+    } catch (error) {
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to set schedule ${scheduleId} as primary`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to set schedule ${scheduleId} as primary`, error);
+      }
+    }
+  }
 }

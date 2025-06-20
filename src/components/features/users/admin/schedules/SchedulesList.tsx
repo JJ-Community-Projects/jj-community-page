@@ -1,6 +1,5 @@
-import {type Component, Show, For} from "solid-js";
+import {type Component, For, Show} from "solid-js";
 import {UserSchedulesProvider, useUserSchedules} from "../providers/UserSchedulesProvider.tsx";
-import {actions} from "astro:actions";
 import type {User} from "../../../../../lib/auth/User.ts";
 
 interface SchedulesListProps {
@@ -10,28 +9,19 @@ interface SchedulesListProps {
 export const SchedulesList: Component<SchedulesListProps> = (props) => {
   return (
     <UserSchedulesProvider user={props.user}>
-      <SchedulesListContent />
+      <SchedulesListContent/>
     </UserSchedulesProvider>
   );
 };
 
 const SchedulesListContent: Component = () => {
-  const {local, createSchedule, user, action} = useUserSchedules();
-
+  const {local, createSchedule, action} = useUserSchedules();
   const addSchedule = async () => {
     try {
       await createSchedule();
     } catch (error) {
       console.error("Failed to create schedule:", error);
       // Error is already handled by the action state
-    }
-  };
-  const refreshDO = async () => {
-    try {
-      await actions.users.refreshDO();
-    } catch (error) {
-      console.error("Failed to create schedule:", error);
-      // Handle error (e.g., show notification)
     }
   };
 
@@ -70,14 +60,7 @@ const SchedulesListContent: Component = () => {
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <For each={local.schedules}>
             {schedule => (
-              <div class="bg-white rounded-2xl shadow-xl p-6 flex flex-col">
-                <h3 class="text-lg font-bold mb-2">{schedule.title}</h3>
-                <p class="text-sm">Year: {schedule.year}</p>
-                <p class="text-sm mb-4">Status: {schedule.visible ? 'Public' : 'Private'}</p>
-                <div class="flex flex-row mt-auto">
-                  <a href={`/admin/schedules/${schedule.id}/edit`} class="bg-primary hover:bg-primary-600 text-white px-3 py-1 rounded-lg transition-all">Edit</a>
-                </div>
-              </div>
+              <SchedulesListItem schedule={schedule}/>
             )}
           </For>
         </div>
@@ -86,3 +69,73 @@ const SchedulesListContent: Component = () => {
     </div>
   );
 };
+
+
+const SchedulesListItem: Component<{
+  schedule: {
+    id: number;
+    title: string;
+    year: number;
+    visible: boolean;
+    primary: boolean;
+  }
+}> = (props) => {
+  const {setPrimarySchedule, action} = useUserSchedules();
+
+  const handleSetPrimary = async () => {
+    try {
+      await setPrimarySchedule(props.schedule.id);
+    } catch (error) {
+      console.error("Failed to set schedule as primary:", error);
+      // Error is already handled by the action state
+    }
+  };
+  return (
+
+    <div class="bg-white rounded-2xl shadow-xl p-6 flex flex-col">
+      <h3 class="text-lg font-bold mb-2">{props.schedule.title}</h3>
+      <p class="text-sm">Year: {props.schedule.year}</p>
+      <p class="text-sm">Status: {props.schedule.visible ? 'Public' : 'Private'}</p>
+      <p class="text-sm mb-4">Primary: {props.schedule.primary ? 'Yes' : 'No'}</p>
+      <a>{}</a>
+      <div class="flex flex-row gap-2 mt-auto">
+        <a href={`/admin/schedules/${props.schedule.id}/edit`}
+           class="bg-primary hover:bg-primary-600 text-white px-3 py-1 rounded-lg transition-all">Edit</a>
+        <SchedulePrimaryButton schedule={props.schedule}/>
+      </div>
+    </div>
+  )
+}
+
+
+const SchedulePrimaryButton: Component<{
+  schedule: {
+    id: number;
+    title: string;
+    year: number;
+    visible: boolean;
+    primary: boolean;
+  }
+}> = (props) => {
+
+  const {setPrimarySchedule, action} = useUserSchedules();
+
+  const handleSetPrimary = async () => {
+    try {
+      await setPrimarySchedule(props.schedule.id);
+    } catch (error) {
+      console.error("Failed to set schedule as primary:", error);
+      // Error is already handled by the action state
+    }
+  };
+
+  return (
+    <button
+      onClick={() => handleSetPrimary()}
+      disabled={props.schedule.primary || action.setPrimarySchedule.actionInProgress}
+      class="bg-accent hover:bg-accent-400 text-white px-3 py-1 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+    >
+      {props.schedule.primary ? 'Primary' : 'Set Primary'}
+    </button>
+  )
+}

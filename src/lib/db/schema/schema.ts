@@ -19,6 +19,7 @@ export const schedulesTable = sqliteTable('schedules', {
     slug: text('slug').notNull().unique(),
     year: integer('year').notNull(),
     visible: integer({mode: 'boolean'}).notNull(),
+    primary: integer({mode: 'boolean'}).notNull().default(false),
     ownerId: integer('owner_id').references(() => users.id, {onDelete: 'cascade'}).notNull(),
     createdAt: integer('created_at', {mode: 'timestamp'}).notNull().default(sql`CURRENT_TIMESTAMP`),
     updatedAt: integer('updated_at', {mode: 'timestamp'}).notNull().default(sql`CURRENT_TIMESTAMP`),

@@ -9,10 +9,17 @@ type HookActions = {
     actionInProgress: boolean,
     lastErrorMessage?: string
   },
+  setPrimarySchedule: {
+    actionInProgress: boolean,
+    lastErrorMessage?: string
+  },
 }
 
 const initHookState: HookActions = {
   createSchedule: {
+    actionInProgress: false,
+  },
+  setPrimarySchedule: {
     actionInProgress: false,
   },
 }
@@ -43,13 +50,14 @@ const useUserSchedulesHook = (user: User) => {
       title: string;
       year: number;
       visible: boolean;
+      primary: boolean;
     }[]
   }>({
     schedules: []
   });
 
   onMount(() => {
-    // Listen for changes to schedules
+    // Listen for changes to schedules (row additions/removals)
     addListener(store.addHasRowListener(
       'schedules', null,
       (s, __, rowId, added) => {
@@ -61,6 +69,7 @@ const useUserSchedulesHook = (user: User) => {
             title: value.title as string,
             year: value.year as number,
             visible: value.visible as boolean,
+            primary: value.primary as boolean,
           }
           setLocal('schedules', (schedules) =>
             schedules.concat(schedule).sort((a, b) => b.year - a.year)); // Sort by year descending
@@ -69,6 +78,36 @@ const useUserSchedulesHook = (user: User) => {
             return schedules.filter((s) => s.id !== scheduleId);
           });
         }
+      }
+    ));
+
+    // Listen for changes to schedule cells (updates to existing schedules)
+    addListener(store.addCellListener(
+      'schedules', null, 'primary',
+      (s, __, rowId) => {
+        const scheduleId = parseInt(rowId);
+        const value = s.getRow('schedules', rowId);
+
+        // Update the schedule in the local store
+        setLocal('schedules', (schedules) => {
+          return schedules.map(schedule => {
+            if (schedule.id === scheduleId) {
+              return {
+                ...schedule,
+                primary: value.primary as boolean
+              };
+            }
+            // If this is in the same year as the updated schedule and the updated schedule is now primary,
+            // then this schedule should not be primary
+            if (schedule.year === value.year && value.primary === true) {
+              return {
+                ...schedule,
+                primary: false
+              };
+            }
+            return schedule;
+          });
+        });
       }
     ));
   });
@@ -86,10 +125,24 @@ const useUserSchedulesHook = (user: User) => {
     }
   };
 
+  // Set a schedule as primary - this will call the API endpoint
+  const setPrimarySchedule = async (scheduleId: number) => {
+    startAction('setPrimarySchedule')
+    const result = await actions.schedules.setPrimary({ scheduleId })
+    stopAction('setPrimarySchedule')
+    if (result.error) {
+      setLastError('setPrimarySchedule', result.error.message || 'Failed to set schedule as primary');
+      throw new Error(result.error.message || 'Failed to set schedule as primary');
+    } else {
+      return result;
+    }
+  };
+
   return {
     local,
     user,
     createSchedule,
+    setPrimarySchedule,
     // Action state
     action: action
   };
