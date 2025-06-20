@@ -45,6 +45,9 @@ export default defineConfig({
                 // debug: 'debug/src/browser.js', // Force the correct ESM file
             },
         },
+        build: {
+            minify: false,
+        },
     },
     optimizeDeps: {
         include: ['debug', 'solid-markdown', 'extend'],

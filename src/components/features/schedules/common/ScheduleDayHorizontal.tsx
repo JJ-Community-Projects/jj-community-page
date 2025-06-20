@@ -1,7 +1,7 @@
 import {type Component, For} from "solid-js";
-import type {ScheduleDayUI} from "../../../lib/db/repos/ScheduleModel.ts";
+import type {ScheduleDayUI} from "../../../../lib/db/repos/ScheduleModel.ts";
 import {DateTime} from "luxon";
-import {rangeFromData} from "../../../lib/utils/rangeFromData.ts";
+import {rangeFromData} from "../../../../lib/utils/rangeFromData.ts";
 import {ScheduleStreamCard} from "./StreamCard.tsx";
 
 interface ScheduleDayProps {

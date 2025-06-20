@@ -1,5 +1,5 @@
 import {createContext, createSignal, onCleanup, type ParentComponent, useContext} from "solid-js";
-import type {ScheduleUI} from "../../../lib/db/repos/ScheduleModel.ts";
+import type {ScheduleUI} from "../../../../lib/db/repos/ScheduleModel.ts";
 import {createStore} from "solid-js/store";
 import {DateTime} from "luxon";
 
@@ -72,22 +72,40 @@ const useScheduleHook = (initSchedule: ScheduleUI) => {
   }
 
   const [dayIndex, setDayIndex] = createSignal<number>(findCurrentDayIndex())
-  const [weekIndex, setWeekIndex] = createSignal<number>(findCurrentWeekIndex())
 
   const nextDay = () => setDayIndex((i) => (i + 1) % schedule.days.length)
   const prevDay = () => setDayIndex((i) => (i - 1) % schedule.days.length)
 
-  const nextWeek = () => setWeekIndex((i) => (i + 1) % 2)
-  const prevWeek = () => setWeekIndex((i) => (i - 1) % 2)
-
   const day = () => schedule.days[dayIndex()]
 
-  const week = () => {
-    if (weekIndex() === 2) {
-      return schedule.weeks.week2
-    } else {
-      return schedule.weeks.week1
-    }
+  const days = () => schedule.days
+
+
+  const nextThreeStreams = () => {
+    const currentDate = date();
+    // Flatten all streams from all days
+    const allStreams = schedule.days.flatMap(day => day.streams);
+
+    // Filter streams that haven't ended yet
+    const upcomingStreams = allStreams.filter(stream => {
+      const endDate = DateTime.fromJSDate(stream.end).setZone('utc');
+      return endDate > currentDate;
+    });
+
+    // Sort by start date
+    const sortedStreams = upcomingStreams.sort((a, b) => {
+      const aStart = DateTime.fromJSDate(a.start).setZone('utc');
+      const bStart = DateTime.fromJSDate(b.start).setZone('utc');
+      return aStart.toMillis() - bStart.toMillis();
+    });
+
+    // Return the first 3 streams
+    return sortedStreams.slice(0, 3);
+  }
+
+  const nextStream = () => {
+    const streams = nextThreeStreams();
+    return streams.length > 0 ? streams[0] : undefined;
   }
 
 
@@ -100,6 +118,9 @@ const useScheduleHook = (initSchedule: ScheduleUI) => {
     findCurrentWeekIndex,
     nextDay,
     prevDay,
+    days,
+    nextThreeStreams,
+    nextStream,
   }
 }
 

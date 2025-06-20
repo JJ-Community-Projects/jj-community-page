@@ -1,10 +1,10 @@
 import {type Component, Match, Show, Switch} from "solid-js";
-import type {DetailedStream} from "../../../lib/db/repos/ScheduleModel.ts";
+import type {DetailedStream} from "../../../../lib/db/repos/ScheduleModel.ts";
 import {DateTime} from "luxon";
-import {useNow} from "../../../lib/utils/useNow.ts";
-import {createModalSignal} from "../../../lib/createModalSignal.ts";
-import {getStreamColor, getStreamColors} from "../../../functions/jjDatesToColors.ts";
-import {getTextColor} from "../../../lib/utils/textColors.ts";
+import {useNow} from "../../../../lib/utils/useNow.ts";
+import {createModalSignal} from "../../../../lib/createModalSignal.ts";
+import {getStreamColor, getStreamColors} from "../../../../functions/jjDatesToColors.ts";
+import {getTextColor} from "../../../../lib/utils/textColors.ts";
 import {ScheduleStreamDetailDialog} from "./ScheduleStreamDetailDialog.tsx";
 import {twMerge} from "tailwind-merge";
 

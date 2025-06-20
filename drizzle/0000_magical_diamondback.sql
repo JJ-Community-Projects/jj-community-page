@@ -41,6 +41,13 @@ CREATE TABLE `userSocials` (
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `unique_user_url_provider` ON `userSocials` (`userId`,`social`);--> statement-breakpoint
+CREATE TABLE `userStyles` (
+	`userId` integer PRIMARY KEY NOT NULL,
+	`primary_color` text DEFAULT '#E30E50' NOT NULL,
+	`accent_color` text DEFAULT '#3584BF' NOT NULL,
+	FOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE cascade
+);
+--> statement-breakpoint
 CREATE TABLE `userTags` (
 	`userId` integer NOT NULL,
 	`tag` text NOT NULL,
@@ -64,8 +71,8 @@ CREATE TABLE `durable_objects` (
 --> statement-breakpoint
 CREATE UNIQUE INDEX `durable_objects_pk` ON `durable_objects` (`namespace`,`id`);--> statement-breakpoint
 CREATE TABLE `editors` (
-	`schedule_id` text,
-	`user_id` text,
+	`schedule_id` integer,
+	`user_id` integer,
 	FOREIGN KEY (`schedule_id`) REFERENCES `schedules`(`id`) ON UPDATE no action ON DELETE no action,
 	FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE no action
 );
@@ -112,6 +119,8 @@ CREATE TABLE `streams` (
 	`visible` integer DEFAULT false NOT NULL,
 	`subtitle` text,
 	`description` text,
+	`youtube_vod_url` text,
+	`twitch_vod_url` text,
 	`start_time` integer NOT NULL,
 	`end_time` integer NOT NULL,
 	PRIMARY KEY(`schedule_id`, `id`),

@@ -1,12 +1,12 @@
 import {type Component, Show} from "solid-js";
-import type {DetailedStream} from "../../../lib/db/repos/ScheduleModel.ts";
+import type {DetailedStream} from "../../../../lib/db/repos/ScheduleModel.ts";
 import {DateTime} from "luxon";
-import {useNow} from "../../../lib/utils/useNow.ts";
-import {type ModalSignal} from "../../../lib/createModalSignal.ts";
-import {getStreamColor} from "../../../functions/jjDatesToColors.ts";
+import {useNow} from "../../../../lib/utils/useNow.ts";
+import {type ModalSignal} from "../../../../lib/createModalSignal.ts";
+import {getStreamColor} from "../../../../functions/jjDatesToColors.ts";
 import {Dialog} from "@kobalte/core";
 import {AiOutlineClose} from "solid-icons/ai";
-import {getTextColor} from "../../../lib/utils/textColors.ts";
+import {getTextColor} from "../../../../lib/utils/textColors.ts";
 
 interface ScheduleStreamDetailDialogProps {
   stream: DetailedStream;

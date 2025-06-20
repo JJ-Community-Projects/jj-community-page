@@ -1,5 +1,5 @@
 import {type Component} from "solid-js";
-import type {ScheduleWeekUI} from "../../../lib/db/repos/ScheduleModel.ts";
+import type {ScheduleWeekUI} from "../../../../lib/db/repos/ScheduleModel.ts";
 
 interface ScheduleWeekCollapsibleDaysProps {
   week: ScheduleWeekUI
