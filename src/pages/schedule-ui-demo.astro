@@ -1,9 +1,9 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import {actions} from "astro:actions";
-import {ScheduleDayHorizontal} from "../components/features/schedules/ScheduleDayHorizontal";
-import {ScheduleDayVertical} from "../components/features/schedules/ScheduleDayVertical";
-import {ScheduleStreamCard} from "../components/features/schedules/StreamCard";
+import {ScheduleDayHorizontal} from "../components/features/schedules/common/ScheduleDayHorizontal";
+import {ScheduleDayVertical} from "../components/features/schedules/common/ScheduleDayVertical";
+import {ScheduleStreamCard} from "../components/features/schedules/common/StreamCard";
 import {fullJJExampleSchedule} from "../functions/exampleSchedule";
 import {WeekScheduleDesktopComponent} from "../components/features/schedules/desktop/WeekScheduleDesktopComponent";
 const {data, error} = await Astro.callAction(actions.ui.user.schedules.demo, {})

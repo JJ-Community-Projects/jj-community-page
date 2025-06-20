@@ -1,9 +1,10 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import {actions} from "astro:actions";
-import {StreamWrap} from "../../components/features/schedules/StreamWrap";
-import {ScheduleDayHorizontal} from "../../components/features/schedules/ScheduleDayHorizontal";
-import {ScheduleDayVertical} from "../../components/features/schedules/ScheduleDayVertical";
+import {StreamWrap} from "../../components/features/schedules/common/StreamWrap";
+import {ScheduleDayHorizontal} from "../../components/features/schedules/common/ScheduleDayHorizontal";
+import {ScheduleDayVertical} from "../../components/features/schedules/common/ScheduleDayVertical";
+import {UserSchedulePage} from "../../components/features/schedules/UserSchedulePage";
 
 const {slug} = Astro.params
 
@@ -12,29 +13,27 @@ if (!slug) {
 }
 
 const {data, error} = await Astro.callAction(actions.ui.user.schedules.byScheduleSlug, slug)
+console.log('error', error)
+console.log('data', data)
 ---
-<BaseLayout>
-    <p>Schedules</p>
-  {
-    error && (
-                  <p>Error: ${error.message}</p>
-    )
-  }
-
-  {
-    (!error && data) && (
-    <div class="flex flex-col gap-4">
-        <StreamWrap streams={data.streams!} client:only="solid-js"/>
-        <ScheduleDayHorizontal day={data.days[0]} client:only="solid-js"/>
-        <ScheduleDayVertical day={data.days[0]} client:only="solid-js"/>
-
-    </div>
-    )
-  }
-
-  {
-    data && (
-                  <pre>{JSON.stringify(data, null, 2)}</pre>
-    )
-  }
+<BaseLayout title={data?.schedule?.title || "Schedule"}>
+  <div class="min-h-screen bg-gradient-to-b from-primary-shade via-primary to-primary-shade">
+    {
+      error && (
+        <div class="container mx-auto px-4 py-8">
+          <div class="bg-white p-6 rounded-lg shadow-lg">
+            <h1 class="text-2xl font-bold text-red-600 mb-4">Error</h1>
+            <p class="text-gray-800">{error.message}</p>
+          </div>
+        </div>
+      )
+    }
+    {
+      (!error && data) && (
+        <div class="container mx-auto px-4 py-8">
+          <UserSchedulePage client:only="solid-js" initSchedule={data}/>
+        </div>
+      )
+    }
+  </div>
 </BaseLayout>

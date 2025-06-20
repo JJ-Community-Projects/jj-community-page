@@ -58,7 +58,7 @@ export const ScheduleEditorHeader: Component = () => {
       <div class="bg-white rounded-2xl shadow-xl p-6 mb-6 transition-transform">
         <div class="flex justify-between items-center">
           <div class="flex items-center gap-4">
-            <a href={`/admin`} class="text-primary hover:underline">
+            <a href={`/admin/schedules`} class="text-primary hover:underline">
               &larr; Back to Admin
             </a>
             <h1 class="text-2xl font-bold">Schedule Editor</h1>

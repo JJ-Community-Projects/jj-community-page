@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "e2a7f0f7-8d49-4031-ba4f-93826cff68db",
+  "id": "5781fa4c-24c9-4105-8237-f4f76b88f3a3",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "accounts": {
@@ -60,6 +60,13 @@
         }
       },
       "indexes": {
+        "accounts_provider_id_unique": {
+          "name": "accounts_provider_id_unique",
+          "columns": [
+            "provider_id"
+          ],
+          "isUnique": true
+        },
         "unique_index_user_id_provider": {
           "name": "unique_index_user_id_provider",
           "columns": [
@@ -107,6 +114,59 @@
           "name": "pk"
         }
       },
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "blockedAccounts": {
+      "name": "blockedAccounts",
+      "columns": {
+        "provider_id": {
+          "name": "provider_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "provider": {
+          "name": "provider",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "reason": {
+          "name": "reason",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(current_timestamp)"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "blockedAccounts_provider_id_accounts_provider_id_fk": {
+          "name": "blockedAccounts_provider_id_accounts_provider_id_fk",
+          "tableFrom": "blockedAccounts",
+          "tableTo": "accounts",
+          "columnsFrom": [
+            "provider_id"
+          ],
+          "columnsTo": [
+            "provider_id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
@@ -239,6 +299,53 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
+    "userStyles": {
+      "name": "userStyles",
+      "columns": {
+        "userId": {
+          "name": "userId",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "primary_color": {
+          "name": "primary_color",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'#E30E50'"
+        },
+        "accent_color": {
+          "name": "accent_color",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'#3584BF'"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "userStyles_userId_users_id_fk": {
+          "name": "userStyles_userId_users_id_fk",
+          "tableFrom": "userStyles",
+          "tableTo": "users",
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
     "userTags": {
       "name": "userTags",
       "columns": {
@@ -326,6 +433,14 @@
           "notNull": true,
           "autoincrement": false,
           "default": "(current_timestamp)"
+        },
+        "role": {
+          "name": "role",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'user'"
         }
       },
       "indexes": {},
@@ -372,14 +487,14 @@
       "columns": {
         "schedule_id": {
           "name": "schedule_id",
-          "type": "text",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
         },
         "user_id": {
           "name": "user_id",
-          "type": "text",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
@@ -713,6 +828,20 @@
         },
         "description": {
           "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "youtube_vod_url": {
+          "name": "youtube_vod_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "twitch_vod_url": {
+          "name": "twitch_vod_url",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
