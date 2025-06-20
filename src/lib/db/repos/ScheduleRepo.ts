@@ -213,6 +213,31 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
     }
   }
 
+  /**
+   * Set the visibility of a schedule
+   * @param id The schedule ID
+   * @param visible The visibility value to set
+   * @returns Promise resolving to the updated schedule
+   *
+   * SQL: `UPDATE "schedules" SET "visible" = ? WHERE "schedules"."id" = ? RETURNING *`
+   */
+  async setVisibility(id: number, visible: boolean): Promise<Schedule> {
+    try {
+      const [result] = await this.db.update(this.table)
+        .set({ visible })
+        .where(eq(this.table.id, id))
+        .returning();
+
+      return result;
+    } catch (error) {
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to set visibility for schedule with id: ${id}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to set visibility for schedule with id: ${id}`, error);
+      }
+    }
+  }
+
 
   /**
    * Updates a schedule with all related streams, participants, and tags in a single batch operation

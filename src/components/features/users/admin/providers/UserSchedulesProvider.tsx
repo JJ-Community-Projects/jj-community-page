@@ -13,6 +13,14 @@ type HookActions = {
     actionInProgress: boolean,
     lastErrorMessage?: string
   },
+  toggleVisibility: {
+    actionInProgress: boolean,
+    lastErrorMessage?: string
+  },
+  deleteSchedule: {
+    actionInProgress: boolean,
+    lastErrorMessage?: string
+  },
 }
 
 const initHookState: HookActions = {
@@ -20,6 +28,12 @@ const initHookState: HookActions = {
     actionInProgress: false,
   },
   setPrimarySchedule: {
+    actionInProgress: false,
+  },
+  toggleVisibility: {
+    actionInProgress: false,
+  },
+  deleteSchedule: {
     actionInProgress: false,
   },
 }
@@ -110,6 +124,28 @@ const useUserSchedulesHook = (user: User) => {
         });
       }
     ));
+
+    // Listen for changes to visibility
+    addListener(store.addCellListener(
+      'schedules', null, 'visible',
+      (s, __, rowId) => {
+        const scheduleId = parseInt(rowId);
+        const value = s.getRow('schedules', rowId);
+
+        // Update the schedule in the local store
+        setLocal('schedules', (schedules) => {
+          return schedules.map(schedule => {
+            if (schedule.id === scheduleId) {
+              return {
+                ...schedule,
+                visible: value.visible as boolean
+              };
+            }
+            return schedule;
+          });
+        });
+      }
+    ));
   });
 
   // Create a new schedule - this will call the API endpoint, not directly modify the UserDO
@@ -138,11 +174,39 @@ const useUserSchedulesHook = (user: User) => {
     }
   };
 
+  // Toggle the visibility of a schedule - this will call the API endpoint
+  const toggleVisibility = async (scheduleId: number) => {
+    startAction('toggleVisibility')
+    const result = await actions.schedules.toggleVisibility({ scheduleId })
+    stopAction('toggleVisibility')
+    if (result.error) {
+      setLastError('toggleVisibility', result.error.message || 'Failed to toggle schedule visibility');
+      throw new Error(result.error.message || 'Failed to toggle schedule visibility');
+    } else {
+      return result;
+    }
+  };
+
+  // Delete a schedule - this will call the API endpoint
+  const deleteSchedule = async (scheduleId: number) => {
+    startAction('deleteSchedule')
+    const result = await actions.schedules.delete(scheduleId)
+    stopAction('deleteSchedule')
+    if (result.error) {
+      setLastError('deleteSchedule', result.error.message || 'Failed to delete schedule');
+      throw new Error(result.error.message || 'Failed to delete schedule');
+    } else {
+      return result;
+    }
+  };
+
   return {
     local,
     user,
     createSchedule,
     setPrimarySchedule,
+    toggleVisibility,
+    deleteSchedule,
     // Action state
     action: action
   };

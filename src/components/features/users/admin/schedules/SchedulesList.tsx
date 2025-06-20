@@ -1,6 +1,8 @@
 import {type Component, For, Show} from "solid-js";
 import {UserSchedulesProvider, useUserSchedules} from "../providers/UserSchedulesProvider.tsx";
 import type {User} from "../../../../../lib/auth/User.ts";
+import {Dialog} from "@kobalte/core/dialog";
+import {createModalSignal} from "../../../../../lib/createModalSignal.ts";
 
 interface SchedulesListProps {
   user: User
@@ -15,7 +17,7 @@ export const SchedulesList: Component<SchedulesListProps> = (props) => {
 };
 
 const SchedulesListContent: Component = () => {
-  const {local, createSchedule, action} = useUserSchedules();
+  const {local, createSchedule, toggleVisibility, action} = useUserSchedules();
   const addSchedule = async () => {
     try {
       await createSchedule();
@@ -80,7 +82,7 @@ const SchedulesListItem: Component<{
     primary: boolean;
   }
 }> = (props) => {
-  const {setPrimarySchedule, action} = useUserSchedules();
+  const {setPrimarySchedule, toggleVisibility, action} = useUserSchedules();
 
   const handleSetPrimary = async () => {
     try {
@@ -102,6 +104,8 @@ const SchedulesListItem: Component<{
         <a href={`/admin/schedules/${props.schedule.id}/edit`}
            class="bg-primary hover:bg-primary-600 text-white px-3 py-1 rounded-lg transition-all">Edit</a>
         <SchedulePrimaryButton schedule={props.schedule}/>
+        <ScheduleVisibilityButton schedule={props.schedule}/>
+        <ScheduleDeleteButton schedule={props.schedule}/>
       </div>
     </div>
   )
@@ -137,5 +141,111 @@ const SchedulePrimaryButton: Component<{
     >
       {props.schedule.primary ? 'Primary' : 'Set Primary'}
     </button>
+  )
+}
+
+const ScheduleVisibilityButton: Component<{
+  schedule: {
+    id: number;
+    title: string;
+    year: number;
+    visible: boolean;
+    primary: boolean;
+  }
+}> = (props) => {
+
+  const {toggleVisibility, action} = useUserSchedules();
+
+  const handleToggleVisibility = async () => {
+    try {
+      await toggleVisibility(props.schedule.id);
+    } catch (error) {
+      console.error("Failed to toggle schedule visibility:", error);
+      // Error is already handled by the action state
+    }
+  };
+
+  return (
+    <button
+      onClick={() => handleToggleVisibility()}
+      disabled={action.toggleVisibility.actionInProgress}
+      class="bg-primary hover:bg-primary-600 text-white px-3 py-1 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+    >
+      {props.schedule.visible ? 'Make Private' : 'Make Public'}
+    </button>
+  )
+}
+
+const ScheduleDeleteButton: Component<{
+  schedule: {
+    id: number;
+    title: string;
+    year: number;
+    visible: boolean;
+    primary: boolean;
+  }
+}> = (props) => {
+  const {deleteSchedule, action} = useUserSchedules();
+  const modal = createModalSignal();
+
+  const handleDelete = async () => {
+    try {
+      await deleteSchedule(props.schedule.id);
+      modal.close();
+    } catch (error) {
+      console.error("Failed to delete schedule:", error);
+      // Error is already handled by the action state
+    }
+  };
+
+  return (
+    <>
+      <button
+        onClick={modal.open}
+        disabled={action.deleteSchedule.actionInProgress}
+        class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        Delete
+      </button>
+
+      <Dialog open={modal.isOpen()} onOpenChange={modal.setOpen}>
+        <Dialog.Portal>
+          <Dialog.Overlay class="fixed inset-0 bg-black/50 z-40"/>
+          <div class="fixed inset-0 flex items-center justify-center z-50">
+            <Dialog.Content class="bg-white rounded-xl shadow-xl p-6 w-full max-w-md">
+              <Dialog.Title class="text-xl font-bold mb-4">Delete Schedule</Dialog.Title>
+              <Dialog.Description class="text-gray-600 mb-4">
+                Are you sure you want to delete "{props.schedule.title}"? This action cannot be undone.
+              </Dialog.Description>
+
+              <Show when={action.deleteSchedule.lastErrorMessage}>
+                <div class="text-red-500 mb-4">
+                  {action.deleteSchedule.lastErrorMessage}
+                </div>
+              </Show>
+
+              <div class="flex justify-end gap-2 mt-4">
+                <button
+                  type="button"
+                  class="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
+                  onClick={modal.close}
+                  disabled={action.deleteSchedule.actionInProgress}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  class="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
+                  onClick={handleDelete}
+                  disabled={action.deleteSchedule.actionInProgress}
+                >
+                  {action.deleteSchedule.actionInProgress ? 'Deleting...' : 'Delete'}
+                </button>
+              </div>
+            </Dialog.Content>
+          </div>
+        </Dialog.Portal>
+      </Dialog>
+    </>
   )
 }

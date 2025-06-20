@@ -652,6 +652,54 @@ export class UserDO extends TinybaseDO {
     }
   }
 
+  /**
+   * Toggle the visibility of a schedule
+   *
+   * @param scheduleId - The ID of the schedule to toggle visibility
+   * @returns Promise resolving to a boolean indicating success
+   */
+  async toggleScheduleVisibility(scheduleId: number) {
+    if (!this.store) {
+      this.error('toggleScheduleVisibility', 'Store not initialized');
+      return false;
+    }
+
+    try {
+      // Get database connection
+      const db = drizzle(this.env.DB);
+
+      // Get the current schedule
+      const schedule = await db.select()
+        .from(schedulesTable)
+        .where(eq(schedulesTable.id, scheduleId))
+        .get();
+
+      if (!schedule) {
+        this.error('toggleScheduleVisibility', 'Schedule not found', scheduleId);
+        return false;
+      }
+
+      // Toggle the visibility
+      const newVisibility = !schedule.visible;
+
+      // Update the database
+      await db.update(schedulesTable)
+        .set({ visible: newVisibility })
+        .where(eq(schedulesTable.id, scheduleId));
+
+      // Update the store
+      if (this.store.hasRow('schedules', `${scheduleId}`)) {
+        this.store.setCell('schedules', `${scheduleId}`, 'visible', newVisibility);
+      }
+
+      this.log('toggleScheduleVisibility', `Schedule visibility set to ${newVisibility}`, scheduleId);
+      return true;
+    } catch (e) {
+      this.error('toggleScheduleVisibility error:', e);
+      return false;
+    }
+  }
+
 
   async fetch(request: Request) {
     const token = request.headers.get('token')

@@ -399,6 +399,41 @@ export class ScheduleEditorDO extends TinybaseDO {
   }
 
   /**
+   * Toggle the visibility of the schedule
+   * This method toggles the visibility of the schedule in both the database and the TinyBase store
+   * @returns Promise resolving to a boolean indicating success
+   */
+  async toggleVisibility(): Promise<boolean> {
+    // Get the TinyBase store and verify it exists
+    const store = this.store;
+    if (!store) {
+      this.error('toggleVisibility', 'Store not initialized');
+      return false;
+    }
+
+    try {
+      // Get the current visibility value
+      const currentVisibility = store.getValue('visible') as boolean;
+      const newVisibility = !currentVisibility;
+
+      // Get the schedule ID
+      const scheduleId = this.scheduleId;
+
+      // Update the database
+      await this.scheduleRepo.setVisibility(scheduleId, newVisibility);
+
+      // Update the store
+      store.setValue('visible', newVisibility);
+
+      this.log('toggleVisibility', `Schedule visibility set to ${newVisibility}`, scheduleId);
+      return true;
+    } catch (e) {
+      this.error('toggleVisibility error:', e);
+      return false;
+    }
+  }
+
+  /**
    * Prepares stream create operations for updateSchedule
    * Identifies streams that exist in the store but not in the database and formats them for creation
    * @param storeStreams - The streams table from the TinyBase store

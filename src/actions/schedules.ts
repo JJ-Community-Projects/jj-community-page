@@ -10,6 +10,53 @@ import {StreamTagRepo} from "../lib/db/repos/StreamTagRepo.ts";
 
 export const schedules = {
   /**
+   * Toggles the visibility of a schedule.
+   * Input: An object containing:
+   *   - scheduleId (number) - The ID of the schedule to toggle visibility
+   * Action: Verifies the user owns the schedule and then toggles its visibility using the UserDO.
+   * Returns: An object with a success message.
+   */
+  toggleVisibility: defineAction({
+    input: z.object({
+      scheduleId: z.number(),
+    }),
+    handler: async ({scheduleId}, ctx) => {
+      const {session, user} = ctx.locals
+      if (!session) {
+        throw new ActionError({code: 'UNAUTHORIZED'})
+      }
+      if (!scheduleId) {
+        throw new ActionError({code: 'BAD_REQUEST', message: 'Schedule ID is required'})
+      }
+
+      // Get the schedule from the database to check ownership
+      const schedules = ScheduleRepo.action(ctx)
+      const schedule = await schedules.findById(scheduleId)
+
+      if (!schedule) {
+        throw new ActionError({code: 'NOT_FOUND', message: 'Schedule not found'})
+      }
+
+      // Check if the user owns this schedule
+      if (schedule.ownerId !== user.id) {
+        throw new ActionError({code: 'FORBIDDEN', message: 'You do not have permission to modify this schedule'})
+      }
+
+      // Get the UserDO and toggle the schedule visibility
+      const stubUserDO = getUserDO(ctx, user.id);
+
+      try {
+        await stubUserDO.toggleScheduleVisibility(scheduleId)
+      } catch (e: any) {
+        console.error('Error toggling schedule visibility:', e);
+        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
+      }
+
+      return {message: "Schedule visibility toggled successfully"}
+    }
+  }),
+
+  /**
    * Sets a schedule as primary and all other schedules with the same year as non-primary.
    * Input: An object containing:
    *   - scheduleId (number) - The ID of the schedule to set as primary
