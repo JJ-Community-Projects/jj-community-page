@@ -1,5 +1,5 @@
 import {type Component, For} from "solid-js";
-import type {DetailedStream} from "../../../../lib/db/repos/ScheduleModel.ts";
+import type {DetailedStream} from "../../../../lib/db/models/schedule-ui.ts";
 import {ScheduleStreamCard} from "./StreamCard.tsx";
 import {twMerge} from "tailwind-merge";
 

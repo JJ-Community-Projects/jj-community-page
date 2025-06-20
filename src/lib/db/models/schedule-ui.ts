@@ -1,13 +1,30 @@
-import type {Prettify} from "../../Prettify.ts";
-import type {InferSelectModel} from "drizzle-orm";
-import {schedulesTable, streamParticipantsTable, streamsTable, streamTagsTable} from "../schema/schema.ts";
 import type {DateTime} from "luxon";
+import type {InferSelectModel} from "drizzle-orm";
+import {streamsTable} from "../schema/schema.ts";
+import type {Prettify} from "../../Prettify.ts";
+import type {Schedule} from "./schedule-base.ts";
 
+/**
+ * Type for a stream tag
+ */
+export type TagUI = {
+  label: string;
+  tag: string
+}
 
-export type ParticipantUI = { tiltifyName: string, label: string, id: number, img?: string }
-export type TagUI = { label: string; tag: string }
+/**
+ * Type for a stream participant
+ */
+export type ParticipantUI = {
+  tiltifyName: string,
+  label: string,
+  id: number,
+  img?: string
+}
 
-
+/**
+ * Type for a stream with detailed information including tags and participants
+ */
 export type DetailedStream = Prettify<Prettify<InferSelectModel<typeof streamsTable>> & {
   tags: TagUI[],
   participants: ParticipantUI[]
@@ -22,16 +39,8 @@ export type ScheduleDayUI = {
 };
 
 /**
- * Type definition for a week containing days
+ * Type definition for time information in a schedule
  */
-export type ScheduleWeekUI = {
-  name: string;
-  days: ScheduleDayUI[];
-  start: DateTime;
-  end: DateTime;
-  times?: ScheduleUITime[]
-};
-
 export type ScheduleUITime = {
   start: {
     hours: number;
@@ -44,6 +53,16 @@ export type ScheduleUITime = {
   timezone: string;
 }
 
+/**
+ * Type definition for a week containing days
+ */
+export type ScheduleWeekUI = {
+  name: string;
+  days: ScheduleDayUI[];
+  start: DateTime;
+  end: DateTime;
+  times?: ScheduleUITime[]
+};
 
 /**
  * Type definition for grouped weeks object
@@ -55,6 +74,9 @@ export type ScheduleGroupedWeeks = {
   afterJJ: ScheduleWeekUI;
 };
 
+/**
+ * Type definition for schedule statistics
+ */
 export type ScheduleUIStats = {
   weeksWithDays: number;    // Number of weeks that have at least one day with streams
   daysWithStreams: number;  // Total number of days that have streams scheduled
@@ -84,9 +106,11 @@ export type ScheduleUIStats = {
   hasMultiDayStreams: boolean; // Whether any streams span multiple days
 }
 
-
+/**
+ * Type definition for the complete UI representation of a schedule
+ */
 export type ScheduleUI = {
-  schedule: InferSelectModel<typeof schedulesTable> | undefined,
+  schedule: Schedule | undefined,
   streams: DetailedStream[],
   days: ScheduleDayUI[],
   weeks: ScheduleGroupedWeeks,

@@ -4,14 +4,15 @@ import {ScheduleRepo} from "./ScheduleRepo.ts";
 import type {InferSelectModel} from "drizzle-orm";
 import {schedulesTable,} from "../schema/schema.ts";
 import {DateTime} from "luxon";
+import type {DetailedStream, Schedule, ScheduleWithDetailedStreams} from "../models/schedule-base.ts";
 import type {
   ScheduleDayUI,
-  DetailedStream,
   ScheduleGroupedWeeks,
   ScheduleUI,
   ScheduleUIStats,
-  ScheduleWeekUI, ScheduleUITime
-} from "./ScheduleModel.ts";
+  ScheduleUITime,
+  ScheduleWeekUI
+} from "../models/schedule-ui.ts";
 import type {ActionAPIContext} from "astro:actions";
 
 
@@ -67,10 +68,7 @@ export class ScheduleUIRepo {
     return this.scheduleToScheduleUI(scheduleWithDetails);
   }
 
-  private scheduleToScheduleUI(scheduleWithDetails?: {
-    schedule: InferSelectModel<typeof schedulesTable>
-    streams: DetailedStream[]
-  } | null): ScheduleUI {
+  private scheduleToScheduleUI(scheduleWithDetails?: ScheduleWithDetailedStreams | null): ScheduleUI {
 
     // If no schedule found, return empty result with the appropriate format
     if (!scheduleWithDetails) {
@@ -292,16 +290,16 @@ export class ScheduleUIRepo {
     // Find common time patterns for each week and set the times attribute
     if (days.length > 0) {
       // For week1 and week2, find common time patterns
-      groupedWeeks.week1.times = this.findCommonTimePatterns(groupedWeeks.week1.days);
-      groupedWeeks.week2.times = this.findCommonTimePatterns(groupedWeeks.week2.days);
+     //  groupedWeeks.week1.times = this.findCommonTimePatterns(groupedWeeks.week1.days);
+      // groupedWeeks.week2.times = this.findCommonTimePatterns(groupedWeeks.week2.days);
 
       // For beforeJJ and afterJJ, only set times if they have days with streams
       if (groupedWeeks.beforeJJ.days.some(day => day.streams.length > 0)) {
-        groupedWeeks.beforeJJ.times = this.findCommonTimePatterns(groupedWeeks.beforeJJ.days);
+        // groupedWeeks.beforeJJ.times = this.findCommonTimePatterns(groupedWeeks.beforeJJ.days);
       }
 
       if (groupedWeeks.afterJJ.days.some(day => day.streams.length > 0)) {
-        groupedWeeks.afterJJ.times = this.findCommonTimePatterns(groupedWeeks.afterJJ.days);
+        // groupedWeeks.afterJJ.times = this.findCommonTimePatterns(groupedWeeks.afterJJ.days);
       }
     }
 

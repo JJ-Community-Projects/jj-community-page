@@ -6,7 +6,7 @@ import {DatabaseError} from "./DatabaseError.ts";
 import {DateTime} from "luxon";
 import type {BatchItem} from "drizzle-orm/batch";
 import type {ActionAPIContext} from "astro:actions";
-import {type DetailedStream} from "./ScheduleModel.ts";
+import {type DetailedStream} from "../models/schedule-ui.ts";
 import {StreamTagRepo} from "./StreamTagRepo.ts";
 import {StreamParticipantsRepo} from "./StreamParticipantsRepo.ts";
 

@@ -1,5 +1,5 @@
 import {type Component, Show} from "solid-js";
-import type {DetailedStream} from "../../../../lib/db/repos/ScheduleModel.ts";
+import type {DetailedStream} from "../../../../lib/db/models/schedule-ui.ts";
 import {DateTime} from "luxon";
 import {useNow} from "../../../../lib/utils/useNow.ts";
 import {type ModalSignal} from "../../../../lib/createModalSignal.ts";

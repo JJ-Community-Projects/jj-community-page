@@ -1,5 +1,5 @@
 import {createContext, createSignal, onCleanup, type ParentComponent, useContext} from "solid-js";
-import type {ScheduleUI} from "../../../../lib/db/repos/ScheduleModel.ts";
+import type {ScheduleUI} from "../../../../lib/db/models/schedule-ui.ts";
 import {createStore} from "solid-js/store";
 import {DateTime} from "luxon";
 

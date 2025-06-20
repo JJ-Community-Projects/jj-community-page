@@ -6,7 +6,7 @@ import {and, eq, type InferSelectModel, sql} from "drizzle-orm";
 import {DatabaseError} from "./DatabaseError.ts";
 import type {BatchItem} from "drizzle-orm/batch";
 import type {ActionAPIContext} from "astro:actions";
-import type {ParticipantUI} from "./ScheduleModel.ts";
+import type {ParticipantUI} from "../models/schedule-ui.ts";
 
 export class StreamParticipantsRepo extends Repo<typeof streamParticipantsTable._['config']> {
   constructor(db: DrizzleD1Database, env: RepoEnv) {

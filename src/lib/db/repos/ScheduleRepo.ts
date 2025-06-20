@@ -10,8 +10,7 @@ import {StreamTagRepo} from "./StreamTagRepo.ts";
 import {StreamParticipantsRepo} from "./StreamParticipantsRepo.ts";
 import {accounts, users} from "../schema/auth-schema";
 import {DateTime} from "luxon";
-import type {Prettify} from "../../Prettify.ts";
-import type {DetailedStream} from "./ScheduleModel.ts";
+import type {DetailedStream, Schedule, ScheduleWithDetailedStreams, ScheduleWithStreams} from "../models/schedule-base.ts";
 
 
 /**
@@ -33,7 +32,7 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
    *
    * SQL: `SELECT * FROM "schedules" WHERE "schedules"."id" = ?`
    */
-  async findById(id: number): Promise<InferSelectModel<typeof schedulesTable> | null> {
+  async findById(id: number): Promise<Schedule | null> {
     try {
       const result = await this.db.select()
         .from(this.table)
@@ -57,7 +56,7 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
    *
    * SQL: `SELECT * FROM "schedules" WHERE "schedules"."slug" = ?`
    */
-  async findBySlug(slug: string): Promise<InferSelectModel<typeof schedulesTable> | null> {
+  async findBySlug(slug: string): Promise<Schedule | null> {
     try {
       const result = await this.db.select()
         .from(this.table)
@@ -81,7 +80,7 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
    *
    * SQL: `SELECT * FROM "schedules" WHERE "schedules"."ownerId" = ?`
    */
-  async findByOwnerId(ownerId: number): Promise<InferSelectModel<typeof schedulesTable>[]> {
+  async findByOwnerId(ownerId: number): Promise<Schedule[]> {
     try {
       return await this.db.select()
         .from(this.table)
@@ -102,7 +101,7 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
    *
    * SQL: `SELECT * FROM "schedules" WHERE "schedules"."visible" = ?`
    */
-  async findVisible(): Promise<InferSelectModel<typeof schedulesTable>[]> {
+  async findVisible(): Promise<Schedule[]> {
     try {
       return await this.db.select()
         .from(this.table)
@@ -123,7 +122,7 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
    *
    * SQL: `SELECT * FROM "schedules"`
    */
-  async findAll(): Promise<InferSelectModel<typeof schedulesTable>[]> {
+  async findAll(): Promise<Schedule[]> {
     try {
       return await this.db.select()
         .from(this.table)
@@ -144,7 +143,7 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
    *
    * SQL: `INSERT INTO "schedules" (...) VALUES (...) RETURNING *`
    */
-  async create(data: InferInsertModel<typeof schedulesTable>): Promise<InferSelectModel<typeof schedulesTable>> {
+  async create(data: InferInsertModel<typeof schedulesTable>): Promise<Schedule> {
     try {
       const [result] = await this.db.insert(this.table)
         .values(data as any)
@@ -168,7 +167,7 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
    *
    * SQL: `UPDATE "schedules" SET ... WHERE "schedules"."id" = ? RETURNING *`
    */
-  async update(id: number | string, data: any): Promise<InferSelectModel<typeof schedulesTable>> {
+  async update(id: number | string, data: any): Promise<Schedule> {
     try {
       // Assuming the primary key column is named 'id'
       const primaryKeyColumn = this.table.id as any;
@@ -298,10 +297,7 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
    */
   async findNextSchedule(
     userId: number,
-  ): Promise<{
-    schedule: InferSelectModel<typeof schedulesTable>,
-    streams: InferSelectModel<typeof streamsTable>[]
-  } | null> {
+  ): Promise<ScheduleWithStreams | null> {
     try {
       // Get the current year for filtering
       const currentYear = new Date().getFullYear();
@@ -370,7 +366,7 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
    */
   async findSchedulesByTiltifyUsername(
     tiltifyUsername: string
-  ): Promise<InferSelectModel<typeof schedulesTable>[]> {
+  ): Promise<Schedule[]> {
     try {
       // Import the and function for combining conditions
       const {and} = await import("drizzle-orm");
@@ -420,10 +416,7 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
    */
   async findNextScheduleByTiltifyUsername(
     tiltifyUsername: string
-  ): Promise<{
-    schedule: InferSelectModel<typeof schedulesTable>,
-    streams: InferSelectModel<typeof streamsTable>[]
-  } | null> {
+  ): Promise<ScheduleWithStreams | null> {
     try {
       // Get the current year for filtering
       const currentYear = new Date().getFullYear();
@@ -494,10 +487,7 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
    */
   async findNextScheduleByTiltifyUsernameWithFullDetails(
     tiltifyUsername: string
-  ): Promise<{
-    schedule: InferSelectModel<typeof schedulesTable>,
-    streams: DetailedStream[]
-  } | null> {
+  ): Promise<ScheduleWithDetailedStreams | null> {
     try {
       // First, get the basic schedule and streams using the existing method
       const basicResult = await this.findNextScheduleByTiltifyUsername(tiltifyUsername);
@@ -555,10 +545,7 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
    */
   async getScheduleBySlug(
     slug: string
-  ): Promise<{
-    schedule: InferSelectModel<typeof schedulesTable>,
-    streams: DetailedStream[]
-  } | null> {
+  ): Promise<ScheduleWithDetailedStreams | null> {
     try {
       // First, get the basic schedule using the existing method
       const schedule = await this.findBySlug(slug);

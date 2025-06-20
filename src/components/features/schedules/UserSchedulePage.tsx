@@ -1,5 +1,5 @@
 import {type Component} from "solid-js";
-import type {ScheduleUI} from "../../../lib/db/repos/ScheduleModel.ts";
+import type {ScheduleUI} from "../../../lib/db/models/schedule-ui.ts";
 import {ScheduleProvider} from "./common/ScheduleProvider.tsx";
 import {UserSchedulePageBodyDesktop} from "./desktop/UserSchedulePageBodyDesktop.tsx";
 import {UserSchedulePageBodyMobile} from "./mobile/UserSchedulePageBodyMobile.tsx";

@@ -1,11 +1,14 @@
 import type {
-  DetailedStream,
-  ParticipantUI,
   ScheduleDayUI,
   ScheduleGroupedWeeks,
   ScheduleUI,
-  ScheduleUIStats, ScheduleUITime, ScheduleWeekUI
-} from "../lib/db/repos/ScheduleModel.ts";
+  ScheduleUIStats,
+  ScheduleUITime,
+  ScheduleWeekUI,
+  DetailedStream,
+  ParticipantUI,
+  TagUI
+} from "../lib/db/models/schedule-ui.ts";
 import {DateTime} from "luxon";
 import {loadScheduleFromContent} from "../content/loadScheduleFromContent.ts";
 import type {FullStream} from "../lib/model/ContentTypes.ts";

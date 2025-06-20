@@ -1,5 +1,5 @@
 import {type Component, For, Show} from "solid-js";
-import type {ScheduleDayUI, ScheduleWeekUI} from "../../../../lib/db/repos/ScheduleModel.ts";
+import type {ScheduleDayUI, ScheduleWeekUI} from "../../../../lib/db/models/schedule-ui.ts";
 import {ScheduleStreamCard} from "../common/StreamCard.tsx";
 
 interface WeekScheduleDesktopComponentProps {
