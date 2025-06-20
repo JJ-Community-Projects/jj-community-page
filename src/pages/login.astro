@@ -1,9 +1,9 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import {TiltifyLoginButton} from "../components/auth/TiltifyLoginButton";
+import {TiltifyLoginButton} from "../components/features/auth/common/TiltifyLoginButton";
 const {user, session} = Astro.locals
 if (session) {
-  return Astro.redirect(`/${user.tiltifyName}/admin`);
+  return Astro.redirect(`/admin`);
 }
 ---
 <BaseLayout>

@@ -2,7 +2,7 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import {loadAllCreatorsFromContent} from "../../content/loadCreatorsFromContent";
 import {type FullCreator} from "../../lib/model/ContentTypes";
-import {StatsPageRoot} from "../../components/stats/StatsPage";
+import {StatsPageRoot} from "../../components/yogs-pages/stats/StatsPage";
 const creators = await loadAllCreatorsFromContent();
 const creatorMap: { [key: string]: FullCreator } = {}
 for (const creator of creators) {

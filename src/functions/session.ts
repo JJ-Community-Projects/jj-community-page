@@ -1,5 +1,5 @@
 import {getDB} from "../lib/db/db.ts";
-import {accounts, tokens, users, userSocials} from "../lib/db/schema/auth-schema.ts";
+import {accounts, tokens, users, userSocials, userStyles} from "../lib/db/schema/auth-schema.ts";
 import type {Session} from "../lib/auth/Session.ts";
 import type {User} from "../lib/auth/User.ts";
 import {encodeBase32, encodeHexLowerCase} from "@oslojs/encoding";
@@ -508,6 +508,22 @@ export async function createNewUserSession(
     // Store user's social media information from Tiltify
     if (tiltifyUser.social) {
       await saveTiltifySocials(db, user.id, tiltifyUser.social);
+    }
+
+    // Set default user styles
+    try {
+      await db.insert(userStyles)
+        .values({
+          userId: user.id,
+          // Default values are already defined in the schema, but we're setting them explicitly for clarity
+          primaryColor: '#E30E50',
+          accentColor: '#3584BF'
+        })
+        .run();
+      console.log('Default user styles set for user', user.id);
+    } catch (error) {
+      console.error('Error setting default user styles:', error);
+      // Continue even if setting styles fails
     }
 
     // Store the session in KV storage with 7-day TTL

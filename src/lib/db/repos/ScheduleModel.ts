@@ -1,37 +1,58 @@
 import type {Prettify} from "../../Prettify.ts";
 import type {InferSelectModel} from "drizzle-orm";
-import {streamParticipantsTable, streamsTable, streamTagsTable} from "../schema/schema.ts";
+import {schedulesTable, streamParticipantsTable, streamsTable, streamTagsTable} from "../schema/schema.ts";
+import type {DateTime} from "luxon";
+
+
+export type ParticipantUI = { tiltifyName: string, label: string, id: number, img?: string }
+export type TagUI = { label: string; tag: string }
+
 
 export type DetailedStream = Prettify<Prettify<InferSelectModel<typeof streamsTable>> & {
-  tags: Prettify<InferSelectModel<typeof streamTagsTable>>[],
-  participants: Prettify<InferSelectModel<typeof streamParticipantsTable>>[]
+  tags: TagUI[],
+  participants: ParticipantUI[]
 }>
 
 /**
  * Type definition for a day containing streams that occur on the same day
  */
-export type Day = {
-  date: Date;
+export type ScheduleDayUI = {
+  date: DateTime;
   streams: DetailedStream[];
 };
 
 /**
  * Type definition for a week containing days
  */
-export type Week = {
+export type ScheduleWeekUI = {
   name: string;
-  days: Day[];
+  days: ScheduleDayUI[];
+  start: DateTime;
+  end: DateTime;
+  times?: ScheduleUITime[]
 };
+
+export type ScheduleUITime = {
+  start: {
+    hours: number;
+    minutes: number;
+  },
+  end: {
+    hours: number;
+    minutes: number;
+  }
+  timezone: string;
+}
 
 
 /**
  * Type definition for grouped weeks object
  */
-export type GroupedWeeks = {
-  beforeJJ: Week;
-  week1: Week;
-  week2: Week;
-  afterJJ: Week;
+export type ScheduleGroupedWeeks = {
+  beforeJJ: ScheduleWeekUI;
+  week1: ScheduleWeekUI;
+  week2: ScheduleWeekUI;
+  afterJJ: ScheduleWeekUI;
 };
 
 export type ScheduleUIStats = {
@@ -61,4 +82,13 @@ export type ScheduleUIStats = {
     notVisible: number;
   };
   hasMultiDayStreams: boolean; // Whether any streams span multiple days
+}
+
+
+export type ScheduleUI = {
+  schedule: InferSelectModel<typeof schedulesTable> | undefined,
+  streams: DetailedStream[],
+  days: ScheduleDayUI[],
+  weeks: ScheduleGroupedWeeks,
+  stats: ScheduleUIStats
 }

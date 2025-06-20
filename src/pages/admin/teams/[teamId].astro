@@ -1,0 +1,52 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import {TeamDetail} from "../../../components/features/users/admin/teams/TeamDetail";
+import {AdminTeamDetail} from "../../../components/features/users/admin/teams/teamAdmin/AdminTeamDetail";
+import {teamsTable} from "../../../lib/db/schema/schema.ts";
+import {eq} from "drizzle-orm";
+import {getDB} from "../../../lib/db/db.ts";
+
+const {session, user} = Astro.locals
+if (session === null) {
+  return Astro.redirect("/");
+}
+
+// Verify the user has access to this page
+if (Astro.params.username !== user.tiltifyName) {
+  return Astro.redirect(`/admin/teams`);
+}
+
+// Get team ID from URL
+const teamId = parseInt(Astro.params.teamId || "0");
+if (!teamId) {
+  return Astro.redirect(`/admin/teams`);
+}
+
+// Get team details to check if user is the owner
+let isOwner = false;
+try {
+  const db = getDB(Astro);
+  const team = await db.select()
+    .from(teamsTable)
+    .where(eq(teamsTable.id, teamId))
+    .get();
+
+  if (!team) {
+    return Astro.redirect(`/admin/teams`);
+  }
+
+  // Check if the current user is the team owner
+  isOwner = team.ownerId === user.id;
+} catch (e) {
+  console.error("Error fetching team:", e);
+  return Astro.redirect(`/admin/teams`);
+}
+---
+
+<BaseLayout>
+  {isOwner ? (
+          <AdminTeamDetail user={user} teamId={teamId} client:only="solid-js"/>
+  ) : (
+          <TeamDetail user={user} teamId={teamId} client:only="solid-js"/>
+  )}
+</BaseLayout>

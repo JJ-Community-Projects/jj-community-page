@@ -23,7 +23,7 @@ export default defineConfig({
                 page !== 'https://jinglejam.ostof.dev/overlays/charities/' &&
                 page !== 'https://jinglejam.ostof.dev/overlays/charities2/' &&
                 page !== 'https://jinglejam.ostof.dev/overlays/fundraisers/' &&
-                page !== 'https://jinglejam.ostof.dev/yogs/schedules/404/' &&
+                page !== 'https://jinglejam.ostof.dev/yogs/archive/404/' &&
                 page !== 'https://jinglejam.ostof.dev/yogs/privacy/twitch-extension' &&
                 !page.includes('pwa'),
         }

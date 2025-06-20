@@ -6,7 +6,9 @@ import {DatabaseError} from "./DatabaseError.ts";
 import {DateTime} from "luxon";
 import type {BatchItem} from "drizzle-orm/batch";
 import type {ActionAPIContext} from "astro:actions";
-import {type DetailedStream} from "./ScheduleRepo.ts";
+import {type DetailedStream} from "./ScheduleModel.ts";
+import {StreamTagRepo} from "./StreamTagRepo.ts";
+import {StreamParticipantsRepo} from "./StreamParticipantsRepo.ts";
 
 export class StreamRepo extends Repo<typeof streamsTable._['config']> {
   constructor(db: DrizzleD1Database, env: RepoEnv) {
@@ -27,46 +29,64 @@ export class StreamRepo extends Repo<typeof streamsTable._['config']> {
    * 2. `SELECT * FROM "streamTags" WHERE "streamTags"."scheduleId" = ?`
    * 3. `SELECT * FROM "streamParticipants" WHERE "streamParticipants"."scheduleId" = ?`
    */
-  async findStreamsWithDetails(scheduleId: number): Promise<DetailedStream[]> {
+  async findStreamsUIWithDetails(scheduleId: number): Promise<DetailedStream[]> {
     try {
-
       // Get all streams for the schedule in one query
       const streams = await this.db.select()
         .from(streamsTable)
         .where(eq(streamsTable.scheduleId, scheduleId))
         .all();
 
-      // Get all tags for all streams in the schedule in one query
-      const allTags = await this.db.select()
-        .from(streamTagsTable)
-        .where(eq(streamTagsTable.scheduleId, scheduleId))
+      // Create instances of the repos we need
+      const tagRepo = new StreamTagRepo(this.db, this.env);
+      const participantRepo = new StreamParticipantsRepo(this.db, this.env);
+
+      // Fetch all tags and participants for all streams in the schedule at once using the UI-specific methods
+      const tagsByStreamId = await tagRepo.findTagsUIGroupedByStream(scheduleId);
+      const participantsByStreamId = await participantRepo.findParticipantsUIByStream(scheduleId);
+
+      // Combine streams with their tags and participants
+      const result = streams.map(stream => ({
+        ...stream,
+        tags: tagsByStreamId[stream.id] || [],
+        participants: participantsByStreamId[stream.id] || []
+      }));
+
+      return result;
+    } catch (error) {
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to find streams with details for schedule ID: ${scheduleId}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to find streams with details for schedule ID: ${scheduleId}`, error);
+      }
+    }
+  }
+
+  /**
+   * Find streams by schedule ID with their tags and participants
+   * @param scheduleId The schedule ID
+   * @returns Promise resolving to an array of streams with their tags and participants
+   *
+   * SQL:
+   * 1. `SELECT * FROM "streams" WHERE "streams"."scheduleId" = ?`
+   * 2. `SELECT * FROM "streamTags" WHERE "streamTags"."scheduleId" = ?`
+   * 3. `SELECT * FROM "streamParticipants" WHERE "streamParticipants"."scheduleId" = ?`
+   */
+  async findStreamsWithDetails(scheduleId: number) {
+    try {
+      // Get all streams for the schedule in one query
+      const streams = await this.db.select()
+        .from(streamsTable)
+        .where(eq(streamsTable.scheduleId, scheduleId))
         .all();
 
-      // Get all participants for all streams in the schedule in one query
-      const allParticipants = await this.db.select()
-        .from(streamParticipantsTable)
-        .where(eq(streamParticipantsTable.scheduleId, scheduleId))
-        .all();
+      // Create instances of the repos we need
+      const tagRepo = new StreamTagRepo(this.db, this.env);
+      const participantRepo = new StreamParticipantsRepo(this.db, this.env);
 
-      // Organize tags and participants by streamId for efficient lookup
-      const tagsByStreamId: Record<number, InferSelectModel<typeof streamTagsTable>[]> = {};
-      const participantsByStreamId: Record<number, InferSelectModel<typeof streamParticipantsTable>[]> = {};
-
-      // Group tags by streamId
-      for (const tag of allTags) {
-        if (!tagsByStreamId[tag.streamId]) {
-          tagsByStreamId[tag.streamId] = [];
-        }
-        tagsByStreamId[tag.streamId].push(tag);
-      }
-
-      // Group participants by streamId
-      for (const participant of allParticipants) {
-        if (!participantsByStreamId[participant.streamId]) {
-          participantsByStreamId[participant.streamId] = [];
-        }
-        participantsByStreamId[participant.streamId].push(participant);
-      }
+      // Fetch all tags and participants for all streams in the schedule at once using the UI-specific methods
+      const tagsByStreamId = await tagRepo.findTagsGroupedByStream(scheduleId);
+      const participantsByStreamId = await participantRepo.findParticipantsGroupedByStream(scheduleId);
 
       // Combine streams with their tags and participants
       const result = streams.map(stream => ({

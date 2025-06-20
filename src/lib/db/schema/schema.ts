@@ -47,6 +47,8 @@ export const streamsTable = sqliteTable('streams', {
     visible: integer({mode: 'boolean'}).notNull().default(false),
     subtitle: text('subtitle'),
     description: text('description'),
+    youtubeVodUrl: text('youtube_vod_url'),
+    twitchVodUrl: text('twitch_vod_url'),
     start: integer('start_time', {mode: 'timestamp'}).notNull(),
     end: integer('end_time', {mode: 'timestamp'}).notNull(),
   },

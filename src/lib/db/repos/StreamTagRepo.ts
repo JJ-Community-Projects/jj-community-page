@@ -6,6 +6,7 @@ import {DatabaseError} from "./DatabaseError.ts";
 import {DateTime} from "luxon";
 import type {BatchItem} from "drizzle-orm/batch";
 import type {ActionAPIContext} from "astro:actions";
+import type {TagUI} from "./ScheduleModel.ts";
 
 export class StreamTagRepo extends Repo<typeof streamTagsTable._['config']> {
   constructor(db: DrizzleD1Database, env: RepoEnv) {
@@ -67,6 +68,39 @@ export class StreamTagRepo extends Repo<typeof streamTagsTable._['config']> {
         throw new DatabaseError(`Failed to find tags grouped by stream for schedule ID: ${scheduleId}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to find tags grouped by stream for schedule ID: ${scheduleId}`, error);
+      }
+    }
+  }
+
+  async findTagsUIGroupedByStream(scheduleId: number): Promise<Record<number, TagUI[]>> {
+    try {
+      // Get all tags for all streams in the schedule in one query
+      const allTags = await this.db.select()
+        .from(streamTagsTable)
+        .where(eq(streamTagsTable.scheduleId, scheduleId))
+        .all();
+
+      // Organize tags by streamId for efficient lookup
+      const tagsByStreamId: Record<number, TagUI[]> = {};
+
+      // Group tags by streamId and transform to TagUI format
+      for (const tag of allTags) {
+        if (!tagsByStreamId[tag.streamId]) {
+          tagsByStreamId[tag.streamId] = [];
+        }
+        // Only include label and tag properties as required by TagUI type
+        tagsByStreamId[tag.streamId].push({
+          label: tag.label,
+          tag: tag.tag
+        });
+      }
+
+      return tagsByStreamId;
+    } catch (error) {
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to find TagUI grouped by stream for schedule ID: ${scheduleId}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to find TagUI grouped by stream for schedule ID: ${scheduleId}`, error);
       }
     }
   }

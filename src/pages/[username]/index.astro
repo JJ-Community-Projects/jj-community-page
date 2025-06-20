@@ -1,9 +1,9 @@
 ---
 import {actions} from 'astro:actions';
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import UserHeader from "../../components/users/public/UserHeader.astro";
-import UserSchedule from "../../components/users/public/UserSchedule.astro";
-import UserTeams from "../../components/users/public/UserTeams.astro";
+import UserHeader from "../../components/features/users/public/UserHeader.astro";
+import UserSchedule from "../../components/features/users/public/UserSchedule.astro";
+import UserTeams from "../../components/features/users/public/UserTeams.astro";
 
 const {username} = Astro.params;
 if (!username) {

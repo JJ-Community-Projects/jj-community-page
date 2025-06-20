@@ -15,7 +15,7 @@ import {deleteSessionTokenCookie, setSessionTokenCookie, validateSessionToken} f
  * @returns {Promise<Response>} The response from the next middleware or route handler
  */
 export const onRequest = defineMiddleware(async (context, next) => {
-
+  console.log('onRequest', context.url)
   const token = context.cookies.get("session")?.value ?? null;
   const upgradeHeader = context.request.headers.get("upgrade");
   if (upgradeHeader && upgradeHeader.toLowerCase() === "websocket") {

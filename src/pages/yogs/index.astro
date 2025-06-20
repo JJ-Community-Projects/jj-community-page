@@ -1,12 +1,12 @@
 ---
 export const prerender = false;
-import TVExtBanner from "../../components/TVExtBanner.astro";
+import YogsTVExtBanner from "../../components/yogs-pages/common/YogsTVExtBanner.astro";
 import {loadScheduleFromContent} from "../../content/loadScheduleFromContent";
 import {loadAllCreatorsFromContent} from "../../content/loadCreatorsFromContent";
-import {CurrentScheduleLoader} from "../../components/yogs/CurrentScheduleLoader.tsx";
+import {YogsCurrentScheduleLoader} from "../../components/yogs-pages/schedule/YogsCurrentScheduleLoader.tsx";
 
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import {CreatorPill} from "../../components/creators/CreatorPill.tsx";
+import {YogsCreatorPill} from "../../components/yogs-pages/creators/YogsCreatorPill.tsx";
 
 const creators = await loadAllCreatorsFromContent();
 
@@ -147,10 +147,10 @@ if (filteredCreators) {
         description={description}
         canonical="https://jinglejam.ostof.dev/yogs"
 >
-    <TVExtBanner/>
+    <YogsTVExtBanner/>
 
     <div class={'min-h-32'}>
-        <CurrentScheduleLoader client:only="solid-js" creators={creators} fallbackSchedule={fallbackSchedule!}/>
+        <YogsCurrentScheduleLoader client:only="solid-js" creators={creators} fallbackSchedule={fallbackSchedule!}/>
     </div>
 
     <div class="flex flex-col justify-center items-center p-4 gap-2">
@@ -160,14 +160,14 @@ if (filteredCreators) {
             <div class="flex flex-wrap gap-2 items-center justify-center">
               {
                 yogs && yogs.map(creator =>
-                              <CreatorPill creator={creator} client:only="solid-js"/>)
+                              <YogsCreatorPill creator={creator} client:only="solid-js"/>)
               }
             </div>
             <p class="text-xl text-white mb-1">Best Of</p>
             <div class="flex flex-wrap gap-2 items-center justify-center">
               {
                 bestOf && bestOf.map(creator =>
-                              <CreatorPill creator={creator} client:only="solid-js"/>
+                              <YogsCreatorPill creator={creator} client:only="solid-js"/>
                 )
               }
             </div>
@@ -175,7 +175,7 @@ if (filteredCreators) {
             <div class="flex flex-wrap gap-2 items-center justify-center">
               {
                 friends && friends.map(creator =>
-                              <CreatorPill creator={creator} client:only="solid-js"/>
+                              <YogsCreatorPill creator={creator} client:only="solid-js"/>
                 )
               }
             </div>

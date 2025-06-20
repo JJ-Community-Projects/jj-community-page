@@ -515,8 +515,8 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
       const scheduleId = basicResult.schedule.id;
 
       // Fetch all tags and participants for all streams in the schedule at once
-      const tagsByStreamId = await tagRepo.findTagsGroupedByStream(scheduleId);
-      const participantsByStreamId = await participantRepo.findParticipantsGroupedByStream(scheduleId);
+      const tagsByStreamId = await tagRepo.findTagsUIGroupedByStream(scheduleId);
+      const participantsByStreamId = await participantRepo.findParticipantsUIByStream(scheduleId);
 
       // Enhance each stream with its tags and participants
       const enhancedStreams = basicResult.streams.map(stream => {
@@ -542,5 +542,74 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
   }
 
 
+
+  /**
+   * Find a schedule by its slug, including full details
+   *
+   * This function is similar to findBySlug but also fetches
+   * the tags and participants for each stream. The returned streams array contains
+   * stream objects with two additional keys: tags and participants.
+   *
+   * @param slug - The slug of the schedule to find
+   * @returns Promise resolving to an object containing the schedule and its streams with full details, or null if none found
+   */
+  async getScheduleBySlug(
+    slug: string
+  ): Promise<{
+    schedule: InferSelectModel<typeof schedulesTable>,
+    streams: DetailedStream[]
+  } | null> {
+    try {
+      // First, get the basic schedule using the existing method
+      const schedule = await this.findBySlug(slug);
+
+      // If no schedule found, return null
+      if (!schedule) {
+        return null;
+      }
+
+      // Get all streams for this schedule, ordered by start time
+      const streams = await this.db.select()
+        .from(streamsTable)
+        .where(
+          and(
+            eq(streamsTable.scheduleId, schedule.id),
+            eq(streamsTable.visible, true)
+          )
+        )
+        .orderBy(streamsTable.start)
+        .all();
+      console.log(streams)
+
+      // Create instances of the repos we need
+      const tagRepo = new StreamTagRepo(this.db, this.env);
+      const participantRepo = new StreamParticipantsRepo(this.db, this.env);
+
+      // Fetch all tags and participants for all streams in the schedule at once
+      const tagsByStreamId = await tagRepo.findTagsUIGroupedByStream(schedule.id);
+      const participantsByStreamId = await participantRepo.findParticipantsUIByStream(schedule.id);
+
+      // Enhance each stream with its tags and participants
+      const enhancedStreams = streams.map(stream => {
+        return {
+          ...stream,
+          tags: tagsByStreamId[stream.id] || [],
+          participants: participantsByStreamId[stream.id] || []
+        };
+      });
+
+      // Return the schedule and enhanced streams
+      return {
+        schedule: schedule,
+        streams: enhancedStreams
+      };
+    } catch (error) {
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to find schedule with full details by slug: ${slug}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to find schedule with full details by slug: ${slug}`, error);
+      }
+    }
+  }
 
 }

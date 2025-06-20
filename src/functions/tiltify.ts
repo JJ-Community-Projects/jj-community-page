@@ -81,20 +81,21 @@ export async function getTiltifyTokenFromContext(ctx: AstroContext): Promise<str
   }
 
   const expiresAt = DateTime.fromJSDate(tokenFromDB.expiresAt)
-
+  console.log('expiresAt', expiresAt)
   if (now < expiresAt) {
     return tokenFromDB.accessToken
   }
-
+  const body = {
+    "client_id": TILTIFY_CLIENT_ID,
+    "client_secret": TILTIFY_SECRET,
+    "refresh_token": tokenFromDB.refreshToken,
+    "grant_type": "refresh_token"
+  }
+  console.log(body)
   const refreshResponse = await fetch('https://v5api.tiltify.com/oauth/token', {
     method: 'POST',
     body: JSON.stringify(
-      {
-        "client_id": TILTIFY_CLIENT_ID,
-        "client_secret": TILTIFY_SECRET,
-        "refresh_token": tokenFromDB.refreshToken,
-        "grant_type": "refresh_token"
-      }
+      body
     ),
   })
   if (!refreshResponse.ok) {

@@ -18,33 +18,33 @@ import {type InferSelectModel} from "drizzle-orm";
  * Represents a schedule from the database
  * Type derived from the schedulesTable schema
  */
-type Schedule = InferSelectModel<typeof schedulesTable>;
+type DBSchedule = InferSelectModel<typeof schedulesTable>;
 
 /**
  * Represents a stream from the database
  * Type derived from the streamsTable schema
  */
-type Stream = InferSelectModel<typeof streamsTable>;
+type DBStream = InferSelectModel<typeof streamsTable>;
 
 /**
  * Represents a stream tag from the database
  * Type derived from the streamTagsTable schema
  */
-type StreamTag = InferSelectModel<typeof streamTagsTable>;
+type DBStreamTag = InferSelectModel<typeof streamTagsTable>;
 
 /**
  * Represents a stream participant from the database
  * Type derived from the streamParticipantsTable schema
  */
-type StreamParticipant = InferSelectModel<typeof streamParticipantsTable>;
+type DBStreamParticipant = InferSelectModel<typeof streamParticipantsTable>;
 
 /**
  * Represents a stream with its associated tags and participants
  * Used for comprehensive stream data representation
  */
-type StreamWithDetails = Stream & {
-  tags: StreamTag[];
-  participants: StreamParticipant[];
+type DBStreamWithDetails = DBStream & {
+  tags: DBStreamTag[];
+  participants: DBStreamParticipant[];
 };
 
 /**
@@ -67,6 +67,10 @@ interface StreamsTable {
     visible: boolean;
     /** Detailed description of the stream */
     description: string;
+    /** YouTube VOD URL for the stream */
+    youtubeVodUrl?: string;
+    /** Twitch VOD URL for the stream */
+    twitchVodUrl?: string;
     /** ISO string representing the start time of the stream */
     start: string;
     /** ISO string representing the end time of the stream */
@@ -258,7 +262,7 @@ export class ScheduleEditorDO extends TinybaseDO {
    * @param store - The MergeableStore instance to update
    * @param schedule - The schedule data to store
    */
-  private setScheduleValuesInStore(store: MergeableStore, schedule: Schedule) {
+  private setScheduleValuesInStore(store: MergeableStore, schedule: DBSchedule) {
     store.setValue('id', schedule.id);
     store.setValue('title', schedule.title);
     store.setValue('slug', schedule.slug);
@@ -272,7 +276,7 @@ export class ScheduleEditorDO extends TinybaseDO {
    * @param streams - Array of stream objects with their details
    * @returns A StreamsTable object ready to be stored in TinyBase
    */
-  private processStreamsForStore(streams: StreamWithDetails[]): StreamsTable {
+  private processStreamsForStore(streams: DBStreamWithDetails[]): StreamsTable {
     const tinyStreamsTable: StreamsTable = {};
 
     for (const stream of streams) {
@@ -282,6 +286,8 @@ export class ScheduleEditorDO extends TinybaseDO {
         subtitle: stream.subtitle ?? '',
         description: stream.description ?? '',
         visible: stream.visible,
+        youtubeVodUrl: stream.youtubeVodUrl ?? '',
+        twitchVodUrl: stream.twitchVodUrl ?? '',
         start: stream.start.toISOString(),
         end: stream.end.toISOString()
       };
@@ -296,7 +302,7 @@ export class ScheduleEditorDO extends TinybaseDO {
    * @param tags - Array of stream tag objects
    * @returns A TagsTable object ready to be stored in TinyBase
    */
-  private processTagsForStore(tags: StreamTag[]): TagsTable {
+  private processTagsForStore(tags: DBStreamTag[]): TagsTable {
     const tagsTable: TagsTable = {};
 
     for (let i = 0; i < tags.length; i++) {
@@ -317,7 +323,7 @@ export class ScheduleEditorDO extends TinybaseDO {
    * @param participants - Array of stream participant objects
    * @returns A ParticipantsTable object ready to be stored in TinyBase
    */
-  private processParticipantsForStore(participants: StreamParticipant[]): ParticipantsTable {
+  private processParticipantsForStore(participants: DBStreamParticipant[]): ParticipantsTable {
     const participantsTable: ParticipantsTable = {};
 
     // Note: We only store the basic participant info here
@@ -408,6 +414,8 @@ export class ScheduleEditorDO extends TinybaseDO {
     description: string;
     visible: boolean;
     createdBy: number;
+    youtubeVodUrl: string;
+    twitchVodUrl: string;
     start: Date;
     end: Date;
   }> {
@@ -423,6 +431,8 @@ export class ScheduleEditorDO extends TinybaseDO {
           description: stream.description ?? '',
           visible: stream.visible,
           createdBy: stream.createdBy,
+          youtubeVodUrl: stream.youtubeVodUrl ?? '',
+          twitchVodUrl: stream.twitchVodUrl ?? '',
           start: DateTime.fromISO(stream.start).toUTC().toJSDate(),
           end: DateTime.fromISO(stream.end).toUTC().toJSDate()
         };
@@ -444,6 +454,8 @@ export class ScheduleEditorDO extends TinybaseDO {
     description: string;
     visible: boolean;
     createdBy: number;
+    youtubeVodUrl: string;
+    twitchVodUrl: string;
     start: Date;
     end: Date;
   }> {
@@ -458,6 +470,8 @@ export class ScheduleEditorDO extends TinybaseDO {
           description: stream.description ?? '',
           visible: stream.visible,
           createdBy: stream.createdBy,
+          youtubeVodUrl: stream.youtubeVodUrl ?? '',
+          twitchVodUrl: stream.twitchVodUrl ?? '',
           start: DateTime.fromISO(stream.start).toUTC().toJSDate(),
           end: DateTime.fromISO(stream.end).toUTC().toJSDate()
         };
@@ -538,7 +552,7 @@ export class ScheduleEditorDO extends TinybaseDO {
    * @param storeStreamIds - Array of stream IDs from the store
    * @returns Array of tag objects to be deleted from the database
    */
-  private prepareTagDeletes(streams: StreamWithDetails[], storeTags: TagsTable, storeStreamIds: number[]): Array<{
+  private prepareTagDeletes(streams: DBStreamWithDetails[], storeTags: TagsTable, storeStreamIds: number[]): Array<{
     streamId: number;
     tag: string
   }> {
@@ -615,7 +629,7 @@ export class ScheduleEditorDO extends TinybaseDO {
    * @param storeStreamIds - Array of stream IDs from the store
    * @returns Array of participant objects to be deleted from the database
    */
-  private prepareParticipantDeletes(streams: StreamWithDetails[], storeParticipants: ParticipantsTable, storeStreamIds: number[]): Array<{
+  private prepareParticipantDeletes(streams: DBStreamWithDetails[], storeParticipants: ParticipantsTable, storeStreamIds: number[]): Array<{
     streamId: number;
     userId: number
   }> {

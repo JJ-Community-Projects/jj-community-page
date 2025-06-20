@@ -1,10 +1,12 @@
 import {Repo, type RepoEnv} from "./Repo.ts";
 import {streamParticipantsTable} from "../schema/schema.ts";
+import {accounts} from "../schema/auth-schema.ts";
 import {drizzle, DrizzleD1Database} from "drizzle-orm/d1";
-import {and, eq, type InferSelectModel} from "drizzle-orm";
+import {and, eq, type InferSelectModel, sql} from "drizzle-orm";
 import {DatabaseError} from "./DatabaseError.ts";
 import type {BatchItem} from "drizzle-orm/batch";
 import type {ActionAPIContext} from "astro:actions";
+import type {ParticipantUI} from "./ScheduleModel.ts";
 
 export class StreamParticipantsRepo extends Repo<typeof streamParticipantsTable._['config']> {
   constructor(db: DrizzleD1Database, env: RepoEnv) {
@@ -305,6 +307,66 @@ export class StreamParticipantsRepo extends Repo<typeof streamParticipantsTable.
         throw new DatabaseError(`Failed to find participants grouped by stream for schedule ID: ${scheduleId}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to find participants grouped by stream for schedule ID: ${scheduleId}`, error);
+      }
+    }
+  }
+
+  async findParticipantsUIByStream(scheduleId: number): Promise<Record<number, ParticipantUI[]>> {
+    try {
+      // Join streamParticipantsTable with accounts to get participant information
+      const participants = await this.db.select({
+        streamId: streamParticipantsTable.streamId,
+        userId: streamParticipantsTable.userId,
+        tiltifyName: accounts.providerUsername,
+        providerId: accounts.providerId,
+        meta: accounts.meta
+      })
+      .from(streamParticipantsTable)
+      .innerJoin(
+        accounts,
+        and(
+          eq(streamParticipantsTable.userId, accounts.userId),
+          eq(accounts.provider, 'tiltify')
+        )
+      )
+      .where(eq(streamParticipantsTable.scheduleId, scheduleId))
+      .all();
+
+      // Organize participants by streamId for efficient lookup
+      const participantsByStreamId: Record<number, ParticipantUI[]> = {};
+
+      // Group participants by streamId and transform to ParticipantUI format
+      for (const participant of participants) {
+        if (!participantsByStreamId[participant.streamId]) {
+          participantsByStreamId[participant.streamId] = [];
+        }
+
+        // Extract image from meta if available
+        let img: string | undefined = undefined;
+        if (participant.meta) {
+          try {
+            const meta = JSON.parse(participant.meta as string);
+            img = meta.avatar ? meta.avatar : undefined;
+          } catch (e) {
+            // Ignore parsing errors
+          }
+        }
+
+        // Add participant in ParticipantUI format
+        participantsByStreamId[participant.streamId].push({
+          tiltifyName: participant.tiltifyName,
+          label: participant.tiltifyName,
+          id: participant.userId,
+          img
+        });
+      }
+
+      return participantsByStreamId;
+    } catch (error) {
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to find ParticipantUI grouped by stream for schedule ID: ${scheduleId}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to find ParticipantUI grouped by stream for schedule ID: ${scheduleId}`, error);
       }
     }
   }

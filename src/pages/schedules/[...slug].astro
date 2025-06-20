@@ -1,0 +1,40 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import {actions} from "astro:actions";
+import {StreamWrap} from "../../components/features/schedules/StreamWrap";
+import {ScheduleDayHorizontal} from "../../components/features/schedules/ScheduleDayHorizontal";
+import {ScheduleDayVertical} from "../../components/features/schedules/ScheduleDayVertical";
+
+const {slug} = Astro.params
+
+if (!slug) {
+  return Astro.redirect('/error')
+}
+
+const {data, error} = await Astro.callAction(actions.ui.user.schedules.byScheduleSlug, slug)
+---
+<BaseLayout>
+    <p>Schedules</p>
+  {
+    error && (
+                  <p>Error: ${error.message}</p>
+    )
+  }
+
+  {
+    (!error && data) && (
+    <div class="flex flex-col gap-4">
+        <StreamWrap streams={data.streams!} client:only="solid-js"/>
+        <ScheduleDayHorizontal day={data.days[0]} client:only="solid-js"/>
+        <ScheduleDayVertical day={data.days[0]} client:only="solid-js"/>
+
+    </div>
+    )
+  }
+
+  {
+    data && (
+                  <pre>{JSON.stringify(data, null, 2)}</pre>
+    )
+  }
+</BaseLayout>

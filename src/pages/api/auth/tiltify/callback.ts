@@ -69,7 +69,7 @@ export const GET: APIRoute = async (ctx) => {
     const sessionToken = generateSessionToken();
     const session = await createSession(ctx, sessionToken, existingAccount.userId);
     setSessionTokenCookie(ctx, sessionToken, session.expiresAt);
-    return ctx.redirect(`/${existingAccount.providerUsername}/admin`);
+    return ctx.redirect(`/admin`);
   }
 
   const sessionToken = generateSessionToken();
@@ -81,6 +81,6 @@ export const GET: APIRoute = async (ctx) => {
   const DO = ctx.locals.runtime.env.UserDO
   const doId = DO.idFromName(`${session.userId}`)
 
-  return ctx.redirect(`/${tiltifyUsername}/admin`);
+  return ctx.redirect(`/admin`);
 
 }

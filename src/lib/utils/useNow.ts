@@ -11,8 +11,8 @@ export const useDatetimeLondonNow = (init?: DateTime) => {
 }
 
 export const useNow = (init?: DateTime) => {
-  const [date, setDate] = createSignal(init ?? DateTime.now())
-  const interval = setInterval(() => setDate(init ?? DateTime.now()), 1000)
+  const [date, setDate] = createSignal(init ?? DateTime.now().setZone('utc'))
+  const interval = setInterval(() => setDate(init ?? DateTime.now().setZone('utc')), 1000)
   onCleanup(() => clearInterval(interval))
   return date
 }

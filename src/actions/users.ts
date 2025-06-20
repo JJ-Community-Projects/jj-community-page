@@ -8,6 +8,60 @@ import {getUserDO} from "./getDO.ts";
 
 export const users = {
   /**
+   * Updates the user's style preferences.
+   * Input: An object containing:
+   *   - primaryColor (string) - The primary color in hex format
+   *   - accentColor (string) - The accent color in hex format
+   * Action: Updates the user's style preferences in the database and UserDO.
+   * Returns: An object with a success flag.
+   */
+  updateUserStyle: defineAction({
+    input: z.object({
+      primaryColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/, {
+        message: "Primary color must be a valid hex color code (e.g., #E30E50)"
+      }),
+      accentColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/, {
+        message: "Accent color must be a valid hex color code (e.g., #3584BF)"
+      })
+    }),
+    handler: async ({primaryColor, accentColor}, context) => {
+      // Check if user is authenticated
+      const {session, user} = context.locals
+      if (!session || !user) {
+        throw new ActionError({code: 'UNAUTHORIZED'});
+      }
+
+      const userId = user.id;
+      const stub = getUserDO(context, userId);
+
+      // Update user style
+      try {
+        let result;
+        try {
+          result = await stub.updateUserStyle(primaryColor, accentColor);
+          console.log('User style updated successfully');
+        } catch (error) {
+          console.error('Error in stub.updateUserStyle operation:', error);
+          throw error;
+        }
+
+        if (!result) {
+          throw new ActionError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: 'Failed to update user style'
+          });
+        }
+        return {success: true};
+      } catch (error) {
+        console.error('Error updating user style:', error);
+        throw new ActionError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to update user style'
+        });
+      }
+    }
+  }),
+  /**
    * Fetches social media links from the user's Tiltify account and adds them to their profile.
    * Input: None
    * Action: Retrieves the user's Tiltify token, fetches their social media links from Tiltify, and adds them to the UserDO.

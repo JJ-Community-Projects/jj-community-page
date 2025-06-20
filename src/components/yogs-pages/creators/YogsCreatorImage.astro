@@ -1,0 +1,7 @@
+---
+import {Image} from 'astro:assets';
+interface Props {
+  url: string, alt: string
+}
+---
+<Image src={Astro.props.url} alt={Astro.props.alt} height="48" width="48" class="rounded-full w-12 h-12"/>

@@ -2,11 +2,11 @@
 import PWABaseLayout from "../../../../layouts/PWABaseLayout.astro";
 export const prerender = false;
 import {type FullSchedule} from "../../../../lib/model/ContentTypes";
-import {YogsScheduleComponent} from "../../../../components/yogs/schedule/YogsScheduleComponent.tsx";
+import {YogsScheduleComponent} from "../../../../components/yogs-pages/schedule/YogsScheduleComponent.tsx";
 import {contentScheduleToJs} from "../../../../content/loadScheduleFromContent";
 import {type CollectionEntry, getCollection,} from 'astro:content';
 import {loadAllCreatorsFromContent} from "../../../../content/loadCreatorsFromContent";
-import {MobileYogsScheduleComponent} from "../../../../components/yogs/schedule/mobile/MobileYogsScheduleComponent.tsx";
+import {MobileYogsScheduleComponent} from "../../../../components/yogs-pages/schedule/mobile/MobileYogsScheduleComponent.tsx";
 
 export async function getStaticPaths() {
   const schedules = await getCollection('schedules');
@@ -120,7 +120,7 @@ const year = Astro.params.year
 <PWABaseLayout
         title={`The Yogscast Jingle Jam ${year} Schedule`}
         description={`The Yogscast Jingle Jam ${year} Interactive Schedule made by the Community`}
-        canonical={`https://jinglejam.ostof.dev/yogs/schedules/${year}`}
+        canonical={`https://jinglejam.ostof.dev/yogs/archive/${year}`}
 >
     <!--Show MobileYogsScheduleComponent on mobile screens-->
 

@@ -5,7 +5,7 @@ import type {Id, IdAddedOrRemoved} from "tinybase";
 import {TinybaseDO} from "./TinybaseDO.ts";
 import {validateSessionTokenFromEnv} from "../functions/session.ts";
 import {createUnauthorizedResponse} from "./utils.ts";
-import {userSocials, userTags} from "../lib/db/schema/auth-schema.ts";
+import {userSocials, userStyles, userTags} from "../lib/db/schema/auth-schema.ts";
 
 
 export class UserDO extends TinybaseDO {
@@ -19,6 +19,7 @@ export class UserDO extends TinybaseDO {
       await this.loadTeamMemberships();
       await this.loadUserTags();
       await this.loadUserSocials();
+      await this.loadUserStyles();
     });
   }
 
@@ -691,6 +692,69 @@ export class UserDO extends TinybaseDO {
       return true;
     } catch (e) {
       this.error('removeSocial error:', e);
+      return false;
+    }
+  }
+
+  private async loadUserStyles() {
+    if (!this.store) {
+      return;
+    }
+
+    try {
+      const db = drizzle(this.env.DB);
+
+      // Load user style from database
+      const style = await db.select()
+        .from(userStyles)
+        .where(eq(userStyles.userId, this.userId))
+        .get();
+
+      // Update store with user style if it exists
+      if (style) {
+        this.store.setRow('userStyle', 'style', {
+          primaryColor: style.primaryColor,
+          accentColor: style.accentColor
+        });
+      }
+    } catch (e) {
+      this.error('loadUserStyles error:', e);
+    }
+  }
+
+  async updateUserStyle(primaryColor: string, accentColor: string) {
+    if (!this.store) {
+      this.error('updateUserStyle', 'Store not initialized');
+      return false;
+    }
+
+    try {
+      // Update style in database
+      const db = drizzle(this.env.DB);
+      await db.insert(userStyles)
+        .values({
+          userId: this.userId,
+          primaryColor: primaryColor,
+          accentColor: accentColor
+        })
+        .onConflictDoUpdate({
+          target: [userStyles.userId],
+          set: {
+            primaryColor: primaryColor,
+            accentColor: accentColor
+          }
+        });
+
+      // Update style in store
+      this.store.setRow('userStyle', 'style', {
+        primaryColor: primaryColor,
+        accentColor: accentColor
+      });
+
+      this.log('updateUserStyle', 'User style updated successfully');
+      return true;
+    } catch (e) {
+      this.error('updateUserStyle error:', e);
       return false;
     }
   }

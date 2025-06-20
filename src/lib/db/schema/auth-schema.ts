@@ -78,3 +78,11 @@ export const blockedAccounts = sqliteTable("blockedAccounts", {
   createdAt: integer('created_at', {mode: 'timestamp'})
     .default(sql`(current_timestamp)`).notNull(),
 })
+
+export const userStyles = sqliteTable("userStyles", {
+  userId: integer({mode: 'number'}).notNull().references(() => users.id, {onDelete: 'cascade'}),
+  primaryColor: text('primary_color').notNull().default('#E30E50'),
+  accentColor: text('accent_color').notNull().default('#3584BF'),
+}, (table) => [
+  primaryKey({name: 'user_style_pk', columns: [table.userId]}),
+])
