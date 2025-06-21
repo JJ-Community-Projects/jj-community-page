@@ -1,7 +1,7 @@
 import {drizzle, DrizzleD1Database} from "drizzle-orm/d1";
 import {Repo, type RepoEnv} from "./Repo";
 import {schedulesTable, streamsTable} from "../schema/schema";
-import {and, eq, type InferInsertModel} from "drizzle-orm";
+import {and, eq, type InferInsertModel, not} from "drizzle-orm";
 import {DatabaseError} from "./DatabaseError";
 import type {ActionAPIContext} from "astro:actions";
 import type {BatchItem} from "drizzle-orm/batch";
@@ -10,6 +10,7 @@ import {StreamTagRepo} from "./StreamTagRepo.ts";
 import {StreamParticipantsRepo} from "./StreamParticipantsRepo.ts";
 import {accounts, users} from "../schema/auth-schema";
 import type {Schedule, ScheduleWithDetailedStreams, ScheduleWithStreams} from "../models/schedule-base.ts";
+import {TeamRepo} from "./TeamRepo.ts";
 
 
 /**
@@ -327,9 +328,6 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
       // Get the current year for filtering
       const currentYear = new Date().getFullYear();
 
-      // Import the and function for combining conditions
-      const {and} = await import("drizzle-orm");
-
       // First, find the schedule with the earliest stream
       const scheduleResult = await this.db.select({
         schedule: schedulesTable
@@ -394,7 +392,6 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
   ): Promise<Schedule[]> {
     try {
       // Import the and function for combining conditions
-      const {and} = await import("drizzle-orm");
 
       // Find all schedules for the user with the given tiltify username using a join query
       const schedules = await this.db.select({
@@ -406,7 +403,8 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
         .where(
           and(
             eq(accounts.provider, 'tiltify'),
-            eq(accounts.providerUsername, tiltifyUsername)
+            eq(accounts.providerUsername, tiltifyUsername),
+            eq(schedulesTable.visible, true)
           )
         )
         .all();
@@ -445,9 +443,6 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
     try {
       // Get the current year for filtering
       const currentYear = new Date().getFullYear();
-
-      // Import the and function for combining conditions
-      const {and} = await import("drizzle-orm");
 
       // Find the schedule with the earliest stream using a join query
       const scheduleResult = await this.db.select({
@@ -643,9 +638,6 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
         throw new Error(`Schedule with ID ${scheduleId} not found`);
       }
 
-      // Import the and function for combining conditions
-      const {and, not} = await import("drizzle-orm");
-
       // Create a batch of operations
       const operations: BatchItem<'sqlite'>[] = [
         // 1. Set the target schedule as primary
@@ -678,4 +670,198 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
       }
     }
   }
+
+  /**
+   * Get the current primary schedule of a user
+   * @param userId The user ID
+   * @returns Promise resolving to the primary schedule or null if not found
+   *
+   * SQL: `SELECT * FROM "schedules" WHERE "schedules"."owner_id" = ? AND "schedules"."primary" = true` AND "schedules"."year" = ?
+   */
+  async getCurrentPrimary(userId: number): Promise<Schedule | null> {
+    try {
+      const currentYear = new Date().getFullYear();
+      const result = await this.db.select()
+        .from(this.table)
+        .where(and(
+          eq(this.table.ownerId, userId),
+          eq(this.table.primary, true),
+          eq(this.table.year, currentYear)
+        ))
+        .get();
+
+      return result || null;
+    } catch (error) {
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to find primary schedule for user: ${userId}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to find primary schedule for user: ${userId}`, error);
+      }
+    }
+  }
+
+  /**
+   * Get the current primary schedule by its slug
+   * @param slug The schedule slug
+   * @returns Promise resolving to the primary schedule or null if not found
+   *
+   * SQL: `SELECT * FROM "schedules" WHERE "schedules"."slug" = ? AND "schedules"."primary" = true AND "schedules"."year" = ?
+   */
+  async getCurrentPrimaryBySlug(slug: string): Promise<Schedule | null> {
+    try {
+      const currentYear = new Date().getFullYear();
+      const result = await this.db.select()
+        .from(this.table)
+        .where(and(
+          eq(this.table.slug, slug),
+          eq(this.table.primary, true),
+          eq(this.table.year, currentYear)
+        ))
+        .get();
+
+      return result || null;
+    } catch (error) {
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to find primary schedule by slug: ${slug}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to find primary schedule by slug: ${slug}`, error);
+      }
+    }
+  }
+
+
+  /**
+   * Get the current primary schedule of a user with a given tiltify username
+   * @param tiltifyUsername The tiltify username
+   * @returns Promise resolving to the primary schedule or null if not found
+   */
+  async getCurrentPrimaryByTiltifyUsername(tiltifyUsername: string): Promise<Schedule | null> {
+    try {
+      // Get the current year for filtering
+      const currentYear = new Date().getFullYear();
+
+      // Find the primary schedule using a join query
+      const scheduleResult = await this.db.select({
+        schedule: schedulesTable
+      })
+        .from(schedulesTable)
+        .innerJoin(users, eq(schedulesTable.ownerId, users.id))
+        .innerJoin(accounts, eq(users.id, accounts.userId))
+        .where(
+          and(
+            eq(accounts.provider, 'tiltify'),
+            eq(accounts.providerUsername, tiltifyUsername),
+            eq(schedulesTable.year, currentYear),
+            eq(schedulesTable.primary, true)
+          )
+        )
+        .get();
+
+      // If no schedule found, return null
+      if (!scheduleResult) {
+        return null;
+      }
+
+      return scheduleResult.schedule;
+    } catch (error) {
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to find primary schedule for tiltify username: ${tiltifyUsername}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to find primary schedule for tiltify username: ${tiltifyUsername}`, error);
+      }
+    }
+  }
+
+  /**
+   * Get all visible, primary schedules for the current year from all members of a team
+   * @param teamId The team ID
+   * @returns Promise resolving to an array of schedules or null if an error occurs
+   */
+  async getTeamMembersSchedules(teamId: number): Promise<Schedule[] | null> {
+    try {
+      // Get the current year for filtering
+      const currentYear = new Date().getFullYear();
+
+      // Get all team members
+      const teamRepo = new TeamRepo(this.db, this.env);
+      const teamMembers = await teamRepo.getTeamMembers(teamId);
+
+      if (!teamMembers || teamMembers.length === 0) {
+        return [];
+      }
+
+      // Get all user IDs from team members
+      const userIds = teamMembers.map(member => member.userId);
+
+      // Query all visible, primary schedules for the current year for all team members
+      const schedules = await this.db.select()
+        .from(this.table)
+        .where(
+          and(
+            eq(this.table.visible, true),
+            eq(this.table.primary, true),
+            eq(this.table.year, currentYear)
+          )
+        )
+        .all();
+
+      // Filter schedules to only include those owned by team members
+      return schedules.filter(schedule => userIds.includes(schedule.ownerId));
+    } catch (error) {
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to get team members schedules for team: ${teamId}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to get team members schedules for team: ${teamId}`, error);
+      }
+    }
+  }
+
+  /**
+   * Get all visible, primary schedules with their streams for the current year from all members of a team
+   * @param teamId The team ID
+   * @returns Promise resolving to an array of schedules with streams or null if an error occurs
+   */
+  async getTeamMembersSchedulesWithDetails(teamId: number): Promise<ScheduleWithStreams[] | null> {
+    try {
+      // First get all the schedules
+      const schedules = await this.getTeamMembersSchedules(teamId);
+
+      if (!schedules || schedules.length === 0) {
+        return [];
+      }
+
+      // For each schedule, get its streams and create a ScheduleWithStreams object
+      const schedulesWithStreams: ScheduleWithStreams[] = [];
+
+      for (const schedule of schedules) {
+        // Get all visible streams for this schedule, ordered by start time
+        const streams = await this.db.select()
+          .from(streamsTable)
+          .where(
+            and(
+              eq(streamsTable.scheduleId, schedule.id),
+              eq(this.table.primary, true),
+              eq(streamsTable.visible, true)
+            )
+          )
+          .orderBy(streamsTable.start)
+          .all();
+
+        // Add to the result array
+        schedulesWithStreams.push({
+          schedule,
+          streams
+        });
+      }
+
+      return schedulesWithStreams;
+    } catch (error) {
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to get team members schedules with details for team: ${teamId}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to get team members schedules with details for team: ${teamId}`, error);
+      }
+    }
+  }
+
 }

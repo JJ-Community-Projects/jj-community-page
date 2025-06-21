@@ -12,7 +12,7 @@ import type {
   ScheduleUI,
   ScheduleUIStats,
   ScheduleUITime,
-  ScheduleWeekUI
+  ScheduleWeekUI, TeamScheduleUI
 } from "../models/schedule-ui.ts";
 import type {ActionAPIContext} from "astro:actions";
 
@@ -69,6 +69,75 @@ export class ScheduleUIRepo {
     if (!scheduleWithDetails) {
       return null
     }
+    return this.scheduleToScheduleUI(scheduleWithDetails);
+  }
+
+  /**
+   * Get the current primary schedule of a user
+   * @param userId The user ID
+   * @returns Promise resolving to the primary schedule as a ScheduleUI object or null if not found
+   */
+  async getCurrentPrimary(
+    userId: number
+  ): Promise<ScheduleUI | null> {
+    // Get the primary schedule using the ScheduleRepo
+    const primarySchedule = await this.scheduleRepo.getCurrentPrimary(userId);
+
+    // If no primary schedule found, return null
+    if (!primarySchedule) {
+      return null;
+    }
+
+    // Get the schedule with detailed streams (similar to getScheduleBySlug)
+    const scheduleWithDetails = await this.scheduleRepo.getScheduleBySlug(primarySchedule.slug);
+
+    // Transform the schedule with details into a ScheduleUI object
+    return this.scheduleToScheduleUI(scheduleWithDetails);
+  }
+
+  /**
+   * Get the current primary schedule by its slug
+   * @param slug The schedule slug
+   * @returns Promise resolving to the primary schedule as a ScheduleUI object or null if not found
+   */
+  async getCurrentPrimaryBySlug(
+    slug: string
+  ): Promise<ScheduleUI | null> {
+    // Get the primary schedule using the ScheduleRepo
+    const primarySchedule = await this.scheduleRepo.getCurrentPrimaryBySlug(slug);
+
+    // If no primary schedule found, return null
+    if (!primarySchedule) {
+      return null;
+    }
+
+    // Get the schedule with detailed streams
+    const scheduleWithDetails = await this.scheduleRepo.getScheduleBySlug(primarySchedule.slug);
+
+    // Transform the schedule with details into a ScheduleUI object
+    return this.scheduleToScheduleUI(scheduleWithDetails);
+  }
+
+  /**
+   * Get the current primary schedule of a user with a given tiltify username
+   * @param tiltifyUsername The tiltify username
+   * @returns Promise resolving to the primary schedule as a ScheduleUI object or null if not found
+   */
+  async getCurrentPrimaryByTiltifyUsername(
+    tiltifyUsername: string
+  ): Promise<ScheduleUI | null> {
+    // Get the primary schedule using the ScheduleRepo
+    const primarySchedule = await this.scheduleRepo.getCurrentPrimaryByTiltifyUsername(tiltifyUsername);
+
+    // If no primary schedule found, return null
+    if (!primarySchedule) {
+      return null;
+    }
+
+    // Get the schedule with detailed streams
+    const scheduleWithDetails = await this.scheduleRepo.getScheduleBySlug(primarySchedule.slug);
+
+    // Transform the schedule with details into a ScheduleUI object
     return this.scheduleToScheduleUI(scheduleWithDetails);
   }
 
@@ -523,7 +592,7 @@ export class ScheduleUIRepo {
    * @param toleranceMinutes - Tolerance in minutes for considering times as similar (default: 10)
    * @returns Array of objects with common start and end times
    */
-  public findCommonTimePatterns(days: ScheduleDayUI[], toleranceMinutes: number = 10): ScheduleUITime[] {
+  private findCommonTimePatterns(days: ScheduleDayUI[], toleranceMinutes: number = 10): ScheduleUITime[] {
     if (!days || days.length === 0) {
       return [];
     }
@@ -623,4 +692,9 @@ export class ScheduleUIRepo {
     });
   }
 
+  
+
+  async getTeamSchedule(teamId: number): Promise<TeamScheduleUI | null> {
+
+  }
 }

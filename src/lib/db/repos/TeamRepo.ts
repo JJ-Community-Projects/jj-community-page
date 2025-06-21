@@ -695,4 +695,65 @@ export class TeamRepo extends Repo<typeof teamsTable._['config']> {
       }
     }
   }
+
+
+  /**
+ * Find all visible teams with member count and owner tiltify username
+ *
+ * This function performs the following operations:
+ * 1. Gets all visible teams
+ * 2. For each team, counts the number of members
+ * 3. For each team, gets the tiltify username of the owner
+ * 4. Returns the combined data
+ *
+ * @returns Promise resolving to an array of visible teams with member count and owner tiltify username
+ */
+async findAllVisibleWithMemberCount(): Promise<(InferSelectModel<typeof teamsTable> & {members: number, ownerTiltifyUsername: string})[]> {
+    try {
+      // Get all visible teams
+      const visibleTeams = await this.findVisible();
+
+      // Create a UserRepo instance to find tiltify usernames
+      const userRepo = new UserRepo(this.db, this.env);
+
+      // Process each team to add member count and owner tiltify username
+      const result = [];
+
+      for (const team of visibleTeams) {
+        // Get team members to count them
+        const teamMembers = await this.getTeamMembers(team.id);
+        const memberCount = teamMembers.length;
+
+        // Get owner's tiltify account
+        const ownerAccount = await this.db.select({
+          providerUsername: accounts.providerUsername
+        })
+        .from(accounts)
+        .where(
+          and(
+            eq(accounts.userId, team.ownerId),
+            eq(accounts.provider, 'tiltify')
+          )
+        )
+        .get();
+
+        const ownerTiltifyUsername = ownerAccount?.providerUsername || '';
+
+        // Add team with additional data to result
+        result.push({
+          ...team,
+          members: memberCount,
+          ownerTiltifyUsername
+        });
+      }
+
+      return result;
+    } catch (error) {
+      if (this.env === 'action') {
+        throw new DatabaseError("Failed to find visible teams with member count", error).toActionError();
+      } else {
+        throw new DatabaseError("Failed to find visible teams with member count", error);
+      }
+    }
+  }
 }
