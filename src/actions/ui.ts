@@ -36,6 +36,15 @@ export const ui = {
           if (!schedule) {
             throw new ActionError({code: 'NOT_FOUND', message: 'Schedule not found.'});
           }
+
+          if (!schedule.schedule) {
+            throw new ActionError({code: 'NOT_FOUND', message: 'Schedule not found.'});
+          }
+
+          if (!schedule.schedule.visible) {
+            throw new ActionError({code: 'NOT_FOUND', message: 'Schedule is set to private'});
+          }
+
           return schedule;
         }
       }),
