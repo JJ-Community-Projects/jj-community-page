@@ -122,8 +122,11 @@ export const schedules = {
       // Check if user already has a schedule
       const existingSchedules = await schedules.findByOwnerId(user.id)
 
+      const allSchedulesWithCurrentYear = existingSchedules.filter(schedule => schedule.year === currentYear)
+
       const existingSchedule = existingSchedules.find(schedule => schedule.year === currentYear)
 
+      const shouldBePrimary = allSchedulesWithCurrentYear.length === 0
       /*
       if (existingSchedule) {
         throw new ActionError({code: 'BAD_REQUEST', message: 'Schedule for this year already exists'})
@@ -142,6 +145,7 @@ export const schedules = {
         year: currentYear,
         slug: slug,
         visible: false,
+        primary: shouldBePrimary
       })
 
       // Initialize the ScheduleEditorDO for this schedule
