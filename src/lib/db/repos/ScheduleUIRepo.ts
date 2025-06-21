@@ -184,14 +184,22 @@ export class ScheduleUIRepo {
 
     // Group streams by day
     for (const stream of streams) {
+      console.log('groupStreamsByDay', 'stream.start', stream.start);
       const startDate = DateTime.fromJSDate(stream.start).setZone('utc');
+      console.log('groupStreamsByDay', 'startDate', startDate);
+      console.log('groupStreamsByDay', 'startDate', startDate.invalidReason);
+      console.log('groupStreamsByDay', 'startDate', startDate.isValid);
+      console.log('groupStreamsByDay', 'startDate', (typeof startDate));
+
       // Create a date string in YYYY-MM-DD format to use as a key
-      const dateKey = startDate.toISODate()!;
+      const startOf = startDate.startOf('day')
+      const dateKey = startOf.toISODate()!;
+      console.log('groupStreamsByDay', 'dateKey', dateKey);
 
       if (!dayMap.has(dateKey)) {
-        // Create a new day if it doesn't exist
+        // Create a new day if it doesn't exist, using JS Date
         dayMap.set(dateKey, {
-          date: startDate.startOf('day'),
+          date: startOf.toJSDate(), // Convert to JS Date
           streams: []
         });
       }
@@ -201,7 +209,7 @@ export class ScheduleUIRepo {
     }
 
     // Convert map to array and sort by date
-    return Array.from(dayMap.values()).sort((a, b) => a.date.toMillis() - b.date.toMillis());
+    return Array.from(dayMap.values()).sort((a, b) => a.date.getTime() - b.date.getTime());
   }
 
   /**
@@ -212,67 +220,69 @@ export class ScheduleUIRepo {
    */
   private groupDaysIntoWeeks(days: ScheduleDayUI[]): ScheduleGroupedWeeks {
     // Define the date ranges for weeks
-    const currentYear = DateTime.now().setZone('utc').year;
+    const currentYear = new Date().getUTCFullYear();
     const dec1 = DateTime.fromObject({
       year: currentYear,
       month: 12,
       day: 1
-    }, { zone: 'utc' })
+    }, { zone: 'utc' });
     const dec8 = DateTime.fromObject({
       year: currentYear,
       month: 12,
       day: 8
-    }, { zone: 'utc' })
+    }, { zone: 'utc' });
     const dec15 = DateTime.fromObject({
       year: currentYear,
       month: 12,
       day: 15
-    }, { zone: 'utc' })
+    }, { zone: 'utc' });
 
     // Initialize grouped weeks object
     const groupedWeeks: ScheduleGroupedWeeks = {
       beforeJJ: {
         name: 'Before Jingle Jam',
         days: [],
-        start: DateTime.fromObject({ year: currentYear, month: 1, day: 1 }, { zone: 'utc' }),
-        end: dec1
+        start: new Date(Date.UTC(currentYear, 0, 1)), // Jan 1
+        end: dec1.toJSDate()
       },
       week1: {
         name: 'Week 1 (Dec 1-7)',
         days: [],
-        start: dec1,
-        end: dec8
+        start: dec1.toJSDate(),
+        end: dec8.toJSDate()
       },
       week2: {
         name: 'Week 2 (Dec 8-14)',
         days: [],
-        start: dec8,
-        end: dec15
+        start: dec8.toJSDate(),
+        end: dec15.toJSDate()
       },
       afterJJ: {
         name: 'After Jingle Jam',
         days: [],
-        start: dec15,
-        end: DateTime.fromObject({ year: currentYear, month: 12, day: 31 }, { zone: 'utc' })
+        start: dec15.toJSDate(),
+        end: new Date(Date.UTC(currentYear, 11, 31)) // Dec 31
       }
     };
 
     // Create a map of existing days for quick lookup
     const dayMap = new Map<string, ScheduleDayUI>();
     for (const day of days) {
-      const dateKey = day.date.toISODate()!;
+      // Convert JS Date to DateTime temporarily for getting ISO date string
+      const dateKey = DateTime.fromJSDate(day.date).toISODate()!;
       dayMap.set(dateKey, day);
     }
 
     // Group days into weeks
     for (const day of days) {
-      // day.date is already a DateTime object now
       const dayDate = day.date;
-      if (dayDate < dec1) {
+      const dayTime = dayDate.getTime();
+
+      if (dayTime < groupedWeeks.week1.start.getTime()) {
         groupedWeeks.beforeJJ.days.push(day); // Before Dec 1st
-      } else if (dayDate < dec8) {
+      } else if (dayTime < groupedWeeks.week2.start.getTime()) {
         groupedWeeks.week1.days.push(day); // Dec 1-7
-      } else if (dayDate < dec15) {
+      } else if (dayTime < groupedWeeks.afterJJ.start.getTime()) {
         groupedWeeks.week2.days.push(day); // Dec 8-14
       } else {
         groupedWeeks.afterJJ.days.push(day); // After Dec 14th
@@ -280,16 +290,16 @@ export class ScheduleUIRepo {
     }
 
     // Ensure week1 has all 7 days (Dec 1-7)
-    this.ensureFullWeek(groupedWeeks.week1, dec1, 7, dayMap);
+    this.ensureFullWeek(groupedWeeks.week1, dec1.toJSDate(), 7, dayMap);
 
     // Ensure week2 has all 7 days (Dec 8-14)
-    this.ensureFullWeek(groupedWeeks.week2, dec8, 7, dayMap);
+    this.ensureFullWeek(groupedWeeks.week2, dec8.toJSDate(), 7, dayMap);
 
     // Sort days within each week
-    groupedWeeks.beforeJJ.days.sort((a, b) => a.date.toMillis() - b.date.toMillis());
-    groupedWeeks.week1.days.sort((a, b) => a.date.toMillis() - b.date.toMillis());
-    groupedWeeks.week2.days.sort((a, b) => a.date.toMillis() - b.date.toMillis());
-    groupedWeeks.afterJJ.days.sort((a, b) => a.date.toMillis() - b.date.toMillis());
+    groupedWeeks.beforeJJ.days.sort((a, b) => a.date.getTime() - b.date.getTime());
+    groupedWeeks.week1.days.sort((a, b) => a.date.getTime() - b.date.getTime());
+    groupedWeeks.week2.days.sort((a, b) => a.date.getTime() - b.date.getTime());
+    groupedWeeks.afterJJ.days.sort((a, b) => a.date.getTime() - b.date.getTime());
 
     // Find common time patterns for each week and set the times attribute
     if (days.length > 0) {
@@ -320,19 +330,21 @@ export class ScheduleUIRepo {
    */
   private ensureFullWeek(
     week: ScheduleWeekUI,
-    startDate: DateTime,
+    startDate: Date,
     numberOfDays: number,
     existingDays: Map<string, ScheduleDayUI>
   ): void {
     // Create a set of existing day dates in ISO format for quick lookup
     const existingDayDates = new Set(
-      week.days.map(day => day.date.toISODate()!)
+      week.days.map(day => DateTime.fromJSDate(day.date).toISODate()!)
     );
 
     // Add placeholder days for each missing day in the week
     for (let i = 0; i < numberOfDays; i++) {
-      const currentDate = startDate.plus({ days: i });
-      const dateKey = currentDate.toISODate()!;
+      // Create a new date by adding i days to startDate
+      const currentDateLuxon = DateTime.fromJSDate(startDate).plus({ days: i });
+      const currentDate = currentDateLuxon.toJSDate();
+      const dateKey = currentDateLuxon.toISODate()!;
 
       // If this date doesn't already exist in the week, add a placeholder day
       if (!existingDayDates.has(dateKey)) {

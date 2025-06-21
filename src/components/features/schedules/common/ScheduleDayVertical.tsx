@@ -40,7 +40,11 @@ const ScheduleDayHeader: Component<ScheduleDayHeaderProps> = props => {
     if (range) {
       return DateTime.fromJSDate(range.start).toFormat("EEE',' MMM d")
     }
-    return DateTime.fromJSDate(props.day.date).toFormat("EEE',' MMM d")
+    // Ensure day.date is a DateTime object
+    const dayDate = props.day.date instanceof DateTime
+      ? props.day.date
+      : DateTime.fromISO(props.day.date as unknown as string);
+    return dayDate.toFormat("EEE',' MMM d")
   }
 
   return (

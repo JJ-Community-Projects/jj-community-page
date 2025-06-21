@@ -81,6 +81,7 @@ const SchedulesListItem: Component<{
     year: number;
     visible: boolean;
     primary: boolean;
+    slug: string;
   }
 }> = (props) => {
   const {setPrimarySchedule, toggleVisibility, action} = useUserSchedules();
@@ -99,9 +100,9 @@ const SchedulesListItem: Component<{
       <h3 class="text-lg font-bold mb-2">{props.schedule.title}</h3>
       <p class="text-sm">Year: {props.schedule.year}</p>
       <p class="text-sm">Status: {props.schedule.visible ? 'Public' : 'Private'}</p>
-      <p class="text-sm mb-4">Primary: {props.schedule.primary ? 'Yes' : 'No'}</p>
-      <a>{}</a>
-      <div class="flex flex-row gap-2 mt-auto">
+      <p class="text-sm">Primary: {props.schedule.primary ? 'Yes' : 'No'}</p>
+      <a href={`/schedules/${props.schedule.slug}`} class={'text-sm text-primary'}>/schedules/{props.schedule.slug}</a>
+      <div class="flex flex-row gap-2 justify-around items-center mt-4">
         <a href={`/admin/schedules/${props.schedule.id}/edit`}
            class="bg-primary hover:bg-primary-600 text-white px-3 py-1 rounded-lg transition-all"
            title="Edit">
@@ -189,6 +190,7 @@ const ScheduleDeleteButton: Component<{
     year: number;
     visible: boolean;
     primary: boolean;
+    slug: string
   }
 }> = (props) => {
   const {deleteSchedule, action} = useUserSchedules();

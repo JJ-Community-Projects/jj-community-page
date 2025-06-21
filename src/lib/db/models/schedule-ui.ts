@@ -34,7 +34,7 @@ export type DetailedStream = Prettify<Prettify<InferSelectModel<typeof streamsTa
  * Type definition for a day containing streams that occur on the same day
  */
 export type ScheduleDayUI = {
-  date: DateTime;
+  date: Date;
   streams: DetailedStream[];
 };
 
@@ -59,8 +59,8 @@ export type ScheduleUITime = {
 export type ScheduleWeekUI = {
   name: string;
   days: ScheduleDayUI[];
-  start: DateTime;
-  end: DateTime;
+  start: Date;
+  end: Date;
   times?: ScheduleUITime[]
 };
 

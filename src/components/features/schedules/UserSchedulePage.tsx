@@ -3,6 +3,7 @@ import type {ScheduleUI} from "../../../lib/db/models/schedule-ui.ts";
 import {ScheduleProvider} from "./common/ScheduleProvider.tsx";
 import {UserSchedulePageBodyDesktop} from "./desktop/UserSchedulePageBodyDesktop.tsx";
 import {UserSchedulePageBodyMobile} from "./mobile/UserSchedulePageBodyMobile.tsx";
+import {DebugJSONView} from "../../common/DebugJSONView.tsx";
 
 interface UserSchedulePageProps {
   initSchedule: ScheduleUI
@@ -16,7 +17,6 @@ export const UserSchedulePage: Component<UserSchedulePageProps> = (props) => {
           {props.initSchedule.schedule?.title || "Schedule"}
         </h1>
         <UserSchedulePageBodyDesktop/>
-        <UserSchedulePageBodyMobile/>
       </div>
     </ScheduleProvider>
   );

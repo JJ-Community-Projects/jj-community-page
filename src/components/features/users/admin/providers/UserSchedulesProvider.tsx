@@ -65,6 +65,7 @@ const useUserSchedulesHook = (user: User) => {
       year: number;
       visible: boolean;
       primary: boolean;
+      slug: string
     }[]
   }>({
     schedules: []
@@ -84,6 +85,7 @@ const useUserSchedulesHook = (user: User) => {
             year: value.year as number,
             visible: value.visible as boolean,
             primary: value.primary as boolean,
+            slug: value.slug as string,
           }
           setLocal('schedules', (schedules) =>
             schedules.concat(schedule).sort((a, b) => b.year - a.year)); // Sort by year descending

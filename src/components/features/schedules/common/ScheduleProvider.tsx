@@ -5,12 +5,12 @@ import {DateTime} from "luxon";
 
 const useScheduleHook = (initSchedule: ScheduleUI) => {
   const [schedule, setSchedule] = createStore<ScheduleUI>(initSchedule)
-  const [date, setDate] = createSignal<DateTime>(DateTime.now().setZone('utc'))
+  const [date, setDate] = createSignal<Date>(new Date())
   const [updatedDate, setUpdatedDate] = createSignal<boolean>(false)
 
   const interval = setInterval(() => {
     if (!updatedDate()) {
-      setDate(DateTime.now().setZone('utc'))
+      setDate(new Date())
     }
   }, 1000)
 
@@ -19,11 +19,11 @@ const useScheduleHook = (initSchedule: ScheduleUI) => {
 
   const updateDate = (date: Date) => {
     setUpdatedDate(true)
-    setDate(DateTime.fromJSDate(date).setZone('utc'))
+    setDate(date)
   }
 
   const resetDate = () => {
-    setDate(DateTime.now().setZone('utc'))
+    setDate(new Date())
     setUpdatedDate(false)
   }
 
@@ -33,41 +33,32 @@ const useScheduleHook = (initSchedule: ScheduleUI) => {
       return 0;
     }
     const currentDate = date()
+    const currentDateStr = currentDate.toISOString().split('T')[0]; // Get YYYY-MM-DD
 
     // Find the day that matches the current date
     return days.findIndex(day => {
-      // day.date is already a DateTime object now
-      return day.date.hasSame(currentDate, 'day')
+      // Get YYYY-MM-DD from the day's date
+      const dayDateStr = day.date.toISOString().split('T')[0];
+      return dayDateStr === currentDateStr;
     })
   }
 
   const findCurrentWeekIndex = () => {
     const currentDate = date()
-    const currentYear = currentDate.year
+    const currentYear = currentDate.getUTCFullYear()
 
     // Define the date ranges for weeks (same as in ScheduleUIRepo)
-    const dec1 = DateTime.fromObject({
-      year: currentYear,
-      month: 12,
-      day: 1
-    }, { zone: 'utc' })
-    const dec8 = DateTime.fromObject({
-      year: currentYear,
-      month: 12,
-      day: 8
-    }, { zone: 'utc' })
-    const dec15 = DateTime.fromObject({
-      year: currentYear,
-      month: 12,
-      day: 15
-    }, { zone: 'utc' })
+    const dec1 = new Date(Date.UTC(currentYear, 11, 1)); // Month is 0-based, so 11 is December
+    const dec8 = new Date(Date.UTC(currentYear, 11, 8));
+    const dec15 = new Date(Date.UTC(currentYear, 11, 15));
 
     // Determine which week the current date falls into
-    if (currentDate < dec1) {
+    const currentTime = currentDate.getTime();
+    if (currentTime < dec1.getTime()) {
       return 0 // beforeJJ
-    } else if (currentDate < dec8) {
+    } else if (currentTime < dec8.getTime()) {
       return 1 // week1
-    } else if (currentDate < dec15) {
+    } else if (currentTime < dec15.getTime()) {
       return 2 // week2
     } else {
       return 3 // afterJJ
@@ -91,15 +82,12 @@ const useScheduleHook = (initSchedule: ScheduleUI) => {
 
     // Filter streams that haven't ended yet
     const upcomingStreams = allStreams.filter(stream => {
-      const endDate = DateTime.fromJSDate(stream.end).setZone('utc');
-      return endDate > currentDate;
+      return stream.end.getTime() > currentDate.getTime();
     });
 
     // Sort by start date
     const sortedStreams = upcomingStreams.sort((a, b) => {
-      const aStart = DateTime.fromJSDate(a.start).setZone('utc');
-      const bStart = DateTime.fromJSDate(b.start).setZone('utc');
-      return aStart.toMillis() - bStart.toMillis();
+      return a.start.getTime() - b.start.getTime();
     });
 
     // Return the first 3 streams

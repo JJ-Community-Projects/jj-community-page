@@ -1,10 +1,13 @@
-import {type Component, For, Show, createSignal} from "solid-js";
+import {type Component, createSignal, For, Show} from "solid-js";
 import {useScheduleTest} from "../common/ScheduleProvider.tsx";
 import {ScheduleStreamCard} from "../common/StreamCard.tsx";
 import {Accordion} from "@kobalte/core";
 import {FaSolidChevronDown} from "solid-icons/fa";
-import {twMerge} from "tailwind-merge";
 import {DateTime} from "luxon";
+import type {ScheduleDayUI} from "../../../../lib/db/models/schedule-ui.ts";
+import {getStreamColor} from "../../../../functions/jjDatesToColors.ts";
+import './UserSchedulePageBodyDesktop.css'
+import {getTextColor} from "../../../../lib/utils/textColors.ts";
 
 export const UserSchedulePageBodyDesktop: Component = () => {
   return (
@@ -46,12 +49,13 @@ const DaysAccordion: Component = () => {
       <h2 class="text-2xl font-bold text-white mb-4">Schedule</h2>
       <Accordion.Root
         class="flex flex-col gap-2 w-full"
+        collapsible={true}
         value={expandedDays()}
         onChange={setExpandedDays}
       >
         <For each={days()}>
           {(day, index) => (
-            <DayAccordionItem day={day} index={index()} />
+            <DayAccordionItem day={day} index={index()} expandedDays={expandedDays}/>
           )}
         </For>
       </Accordion.Root>
@@ -59,28 +63,59 @@ const DaysAccordion: Component = () => {
   )
 }
 
-const DayAccordionItem: Component<{day: any, index: number}> = (props) => {
+const DayAccordionItem: Component<{ day: ScheduleDayUI, index: number, expandedDays: () => string[] }> = (props) => {
   const isOpen = () => {
-    const expandedDays = document.querySelector('[data-expanded="true"]');
-    return expandedDays?.getAttribute('data-value') === props.index.toString();
+    return props.expandedDays().includes(props.index.toString());
+  };
+
+  // Get highlight color based on the day's date
+  const getHighlightColor = () => {
+    // Convert JS Date to DateTime for color calculation
+    const dayDate = DateTime.fromJSDate(props.day.date);
+    return getStreamColor(dayDate);
+  };
+
+  const highlightColor = getHighlightColor();
+  const textColor = getTextColor(highlightColor);
+
+  // Format date for display
+  const formatDate = (date: Date) => {
+    return DateTime.fromJSDate(date).toLocaleString({
+      weekday: 'long',
+      month: 'long',
+      day: 'numeric'
+    });
   };
 
   return (
     <Accordion.Item
       value={props.index.toString()}
-      class="bg-white rounded-lg overflow-hidden"
+      class="accordion__item"
     >
-      <Accordion.Header>
+      <Accordion.Header class="accordion__item-header">
         <Accordion.Trigger
-          class="w-full flex items-center justify-between p-4 text-left font-medium focus:outline-none"
+          class="accordion__item-trigger bg-white rounded-lg"
+          style={{
+            '--highlight-color': highlightColor,
+            '--text-color': textColor
+          }}
         >
-          <span>{DateTime.fromJSDate(props.day.date).toFormat("EEEE, MMMM d")}</span>
-          <FaSolidChevronDown
-            class={twMerge('transition-transform duration-300', isOpen() && 'rotate-180')}
+          {/* Colored stripe on left */}
+          <div
+            class="absolute left-0 top-0 w-4 h-full"
+            style={{'background-color': highlightColor}}
           />
+
+          {/* Overlay that fills from left to right when accordion is open */}
+          <div class="accordion__item-trigger-bg" />
+
+          <span class="accordion__item-trigger-text">
+            {formatDate(props.day.date)}
+          </span>
+          <FaSolidChevronDown class="accordion__item-trigger-chevron" />
         </Accordion.Trigger>
       </Accordion.Header>
-      <Accordion.Content class="p-4 pt-0">
+      <Accordion.Content class="accordion__item-content p-4 pt-4">
         <div class="grid grid-cols-1 gap-4">
           <Show when={props.day.streams.length > 0} fallback={<p>No streams scheduled for this day.</p>}>
             <For each={props.day.streams}>
