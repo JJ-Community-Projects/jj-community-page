@@ -82,6 +82,8 @@ export async function getTiltifyTokenFromContext(ctx: AstroContext): Promise<str
 
   const expiresAt = DateTime.fromJSDate(tokenFromDB.expiresAt)
   console.log('expiresAt', expiresAt)
+  console.log('now', now)
+  console.log('now < expiresAt', now < expiresAt)
   if (now < expiresAt) {
     return tokenFromDB.accessToken
   }
@@ -94,6 +96,7 @@ export async function getTiltifyTokenFromContext(ctx: AstroContext): Promise<str
   console.log(body)
   const refreshResponse = await fetch('https://v5api.tiltify.com/oauth/token', {
     method: 'POST',
+    headers: {"Content-Type": "application/json"},
     body: JSON.stringify(
       body
     ),
@@ -103,25 +106,25 @@ export async function getTiltifyTokenFromContext(ctx: AstroContext): Promise<str
     return null;
   }
   const tiltifyToken: any = await refreshResponse.json();
-
+  console.log('tiltifyToken', tiltifyToken);
   await db.insert(tokens)
     .values({
       userId: user.id,
       provider: 'tiltify',
-      accessToken: tiltifyToken.accessToken,
-      refreshToken: tiltifyToken.refreshToken,
-      expiresAt: new Date(Date.now() + tiltifyToken.expiresIn * 1000)
+      accessToken: tiltifyToken.access_token,
+      refreshToken: tiltifyToken.refresh_token,
+      expiresAt: new Date(Date.now() + tiltifyToken.expires_in * 1000)
     })
     .onConflictDoUpdate({
       target: [tokens.userId, tokens.provider],
       set: {
-        accessToken: tiltifyToken.accessToken,
-        refreshToken: tiltifyToken.refreshToken,
-        expiresAt: new Date(Date.now() + tiltifyToken.expiresIn * 1000)
+        accessToken: tiltifyToken.access_token,
+        refreshToken: tiltifyToken.refresh_token,
+        expiresAt: new Date(Date.now() + tiltifyToken.expires_in * 1000)
       }
     })
     .run();
-  return tiltifyToken.accessToken
+  return tiltifyToken.access_token
 }
 
 
