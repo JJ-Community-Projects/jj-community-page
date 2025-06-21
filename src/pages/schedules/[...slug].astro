@@ -29,7 +29,7 @@ console.log('data', data)
     (!error && data) && (
                   <div class="container mx-auto px-4 py-8">
                       <UserSchedulePage client:only="solid-js" initSchedule={data}/>
-                      <DebugJSONView client:only="solid-js"  data={data} title="Schedule Data" />
+                      <DebugJSONView client:only="solid-js"  data={data} title="DEBUG Schedule Data" />
                   </div>
     )
   }
