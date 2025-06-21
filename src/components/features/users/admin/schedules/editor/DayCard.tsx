@@ -55,7 +55,7 @@ export const DayCard: Component<DayCardProps> = (props) => {
         }>
           <For each={props.streams}>
             {(stream) => (
-              <StreamCard stream={(stream)}/>
+              <StreamCard stream={(stream)} showDate={false} whiteBackground={true}/>
             )}
           </For>
         </Show>

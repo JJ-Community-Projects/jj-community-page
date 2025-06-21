@@ -3,6 +3,8 @@ import {DateTime} from "luxon";
 import {debounce} from "@solid-primitives/scheduled";
 import {useScheduleEditor} from "../../providers/ScheduleEditorProvider.tsx";
 import {DayCard} from "./DayCard.tsx";
+import {DayCardProvider} from "./DayCardContext.tsx";
+import {StreamCard} from "./stream/StreamCard.tsx";
 
 // Mobile view - similar to the original editor
 export const MobileStreamsList: Component = () => {
@@ -178,9 +180,10 @@ export const DesktopStreamsList: Component = () => {
   const {
     local,
     addNewStream,
+    addCustomStream,
     getAllDays,
     getStreamsByDay,
-    action
+    action,
   } = useScheduleEditor();
 
   // Group days into two rows
@@ -202,13 +205,19 @@ export const DesktopStreamsList: Component = () => {
         <div class="grid grid-cols-7 gap-4">
           <For each={firstWeek()}>
             {(day, index) => (
-              <DayCard
-                dayIndex={index()}
-                day={day}
-                streams={getStreamsByDay(day.day)}
-                onAddStream={() => addNewStream(day.day)}
-                isAddingStream={action.addNewStream.actionInProgress}
-              />
+              <DayCardProvider
+                start={day}
+                end={day}
+              >
+                <DayCard
+                  dayIndex={index()}
+                  day={day}
+                  streams={getStreamsByDay(day.day)}
+                  onAddStream={() => addNewStream(day.day)}
+                  isAddingStream={action.addNewStream.actionInProgress}
+                />
+              </DayCardProvider>
+
             )}
           </For>
         </div>
@@ -220,15 +229,61 @@ export const DesktopStreamsList: Component = () => {
         <div class="grid grid-cols-7 gap-4">
           <For each={secondWeek()}>
             {(day, index) => (
-              <DayCard
-                dayIndex={index()}
-                day={day}
-                streams={getStreamsByDay(day.day)}
-                onAddStream={() => addNewStream(day.day)}
-                isAddingStream={action.addNewStream.actionInProgress}
-              />
+              <DayCardProvider
+                start={day}
+                end={day}
+              >
+                <DayCard
+                  dayIndex={index()}
+                  day={day}
+                  streams={getStreamsByDay(day.day)}
+                  onAddStream={() => addNewStream(day.day)}
+                  isAddingStream={action.addNewStream.actionInProgress}
+                />
+              </DayCardProvider>
             )}
           </For>
+        </div>
+      </div>
+
+      {/* Custom Streams Section */}
+      <div class="mt-8 pt-6 border-t border-gray-200">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-lg font-semibold">Custom Streams</h3>
+          <button
+            onClick={() => addCustomStream()}
+            class="bg-accent hover:bg-accent-400 text-white px-3 py-1 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={action.addNewStream.actionInProgress}
+          >
+            {action.addNewStream.actionInProgress ? "Adding..." : "Add Stream"}
+          </button>
+        </div>
+
+        <Show when={local.streams.length === 0}>
+          <p class="text-center py-4 text-gray-500">No streams yet. Add one to get started!</p>
+        </Show>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <DayCardProvider
+            start={DateTime.fromObject({
+              year: local.year,
+              month: 11,
+              day: 1,
+            })}
+            end={DateTime.fromObject({
+              year: local.year,
+              month: 12,
+              day: 21,
+            })}>
+            <For
+              each={local.streams}
+              fallback={<p class="text-center py-4 text-gray-500">No streams yet. Add one to get started!</p>}
+            >
+              {(stream) => (
+                <StreamCard stream={stream} showDate={true} whiteBackground={false}/>
+              )}
+            </For>
+          </DayCardProvider>
         </div>
       </div>
     </div>

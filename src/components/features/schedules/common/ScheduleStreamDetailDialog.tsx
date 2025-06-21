@@ -21,9 +21,21 @@ export const ScheduleStreamDetailDialog: Component<ScheduleStreamDetailDialogPro
   const stream = () => props.stream;
   const now = useNow();
 
+  // Convert UTC dates from backend to DateTime objects
+  const getStreamStartDateTime = () => {
+    // Create DateTime from JS Date, assuming it's in UTC, then convert to local time
+    return DateTime.fromJSDate(stream().start, { zone: 'utc' }).toLocal();
+  };
+
+  const getStreamEndDateTime = () => {
+    // Create DateTime from JS Date, assuming it's in UTC, then convert to local time
+    return DateTime.fromJSDate(stream().end, { zone: 'utc' }).toLocal();
+  };
+
   // Calculate the highlight color using getStreamColor
   const getHighlightColor = () => {
-    const startDate = DateTime.fromJSDate(stream().start);
+    // For color calculation, we still use UTC to maintain consistent colors
+    const startDate = DateTime.fromJSDate(stream().start, { zone: 'utc' });
     return getStreamColor(startDate);
   };
 
@@ -31,17 +43,17 @@ export const ScheduleStreamDetailDialog: Component<ScheduleStreamDetailDialogPro
   const textColor = getTextColor(highlightColor);
 
   const showCountdown = () => {
-    return DateTime.fromJSDate(stream().start) > now();
+    return getStreamStartDateTime() > now();
   };
 
   const isLive = () => {
-    const start = DateTime.fromJSDate(stream().start);
-    const end = DateTime.fromJSDate(stream().end);
+    const start = getStreamStartDateTime();
+    const end = getStreamEndDateTime();
     return start < now() && end > now();
   };
 
   const diff = () => {
-    return DateTime.fromJSDate(stream().start).diff(now());
+    return getStreamStartDateTime().diff(now());
   };
 
   const countdownFormat = () => {
@@ -101,7 +113,7 @@ export const ScheduleStreamDetailDialog: Component<ScheduleStreamDetailDialogPro
                     </div>
                   </Show>
 
-                  <p>{DateTime.fromJSDate(stream().start).toLocaleString({
+                  <p>{getStreamStartDateTime().toLocaleString({
                     weekday: 'short',
                     month: 'short',
                     day: 'numeric',

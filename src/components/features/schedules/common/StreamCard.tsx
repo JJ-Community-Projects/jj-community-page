@@ -17,29 +17,43 @@ const useScheduleStreamState = (stream: DetailedStream) => {
 
   const now = useNow();
 
+  // Convert UTC dates from backend to DateTime objects
+  const getStreamStartDateTime = () => {
+    // Create DateTime from JS Date, assuming it's in UTC, then convert to local time
+    return DateTime.fromJSDate(stream.start, { zone: 'utc' }).toLocal();
+  };
+
+  const getStreamEndDateTime = () => {
+    // Create DateTime from JS Date, assuming it's in UTC, then convert to local time
+    return DateTime.fromJSDate(stream.end, { zone: 'utc' }).toLocal();
+  };
+
   // Calculate the highlight color using getStreamColor
   const getHighlightColor = () => {
-    const startDate = DateTime.fromJSDate(stream.start).setZone('utc');
+    // For color calculation, we still use UTC to maintain consistent colors
+    const startDate = DateTime.fromJSDate(stream.start, { zone: 'utc' });
     return getStreamColor(startDate);
   };
+
   // Calculate the highlight color using getStreamColor
   const getHighlightColors = () => {
-    const startDate = DateTime.fromJSDate(stream.start).setZone('utc');
+    // For color calculation, we still use UTC to maintain consistent colors
+    const startDate = DateTime.fromJSDate(stream.start, { zone: 'utc' });
     return getStreamColors(startDate);
   };
 
   const showCountdown = () => {
-    return DateTime.fromJSDate(stream.start).setZone('utc') > now();
+    return getStreamStartDateTime() > now();
   };
 
   const isLive = () => {
-    const start = DateTime.fromJSDate(stream.start).setZone('utc');
-    const end = DateTime.fromJSDate(stream.end).setZone('utc');
+    const start = getStreamStartDateTime();
+    const end = getStreamEndDateTime();
     return start < now() && end > now();
   };
 
   const diff = () => {
-    return DateTime.fromJSDate(stream.start).setZone('utc').diff(now());
+    return getStreamStartDateTime().diff(now());
   };
 
   const countdown = () => {
@@ -54,7 +68,8 @@ const useScheduleStreamState = (stream: DetailedStream) => {
   };
 
   const formatDate = () => {
-    return DateTime.fromJSDate(stream.start).setZone('utc').toLocaleString({
+    // Display date in user's local timezone
+    return getStreamStartDateTime().toLocaleString({
       weekday: 'short',
       month: 'short',
       day: 'numeric',

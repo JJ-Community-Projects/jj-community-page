@@ -110,7 +110,7 @@ export type ScheduleUIStats = {
  * Type definition for the complete UI representation of a schedule
  */
 export type ScheduleUI = {
-  schedule: Schedule | undefined,
+  schedule: Schedule,
   streams: DetailedStream[],
   days: ScheduleDayUI[],
   weeks: ScheduleGroupedWeeks,

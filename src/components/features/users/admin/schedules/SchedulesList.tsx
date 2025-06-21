@@ -47,6 +47,9 @@ const SchedulesListContent: Component = () => {
               {action.createSchedule.actionInProgress ? 'Creating...' : 'Add Schedule'}
             </button>
           </div>
+          <p class="text-gray-600">
+            You can create as many schedules as you want, but only one can be set as your primary schedule for each year. In most cases, you'll only need one per year. Your primary schedule will be highlighted on your page, while any other schedules—whether from the same year or different years—will still be available to view from your page.
+          </p>
           <Show when={action.createSchedule.lastErrorMessage}>
             <div class="text-red-500">
               {action.createSchedule.lastErrorMessage}

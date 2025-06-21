@@ -33,32 +33,37 @@ const useScheduleHook = (initSchedule: ScheduleUI) => {
       return 0;
     }
     const currentDate = date()
-    const currentDateStr = currentDate.toISOString().split('T')[0]; // Get YYYY-MM-DD
+    // Get current date in local timezone
+    const currentLocalDate = DateTime.fromJSDate(currentDate).toLocal()
+    const currentDateStr = currentLocalDate.toISODate(); // Get YYYY-MM-DD
 
     // Find the day that matches the current date
     return days.findIndex(day => {
-      // Get YYYY-MM-DD from the day's date
-      const dayDateStr = day.date.toISOString().split('T')[0];
+      // Convert day date from UTC to local timezone
+      const dayLocalDate = DateTime.fromJSDate(day.date, { zone: 'utc' }).toLocal()
+      // Get YYYY-MM-DD from the day's date in local timezone
+      const dayDateStr = dayLocalDate.toISODate();
       return dayDateStr === currentDateStr;
     })
   }
 
   const findCurrentWeekIndex = () => {
     const currentDate = date()
-    const currentYear = currentDate.getUTCFullYear()
+    // Get current date in local timezone
+    const currentLocalDate = DateTime.fromJSDate(currentDate).toLocal()
+    const currentYear = currentLocalDate.year
 
-    // Define the date ranges for weeks (same as in ScheduleUIRepo)
-    const dec1 = new Date(Date.UTC(currentYear, 11, 1)); // Month is 0-based, so 11 is December
-    const dec8 = new Date(Date.UTC(currentYear, 11, 8));
-    const dec15 = new Date(Date.UTC(currentYear, 11, 15));
+    // Define the date ranges for weeks in local timezone
+    const dec1 = DateTime.fromObject({ year: currentYear, month: 12, day: 1 }, { zone: 'local' }).startOf('day')
+    const dec8 = DateTime.fromObject({ year: currentYear, month: 12, day: 8 }, { zone: 'local' }).startOf('day')
+    const dec15 = DateTime.fromObject({ year: currentYear, month: 12, day: 15 }, { zone: 'local' }).startOf('day')
 
     // Determine which week the current date falls into
-    const currentTime = currentDate.getTime();
-    if (currentTime < dec1.getTime()) {
+    if (currentLocalDate < dec1) {
       return 0 // beforeJJ
-    } else if (currentTime < dec8.getTime()) {
+    } else if (currentLocalDate < dec8) {
       return 1 // week1
-    } else if (currentTime < dec15.getTime()) {
+    } else if (currentLocalDate < dec15) {
       return 2 // week2
     } else {
       return 3 // afterJJ
@@ -82,12 +87,17 @@ const useScheduleHook = (initSchedule: ScheduleUI) => {
 
     // Filter streams that haven't ended yet
     const upcomingStreams = allStreams.filter(stream => {
-      return stream.end.getTime() > currentDate.getTime();
+      // Convert end time from UTC to local time for comparison
+      const endDateTime = DateTime.fromJSDate(stream.end, { zone: 'utc' }).toLocal();
+      return endDateTime.toJSDate().getTime() > currentDate.getTime();
     });
 
     // Sort by start date
     const sortedStreams = upcomingStreams.sort((a, b) => {
-      return a.start.getTime() - b.start.getTime();
+      // Convert start times from UTC to local time for sorting
+      const aStartDateTime = DateTime.fromJSDate(a.start, { zone: 'utc' }).toLocal();
+      const bStartDateTime = DateTime.fromJSDate(b.start, { zone: 'utc' }).toLocal();
+      return aStartDateTime.toJSDate().getTime() - bStartDateTime.toJSDate().getTime();
     });
 
     // Return the first 3 streams

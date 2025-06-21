@@ -1,7 +1,7 @@
 import {drizzle, DrizzleD1Database} from "drizzle-orm/d1";
 import {Repo, type RepoEnv} from "./Repo";
-import {schedulesTable, streamParticipantsTable, streamsTable, streamTagsTable} from "../schema/schema";
-import {and, eq, type InferInsertModel, type InferSelectModel} from "drizzle-orm";
+import {schedulesTable, streamsTable} from "../schema/schema";
+import {and, eq, type InferInsertModel} from "drizzle-orm";
 import {DatabaseError} from "./DatabaseError";
 import type {ActionAPIContext} from "astro:actions";
 import type {BatchItem} from "drizzle-orm/batch";
@@ -9,7 +9,6 @@ import {StreamRepo} from "./StreamRepo.ts";
 import {StreamTagRepo} from "./StreamTagRepo.ts";
 import {StreamParticipantsRepo} from "./StreamParticipantsRepo.ts";
 import {accounts, users} from "../schema/auth-schema";
-import {DateTime} from "luxon";
 import type {Schedule, ScheduleWithDetailedStreams, ScheduleWithStreams} from "../models/schedule-base.ts";
 
 
@@ -205,6 +204,7 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
 
       return result.length > 0;
     } catch (error) {
+      console.log('ScheduleRepo', 'delete', error)
       if (this.env === 'action') {
         throw new DatabaseError(`Failed to delete record with id: ${id}`, error).toActionError();
       } else {
@@ -224,7 +224,7 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
   async setVisibility(id: number, visible: boolean): Promise<Schedule> {
     try {
       const [result] = await this.db.update(this.table)
-        .set({ visible })
+        .set({visible})
         .where(eq(this.table.id, id))
         .returning();
 
@@ -557,7 +557,6 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
   }
 
 
-
   /**
    * Find a schedule by its slug, including full details
    *
@@ -651,12 +650,12 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
       const operations: BatchItem<'sqlite'>[] = [
         // 1. Set the target schedule as primary
         this.db.update(this.table)
-          .set({ primary: true })
+          .set({primary: true})
           .where(eq(this.table.id, scheduleId)),
 
         // 2. Set all other schedules with the same year and owner as non-primary
         this.db.update(this.table)
-          .set({ primary: false })
+          .set({primary: false})
           .where(
             and(
               eq(this.table.year, schedule.year),

@@ -48,7 +48,7 @@ export class ScheduleUIRepo {
    */
   async findNextScheduleByTiltifyUsernameFormated(
     tiltifyUsername: string
-  ): Promise<ScheduleUI> {
+  ): Promise<ScheduleUI | null> {
     const scheduleWithDetails = await this.scheduleRepo.findNextScheduleByTiltifyUsernameWithFullDetails(tiltifyUsername);
     return this.scheduleToScheduleUI(scheduleWithDetails);
   }
@@ -72,10 +72,12 @@ export class ScheduleUIRepo {
     return this.scheduleToScheduleUI(scheduleWithDetails);
   }
 
-  private scheduleToScheduleUI(scheduleWithDetails?: ScheduleWithDetailedStreams | null): ScheduleUI {
+  private scheduleToScheduleUI(scheduleWithDetails?: ScheduleWithDetailedStreams | null): ScheduleUI | null {
 
     // If no schedule found, return empty result with the appropriate format
     if (!scheduleWithDetails) {
+      return null
+      /*
       const currentYear = DateTime.now().setZone('utc').year;
       const dec1 = DateTime.fromObject({
         year: currentYear,
@@ -127,6 +129,7 @@ export class ScheduleUIRepo {
         weeks: emptyWeeks,
         stats: this.scheduleStats(emptyWeeks)
       };
+      */
     }
 
 

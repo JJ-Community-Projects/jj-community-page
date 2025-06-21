@@ -259,7 +259,7 @@ const useScheduleEditorHook = (id: number, userId: number,
       }
     )
   )
-  
+
   addListener(
     store.addValueListener(
       'visible',
@@ -549,6 +549,60 @@ const useScheduleEditorHook = (id: number, userId: number,
 
 
   // region Stream Operations
+  const addCustomStream = () => {
+    startAction('addNewStream');
+    try {
+      let startTime: DateTime;
+      let endTime: DateTime;
+
+      if (local.streams.length === 0) {
+        // If there are no streams, set start time to December 1 of current year at 11:00
+        const currentYear = new Date().getFullYear();
+        startTime = DateTime.fromObject({
+          year: currentYear,
+          month: 12,
+          day: 1,
+          hour: 11,
+          minute: 0,
+        }, {
+          zone: 'utc',
+        });
+        // End time is 3 hours later at 14:00
+        endTime = startTime.plus({hours: 3});
+      } else {
+        // If there are streams, set start time to the end time of the last stream
+        const streamValues = Object.values(local.streams);
+        const lastStream = streamValues[streamValues.length - 1];
+
+        startTime = lastStream.end;
+        // End time is 3 hours later
+        endTime = startTime.plus({hours: 3});
+      }
+
+      // Add the new stream
+      store.addRow('streams', {
+        title: 'New stream',
+        subtitle: '',
+        description: '',
+        visible: false,
+        start: startTime.setZone('utc').toISO()!,
+        end: endTime.setZone('utc').toISO()!,
+        createdBy: userId
+      });
+
+      // Ensure the streamTags table exists
+      if (!store.hasTable('streamTags')) {
+        store.setTable('streamTags', {});
+      }
+      stopAction('addNewStream');
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : 'An unknown error occurred';
+      setLastError('addNewStream', errorMsg);
+      stopAction('addNewStream');
+      throw error;
+    }
+  };
+
   const addNewStream = (day?: number) => {
     startAction('addNewStream');
     try {
@@ -961,7 +1015,9 @@ const useScheduleEditorHook = (id: number, userId: number,
   const getAllDays = () => {
     const days = [];
     for (let day = 1; day <= 14; day++) {
-      days.push(DateTime.fromObject({year: local.year, month: 12, day: day}));
+      days.push(DateTime.fromObject({year: local.year, month: 12, day: day}, {
+        zone: 'Europe/London',
+      }).toLocal());
     }
     return days;
   };
@@ -991,8 +1047,8 @@ const useScheduleEditorHook = (id: number, userId: number,
         subtitle: stream.subtitle,
         description: stream.description,
         visible: stream.visible,
-        start: stream.start.setZone('utc').toISO()!,
-        end: stream.end.setZone('utc').toISO()!,
+        start: stream.start.toUTC().toISO()!,
+        end: stream.end.toUTC().toISO()!,
         createdBy: stream.createdBy
       });
       stopAction('saveStream');
@@ -1299,6 +1355,7 @@ const useScheduleEditorHook = (id: number, userId: number,
     local,
     username,
     addNewStream,
+    addCustomStream,
     updateStream,
     deleteStream,
     saveStream,

@@ -7,6 +7,7 @@ import {TextField} from "@kobalte/core/text-field";
 import {Checkbox} from "@kobalte/core/checkbox";
 import {TagsSection} from "./TagsSection.tsx";
 import {StreamParticipantsSection} from "./StreamParticipantsSection.tsx";
+import {useDayCard} from "../DayCardContext.tsx";
 
 interface ScheduleEditorStreamEditDialogBodyProps {
   stream: {
@@ -32,6 +33,7 @@ export const ScheduleEditorStreamEditDialogBody: Component<ScheduleEditorStreamE
     saveStream,
     action,
   } = useScheduleEditor();
+  const {minStr, maxStr} = useDayCard()
 
 
   const [stream, setStream] = createStore<{
@@ -61,6 +63,13 @@ export const ScheduleEditorStreamEditDialogBody: Component<ScheduleEditorStreamE
     participants: props.stream.participants || [],
     createdBy: props.stream.createdBy
   })
+
+  const start = () => stream.start.toLocal()
+  const end = () => stream.end.toLocal()
+
+  const startFormated = () => start().toFormat("yyyy-MM-dd'T'HH:mm")
+  const endFormated = () => end().toFormat("yyyy-MM-dd'T'HH:mm")
+
 
   const save = (e: SubmitEvent) => {
     e.preventDefault(); // Prevent default form submission
@@ -93,6 +102,77 @@ export const ScheduleEditorStreamEditDialogBody: Component<ScheduleEditorStreamE
           class="border border-gray-300 rounded-lg px-3 py-2"
         />
       </TextField>
+
+      <Checkbox
+        name="visible"
+        class="items-center inline-flex cursor-pointe"
+        checked={stream.visible}
+        onChange={(checked) => setStream('visible', checked)}
+      >
+        <Checkbox.Input class="sr-only"/>
+        <Checkbox.Control
+          class="h-5 w-5 rounded border border-gray-300 bg-white text-blue-600 focus:ring-blue-500 data-[checked]:bg-blue-600 data-[checked]:border-blue-600">
+          <Checkbox.Indicator>
+            <svg class="h-4 w-4 text-white" viewBox="0 0 8 8">
+              <path stroke="currentColor" stroke-width="1.5" fill="none" d="M1,4 L3,6 L7,2"/>
+            </svg>
+          </Checkbox.Indicator>
+        </Checkbox.Control>
+        <Checkbox.Label class="ml-2 text-sm font-medium">Visible</Checkbox.Label>
+        <Checkbox.Description class="text-xs text-gray-500 ml-2">When checked, this stream will be publicly
+          visible.</Checkbox.Description>
+      </Checkbox>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <TextField
+          name="start"
+          class="flex flex-col"
+          value={startFormated() ?? ''}
+          onChange={(value) => setStream('start', DateTime.fromISO(value).toUTC())}
+          validationState={stream.start < stream.end ? "valid" : "invalid"}
+        >
+          <TextField.Label class="text-sm font-medium mb-1">Start Time: </TextField.Label>
+          <TextField.Input
+            type="datetime-local"
+            class="border border-gray-300 rounded-lg px-3 py-2"
+            min={minStr}
+            max={maxStr}
+          />
+          <TextField.ErrorMessage class="text-red-500 text-xs mt-1">Start time must be before end
+            time</TextField.ErrorMessage>
+          <TextField.Description
+            class="text-xs text-gray-500 mt-1">Day: {stream.start.toFormat("cccc, MMMM d")}</TextField.Description>
+        </TextField>
+
+        <TextField
+          name="end"
+          class="flex flex-col"
+          value={endFormated() ?? ''}
+          onChange={(value) => setStream('end', DateTime.fromISO(value).toUTC())}
+          validationState={stream.end > stream.start ? "valid" : "invalid"}
+        >
+          <TextField.Label class="text-sm font-medium mb-1">End Time: </TextField.Label>
+          <TextField.Input
+            type="datetime-local"
+            class="border border-gray-300 rounded-lg px-3 py-2"
+            min={minStr}
+            max={maxStr}
+          />
+          <TextField.ErrorMessage class="text-red-500 text-xs mt-1">End time must be after start
+            time</TextField.ErrorMessage>
+          <TextField.Description
+            class="text-xs text-gray-500 mt-1">Day: {stream.end.toFormat("cccc, MMMM d")}</TextField.Description>
+        </TextField>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <TagsSection
+          streamId={stream.id}
+        />
+        <StreamParticipantsSection
+          streamId={stream.id}
+        />
+      </div>
 
       <TextField
         name="description"
@@ -144,72 +224,8 @@ export const ScheduleEditorStreamEditDialogBody: Component<ScheduleEditorStreamE
         </TextField>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <TextField
-          name="start"
-          class="flex flex-col"
-          value={stream.start.toFormat("yyyy-MM-dd'T'HH:mm") ?? ''}
-          onChange={(value) => setStream('start', DateTime.fromISO(value).setZone('utc'))}
-          validationState={stream.start < stream.end ? "valid" : "invalid"}
-        >
-          <TextField.Label class="text-sm font-medium mb-1">Start Time: </TextField.Label>
-          <TextField.Input
-            type="datetime-local"
-            class="border border-gray-300 rounded-lg px-3 py-2"
-          />
-          <TextField.ErrorMessage class="text-red-500 text-xs mt-1">Start time must be before end
-            time</TextField.ErrorMessage>
-          <TextField.Description
-            class="text-xs text-gray-500 mt-1">Day: {stream.start.toFormat("cccc, MMMM d")}</TextField.Description>
-        </TextField>
 
-        <TextField
-          name="end"
-          class="flex flex-col"
-          value={stream.end.toFormat("yyyy-MM-dd'T'HH:mm") ?? ''}
-          onChange={(value) => setStream('end', DateTime.fromISO(value).setZone('utc'))}
-          validationState={stream.end > stream.start ? "valid" : "invalid"}
-        >
-          <TextField.Label class="text-sm font-medium mb-1">End Time: </TextField.Label>
-          <TextField.Input
-            type="datetime-local"
-            class="border border-gray-300 rounded-lg px-3 py-2"
-          />
-          <TextField.ErrorMessage class="text-red-500 text-xs mt-1">End time must be after start
-            time</TextField.ErrorMessage>
-          <TextField.Description
-            class="text-xs text-gray-500 mt-1">Day: {stream.end.toFormat("cccc, MMMM d")}</TextField.Description>
-        </TextField>
-      </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <TagsSection
-          streamId={stream.id}
-        />
-        <StreamParticipantsSection
-          streamId={stream.id}
-        />
-      </div>
-
-      <Checkbox
-        name="visible"
-        class="items-center inline-flex cursor-pointe"
-        checked={stream.visible}
-        onChange={(checked) => setStream('visible', checked)}
-      >
-        <Checkbox.Input class="sr-only"/>
-        <Checkbox.Control
-          class="h-5 w-5 rounded border border-gray-300 bg-white text-blue-600 focus:ring-blue-500 data-[checked]:bg-blue-600 data-[checked]:border-blue-600">
-          <Checkbox.Indicator>
-            <svg class="h-4 w-4 text-white" viewBox="0 0 8 8">
-              <path stroke="currentColor" stroke-width="1.5" fill="none" d="M1,4 L3,6 L7,2"/>
-            </svg>
-          </Checkbox.Indicator>
-        </Checkbox.Control>
-        <Checkbox.Label class="ml-2 text-sm font-medium">Visible</Checkbox.Label>
-        <Checkbox.Description class="text-xs text-gray-500 ml-2">When checked, this stream will be publicly
-          visible.</Checkbox.Description>
-      </Checkbox>
       <Show when={action.saveStream.lastErrorMessage}>
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-4">
           {action.saveStream.lastErrorMessage}

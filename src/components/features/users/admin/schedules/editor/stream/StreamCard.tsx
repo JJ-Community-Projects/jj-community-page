@@ -4,10 +4,14 @@ import type {StreamType} from "./StreamType.ts";
 import {StreamEditDialog} from "./StreamEditDialog.tsx";
 import {createModalSignal} from "../../../../../../../lib/createModalSignal.ts";
 import {ConfirmationDialog} from "../../../../../../common/dialogs/ConfirmationDialog.tsx";
+import {getStreamColors} from "../../../../../../../functions/jjDatesToColors.ts";
+import {twMerge} from "tailwind-merge";
 
 // Component for a single stream card
 interface StreamCardProps {
   stream: StreamType;
+  showDate: boolean
+  whiteBackground: boolean
 }
 
 export const StreamCard: Component<StreamCardProps> = (props) => {
@@ -15,6 +19,32 @@ export const StreamCard: Component<StreamCardProps> = (props) => {
     deleteStream,
     action
   } = useScheduleEditor();
+
+  const getDayBackgroundColor = () => {
+    if (props.whiteBackground) {
+      return undefined
+    }
+    return getStreamColors(props.stream.start)['50']
+    /*
+    switch (props.dayIndex) {
+      case 0:
+        return 'bg-day-1-50'
+      case 1:
+        return 'bg-day-2-50'
+      case 2:
+        return 'bg-day-3-50'
+      case 3:
+        return 'bg-day-4-50'
+      case 4:
+        return 'bg-day-5-50'
+      case 5:
+        return 'bg-day-6-50'
+      case 6:
+        return 'bg-day-7-50'
+      default:
+        return 'bg-white'
+    }*/
+  };
 
   const showEditDialog = createModalSignal();
 
@@ -28,13 +58,20 @@ export const StreamCard: Component<StreamCardProps> = (props) => {
   return (
     <>
       <div
-        class="p-2 bg-white rounded border border-gray-100 cursor-pointer hover:bg-gray-50"
+        class={twMerge(getDayBackgroundColor(), "p-2 bg-white rounded border border-gray-100 cursor-pointer hover:bg-gray-50")}
         onClick={showEditDialog.open}
       >
         <p class="font-medium text-sm truncate">{props.stream.title}</p>
-        <p class="text-xs text-gray-600">
-          {props.stream.start.toFormat("HH:mm")} - {props.stream.end.toFormat("HH:mm")}
-        </p>
+        <Show when={props.showDate}>
+          <p class="text-xs text-gray-600">
+            {props.stream.start.toFormat("EEE',' MMM dd")} {props.stream.start.toFormat("HH:mm")} - {props.stream.end.toFormat("HH:mm")}
+          </p>
+        </Show>
+        <Show when={!props.showDate}>
+          <p class="text-xs text-gray-600">
+            {props.stream.start.toFormat("HH:mm")} - {props.stream.end.toFormat("HH:mm")}
+          </p>
+        </Show>
       </div>
 
       <StreamEditDialog

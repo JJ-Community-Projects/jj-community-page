@@ -3,6 +3,7 @@ import {DateTime} from "luxon";
 import {Dialog} from "@kobalte/core/dialog";
 import {type ModalSignal} from "../../../../../../../lib/createModalSignal.ts";
 import {ScheduleEditorStreamEditDialogBody} from "./ScheduleEditorStreamEditDialogBody.tsx";
+import {useDayCard} from "../DayCardContext.tsx";
 
 
 // Dialog for editing a stream

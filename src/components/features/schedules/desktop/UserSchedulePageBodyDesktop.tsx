@@ -71,7 +71,8 @@ const DayAccordionItem: Component<{ day: ScheduleDayUI, index: number, expandedD
   // Get highlight color based on the day's date
   const getHighlightColor = () => {
     // Convert JS Date to DateTime for color calculation
-    const dayDate = DateTime.fromJSDate(props.day.date);
+    // For color calculation, we still use UTC to maintain consistent colors
+    const dayDate = DateTime.fromJSDate(props.day.date, { zone: 'utc' });
     return getStreamColor(dayDate);
   };
 
@@ -80,7 +81,8 @@ const DayAccordionItem: Component<{ day: ScheduleDayUI, index: number, expandedD
 
   // Format date for display
   const formatDate = (date: Date) => {
-    return DateTime.fromJSDate(date).toLocaleString({
+    // Create DateTime from JS Date, assuming it's in UTC, then convert to local time for display
+    return DateTime.fromJSDate(date, { zone: 'utc' }).toLocal().toLocaleString({
       weekday: 'long',
       month: 'long',
       day: 'numeric'
