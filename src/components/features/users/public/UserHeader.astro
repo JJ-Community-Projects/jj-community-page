@@ -45,7 +45,7 @@ import {GlobeIcon} from "../../../common/icons/JJIcons";
     </div>
 
     <div class="mt-4">
-      {tags.length > 0 ? (
+      {tags.length > 0 && (
               <div class="flex flex-wrap gap-2 justify-center">
                 {tags.map((tag) => (
                         <span class="bg-accent text-white px-3 py-1 rounded-full text-xs">
@@ -53,8 +53,6 @@ import {GlobeIcon} from "../../../common/icons/JJIcons";
           </span>
                 ))}
               </div>
-      ) : (
-              <p class="text-gray-500 text-center">No tags added yet</p>
       )}
     </div>
 
