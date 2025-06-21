@@ -4,6 +4,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import UserHeader from "../../components/features/users/public/UserHeader.astro";
 import UserSchedule from "../../components/features/users/public/UserSchedule.astro";
 import UserTeams from "../../components/features/users/public/UserTeams.astro";
+import { ActiveSchedule } from "../../components/features/users/public/schedule/ActiveSchedule";
 
 const {username} = Astro.params;
 if (!username) {
@@ -21,10 +22,21 @@ if (!data) {
 }
 
 const { user, account, tags, socials } = data;
+
+// Fetch the user's primary schedule for the ActiveSchedule component
+const { data: primarySchedule, error: scheduleError } = await Astro.callAction(actions.ui.user.schedules.getCurrentPrimaryByTiltifyUsername, username);
 ---
 <BaseLayout title={`${account.providerUsername} | Jingle Jam Community`}>
   <div class="w-full max-w-4xl mx-auto">
     <UserHeader user={user} account={account} tags={tags} socials={socials} />
+
+    {/* Display ActiveSchedule if primary schedule is available */}
+    {primarySchedule && !scheduleError && (
+      <div class="w-full bg-white rounded-lg p-6 mb-4 shadow-md">
+        <ActiveSchedule client:load initSchedule={primarySchedule} />
+      </div>
+    )}
+
     <UserSchedule tiltifyUsername={username} />
     <UserTeams tiltifyUsername={username} userId={user.id} />
   </div>
