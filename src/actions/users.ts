@@ -128,10 +128,10 @@ export const users = {
 
           try {
             const result = await stub.addSocial('twitch', twitchUrl);
-            results.push({ provider: 'twitch', success: !!result });
+            results.push({provider: 'twitch', success: !!result});
           } catch (error) {
             console.error('Error adding Twitch social:', error);
-            results.push({ provider: 'twitch', success: false });
+            results.push({provider: 'twitch', success: false});
           }
         }
 
@@ -143,10 +143,10 @@ export const users = {
 
           try {
             const result = await stub.addSocial('twitter', twitterUrl);
-            results.push({ provider: 'twitter', success: !!result });
+            results.push({provider: 'twitter', success: !!result});
           } catch (error) {
             console.error('Error adding Twitter social:', error);
-            results.push({ provider: 'twitter', success: false });
+            results.push({provider: 'twitter', success: false});
           }
         }
 
@@ -164,10 +164,10 @@ export const users = {
 
           try {
             const result = await stub.addSocial('youtube', youtubeUrl);
-            results.push({ provider: 'youtube', success: !!result });
+            results.push({provider: 'youtube', success: !!result});
           } catch (error) {
             console.error('Error adding YouTube social:', error);
-            results.push({ provider: 'youtube', success: false });
+            results.push({provider: 'youtube', success: false});
           }
         }
 
@@ -179,10 +179,10 @@ export const users = {
 
           try {
             const result = await stub.addSocial('instagram', instagramUrl);
-            results.push({ provider: 'instagram', success: !!result });
+            results.push({provider: 'instagram', success: !!result});
           } catch (error) {
             console.error('Error adding Instagram social:', error);
-            results.push({ provider: 'instagram', success: false });
+            results.push({provider: 'instagram', success: false});
           }
         }
 
@@ -194,10 +194,10 @@ export const users = {
 
           try {
             const result = await stub.addSocial('tiktok', tiktokUrl);
-            results.push({ provider: 'tiktok', success: !!result });
+            results.push({provider: 'tiktok', success: !!result});
           } catch (error) {
             console.error('Error adding TikTok social:', error);
-            results.push({ provider: 'tiktok', success: false });
+            results.push({provider: 'tiktok', success: false});
           }
         }
 
@@ -857,4 +857,11 @@ export const users = {
     }
   }),
 
+
+  findAllUsers: defineAction({
+    handler: (_, context) => {
+      const repo = UserRepo.action(context);
+      return repo.findAll();
+    }
+  })
 }
