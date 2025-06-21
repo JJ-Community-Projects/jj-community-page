@@ -259,6 +259,15 @@ const useScheduleEditorHook = (id: number, userId: number,
       }
     )
   )
+  
+  addListener(
+    store.addValueListener(
+      'visible',
+      (_, __, newValue) => {
+        setLocal('visible', newValue as boolean);
+      }
+    )
+  )
 
   addListener(
     store.addValueListener(

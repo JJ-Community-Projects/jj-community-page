@@ -5,6 +5,7 @@ import {Accordion} from '@kobalte/core'
 import {BiRegularChevronDown} from 'solid-icons/bi'
 import {twMerge} from 'tailwind-merge'
 import {SimpleScheduleOverviewComponent} from "./SimpleScheduleOverviewComponent.tsx";
+import {FaSolidChevronDown} from "solid-icons/fa";
 // import { useAnalytics } from '../../AnalyticsProvider'
 
 export const OverlayOverview: Component = () => {
@@ -42,7 +43,7 @@ const Body = () => {
               }
             >
               <p class={'flex-1 text-left'}>Community Fundraisers</p>
-              <BiRegularChevronDown
+              <FaSolidChevronDown
                 class={twMerge('transition-all group-hover:animate-none', fundraiser() && 'rotate-180 animate-none')}
               />
             </Accordion.Trigger>
@@ -59,7 +60,7 @@ const Body = () => {
               }
             >
               <p class={'flex-1 text-left'}>Charities</p>
-              <BiRegularChevronDown
+              <FaSolidChevronDown
                 class={twMerge('transition-all group-hover:animate-none', charities() && 'rotate-180 animate-none')}
               />
             </Accordion.Trigger>
@@ -76,7 +77,7 @@ const Body = () => {
               }
             >
               <p class={'flex-1 text-left'}>Charities 2</p>
-              <BiRegularChevronDown
+              <FaSolidChevronDown
                 class={twMerge('transition-all group-hover:animate-none', charities2() && 'rotate-180 animate-none')}
               />
             </Accordion.Trigger>
@@ -93,7 +94,7 @@ const Body = () => {
               }
             >
               <p class={'flex-1 text-left'}>Custom JJ Schedule</p>
-              <BiRegularChevronDown
+              <FaSolidChevronDown
                 class={twMerge(
                   'transition-all group-hover:animate-none',
                   customCchedule() && 'rotate-180 animate-none',

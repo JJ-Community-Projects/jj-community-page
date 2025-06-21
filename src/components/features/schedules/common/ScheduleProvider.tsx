@@ -29,6 +29,9 @@ const useScheduleHook = (initSchedule: ScheduleUI) => {
 
   const findCurrentDayIndex = () => {
     const days = schedule.days
+    if (days.length === 0) {
+      return 0;
+    }
     const currentDate = date()
 
     // Find the day that matches the current date
@@ -121,6 +124,7 @@ const useScheduleHook = (initSchedule: ScheduleUI) => {
     days,
     nextThreeStreams,
     nextStream,
+    dayIndex
   }
 }
 

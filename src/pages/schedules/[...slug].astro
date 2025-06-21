@@ -17,23 +17,22 @@ console.log('error', error)
 console.log('data', data)
 ---
 <BaseLayout title={data?.schedule?.title || "Schedule"}>
-  <div class="min-h-screen bg-gradient-to-b from-primary-shade via-primary to-primary-shade">
-    {
-      error && (
-        <div class="container mx-auto px-4 py-8">
-          <div class="bg-white p-6 rounded-lg shadow-lg">
-            <h1 class="text-2xl font-bold text-red-600 mb-4">Error</h1>
-            <p class="text-gray-800">{error.message}</p>
-          </div>
-        </div>
-      )
-    }
-    {
-      (!error && data) && (
-        <div class="container mx-auto px-4 py-8">
-          <UserSchedulePage client:only="solid-js" initSchedule={data}/>
-        </div>
-      )
-    }
-  </div>
+  {
+    error && (
+                  <div class="container mx-auto px-4 py-8">
+                      <div class="bg-white p-6 rounded-lg shadow-lg">
+                          <h1 class="text-2xl font-bold text-red-600 mb-4">Error</h1>
+                          <p class="text-gray-800">{error.message}</p>
+                      </div>
+                  </div>
+    )
+  }
+  {
+    (!error && data) && (
+                  <div class="container mx-auto px-4 py-8">
+                      <UserSchedulePage client:only="solid-js" initSchedule={data}/>
+                      <pre>{JSON.stringify(data, null, 2)}</pre>
+                  </div>
+    )
+  }
 </BaseLayout>

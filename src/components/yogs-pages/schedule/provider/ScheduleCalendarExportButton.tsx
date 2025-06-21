@@ -1,6 +1,6 @@
 import {type Component, createSignal, For, Show} from 'solid-js'
 import {Dialog} from '@kobalte/core'
-import {CgClose, CgInfo} from 'solid-icons/cg'
+import {FaSolidInfo, FaSolidXmark} from 'solid-icons/fa'
 import {FaRegularCalendar, FaRegularSquare, FaSolidSquareCheck} from 'solid-icons/fa'
 import {DateTime, Duration} from 'luxon'
 import ical, {ICalAlarmType} from 'ical-generator'
@@ -145,7 +145,7 @@ const CalendarDialogDialogBody: Component<CalendarDialogDialogBodyProps> = props
     <div class={'flex h-full w-full flex-col rounded-3xl bg-white'}>
       <div class={`bg-primary flex h-[72px] items-center justify-center rounded-t-3xl p-2 text-white shadow-xl`}>
         <button onClick={onClose}>
-          <CgClose size={24} class={''}/>
+          <FaSolidXmark size={24} class={''}/>
         </button>
         <div class={'flex-1'}></div>
         <h3 class={'text-2xl'}>Calendar Export</h3>
@@ -158,7 +158,7 @@ const CalendarDialogDialogBody: Component<CalendarDialogDialogBodyProps> = props
         href={'https://support.google.com/calendar/answer/37118?co=GENIE.Platform%3DDesktop'}
         target={'_blank'}
       >
-        <CgInfo/> How to import an .ics (iCal) file into Google Calendar
+        <FaSolidInfo/> How to import an .ics (iCal) file into Google Calendar
       </a>
       <p class={'px-2 py-2'}>Filtered streams: {filteredStreams().length}</p>
       <p class={'px-2 py-2'}>This list of streams takes the creator filter into account</p>

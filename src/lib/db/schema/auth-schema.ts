@@ -4,7 +4,7 @@ import {sql} from "drizzle-orm";
 export const users = sqliteTable("users", {
   id: integer({mode: 'number'}).primaryKey({autoIncrement: true}),
   createdAt: integer('created_at', {mode: 'timestamp'}).notNull()
-    .default(sql`(current_timestamp)`),
+    .default(sql`((unixepoch()))`),
   role: text('role').$type<"user" | "admin">().notNull().default('user'),
 });
 
@@ -16,9 +16,9 @@ export const accounts =
       providerId: text('provider_id').notNull().unique(),
       providerUsername: text("provider_username").notNull(),
       createdAt: integer('created_at', {mode: 'timestamp'})
-        .default(sql`(current_timestamp)`).notNull(),
+        .default(sql`((unixepoch()))`).notNull(),
       updatedAt: integer('updated_at', {mode: 'timestamp'})
-        .default(sql`(current_timestamp)`).notNull(),
+        .default(sql`((unixepoch()))`).notNull(),
       meta: text('meta', {mode: "json"}),
     },
     (table) => {
@@ -56,7 +56,7 @@ export const userTags = sqliteTable("userTags", {
   userId: integer({mode: 'number'}).notNull().references(() => users.id, {onDelete: 'cascade'}),
   tag: text('tag').notNull(),
   label: text('label').notNull(),
-  addedAt: integer('added_at', {mode: 'timestamp'}).notNull().default(sql`CURRENT_TIMESTAMP`),
+  addedAt: integer('added_at', {mode: 'timestamp'}).notNull().default(sql`(unixepoch())`),
 }, (table) => [
   primaryKey({name: 'user_tag_pk', columns: [table.userId, table.tag]}),
   uniqueIndex('unique_user_tag').on(table.userId, table.tag)
@@ -76,7 +76,7 @@ export const blockedAccounts = sqliteTable("blockedAccounts", {
   provider: text('provider').notNull(),
   reason: text('reason'),
   createdAt: integer('created_at', {mode: 'timestamp'})
-    .default(sql`(current_timestamp)`).notNull(),
+    .default(sql`((unixepoch()))`).notNull(),
 })
 
 export const userStyles = sqliteTable("userStyles", {

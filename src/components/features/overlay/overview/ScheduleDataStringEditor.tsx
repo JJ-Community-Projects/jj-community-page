@@ -2,7 +2,7 @@ import {type Component, createEffect, createSignal} from 'solid-js'
 import {useScheduleDataString} from '../schedule/ScheduleDataStringProvider.tsx'
 import {Button, TextField} from '@kobalte/core'
 import {IANAZone} from 'luxon'
-import {BsInfoCircle} from 'solid-icons/bs'
+import {FaSolidCircleInfo} from 'solid-icons/fa'
 import {OTHER_DEMO, YOGS_DEMO} from "../schedule/demoSchedules.ts";
 
 export const ScheduleDataStringEditor: Component = () => {
@@ -29,7 +29,7 @@ export const ScheduleDataStringEditor: Component = () => {
         <TextField.Label class={'flex flex-row items-center'}>
           IANA Time zone{' '}
           <a class={'pl-2'} href={'https://en.wikipedia.org/wiki/List_of_tz_database_time_zones'} target={'_blank'}>
-            <BsInfoCircle/>
+            <FaSolidCircleInfo/>
           </a>
         </TextField.Label>
         <TextField.Input class={'text-black'}></TextField.Input>

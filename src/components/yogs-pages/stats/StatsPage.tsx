@@ -8,7 +8,7 @@ import All from '../../../stats/all.json'
 import {type Stats} from "../../../lib/model/Stats.ts";
 import type {FullCreator} from "../../../lib/model/ContentTypes.ts";
 import {Accordion} from "@kobalte/core";
-import {BiRegularChevronDown} from "solid-icons/bi";
+import {FaSolidChevronDown} from "solid-icons/fa";
 import {twMerge} from "tailwind-merge";
 import {CreatorProvider} from "../../features/stats/provider/CreatorProvider.tsx";
 import {StreamStats} from "../../features/stats/graphs/StreamStats.tsx";
@@ -64,7 +64,7 @@ const Year: Component<{ stats: Stats, key: string, title: string, expandedItem: 
           }
         >
           <p class={'flex-1 text-left'}>{props.title}</p>
-          <BiRegularChevronDown
+          <FaSolidChevronDown
             class={twMerge('transition-all group-hover:animate-none', isOpen() && 'rotate-180 animate-none')}
           />
         </Accordion.Trigger>

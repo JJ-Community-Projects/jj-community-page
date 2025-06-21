@@ -12,7 +12,9 @@ export const durableObjectsTable = sqliteTable('durable_objects', {
     uniqueIndex('durable_objects_pk').on(table.namespace, table.id),
   ]
 )
-
+// integer('timestamp1', { mode: 'timestamp' })
+//     .notNull()
+//     .default(sql`((unixepoch()))`),
 export const schedulesTable = sqliteTable('schedules', {
     id: integer().primaryKey({autoIncrement: true}).notNull(),
     title: text('title').notNull(),
@@ -21,8 +23,8 @@ export const schedulesTable = sqliteTable('schedules', {
     visible: integer({mode: 'boolean'}).notNull(),
     primary: integer({mode: 'boolean'}).notNull().default(false),
     ownerId: integer('owner_id').references(() => users.id, {onDelete: 'cascade'}).notNull(),
-    createdAt: integer('created_at', {mode: 'timestamp'}).notNull().default(sql`CURRENT_TIMESTAMP`),
-    updatedAt: integer('updated_at', {mode: 'timestamp'}).notNull().default(sql`CURRENT_TIMESTAMP`),
+    createdAt: integer('created_at', {mode: 'timestamp'}).notNull().default(sql`(unixepoch())`),
+    updatedAt: integer('updated_at', {mode: 'timestamp'}).notNull().default(sql`(unixepoch())`),
   },
   (table) => [
     // uniqueIndex('one_schedule_per_year_per_user').on(table.ownerId, table.year),
@@ -63,7 +65,7 @@ export const streamTagsTable = sqliteTable('stream_tags', {
     scheduleId: integer('schedule_id').notNull(),
     tag: text('tag').notNull(),
     label: text('label').notNull(),
-    addedAt: integer('added_at', {mode: 'timestamp'}).notNull().default(sql`CURRENT_TIMESTAMP`),
+    addedAt: integer('added_at', {mode: 'timestamp'}).notNull().default(sql`(unixepoch())`),
   },
   (table) => [
     primaryKey({name: 'stream_tags_pk', columns: [table.scheduleId, table.streamId, table.tag]}),

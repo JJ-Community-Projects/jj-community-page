@@ -5,11 +5,14 @@ import {DateTime} from "luxon";
 import {FaSolidChevronLeft, FaSolidChevronRight} from "solid-icons/fa";
 
 export const UserSchedulePageBodyMobile: Component = () => {
+  const {days} = useScheduleTest();
   return (
-    <div class="md:hidden flex flex-col gap-4 w-full p-4">
-      <NextStreams/>
-      <DaysPager/>
-    </div>
+    <Show when={days().length > 0}>
+      <div class="md:hidden flex flex-col gap-4 w-full p-4">
+        <NextStreams/>
+        <DaysPager/>
+      </div>
+    </Show>
   )
 }
 
@@ -40,7 +43,7 @@ const DaysPager: Component = () => {
       <div class="flex items-center justify-between mb-2">
         <h2 class="text-xl font-bold text-white">Schedule</h2>
         <div class="text-white text-sm">
-          {DateTime.fromJSDate(currentDay().date).toFormat("EEE, MMM d")}
+          {(currentDay().date).toFormat("EEE, MMM d")}
         </div>
       </div>
 
@@ -49,19 +52,20 @@ const DaysPager: Component = () => {
           class="h-8 w-8 rounded-full bg-accent text-white shadow-md flex items-center justify-center"
           onClick={prevDay}
         >
-          <FaSolidChevronLeft />
+          <FaSolidChevronLeft/>
         </button>
 
         <button
           class="h-8 w-8 rounded-full bg-accent text-white shadow-md flex items-center justify-center"
           onClick={nextDay}
         >
-          <FaSolidChevronRight />
+          <FaSolidChevronRight/>
         </button>
       </div>
 
       <div class="grid grid-cols-1 gap-3">
-        <Show when={currentDay().streams.length > 0} fallback={<p class="text-white">No streams scheduled for this day.</p>}>
+        <Show when={currentDay().streams.length > 0}
+              fallback={<p class="text-white">No streams scheduled for this day.</p>}>
           <For each={currentDay().streams}>
             {(stream) => (
               <ScheduleStreamCard

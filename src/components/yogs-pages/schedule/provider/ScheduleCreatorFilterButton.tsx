@@ -47,7 +47,7 @@ export const FilterShareButton: Component = () => {
           onClick={copyFilterUrl}
         >
           <div class={'flex w-full flex-row items-center justify-around'}>
-            <BiRegularShare/>
+            <FaSolidShare/>
           </div>
         </Tooltip.Trigger>
         <Tooltip.Portal>

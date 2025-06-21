@@ -4,8 +4,9 @@ import {ScheduleRepo} from "./ScheduleRepo.ts";
 import type {InferSelectModel} from "drizzle-orm";
 import {schedulesTable,} from "../schema/schema.ts";
 import {DateTime} from "luxon";
-import type {DetailedStream, Schedule, ScheduleWithDetailedStreams} from "../models/schedule-base.ts";
+import type {Schedule, ScheduleWithDetailedStreams} from "../models/schedule-base.ts";
 import type {
+  DetailedStream,
   ScheduleDayUI,
   ScheduleGroupedWeeks,
   ScheduleUI,
@@ -63,8 +64,11 @@ export class ScheduleUIRepo {
    */
   async getScheduleBySlug(
     slug: string
-  ): Promise<ScheduleUI> {
+  ): Promise<ScheduleUI | null> {
     const scheduleWithDetails = await this.scheduleRepo.getScheduleBySlug(slug);
+    if (!scheduleWithDetails) {
+      return null
+    }
     return this.scheduleToScheduleUI(scheduleWithDetails);
   }
 

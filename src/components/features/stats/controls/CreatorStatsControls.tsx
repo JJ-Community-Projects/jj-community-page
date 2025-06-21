@@ -1,7 +1,7 @@
 import {Select, ToggleButton} from "@kobalte/core";
 import {type Component} from "solid-js";
 import {twMerge} from "tailwind-merge";
-import {AiOutlineCheck} from "solid-icons/ai";
+import {FaSolidCheck} from "solid-icons/fa";
 import {useCreatorStatsSettings} from "../provider/CreatorStatsSettings.tsx";
 import {StatsValueTypeCreator} from "../../../../lib/model/Stats.ts";
 
@@ -63,7 +63,7 @@ const DataSelector: Component = () => {
         >
           <Select.ItemLabel>{label(props.item.rawValue)}</Select.ItemLabel>
           <Select.ItemIndicator>
-            <AiOutlineCheck/>
+            <FaSolidCheck/>
           </Select.ItemIndicator>
         </Select.Item>
       )}

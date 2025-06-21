@@ -11,7 +11,7 @@ import {CreatorStats} from "./graphs/CreatorStats.tsx";
 import type {FullCreator} from "../../../lib/model/ContentTypes.ts";
 import {CreatorProvider} from "./provider/CreatorProvider.tsx";
 import {Accordion} from "@kobalte/core";
-import {BiRegularChevronDown} from "solid-icons/bi";
+import {FaSolidChevronDown} from "solid-icons/fa";
 import {twMerge} from "tailwind-merge";
 
 interface StreamStatsProps {
@@ -64,7 +64,7 @@ const Year: Component<{ stats: Stats, key: string, title: string, expandedItem: 
           }
         >
           <p class={'flex-1 text-left'}>{props.title}</p>
-          <BiRegularChevronDown
+          <FaSolidChevronDown
             class={twMerge('transition-all group-hover:animate-none', isOpen() && 'rotate-180 animate-none')}
           />
         </Accordion.Trigger>

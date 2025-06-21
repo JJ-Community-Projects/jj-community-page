@@ -20,14 +20,23 @@ export const ui = {
       }),
       byScheduleSlug: defineAction({
         input: z.string(),
-        handler: (slug: string, ctx) => {
+        handler: async (slug: string, ctx) => {
+          let repo: ScheduleUIRepo;
+
           try {
-            const repo = ScheduleUIRepo.action(ctx);
-            return repo.getScheduleBySlug(slug);
+            console.log('ui.user.schedules.byScheduleSlug', slug)
+            repo = ScheduleUIRepo.action(ctx);
           } catch (e: any) {
             console.error('Error getting schedule by slug:', e);
             throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message});
           }
+
+          console.log('ui.user.schedules.byScheduleSlug', slug)
+          const schedule = await repo.getScheduleBySlug(slug);
+          if (!schedule) {
+            throw new ActionError({code: 'NOT_FOUND', message: 'Schedule not found.'});
+          }
+          return schedule;
         }
       }),
       demo: defineAction({

@@ -10,7 +10,7 @@ import {StreamTagRepo} from "./StreamTagRepo.ts";
 import {StreamParticipantsRepo} from "./StreamParticipantsRepo.ts";
 import {accounts, users} from "../schema/auth-schema";
 import {DateTime} from "luxon";
-import type {DetailedStream, Schedule, ScheduleWithDetailedStreams, ScheduleWithStreams} from "../models/schedule-base.ts";
+import type {Schedule, ScheduleWithDetailedStreams, ScheduleWithStreams} from "../models/schedule-base.ts";
 
 
 /**
@@ -146,7 +146,7 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
   async create(data: InferInsertModel<typeof schedulesTable>): Promise<Schedule> {
     try {
       const [result] = await this.db.insert(this.table)
-        .values(data as any)
+        .values(data)
         .returning();
 
       return result;
@@ -574,7 +574,7 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
     try {
       // First, get the basic schedule using the existing method
       const schedule = await this.findBySlug(slug);
-
+      console.log('getScheduleBySlug', 'schedule', schedule);
       // If no schedule found, return null
       if (!schedule) {
         return null;

@@ -3,7 +3,7 @@ import type {ModalSignal} from "../../../lib/createModalSignal.ts";
 import {type Component, For, Match, Show, Switch} from "solid-js";
 import {Dialog} from "@kobalte/core/dialog";
 import {getTextColor} from "../../../lib/utils/textColors.ts";
-import {AiOutlineClose} from "solid-icons/ai";
+import {FaSolidXmark} from "solid-icons/fa";
 import {twMerge} from "tailwind-merge";
 import {
   FaBrandsDiscord,
@@ -40,7 +40,7 @@ export const YogsCreatorDialog: Component<CreatorDialogProps> = (props) => {
           >
             <button class={'rounded-full hover:bg-accent-200/10 aspect-square'}
                     onClick={() => props.modalSignal.close()}>
-              <AiOutlineClose size={24}/>
+              <FaSolidXmark size={24}/>
             </button>
             <div class={'flex flex-col'}>
               <p class={'text-xl font-bold'}>{props.creator.name}</p>
@@ -168,7 +168,7 @@ export const Links: Component<LinksProps> = (props) => {
           )}
         </For>
       </div>
-      <Show when={props.creator.jjStreams && props.creator.jjStreams.length > 0 && props.onJJStreamsClick}>
+      <Show when={props.onJJStreamsClick}>
         <button
           class={'flex flex-row gap-2 items-center justify-center p-2 rounded-full bg-primary text-white hover:bg-primary-400 transition-all'}
           onClick={() => props.onJJStreamsClick?.()}

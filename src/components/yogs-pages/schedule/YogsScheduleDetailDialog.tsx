@@ -1,7 +1,7 @@
 import {type Component, For, Show} from "solid-js";
 import {Dialog} from "@kobalte/core";
-import {BsTwitch, BsYoutube} from "solid-icons/bs";
-import {AiOutlineClose} from "solid-icons/ai";
+import {FaBrandsTwitch, FaBrandsYoutube} from "solid-icons/fa";
+import {FaSolidXmark} from "solid-icons/fa";
 import {DateTime} from "luxon";
 import {getTextColor} from "../../../lib/utils/textColors.ts";
 import type {ContentVod, FullCreator, FullStream} from "../../../lib/model/ContentTypes.ts";
@@ -42,7 +42,7 @@ export const YogsScheduleDetailDialog: Component<YogsScheduleDetailDialogProps> 
           >
             <button class={'rounded-full hover:bg-accent-200/10 aspect-square'}
                     onClick={() => props.modalSignal.close()}>
-              <AiOutlineClose size={24}/>
+              <FaSolidXmark size={24}/>
             </button>
             <div class={'flex flex-col'}>
               <p class={'text-xl font-bold'}>{props.stream.title}</p>
@@ -166,7 +166,7 @@ const VodComponent: Component<VodProps> = (props) => {
           }
           href={props.vod.link}
         >
-          <BsYoutube/> {props.vod.label}
+          <FaBrandsYoutube/> {props.vod.label}
         </a>
       </div>
     )

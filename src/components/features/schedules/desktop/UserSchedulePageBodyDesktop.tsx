@@ -2,7 +2,7 @@ import {type Component, For, Show, createSignal} from "solid-js";
 import {useScheduleTest} from "../common/ScheduleProvider.tsx";
 import {ScheduleStreamCard} from "../common/StreamCard.tsx";
 import {Accordion} from "@kobalte/core";
-import {BiRegularChevronDown} from "solid-icons/bi";
+import {FaSolidChevronDown} from "solid-icons/fa";
 import {twMerge} from "tailwind-merge";
 import {DateTime} from "luxon";
 
@@ -75,7 +75,7 @@ const DayAccordionItem: Component<{day: any, index: number}> = (props) => {
           class="w-full flex items-center justify-between p-4 text-left font-medium focus:outline-none"
         >
           <span>{DateTime.fromJSDate(props.day.date).toFormat("EEEE, MMMM d")}</span>
-          <BiRegularChevronDown
+          <FaSolidChevronDown
             class={twMerge('transition-transform duration-300', isOpen() && 'rotate-180')}
           />
         </Accordion.Trigger>

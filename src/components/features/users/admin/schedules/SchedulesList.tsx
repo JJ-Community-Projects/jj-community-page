@@ -3,6 +3,7 @@ import {UserSchedulesProvider, useUserSchedules} from "../providers/UserSchedule
 import type {User} from "../../../../../lib/auth/User.ts";
 import {Dialog} from "@kobalte/core/dialog";
 import {createModalSignal} from "../../../../../lib/createModalSignal.ts";
+import {FaRegularStar, FaSolidStar, FaRegularEye, FaRegularEyeSlash, FaRegularPenToSquare, FaSolidTrash} from "solid-icons/fa";
 
 interface SchedulesListProps {
   user: User
@@ -102,7 +103,10 @@ const SchedulesListItem: Component<{
       <a>{}</a>
       <div class="flex flex-row gap-2 mt-auto">
         <a href={`/admin/schedules/${props.schedule.id}/edit`}
-           class="bg-primary hover:bg-primary-600 text-white px-3 py-1 rounded-lg transition-all">Edit</a>
+           class="bg-primary hover:bg-primary-600 text-white px-3 py-1 rounded-lg transition-all"
+           title="Edit">
+          <FaRegularPenToSquare />
+        </a>
         <SchedulePrimaryButton schedule={props.schedule}/>
         <ScheduleVisibilityButton schedule={props.schedule}/>
         <ScheduleDeleteButton schedule={props.schedule}/>
@@ -138,8 +142,9 @@ const SchedulePrimaryButton: Component<{
       onClick={() => handleSetPrimary()}
       disabled={props.schedule.primary || action.setPrimarySchedule.actionInProgress}
       class="bg-accent hover:bg-accent-400 text-white px-3 py-1 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+      title={props.schedule.primary ? 'Primary' : 'Set Primary'}
     >
-      {props.schedule.primary ? 'Primary' : 'Set Primary'}
+      {props.schedule.primary ? <FaSolidStar /> : <FaRegularStar />}
     </button>
   )
 }
@@ -170,8 +175,9 @@ const ScheduleVisibilityButton: Component<{
       onClick={() => handleToggleVisibility()}
       disabled={action.toggleVisibility.actionInProgress}
       class="bg-primary hover:bg-primary-600 text-white px-3 py-1 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+      title={props.schedule.visible ? 'Make Private' : 'Make Public'}
     >
-      {props.schedule.visible ? 'Make Private' : 'Make Public'}
+      {props.schedule.visible ? <FaRegularEye /> : <FaRegularEyeSlash />}
     </button>
   )
 }
@@ -204,8 +210,9 @@ const ScheduleDeleteButton: Component<{
         onClick={modal.open}
         disabled={action.deleteSchedule.actionInProgress}
         class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+        title="Delete"
       >
-        Delete
+        <FaSolidTrash />
       </button>
 
       <Dialog open={modal.isOpen()} onOpenChange={modal.setOpen}>
