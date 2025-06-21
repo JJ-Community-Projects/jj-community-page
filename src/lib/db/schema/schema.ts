@@ -23,8 +23,10 @@ export const schedulesTable = sqliteTable('schedules', {
     visible: integer({mode: 'boolean'}).notNull(),
     primary: integer({mode: 'boolean'}).notNull().default(false),
     ownerId: integer('owner_id').references(() => users.id, {onDelete: 'cascade'}).notNull(),
-    createdAt: integer('created_at', {mode: 'timestamp'}).notNull().default(sql`(unixepoch())`),
-    updatedAt: integer('updated_at', {mode: 'timestamp'}).notNull().default(sql`(unixepoch())`),
+    createdAt: integer('created_at', {mode: 'timestamp'}).notNull().default(sql`(unixepoch()
+                                                                                )`),
+    updatedAt: integer('updated_at', {mode: 'timestamp'}).notNull().default(sql`(unixepoch()
+                                                                                )`),
   },
   (table) => [
     // uniqueIndex('one_schedule_per_year_per_user').on(table.ownerId, table.year),
@@ -33,8 +35,8 @@ export const schedulesTable = sqliteTable('schedules', {
 );
 
 export const editorsTable = sqliteTable('editors', {
-    scheduleId: integer('schedule_id').references(() => schedulesTable.id),
-    userId: integer('user_id').references(() => users.id),
+    scheduleId: integer('schedule_id').references(() => schedulesTable.id, {onDelete: 'cascade'}).notNull(),
+    userId: integer('user_id').references(() => users.id, {onDelete: 'cascade'}).notNull(),
   },
   (table) => [
     uniqueIndex('editors_pk').on(table.scheduleId, table.userId),
@@ -44,7 +46,7 @@ export const editorsTable = sqliteTable('editors', {
 
 export const streamsTable = sqliteTable('streams', {
     id: integer('id').notNull(),
-    scheduleId: integer('schedule_id').references(() => schedulesTable.id).notNull(),
+    scheduleId: integer('schedule_id').references(() => schedulesTable.id, {onDelete: "cascade"}).notNull(),
     createdBy: integer('created_by').references(() => users.id).notNull(),
     title: text('title').notNull(),
     visible: integer({mode: 'boolean'}).notNull().default(false),
@@ -65,7 +67,8 @@ export const streamTagsTable = sqliteTable('stream_tags', {
     scheduleId: integer('schedule_id').notNull(),
     tag: text('tag').notNull(),
     label: text('label').notNull(),
-    addedAt: integer('added_at', {mode: 'timestamp'}).notNull().default(sql`(unixepoch())`),
+    addedAt: integer('added_at', {mode: 'timestamp'}).notNull().default(sql`(unixepoch()
+                                                                            )`),
   },
   (table) => [
     primaryKey({name: 'stream_tags_pk', columns: [table.scheduleId, table.streamId, table.tag]}),
@@ -96,7 +99,6 @@ export const streamParticipantsTable = sqliteTable('stream_participants', {
 ])
 
 
-
 export const teamsTable = sqliteTable('teams', {
     id: integer('team_id').primaryKey({autoIncrement: true}).notNull(),
     ownerId: integer('owner_id').references(() => users.id, {onDelete: 'cascade'}).notNull(),
@@ -112,7 +114,7 @@ export const teamsTable = sqliteTable('teams', {
 
 export const teamMembersTable = sqliteTable('team_members', {
     teamId: integer('team_id').references(() => teamsTable.id, {onDelete: 'cascade'}).notNull(),
-    userId: integer('user_id').references(() => users.id).notNull(),
+    userId: integer('user_id').references(() => users.id, {onDelete: 'cascade'}).notNull(),
   },
   (table) => [
     uniqueIndex('single_user_per_team').on(table.teamId, table.userId),
@@ -120,7 +122,7 @@ export const teamMembersTable = sqliteTable('team_members', {
 )
 
 export const teamInvitesTable = sqliteTable('team_invites', {
-    teamId: integer('team_id').references(() => teamsTable.id).notNull(),
+    teamId: integer('team_id').references(() => teamsTable.id, {onDelete: 'cascade'}).notNull(),
     invitedUserId: integer('invite_id').references(() => users.id).notNull(),
   },
   (table) => [
