@@ -441,6 +441,20 @@ export const teams = {
       }
     }
   }),
+
+  findVisible: defineAction({
+    handler: (_, ctx) => {
+      const repo = TeamRepo.action(ctx);
+      return repo.findVisible()
+    }
+  }),
+
+  findAllVisibleWithMemberCount: defineAction({
+    handler: (_, ctx) => {
+      const repo = TeamRepo.action(ctx);
+      return repo.findAllVisibleWithMemberCount()
+    }
+  })
 }
 
 export const teamInvites = {
