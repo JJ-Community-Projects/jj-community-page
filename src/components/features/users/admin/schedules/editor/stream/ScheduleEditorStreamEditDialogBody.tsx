@@ -10,6 +10,7 @@ import {StreamParticipantsSection} from "./StreamParticipantsSection.tsx";
 import {useDayCard} from "../DayCardContext.tsx";
 import {useStreamEditor} from "./ScheduleEditorStreamEditDialogBodyProvider.tsx";
 import "./ScheduleEditorStreamEditDialogBody.css";
+import { FaSolidTag, FaSolidUserGroup, FaRegularClock } from "solid-icons/fa";
 
 interface ScheduleEditorStreamEditDialogBodyProps {
   stream: {
@@ -36,57 +37,78 @@ export const ScheduleEditorStreamEditDialogBody: Component<ScheduleEditorStreamE
   const {stream, save} = useStreamEditor()
 
   return (
-    <form class="space-y-4" onSubmit={save}>
-      <Title/>
-
-      <Subtitle/>
-
-      <Visibility/>
-
-      <Start/>
-      <DurationAndEndSwitch/>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Accordion class="accordion" collapsible={true}>
-          <Accordion.Item class="accordion__item" value="tags-section">
-            <Accordion.Header class="accordion__item-header">
-              <Accordion.Trigger class="accordion__item-trigger flex items-center justify-between w-full px-4 py-2 bg-gray-100 rounded-lg">
-                <span class="font-medium">Tags ({stream.tags.length})</span>
-                <svg class="h-5 w-5 accordion__item-trigger-icon" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                </svg>
-              </Accordion.Trigger>
-            </Accordion.Header>
-            <Accordion.Content class="accordion__item-content pt-2">
-              <TagsSection
-                streamId={stream.id}
-              />
-            </Accordion.Content>
-          </Accordion.Item>
-        </Accordion>
-
-        <Accordion class="accordion" collapsible={true} >
-          <Accordion.Item class="accordion__item" value="participants-section">
-            <Accordion.Header class="accordion__item-header">
-              <Accordion.Trigger class="accordion__item-trigger flex items-center justify-between w-full px-4 py-2 bg-gray-100 rounded-lg">
-                <span class="font-medium">Participants ({stream.participants.length})</span>
-                <svg class="h-5 w-5 accordion__item-trigger-icon" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                </svg>
-              </Accordion.Trigger>
-            </Accordion.Header>
-            <Accordion.Content class="accordion__item-content pt-2">
-              <StreamParticipantsSection
-                streamId={stream.id}
-              />
-            </Accordion.Content>
-          </Accordion.Item>
-        </Accordion>
+    <form class="space-y-6" onSubmit={save}>
+      <div class="mb-6">
+        <h3 class="text-lg font-medium mb-4 pb-2 border-b border-gray-200">Stream Details</h3>
+        <div class="space-y-4">
+          <Title/>
+          <Subtitle/>
+          <Visibility/>
+        </div>
       </div>
 
-      <Description/>
+      <div class="mb-6">
+        <h3 class="text-lg font-medium mb-4 pb-2 border-b border-gray-200">Time Settings</h3>
+        <div class="space-y-4">
+          <Start/>
+          <DurationAndEndSwitch/>
+        </div>
+      </div>
 
-      <Vods/>
+      <div class="mb-6">
+        <h3 class="text-lg font-medium mb-4 pb-2 border-b border-gray-200">Additional Information</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Accordion class="accordion" collapsible={true}>
+            <Accordion.Item class="accordion__item" value="tags-section">
+              <Accordion.Header class="accordion__item-header">
+                <Accordion.Trigger class="accordion__item-trigger flex items-center justify-between w-full px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-all">
+                  <div class="flex items-center">
+                    <FaSolidTag class="h-5 w-5 mr-2 text-accent" />
+                    <span class="font-medium">Tags ({stream.tags.length})</span>
+                  </div>
+                  <svg class="h-5 w-5 accordion__item-trigger-icon transition-transform" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                  </svg>
+                </Accordion.Trigger>
+              </Accordion.Header>
+              <Accordion.Content class="accordion__item-content pt-2">
+                <TagsSection
+                  streamId={stream.id}
+                />
+              </Accordion.Content>
+            </Accordion.Item>
+          </Accordion>
+
+          <Accordion class="accordion" collapsible={true} >
+            <Accordion.Item class="accordion__item" value="participants-section">
+              <Accordion.Header class="accordion__item-header">
+                <Accordion.Trigger class="accordion__item-trigger flex items-center justify-between w-full px-4 py-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-all">
+                  <div class="flex items-center">
+                    <FaSolidUserGroup class="h-5 w-5 mr-2 text-accent" />
+                    <span class="font-medium">Participants ({stream.participants.length})</span>
+                  </div>
+                  <svg class="h-5 w-5 accordion__item-trigger-icon transition-transform" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                  </svg>
+                </Accordion.Trigger>
+              </Accordion.Header>
+              <Accordion.Content class="accordion__item-content pt-2">
+                <StreamParticipantsSection
+                  streamId={stream.id}
+                />
+              </Accordion.Content>
+            </Accordion.Item>
+          </Accordion>
+        </div>
+      </div>
+
+      <div class="mb-6">
+        <h3 class="text-lg font-medium mb-4 pb-2 border-b border-gray-200">Content Information</h3>
+        <div class="space-y-4">
+          <Description/>
+          <Vods/>
+        </div>
+      </div>
 
       <Show when={action.saveStream.lastErrorMessage}>
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-4">
@@ -100,14 +122,15 @@ export const ScheduleEditorStreamEditDialogBody: Component<ScheduleEditorStreamE
             props.editStreamDialog.close()
             props.deleteDialog.open()
           }}
-          class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-all"
+          class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-all shadow-sm hover:shadow disabled:opacity-50 disabled:cursor-not-allowed"
           disabled={action.saveStream.actionInProgress}
+          type="button"
         >
           Delete
         </button>
         <button
           type="submit"
-          class="bg-accent hover:bg-accent-600 text-white px-4 py-2 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          class="bg-accent hover:bg-accent-600 text-white px-6 py-2 rounded-lg transition-all shadow-sm hover:shadow font-medium disabled:opacity-50 disabled:cursor-not-allowed"
           disabled={action.saveStream.actionInProgress}
         >
           {action.saveStream.actionInProgress ? "Saving..." : "Save"}
@@ -116,12 +139,10 @@ export const ScheduleEditorStreamEditDialogBody: Component<ScheduleEditorStreamE
 
       {/* Display loading indicator when saving */}
       <Show when={action.saveStream.actionInProgress}>
-        <div class="fixed inset-0 bg-black/10 flex items-center justify-center z-50">
-          <div class="bg-white p-4 rounded-lg shadow-xl">
-            <div class="flex items-center gap-2">
-              <div class="animate-spin h-5 w-5 border-2 border-accent border-t-transparent rounded-full"></div>
-              <span>Saving stream...</span>
-            </div>
+        <div class="fixed inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-50">
+          <div class="bg-white p-6 rounded-xl shadow-xl flex flex-col items-center">
+            <div class="animate-spin h-10 w-10 border-3 border-accent border-t-transparent rounded-full mb-4"></div>
+            <span class="text-lg font-medium">Saving your stream...</span>
           </div>
         </div>
       </Show>
@@ -140,7 +161,7 @@ const Title: Component = () => {
     >
       <TextField.Label class="text-sm font-medium mb-1">Title: </TextField.Label>
       <TextField.Input
-        class="border border-gray-300 rounded-lg px-3 py-2"
+        class="border border-gray-300 rounded-lg px-3 py-2 w-full transition-all focus:ring-2 focus:ring-accent focus:border-accent"
       />
     </TextField>
   )
@@ -157,7 +178,7 @@ const Subtitle: Component = () => {
     >
       <TextField.Label class="text-sm font-medium mb-1">Subtitle: </TextField.Label>
       <TextField.Input
-        class="border border-gray-300 rounded-lg px-3 py-2"
+        class="border border-gray-300 rounded-lg px-3 py-2 w-full transition-all focus:ring-2 focus:ring-accent focus:border-accent"
       />
     </TextField>
   )
@@ -168,13 +189,13 @@ const Visibility: Component = () => {
   return (
     <Checkbox
       name="visible"
-      class="items-center inline-flex cursor-pointe"
+      class="items-center inline-flex cursor-pointer"
       checked={stream.visible}
       onChange={setVisible}
     >
       <Checkbox.Input class="sr-only"/>
       <Checkbox.Control
-        class="h-5 w-5 rounded border border-gray-300 bg-white text-blue-600 focus:ring-blue-500 data-[checked]:bg-blue-600 data-[checked]:border-blue-600">
+        class="h-5 w-5 rounded border border-gray-300 bg-white text-accent focus:ring-2 focus:ring-accent data-[checked]:bg-accent data-[checked]:border-accent transition-all">
         <Checkbox.Indicator>
           <svg class="h-4 w-4 text-white" viewBox="0 0 8 8">
             <path stroke="currentColor" stroke-width="1.5" fill="none" d="M1,4 L3,6 L7,2"/>
@@ -200,7 +221,7 @@ const Description: Component = () => {
     >
       <TextField.Label class="text-sm font-medium mb-1">Description: </TextField.Label>
       <TextField.TextArea
-        class="border border-gray-300 rounded-lg px-3 py-2 w-full h-24"
+        class="border border-gray-300 rounded-lg px-3 py-2 w-full h-24 transition-all focus:ring-2 focus:ring-accent focus:border-accent"
       />
     </TextField>
   )
@@ -215,7 +236,6 @@ const Vods: Component = () => {
   } = useStreamEditor()
 
   return (
-
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <TextField
         name="youtubeVodUrl"
@@ -228,7 +248,7 @@ const Vods: Component = () => {
         <TextField.Input
           type="url"
           placeholder="https://www.youtube.com/watch?v=..."
-          class="border border-gray-300 rounded-lg px-3 py-2"
+          class="border border-gray-300 rounded-lg px-3 py-2 w-full transition-all focus:ring-2 focus:ring-accent focus:border-accent"
         />
         <TextField.ErrorMessage class="text-red-500 text-xs mt-1">
           Must be a valid YouTube URL
@@ -246,7 +266,7 @@ const Vods: Component = () => {
         <TextField.Input
           type="url"
           placeholder="https://www.twitch.tv/videos/..."
-          class="border border-gray-300 rounded-lg px-3 py-2"
+          class="border border-gray-300 rounded-lg px-3 py-2 w-full transition-all focus:ring-2 focus:ring-accent focus:border-accent"
         />
         <TextField.ErrorMessage class="text-red-500 text-xs mt-1">
           Must be a valid Twitch URL
@@ -684,14 +704,17 @@ const Start: Component = () => {
       }}
       validationState={stream.start < stream.end ? "valid" : "invalid"}
     >
-      <TextField.Label class="text-sm font-medium mb-1">Start Time: </TextField.Label>
+      <div class="flex items-center gap-2 mb-1">
+        <FaRegularClock class="h-4 w-4 text-accent" />
+        <TextField.Label class="text-sm font-medium">Start Time: </TextField.Label>
+      </div>
       <TextField.Input
         type="datetime-local"
-        class="border border-gray-300 rounded-lg px-3 py-2"
+        class="border border-gray-300 rounded-lg px-3 py-2 w-full transition-all focus:ring-2 focus:ring-accent focus:border-accent"
         min={minStr}
         max={maxStr}
       />
-      <div class="flex items-center gap-2 mt-1">
+      <div class="flex items-center gap-2 mt-2 flex-wrap">
         <button
           type="button"
           disabled={!latestStream()}
@@ -855,14 +878,17 @@ const Duration: Component = () => {
       }}
       validationState={durationMinutes() > 0 ? "valid" : "invalid"}
     >
-      <TextField.Label class="text-sm font-medium mb-1">Length (minutes): </TextField.Label>
+      <div class="flex items-center gap-2 mb-1">
+        <FaRegularClock class="h-4 w-4 text-accent" />
+        <TextField.Label class="text-sm font-medium">Length (minutes): </TextField.Label>
+      </div>
       <TextField.Input
         type="number"
         min="30"
         step="5"
-        class="border border-gray-300 rounded-lg px-3 py-2 flex-1"
+        class="border border-gray-300 rounded-lg px-3 py-2 w-full transition-all focus:ring-2 focus:ring-accent focus:border-accent"
       />
-      <div class="flex items-center gap-2 mt-1">
+      <div class="flex items-center gap-2 mt-2 flex-wrap">
         <button
           type="button"
           disabled={disableEndMinus30Button()}
