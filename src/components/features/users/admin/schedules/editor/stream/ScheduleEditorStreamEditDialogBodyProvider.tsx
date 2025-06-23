@@ -77,7 +77,7 @@ const useScheduleEditorStreamEditDialogBodyHook = (props: {
     }).toFormat("yyyy-MM-dd'T'HH:mm")
   }
 
-  const save = (e: SubmitEvent) => {
+  const save = (e: Event) => {
     e.preventDefault(); // Prevent default form submission
     saveStream(stream);
     props.editStreamDialog.close()
