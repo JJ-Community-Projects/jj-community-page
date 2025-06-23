@@ -33,11 +33,10 @@ interface ScheduleEditorStreamEditDialogBodyProps {
 
 export const ScheduleEditorStreamEditDialogBody: Component<ScheduleEditorStreamEditDialogBodyProps> = (props) => {
   const {action} = useScheduleEditor();
-
-  const {stream, save} = useStreamEditor()
+  const {stream} = useStreamEditor()
 
   return (
-    <form class="space-y-6" onSubmit={save}>
+    <div class="space-y-6">
       <div class="mb-6">
         <h3 class="text-lg font-medium mb-4 pb-2 border-b border-gray-200">Stream Details</h3>
         <div class="space-y-4">
@@ -115,38 +114,7 @@ export const ScheduleEditorStreamEditDialogBody: Component<ScheduleEditorStreamE
           {action.saveStream.lastErrorMessage}
         </div>
       </Show>
-
-      <div class="flex justify-between pt-4 border-t border-gray-200">
-        <button
-          onClick={() => {
-            props.editStreamDialog.close()
-            props.deleteDialog.open()
-          }}
-          class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-all shadow-sm hover:shadow disabled:opacity-50 disabled:cursor-not-allowed"
-          disabled={action.saveStream.actionInProgress}
-          type="button"
-        >
-          Delete
-        </button>
-        <button
-          type="submit"
-          class="bg-accent hover:bg-accent-600 text-white px-6 py-2 rounded-lg transition-all shadow-sm hover:shadow font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-          disabled={action.saveStream.actionInProgress}
-        >
-          {action.saveStream.actionInProgress ? "Saving..." : "Save"}
-        </button>
-      </div>
-
-      {/* Display loading indicator when saving */}
-      <Show when={action.saveStream.actionInProgress}>
-        <div class="fixed inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-50">
-          <div class="bg-white p-6 rounded-xl shadow-xl flex flex-col items-center">
-            <div class="animate-spin h-10 w-10 border-3 border-accent border-t-transparent rounded-full mb-4"></div>
-            <span class="text-lg font-medium">Saving your stream...</span>
-          </div>
-        </div>
-      </Show>
-    </form>
+    </div>
   );
 }
 
