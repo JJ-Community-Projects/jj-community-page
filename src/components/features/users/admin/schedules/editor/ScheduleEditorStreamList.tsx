@@ -177,10 +177,31 @@ export const MobileStreamsList: Component = () => {
 
 // Desktop view - 2 rows of 7 days each
 export const DesktopStreamsList: Component = () => {
+  const {action} = useScheduleEditor();
+
+  return (
+    <div class="bg-white rounded-2xl shadow-xl p-6">
+      <Show when={action.addNewStream.lastErrorMessage || action.deleteStream.lastErrorMessage}>
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-4">
+          {action.addNewStream.lastErrorMessage || action.deleteStream.lastErrorMessage}
+        </div>
+      </Show>
+
+      {/* First week (Dec 1-7) */}
+      <Week1/>
+
+      {/* Second week (Dec 8-14) */}
+      <Week2/>
+
+      {/* Custom Streams Section */}
+      <AllStreams/>
+    </div>
+  );
+}
+
+const Week1: Component = () => {
   const {
-    local,
     addNewStream,
-    addCustomStream,
     getAllDays,
     getStreamsByDay,
     action,
@@ -188,104 +209,114 @@ export const DesktopStreamsList: Component = () => {
 
   // Group days into two rows
   const firstWeek = () => getAllDays().slice(0, 7);
+  return (
+    <div class="mb-6">
+      <h3 class="text-lg font-semibold mb-2">December 1-7</h3>
+      <div class="grid grid-cols-7 gap-4">
+        <For each={firstWeek()}>
+          {(day, index) => (
+            <DayCardProvider
+              start={day}
+              end={day}
+            >
+              <DayCard
+                dayIndex={index()}
+                day={day}
+                streams={getStreamsByDay(day.day)}
+                onAddStream={() => addNewStream(day.day)}
+                isAddingStream={action.addNewStream.actionInProgress}
+              />
+            </DayCardProvider>
+
+          )}
+        </For>
+      </div>
+    </div>
+  )
+}
+
+const Week2: Component = () => {
+  const {
+    addNewStream,
+    getAllDays,
+    getStreamsByDay,
+    action,
+  } = useScheduleEditor();
+
   const secondWeek = () => getAllDays().slice(7, 14);
 
   return (
-    <div class="bg-white rounded-2xl shadow-xl p-6">
-      <h2 class="text-xl font-bold mb-4">December Schedule</h2>
-
-      <Show when={action.addNewStream.lastErrorMessage || action.deleteStream.lastErrorMessage}>
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-4">
-          {action.addNewStream.lastErrorMessage || action.deleteStream.lastErrorMessage}
-        </div>
-      </Show>
-      {/* First week (Dec 1-7) */}
-      <div class="mb-6">
-        <h3 class="text-lg font-semibold mb-2">December 1-7</h3>
-        <div class="grid grid-cols-7 gap-4">
-          <For each={firstWeek()}>
-            {(day, index) => (
-              <DayCardProvider
-                start={day}
-                end={day}
-              >
-                <DayCard
-                  dayIndex={index()}
-                  day={day}
-                  streams={getStreamsByDay(day.day)}
-                  onAddStream={() => addNewStream(day.day)}
-                  isAddingStream={action.addNewStream.actionInProgress}
-                />
-              </DayCardProvider>
-
-            )}
-          </For>
-        </div>
-      </div>
-
-      {/* Second week (Dec 8-14) */}
-      <div>
-        <h3 class="text-lg font-semibold mb-2">December 8-14</h3>
-        <div class="grid grid-cols-7 gap-4">
-          <For each={secondWeek()}>
-            {(day, index) => (
-              <DayCardProvider
-                start={day}
-                end={day}
-              >
-                <DayCard
-                  dayIndex={index()}
-                  day={day}
-                  streams={getStreamsByDay(day.day)}
-                  onAddStream={() => addNewStream(day.day)}
-                  isAddingStream={action.addNewStream.actionInProgress}
-                />
-              </DayCardProvider>
-            )}
-          </For>
-        </div>
-      </div>
-
-      {/* Custom Streams Section */}
-      <div class="mt-8 pt-6 border-t border-gray-200">
-        <div class="flex justify-between items-center mb-4">
-          <h3 class="text-lg font-semibold">Custom Streams</h3>
-          <button
-            onClick={() => addCustomStream()}
-            class="bg-accent hover:bg-accent-400 text-white px-3 py-1 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled={action.addNewStream.actionInProgress}
-          >
-            {action.addNewStream.actionInProgress ? "Adding..." : "Add Stream"}
-          </button>
-        </div>
-
-        <Show when={local.streams.length === 0}>
-          <p class="text-center py-4 text-gray-500">No streams yet. Add one to get started!</p>
-        </Show>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <DayCardProvider
-            start={DateTime.fromObject({
-              year: local.year,
-              month: 11,
-              day: 1,
-            })}
-            end={DateTime.fromObject({
-              year: local.year,
-              month: 12,
-              day: 21,
-            })}>
-            <For
-              each={local.streams}
-              fallback={<p class="text-center py-4 text-gray-500">No streams yet. Add one to get started!</p>}
+    <div>
+      <h3 class="text-lg font-semibold mb-2">December 8-14</h3>
+      <div class="grid grid-cols-7 gap-4">
+        <For each={secondWeek()}>
+          {(day, index) => (
+            <DayCardProvider
+              start={day}
+              end={day}
             >
-              {(stream) => (
-                <StreamCard stream={stream} showDate={true} whiteBackground={false}/>
-              )}
-            </For>
-          </DayCardProvider>
-        </div>
+              <DayCard
+                dayIndex={index()}
+                day={day}
+                streams={getStreamsByDay(day.day)}
+                onAddStream={() => addNewStream(day.day)}
+                isAddingStream={action.addNewStream.actionInProgress}
+              />
+            </DayCardProvider>
+          )}
+        </For>
       </div>
     </div>
-  );
+  )
+}
+
+
+const AllStreams: Component = () => {
+  const {
+    local,
+    addCustomStream,
+    action,
+  } = useScheduleEditor();
+
+  return (
+    <div class="mt-8 pt-6 border-t border-gray-200">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-semibold">Custom Streams</h3>
+        <button
+          onClick={() => addCustomStream()}
+          class="bg-accent hover:bg-accent-400 text-white px-3 py-1 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={action.addNewStream.actionInProgress}
+        >
+          {action.addNewStream.actionInProgress ? "Adding..." : "Add Stream"}
+        </button>
+      </div>
+
+      <Show when={local.streams.length === 0}>
+        <p class="text-center py-4 text-gray-500">No streams yet. Add one to get started!</p>
+      </Show>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <DayCardProvider
+          start={DateTime.fromObject({
+            year: local.year,
+            month: 11,
+            day: 1,
+          })}
+          end={DateTime.fromObject({
+            year: local.year,
+            month: 12,
+            day: 21,
+          })}>
+          <For
+            each={local.streams}
+            fallback={<p class="text-center py-4 text-gray-500">No streams yet. Add one to get started!</p>}
+          >
+            {(stream) => (
+              <StreamCard stream={stream} showDate={true} whiteBackground={false}/>
+            )}
+          </For>
+        </DayCardProvider>
+      </div>
+    </div>
+  )
 }
