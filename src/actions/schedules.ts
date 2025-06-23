@@ -403,7 +403,7 @@ export const schedules = {
       const streamTagValues = streamTags.map(t => t.tag);
 
       // 2. Find the most used tags that aren't part of the stream
-      const popularTags = tagsRepo.getSuggestedTagsForStream(
+      const popularTags = await tagsRepo.getSuggestedTagsForStream(
         streamId,
         scheduleId,
         limit,

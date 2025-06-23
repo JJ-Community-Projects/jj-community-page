@@ -11,11 +11,6 @@ if (session === null) {
   return Astro.redirect("/");
 }
 
-// Verify the user has access to this page
-if (Astro.params.username !== user.tiltifyName) {
-  return Astro.redirect(`/admin/teams`);
-}
-
 // Get team ID from URL
 const teamId = parseInt(Astro.params.teamId || "0");
 if (!teamId) {

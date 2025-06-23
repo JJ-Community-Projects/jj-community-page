@@ -1,9 +1,20 @@
-import {type Component, createMemo, createResource, createSignal, For, Match, Show, Switch, type Signal} from "solid-js";
+import {
+  type Component,
+  createMemo,
+  createResource,
+  createSignal,
+  For,
+  Match,
+  Show,
+  type Signal,
+  Switch
+} from "solid-js";
 import {TextField} from "@kobalte/core/text-field";
 import {debounce} from "@solid-primitives/scheduled";
 import {FaRegularCircle} from "solid-icons/fa";
 import {useScheduleEditor} from "../../../providers/ScheduleEditorProvider.tsx";
 import {createStore, reconcile, unwrap} from "solid-js/store";
+import {useStreamEditor} from "./ScheduleEditorStreamEditDialogBodyProvider.tsx";
 
 function createDeepSignal<T>(value: T): Signal<T> {
   const [store, setStore] = createStore({
@@ -20,25 +31,13 @@ function createDeepSignal<T>(value: T): Signal<T> {
   ] as Signal<T>
 }
 
-interface TagsSectionProps {
-  streamId: string;
-}
-
-export const TagsSection: Component<TagsSectionProps> = (props) => {
+const useTags = () => {
   const {
     local,
-    addTag,
-    removeTag,
-    fetchTags: fetchBackendTags,
+    fetchTags,
     action
   } = useScheduleEditor();
-
-  // Get the current stream's tags from the local store
-  const tags = createMemo(() => {
-    const stream = local.streams.find(s => s.id === props.streamId);
-    return stream?.tags || [];
-  });
-
+  const {stream, removeTag, addTag} = useStreamEditor()
   // State for tag input and suggestions
   const [tagInput, setTagInput] = createSignal("");
   const [debouncedInput, setDebouncedInput] = createSignal("");
@@ -50,78 +49,145 @@ export const TagsSection: Component<TagsSectionProps> = (props) => {
     trigger: refetchTrigger()
   });
 
-  // Debounced input handler
-  const debouncedSetTagInput = debounce((value: string) => {
-    setDebouncedInput(value);
-  }, 1000);
+  const currentTags = createMemo(() => {
+    // const s = local.streams.find(s => s.id === stream?.id);
+    return stream?.tags || [];
+  });
 
-  // Fetch tags function for createResource
-  const fetchTags = async (source: { input: string, trigger: number }) => {
+  const currentTagsIds = () => currentTags().map((t) => t.tag)
+
+  // Create resource for fetching tags
+  const [data] = createResource(tagSource, (source: { input: string, trigger: number }) => {
     console.log('fetchTags', source);
-    return fetchBackendTags({
+    return fetchTags({
       searchTag: source.input ? source.input.length > 0 ? source.input : undefined : undefined,
       stream: {
         scheduleId: local.id,
-        streamId: parseInt(props.streamId),
+        streamId: parseInt(stream.id),
       },
-      exclude: tags().map((t) => t.tag)
+      exclude: currentTags().map((t) => t.tag)
     });
-  };
-
-  // Create resource for fetching tags
-  const [data, { refetch }] = createResource(tagSource, fetchTags, {
+  }, {
     storage: createDeepSignal
   });
 
   // Helper functions for UI - use data.latest to prevent UI flickering during loading
-  const suggestedTags = () => {
-    return (data.latest?.tags || []);
+  const suggestedTags = (): ({
+    tag: string
+    label: string
+    count: number
+  }[]) => {
+    return (data()?.tags ?? data.latest?.tags ?? [])
+      .filter((tag) => !currentTagsIds().includes(tag.tag))
   };
 
   const defaultTags = () => {
-    return (data.latest?.defaultTags || []);
+    return (data()?.defaultTags ?? data.latest?.defaultTags ?? [])
+      .filter((tag) => !currentTagsIds().includes(tag.tag))
   };
 
   const charityTags = () => {
-    return (data.latest?.charityTags || []);
+    return (data()?.charityTags ?? data.latest?.charityTags ?? [])
+      .filter((tag) => !currentTagsIds().includes(tag.tag))
   };
 
-  const isLoadingTags = () => data.loading || action.fetchTags.actionInProgress;
-  const hasTags = () => (suggestedTags().length > 0 || defaultTags().length > 0 || charityTags().length > 0);
-  const hasTagsError = () => !!action.fetchTags.lastErrorMessage;
+  const debouncedSetTagInput = debounce((value: string) => {
+    setDebouncedInput(value);
+  }, 1000);
 
-  // Handle adding a new tag
+  const isLoadingTags = () => data.loading || action.fetchTags.actionInProgress;
+  const hasTags = () => data.latest !== undefined || (suggestedTags().length > 0 || defaultTags().length > 0 || charityTags().length > 0);
+  const hasTagsError = () => !!action.fetchTags.lastErrorMessage;
+  const hasLatest = () => data.latest !== undefined
+
+  const reset = () => {
+    setTagInput("");
+    setDebouncedInput("");
+    // Trigger refetch after adding a tag
+    setRefetchTrigger(prev => prev + 1);
+  }
+
   const handleAddTag = () => {
     console.log("handleAddTag");
     const tagText = tagInput().trim();
-    if (tagText && !tags().some(t => t.tag.toLowerCase() === tagText.toLowerCase())) {
-      addTag(props.streamId, tagText);
-      setTagInput("");
-      setDebouncedInput("");
-      // Trigger refetch after adding a tag
-      setRefetchTrigger(prev => prev + 1);
+    if (tagText && !currentTags().some(t => t.tag.toLowerCase() === tagText.toLowerCase())) {
+      reset()
+      addTag({
+        label: tagText, tag: tagText.toLowerCase()
+      })
     }
   };
 
   // Handle removing a tag
-  const handleRemoveTag = (tagObj: {label: string, tag: string}) => {
-    removeTag(props.streamId, tagObj.tag);
-    // Trigger refetch after removing a tag
+  const handleRemoveTag = (tag: string) => {
+    removeTag(tag)
     setRefetchTrigger(prev => prev + 1);
   };
+
 
   // Handle selecting a suggested tag
   const handleSelectTag = (event: Event, tag: string, label?: string) => {
     event.preventDefault();
     event.stopPropagation();
-    if (!tags().some(t => t.tag.toLowerCase() === tag.toLowerCase())) {
-      addTag(props.streamId, tag);
+    if (!currentTags().some(t => t.tag.toLowerCase() === tag.toLowerCase())) {
+      addTag({
+        label: label ?? tag, tag
+      })
+      setTagInput("");
+      setDebouncedInput("");
+      // Trigger refetch after selecting a tag
+      setRefetchTrigger(prev => prev + 1);
     }
-    setTagInput("");
-    setDebouncedInput("");
-    // Trigger refetch after selecting a tag
-    setRefetchTrigger(prev => prev + 1);
   };
+
+  const isReady = () => data.state === "ready"
+  const hasError = () => data.error !== undefined && data.error !== null;
+  const hasData = () => data() !== undefined && data() !== null;
+
+  return {
+    currentTags,
+    suggestedTags,
+    defaultTags,
+    charityTags,
+    debouncedSetTagInput,
+    tagInput,
+    setTagInput,
+    isLoadingTags,
+    hasTags, hasTagsError,
+    reset,
+    handleAddTag,
+    handleRemoveTag,
+    handleSelectTag,
+    isReady,
+    hasError, hasData, hasLatest
+  }
+}
+
+interface TagsSectionProps {
+  streamId: string;
+}
+
+export const TagsSection: Component<TagsSectionProps> = (props) => {
+  const {
+    action
+  } = useScheduleEditor();
+
+  const {
+    tagInput,
+    setTagInput,
+    debouncedSetTagInput,
+    currentTags,
+    suggestedTags,
+    defaultTags,
+    charityTags,
+    isLoadingTags,
+    handleAddTag,
+    isReady,
+    hasError,
+    hasTags, hasData,
+    handleSelectTag, handleRemoveTag, hasLatest
+  } = useTags()
+
 
   return (
     <div class="space-y-3">
@@ -154,6 +220,11 @@ export const TagsSection: Component<TagsSectionProps> = (props) => {
           <TextField.Description class="text-xs text-gray-500 mt-1">
             You can add any tag. Tags are not case sensitive. Pick tags that describe your stream the best.
           </TextField.Description>
+          <Show when={currentTags().length >= 6}>
+            <div class="mt-1 text-xs text-amber-600 font-medium">
+              You already have {currentTags().length} tags. It's recommended not to add more then 5 tags.
+            </div>
+          </Show>
         </TextField>
       </div>
 
@@ -165,18 +236,18 @@ export const TagsSection: Component<TagsSectionProps> = (props) => {
           {/* State indicator for fetch process */}
           <div class="flex items-center gap-1">
             <Switch>
-              <Match when={data.loading}>
+              <Match when={isLoadingTags()}>
                 <span class="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">
                   <FaRegularCircle class="inline mr-1 text-blue-500 animate-ping" size={8}/>
                   Loading
                 </span>
               </Match>
-              <Match when={data.error}>
+              <Match when={hasError()}>
                 <span class="text-xs bg-red-100 text-red-800 px-2 py-0.5 rounded-full">
                   Error
                 </span>
               </Match>
-              <Match when={data.state === 'ready'}>
+              <Match when={isReady()}>
                 <span class="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded-full">
                   Ready
                 </span>
@@ -192,21 +263,22 @@ export const TagsSection: Component<TagsSectionProps> = (props) => {
           </div>
         }>
           {/* Error state */}
-          <Match when={data.error}>
+          <Match when={hasError()}>
             <div class="flex flex-wrap gap-2 min-h-[28px]">
-              <p class="text-xs text-red-500 mb-1">Error loading tags: {action.fetchTags.lastErrorMessage || "Unknown error"}</p>
+              <p class="text-xs text-red-500 mb-1">Error loading
+                tags: {action.fetchTags.lastErrorMessage || "Unknown error"}</p>
             </div>
           </Match>
 
           {/* Loading state */}
-          <Match when={data.loading && !data.latest}>
+          <Match when={isLoadingTags() && !hasLatest()}>
             <div class="flex flex-wrap gap-2 min-h-[28px]">
               <p class="text-xs text-gray-500">Loading tags...</p>
             </div>
           </Match>
 
           {/* Data state */}
-          <Match when={data.latest && hasTags()}>
+          <Match when={hasData() || (isLoadingTags() && hasLatest())}>
             <div class="flex flex-wrap gap-2 min-h-[28px]">
               {/* Suggested tags */}
               <For each={suggestedTags()}>
@@ -252,17 +324,17 @@ export const TagsSection: Component<TagsSectionProps> = (props) => {
       </div>
 
       {/* Current Tags */}
-      <Show when={tags().length > 0}>
+      <Show when={currentTags().length > 0}>
         <div class="mt-2">
           <p class="text-xs text-gray-500 mb-1">Current tags:</p>
           <div class="flex flex-wrap gap-2">
-            <For each={tags()}>
+            <For each={currentTags()}>
               {(tag) => (
                 <div class="flex items-center bg-accent/10 text-accent px-2 py-1 rounded-full text-sm">
                   {tag.label}
                   <button
                     type="button"
-                    onClick={() => handleRemoveTag(tag)}
+                    onClick={() => handleRemoveTag(tag.tag)}
                     class="ml-1 text-accent hover:text-accent-600"
                     aria-label={`Remove tag ${tag.label}`}
                   >

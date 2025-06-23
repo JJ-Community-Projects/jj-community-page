@@ -101,8 +101,9 @@ export const teams = {
       id: z.number(),
       name: z.string(),
       slug: z.string(),
+      visible: z.boolean().optional(),
     }),
-    handler: async ({id, name, slug}, ctx) => {
+    handler: async ({id, name, slug, visible}, ctx) => {
       const {user, session} = ctx.locals;
       if (!user || !session) {
         throw new ActionError({code: 'UNAUTHORIZED'})
@@ -140,6 +141,7 @@ export const teams = {
       const updatedTeam = await teams.update(id, {
         name: name,
         slug: slug,
+        ...(visible !== undefined && { visible }),
       });
 
       // Update TeamDO
@@ -149,6 +151,7 @@ export const teams = {
         await teamStub.updateTeam({
           name: name,
           slug: slug,
+          ...(visible !== undefined && { visible }),
         })
       } catch (e: any) {
         console.error('Error updating TeamDO:', e);

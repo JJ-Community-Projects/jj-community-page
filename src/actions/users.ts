@@ -863,5 +863,11 @@ export const users = {
       const repo = UserRepo.action(context);
       return repo.findAll();
     }
+  }),
+  findAllTiltifyAccounts: defineAction({
+    handler: (_, context) => {
+      const repo = UserRepo.action(context);
+      return repo.findAllTiltifyAccounts();
+    }
   })
 }

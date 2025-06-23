@@ -222,12 +222,13 @@ const useTeamHook = (teamId: number, user: User) => {
   };
 
   // Update team details (team owner only)
-  const updateTeam = async (name: string, slug: string) => {
+  const updateTeam = async (name: string, slug: string, visible?: boolean) => {
     startAction('updateTeam')
     const result = await actions.teams.update({
       id: teamId,
       name: name,
-      slug: slug
+      slug: slug,
+      visible: visible !== undefined ? visible : local.visible
     });
     stopAction('updateTeam')
     if (result.error) {

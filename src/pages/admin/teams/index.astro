@@ -8,17 +8,6 @@ if (session === null) {
   return Astro.redirect("/");
 }
 
-// Verify the user has access to this page
-if (Astro.params.username !== user.tiltifyName) {
-  return Astro.redirect(`/admin/teams`);
-}
-
-// Get Tiltify account info
-const {data, error} = await Astro.callAction(actions.users.getTiltifyAccount)
-if (error) {
-  console.error(error)
-  return Astro.redirect("/");
-}
 ---
 
 <BaseLayout>

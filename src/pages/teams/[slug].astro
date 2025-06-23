@@ -1,0 +1,22 @@
+---
+import {actions} from "astro:actions";
+import {DebugJSONView} from "../../components/common/DebugJSONView";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+const {slug} = Astro.params
+if (!slug) {
+  return Astro.redirect('/teams')
+}
+const {data, error} = await Astro.callAction(actions.ui.teams.getBySlug, slug)
+---
+<BaseLayout>
+  {
+    error && (
+                  <p>Error: {error.message}</p>
+    )
+  }
+  {data && (
+          <DebugJSONView client:only="solid-js" data={data} title="Debug Team"/>
+
+  )
+  }
+</BaseLayout>

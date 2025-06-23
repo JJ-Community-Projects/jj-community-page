@@ -65,6 +65,21 @@ export class UserRepo extends Repo<typeof users._['config']> {
     }
   }
 
+  async findAllTiltifyAccounts(): Promise<InferSelectModel<typeof accounts>[]> {
+    try {
+      return this.db.select()
+        .from(accounts)
+        .where(eq(accounts.provider, 'tiltify'))
+        .all();
+    } catch (error) {
+      if (this.env === 'action') {
+        throw new DatabaseError("Failed to find all tiltify accounts", error).toActionError();
+      } else {
+        throw new DatabaseError("Failed to find all tiltify accounts", error);
+      }
+    }
+  }
+
   /**
    * Create a new user
    * @param data The data to insert

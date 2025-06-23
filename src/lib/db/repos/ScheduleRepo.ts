@@ -808,6 +808,7 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
       // Filter schedules to only include those owned by team members
       return schedules.filter(schedule => userIds.includes(schedule.ownerId));
     } catch (error) {
+      console.log('ScheduleRepo', 'getTeamMembersSchedules', error);
       if (this.env === 'action') {
         throw new DatabaseError(`Failed to get team members schedules for team: ${teamId}`, error).toActionError();
       } else {
@@ -840,7 +841,6 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
           .where(
             and(
               eq(streamsTable.scheduleId, schedule.id),
-              eq(this.table.primary, true),
               eq(streamsTable.visible, true)
             )
           )
@@ -856,6 +856,7 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
 
       return schedulesWithStreams;
     } catch (error) {
+      console.log('ScheduleRep', 'getTeamMembersSchedulesWithDetails', error);
       if (this.env === 'action') {
         throw new DatabaseError(`Failed to get team members schedules with details for team: ${teamId}`, error).toActionError();
       } else {

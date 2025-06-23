@@ -4,6 +4,7 @@ import {Dialog} from "@kobalte/core/dialog";
 import {type ModalSignal} from "../../../../../../../lib/createModalSignal.ts";
 import {ScheduleEditorStreamEditDialogBody} from "./ScheduleEditorStreamEditDialogBody.tsx";
 import {useDayCard} from "../DayCardContext.tsx";
+import {ScheduleEditorStreamEditDialogBodyProvider} from "./ScheduleEditorStreamEditDialogBodyProvider.tsx";
 
 
 // Dialog for editing a stream
@@ -39,11 +40,17 @@ export const StreamEditDialog: Component<StreamEditDialogProps> = (props) => {
             </Dialog.CloseButton>
           </div>
 
-          <ScheduleEditorStreamEditDialogBody
+          <ScheduleEditorStreamEditDialogBodyProvider
             stream={props.stream}
             editStreamDialog={props.dialog}
             deleteDialog={props.deleteDialog}
-          />
+          >
+            <ScheduleEditorStreamEditDialogBody
+              stream={props.stream}
+              editStreamDialog={props.dialog}
+              deleteDialog={props.deleteDialog}
+            />
+          </ScheduleEditorStreamEditDialogBodyProvider>
 
         </Dialog.Content>
       </Dialog.Portal>

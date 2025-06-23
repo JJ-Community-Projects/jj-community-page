@@ -1,25 +1,16 @@
-import {type Component, createEffect, createMemo, createSignal, For, Show} from "solid-js";
+import {type Component, createMemo, createSignal, For, Show} from "solid-js";
 import {TextField} from "@kobalte/core/text-field";
 import {debounce} from "@solid-primitives/scheduled";
 import {FaRegularCircle} from "solid-icons/fa";
 import {useScheduleEditor} from "../../../providers/ScheduleEditorProvider.tsx";
 import {actions} from "astro:actions";
+import {useStreamEditor} from "./ScheduleEditorStreamEditDialogBodyProvider.tsx";
 
-interface StreamParticipantsSectionProps {
-  streamId: string;
-}
-
-export const StreamParticipantsSection: Component<StreamParticipantsSectionProps> = (props) => {
-  const {
-    local,
-    addParticipant,
-    removeParticipant,
-    action
-  } = useScheduleEditor();
+const useParticipants = () => {
+  const {stream} = useStreamEditor()
 
   // Get the current stream's participants from the local store
   const participants = createMemo(() => {
-    const stream = local.streams.find(s => s.id === props.streamId);
     return stream?.participants || [];
   });
 
@@ -69,15 +60,31 @@ export const StreamParticipantsSection: Component<StreamParticipantsSectionProps
 
   // Handle adding a participant
   const handleAddParticipant = (user: any) => {
-    addParticipant(props.streamId, user.userId, user.providerName, user.provider);
+    // addParticipant(props.streamId, user.userId, user.providerName, user.provider);
     setSearchText("");
     setSearchResults([]);
   };
 
   // Handle removing a participant
   const handleRemoveParticipant = (userId: number) => {
-    removeParticipant(props.streamId, userId);
+    // removeParticipant(props.streamId, userId);
   };
+
+  return {
+    searchText, handleSearchChange, isSearching, error, searchResults, handleAddParticipant,
+    participants, handleRemoveParticipant
+  }
+}
+
+interface StreamParticipantsSectionProps {
+  streamId: string;
+}
+
+export const StreamParticipantsSection: Component<StreamParticipantsSectionProps> = () => {
+  const {searchText, handleSearchChange, isSearching, error, searchResults, handleAddParticipant,handleRemoveParticipant, participants} = useParticipants()
+  const {
+    action
+  } = useScheduleEditor();
 
   return (
     <div class="space-y-3">
@@ -146,7 +153,7 @@ export const StreamParticipantsSection: Component<StreamParticipantsSectionProps
               {(participant) => (
                 <li class="p-2 flex justify-between items-center">
                   <div>
-                    <p class="font-medium">{participant.name}</p>
+                    <p class="font-medium">{participant.providerName}</p>
                   </div>
                   <button
                     class="text-red-500 hover:text-red-700 disabled:opacity-50 disabled:cursor-not-allowed"

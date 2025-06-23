@@ -2,12 +2,12 @@ import {DateTime} from "luxon";
 import type {ModalSignal} from "../../../../../../../lib/createModalSignal.ts";
 import {type Component, Show} from "solid-js";
 import {useScheduleEditor} from "../../../providers/ScheduleEditorProvider.tsx";
-import {createStore} from "solid-js/store";
 import {TextField} from "@kobalte/core/text-field";
 import {Checkbox} from "@kobalte/core/checkbox";
 import {TagsSection} from "./TagsSection.tsx";
 import {StreamParticipantsSection} from "./StreamParticipantsSection.tsx";
 import {useDayCard} from "../DayCardContext.tsx";
+import {useStreamEditor} from "./ScheduleEditorStreamEditDialogBodyProvider.tsx";
 
 interface ScheduleEditorStreamEditDialogBodyProps {
   stream: {
@@ -20,7 +20,7 @@ interface ScheduleEditorStreamEditDialogBodyProps {
     start: DateTime;
     end: DateTime;
     visible: boolean;
-    tags?: {label: string, tag: string}[];
+    tags?: { label: string, tag: string }[];
     participants?: { userId: number, providerName: string, provider: string }[];
     createdBy: number;
   };
@@ -29,141 +29,20 @@ interface ScheduleEditorStreamEditDialogBodyProps {
 }
 
 export const ScheduleEditorStreamEditDialogBody: Component<ScheduleEditorStreamEditDialogBodyProps> = (props) => {
-  const {
-    saveStream,
-    action,
-  } = useScheduleEditor();
-  const {minStr, maxStr} = useDayCard()
+  const {action} = useScheduleEditor();
 
-
-  const [stream, setStream] = createStore<{
-    id: string,
-    title: string,
-    subtitle: string,
-    description: string,
-    youtubeVodUrl: string,
-    twitchVodUrl: string,
-    start: DateTime,
-    end: DateTime,
-    visible: boolean,
-    tags: {label: string, tag: string}[],
-    participants: { userId: number, providerName: string, provider: string }[],
-    createdBy: number
-  }>({
-    id: props.stream.id,
-    title: props.stream.title,
-    subtitle: props.stream.subtitle,
-    description: props.stream.description,
-    youtubeVodUrl: props.stream.youtubeVodUrl || '',
-    twitchVodUrl: props.stream.twitchVodUrl || '',
-    visible: props.stream.visible,
-    start: props.stream.start,
-    end: props.stream.end,
-    tags: props.stream.tags || [],
-    participants: props.stream.participants || [],
-    createdBy: props.stream.createdBy
-  })
-
-  const start = () => stream.start.toLocal()
-  const end = () => stream.end.toLocal()
-
-  const startFormated = () => start().toFormat("yyyy-MM-dd'T'HH:mm")
-  const endFormated = () => end().toFormat("yyyy-MM-dd'T'HH:mm")
-
-
-  const save = (e: SubmitEvent) => {
-    e.preventDefault(); // Prevent default form submission
-    saveStream(stream);
-    props.editStreamDialog.close()
-  }
+  const {stream, save} = useStreamEditor()
 
   return (
     <form class="space-y-4" onSubmit={save}>
-      <TextField
-        name="title"
-        class="flex flex-col"
-        value={stream.title}
-        onChange={(value) => setStream('title', value)}
-      >
-        <TextField.Label class="text-sm font-medium mb-1">Title: </TextField.Label>
-        <TextField.Input
-          class="border border-gray-300 rounded-lg px-3 py-2"
-        />
-      </TextField>
+      <Title/>
 
-      <TextField
-        name="subtitle"
-        class="flex flex-col"
-        value={stream.subtitle}
-        onChange={(value) => setStream('subtitle', value)}
-      >
-        <TextField.Label class="text-sm font-medium mb-1">Subtitle: </TextField.Label>
-        <TextField.Input
-          class="border border-gray-300 rounded-lg px-3 py-2"
-        />
-      </TextField>
+      <Subtitle/>
 
-      <Checkbox
-        name="visible"
-        class="items-center inline-flex cursor-pointe"
-        checked={stream.visible}
-        onChange={(checked) => setStream('visible', checked)}
-      >
-        <Checkbox.Input class="sr-only"/>
-        <Checkbox.Control
-          class="h-5 w-5 rounded border border-gray-300 bg-white text-blue-600 focus:ring-blue-500 data-[checked]:bg-blue-600 data-[checked]:border-blue-600">
-          <Checkbox.Indicator>
-            <svg class="h-4 w-4 text-white" viewBox="0 0 8 8">
-              <path stroke="currentColor" stroke-width="1.5" fill="none" d="M1,4 L3,6 L7,2"/>
-            </svg>
-          </Checkbox.Indicator>
-        </Checkbox.Control>
-        <Checkbox.Label class="ml-2 text-sm font-medium">Visible</Checkbox.Label>
-        <Checkbox.Description class="text-xs text-gray-500 ml-2">When checked, this stream will be publicly
-          visible.</Checkbox.Description>
-      </Checkbox>
+      <Visibility/>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <TextField
-          name="start"
-          class="flex flex-col"
-          value={startFormated() ?? ''}
-          onChange={(value) => setStream('start', DateTime.fromISO(value).toUTC())}
-          validationState={stream.start < stream.end ? "valid" : "invalid"}
-        >
-          <TextField.Label class="text-sm font-medium mb-1">Start Time: </TextField.Label>
-          <TextField.Input
-            type="datetime-local"
-            class="border border-gray-300 rounded-lg px-3 py-2"
-            min={minStr}
-            max={maxStr}
-          />
-          <TextField.ErrorMessage class="text-red-500 text-xs mt-1">Start time must be before end
-            time</TextField.ErrorMessage>
-          <TextField.Description
-            class="text-xs text-gray-500 mt-1">Day: {stream.start.toFormat("cccc, MMMM d")}</TextField.Description>
-        </TextField>
-
-        <TextField
-          name="end"
-          class="flex flex-col"
-          value={endFormated() ?? ''}
-          onChange={(value) => setStream('end', DateTime.fromISO(value).toUTC())}
-          validationState={stream.end > stream.start ? "valid" : "invalid"}
-        >
-          <TextField.Label class="text-sm font-medium mb-1">End Time: </TextField.Label>
-          <TextField.Input
-            type="datetime-local"
-            class="border border-gray-300 rounded-lg px-3 py-2"
-            min={minStr}
-            max={maxStr}
-          />
-          <TextField.ErrorMessage class="text-red-500 text-xs mt-1">End time must be after start
-            time</TextField.ErrorMessage>
-          <TextField.Description
-            class="text-xs text-gray-500 mt-1">Day: {stream.end.toFormat("cccc, MMMM d")}</TextField.Description>
-        </TextField>
-      </div>
+      <Dates/>
+      <Dates2/>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <TagsSection
@@ -174,57 +53,9 @@ export const ScheduleEditorStreamEditDialogBody: Component<ScheduleEditorStreamE
         />
       </div>
 
-      <TextField
-        name="description"
-        class={'flex flex-col'}
-        value={stream.description}
-        onChange={(value) => setStream('description', value)}
-      >
-        <TextField.Label class="text-sm font-medium mb-1">Description: </TextField.Label>
-        <TextField.TextArea
-          class="border border-gray-300 rounded-lg px-3 py-2 w-full h-24"
-        />
-      </TextField>
+      <Description/>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <TextField
-          name="youtubeVodUrl"
-          class="flex flex-col"
-          value={stream.youtubeVodUrl}
-          onChange={(value) => setStream('youtubeVodUrl', value)}
-          validationState={!stream.youtubeVodUrl || stream.youtubeVodUrl === '' || stream.youtubeVodUrl.startsWith('https://www.youtube.com/') || stream.youtubeVodUrl.startsWith('https://youtu.be/') ? "valid" : "invalid"}
-        >
-          <TextField.Label class="text-sm font-medium mb-1">YouTube VOD URL: </TextField.Label>
-          <TextField.Input
-            type="url"
-            placeholder="https://www.youtube.com/watch?v=..."
-            class="border border-gray-300 rounded-lg px-3 py-2"
-          />
-          <TextField.ErrorMessage class="text-red-500 text-xs mt-1">
-            Must be a valid YouTube URL
-          </TextField.ErrorMessage>
-        </TextField>
-
-        <TextField
-          name="twitchVodUrl"
-          class="flex flex-col"
-          value={stream.twitchVodUrl}
-          onChange={(value) => setStream('twitchVodUrl', value)}
-          validationState={!stream.twitchVodUrl || stream.twitchVodUrl === '' || stream.twitchVodUrl.startsWith('https://www.twitch.tv/') ? "valid" : "invalid"}
-        >
-          <TextField.Label class="text-sm font-medium mb-1">Twitch VOD URL: </TextField.Label>
-          <TextField.Input
-            type="url"
-            placeholder="https://www.twitch.tv/videos/..."
-            class="border border-gray-300 rounded-lg px-3 py-2"
-          />
-          <TextField.ErrorMessage class="text-red-500 text-xs mt-1">
-            Must be a valid Twitch URL
-          </TextField.ErrorMessage>
-        </TextField>
-      </div>
-
-
+      <Vods/>
 
       <Show when={action.saveStream.lastErrorMessage}>
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-4">
@@ -264,6 +95,473 @@ export const ScheduleEditorStreamEditDialogBody: Component<ScheduleEditorStreamE
         </div>
       </Show>
     </form>
-
   );
+}
+
+const Title: Component = () => {
+  const {stream, setTitle} = useStreamEditor()
+  return (
+    <TextField
+      name="title"
+      class="flex flex-col"
+      value={stream.title}
+      onChange={setTitle}
+    >
+      <TextField.Label class="text-sm font-medium mb-1">Title: </TextField.Label>
+      <TextField.Input
+        class="border border-gray-300 rounded-lg px-3 py-2"
+      />
+    </TextField>
+  )
+}
+
+const Subtitle: Component = () => {
+  const {stream, setSubtitle} = useStreamEditor()
+  return (
+    <TextField
+      name="subtitle"
+      class="flex flex-col"
+      value={stream.subtitle}
+      onChange={setSubtitle}
+    >
+      <TextField.Label class="text-sm font-medium mb-1">Subtitle: </TextField.Label>
+      <TextField.Input
+        class="border border-gray-300 rounded-lg px-3 py-2"
+      />
+    </TextField>
+  )
+}
+
+const Visibility: Component = () => {
+  const {stream, setVisible} = useStreamEditor()
+  return (
+    <Checkbox
+      name="visible"
+      class="items-center inline-flex cursor-pointe"
+      checked={stream.visible}
+      onChange={setVisible}
+    >
+      <Checkbox.Input class="sr-only"/>
+      <Checkbox.Control
+        class="h-5 w-5 rounded border border-gray-300 bg-white text-blue-600 focus:ring-blue-500 data-[checked]:bg-blue-600 data-[checked]:border-blue-600">
+        <Checkbox.Indicator>
+          <svg class="h-4 w-4 text-white" viewBox="0 0 8 8">
+            <path stroke="currentColor" stroke-width="1.5" fill="none" d="M1,4 L3,6 L7,2"/>
+          </svg>
+        </Checkbox.Indicator>
+      </Checkbox.Control>
+      <Checkbox.Label class="ml-2 text-sm font-medium">Visible</Checkbox.Label>
+      <Checkbox.Description class="text-xs text-gray-500 ml-2">When checked, this stream will be publicly
+        visible.</Checkbox.Description>
+    </Checkbox>
+  )
+}
+
+const Description: Component = () => {
+  const {stream, setDescription} = useStreamEditor()
+
+  return (
+    <TextField
+      name="description"
+      class={'flex flex-col'}
+      value={stream.description}
+      onChange={setDescription}
+    >
+      <TextField.Label class="text-sm font-medium mb-1">Description: </TextField.Label>
+      <TextField.TextArea
+        class="border border-gray-300 rounded-lg px-3 py-2 w-full h-24"
+      />
+    </TextField>
+  )
+}
+
+const Vods: Component = () => {
+
+  const {
+    stream,
+    setYouTubeVodUrl,
+    setTwitchVodUrl,
+  } = useStreamEditor()
+
+  return (
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <TextField
+        name="youtubeVodUrl"
+        class="flex flex-col"
+        value={stream.youtubeVodUrl}
+        onChange={setYouTubeVodUrl}
+        validationState={!stream.youtubeVodUrl || stream.youtubeVodUrl === '' || stream.youtubeVodUrl.startsWith('https://www.youtube.com/') || stream.youtubeVodUrl.startsWith('https://youtu.be/') ? "valid" : "invalid"}
+      >
+        <TextField.Label class="text-sm font-medium mb-1">YouTube VOD URL: </TextField.Label>
+        <TextField.Input
+          type="url"
+          placeholder="https://www.youtube.com/watch?v=..."
+          class="border border-gray-300 rounded-lg px-3 py-2"
+        />
+        <TextField.ErrorMessage class="text-red-500 text-xs mt-1">
+          Must be a valid YouTube URL
+        </TextField.ErrorMessage>
+      </TextField>
+
+      <TextField
+        name="twitchVodUrl"
+        class="flex flex-col"
+        value={stream.twitchVodUrl}
+        onChange={setTwitchVodUrl}
+        validationState={!stream.twitchVodUrl || stream.twitchVodUrl === '' || stream.twitchVodUrl.startsWith('https://www.twitch.tv/') ? "valid" : "invalid"}
+      >
+        <TextField.Label class="text-sm font-medium mb-1">Twitch VOD URL: </TextField.Label>
+        <TextField.Input
+          type="url"
+          placeholder="https://www.twitch.tv/videos/..."
+          class="border border-gray-300 rounded-lg px-3 py-2"
+        />
+        <TextField.ErrorMessage class="text-red-500 text-xs mt-1">
+          Must be a valid Twitch URL
+        </TextField.ErrorMessage>
+      </TextField>
+    </div>
+  )
+}
+
+
+const Dates: Component = () => {
+  const {stream, setStart, setEnd} = useStreamEditor()
+  const {minStr, maxStr} = useDayCard()
+  const start = () => stream.start.toLocal()
+  const end = () => stream.end.toLocal()
+
+  const startFormated = () => start().toFormat("yyyy-MM-dd'T'HH:mm")
+  const endFormated = () => end().toFormat("yyyy-MM-dd'T'HH:mm")
+
+  const localEndDateMin = () => {
+    return start().plus({
+      hours: 1,
+    }).toFormat("yyyy-MM-dd'T'HH:mm")
+  }
+
+  const localStartDateMax = () => {
+    return end().minus({
+      hours: 1,
+    }).toFormat("yyyy-MM-dd'T'HH:mm")
+  }
+  return (
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <TextField
+        name="start"
+        class="flex flex-col"
+        value={startFormated() ?? ''}
+        onChange={(value) => setStart(DateTime.fromISO(value).toUTC())}
+        validationState={stream.start < stream.end ? "valid" : "invalid"}
+      >
+        <TextField.Label class="text-sm font-medium mb-1">Start Time: </TextField.Label>
+        <TextField.Input
+          type="datetime-local"
+          class="border border-gray-300 rounded-lg px-3 py-2"
+          min={minStr}
+          max={localStartDateMax()}
+        />
+        <TextField.ErrorMessage class="text-red-500 text-xs mt-1">Start time must be before end
+          time</TextField.ErrorMessage>
+        <TextField.Description
+          class="text-xs text-gray-500 mt-1">Day: {stream.start.toFormat("cccc, MMMM d")}</TextField.Description>
+      </TextField>
+
+      <TextField
+        name="end"
+        class="flex flex-col"
+        value={endFormated() ?? ''}
+        onChange={(value) => setEnd(DateTime.fromISO(value).toUTC())}
+        validationState={stream.end > stream.start ? "valid" : "invalid"}
+      >
+        <TextField.Label class="text-sm font-medium mb-1">End Time: </TextField.Label>
+        <TextField.Input
+          type="datetime-local"
+          class="border border-gray-300 rounded-lg px-3 py-2"
+          min={localEndDateMin()}
+          max={maxStr}
+        />
+        <TextField.ErrorMessage class="text-red-500 text-xs mt-1">End time must be after start
+          time</TextField.ErrorMessage>
+        <TextField.Description
+          class="text-xs text-gray-500 mt-1">Day: {stream.end.toFormat("cccc, MMMM d")}</TextField.Description>
+      </TextField>
+    </div>
+  )
+}
+
+
+const Dates2: Component = () => {
+  const {action, local} = useScheduleEditor();
+  const {stream, setStart, setEnd} = useStreamEditor()
+
+  const otherStreams = () => {
+    return local.streams.filter((s) => s.id !== stream.id && s.end.hasSame(stream.end, 'day'))
+  }
+
+  const latestStream = () => {
+    const streams = otherStreams()
+    if (streams.length === 0) return null
+    return streams.reduce((latest, current) => {
+      return latest.end >= current.end ? latest : current
+    })
+  }
+
+  const setStartAfterLatestSteam = () => {
+    const latest = latestStream()
+    if (!latest) return // No latest stream to set after
+
+    // Get current duration
+    const currentDuration = durationMinutes()
+
+    // Set start time to the end time of the latest stream
+    const newStart = latest.end.toLocal()
+    setStart(newStart.toUTC())
+
+    // Update end time based on new start time and current duration
+    updateEndFromDuration(currentDuration)
+  }
+
+  const {minStr, maxStr, min, max} = useDayCard()
+  const start = () => stream.start.toLocal()
+  const end = () => stream.end.toLocal()
+
+  const startFormated = () => start().toFormat("yyyy-MM-dd'T'HH:mm")
+
+  // Calculate duration in minutes between start and end
+  const durationMinutes = () => {
+    const diffMillis = end().diff(start()).milliseconds
+    return Math.round(diffMillis / (1000 * 60))
+  }
+
+  // Update end time based on start time and duration
+  const updateEndFromDuration = (minutes: number) => {
+    const newEnd = start().plus({minutes})
+    // Ensure end time doesn't exceed max allowed time
+    const maxDateTime = DateTime.fromISO(maxStr)
+    if (newEnd <= maxDateTime) {
+      setEnd(newEnd.toUTC())
+    } else {
+      setEnd(maxDateTime.toUTC())
+    }
+  }
+
+  const disableStartMinus15Button = () => {
+    const s = start().minus({minutes: 15})
+    return s < min
+  }
+
+  const disableStartPlus15Button = () => {
+    const s = start().plus({minutes: 15})
+    return s > max
+  }
+
+  const disableStartMinus30Button = () => {
+    const s = start().minus({minutes: 30})
+    return s < min
+  }
+
+  const disableStartPlus30Button = () => {
+    const s = start().plus({minutes: 30})
+    return s > max
+  }
+
+  const disableEndMinus15Button = () => {
+    const s = end().minus({minutes: 15})
+    return s < min || durationMinutes() <= 15
+  }
+
+  const disableEndPlus15Button = () => {
+    const s = end().plus({minutes: 15})
+    return s > max
+  }
+
+  const disableEndMinus30Button = () => {
+    const s = end().minus({minutes: 30})
+    return s < min || durationMinutes() <= 30
+  }
+
+  const disableEndPlus30Button = () => {
+    const s = end().plus({minutes: 30})
+    return s > max
+  }
+
+  return (
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <TextField
+        name="start"
+        class="flex flex-col"
+        value={startFormated() ?? ''}
+        onChange={(value) => {
+          const currentDuration = durationMinutes()
+          const newStart = DateTime.fromISO(value)
+          const newEnd = DateTime.fromISO(value).plus({minutes: currentDuration})
+          setStart(newStart.toUTC())
+          setEnd(newEnd.toUTC())
+        }}
+        validationState={stream.start < stream.end ? "valid" : "invalid"}
+      >
+        <TextField.Label class="text-sm font-medium mb-1">Start Time: </TextField.Label>
+        <TextField.Input
+          type="datetime-local"
+          class="border border-gray-300 rounded-lg px-3 py-2"
+          min={minStr}
+          max={maxStr}
+        />
+        <div class="flex items-center gap-2 mt-1">
+          <button
+            type="button"
+            disabled={!latestStream()}
+            class="bg-accent hover:bg-accent-600 text-white px-3 py-2 rounded-lg transition-all text-xxs disabled:opacity-50 disabled:cursor-not-allowed"
+            title="Set start time after latest stream"
+            onClick={setStartAfterLatestSteam}
+          >
+            After Latest
+          </button>
+          <button
+            type="button"
+            disabled={disableStartMinus30Button()}
+            class="bg-accent hover:bg-accent-600 text-white px-3 py-2 rounded-lg transition-all text-xxs disabled:opacity-50 disabled:cursor-not-allowed"
+            title="Decrease start time by 30 minutes"
+            onClick={() => {
+              setStart((d) => d.minus({minutes: 30}))
+              setEnd((d) => d.minus({minutes: 30}))
+            }}
+          >
+            -30m
+          </button>
+          <button
+            type="button"
+            disabled={disableStartMinus15Button()}
+            class="bg-accent hover:bg-accent-600 text-white px-3 py-2 rounded-lg transition-all text-xxs disabled:opacity-50 disabled:cursor-not-allowed"
+            title="Decrease start time by 15 minutes"
+            onClick={() => {
+              setStart((d) => d.minus({minutes: 15}))
+              setEnd((d) => d.minus({minutes: 15}))
+            }}
+          >
+            -15m
+          </button>
+          <button
+            type="button"
+            disabled={disableStartPlus15Button()}
+            class="bg-accent hover:bg-accent-600 text-white px-3 py-2 rounded-lg transition-all text-xxs disabled:opacity-50 disabled:cursor-not-allowed"
+            title="Increase start time by 15 minutes"
+            onClick={() => {
+              setStart((d) => d.plus({minutes: 15}))
+              setEnd((d) => d.plus({minutes: 15}))
+            }}
+          >
+            +15m
+          </button>
+          <button
+            type="button"
+            disabled={disableStartPlus30Button()}
+            class="bg-accent hover:bg-accent-600 text-white px-3 py-2 rounded-lg transition-all text-xxs disabled:opacity-50 disabled:cursor-not-allowed"
+            title="Increase start time by 30 minutes"
+            onClick={() => {
+              setStart((d) => d.plus({minutes: 30}))
+              setEnd((d) => d.plus({minutes: 30}))
+            }}
+          >
+            +30m
+          </button>
+        </div>
+        <TextField.ErrorMessage class="text-red-500 text-xs mt-1">
+          Start time must be before end time
+        </TextField.ErrorMessage>
+        <TextField.Description class="text-xs text-gray-500 mt-1">
+          Day: {stream.start.toFormat("cccc, MMMM d")}
+        </TextField.Description>
+      </TextField>
+
+      <TextField
+        name="duration"
+        class="flex flex-col"
+        value={durationMinutes().toString()}
+        onChange={(value) => {
+          const minutes = parseInt(value)
+          if (!isNaN(minutes) && minutes > 0) {
+            updateEndFromDuration(minutes)
+          }
+        }}
+        validationState={durationMinutes() > 0 ? "valid" : "invalid"}
+      >
+        <TextField.Label class="text-sm font-medium mb-1">Length (minutes): </TextField.Label>
+        <TextField.Input
+          type="number"
+          min="30"
+          step="5"
+          class="border border-gray-300 rounded-lg px-3 py-2 flex-1"
+        />
+        <div class="flex items-center gap-2 mt-1">
+          <button
+            type="button"
+            disabled={disableEndMinus30Button()}
+            class="bg-accent hover:bg-accent-600 text-white px-3 py-2 rounded-lg transition-all text-xxs disabled:opacity-50 disabled:cursor-not-allowed"
+            title="Decrease duration by 30 minutes"
+            onClick={() => {
+              const currentDuration = durationMinutes()
+              updateEndFromDuration(Math.max(1, currentDuration - 30))
+            }}
+          >
+            -30m
+          </button>
+          <button
+            type="button"
+            disabled={disableEndMinus15Button()}
+            class="bg-accent hover:bg-accent-600 text-white px-3 py-2 rounded-lg transition-all text-xxs disabled:opacity-50 disabled:cursor-not-allowed"
+            title="Decrease duration by 15 minutes"
+            onClick={() => {
+              const currentDuration = durationMinutes()
+              updateEndFromDuration(Math.max(1, currentDuration - 15))
+            }}
+          >
+            -15m
+          </button>
+          <button
+            type="button"
+            class="bg-accent hover:bg-accent-600 text-white px-3 py-2 rounded-lg transition-all text-xxs"
+            title="Set duration to 3 hours"
+            onClick={() => {
+              updateEndFromDuration(180)
+            }}
+          >
+            3h
+          </button>
+          <button
+            type="button"
+            disabled={disableEndPlus15Button()}
+            class="bg-accent hover:bg-accent-600 text-white px-3 py-2 rounded-lg transition-all text-xxs disabled:opacity-50 disabled:cursor-not-allowed"
+            title="Increase duration by 15 minutes"
+            onClick={() => {
+              const currentDuration = durationMinutes()
+              updateEndFromDuration(currentDuration + 15)
+            }}
+          >
+            +15m
+          </button>
+          <button
+            type="button"
+            disabled={disableEndPlus30Button()}
+            class="bg-accent hover:bg-accent-600 text-white px-3 py-2 rounded-lg transition-all text-xxs disabled:opacity-50 disabled:cursor-not-allowed"
+            title="Increase duration by 30 minutes"
+            onClick={() => {
+              const currentDuration = durationMinutes()
+              updateEndFromDuration(currentDuration + 30)
+            }}
+          >
+            +30m
+          </button>
+        </div>
+        <TextField.ErrorMessage class="text-red-500 text-xs mt-1">
+          Duration must be greater than 0
+        </TextField.ErrorMessage>
+        <TextField.Description class="text-xs text-gray-500 mt-1">
+          End time: {end().toFormat("h:mm a")} ({end().toFormat("cccc, MMMM d")})
+        </TextField.Description>
+      </TextField>
+    </div>
+  )
 }

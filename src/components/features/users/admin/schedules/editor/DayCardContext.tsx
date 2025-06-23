@@ -13,6 +13,8 @@ const useDayCardHook = (
   return {
     minStr,
     maxStr,
+    min: start.startOf('day'),
+    max: start.endOf('day')
   }
 }
 

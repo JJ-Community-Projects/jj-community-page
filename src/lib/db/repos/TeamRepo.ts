@@ -357,6 +357,7 @@ export class TeamRepo extends Repo<typeof teamsTable._['config']> {
         .where(eq(teamMembersTable.teamId, teamId))
         .all();
     } catch (error) {
+      console.log('TeamRepo', 'getTeamMembers', error)
       if (this.env === 'action') {
         throw new DatabaseError(`Failed to get members for team with id: ${teamId}`, error).toActionError();
       } else {

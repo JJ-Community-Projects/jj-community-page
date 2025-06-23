@@ -5,6 +5,7 @@ import {useUser} from "../../providers/UserProvider.tsx";
 import {createStore} from "solid-js/store";
 import {debounce} from "@solid-primitives/scheduled";
 import {TextField} from "@kobalte/core/text-field";
+import {Checkbox} from "@kobalte/core/checkbox";
 
 const Correct = () => {
   return (
@@ -31,6 +32,7 @@ export const AdminTeamSettingsSection: Component = () => {
   const [state, setState] = createStore<{
     name: string,
     slug: string,
+    visible: boolean,
     slugValid: boolean,
     errorMessage?: string,
     isCheckingSlug: boolean,
@@ -38,6 +40,7 @@ export const AdminTeamSettingsSection: Component = () => {
   }>({
     name: local.name,
     slug: local.slug,
+    visible: local.visible,
     slugValid: true,
     isCheckingSlug: false,
     suggestions: []
@@ -46,6 +49,7 @@ export const AdminTeamSettingsSection: Component = () => {
   createEffect(() => {
     setState('name', local.name);
     setState('slug', local.slug);
+    setState('visible', local.visible);
     setState('suggestions', []);
     setState('slugValid', true);
   })
@@ -110,18 +114,18 @@ export const AdminTeamSettingsSection: Component = () => {
 
 
   const save = async () => {
-    await updateTeam(state.name, state.slug);
+    await updateTeam(state.name, state.slug, state.visible);
   }
 
   const disableButton = () => {
     // Disable button if:
     // 1. Slug is not valid
     // 2. Action is in progress
-    // 3. No changes have been made
+    // 3. No changes have been made (name, slug, or visibility)
     // 4. slug is empty
     return !state.slugValid ||
       action.updateTeam.actionInProgress ||
-      (state.name === local.name && state.slug === local.slug) ||
+      (state.name === local.name && state.slug === local.slug && state.visible === local.visible) ||
       state.slug === '' ||
       state.isCheckingSlug;
   }
@@ -197,6 +201,25 @@ export const AdminTeamSettingsSection: Component = () => {
       <p class="text-xs text-gray-500 mt-1">
         This will be used in URLs: jj.ostof.dev/teams/{state.slug || "your-team-slug"}
       </p>
+
+      <Checkbox
+        checked={state.visible}
+        onChange={(checked) => setState('visible', checked)}
+        class="flex items-start mt-4"
+      >
+        <Checkbox.Input class="sr-only"/>
+        <Checkbox.Control
+          class="flex h-5 w-5 items-center justify-center rounded border border-gray-300 bg-white data-[checked]:bg-accent data-[checked]:border-accent">
+          <Checkbox.Indicator>
+            <FaRegularCircleCheck class="text-white" size={14}/>
+          </Checkbox.Indicator>
+        </Checkbox.Control>
+        <Checkbox.Label class="ml-2 text-sm font-medium">Team Visible</Checkbox.Label>
+        <Checkbox.Description class="text-xs text-gray-500 ml-2">
+          When checked, this team will be publicly visible in team listings and searchable.
+        </Checkbox.Description>
+      </Checkbox>
+
       <button
         class="bg-accent hover:bg-accent-400 text-white px-3 py-2 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-6"
         onClick={save}

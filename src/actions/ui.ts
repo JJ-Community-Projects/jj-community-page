@@ -2,6 +2,7 @@ import {ActionError, defineAction} from "astro:actions";
 import {z} from "astro:content";
 import {ScheduleUIRepo} from "../lib/db/repos/ScheduleUIRepo.ts";
 import {fullJJExampleSchedule} from "../functions/exampleSchedule.ts";
+import {TeamRepo} from "../lib/db/repos/TeamRepo.ts";
 
 export const ui = {
   user: {
@@ -105,6 +106,46 @@ export const ui = {
           }
         }
       })
-    }
+    },
+  },
+  teams: {
+    getById: defineAction({
+      input: z.number(),
+      handler: async (teamId, context) => {
+        const teamRepo =  TeamRepo.action(context);
+        const team = await teamRepo.findById(teamId);
+        if (!team) {
+          return null;
+        }
+        const scheduleRepo = ScheduleUIRepo.action(context);
+        const teamSchedule = await scheduleRepo.getTeamSchedule(teamId);
+        if (!teamSchedule) {
+          throw new ActionError({code: 'NOT_FOUND', message: 'Schedule not found.'});
+        }
+        return {
+          team: team,
+          ...teamSchedule,
+        }
+      }
+    }),
+    getBySlug: defineAction({
+      input: z.string(),
+      handler: async (slug, context) => {
+        const teamRepo =  TeamRepo.action(context);
+        const team = await teamRepo.findBySlug(slug);
+        if (!team) {
+          return null;
+        }
+        const scheduleRepo = ScheduleUIRepo.action(context);
+        const teamSchedule = await scheduleRepo.getTeamSchedule(team.id);
+        if (!teamSchedule) {
+          throw new ActionError({code: 'NOT_FOUND', message: 'Schedule not found.'});
+        }
+        return {
+          team: team,
+          ...teamSchedule,
+        }
+      }
+    })
   }
 }

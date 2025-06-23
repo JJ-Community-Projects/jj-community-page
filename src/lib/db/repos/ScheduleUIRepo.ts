@@ -1,6 +1,9 @@
 import {drizzle, DrizzleD1Database} from "drizzle-orm/d1";
 import type {RepoEnv} from "./Repo.ts";
 import {ScheduleRepo} from "./ScheduleRepo.ts";
+import {TeamRepo} from "./TeamRepo.ts";
+import {StreamTagRepo} from "./StreamTagRepo.ts";
+import {StreamParticipantsRepo} from "./StreamParticipantsRepo.ts";
 import type {InferSelectModel} from "drizzle-orm";
 import {schedulesTable,} from "../schema/schema.ts";
 import {DateTime} from "luxon";
@@ -15,6 +18,7 @@ import type {
   ScheduleWeekUI, TeamScheduleUI
 } from "../models/schedule-ui.ts";
 import type {ActionAPIContext} from "astro:actions";
+import {DatabaseError} from "./DatabaseError";
 
 
 export class ScheduleUIRepo {
@@ -692,9 +696,86 @@ export class ScheduleUIRepo {
     });
   }
 
-  
 
+
+  /**
+   * Get a team schedule with all streams from team members' schedules
+   *
+   * This function performs the following operations:
+   * 1. Gets the team information
+   * 2. Gets all schedules with streams for team members
+   * 3. Enhances each stream with tags and participants
+   * 4. Groups all streams by day
+   * 5. Returns the formatted data according to the TeamScheduleUI type
+   *
+   * @param teamId - The ID of the team to get the schedule for
+   * @returns Promise resolving to a TeamScheduleUI object or null if the team is not found
+   */
   async getTeamSchedule(teamId: number): Promise<TeamScheduleUI | null> {
+    try {
+      // Get all schedules with streams for team members
+      const schedulesWithStreams = await this.scheduleRepo.getTeamMembersSchedulesWithDetails(teamId);
 
+      if (!schedulesWithStreams || schedulesWithStreams.length === 0) {
+        return null
+      }
+
+      // Create instances of the repos we need for tags and participants
+      const tagRepo = new StreamTagRepo(this.db, this.env);
+      const participantRepo = new StreamParticipantsRepo(this.db, this.env);
+
+      // Prepare the result object
+      const result: TeamScheduleUI = {
+        streams: [],
+        days: [],
+        schedules: []
+      };
+
+      // Process each schedule
+      for (const scheduleWithStreams of schedulesWithStreams) {
+        const { schedule, streams } = scheduleWithStreams;
+
+        // Get all schedule IDs to fetch tags and participants in bulk
+        const scheduleId = schedule.id;
+
+        // Fetch all tags and participants for all streams in the schedule at once
+        const tagsByStreamId = await tagRepo.findTagsUIGroupedByStream(scheduleId);
+        const participantsByStreamId = await participantRepo.findParticipantsUIByStream(scheduleId);
+
+        // Enhance each stream with its tags and participants
+        const enhancedStreams = streams.map(stream => {
+          return {
+            ...stream,
+            tags: tagsByStreamId[stream.id] || [],
+            participants: participantsByStreamId[stream.id] || []
+          };
+        });
+
+        // Group streams by day
+        const days = this.groupStreamsByDay(enhancedStreams);
+
+        // Add to the result
+        result.schedules.push({
+          schedule,
+          streams: enhancedStreams,
+          days
+        });
+
+        // Add all streams to the combined streams array
+        result.streams = [...result.streams, ...enhancedStreams];
+      }
+
+      // Group all streams by day
+      result.days = this.groupStreamsByDay(result.streams);
+
+      return result;
+    } catch (error) {
+      console.log('ScheduleUI', 'getTeamSchedule', error);
+      if (this.env === 'action') {
+        throw new DatabaseError(`Failed to get team schedule for team with id: ${teamId}`, error).toActionError();
+      } else {
+        throw new DatabaseError(`Failed to get team schedule for team with id: ${teamId}`, error);
+      }
+    }
   }
 }

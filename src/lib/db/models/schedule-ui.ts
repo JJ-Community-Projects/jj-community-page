@@ -1,6 +1,6 @@
 import type {DateTime} from "luxon";
 import type {InferSelectModel} from "drizzle-orm";
-import {streamsTable} from "../schema/schema.ts";
+import {streamsTable, teamsTable} from "../schema/schema.ts";
 import type {Prettify} from "../../Prettify.ts";
 import type {Schedule} from "./schedule-base.ts";
 
@@ -115,4 +115,15 @@ export type ScheduleUI = {
   days: ScheduleDayUI[],
   weeks: ScheduleGroupedWeeks,
   stats: ScheduleUIStats
+}
+
+
+export type TeamScheduleUI = {
+  streams: DetailedStream[],
+  days: ScheduleDayUI[],
+  schedules: {
+    schedule: Schedule,
+    streams: DetailedStream[],
+    days: ScheduleDayUI[],
+  }[]
 }

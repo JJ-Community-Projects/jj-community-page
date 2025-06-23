@@ -1,0 +1,63 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import {actions} from "astro:actions";
+const {data, error } = await Astro.callAction(actions.users.findAllTiltifyAccounts, {})
+
+// Function to parse the meta field and extract avatar URL
+function getAvatarFromMeta(meta: unknown): string {
+  if (!meta) return "https://assets.tiltify.com/assets/default-avatar.png";
+
+  try {
+    // Check if meta is a string before parsing
+    const metaData = typeof meta === 'string' ? JSON.parse(meta) : meta;
+    // Check if metaData and metaData.avatar exist before accessing src
+    return metaData && metaData.avatar?.src ? metaData.avatar.src : "https://assets.tiltify.com/assets/default-avatar.png";
+  } catch (e) {
+    console.error("Error parsing meta data:", e);
+    return "https://assets.tiltify.com/assets/default-avatar.png";
+  }
+}
+---
+<BaseLayout title="Users - Jingle Jam Community">
+  <div class="w-full max-w-4xl">
+    <h1 class="text-4xl text-center text-white mb-8">Users</h1>
+
+    {error && (
+      <div class="bg-red-500 bg-opacity-20 p-4 rounded-lg text-white mb-6">
+        <h2 class="text-xl font-semibold">Error Loading Users</h2>
+        <p>{error.message || "An unknown error occurred while loading users."}</p>
+      </div>
+    )}
+
+    {!error && (
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {data && data.map((account) => {
+          // Make sure account is defined before accessing its properties
+          if (!account) return null;
+
+          const avatar = getAvatarFromMeta(account.meta);
+          return (
+            <a href={`/${account.providerUsername}`} class="bg-white bg-opacity-10 rounded-lg p-4 hover:bg-opacity-20 transition-all flex items-center gap-4">
+              <img
+                src={avatar}
+                alt={`${account.providerUsername}'s avatar`}
+                class="w-16 h-16 rounded-full object-cover"
+                width="64"
+                height="64"
+              />
+              <div>
+                <h2 class="text-xl font-semibold text-white">{account.providerUsername}</h2>
+              </div>
+            </a>
+          );
+        })}
+
+        {(!data || data.length === 0) && (
+          <div class="col-span-full text-center text-white p-8">
+            <p>No users found.</p>
+          </div>
+        )}
+      </div>
+    )}
+  </div>
+</BaseLayout>

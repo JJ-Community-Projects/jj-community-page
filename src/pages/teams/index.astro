@@ -1,0 +1,75 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import {actions} from "astro:actions";
+const {data, error} = await Astro.callAction(actions.teams.findAllVisibleWithMemberCount, {})
+
+
+/*
+ {data && data.map((team) => {
+          // Make sure team is defined before accessing its properties
+          if (!team) return null;
+
+          return (
+            <a href={`/teams/${team.slug}`} class="bg-white bg-opacity-10 rounded-lg p-4 hover:bg-opacity-20 transition-all flex flex-col">
+              <div>
+                <h2 class="text-xl font-semibold text-white">{team.name}</h2>
+                {team.description && (
+                  <p class="text-white text-opacity-80 mt-1 line-clamp-2">{team.description}</p>
+                )}
+                <div class="mt-2 flex items-center text-white text-opacity-60">
+                  <span>{team.members} {team.members === 1 ? 'member' : 'members'}</span>
+                  {team.ownerTiltifyUsername && (
+                    <span class="ml-auto">Owner: {team.ownerTiltifyUsername}</span>
+                  )}
+                </div>
+              </div>
+            </a>
+          );
+        })}
+*/
+
+---
+
+<BaseLayout title="Teams - Jingle Jam Community">
+  <div class="w-full max-w-4xl">
+    <h1 class="text-4xl text-center text-white mb-8">Teams</h1>
+
+    {error && (
+      <div class="bg-red-500 bg-opacity-20 p-4 rounded-lg text-white mb-6">
+        <h2 class="text-xl font-semibold">Error Loading Teams</h2>
+        <p>{error.message || "An unknown error occurred while loading teams."}</p>
+      </div>
+    )}
+
+    {!error && (
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+        {data && (data.map((team) => {
+          // Make sure team is defined before accessing its properties
+          if (!team) return null;
+          return (
+            <a href={`/teams/${team.slug}`} class="bg-white bg-opacity-10 rounded-lg p-4 hover:bg-opacity-20 transition-all flex flex-col">
+                <div>
+                    <h2 class="text-xl font-semibold text-white">{team.name}</h2>
+                    {team.description && (
+                      <p class="text-white text-opacity-80 mt-1 line-clamp-2">{team.description}</p>
+                    )}
+                    <span>{team.members} {team.members === 1 ? 'member' : 'members'}</span>
+                    {team.ownerTiltifyUsername && (
+                      <span class="ml-auto">Owner: {team.ownerTiltifyUsername}</span>
+                    )}
+                </div>
+            </a>
+            )
+        }))}
+
+
+        {(!data || data.length === 0) && (
+          <div class="col-span-full text-center text-white p-8">
+            <p>No teams found.</p>
+          </div>
+        )}
+      </div>
+    )}
+  </div>
+</BaseLayout>
