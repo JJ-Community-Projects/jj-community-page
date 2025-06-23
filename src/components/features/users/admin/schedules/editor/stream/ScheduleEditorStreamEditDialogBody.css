@@ -1,0 +1,36 @@
+/* Accordion styles for ScheduleEditorStreamEditDialogBody */
+
+.accordion {
+  width: 100%;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.accordion__item {
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.accordion__item-header {
+  margin: 0;
+}
+
+.accordion__item-trigger {
+  transition: background-color 0.2s ease;
+}
+
+.accordion__item-trigger:hover {
+  background-color: #f3f4f6;
+}
+
+.accordion__item-trigger-icon {
+  transition: transform 0.2s ease;
+}
+
+.accordion__item[data-expanded] .accordion__item-trigger-icon {
+  transform: rotate(180deg);
+}
+
+.accordion__item-content {
+  overflow: hidden;
+}
