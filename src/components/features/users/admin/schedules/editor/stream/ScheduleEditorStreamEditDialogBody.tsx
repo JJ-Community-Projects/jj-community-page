@@ -1,13 +1,15 @@
 import {DateTime} from "luxon";
 import type {ModalSignal} from "../../../../../../../lib/createModalSignal.ts";
-import {type Component, Show} from "solid-js";
+import {type Component, createSignal, Show} from "solid-js";
 import {useScheduleEditor} from "../../../providers/ScheduleEditorProvider.tsx";
 import {TextField} from "@kobalte/core/text-field";
 import {Checkbox} from "@kobalte/core/checkbox";
+import {Accordion} from "@kobalte/core/accordion";
 import {TagsSection} from "./TagsSection.tsx";
 import {StreamParticipantsSection} from "./StreamParticipantsSection.tsx";
 import {useDayCard} from "../DayCardContext.tsx";
 import {useStreamEditor} from "./ScheduleEditorStreamEditDialogBodyProvider.tsx";
+import "./ScheduleEditorStreamEditDialogBody.css";
 
 interface ScheduleEditorStreamEditDialogBodyProps {
   stream: {
@@ -41,16 +43,45 @@ export const ScheduleEditorStreamEditDialogBody: Component<ScheduleEditorStreamE
 
       <Visibility/>
 
-      <Dates/>
-      <Dates2/>
+      <Start/>
+      <DurationAndEndSwitch/>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <TagsSection
-          streamId={stream.id}
-        />
-        <StreamParticipantsSection
-          streamId={stream.id}
-        />
+        <Accordion class="accordion" collapsible={true}>
+          <Accordion.Item class="accordion__item" value="tags-section">
+            <Accordion.Header class="accordion__item-header">
+              <Accordion.Trigger class="accordion__item-trigger flex items-center justify-between w-full px-4 py-2 bg-gray-100 rounded-lg">
+                <span class="font-medium">Tags ({stream.tags.length})</span>
+                <svg class="h-5 w-5 accordion__item-trigger-icon" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+              </Accordion.Trigger>
+            </Accordion.Header>
+            <Accordion.Content class="accordion__item-content pt-2">
+              <TagsSection
+                streamId={stream.id}
+              />
+            </Accordion.Content>
+          </Accordion.Item>
+        </Accordion>
+
+        <Accordion class="accordion" collapsible={true} >
+          <Accordion.Item class="accordion__item" value="participants-section">
+            <Accordion.Header class="accordion__item-header">
+              <Accordion.Trigger class="accordion__item-trigger flex items-center justify-between w-full px-4 py-2 bg-gray-100 rounded-lg">
+                <span class="font-medium">Participants ({stream.participants.length})</span>
+                <svg class="h-5 w-5 accordion__item-trigger-icon" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+              </Accordion.Trigger>
+            </Accordion.Header>
+            <Accordion.Content class="accordion__item-content pt-2">
+              <StreamParticipantsSection
+                streamId={stream.id}
+              />
+            </Accordion.Content>
+          </Accordion.Item>
+        </Accordion>
       </div>
 
       <Description/>
@@ -225,7 +256,6 @@ const Vods: Component = () => {
   )
 }
 
-
 const Dates: Component = () => {
   const {stream, setStart, setEnd} = useStreamEditor()
   const {minStr, maxStr} = useDayCard()
@@ -290,7 +320,6 @@ const Dates: Component = () => {
     </div>
   )
 }
-
 
 const Dates2: Component = () => {
   const {action, local} = useScheduleEditor();
@@ -562,6 +591,373 @@ const Dates2: Component = () => {
           End time: {end().toFormat("h:mm a")} ({end().toFormat("cccc, MMMM d")})
         </TextField.Description>
       </TextField>
+    </div>
+  )
+}
+
+const Start: Component = () => {
+  const {action, local} = useScheduleEditor();
+  const {stream, setStart, setEnd} = useStreamEditor()
+
+  const otherStreams = () => {
+    return local.streams.filter((s) => s.id !== stream.id && s.end.hasSame(stream.end, 'day'))
+  }
+
+  const latestStream = () => {
+    const streams = otherStreams()
+    if (streams.length === 0) return null
+    return streams.reduce((latest, current) => {
+      return latest.end >= current.end ? latest : current
+    })
+  }
+
+  const setStartAfterLatestSteam = () => {
+    const latest = latestStream()
+    if (!latest) return // No latest stream to set after
+
+    // Get current duration
+    const currentDuration = durationMinutes()
+
+    // Set start time to the end time of the latest stream
+    const newStart = latest.end.toLocal()
+    setStart(newStart.toUTC())
+
+    // Update end time based on new start time and current duration
+    updateEndFromDuration(currentDuration)
+  }
+
+  const {minStr, maxStr, min, max} = useDayCard()
+  const start = () => stream.start.toLocal()
+  const end = () => stream.end.toLocal()
+
+  const startFormated = () => start().toFormat("yyyy-MM-dd'T'HH:mm")
+
+  // Calculate duration in minutes between start and end
+  const durationMinutes = () => {
+    const diffMillis = end().diff(start()).milliseconds
+    return Math.round(diffMillis / (1000 * 60))
+  }
+
+  // Update end time based on start time and duration
+  const updateEndFromDuration = (minutes: number) => {
+    const newEnd = start().plus({minutes})
+    // Ensure end time doesn't exceed max allowed time
+    const maxDateTime = DateTime.fromISO(maxStr)
+    if (newEnd <= maxDateTime) {
+      setEnd(newEnd.toUTC())
+    } else {
+      setEnd(maxDateTime.toUTC())
+    }
+  }
+
+  const disableStartMinus15Button = () => {
+    const s = start().minus({minutes: 15})
+    return s < min
+  }
+
+  const disableStartPlus15Button = () => {
+    const s = start().plus({minutes: 15})
+    return s > max
+  }
+
+  const disableStartMinus30Button = () => {
+    const s = start().minus({minutes: 30})
+    return s < min
+  }
+
+  const disableStartPlus30Button = () => {
+    const s = start().plus({minutes: 30})
+    return s > max
+  }
+
+  return (
+    <TextField
+      name="start"
+      class="flex flex-col"
+      value={startFormated() ?? ''}
+      onChange={(value) => {
+        const currentDuration = durationMinutes()
+        const newStart = DateTime.fromISO(value)
+        const newEnd = DateTime.fromISO(value).plus({minutes: currentDuration})
+        setStart(newStart.toUTC())
+        setEnd(newEnd.toUTC())
+      }}
+      validationState={stream.start < stream.end ? "valid" : "invalid"}
+    >
+      <TextField.Label class="text-sm font-medium mb-1">Start Time: </TextField.Label>
+      <TextField.Input
+        type="datetime-local"
+        class="border border-gray-300 rounded-lg px-3 py-2"
+        min={minStr}
+        max={maxStr}
+      />
+      <div class="flex items-center gap-2 mt-1">
+        <button
+          type="button"
+          disabled={!latestStream()}
+          class="bg-accent hover:bg-accent-600 text-white px-3 py-2 rounded-lg transition-all text-xxs disabled:opacity-50 disabled:cursor-not-allowed"
+          title="Set start time after latest stream"
+          onClick={setStartAfterLatestSteam}
+        >
+          After Latest
+        </button>
+        <button
+          type="button"
+          disabled={disableStartMinus30Button()}
+          class="bg-accent hover:bg-accent-600 text-white px-3 py-2 rounded-lg transition-all text-xxs disabled:opacity-50 disabled:cursor-not-allowed"
+          title="Decrease start time by 30 minutes"
+          onClick={() => {
+            setStart((d) => d.minus({minutes: 30}))
+            setEnd((d) => d.minus({minutes: 30}))
+          }}
+        >
+          -30m
+        </button>
+        <button
+          type="button"
+          disabled={disableStartMinus15Button()}
+          class="bg-accent hover:bg-accent-600 text-white px-3 py-2 rounded-lg transition-all text-xxs disabled:opacity-50 disabled:cursor-not-allowed"
+          title="Decrease start time by 15 minutes"
+          onClick={() => {
+            setStart((d) => d.minus({minutes: 15}))
+            setEnd((d) => d.minus({minutes: 15}))
+          }}
+        >
+          -15m
+        </button>
+        <button
+          type="button"
+          disabled={disableStartPlus15Button()}
+          class="bg-accent hover:bg-accent-600 text-white px-3 py-2 rounded-lg transition-all text-xxs disabled:opacity-50 disabled:cursor-not-allowed"
+          title="Increase start time by 15 minutes"
+          onClick={() => {
+            setStart((d) => d.plus({minutes: 15}))
+            setEnd((d) => d.plus({minutes: 15}))
+          }}
+        >
+          +15m
+        </button>
+        <button
+          type="button"
+          disabled={disableStartPlus30Button()}
+          class="bg-accent hover:bg-accent-600 text-white px-3 py-2 rounded-lg transition-all text-xxs disabled:opacity-50 disabled:cursor-not-allowed"
+          title="Increase start time by 30 minutes"
+          onClick={() => {
+            setStart((d) => d.plus({minutes: 30}))
+            setEnd((d) => d.plus({minutes: 30}))
+          }}
+        >
+          +30m
+        </button>
+      </div>
+      <TextField.ErrorMessage class="text-red-500 text-xs mt-1">
+        Start time must be before end time
+      </TextField.ErrorMessage>
+      <TextField.Description class="text-xs text-gray-500 mt-1">
+        Day: {stream.start.toFormat("cccc, MMMM d")}
+      </TextField.Description>
+    </TextField>
+  )
+}
+
+const End: Component = () => {
+  const {stream, setEnd} = useStreamEditor()
+  const {maxStr} = useDayCard()
+  const start = () => stream.start.toLocal()
+
+  const end = () => stream.end.toLocal()
+  const endFormated = () => end().toFormat("yyyy-MM-dd'T'HH:mm")
+
+  const localEndDateMin = () => {
+    return start().plus({
+      hours: 1,
+    }).toFormat("yyyy-MM-dd'T'HH:mm")
+  }
+
+  return (
+    <TextField
+      name="end"
+      class="flex flex-col"
+      value={endFormated() ?? ''}
+      onChange={(value) => setEnd(DateTime.fromISO(value).toUTC())}
+      validationState={stream.end > stream.start ? "valid" : "invalid"}
+    >
+      <TextField.Label class="text-sm font-medium mb-1">End Time: </TextField.Label>
+      <TextField.Input
+        type="datetime-local"
+        class="border border-gray-300 rounded-lg px-3 py-2"
+        min={localEndDateMin()}
+        max={maxStr}
+      />
+      <TextField.ErrorMessage class="text-red-500 text-xs mt-1">End time must be after start
+        time</TextField.ErrorMessage>
+      <TextField.Description
+        class="text-xs text-gray-500 mt-1">Day: {stream.end.toFormat("cccc, MMMM d")}</TextField.Description>
+    </TextField>
+  )
+}
+
+const Duration: Component = () => {
+  const {stream, setEnd} = useStreamEditor()
+
+  const {maxStr, min, max} = useDayCard()
+  const start = () => stream.start.toLocal()
+  const end = () => stream.end.toLocal()
+
+  // Calculate duration in minutes between start and end
+  const durationMinutes = () => {
+    const diffMillis = end().diff(start()).milliseconds
+    return Math.round(diffMillis / (1000 * 60))
+  }
+
+  // Update end time based on start time and duration
+  const updateEndFromDuration = (minutes: number) => {
+    const newEnd = start().plus({minutes})
+    // Ensure end time doesn't exceed max allowed time
+    const maxDateTime = DateTime.fromISO(maxStr)
+    if (newEnd <= maxDateTime) {
+      setEnd(newEnd.toUTC())
+    } else {
+      setEnd(maxDateTime.toUTC())
+    }
+  }
+
+  const disableEndMinus15Button = () => {
+    const s = end().minus({minutes: 15})
+    return s < min || durationMinutes() <= 15
+  }
+
+  const disableEndPlus15Button = () => {
+    const s = end().plus({minutes: 15})
+    return s > max
+  }
+
+  const disableEndMinus30Button = () => {
+    const s = end().minus({minutes: 30})
+    return s < min || durationMinutes() <= 30
+  }
+
+  const disableEndPlus30Button = () => {
+    const s = end().plus({minutes: 30})
+    return s > max
+  }
+
+  return (
+    <TextField
+      name="duration"
+      class="flex flex-col"
+      value={durationMinutes().toString()}
+      onChange={(value) => {
+        const minutes = parseInt(value)
+        if (!isNaN(minutes) && minutes > 0) {
+          updateEndFromDuration(minutes)
+        }
+      }}
+      validationState={durationMinutes() > 0 ? "valid" : "invalid"}
+    >
+      <TextField.Label class="text-sm font-medium mb-1">Length (minutes): </TextField.Label>
+      <TextField.Input
+        type="number"
+        min="30"
+        step="5"
+        class="border border-gray-300 rounded-lg px-3 py-2 flex-1"
+      />
+      <div class="flex items-center gap-2 mt-1">
+        <button
+          type="button"
+          disabled={disableEndMinus30Button()}
+          class="bg-accent hover:bg-accent-600 text-white px-3 py-2 rounded-lg transition-all text-xxs disabled:opacity-50 disabled:cursor-not-allowed"
+          title="Decrease duration by 30 minutes"
+          onClick={() => {
+            const currentDuration = durationMinutes()
+            updateEndFromDuration(Math.max(1, currentDuration - 30))
+          }}
+        >
+          -30m
+        </button>
+        <button
+          type="button"
+          disabled={disableEndMinus15Button()}
+          class="bg-accent hover:bg-accent-600 text-white px-3 py-2 rounded-lg transition-all text-xxs disabled:opacity-50 disabled:cursor-not-allowed"
+          title="Decrease duration by 15 minutes"
+          onClick={() => {
+            const currentDuration = durationMinutes()
+            updateEndFromDuration(Math.max(1, currentDuration - 15))
+          }}
+        >
+          -15m
+        </button>
+        <button
+          type="button"
+          class="bg-accent hover:bg-accent-600 text-white px-3 py-2 rounded-lg transition-all text-xxs"
+          title="Set duration to 3 hours"
+          onClick={() => {
+            updateEndFromDuration(180)
+          }}
+        >
+          3h
+        </button>
+        <button
+          type="button"
+          disabled={disableEndPlus15Button()}
+          class="bg-accent hover:bg-accent-600 text-white px-3 py-2 rounded-lg transition-all text-xxs disabled:opacity-50 disabled:cursor-not-allowed"
+          title="Increase duration by 15 minutes"
+          onClick={() => {
+            const currentDuration = durationMinutes()
+            updateEndFromDuration(currentDuration + 15)
+          }}
+        >
+          +15m
+        </button>
+        <button
+          type="button"
+          disabled={disableEndPlus30Button()}
+          class="bg-accent hover:bg-accent-600 text-white px-3 py-2 rounded-lg transition-all text-xxs disabled:opacity-50 disabled:cursor-not-allowed"
+          title="Increase duration by 30 minutes"
+          onClick={() => {
+            const currentDuration = durationMinutes()
+            updateEndFromDuration(currentDuration + 30)
+          }}
+        >
+          +30m
+        </button>
+      </div>
+      <TextField.ErrorMessage class="text-red-500 text-xs mt-1">
+        Duration must be greater than 0
+      </TextField.ErrorMessage>
+      <TextField.Description class="text-xs text-gray-500 mt-1">
+        End time: {end().toFormat("h:mm a")} ({end().toFormat("cccc, MMMM d")})
+      </TextField.Description>
+    </TextField>
+  )
+}
+
+const DurationAndEndSwitch: Component = () => {
+  const [showDuration, setShowDuration] = createSignal(true);
+
+  return (
+    <div class="flex flex-col">
+      <div class="flex items-center justify-start mb-2">
+        <div class="bg-gray-200 rounded-lg p-1 flex">
+          <button
+            type="button"
+            class={`px-3 py-1 rounded-l-lg transition-all text-sm ${showDuration() ? 'bg-white shadow-sm' : 'hover:bg-gray-300'}`}
+            onClick={() => setShowDuration(true)}
+          >
+            Duration
+          </button>
+          <button
+            type="button"
+            class={`px-3 py-1 rounded-r-lg transition-all text-sm ${!showDuration() ? 'bg-white shadow-sm' : 'hover:bg-gray-300'}`}
+            onClick={() => setShowDuration(false)}
+          >
+            End Time
+          </button>
+        </div>
+      </div>
+      <Show when={showDuration()} fallback={<End/>}>
+        <Duration/>
+      </Show>
     </div>
   )
 }
