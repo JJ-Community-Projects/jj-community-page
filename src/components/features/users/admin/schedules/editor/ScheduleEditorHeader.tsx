@@ -5,6 +5,7 @@ import {createModalSignal} from "../../../../../../lib/createModalSignal.ts";
 import {ConfirmationDialog} from "../../../../../common/dialogs/ConfirmationDialog.tsx";
 import "./successAnimation.css";
 import {Transition} from "solid-transition-group";
+import {twMerge} from "tailwind-merge";
 
 
 export const ScheduleEditorHeader: Component = () => {
@@ -83,6 +84,17 @@ export const ScheduleEditorHeader: Component = () => {
         <div class="mt-4 p-3 bg-blue-50 text-blue-700 rounded-lg text-sm">
           <p>The schedule is continuously saved automatically. To make your changes visible to all users, press
             the <strong>Publish Schedule</strong> button.</p>
+        </div>
+
+        {/* Label showing if the schedule is visible or not */}
+        <div class="mt-2 flex items-center">
+          <div class={twMerge(
+            local.visible && 'bg-green-100 text-green-800',
+            !local.visible && 'bg-red-100 text-red-800',
+            'text-xs px-2 py-1 rounded-full'
+          )}>
+            {local.visible ? 'Schedule Visible' : 'Schedule Hidden'}
+          </div>
         </div>
 
         {/* Action status feedback */}

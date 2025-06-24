@@ -1,11 +1,12 @@
 import {createMergeableStore} from "tinybase/mergeable-store";
 import {createStore} from "solid-js/store";
 import {DateTime} from "luxon";
-import { sanitizeTag } from "../../../../../functions/slug.ts";
+import {sanitizeTag} from "../../../../../functions/slug.ts";
 
 import {
-  createContext, createEffect,
-  createSignal, on,
+  createContext,
+  createEffect,
+  createSignal,
   onCleanup,
   onMount,
   type ParentComponent,
@@ -393,7 +394,7 @@ const useScheduleEditorHook = (id: number, userId: number,
       const streams = local.streams;
 
       // Create a map of streamId to tags
-      const tagsByStream: { [streamId: string]: {label: string; tag: string}[] } = {};
+      const tagsByStream: { [streamId: string]: { label: string; tag: string }[] } = {};
 
       // Initialize empty arrays for all streams
       for (const stream of streams) {
@@ -428,7 +429,7 @@ const useScheduleEditorHook = (id: number, userId: number,
       const streams = local.streams;
 
       // Create a map of streamId to participants
-      const participantsByStream: { [streamId: string]: {userId: number; name: string}[] } = {};
+      const participantsByStream: { [streamId: string]: { userId: number; name: string }[] } = {};
 
       // Initialize empty arrays for all streams
       for (const stream of streams) {
@@ -476,12 +477,12 @@ const useScheduleEditorHook = (id: number, userId: number,
     start: DateTime,
     end: DateTime,
     visible: boolean,
-    tags: {label: string, tag: string}[],
-    participants: {userId: number, name: string}[],
+    tags: { label: string, tag: string }[],
+    participants: { userId: number, name: string }[],
     createdBy: number;
   } => {
     // Get tags for this stream from the streamTags table
-    const tags: {label: string, tag: string}[] = [];
+    const tags: { label: string, tag: string }[] = [];
     if (store.hasTable('streamTags')) {
       const streamTags = store.getTable('streamTags');
       for (const tagId in streamTags) {
@@ -489,14 +490,14 @@ const useScheduleEditorHook = (id: number, userId: number,
         if (tagEntry.streamId === id) {
           // Use the label for display if available, otherwise use the tag
           tags.push({
-            label: tagEntry.label as string, tag:tagEntry.tag as string
+            label: tagEntry.label as string, tag: tagEntry.tag as string
           });
         }
       }
     }
 
     // Get participants for this stream from the streamParticipants table
-    const participants: {userId: number, name: string}[] = [];
+    const participants: { userId: number, name: string }[] = [];
     if (store.hasTable('streamParticipants')) {
       const streamParticipants = store.getTable('streamParticipants');
       for (const participantId in streamParticipants) {
@@ -532,7 +533,7 @@ const useScheduleEditorHook = (id: number, userId: number,
     start: DateTime,
     end: DateTime,
     visible: boolean,
-    tags?: {label: string, tag: string}[]
+    tags?: { label: string, tag: string }[]
     createdBy: number
   }): Row => {
     return {
@@ -626,8 +627,15 @@ const useScheduleEditorHook = (id: number, userId: number,
       });
 
       if (day !== undefined) {
+        const streamsOfTheDay = local.streams.filter((s) => s.start.day === day)
+        const lastStream = streamsOfTheDay.length > 0 ? streamsOfTheDay.reduce((a, b) => {
+          if (a.start > b.start) {
+            return a
+          }
+          return b
+        }) : undefined
         // If a specific day is provided (for the desktop view)
-        startTime = DateTime.fromObject({
+        startTime = lastStream?.end ?? DateTime.fromObject({
           year: currentYear,
           month: 12,
           day: day,
@@ -1030,7 +1038,9 @@ const useScheduleEditorHook = (id: number, userId: number,
     start: DateTime;
     end: DateTime;
     visible: boolean;
-    createdBy: number
+    createdBy: number;
+    tags: { label: string, tag: string }[],
+    participants: { userId: number, providerName: string, provider: string }[],
   }) => {
     startAction('saveStream');
     try {
@@ -1051,6 +1061,7 @@ const useScheduleEditorHook = (id: number, userId: number,
         end: stream.end.toUTC().toISO()!,
         createdBy: stream.createdBy
       });
+      
       stopAction('saveStream');
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : 'An unknown error occurred';

@@ -58,10 +58,18 @@ export const StreamCard: Component<StreamCardProps> = (props) => {
   return (
     <>
       <div
-        class={twMerge(getDayBackgroundColor(), "p-2 bg-white rounded border border-gray-100 cursor-pointer hover:bg-gray-50")}
+        class={twMerge(
+          getDayBackgroundColor(),
+          "p-2 bg-white rounded border border-gray-100 cursor-pointer hover:bg-gray-50",
+          !props.stream.visible && "opacity-70"
+        )}
         onClick={showEditDialog.open}
       >
         <p class="font-medium text-sm truncate">{props.stream.title}</p>
+        <div
+          class={`text-xs px-1.5 py-0.5 rounded-full ml-1 ${props.stream.visible ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+          {props.stream.visible ? 'Visible' : 'Hidden'}
+        </div>
         <Show when={props.showDate}>
           <p class="text-xs text-gray-600">
             {props.stream.start.toFormat("EEE',' MMM dd")} {props.stream.start.toFormat("HH:mm")} - {props.stream.end.toFormat("HH:mm")}

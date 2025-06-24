@@ -1,0 +1,73 @@
+/* Accordion styles for Schedule Editor */
+.schedule-accordion {
+  width: 100%;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.schedule-accordion__item {
+  border-radius: 0.75rem;
+  overflow: hidden;
+  background-color: white;
+  margin-bottom: 0.75rem;
+  border: 1px solid rgba(229, 231, 235, 0.5);
+  transition: all 0.2s ease;
+}
+
+.schedule-accordion__item:last-child {
+  margin-bottom: 0;
+}
+
+.schedule-accordion__item[data-expanded] {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.schedule-accordion__item-header {
+  margin: 0;
+}
+
+.schedule-accordion__item-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 1rem 1.25rem;
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: #1a202c;
+  background-color: #f9fafb;
+  border-radius: 0.75rem;
+  transition: all 0.2s ease;
+  border-left: 4px solid #3584BF; /* Accent color */
+}
+
+.schedule-accordion__item-trigger:hover {
+  background-color: #edf2f7;
+}
+
+.schedule-accordion__item[data-expanded] .schedule-accordion__item-trigger {
+  background-color: #e6f0f9; /* Light accent color */
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  border-left: 4px solid #E30E50; /* Primary color */
+}
+
+.schedule-accordion__item-trigger-icon {
+  transition: transform 0.3s ease;
+  color: #3584BF; /* Accent color */
+}
+
+.schedule-accordion__item[data-expanded] .schedule-accordion__item-trigger-icon {
+  transform: rotate(180deg);
+  color: #E30E50; /* Primary color */
+}
+
+.schedule-accordion__item-content {
+  overflow: hidden;
+  padding: 1.25rem;
+  border-bottom-left-radius: 0.75rem;
+  border-bottom-right-radius: 0.75rem;
+  background-color: white;
+}

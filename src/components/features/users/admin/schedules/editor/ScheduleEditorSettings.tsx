@@ -279,7 +279,7 @@ export const ScheduleEditorSettings: Component = () => {
   } = useScheduleEditor();
 
   return (
-    <div class="bg-white rounded-2xl shadow-xl p-6 mb-6">
+    <div>
       <h2 class="text-xl font-bold mb-4">Schedule Settings</h2>
 
       <Show when={action.updateScheduleTitle.lastErrorMessage ||
