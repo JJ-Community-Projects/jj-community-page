@@ -1051,6 +1051,8 @@ const useScheduleEditorHook = (id: number, userId: number,
         stopAction('saveStream');
         return;
       }
+
+      // Update stream properties
       store.setRow('streams', stream.id, {
         id: stream.id,
         title: stream.title,
@@ -1061,7 +1063,59 @@ const useScheduleEditorHook = (id: number, userId: number,
         end: stream.end.toUTC().toISO()!,
         createdBy: stream.createdBy
       });
-      
+
+      // Handle tags
+      // First, remove all existing tags for this stream
+      if (store.hasTable('streamTags')) {
+        const streamTags = store.getTable('streamTags');
+        for (const tagId in streamTags) {
+          const tagEntry = streamTags[tagId];
+          if (tagEntry.streamId === stream.id) {
+            store.delRow('streamTags', tagId);
+          }
+        }
+      } else {
+        // Create the streamTags table if it doesn't exist
+        store.setTable('streamTags', {});
+      }
+
+      // Add new tags
+      for (const tagItem of stream.tags) {
+        const sanitizedTag = sanitizeTag(tagItem.tag);
+        const newTagId = Date.now().toString() + Math.random().toString(36).substring(2, 9);
+        store.setRow('streamTags', newTagId, {
+          streamId: stream.id,
+          tag: sanitizedTag,
+          label: tagItem.label || tagItem.tag
+        });
+      }
+
+      // Handle participants
+      // First, remove all existing participants for this stream
+      if (store.hasTable('streamParticipants')) {
+        const streamParticipants = store.getTable('streamParticipants');
+        for (const participantId in streamParticipants) {
+          const participantEntry = streamParticipants[participantId];
+          if (participantEntry.streamId === stream.id) {
+            store.delRow('streamParticipants', participantId);
+          }
+        }
+      } else {
+        // Create the streamParticipants table if it doesn't exist
+        store.setTable('streamParticipants', {});
+      }
+
+      // Add new participants
+      for (const participant of stream.participants) {
+        const newParticipantId = Date.now().toString() + Math.random().toString(36).substring(2, 9);
+        store.setRow('streamParticipants', newParticipantId, {
+          streamId: stream.id,
+          userId: participant.userId,
+          providerName: participant.providerName,
+          provider: participant.provider
+        });
+      }
+
       stopAction('saveStream');
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : 'An unknown error occurred';
@@ -1073,6 +1127,10 @@ const useScheduleEditorHook = (id: number, userId: number,
   // endregion
 
   // region Tag Operations
+  /**
+   * @deprecated Use saveStream with tags included in the stream object instead.
+   * This function is maintained for backward compatibility.
+   */
   const addTag = (streamId: string, tag: string) => {
     startAction('addTag');
     try {
@@ -1133,6 +1191,10 @@ const useScheduleEditorHook = (id: number, userId: number,
     }
   };
 
+  /**
+   * @deprecated Use saveStream with tags included in the stream object instead.
+   * This function is maintained for backward compatibility.
+   */
   const removeTag = (streamId: string, tag: string) => {
     startAction('removeTag');
     try {
@@ -1170,6 +1232,10 @@ const useScheduleEditorHook = (id: number, userId: number,
   // endregion
 
   // region Participant Operations
+  /**
+   * @deprecated Use saveStream with participants included in the stream object instead.
+   * This function is maintained for backward compatibility.
+   */
   const addParticipant = (streamId: string, userId: number, providerName: string, provider: string) => {
     startAction('addParticipant');
     try {
@@ -1224,6 +1290,10 @@ const useScheduleEditorHook = (id: number, userId: number,
     }
   };
 
+  /**
+   * @deprecated Use saveStream with participants included in the stream object instead.
+   * This function is maintained for backward compatibility.
+   */
   const removeParticipant = (streamId: string, userId: number) => {
     startAction('removeParticipant');
     try {
