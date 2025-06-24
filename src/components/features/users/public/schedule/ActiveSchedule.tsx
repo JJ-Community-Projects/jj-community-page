@@ -43,7 +43,7 @@ const ActiveScheduleBody: Component = () => {
 
       <div class="mt-4 text-center">
         <a
-          href={`/schedule/${schedule().schedule?.slug}`}
+          href={`/schedules/${schedule().schedule?.slug}`}
           class="text-accent hover:underline font-medium"
         >
           View Full Schedule
