@@ -7,6 +7,8 @@ import {getStreamColor} from "../../../../functions/jjDatesToColors.ts";
 import {Dialog} from "@kobalte/core";
 import {AiOutlineClose} from "solid-icons/ai";
 import {getTextColor} from "../../../../lib/utils/textColors.ts";
+import {StreamTags} from "./StreamTags";
+import {StreamParticipants} from "./StreamParticipants";
 
 interface ScheduleStreamDetailDialogProps {
   stream: DetailedStream;
@@ -126,16 +128,8 @@ export const ScheduleStreamDetailDialog: Component<ScheduleStreamDetailDialogPro
                     <p>{countdownFormat()}</p>
                   </Show>
 
-                  <Show when={stream().tags && stream().tags.length > 0}>
-                    <p class="text-lg mt-4">Tags</p>
-                    <div class="flex flex-wrap gap-2">
-                      {stream().tags.map(tag => (
-                        <div class="bg-accent-100 rounded-full px-2 py-0.5">
-                          {tag.label}
-                        </div>
-                      ))}
-                    </div>
-                  </Show>
+                  <StreamTags tags={stream().tags} />
+                  <StreamParticipants participants={stream().participants} />
                 </div>
               </div>
             </div>
