@@ -67,8 +67,7 @@ export const streamTagsTable = sqliteTable('stream_tags', {
     scheduleId: integer('schedule_id').notNull(),
     tag: text('tag').notNull(),
     label: text('label').notNull(),
-    addedAt: integer('added_at', {mode: 'timestamp'}).notNull().default(sql`(unixepoch()
-                                                                            )`),
+    addedAt: integer('added_at', {mode: 'timestamp'}).notNull().default(sql`(unixepoch())`),
   },
   (table) => [
     primaryKey({name: 'stream_tags_pk', columns: [table.scheduleId, table.streamId, table.tag]}),

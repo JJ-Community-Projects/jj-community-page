@@ -1,6 +1,6 @@
 import {Repo, type RepoEnv} from "./Repo.ts";
 import {streamParticipantsTable} from "../schema/schema.ts";
-import {accounts} from "../schema/auth-schema.ts";
+import {accounts, userStyles} from "../schema/auth-schema.ts";
 import {drizzle, DrizzleD1Database} from "drizzle-orm/d1";
 import {and, eq, type InferSelectModel, sql} from "drizzle-orm";
 import {DatabaseError} from "./DatabaseError.ts";
@@ -313,13 +313,17 @@ export class StreamParticipantsRepo extends Repo<typeof streamParticipantsTable.
 
   async findParticipantsUIByStream(scheduleId: number): Promise<Record<number, ParticipantUI[]>> {
     try {
-      // Join streamParticipantsTable with accounts to get participant information
+      // Join streamParticipantsTable with accounts and userStyles to get participant information
       const participants = await this.db.select({
         streamId: streamParticipantsTable.streamId,
         userId: streamParticipantsTable.userId,
         tiltifyName: accounts.providerUsername,
         providerId: accounts.providerId,
-        meta: accounts.meta
+        meta: accounts.meta,
+        style: {
+          primaryColor: userStyles.primaryColor,
+          accentColor: userStyles.accentColor
+        }
       })
       .from(streamParticipantsTable)
       .innerJoin(
@@ -328,6 +332,10 @@ export class StreamParticipantsRepo extends Repo<typeof streamParticipantsTable.
           eq(streamParticipantsTable.userId, accounts.userId),
           eq(accounts.provider, 'tiltify')
         )
+      )
+      .leftJoin(
+        userStyles,
+        eq(streamParticipantsTable.userId, userStyles.userId)
       )
       .where(eq(streamParticipantsTable.scheduleId, scheduleId))
       .all();
@@ -353,12 +361,23 @@ export class StreamParticipantsRepo extends Repo<typeof streamParticipantsTable.
         }
 
         // Add participant in ParticipantUI format
-        participantsByStreamId[participant.streamId].push({
+        const participantUI: ParticipantUI = {
           tiltifyName: participant.tiltifyName,
           label: participant.tiltifyName,
           id: participant.userId,
           img
-        });
+        };
+
+        // Add style if primaryColor and accentColor are available
+        /*
+        if (participant.primaryColor && participant.accentColor) {
+          participantUI.style = {
+            primaryColor: participant.primaryColor,
+            accentColor: participant.accentColor
+          };
+        }*/
+
+        participantsByStreamId[participant.streamId].push(participantUI);
       }
 
       return participantsByStreamId;

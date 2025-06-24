@@ -709,7 +709,7 @@ export class TeamRepo extends Repo<typeof teamsTable._['config']> {
  *
  * @returns Promise resolving to an array of visible teams with member count and owner tiltify username
  */
-async findAllVisibleWithMemberCount(): Promise<(InferSelectModel<typeof teamsTable> & {members: number, ownerTiltifyUsername: string})[]> {
+  async findAllVisibleWithMemberCount(): Promise<(InferSelectModel<typeof teamsTable> & {members: number, ownerTiltifyUsername: string})[]> {
     try {
       // Get all visible teams
       const visibleTeams = await this.findVisible();

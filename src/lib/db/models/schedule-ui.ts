@@ -19,7 +19,11 @@ export type ParticipantUI = {
   tiltifyName: string,
   label: string,
   id: number,
-  img?: string
+  img?: string,
+  style?: {
+    primaryColor: string,
+    accentColor: string,
+  }
 }
 
 /**
