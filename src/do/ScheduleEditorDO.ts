@@ -7,108 +7,21 @@ import {ScheduleRepo} from "../lib/db/repos/ScheduleRepo.ts";
 import {StreamRepo} from "../lib/db/repos/StreamRepo.ts";
 import {StreamTagRepo} from "../lib/db/repos/StreamTagRepo.ts";
 import {StreamParticipantsRepo} from "../lib/db/repos/StreamParticipantsRepo.ts";
-import {schedulesTable, streamParticipantsTable, streamTagsTable, streamsTable} from "../lib/db/schema/schema";
-import {type InferSelectModel} from "drizzle-orm";
+import type {
+  DBSchedule,
+  DBStream,
+  DBStreamTag,
+  DBStreamParticipant,
+  DBStreamWithDetails,
+  StreamsTable,
+  TagsTable,
+  ParticipantsTable,
+  ScheduleUpdateData
+} from "../lib/model/admin/user/scheduleEditor/ScheduleEditorTypes";
 
 /**
- * Define types for the data structures used in the ScheduleEditorDO
+ * This file uses types from ScheduleEditorTypes.ts
  */
-
-/**
- * Represents a schedule from the database
- * Type derived from the schedulesTable schema
- */
-type DBSchedule = InferSelectModel<typeof schedulesTable>;
-
-/**
- * Represents a stream from the database
- * Type derived from the streamsTable schema
- */
-type DBStream = InferSelectModel<typeof streamsTable>;
-
-/**
- * Represents a stream tag from the database
- * Type derived from the streamTagsTable schema
- */
-type DBStreamTag = InferSelectModel<typeof streamTagsTable>;
-
-/**
- * Represents a stream participant from the database
- * Type derived from the streamParticipantsTable schema
- */
-type DBStreamParticipant = InferSelectModel<typeof streamParticipantsTable>;
-
-/**
- * Represents a stream with its associated tags and participants
- * Used for comprehensive stream data representation
- */
-type DBStreamWithDetails = DBStream & {
-  tags: DBStreamTag[];
-  participants: DBStreamParticipant[];
-};
-
-/**
- * Define types for the TinyBase store tables
- */
-
-/**
- * Interface representing the streams table in the TinyBase store
- * Maps stream IDs to their properties
- */
-interface StreamsTable {
-  [id: string]: {
-    /** User ID of the stream creator */
-    createdBy: number;
-    /** Title of the stream */
-    title: string;
-    /** Optional subtitle of the stream */
-    subtitle: string;
-    /** Whether the stream is visible to users */
-    visible: boolean;
-    /** Detailed description of the stream */
-    description: string;
-    /** YouTube VOD URL for the stream */
-    youtubeVodUrl?: string;
-    /** Twitch VOD URL for the stream */
-    twitchVodUrl?: string;
-    /** ISO string representing the start time of the stream */
-    start: string;
-    /** ISO string representing the end time of the stream */
-    end: string;
-  };
-}
-
-/**
- * Interface representing the tags table in the TinyBase store
- * Maps tag IDs to their properties
- */
-interface TagsTable {
-  [id: string]: {
-    /** ID of the stream this tag belongs to */
-    streamId: string;
-    /** Tag identifier */
-    tag: string;
-    /** Human-readable label for the tag */
-    label: string;
-  };
-}
-
-/**
- * Interface representing the participants table in the TinyBase store
- * Maps participant IDs to their properties
- */
-interface ParticipantsTable {
-  [id: string]: {
-    /** ID of the stream this participant belongs to */
-    streamId: string;
-    /** User ID of the participant */
-    userId: number;
-    /** Display name of the participant */
-    providerName: string;
-    /** Service provider (e.g., Twitch, YouTube) */
-    provider: string;
-  };
-}
 
 /**
  * Durable Object for managing schedule editing with real-time collaboration
@@ -171,7 +84,7 @@ export class ScheduleEditorDO extends TinybaseDO {
    * @param addedOrRemoved - True if the path was added, false if removed
    */
   onPathId(pathId: Id, addedOrRemoved: IdAddedOrRemoved): void {
-    console.info((addedOrRemoved ? 'Added' : 'Removed') + ` path ${pathId}`);
+    this.log((addedOrRemoved ? 'Added' : 'Removed') + ` path ${pathId}`);
   }
 
   /**
@@ -182,7 +95,7 @@ export class ScheduleEditorDO extends TinybaseDO {
    * @param addedOrRemoved - True if the client was added, false if removed
    */
   onClientId(pathId: Id, clientId: Id, addedOrRemoved: IdAddedOrRemoved): void {
-    console.info(
+    this.log(
       (addedOrRemoved ? 'Added' : 'Removed') +
       ` client ${clientId} on path ${pathId}`,
     );
@@ -197,13 +110,13 @@ export class ScheduleEditorDO extends TinybaseDO {
    * @param message - The message content
    */
   async onMessage(fromClientId: Id, toClientId: Id, message: string): Promise<void> {
-    console.info('Message received on path: ', this.getPathId());
-    console.log('ScheduleEditorDO', 'onMessage', fromClientId, toClientId, message);
+    this.log('Message received on path: ', this.getPathId());
+    this.log('ScheduleEditorDO', 'onMessage', fromClientId, toClientId, message);
 
     super.onMessage(fromClientId, toClientId, message)
 
-    const lst = await this.ctx.storage.list()
-    console.log('lst', lst)
+    // const lst = await this.ctx.storage.list()
+    // this.log('lst', lst)
   }
 
   /**
@@ -212,7 +125,7 @@ export class ScheduleEditorDO extends TinybaseDO {
    */
   getTables() {
     const tables = this.persister?.getStore().getTables()
-    console.log('ScheduleEditorDO', 'getTables', tables)
+    this.log('ScheduleEditorDO', 'getTables', tables)
     return tables;
   }
 
@@ -223,14 +136,20 @@ export class ScheduleEditorDO extends TinybaseDO {
   async loadFromDB(): Promise<void> {
     const id = this.scheduleId
 
+    if (this.hasScheduleInStore()) {
+      return
+    }
+
     // Load schedule using ScheduleRepo
     const schedule = await this.scheduleRepo.findById(id);
     if (!schedule) {
       return;
     }
 
+
     // Load streams with details using StreamRepo
     const streamsWithDetails = await this.streamRepo.findStreamsWithDetails(id);
+    this.log('ScheduleEditorDO', 'loadFromDB', schedule, streamsWithDetails.length);
 
     // Extract streams, tags, and participants from the result
     const streams = streamsWithDetails.map(s => ({...s}));
@@ -254,6 +173,10 @@ export class ScheduleEditorDO extends TinybaseDO {
     store.setTable('streams', tinyStreamsTable);
     store.setTable('streamTags', tagsTable);
     store.setTable('streamParticipants', participantsTable);
+  }
+
+  private hasScheduleInStore() {
+    return this.store?.getValue('id') !== undefined
   }
 
 
@@ -378,7 +301,7 @@ export class ScheduleEditorDO extends TinybaseDO {
     const dbStreamIds = streams.map(stream => stream.id);
 
     // Prepare data for updateSchedule
-    const updateData = {
+    const updateData: ScheduleUpdateData = {
       streams: {
         creates: this.prepareStreamCreates(storeStreams, storeStreamIds, dbStreamIds),
         updates: this.prepareStreamUpdates(storeStreams, storeStreamIds, dbStreamIds),

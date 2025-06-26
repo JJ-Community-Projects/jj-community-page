@@ -226,7 +226,7 @@ export class StreamParticipantsRepo extends Repo<typeof streamParticipantsTable.
             streamId: participant.streamId,
             scheduleId,
             userId: participant.userId
-          })
+          }).onConflictDoNothing()
       );
     }
     return operations;

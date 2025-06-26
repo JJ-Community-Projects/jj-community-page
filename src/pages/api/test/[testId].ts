@@ -1,22 +1,23 @@
 import type {APIRoute} from "astro";
-import {
-  getWsServerDurableObjectFetch,
-  type WsServerDurableObject
-} from "tinybase/synchronizers/synchronizer-ws-server-durable-object";
 
-export const GET: APIRoute = (ctx) => {
-  const DO = ctx.locals.runtime.env.TinyDO //  as unknown as DurableObjectNamespace<WsServerDurableObject<unknown>>
+export const GET: APIRoute = async (ctx) => {
+  const DO = ctx.locals.runtime.env.ScheduleEditorDO //  as unknown as DurableObjectNamespace<WsServerDurableObject<unknown>>
   if (!DO) {
     return new Response("Durable object not found", {status: 404});
   }
   const testId = ctx.params.testId
-  if (!testId){
+  if (!testId) {
     return new Response("Test id not found", {status: 404});
   }
 
   const id = DO.idFromName(testId);
   const stub = DO.get(id)
-  return stub.fetch(ctx.request)
+  const data = await stub.getTables()
+
+  return new Response(JSON.stringify(data, null, 2), {
+    status: 200,
+    headers: {"content-type": "application/json"},
+  })
   /*
   const fetch =  getWsServerDurableObjectFetch('ScheduleEditorDO')
 

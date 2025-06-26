@@ -11,27 +11,10 @@ import {useDayCard} from "../DayCardContext.tsx";
 import {useStreamEditor} from "./ScheduleEditorStreamEditDialogBodyProvider.tsx";
 import "./ScheduleEditorStreamEditDialogBody.css";
 import { FaSolidTag, FaSolidUserGroup, FaRegularClock } from "solid-icons/fa";
+import {DebugJSONView} from "../../../../../../common/DebugJSONView.tsx";
 
-interface ScheduleEditorStreamEditDialogBodyProps {
-  stream: {
-    id: string;
-    title: string;
-    subtitle: string;
-    description: string;
-    youtubeVodUrl?: string;
-    twitchVodUrl?: string;
-    start: DateTime;
-    end: DateTime;
-    visible: boolean;
-    tags?: { label: string, tag: string }[];
-    participants?: { userId: number, providerName: string, provider: string }[];
-    createdBy: number;
-  };
-  editStreamDialog: ModalSignal,
-  deleteDialog: ModalSignal,
-}
 
-export const ScheduleEditorStreamEditDialogBody: Component<ScheduleEditorStreamEditDialogBodyProps> = (props) => {
+export const ScheduleEditorStreamEditDialogBody: Component = (props) => {
   const {action} = useScheduleEditor();
   const {stream} = useStreamEditor()
 
@@ -108,6 +91,8 @@ export const ScheduleEditorStreamEditDialogBody: Component<ScheduleEditorStreamE
           <Vods/>
         </div>
       </div>
+
+      <DebugJSONView data={stream} title={'Debug Stream'}/>
 
       <Show when={action.saveStream.lastErrorMessage}>
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-4">

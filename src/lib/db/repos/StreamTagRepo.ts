@@ -394,7 +394,7 @@ export class StreamTagRepo extends Repo<typeof streamTagsTable._['config']> {
             tag: normalizedTag,
             label: tagLabel,
             addedAt: DateTime.now().toUTC().toJSDate()
-          })
+          }).onConflictDoNothing()
       );
     }
     return operations;

@@ -294,6 +294,8 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
       // Execute all operations in a single batch
       await this.executeBatch(operations);
     } catch (error) {
+
+      console.error('ScheduleRepo', 'updateSchedule', error);
       if (this.env === 'action') {
         throw new DatabaseError("Failed to update schedule", error).toActionError();
       } else {

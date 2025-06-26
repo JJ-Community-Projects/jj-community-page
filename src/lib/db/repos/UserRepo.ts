@@ -318,34 +318,49 @@ export class UserRepo extends Repo<typeof users._['config']> {
   /**
    * Search for users by a search term
    * @param searchTerm The term to search for
+   * @param includeSelf Include the current user
    * @param currentUserId The ID of the current user to exclude from results
    * @param limit Maximum number of results to return
    * @returns Promise resolving to an array of matching accounts
    *
    * SQL: `SELECT "accounts"."userId", "accounts"."provider", "accounts"."providerUsername" FROM "accounts" WHERE ("accounts"."providerUsername" LIKE ? AND "accounts"."userId" != ?) LIMIT ?`
    */
-  async searchUser(searchTerm: string, currentUserId: number, limit: number = 5): Promise<{
+  async searchUser(searchTerm: string, includeSelf: boolean, currentUserId: number, limit: number = 5): Promise<{
     userId: number,
     provider: string,
     providerName: string
   }[]> {
     try {
       const searchPattern = `%${searchTerm}%`;
-
-      return await this.db.select({
-        userId: accounts.userId,
-        provider: accounts.provider,
-        providerName: accounts.providerUsername
-      })
-        .from(accounts)
-        .where(
-          and(
+      if (includeSelf) {
+        return await this.db.select({
+          userId: accounts.userId,
+          provider: accounts.provider,
+          providerName: accounts.providerUsername
+        })
+          .from(accounts)
+          .where(
             like(accounts.providerUsername, searchPattern),
-            not(eq(accounts.userId, currentUserId))
           )
-        )
-        .limit(limit)
-        .all();
+          .limit(limit)
+          .all();
+      } else {
+        return await this.db.select({
+          userId: accounts.userId,
+          provider: accounts.provider,
+          providerName: accounts.providerUsername
+        })
+          .from(accounts)
+          .where(
+            and(
+              like(accounts.providerUsername, searchPattern),
+              not(eq(accounts.userId, currentUserId))
+            )
+          )
+          .limit(limit)
+          .all();
+      }
+
     } catch (error) {
       if (this.env === 'action') {
         throw new DatabaseError(`Failed to search users with term: ${searchTerm}`, error).toActionError();

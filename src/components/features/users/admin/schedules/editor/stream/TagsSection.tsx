@@ -5,16 +5,20 @@ import {
   createSignal,
   For,
   Match,
-  Show,
-  type Signal,
+  Show, type Signal,
   Switch
 } from "solid-js";
+import type {
+  Tag,
+  TagSearchResults
+} from "../../../../../../../lib/model/admin/user/scheduleEditor/ScheduleEditorTypes";
 import {TextField} from "@kobalte/core/text-field";
 import {debounce} from "@solid-primitives/scheduled";
 import {FaRegularCircle} from "solid-icons/fa";
 import {useScheduleEditor} from "../../../providers/ScheduleEditorProvider.tsx";
 import {createStore, reconcile, unwrap} from "solid-js/store";
 import {useStreamEditor} from "./ScheduleEditorStreamEditDialogBodyProvider.tsx";
+import {TagPill} from "../../../../../../common/TagPill.tsx";
 
 function createDeepSignal<T>(value: T): Signal<T> {
   const [store, setStore] = createStore({
@@ -72,11 +76,7 @@ const useTags = () => {
   });
 
   // Helper functions for UI - use data.latest to prevent UI flickering during loading
-  const suggestedTags = (): ({
-    tag: string
-    label: string
-    count: number
-  }[]) => {
+  const suggestedTags = (): (Tag & { count: number })[] => {
     return (data()?.tags ?? data.latest?.tags ?? [])
       .filter((tag) => !currentTagsIds().includes(tag.tag))
   };
@@ -164,7 +164,7 @@ const useTags = () => {
 }
 
 interface TagsSectionProps {
-  streamId: string;
+  streamId: number;
 }
 
 export const TagsSection: Component<TagsSectionProps> = (props) => {
@@ -283,39 +283,39 @@ export const TagsSection: Component<TagsSectionProps> = (props) => {
               {/* Suggested tags */}
               <For each={suggestedTags()}>
                 {(tag) => (
-                  <button
-                    type="button"
+                  <TagPill
+                    label={tag.label}
+                    tag={tag.tag}
+                    variant="interactive"
+                    count={tag.count}
                     onClick={(e) => handleSelectTag(e, tag.tag, tag.label)}
-                    class="text-white text-xs bg-accent-200 hover:bg-accent-300 px-2 py-1 rounded-full transition-all"
-                  >
-                    {tag.label} ({tag.count})
-                  </button>
+                  />
                 )}
               </For>
 
               {/* Default tags */}
               <For each={defaultTags()}>
                 {(tag) => (
-                  <button
-                    type="button"
+                  <TagPill
+                    label={tag.label}
+                    tag={tag.tag}
+                    variant="interactive"
+                    count={tag.count}
                     onClick={(e) => handleSelectTag(e, tag.tag, tag.label)}
-                    class="text-white text-xs bg-accent-200 hover:bg-accent-300 px-2 py-1 rounded-full transition-all"
-                  >
-                    {tag.label} ({tag.count})
-                  </button>
+                  />
                 )}
               </For>
 
               {/* Charity tags */}
               <For each={charityTags()}>
                 {(tag) => (
-                  <button
-                    type="button"
+                  <TagPill
+                    label={tag.label}
+                    tag={tag.tag}
+                    variant="charity"
+                    count={tag.count}
                     onClick={(e) => handleSelectTag(e, tag.tag, tag.label)}
-                    class="text-xs bg-primary-200 hover:bg-primary-300 text-white px-2 py-1 rounded-full transition-all"
-                  >
-                    {tag.label} ({tag.count})
-                  </button>
+                  />
                 )}
               </For>
             </div>
@@ -330,21 +330,12 @@ export const TagsSection: Component<TagsSectionProps> = (props) => {
           <div class="flex flex-wrap gap-2">
             <For each={currentTags()}>
               {(tag) => (
-                <div class="flex items-center bg-accent/10 text-accent px-2 py-1 rounded-full text-sm">
-                  {tag.label}
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveTag(tag.tag)}
-                    class="ml-1 text-accent hover:text-accent-600"
-                    aria-label={`Remove tag ${tag.label}`}
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                      <path fill-rule="evenodd"
-                            d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                            clip-rule="evenodd"/>
-                    </svg>
-                  </button>
-                </div>
+                <TagPill
+                  label={tag.label}
+                  tag={tag.tag}
+                  variant="selected"
+                  onRemove={() => handleRemoveTag(tag.tag)}
+                />
               )}
             </For>
           </div>

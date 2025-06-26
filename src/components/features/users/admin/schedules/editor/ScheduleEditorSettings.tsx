@@ -273,6 +273,42 @@ const ScheduleVisibilityCheckbox: Component = () => {
   );
 };
 
+// Always add self to stream checkbox component
+const AlwaysAddSelfToStreamCheckbox: Component = () => {
+  const {
+    local,
+    updateAlwaysAddSelfToStream
+  } = useScheduleEditor();
+
+  // Handler to update the always add self to stream setting
+  const onChangeAlwaysAddSelfToStream = debounce((checked: boolean) => {
+    updateAlwaysAddSelfToStream(checked);
+  }, 200);
+
+  return (
+    <Checkbox
+      name="alwaysAddSelfToStream"
+      class="items-center inline-flex cursor-pointer"
+      checked={local.alwaysAddSelfToStream}
+      onChange={onChangeAlwaysAddSelfToStream}
+    >
+      <Checkbox.Input class="sr-only"/>
+      <Checkbox.Control
+        class="h-5 w-5 rounded border border-gray-300 bg-white text-blue-600 focus:ring-blue-500 data-[checked]:bg-blue-600 data-[checked]:border-blue-600">
+        <Checkbox.Indicator>
+          <svg class="h-4 w-4 text-white" viewBox="0 0 8 8">
+            <path stroke="currentColor" stroke-width="1.5" fill="none" d="M1,4 L3,6 L7,2"/>
+          </svg>
+        </Checkbox.Indicator>
+      </Checkbox.Control>
+      <Checkbox.Label class="ml-2 text-sm font-medium">Always Add Self to Stream</Checkbox.Label>
+      <Checkbox.Description class="text-xs text-gray-500 ml-2">
+        When checked, you will be automatically added as a participant to new streams.
+      </Checkbox.Description>
+    </Checkbox>
+  );
+};
+
 export const ScheduleEditorSettings: Component = () => {
   const {
     action
@@ -285,12 +321,14 @@ export const ScheduleEditorSettings: Component = () => {
       <Show when={action.updateScheduleTitle.lastErrorMessage ||
                   action.updateScheduleYear.lastErrorMessage ||
                   action.updateScheduleSlug.lastErrorMessage ||
-                  action.updateScheduleVisibility.lastErrorMessage}>
+                  action.updateScheduleVisibility.lastErrorMessage ||
+                  action.updateAlwaysAddSelfToStream.lastErrorMessage}>
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-4">
           {action.updateScheduleTitle.lastErrorMessage ||
            action.updateScheduleYear.lastErrorMessage ||
            action.updateScheduleSlug.lastErrorMessage ||
-           action.updateScheduleVisibility.lastErrorMessage}
+           action.updateScheduleVisibility.lastErrorMessage ||
+           action.updateAlwaysAddSelfToStream.lastErrorMessage}
         </div>
       </Show>
 
@@ -301,6 +339,7 @@ export const ScheduleEditorSettings: Component = () => {
         </div>
         <ScheduleSlugField />
         <ScheduleVisibilityCheckbox />
+        <AlwaysAddSelfToStreamCheckbox />
       </div>
     </div>
   );

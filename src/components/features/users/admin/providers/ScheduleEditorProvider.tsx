@@ -1,7 +1,28 @@
+/**
+ * ScheduleEditorProvider.tsx
+ *
+ * This file implements the main provider for the Schedule Editor system, which enables
+ * real-time collaborative editing of JingleJam schedules. The provider manages:
+ *
+ * - Synchronization with the server via WebSockets and TinyBase
+ * - Local state management for UI rendering
+ * - Methods for creating, updating, and deleting streams
+ * - Methods for managing tags and participants
+ * - Schedule metadata operations
+ *
+ * The provider uses a dual-state approach:
+ * 1. A TinyBase store synchronized with the server for data consistency
+ * 2. A local SolidJS store for reactive UI updates
+ *
+ * Changes made through the provider's methods are automatically synchronized
+ * with the server and other connected clients in real-time.
+ */
+
 import {createMergeableStore} from "tinybase/mergeable-store";
 import {createStore} from "solid-js/store";
 import {DateTime} from "luxon";
 import {sanitizeTag} from "../../../../../functions/slug.ts";
+import {createAction} from "../../../../../functions/createAction.ts";
 
 import {
   createContext,
@@ -14,97 +35,35 @@ import {
 } from "solid-js";
 
 import type {Row} from "tinybase/store";
+import type {
+  HookActions,
+  ScheduleType,
+  StreamType,
+  Tag,
+  Participant,
+  ValueOrSetter
+} from "../../../../../lib/model/admin/user/scheduleEditor/ScheduleEditorTypes";
 import {createWsSynchronizer, type WsSynchronizer} from "tinybase/synchronizers/synchronizer-ws-client";
 import ReconnectingWebSocket from "reconnecting-websocket";
 import {actions} from "astro:actions";
+import {useScheduleEditorConnection} from "./ScheduleEditorConnectionProvider.tsx";
 
-type HookActions = {
-  addNewStream: {
-    actionInProgress: boolean,
-    lastErrorMessage?: string
-  },
-  updateStream: {
-    actionInProgress: boolean,
-    lastErrorMessage?: string
-  },
-  deleteStream: {
-    actionInProgress: boolean,
-    lastErrorMessage?: string
-  },
-  saveStream: {
-    actionInProgress: boolean,
-    lastErrorMessage?: string
-  },
-  updateStreamTitle: {
-    actionInProgress: boolean,
-    lastErrorMessage?: string
-  },
-  updateStreamDescription: {
-    actionInProgress: boolean,
-    lastErrorMessage?: string
-  },
-  updateStreamSubtitle: {
-    actionInProgress: boolean,
-    lastErrorMessage?: string
-  },
-  updateStreamEnd: {
-    actionInProgress: boolean,
-    lastErrorMessage?: string
-  },
-  updateStreamStart: {
-    actionInProgress: boolean,
-    lastErrorMessage?: string
-  },
-  updateStreamVisibility: {
-    actionInProgress: boolean,
-    lastErrorMessage?: string
-  },
-  updateScheduleTitle: {
-    actionInProgress: boolean,
-    lastErrorMessage?: string
-  },
-  updateScheduleYear: {
-    actionInProgress: boolean,
-    lastErrorMessage?: string
-  },
-  updateScheduleSlug: {
-    actionInProgress: boolean,
-    lastErrorMessage?: string
-  },
-  updateScheduleVisibility: {
-    actionInProgress: boolean,
-    lastErrorMessage?: string
-  },
-  addTag: {
-    actionInProgress: boolean,
-    lastErrorMessage?: string
-  },
-  removeTag: {
-    actionInProgress: boolean,
-    lastErrorMessage?: string
-  },
-  addParticipant: {
-    actionInProgress: boolean,
-    lastErrorMessage?: string
-  },
-  removeParticipant: {
-    actionInProgress: boolean,
-    lastErrorMessage?: string
-  },
-  saveSchedule: {
-    actionInProgress: boolean,
-    lastErrorMessage?: string
-  },
-  deleteSchedule: {
-    actionInProgress: boolean,
-    lastErrorMessage?: string
-  },
-  fetchTags: {
-    actionInProgress: boolean,
-    lastErrorMessage?: string
-  },
-}
+/**
+ * Defines the structure for tracking the state of all actions in the hook.
+ * Each action has:
+ * - actionInProgress: Boolean flag indicating if the action is currently executing
+ * - lastErrorMessage: Optional string containing the last error message if the action failed
+ *
+ * This type is used to create a store that tracks loading states and errors
+ * for all operations, enabling UI components to show loading indicators and error messages.
+ *
+ * @see HookActions in ScheduleEditorTypes.ts
+ */
 
+/**
+ * Initial state for all hook actions.
+ * Sets all actions to not in progress and with no error messages.
+ */
 const initHookState: HookActions = {
   addNewStream: {
     actionInProgress: false,
@@ -148,6 +107,9 @@ const initHookState: HookActions = {
   updateScheduleVisibility: {
     actionInProgress: false,
   },
+  updateAlwaysAddSelfToStream: {
+    actionInProgress: false,
+  },
   addTag: {
     actionInProgress: false,
   },
@@ -172,82 +134,66 @@ const initHookState: HookActions = {
 };
 
 // region Initialization
+/**
+ * The main hook that powers the Schedule Editor functionality.
+ *
+ * This hook creates and manages:
+ * 1. A TinyBase store that synchronizes with the server via WebSocket
+ * 2. A local SolidJS store for UI rendering
+ * 3. Action tracking for loading states and errors
+ * 4. Methods for manipulating schedule data
+ *
+ * The hook sets up listeners to keep the local store in sync with the TinyBase store,
+ * which in turn stays in sync with the server. This enables real-time collaborative
+ * editing where changes made by one user are immediately visible to others.
+ *
+ * @param id - The ID of the schedule being edited
+ * @param userId - The ID of the current user
+ * @param username - The username of the current user
+ * @returns An object containing the local state and methods for manipulating the schedule
+ */
 const useScheduleEditorHook = (id: number, userId: number,
                                username: string) => {
 
-  const store = createMergeableStore()
+  const {store, addListener} = useScheduleEditorConnection()
 
-  const [action, setAction] = createStore<HookActions>(initHookState)
+  const {
+    actions: action,
+    startAction,
+    stopAction,
+    setLastError,
+    isActionInProgress,
+    getLastErrorMessage
+  } = createAction<keyof HookActions>(undefined, Object.keys(initHookState) as (keyof HookActions)[])
 
-  const startAction = (key: (keyof HookActions)) => {
-    setAction(key, {
-      actionInProgress: true,
-      lastErrorMessage: undefined,
-    })
-  }
-
-  const stopAction = (key: (keyof HookActions)) => {
-    setAction(key, 'actionInProgress', false)
-  }
-
-  const setLastError = (key: (keyof HookActions), error: string) => {
-    setAction(key, 'lastErrorMessage', error)
-  }
-
-  const [listener, setListener] = createSignal<string[]>([])
-  const addListener = (id: string) => setListener((ids) => ids.concat(id));
-  const [local, setLocal] = createStore<{
-    id: number;
-    title: string;
-    year: number;
-    slug: string;
-    visible: boolean;
-    streams: {
-      id: string;
-      title: string;
-      description: string;
-      subtitle: string;
-      start: DateTime,
-      end: DateTime,
-      visible: boolean,
-      tags: { label: string, tag: string }[],
-      participants: { userId: number, name: string }[],
-      createdBy: number;
-    }[],
-  }>({
+  const [local, setLocal] = createStore<ScheduleType>({
     id: id,
     title: '',
     year: new Date().getFullYear(),
     slug: '',
     visible: false,
-    streams: []
+    streams: [],
+    alwaysAddSelfToStream: true
   })
 
-  const [sync, setSync] = createSignal<WsSynchronizer<any> | undefined>()
-// endregion
 
-
-  // region Lifecycle Methods
-  onMount(async () => {
-    const hostname = window.location.hostname
-    const port = window.location.port
-    const clientSynchronizer = await createWsSynchronizer(
-      store,
-      new ReconnectingWebSocket(`ws://${hostname}:${port}/api/ws/schedules/${id}/editor?userId=${userId}`),
-    );
-    await clientSynchronizer.startSync()
-    setSync(clientSynchronizer)
-  })
-
-  // region listener
-
-
-  // Add listeners for schedule properties
+  // region schedule properties
   addListener(
     store.addValueListener(
       'id',
       (_, __, newValue) => {
+        console.log('Changing schedule id to', newValue);
         setLocal('id', newValue as number);
+      }
+    )
+  )
+
+  addListener(
+    store.addValueListener(
+      'alwaysAddSelfToStream',
+      (_, __, newValue) => {
+        console.log('Changing alwaysAddSelfToStream to', newValue);
+        setLocal('alwaysAddSelfToStream', newValue as boolean);
       }
     )
   )
@@ -256,6 +202,7 @@ const useScheduleEditorHook = (id: number, userId: number,
     store.addValueListener(
       'title',
       (_, __, newValue) => {
+        console.log('Changing schedule title to', newValue);
         setLocal('title', newValue as string);
       }
     )
@@ -265,6 +212,7 @@ const useScheduleEditorHook = (id: number, userId: number,
     store.addValueListener(
       'visible',
       (_, __, newValue) => {
+        console.log('Changing schedule visibility to', newValue);
         setLocal('visible', newValue as boolean);
       }
     )
@@ -274,6 +222,7 @@ const useScheduleEditorHook = (id: number, userId: number,
     store.addValueListener(
       'year',
       (_, __, newValue) => {
+        console.log('Changing schedule year to', newValue);
         setLocal('year', newValue as number);
       }
     )
@@ -283,31 +232,33 @@ const useScheduleEditorHook = (id: number, userId: number,
     store.addValueListener(
       'slug',
       (_, __, newValue) => {
+        console.log('Changing schedule slug to', newValue);
         setLocal('slug', newValue as string);
       }
     )
   )
+  // endregion
 
-  // Add listeners for streams
+  // region streams management
   addListener(
     store.addHasRowListener(
       'streams', null,
       (s, __, rowId, added) => {
         if (added) {
           const value = s.getRow('streams', rowId);
-          console.log('Add row', value)
-          setLocal('streams', (streams) => streams.concat(rowToLocal(rowId, value)).sort((a, b) => a.id.localeCompare(b.id)));
+          console.log('Adding stream row', value);
+          setLocal('streams', (streams) => streams.concat(rowToLocal(parseInt(rowId), value)).sort((a, b) => a.id - b.id));
         } else {
-          console.log('Remove row', rowId)
+          console.log('Removing stream row', rowId);
           setLocal('streams', (streams) => {
-            return streams.filter((s) => s.id !== rowId);
+            return streams.filter((s) => s.id !== parseInt(rowId));
           })
         }
       }
     )
   )
 
-  // Add listeners for stream properties
+  // region stream properties
   addListener(
     store.addCellListener('streams', null, 'title',
       (s, _, rowId, cellId,
@@ -315,8 +266,9 @@ const useScheduleEditorHook = (id: number, userId: number,
         if (!s.hasRow('streams', rowId)) {
           return
         }
+        console.log('Changing stream title to', value, 'for stream', rowId);
         setLocal('streams', (s) => {
-          return s.id == rowId
+          return s.id === parseInt(rowId)!
         }, 'title', value as string);
       })
   )
@@ -328,8 +280,9 @@ const useScheduleEditorHook = (id: number, userId: number,
         if (!s.hasRow('streams', rowId)) {
           return
         }
+        console.log('Changing stream visibility to', value, 'for stream', rowId);
         setLocal('streams', (s) => {
-          return s.id == rowId
+          return s.id == parseInt(rowId)
         }, 'visible', value as boolean);
       })
   )
@@ -341,8 +294,9 @@ const useScheduleEditorHook = (id: number, userId: number,
         if (!s.hasRow('streams', rowId)) {
           return
         }
+        console.log('Changing stream subtitle to', value, 'for stream', rowId);
         setLocal('streams', (s) => {
-          return s.id == rowId
+          return s.id == parseInt(rowId)
         }, 'subtitle', value as string);
       })
   )
@@ -354,8 +308,9 @@ const useScheduleEditorHook = (id: number, userId: number,
         if (!s.hasRow('streams', rowId)) {
           return
         }
+        console.log('Changing stream description to', value, 'for stream', rowId);
         setLocal('streams', (s) => {
-          return s.id == rowId
+          return s.id == parseInt(rowId)
         }, 'description', value as string);
       })
   )
@@ -367,8 +322,9 @@ const useScheduleEditorHook = (id: number, userId: number,
         if (!s.hasRow('streams', rowId)) {
           return
         }
+        console.log('Changing stream start time to', value, 'for stream', rowId);
         setLocal('streams', (s) => {
-          return s.id == rowId
+          return s.id == parseInt(rowId)
         }, 'start', DateTime.fromISO(value as string, {zone: 'utc'}).toLocal());
       })
   )
@@ -380,16 +336,33 @@ const useScheduleEditorHook = (id: number, userId: number,
         if (!s.hasRow('streams', rowId)) {
           return
         }
+        console.log('Changing stream end time to', value, 'for stream', rowId);
         setLocal('streams', (s) => {
-          return s.id == rowId
+          return s.id == parseInt(rowId)
         }, 'end', DateTime.fromISO(value as string, {zone: 'utc'}).toLocal());
       })
   )
 
-  // Add listener for streamTags table to update local state when tags change
+  addListener(
+    store.addCellListener('streams', null, 'createdBy',
+      (s, _, rowId, cellId,
+       value) => {
+        if (!s.hasRow('streams', rowId)) {
+          return
+        }
+        console.log('Changing stream createdBy to', value, 'for stream', rowId);
+        setLocal('streams', (s) => {
+          return s.id === parseInt(rowId)
+        }, 'createdBy', value as number);
+      })
+  )
+  // endregion
+
+  // region stream tags
   addListener(
     store.addTableListener('streamTags', (s, _, tableId) => {
       // When the streamTags table changes, update all streams' tags in the local state
+      console.log('Stream tags table changed');
       const streamTags = s.getTable('streamTags');
       const streams = local.streams;
 
@@ -421,10 +394,58 @@ const useScheduleEditorHook = (id: number, userId: number,
     })
   )
 
-  // Add listener for streamParticipants table to update local state when participants change
+  addListener(
+    store.addHasRowListener(
+      'streamTags', null,
+      (s, __, rowId, added) => {
+        if (added) {
+          const value = s.getRow('streamTags', rowId);
+          console.log('Adding tag to stream', value);
+          const streamId = value.streamId as string;
+          const tag = {
+            label: value.label as string,
+            tag: value.tag as string
+          };
+
+          // Add the tag to the appropriate stream's tags array
+          setLocal('streams', (stream) => stream.id === parseInt(streamId), 'tags',
+            (tags) => [...tags, tag]);
+        } else {
+          console.log('Removing tag from stream', rowId);
+          // Find the stream and tag to remove
+          const streamTags = s.getTable('streamTags');
+          const streams = local.streams;
+
+          // We need to find which stream this tag belonged to
+          // Since the row is already deleted, we need to check all streams
+          for (const stream of streams) {
+            // Check if any tag in this stream matches the deleted rowId
+            const tagIndex = stream.tags.findIndex(t =>
+              // We can't directly compare with rowId since it's deleted
+              // Instead, we check if this tag doesn't exist in the table anymore
+              !Object.values(streamTags).some(st =>
+                st.streamId === stream.id && st.tag === t.tag
+              )
+            );
+
+            if (tagIndex !== -1) {
+              // Remove the tag from this stream
+              setLocal('streams', (s) => s.id === stream.id, 'tags',
+                (tags) => tags.filter((_, i) => i !== tagIndex));
+              break;
+            }
+          }
+        }
+      }
+    )
+  )
+  // endregion
+
+  // region stream participants
   addListener(
     store.addTableListener('streamParticipants', (s, _, tableId) => {
       // When the streamParticipants table changes, update all streams' participants in the local state
+      console.log('Stream participants table changed');
       const streamParticipants = s.getTable('streamParticipants');
       const streams = local.streams;
 
@@ -457,32 +478,59 @@ const useScheduleEditorHook = (id: number, userId: number,
     })
   )
 
+  addListener(
+    store.addHasRowListener(
+      'streamParticipants', null,
+      (s, __, rowId, added) => {
+        if (added) {
+          const value = s.getRow('streamParticipants', rowId);
+          console.log('Adding participant to stream', value);
+          const streamId = value.streamId as string;
+          const participant = {
+            userId: value.userId as number,
+            name: value.providerName as string || 'Unknown'
+          };
+
+          // Add the participant to the appropriate stream's participants array
+          setLocal('streams', (stream) => stream.id === parseInt(streamId), 'participants',
+            (participants) => [...participants, participant]);
+        } else {
+          console.log('Removing participant from stream', rowId);
+          // Find the stream and participant to remove
+          const streamParticipants = s.getTable('streamParticipants');
+          const streams = local.streams;
+
+          // We need to find which stream this participant belonged to
+          // Since the row is already deleted, we need to check all streams
+          for (const stream of streams) {
+            // Check if any participant in this stream matches the deleted rowId
+            const participantIndex = stream.participants.findIndex(p =>
+              // We can't directly compare with rowId since it's deleted
+              // Instead, we check if this participant doesn't exist in the table anymore
+              !Object.values(streamParticipants).some(sp =>
+                sp.streamId === stream.id && sp.userId === p.userId
+              )
+            );
+
+            if (participantIndex !== -1) {
+              // Remove the participant from this stream
+              setLocal('streams', (s) => s.id === stream.id, 'participants',
+                (participants) => participants.filter((_, i) => i !== participantIndex));
+              break;
+            }
+          }
+        }
+      }
+    )
+  )
   // endregion
 
-  onCleanup(() => {
-    for (const l in listener()) {
-      store.delListener(l)
-    }
-    sync()?.stopSync()
-  })
   // endregion
 
   // region Data Conversion
-  const rowToLocal = (id: string, row: Row
-  ): {
-    id: string;
-    title: string;
-    subtitle: string;
-    description: string;
-    start: DateTime,
-    end: DateTime,
-    visible: boolean,
-    tags: { label: string, tag: string }[],
-    participants: { userId: number, name: string }[],
-    createdBy: number;
-  } => {
+  const rowToLocal = (id: number, row: Row): StreamType => {
     // Get tags for this stream from the streamTags table
-    const tags: { label: string, tag: string }[] = [];
+    const tags: Tag[] = [];
     if (store.hasTable('streamTags')) {
       const streamTags = store.getTable('streamTags');
       for (const tagId in streamTags) {
@@ -497,7 +545,7 @@ const useScheduleEditorHook = (id: number, userId: number,
     }
 
     // Get participants for this stream from the streamParticipants table
-    const participants: { userId: number, name: string }[] = [];
+    const participants: Participant[] = [];
     if (store.hasTable('streamParticipants')) {
       const streamParticipants = store.getTable('streamParticipants');
       for (const participantId in streamParticipants) {
@@ -525,17 +573,7 @@ const useScheduleEditorHook = (id: number, userId: number,
     }
   }
 
-  const localToRow = (stream: {
-    id: number | string;
-    title: string;
-    subtitle: string;
-    description: string;
-    start: DateTime,
-    end: DateTime,
-    visible: boolean,
-    tags?: { label: string, tag: string }[]
-    createdBy: number
-  }): Row => {
+  const localToRow = (stream: StreamType): Row => {
     return {
       title: stream.title ?? '',
       subtitle: stream.subtitle ?? '',
@@ -581,7 +619,7 @@ const useScheduleEditorHook = (id: number, userId: number,
       }
 
       // Add the new stream
-      store.addRow('streams', {
+      const id = store.addRow('streams', {
         title: 'New stream',
         subtitle: '',
         description: '',
@@ -590,6 +628,26 @@ const useScheduleEditorHook = (id: number, userId: number,
         end: endTime.setZone('utc').toISO()!,
         createdBy: userId
       });
+
+      if (local.alwaysAddSelfToStream) {
+        // Ensure the streamParticipants table exists
+        if (!store.hasTable('streamParticipants')) {
+          store.setTable('streamParticipants', {});
+        }
+
+        // Generate a new unique ID for the participant
+        const newParticipantId = Date.now().toString();
+
+        // Add the current user as a participant using the ID returned by addRow
+        if (id) {
+          store.setRow('streamParticipants', newParticipantId, {
+            streamId: id,
+            userId: userId,
+            providerName: username,
+            provider: 'tiltify'
+          });
+        }
+      }
 
       // Ensure the streamTags table exists
       if (!store.hasTable('streamTags')) {
@@ -691,15 +749,42 @@ const useScheduleEditorHook = (id: number, userId: number,
       }
 
       // Add the new stream
-      store.addRow('streams', {
+      const id = store.addRow('streams', {
         title: 'New stream',
         subtitle: '',
         description: '',
         visible: false,
         start: startTime.setZone('utc').toISO()!,
         end: endTime.setZone('utc').toISO()!,
-        createdBy: userId
+        createdBy: userId,
       });
+
+      if (local.alwaysAddSelfToStream) {
+        // Ensure the streamParticipants table exists
+        if (!store.hasTable('streamParticipants')) {
+          store.setTable('streamParticipants', {});
+        }
+
+        // Generate a new unique ID for the participant
+        const newParticipantId = Date.now().toString();
+
+        const user = {
+          streamId: id,
+          userId: userId,
+          providerName: username,
+          provider: 'tiltify'
+        }
+
+        if (id) {
+          // Add the current user as a participant using the ID returned by addRow
+          store.setRow('streamParticipants', newParticipantId, {
+            streamId: id,
+            userId: userId,
+            providerName: username,
+            provider: 'tiltify'
+          });
+        }
+      }
 
       // Ensure the streamTags table exists
       if (!store.hasTable('streamTags')) {
@@ -714,18 +799,11 @@ const useScheduleEditorHook = (id: number, userId: number,
     }
   }
 
-  const updateStream = (stream: {
-    id: number,
-    title: string;
-    subtitle: string;
-    description: string;
-    start: DateTime,
-    end: DateTime,
-    visible: boolean,
-    createdBy: number
-  }) => {
+  const updateStream = (stream: StreamType) => {
     startAction('updateStream');
     try {
+      console.log('updateStream', stream);
+      setLocal('streams', (s) => s.id === stream.id, stream);
       store.setRow('streams', `${id}`, localToRow(stream));
       stopAction('updateStream');
     } catch (error) {
@@ -736,7 +814,7 @@ const useScheduleEditorHook = (id: number, userId: number,
     }
   }
 
-  const deleteStream = (id: string) => {
+  const deleteStream = (id: number) => {
     startAction('deleteStream');
     try {
       // Delete all related tags from the streamTags table
@@ -762,192 +840,12 @@ const useScheduleEditorHook = (id: number, userId: number,
       }
 
       // Delete the stream itself
-      store.delRow('streams', id);
+      store.delRow('streams', `${id}`);
       stopAction('deleteStream');
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : 'An unknown error occurred';
       setLastError('deleteStream', errorMsg);
       stopAction('deleteStream');
-      throw error;
-    }
-  }
-
-  const updateStreamTitle = (id: string, title: string) => {
-    startAction('updateStreamTitle');
-    try {
-      if (!store.hasRow('streams', id)) {
-        const errorMsg = 'Stream not found';
-        setLastError('updateStreamTitle', errorMsg);
-        stopAction('updateStreamTitle');
-        return;
-      }
-      store.setCell('streams', id, 'title', title);
-      stopAction('updateStreamTitle');
-    } catch (error) {
-      const errorMsg = error instanceof Error ? error.message : 'An unknown error occurred';
-      setLastError('updateStreamTitle', errorMsg);
-      stopAction('updateStreamTitle');
-      throw error;
-    }
-  }
-
-  const updateStreamVisibility = (id: string, visible: boolean) => {
-    startAction('updateStreamVisibility');
-    try {
-      if (!store.hasRow('streams', id)) {
-        const errorMsg = 'Stream not found';
-        setLastError('updateStreamVisibility', errorMsg);
-        stopAction('updateStreamVisibility');
-        return;
-      }
-      store.setCell('streams', id, 'visible', visible);
-      stopAction('updateStreamVisibility');
-    } catch (error) {
-      const errorMsg = error instanceof Error ? error.message : 'An unknown error occurred';
-      setLastError('updateStreamVisibility', errorMsg);
-      stopAction('updateStreamVisibility');
-      throw error;
-    }
-  }
-
-  const updateStreamDescription = (id: string, description: string) => {
-    startAction('updateStreamDescription');
-    try {
-      if (!store.hasRow('streams', id)) {
-        const errorMsg = 'Stream not found';
-        setLastError('updateStreamDescription', errorMsg);
-        stopAction('updateStreamDescription');
-        return;
-      }
-      store.setCell('streams', id, 'description', description);
-      stopAction('updateStreamDescription');
-    } catch (error) {
-      const errorMsg = error instanceof Error ? error.message : 'An unknown error occurred';
-      setLastError('updateStreamDescription', errorMsg);
-      stopAction('updateStreamDescription');
-      throw error;
-    }
-  }
-
-  const updateStreamSubtitle = (id: string, subtitle: string) => {
-    startAction('updateStreamSubtitle');
-    try {
-      if (!store.hasRow('streams', id)) {
-        const errorMsg = 'Stream not found';
-        setLastError('updateStreamSubtitle', errorMsg);
-        stopAction('updateStreamSubtitle');
-        return;
-      }
-      store.setCell('streams', id, 'subtitle', subtitle);
-      stopAction('updateStreamSubtitle');
-    } catch (error) {
-      const errorMsg = error instanceof Error ? error.message : 'An unknown error occurred';
-      setLastError('updateStreamSubtitle', errorMsg);
-      stopAction('updateStreamSubtitle');
-      throw error;
-    }
-  }
-
-  const updateStreamEnd = (id: string, end: DateTime) => {
-    startAction('updateStreamEnd');
-    try {
-      if (!store.hasRow('streams', id)) {
-        const errorMsg = 'Stream not found';
-        setLastError('updateStreamEnd', errorMsg);
-        stopAction('updateStreamEnd');
-        return;
-      }
-
-      // Get the current start time of the stream
-      const stream = local.streams.find(s => s.id === id);
-      if (!stream) {
-        const errorMsg = 'Stream not found in local state';
-        setLastError('updateStreamEnd', errorMsg);
-        stopAction('updateStreamEnd');
-        return;
-      }
-
-      const currentYear = new Date().getFullYear();
-      const startOfRange = DateTime.fromObject({year: currentYear, month: 12, day: 1});
-      const endOfRange = DateTime.fromObject({year: currentYear, month: 12, day: 14, hour: 23, minute: 59, second: 59});
-
-      // Validate that end time is not before start time
-      if (end < stream.start) {
-        const errorMsg = "End time cannot be before start time";
-        alert(errorMsg);
-        setLastError('updateStreamEnd', errorMsg);
-        stopAction('updateStreamEnd');
-        return;
-      }
-
-      // Validate that end time is within the allowed range
-      if (end < startOfRange || end > endOfRange) {
-        const errorMsg = "Streams can only be scheduled between December 1 and December 14 of the current year";
-        alert(errorMsg);
-        setLastError('updateStreamEnd', errorMsg);
-        stopAction('updateStreamEnd');
-        return;
-      }
-
-      // Convert to UTC before saving
-      store.setCell('streams', id, 'end', end.setZone('utc').toISO() ?? '');
-      stopAction('updateStreamEnd');
-    } catch (error) {
-      const errorMsg = error instanceof Error ? error.message : 'An unknown error occurred';
-      setLastError('updateStreamEnd', errorMsg);
-      stopAction('updateStreamEnd');
-      throw error;
-    }
-  }
-
-  const updateStreamStart = (id: string, start: DateTime) => {
-    startAction('updateStreamStart');
-    try {
-      if (!store.hasRow('streams', id)) {
-        const errorMsg = 'Stream not found';
-        setLastError('updateStreamStart', errorMsg);
-        stopAction('updateStreamStart');
-        return;
-      }
-
-      // Get the current end time of the stream
-      const stream = local.streams.find(s => s.id === id);
-      if (!stream) {
-        const errorMsg = 'Stream not found in local state';
-        setLastError('updateStreamStart', errorMsg);
-        stopAction('updateStreamStart');
-        return;
-      }
-
-      const currentYear = new Date().getFullYear();
-      const startOfRange = DateTime.fromObject({year: currentYear, month: 12, day: 1});
-      const endOfRange = DateTime.fromObject({year: currentYear, month: 12, day: 14, hour: 23, minute: 59, second: 59});
-
-      // Validate that start time is not after end time
-      if (start > stream.end) {
-        const errorMsg = "Start time cannot be after end time";
-        alert(errorMsg);
-        setLastError('updateStreamStart', errorMsg);
-        stopAction('updateStreamStart');
-        return;
-      }
-
-      // Validate that start time is within the allowed range
-      if (start < startOfRange || start > endOfRange) {
-        const errorMsg = "Streams can only be scheduled between December 1 and December 14 of the current year";
-        alert(errorMsg);
-        setLastError('updateStreamStart', errorMsg);
-        stopAction('updateStreamStart');
-        return;
-      }
-
-      // Convert to UTC before saving
-      store.setCell('streams', id, 'start', start.setZone('utc').toISO() ?? '');
-      stopAction('updateStreamStart');
-    } catch (error) {
-      const errorMsg = error instanceof Error ? error.message : 'An unknown error occurred';
-      setLastError('updateStreamStart', errorMsg);
-      stopAction('updateStreamStart');
       throw error;
     }
   }
@@ -1005,6 +903,19 @@ const useScheduleEditorHook = (id: number, userId: number,
       throw error;
     }
   }
+
+  const updateAlwaysAddSelfToStream = (alwaysAdd: boolean) => {
+    startAction('updateAlwaysAddSelfToStream');
+    try {
+      store.setValue('alwaysAddSelfToStream', alwaysAdd);
+      stopAction('updateAlwaysAddSelfToStream');
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : 'An unknown error occurred';
+      setLastError('updateAlwaysAddSelfToStream', errorMsg);
+      stopAction('updateAlwaysAddSelfToStream');
+      throw error;
+    }
+  }
   // endregion
 
   // region Stream Utility Functions
@@ -1030,21 +941,12 @@ const useScheduleEditorHook = (id: number, userId: number,
     return days;
   };
 
-  const saveStream = (stream: {
-    id: string;
-    title: string;
-    subtitle: string;
-    description: string;
-    start: DateTime;
-    end: DateTime;
-    visible: boolean;
-    createdBy: number;
-    tags: { label: string, tag: string }[],
-    participants: { userId: number, providerName: string, provider: string }[],
-  }) => {
+  const saveStream = (stream: StreamType) => {
     startAction('saveStream');
+    console.log('saveStream', stream);
+    const id = `${stream.id}`
     try {
-      if (!store.hasRow('streams', stream.id)) {
+      if (!store.hasRow('streams', id)) {
         const errorMsg = 'Stream not found';
         console.log('saveStream', 'stream not found', stream);
         setLastError('saveStream', errorMsg);
@@ -1053,7 +955,7 @@ const useScheduleEditorHook = (id: number, userId: number,
       }
 
       // Update stream properties
-      store.setRow('streams', stream.id, {
+      store.setRow('streams', id, {
         id: stream.id,
         title: stream.title,
         subtitle: stream.subtitle,
@@ -1111,8 +1013,8 @@ const useScheduleEditorHook = (id: number, userId: number,
         store.setRow('streamParticipants', newParticipantId, {
           streamId: stream.id,
           userId: participant.userId,
-          providerName: participant.providerName,
-          provider: participant.provider
+          providerName: participant.name,
+          provider: participant.provider ?? 'UNKNOWN',
         });
       }
 
@@ -1126,206 +1028,6 @@ const useScheduleEditorHook = (id: number, userId: number,
   }
   // endregion
 
-  // region Tag Operations
-  /**
-   * @deprecated Use saveStream with tags included in the stream object instead.
-   * This function is maintained for backward compatibility.
-   */
-  const addTag = (streamId: string, tag: string) => {
-    startAction('addTag');
-    try {
-      if (!store.hasRow('streams', streamId)) {
-        const errorMsg = 'Stream not found';
-        setLastError('addTag', errorMsg);
-        stopAction('addTag');
-        return;
-      }
-
-      // Store the original tag as the label
-      let label = tag.trim();
-
-      // Sanitize the tag for internal use (lowercase, no spaces, only hyphens)
-      const sanitizedTag = sanitizeTag(tag);
-
-      // Check if tag already exists in the streamTags table
-      let tagExists = false;
-      if (store.hasTable('streamTags')) {
-        const streamTags = store.getTable('streamTags');
-        for (const tagId in streamTags) {
-          const tagEntry = streamTags[tagId];
-          if (tagEntry.streamId === streamId && (tagEntry.tag as string) === sanitizedTag) {
-            tagExists = true;
-            label = tagEntry.label as string;
-            break;
-          }
-        }
-      }
-
-      if (tagExists) {
-        // Tag already exists, no need to add it again
-        stopAction('addTag');
-        return;
-      }
-
-      // Create the streamTags table if it doesn't exist
-      if (!store.hasTable('streamTags')) {
-        store.setTable('streamTags', {});
-      }
-
-      // Generate a new unique ID for the tag
-      const newTagId = Date.now().toString();
-
-      // Add the new tag to the streamTags table with both tag and label
-      store.setRow('streamTags', newTagId, {
-        streamId: streamId,
-        tag: sanitizedTag,
-        label: label
-      });
-
-      stopAction('addTag');
-    } catch (error) {
-      const errorMsg = error instanceof Error ? error.message : 'An unknown error occurred';
-      setLastError('addTag', errorMsg);
-      stopAction('addTag');
-      throw error;
-    }
-  };
-
-  /**
-   * @deprecated Use saveStream with tags included in the stream object instead.
-   * This function is maintained for backward compatibility.
-   */
-  const removeTag = (streamId: string, tag: string) => {
-    startAction('removeTag');
-    try {
-      if (!store.hasRow('streams', streamId)) {
-        const errorMsg = 'Stream not found';
-        setLastError('removeTag', errorMsg);
-        stopAction('removeTag');
-        return;
-      }
-
-      // Sanitize the tag for comparison with stored tags
-      const sanitizedTag = sanitizeTag(tag);
-
-      // Find and remove the tag from the streamTags table
-      if (store.hasTable('streamTags')) {
-        const streamTags = store.getTable('streamTags');
-        for (const tagId in streamTags) {
-          const tagEntry = streamTags[tagId];
-          if (tagEntry.streamId === streamId && (tagEntry.tag as string) === sanitizedTag) {
-            // Remove this tag
-            store.delRow('streamTags', tagId);
-            break;
-          }
-        }
-      }
-
-      stopAction('removeTag');
-    } catch (error) {
-      const errorMsg = error instanceof Error ? error.message : 'An unknown error occurred';
-      setLastError('removeTag', errorMsg);
-      stopAction('removeTag');
-      throw error;
-    }
-  };
-  // endregion
-
-  // region Participant Operations
-  /**
-   * @deprecated Use saveStream with participants included in the stream object instead.
-   * This function is maintained for backward compatibility.
-   */
-  const addParticipant = (streamId: string, userId: number, providerName: string, provider: string) => {
-    startAction('addParticipant');
-    try {
-      if (!store.hasRow('streams', streamId)) {
-        const errorMsg = 'Stream not found';
-        setLastError('addParticipant', errorMsg);
-        stopAction('addParticipant');
-        return;
-      }
-
-      // Check if participant already exists in the streamParticipants table
-      let participantExists = false;
-      if (store.hasTable('streamParticipants')) {
-        const streamParticipants = store.getTable('streamParticipants');
-        for (const participantId in streamParticipants) {
-          const participantEntry = streamParticipants[participantId];
-          if (participantEntry.streamId === streamId && participantEntry.userId === userId) {
-            participantExists = true;
-            break;
-          }
-        }
-      }
-
-      if (participantExists) {
-        // Participant already exists, no need to add it again
-        stopAction('addParticipant');
-        return;
-      }
-
-      // Create the streamParticipants table if it doesn't exist
-      if (!store.hasTable('streamParticipants')) {
-        store.setTable('streamParticipants', {});
-      }
-
-      // Generate a new unique ID for the participant
-      const newParticipantId = Date.now().toString();
-
-      // Add the new participant to the streamParticipants table
-      store.setRow('streamParticipants', newParticipantId, {
-        streamId: streamId,
-        userId: userId,
-        providerName: providerName,
-        provider: provider
-      });
-
-      stopAction('addParticipant');
-    } catch (error) {
-      const errorMsg = error instanceof Error ? error.message : 'An unknown error occurred';
-      setLastError('addParticipant', errorMsg);
-      stopAction('addParticipant');
-      throw error;
-    }
-  };
-
-  /**
-   * @deprecated Use saveStream with participants included in the stream object instead.
-   * This function is maintained for backward compatibility.
-   */
-  const removeParticipant = (streamId: string, userId: number) => {
-    startAction('removeParticipant');
-    try {
-      if (!store.hasRow('streams', streamId)) {
-        const errorMsg = 'Stream not found';
-        setLastError('removeParticipant', errorMsg);
-        stopAction('removeParticipant');
-        return;
-      }
-
-      // Find and remove the participant from the streamParticipants table
-      if (store.hasTable('streamParticipants')) {
-        const streamParticipants = store.getTable('streamParticipants');
-        for (const participantId in streamParticipants) {
-          const participantEntry = streamParticipants[participantId];
-          if (participantEntry.streamId === streamId && participantEntry.userId === userId) {
-            // Remove this participant
-            store.delRow('streamParticipants', participantId);
-            break;
-          }
-        }
-      }
-
-      stopAction('removeParticipant');
-    } catch (error) {
-      const errorMsg = error instanceof Error ? error.message : 'An unknown error occurred';
-      setLastError('removeParticipant', errorMsg);
-      stopAction('removeParticipant');
-      throw error;
-    }
-  };
-  // endregion
 
   // region Tag API Operations
   // Fetch tags from the server based on the request parameters
@@ -1426,11 +1128,6 @@ const useScheduleEditorHook = (id: number, userId: number,
   };
   // endregion
 
-
-  createEffect(() => {
-    console.log('streams', local.streams)
-  })
-
   return {
     id,
     local,
@@ -1440,22 +1137,13 @@ const useScheduleEditorHook = (id: number, userId: number,
     updateStream,
     deleteStream,
     saveStream,
-    updateStreamTitle,
-    updateStreamDescription,
-    updateStreamSubtitle,
-    updateStreamEnd,
-    updateStreamStart,
-    updateStreamVisibility,
     updateScheduleTitle,
     updateScheduleYear,
     updateScheduleSlug,
     updateScheduleVisibility,
+    updateAlwaysAddSelfToStream,
     getStreamsByDay,
     getAllDays,
-    addTag,
-    removeTag,
-    addParticipant,
-    removeParticipant,
     fetchTags,
     saveSchedule,
     deleteSchedule,

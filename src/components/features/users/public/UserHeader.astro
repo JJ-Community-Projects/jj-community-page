@@ -37,6 +37,7 @@ import Instagram from "./social/Instagram.astro";
 import TikTok from "./social/TikTok.astro";
 import BlueSky from "./social/BlueSky.astro";
 import {GlobeIcon} from "../../../common/icons/JJIcons";
+import Tag from "../../../common/Tag.astro";
 ---
 
 <div class="bg-white rounded-lg p-6 mb-4 shadow-md">
@@ -48,9 +49,11 @@ import {GlobeIcon} from "../../../common/icons/JJIcons";
       {tags.length > 0 && (
               <div class="flex flex-wrap gap-2 justify-center">
                 {tags.map((tag) => (
-                        <span class="bg-accent text-white px-3 py-1 rounded-full text-xs">
-            {tag.label}
-          </span>
+                  <Tag
+                    label={tag.label}
+                    tag={tag.tag}
+                    variant="default"
+                  />
                 ))}
               </div>
       )}

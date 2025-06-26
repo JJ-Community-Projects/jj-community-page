@@ -1,10 +1,6 @@
-import {drizzle, DrizzleD1Database} from "drizzle-orm/d1";
-import type {APIContext} from "astro";
-import type {ActionAPIContext} from "astro:actions";
+import {DrizzleD1Database} from "drizzle-orm/d1";
 import type {SQLiteTableWithColumns, TableConfig} from "drizzle-orm/sqlite-core";
-import {eq} from "drizzle-orm";
 import {DatabaseError} from "./DatabaseError";
-import type {InferInsertModel, InferSelectModel} from "drizzle-orm";
 import type {BatchItem} from "drizzle-orm/batch";
 
 export type RepoEnv = 'action' | 'do'
@@ -39,6 +35,7 @@ export abstract class Repo<
       const [firstOp, ...restOps] = operations;
       await this.db.batch([firstOp, ...restOps] as const);
     } catch (error) {
+      console.log('Repo', 'executeBatch', error);
       if (this.env === 'action') {
         throw new DatabaseError("Failed to execute batch operations", error).toActionError();
       } else {

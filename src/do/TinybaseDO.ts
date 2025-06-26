@@ -1,9 +1,5 @@
 import {WsServerDurableObject} from "tinybase/synchronizers/synchronizer-ws-server-durable-object";
 import {createMergeableStore, type MergeableStore} from "tinybase/mergeable-store";
-import {
-  createDurableObjectStoragePersister,
-  type DurableObjectStoragePersister,
-} from "tinybase/persisters/persister-durable-object-storage";
 import {drizzle} from "drizzle-orm/d1";
 import {durableObjectsTable} from "../lib/db/schema/schema.ts";
 import {
@@ -18,12 +14,16 @@ import {
   objValues
 } from "./utils.ts";
 import type {Id} from "tinybase";
+import {
+  createDurableObjectSqlStoragePersister,
+  type DurableObjectSqlStoragePersister
+} from "tinybase/persisters/persister-durable-object-sql-storage";
 
 const SERVER_CLIENT_ID = 'S';
 
 export abstract class TinybaseDO extends WsServerDurableObject<Env> {
   protected store?: MergeableStore;
-  protected persister?: DurableObjectStoragePersister
+  protected persister?: DurableObjectSqlStoragePersister // DurableObjectStoragePersister
 
   protected constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
@@ -65,12 +65,28 @@ export abstract class TinybaseDO extends WsServerDurableObject<Env> {
     if (this.persister) {
       return this.persister;
     }
+    const config = {
+      mode: 'fragmented',
+      storagePrefix: 'my_app_',
+    };
     this.log('createPersister', 'Creating store and persister');
     this.store = createMergeableStore()
+    this.persister = createDurableObjectSqlStoragePersister(
+      this.store,
+      this.ctx.storage.sql,
+      'fragmented',
+      (sql, a) => {
+        console.log('TinybaseDO', 'onSqlCommand', sql);
+      },
+      (e) => {
+        console.error('TinybaseDO', e);
+      }
+    )
+    /*
     this.persister = createDurableObjectStoragePersister(
       this.store,
       this.ctx.storage,
-    );
+    );*/
     return this.persister;
   }
 
@@ -78,7 +94,7 @@ export abstract class TinybaseDO extends WsServerDurableObject<Env> {
     return this.ctx.getWebSockets(tag);
   }
 
-  protected defaultFetch(request: Request): Response | Promise<Response>{
+  protected defaultFetch(request: Request): Response | Promise<Response> {
     const pathId = getPathId(request);
     return ifNotUndefined(
       getClientId(request),
@@ -95,7 +111,6 @@ export abstract class TinybaseDO extends WsServerDurableObject<Env> {
       createUpgradeRequiredResponse,
     ) as Response;
   }
-
 
 
 }

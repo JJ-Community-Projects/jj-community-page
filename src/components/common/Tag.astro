@@ -1,0 +1,36 @@
+---
+interface Props {
+  label: string;
+  tag?: string;
+  variant?: 'default' | 'interactive' | 'charity' | 'selected';
+}
+
+const { label, tag, variant = 'default' } = Astro.props;
+
+// Base classes for all tag variants
+const baseClasses = "rounded-full px-2 py-1 text-sm inline-flex items-center";
+
+// Variant-specific classes
+let variantClasses = "";
+switch(variant) {
+  case 'interactive':
+    variantClasses = "bg-accent-200 hover:bg-accent-300 text-white cursor-pointer transition-colors";
+    break;
+  case 'charity':
+    variantClasses = "bg-primary-200 hover:bg-primary-300 text-white cursor-pointer transition-colors";
+    break;
+  case 'selected':
+    variantClasses = "bg-accent/10 text-accent";
+    break;
+  default:
+    variantClasses = "bg-accent-100 text-accent-800";
+    break;
+}
+
+const classes = `${baseClasses} ${variantClasses}`;
+---
+
+<span class={classes}>
+  {label}
+  <slot />
+</span>

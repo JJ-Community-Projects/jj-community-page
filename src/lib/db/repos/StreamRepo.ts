@@ -304,7 +304,7 @@ export class StreamRepo extends Repo<typeof streamsTable._['config']> {
       };
 
       operations.push(
-        this.db.insert(streamsTable).values(processedData)
+        this.db.insert(streamsTable).values(processedData).onConflictDoNothing()
       );
     }
     return operations;

@@ -1,4 +1,5 @@
 import {type Component, createMemo, createSignal, For, Show} from "solid-js";
+import type { Participant } from "../../../../../../../lib/model/admin/user/scheduleEditor/ScheduleEditorTypes";
 import {TextField} from "@kobalte/core/text-field";
 import {debounce} from "@solid-primitives/scheduled";
 import {FaRegularCircle} from "solid-icons/fa";
@@ -7,7 +8,7 @@ import {actions} from "astro:actions";
 import {useStreamEditor} from "./ScheduleEditorStreamEditDialogBodyProvider.tsx";
 
 const useParticipants = () => {
-  const {stream} = useStreamEditor()
+  const {stream, addParticipant, removeParticipant} = useStreamEditor()
 
   // Get the current stream's participants from the local store
   const participants = createMemo(() => {
@@ -16,7 +17,7 @@ const useParticipants = () => {
 
   // State for search input and results
   const [searchText, setSearchText] = createSignal("");
-  const [searchResults, setSearchResults] = createSignal<any[]>([]);
+  const [searchResults, setSearchResults] = createSignal<Participant[]>([]);
   const [isSearching, setIsSearching] = createSignal(false);
   const [error, setError] = createSignal("");
 
@@ -30,7 +31,7 @@ const useParticipants = () => {
 
     setIsSearching(true);
     try {
-      const {data, error} = await actions.users.search(query);
+      const {data, error} = await actions.users.search({searchTerm: query, includeSelf: true});
       if (error) {
         console.error("Search error:", error);
         setError("Failed to search for users");
@@ -39,7 +40,13 @@ const useParticipants = () => {
         // Filter out users that are already participants
         const filteredResults = data?.filter(user =>
           !participants().some(p => p.userId === user.userId)
-        ) || [];
+        ).map(({userId, provider, providerName}) => {
+          return {
+            userId,
+            provider: provider,
+            name: providerName,
+          }
+        }) || [];
         setSearchResults(filteredResults);
         setError("");
       }
@@ -59,8 +66,9 @@ const useParticipants = () => {
   };
 
   // Handle adding a participant
-  const handleAddParticipant = (user: any) => {
-    // addParticipant(props.streamId, user.userId, user.providerName, user.provider);
+  const handleAddParticipant = (participant: Participant) => {
+    // addParticipant(props.streamId, user.userId, user.name, user.provider);
+    addParticipant(participant)
     setSearchText("");
     setSearchResults([]);
   };
@@ -68,6 +76,7 @@ const useParticipants = () => {
   // Handle removing a participant
   const handleRemoveParticipant = (userId: number) => {
     // removeParticipant(props.streamId, userId);
+    removeParticipant(userId);
   };
 
   return {
@@ -77,7 +86,7 @@ const useParticipants = () => {
 }
 
 interface StreamParticipantsSectionProps {
-  streamId: string;
+  streamId: number;
 }
 
 export const StreamParticipantsSection: Component<StreamParticipantsSectionProps> = () => {
@@ -127,7 +136,7 @@ export const StreamParticipantsSection: Component<StreamParticipantsSectionProps
               {(result) => (
                 <li class="p-2 hover:bg-gray-50 flex justify-between items-center">
                   <div>
-                    <p class="font-medium">{result.providerName}</p>
+                    <p class="font-medium">{result.name}</p>
                     <p class="text-sm text-gray-500">{result.provider}</p>
                   </div>
                   <button
@@ -153,7 +162,7 @@ export const StreamParticipantsSection: Component<StreamParticipantsSectionProps
               {(participant) => (
                 <li class="p-2 flex justify-between items-center">
                   <div>
-                    <p class="font-medium">{participant.providerName}</p>
+                    <p class="font-medium">{participant.name}</p>
                   </div>
                   <button
                     class="text-red-500 hover:text-red-700 disabled:opacity-50 disabled:cursor-not-allowed"

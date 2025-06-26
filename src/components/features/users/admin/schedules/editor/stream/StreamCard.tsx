@@ -1,11 +1,12 @@
 import {type Component, Show} from "solid-js";
 import {useScheduleEditor} from "../../../providers/ScheduleEditorProvider.tsx";
-import type {StreamType} from "./StreamType.ts";
 import {StreamEditDialog} from "./StreamEditDialog.tsx";
 import {createModalSignal} from "../../../../../../../lib/createModalSignal.ts";
 import {ConfirmationDialog} from "../../../../../../common/dialogs/ConfirmationDialog.tsx";
 import {getStreamColors} from "../../../../../../../functions/jjDatesToColors.ts";
 import {twMerge} from "tailwind-merge";
+import type {StreamType} from "../../../../../../../lib/model/admin/user/scheduleEditor/ScheduleEditorTypes.ts";
+import {useStreamEditor} from "./ScheduleEditorStreamEditDialogBodyProvider.tsx";
 
 // Component for a single stream card
 interface StreamCardProps {
@@ -17,8 +18,11 @@ interface StreamCardProps {
 export const StreamCard: Component<StreamCardProps> = (props) => {
   const {
     deleteStream,
-    action
+    action,
+
   } = useScheduleEditor();
+
+  const {editDialog, deleteDialog, openEdit} = useStreamEditor()
 
   const getDayBackgroundColor = () => {
     if (props.whiteBackground) {
@@ -46,9 +50,6 @@ export const StreamCard: Component<StreamCardProps> = (props) => {
     }*/
   };
 
-  const showEditDialog = createModalSignal();
-
-  const deleteDialog = createModalSignal();
 
   const handleDelete = () => {
     deleteStream(props.stream.id);
@@ -63,7 +64,7 @@ export const StreamCard: Component<StreamCardProps> = (props) => {
           "p-2 bg-white rounded border border-gray-100 cursor-pointer hover:bg-gray-50",
           !props.stream.visible && "opacity-70"
         )}
-        onClick={showEditDialog.open}
+        onClick={() => openEdit(props.stream)}
       >
         <p class="font-medium text-sm truncate">{props.stream.title}</p>
         <div
@@ -82,12 +83,8 @@ export const StreamCard: Component<StreamCardProps> = (props) => {
         </Show>
       </div>
 
-      <StreamEditDialog
-        stream={(props.stream)}
-        dialog={showEditDialog}
-        deleteDialog={deleteDialog}
-      />
 
+      <StreamEditDialog/>
       <ConfirmationDialog
         isOpen={deleteDialog.isOpen()}
         onOpenChange={deleteDialog.setOpen}
@@ -100,7 +97,7 @@ export const StreamCard: Component<StreamCardProps> = (props) => {
         onConfirm={handleDelete}
         onCancel={() => {
           deleteDialog.close()
-          showEditDialog.open()
+          editDialog.open()
         }}
       />
 

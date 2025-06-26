@@ -1,7 +1,7 @@
 import {type Component, For, Show} from "solid-js";
 import {DateTime} from "luxon";
 import {StreamCard} from "./stream/StreamCard.tsx";
-import type {StreamType} from "./stream/StreamType.ts";
+import type {StreamType} from "../../../../../../lib/model/admin/user/scheduleEditor/ScheduleEditorTypes.ts";
 
 
 // Component for a single day card in the desktop view

@@ -3,21 +3,17 @@ import { type ModalSignal } from "../../../../../../../lib/createModalSignal.ts"
 import { useScheduleEditor } from "../../../providers/ScheduleEditorProvider.tsx";
 import { useStreamEditor } from "./ScheduleEditorStreamEditDialogBodyProvider.tsx";
 
-interface StreamDialogControlsProps {
-  editStreamDialog: ModalSignal;
-  deleteDialog: ModalSignal;
-}
 
-export const StreamDialogControls: Component<StreamDialogControlsProps> = (props) => {
+export const StreamDialogControls: Component = () => {
   const { action } = useScheduleEditor();
-  const { save } = useStreamEditor();
+  const { save, editDialog, deleteDialog } = useStreamEditor();
 
   return (
     <div class="flex justify-between pt-4 border-t border-gray-200">
       <button
         onClick={() => {
-          props.editStreamDialog.close();
-          props.deleteDialog.open();
+          editDialog.close();
+          deleteDialog.open();
         }}
         class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-all shadow-sm hover:shadow disabled:opacity-50 disabled:cursor-not-allowed"
         disabled={action.saveStream.actionInProgress}

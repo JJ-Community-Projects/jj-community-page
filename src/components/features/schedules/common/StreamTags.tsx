@@ -1,5 +1,6 @@
 import {type Component, For, Show} from "solid-js";
 import type {TagUI} from "../../../../lib/db/models/schedule-ui.ts";
+import {TagPill} from "../../../common/TagPill.tsx";
 
 interface StreamTagsProps {
   tags: TagUI[];
@@ -15,9 +16,11 @@ export const StreamTags: Component<StreamTagsProps> = (props) => {
       <div class="flex flex-wrap gap-2">
         <For each={props.tags}>
           {(tag) => (
-            <div class="bg-accent-100 rounded-full px-2 py-0.5">
-              {tag.label}
-            </div>
+            <TagPill
+              label={tag.label}
+              tag={tag.tag}
+              variant="default"
+            />
           )}
         </For>
       </div>
