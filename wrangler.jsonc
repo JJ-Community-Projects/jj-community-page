@@ -21,8 +21,10 @@
   "migrations": [
     {
       "tag": "v1",
-      "new_classes": [
-        // TODO
+      "new_sqlite_classes": [
+        "ScheduleEditorDO",
+        "UserDO",
+        "TeamDO"
       ]
     }
   ],
