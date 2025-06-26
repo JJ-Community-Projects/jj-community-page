@@ -523,8 +523,11 @@ export const users = {
    * Returns: An array of matching user accounts.
    */
   search: defineAction({
-    input: z.string(),
-    handler: async (searchTerm, context) => {
+    input: z.object({
+      searchTerm: z.string(),
+      includeSelf: z.boolean(),
+    }),
+    handler: async ({searchTerm, includeSelf}, context) => {
       // Check if user is authenticated
       const {session, user} = context.locals
       if (!session || !user) {
@@ -535,7 +538,7 @@ export const users = {
 
       // Perform search using UserRepo
       const users = UserRepo.action(context);
-      const foundAccounts = await users.searchUser(searchTerm, user.id, 5);
+      const foundAccounts = await users.searchUser(searchTerm, includeSelf, user.id, 5);
       return foundAccounts;
     }
   }),
