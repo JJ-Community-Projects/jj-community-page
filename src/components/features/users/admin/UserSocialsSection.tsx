@@ -10,6 +10,7 @@ import { useUser } from "./providers/UserProvider.tsx";
 import { socialUrlRegex } from "../../../../functions/socialUrlRegex.ts";
 import { FaSolidTrash } from "solid-icons/fa";
 import { FaSolidArrowsRotate } from "solid-icons/fa";
+import { PrimaryLivePlatform } from "./PrimaryLivePlatform.tsx";
 
 export const UserSocialsSection: Component = () => {
   // Get user context
@@ -224,6 +225,9 @@ export const UserSocialsSection: Component = () => {
       </div>
 
       <div class="space-y-6">
+        {/* Primary Live Stream Platform */}
+        <PrimaryLivePlatform />
+
         {/* Twitch */}
         <div>
           <h3 class="text-lg font-medium mb-2">Twitch</h3>

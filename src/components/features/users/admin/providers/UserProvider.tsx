@@ -81,6 +81,10 @@ type HookActions = {
     actionInProgress: boolean,
     lastErrorMessage?: string
   },
+  setPrimaryLiveStream: {
+    actionInProgress: boolean,
+    lastErrorMessage?: string
+  },
 }
 
 const initHookState: HookActions = {
@@ -141,6 +145,9 @@ const initHookState: HookActions = {
   updateUserStyle: {
     actionInProgress: false,
   },
+  setPrimaryLiveStream: {
+    actionInProgress: false,
+  },
 }
 
 const useUserHook = (user: User) => {
@@ -195,6 +202,7 @@ const useUserHook = (user: User) => {
       primaryColor: string;
       accentColor: string;
     } | null,
+    primaryLiveStream: string,
   }>({
     schedules: [],
     invites: [],
@@ -202,6 +210,7 @@ const useUserHook = (user: User) => {
     userTags: [],
     userSocials: [],
     userStyle: null,
+    primaryLiveStream: 'twitch', // Default value
   });
 
   onMount(() => {
@@ -337,6 +346,18 @@ const useUserHook = (user: User) => {
           setLocal('userStyle', style);
         } else {
           setLocal('userStyle', null);
+        }
+      }
+    ));
+
+    // Listen for changes to user settings (primaryLiveStream)
+    addListener(store.addHasRowListener(
+      'userSettings', null,
+      (s, __, rowId, added) => {
+        console.log('userSettings', 'rowListener', rowId)
+        if (added && rowId === 'primaryLiveStream') {
+          const value = s.getRow('userSettings', rowId);
+          setLocal('primaryLiveStream', value.platform as string);
         }
       }
     ));
@@ -777,6 +798,30 @@ const useUserHook = (user: User) => {
     }
   };
 
+  //----------------------------------------------
+  // Primary Live Stream Management Functions
+  //----------------------------------------------
+
+  // Set primary live stream platform
+  const setPrimaryLiveStream = async (platform: string) => {
+    startAction('setPrimaryLiveStream');
+    try {
+      const result = await actions.users.setPrimaryLiveStream({platform});
+      stopAction('setPrimaryLiveStream');
+      if (result.error) {
+        const errorMsg = result.error.message || 'Failed to set primary live stream platform';
+        setLastError('setPrimaryLiveStream', errorMsg);
+        throw new Error(errorMsg);
+      }
+      return result;
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : 'An unknown error occurred';
+      setLastError('setPrimaryLiveStream', errorMsg);
+      stopAction('setPrimaryLiveStream');
+      throw error;
+    }
+  };
+
   return {
     local,
     user,
@@ -805,6 +850,8 @@ const useUserHook = (user: User) => {
     fetchSocialsFromTiltify,
     // User style management
     updateUserStyle,
+    // Primary live stream management
+    setPrimaryLiveStream,
     // Action state
     action: action
   };

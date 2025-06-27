@@ -5,7 +5,7 @@ import type {Id, IdAddedOrRemoved} from "tinybase";
 import {TinybaseDO} from "./TinybaseDO.ts";
 import {validateSessionTokenFromEnv} from "../functions/session.ts";
 import {createUnauthorizedResponse} from "./utils.ts";
-import {userSocials, userStyles, userTags} from "../lib/db/schema/auth-schema.ts";
+import {users, userSocials, userStyles, userTags} from "../lib/db/schema/auth-schema.ts";
 
 
 export class UserDO extends TinybaseDO {
@@ -20,6 +20,7 @@ export class UserDO extends TinybaseDO {
       await this.loadUserTags();
       await this.loadUserSocials();
       await this.loadUserStyles();
+      await this.loadUserSettings();
     });
   }
 
@@ -475,7 +476,7 @@ export class UserDO extends TinybaseDO {
     return true;
   }
 
-  async updateTeamßInfo(updates: {
+  async updateTeamInfo(updates: {
     teamId: number;
     name?: string;
     slug?: string;
@@ -848,6 +849,38 @@ export class UserDO extends TinybaseDO {
     }
   }
 
+  private async loadUserSettings() {
+    if (!this.store) {
+      return;
+    }
+
+    try {
+      const db = drizzle(this.env.DB);
+
+      // Load user settings from database
+      const user = await db.select({
+        primaryLiveStream: users.primaryLiveStream
+      })
+        .from(users)
+        .where(eq(users.id, this.userId))
+        .get();
+
+      // Initialize userSettings table if it doesn't exist
+      if (!this.store.hasTable('userSettings')) {
+        this.store.setTable('userSettings', {});
+      }
+
+      // Update store with user settings if they exist
+      if (user) {
+        this.store.setRow('userSettings', 'primaryLiveStream', {
+          platform: user.primaryLiveStream
+        });
+      }
+    } catch (e) {
+      this.error('loadUserSettings error:', e);
+    }
+  }
+
   async updateUserStyle(primaryColor: string, accentColor: string) {
     if (!this.store) {
       this.error('updateUserStyle', 'Store not initialized');
@@ -881,6 +914,46 @@ export class UserDO extends TinybaseDO {
       return true;
     } catch (e) {
       this.error('updateUserStyle error:', e);
+      return false;
+    }
+  }
+
+  async setPrimaryLiveStream(platform: string) {
+    if (!this.store) {
+      this.error('setPrimaryLiveStream', 'Store not initialized');
+      return false;
+    }
+
+    try {
+      // Validate platform (should be one of twitch, youtube, tiktok)
+      if (!['twitch', 'youtube', 'tiktok'].includes(platform.toLowerCase())) {
+        this.error('setPrimaryLiveStream', 'Invalid platform', platform);
+        return false;
+      }
+
+      // Normalize platform to lowercase
+      const normalizedPlatform = platform.toLowerCase();
+
+      // Update primaryLiveStream in database
+      const db = drizzle(this.env.DB);
+      await db.update(users)
+        .set({
+          primaryLiveStream: normalizedPlatform
+        })
+        .where(eq(users.id, this.userId));
+
+      // Store the primaryLiveStream in the store
+      if (!this.store.hasTable('userSettings')) {
+        this.store.setTable('userSettings', {});
+      }
+      this.store.setRow('userSettings', 'primaryLiveStream', {
+        platform: normalizedPlatform
+      });
+
+      this.log('setPrimaryLiveStream', 'Primary live stream platform updated successfully', normalizedPlatform);
+      return true;
+    } catch (e) {
+      this.error('setPrimaryLiveStream error:', e);
       return false;
     }
   }

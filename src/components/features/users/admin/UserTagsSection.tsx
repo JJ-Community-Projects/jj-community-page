@@ -159,8 +159,15 @@ export const UserTagsSection: Component = () => {
           onClick={modal.open}
           class="bg-accent text-white px-4 py-2 rounded-lg hover:bg-accent-600 transition-all"
         >
-          Add Tag
+          Add New Tag
         </button>
+      </div>
+
+      {/* Explanation text */}
+      <div class="mb-4 text-sm text-gray-600">
+        <p>Tags help others discover streamers with similar interests and causes. Add regular tags to show off your favorite games, hobbies, or communities — and don't forget to add a charity tag to highlight the cause you're fundraising for.</p>
+        <p class="mt-2">This makes it easier for viewers to connect with you and support the charity you care about most.</p>
+        <p class="mt-2">You can pick from suggested tags, search for existing ones, or create your own custom tags — it's quick and easy! The more relevant your tags, the easier it is for viewers to connect with you and support your stream.</p>
       </div>
 
       {/* Tag Search Input */}

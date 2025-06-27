@@ -20,8 +20,10 @@ export const UserStylesSection: Component = () => {
   } = useUser();
 
   // State for color inputs and dialog
-  const [primaryColor, setPrimaryColor] = createSignal("#E30E50");
-  const [accentColor, setAccentColor] = createSignal("#3584BF");
+  const DEFAULT_PRIMARY_COLOR = "#E30E50";
+  const DEFAULT_ACCENT_COLOR = "#3584BF";
+  const [primaryColor, setPrimaryColor] = createSignal(DEFAULT_PRIMARY_COLOR);
+  const [accentColor, setAccentColor] = createSignal(DEFAULT_ACCENT_COLOR);
   const modal = createModalSignal();
 
   // Update local state when user style changes
@@ -40,6 +42,12 @@ export const UserStylesSection: Component = () => {
     } catch (error) {
       console.error("Error saving styles:", error);
     }
+  };
+
+  // Handle resetting colors to default
+  const handleResetColors = () => {
+    setPrimaryColor(DEFAULT_PRIMARY_COLOR);
+    setAccentColor(DEFAULT_ACCENT_COLOR);
   };
 
   return (
@@ -143,6 +151,14 @@ export const UserStylesSection: Component = () => {
                   disabled={action.updateUserStyle.actionInProgress}
                 >
                   Cancel
+                </button>
+                <button
+                  type="button"
+                  class="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
+                  onClick={handleResetColors}
+                  disabled={action.updateUserStyle.actionInProgress}
+                >
+                  Reset to Default
                 </button>
                 <button
                   type="button"

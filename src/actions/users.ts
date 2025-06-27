@@ -872,5 +872,56 @@ export const users = {
       const repo = UserRepo.action(context);
       return repo.findAllTiltifyAccounts();
     }
+  }),
+
+  /**
+   * Sets the user's primary live streaming platform.
+   * Input: An object containing:
+   *   - platform (string) - The platform to set as primary (twitch, youtube, tiktok)
+   * Action: Updates the user's primaryLiveStream setting in the database and UserDO.
+   * Returns: An object with a success flag.
+   */
+  setPrimaryLiveStream: defineAction({
+    input: z.object({
+      platform: z.string().refine(val => ['twitch', 'youtube', 'tiktok'].includes(val.toLowerCase()), {
+        message: "Platform must be one of: twitch, youtube, tiktok"
+      })
+    }),
+    handler: async ({platform}, context) => {
+      // Check if user is authenticated
+      const {session, user} = context.locals
+      if (!session || !user) {
+        throw new ActionError({code: 'UNAUTHORIZED'});
+      }
+
+      const userId = user.id;
+      const stub = getUserDO(context, userId);
+
+      // Set primary live stream platform
+      try {
+        let result;
+        try {
+          result = await stub.setPrimaryLiveStream(platform.toLowerCase());
+          console.log('Primary live stream platform set successfully:', platform);
+        } catch (error) {
+          console.error('Error in stub.setPrimaryLiveStream operation:', error);
+          throw error;
+        }
+
+        if (!result) {
+          throw new ActionError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: 'Failed to set primary live stream platform'
+          });
+        }
+        return {success: true};
+      } catch (error) {
+        console.error('Error setting primary live stream platform:', error);
+        throw new ActionError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to set primary live stream platform'
+        });
+      }
+    }
   })
 }
