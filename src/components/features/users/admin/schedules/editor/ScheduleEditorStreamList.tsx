@@ -257,6 +257,10 @@ const AllStreams: Component = () => {
     action,
   } = useScheduleEditor();
 
+  const streams = createMemo(() => {
+    return local.streams.toSorted((a, b) => a.start.toMillis() - b.start.toMillis());
+  })
+
   return (
     <div class="pt-2">
       <div class="flex justify-between items-center mb-6">
@@ -278,7 +282,7 @@ const AllStreams: Component = () => {
         </button>
       </div>
 
-      <Show when={local.streams.length === 0}>
+      <Show when={streams().length === 0}>
         <div class="bg-gray-50 border border-gray-200 rounded-xl p-8 text-center">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-400 mb-4" fill="none"
                viewBox="0 0 24 24" stroke="currentColor">
@@ -301,7 +305,7 @@ const AllStreams: Component = () => {
         </div>
       </Show>
 
-      <Show when={local.streams.length > 0}>
+      <Show when={streams().length > 0}>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <DayCardProvider
             start={DateTime.fromObject({
@@ -314,7 +318,7 @@ const AllStreams: Component = () => {
               month: 12,
               day: 21,
             })}>
-            <For each={local.streams}>
+            <For each={streams()}>
               {(stream) => (
                 <div
                   class="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow overflow-hidden border border-gray-100">
