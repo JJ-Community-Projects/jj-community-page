@@ -71,6 +71,7 @@ export abstract class TinybaseDO extends WsServerDurableObject<Env> {
     };
     this.log('createPersister', 'Creating store and persister');
     this.store = createMergeableStore()
+    this.store.getMergeableContent()
     this.persister = createDurableObjectSqlStoragePersister(
       this.store,
       this.ctx.storage.sql,

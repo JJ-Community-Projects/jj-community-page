@@ -2,6 +2,7 @@ import type {Component} from "solid-js";
 import {useTeamDetail} from "../../providers/TeamDetailsProvider.tsx";
 import {createModalSignal} from "../../../../../../lib/createModalSignal.ts";
 import {ConfirmationDialog} from "../../../../../common/dialogs/ConfirmationDialog.tsx";
+import {FaSolidChevronLeft} from "solid-icons/fa";
 
 export const AdminTeamDetailHeader: Component = () => {
   const {
@@ -30,8 +31,8 @@ export const AdminTeamDetailHeader: Component = () => {
       <div class="bg-white rounded-2xl shadow-xl p-6 mb-6">
         <div class="flex justify-between items-center">
           <div class="flex items-center gap-4">
-            <a href={`/admin/teams`} class="text-primary hover:underline">
-              &larr; Back to Teams
+            <a href={`/admin/teams`} class="text-primary hover:underline flex flex-row gap-1 items-center">
+              <FaSolidChevronLeft/><p>Back to Teams</p>
             </a>
             <h1 class="text-2xl font-bold">Team Details</h1>
           </div>
@@ -48,7 +49,7 @@ export const AdminTeamDetailHeader: Component = () => {
 
         {/* Informational text */}
         <div class="mt-4 p-3 bg-blue-50 text-blue-700 rounded-lg text-sm">
-          <p>Manage your team details, members, and invites from this page. Changes to team properties are saved automatically when you click the Save button.</p>
+          <p>Manage your team details, members, and invites from this page. Changes to team properties are saved when you click the Save button.</p>
         </div>
       </div>
 

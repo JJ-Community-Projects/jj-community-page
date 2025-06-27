@@ -9,11 +9,13 @@ import {
 } from "solid-js";
 import { TextField } from "@kobalte/core/text-field";
 import { Dialog } from "@kobalte/core/dialog";
+import { Accordion } from "@kobalte/core/accordion";
 import { createModalSignal } from "../../../../lib/createModalSignal.ts";
 import { useUser } from "./providers/UserProvider.tsx";
 import { debounce } from "@solid-primitives/scheduled";
 import { FaRegularCircle } from "solid-icons/fa";
 import { createStore, reconcile, unwrap } from "solid-js/store";
+import "./UserTagsSection.css";
 
 
 function createDeepSignal<T>(value: T): Signal<T> {
@@ -163,12 +165,32 @@ export const UserTagsSection: Component = () => {
         </button>
       </div>
 
-      {/* Explanation text */}
-      <div class="mb-4 text-sm text-gray-600">
-        <p>Tags help others discover streamers with similar interests and causes. Add regular tags to show off your favorite games, hobbies, or communities — and don't forget to add a charity tag to highlight the cause you're fundraising for.</p>
-        <p class="mt-2">This makes it easier for viewers to connect with you and support the charity you care about most.</p>
-        <p class="mt-2">You can pick from suggested tags, search for existing ones, or create your own custom tags — it's quick and easy! The more relevant your tags, the easier it is for viewers to connect with you and support your stream.</p>
-      </div>
+      {/* Explanation text in accordion */}
+      <Accordion class="mb-4" collapsible={true} defaultValue={[]}>
+        <Accordion.Item value="explanation" class="border border-gray-200 rounded-lg">
+          <Accordion.Header>
+            <Accordion.Trigger class="flex justify-between items-center w-full px-4 py-2 text-left text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg">
+              <span>About User Tags</span>
+              <svg
+                class="w-5 h-5 transform transition-transform duration-200 accordion__item-trigger-icon"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </Accordion.Trigger>
+          </Accordion.Header>
+          <Accordion.Content class="px-4 pt-0 pb-2 text-sm text-gray-600">
+            <div class="pt-2">
+              <p>Tags help others discover streamers with similar interests and causes. Add regular tags to show off your favorite games, hobbies, or communities — and don't forget to add a charity tag to highlight the cause you're fundraising for.</p>
+              <p class="mt-2">This makes it easier for viewers to connect with you and support the charity you care about most.</p>
+              <p class="mt-2">You can pick from suggested tags, search for existing ones, or create your own custom tags — it's quick and easy! The more relevant your tags, the easier it is for viewers to connect with you and support your stream.</p>
+            </div>
+          </Accordion.Content>
+        </Accordion.Item>
+      </Accordion>
 
       {/* Tag Search Input */}
       <div class="mb-4">
@@ -305,7 +327,7 @@ export const UserTagsSection: Component = () => {
 
           <Match when={local.userTags.length === 0}>
             <div class="flex justify-center items-center p-4">
-              <p class="text-gray-500">No tags added yet. Click "Add Tag" to add your first tag.</p>
+              <p class="text-gray-500">No tags added yet. Click on a suggested Tag or "Add Tag" to add your first tag.</p>
             </div>
           </Match>
 

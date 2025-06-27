@@ -1,4 +1,4 @@
-import {type Id, type IdAddedOrRemoved, type TablesSchema, type ValuesSchema} from 'tinybase';
+import {type Id, type IdAddedOrRemoved} from 'tinybase';
 import {drizzle} from "drizzle-orm/d1";
 import {DateTime} from "luxon";
 import {TinybaseDO} from "./TinybaseDO.ts";
@@ -9,14 +9,13 @@ import {StreamTagRepo} from "../lib/db/repos/StreamTagRepo.ts";
 import {StreamParticipantsRepo} from "../lib/db/repos/StreamParticipantsRepo.ts";
 import type {
   DBSchedule,
-  DBStream,
-  DBStreamTag,
   DBStreamParticipant,
+  DBStreamTag,
   DBStreamWithDetails,
-  StreamsTable,
-  TagsTable,
   ParticipantsTable,
-  ScheduleUpdateData
+  ScheduleUpdateData,
+  StreamsTable,
+  TagsTable
 } from "../lib/model/admin/user/scheduleEditor/ScheduleEditorTypes";
 
 /**
@@ -136,14 +135,17 @@ export class ScheduleEditorDO extends TinybaseDO {
   async loadFromDB(): Promise<void> {
     const id = this.scheduleId
 
-    if (this.hasScheduleInStore()) {
-      return
-    }
-
     // Load schedule using ScheduleRepo
     const schedule = await this.scheduleRepo.findById(id);
     if (!schedule) {
       return;
+    }
+
+    const updatedAt = DateTime.fromJSDate(schedule.updatedAt)
+    this.store?.setValue('lastScheduleDBUpdate', updatedAt?.toISO() ?? '')
+
+    if (this.hasScheduleInStore()) {
+      return
     }
 
 
@@ -279,19 +281,22 @@ export class ScheduleEditorDO extends TinybaseDO {
     // Get the schedule ID from the store
     const scheduleId = store.getValue('id') as number
 
+    const now = DateTime.now().toUTC()
     // Update schedule information
     const scheduleData = {
       title: store.getValue('title') as string,
       slug: store.getValue('slug') as string,
       year: store.getValue('year') as number,
       visible: store.getValue('visible') as boolean,
-      updatedAt: DateTime.now().toUTC().toJSDate()
+      updatedAt: now.toJSDate()
     };
 
     await this.scheduleRepo.update(scheduleId, scheduleData);
 
+    this.store?.setValue('lastScheduleDBSync', now?.toISO() ?? '')
+
     // Get data from the store
-    const { storeStreams, storeTags, storeParticipants } = this.getDataFromStore(store);
+    const {storeStreams, storeTags, storeParticipants} = this.getDataFromStore(store);
 
     // Fetch existing streams with details from the database for comparison
     const streams = await this.streamRepo.findStreamsWithDetails(scheduleId);
@@ -468,7 +473,7 @@ export class ScheduleEditorDO extends TinybaseDO {
     // Get participants from the streamParticipants table in the TinyBase store
     const storeParticipants = (store.getTable('streamParticipants') as ParticipantsTable) || {};
 
-    return { storeStreams, storeTags, storeParticipants };
+    return {storeStreams, storeTags, storeParticipants};
   }
 
   /**

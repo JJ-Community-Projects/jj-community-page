@@ -213,9 +213,6 @@ const Week1: Component = () => {
             <DayCard
               dayIndex={index()}
               day={day}
-              streams={getStreamsByDay(day.day)}
-              onAddStream={() => addNewStream(day.day)}
-              isAddingStream={action.addNewStream.actionInProgress}
             />
           </DayCardProvider>
         )}
@@ -245,9 +242,6 @@ const Week2: Component = () => {
             <DayCard
               dayIndex={index()}
               day={day}
-              streams={getStreamsByDay(day.day)}
-              onAddStream={() => addNewStream(day.day)}
-              isAddingStream={action.addNewStream.actionInProgress}
             />
           </DayCardProvider>
         )}

@@ -110,6 +110,12 @@ const initHookState: HookActions = {
   updateAlwaysAddSelfToStream: {
     actionInProgress: false,
   },
+  updateDefaultStreamVisibility: {
+    actionInProgress: false,
+  },
+  updateDefaultStreamLength: {
+    actionInProgress: false,
+  },
   addTag: {
     actionInProgress: false,
   },
@@ -172,8 +178,10 @@ const useScheduleEditorHook = (id: number, userId: number,
     year: new Date().getFullYear(),
     slug: '',
     visible: false,
+    alwaysAddSelfToStream: true,
+    defaultStreamVisibility: false,
+    defaultStreamLength: 180,
     streams: [],
-    alwaysAddSelfToStream: true
   })
 
 
@@ -194,6 +202,25 @@ const useScheduleEditorHook = (id: number, userId: number,
       (_, __, newValue) => {
         console.log('Changing alwaysAddSelfToStream to', newValue);
         setLocal('alwaysAddSelfToStream', newValue as boolean);
+      }
+    )
+  )
+
+  addListener(
+    store.addValueListener(
+      'defaultStreamVisibility',
+      (_, __, newValue) => {
+        console.log('Changing defaultStreamVisibility to', newValue);
+        setLocal('defaultStreamVisibility', newValue as boolean);
+      }
+    )
+  )
+  addListener(
+    store.addValueListener(
+      'defaultStreamLength',
+      (_, __, newValue) => {
+        console.log('Changing defaultStreamLength to', newValue);
+        setLocal('defaultStreamLength', newValue as number);
       }
     )
   )
@@ -607,7 +634,7 @@ const useScheduleEditorHook = (id: number, userId: number,
           zone: 'utc',
         });
         // End time is 3 hours later at 14:00
-        endTime = startTime.plus({hours: 3});
+        endTime = startTime.plus({minute: local.defaultStreamLength});
       } else {
         // If there are streams, set start time to the end time of the last stream
         const streamValues = Object.values(local.streams);
@@ -615,7 +642,7 @@ const useScheduleEditorHook = (id: number, userId: number,
 
         startTime = lastStream.end;
         // End time is 3 hours later
-        endTime = startTime.plus({hours: 3});
+        endTime = startTime.plus({minute: local.defaultStreamLength});
       }
 
       // Add the new stream
@@ -623,7 +650,7 @@ const useScheduleEditorHook = (id: number, userId: number,
         title: 'New stream',
         subtitle: '',
         description: '',
-        visible: false,
+        visible: local.defaultStreamVisibility,
         start: startTime.setZone('utc').toISO()!,
         end: endTime.setZone('utc').toISO()!,
         createdBy: userId
@@ -635,11 +662,26 @@ const useScheduleEditorHook = (id: number, userId: number,
           store.setTable('streamParticipants', {});
         }
 
-        // Generate a new unique ID for the participant
-        const newParticipantId = Date.now().toString();
+        // Check if the user is already a participant in this stream
+        let userAlreadyAdded = false;
+        if (store.hasTable('streamParticipants')) {
+          const streamParticipants = store.getTable('streamParticipants');
+          for (const participantId in streamParticipants) {
+            const participantEntry = streamParticipants[participantId];
+            if (participantEntry.streamId === id && participantEntry.userId === userId) {
+              userAlreadyAdded = true;
+              console.log('User is already a participant in this stream:', username, 'with userId:', userId);
+              break;
+            }
+          }
+        }
 
-        // Add the current user as a participant using the ID returned by addRow
-        if (id) {
+        // Only add the user if they're not already a participant
+        if (!userAlreadyAdded && id) {
+          // Generate a new unique ID for the participant
+          const newParticipantId = Date.now().toString();
+
+          // Add the current user as a participant using the ID returned by addRow
           store.setRow('streamParticipants', newParticipantId, {
             streamId: id,
             userId: userId,
@@ -703,7 +745,7 @@ const useScheduleEditorHook = (id: number, userId: number,
           zone: 'utc',
         });
         // End time is 3 hours later at 14:00
-        endTime = startTime.plus({hours: 3});
+        endTime = startTime.plus({minute: local.defaultStreamLength});
       } else if (local.streams.length === 0) {
         // If there are no streams, set start time to December 1 of current year at 17:00
         startTime = DateTime.fromObject({
@@ -716,26 +758,26 @@ const useScheduleEditorHook = (id: number, userId: number,
           zone: 'utc',
         });
         // End time is 3 hours later at 14:00
-        endTime = startTime.plus({hours: 3});
+        endTime = startTime.plus({minute: local.defaultStreamLength});
       } else {
         // If there are streams, set start time to the end time of the last stream
         const lastStream = local.streams[local.streams.length - 1];
 
         startTime = lastStream.end;
         // End time is 3 hours later
-        endTime = startTime.plus({hours: 3});
+        endTime = startTime.plus({minute: local.defaultStreamLength});
 
         // Ensure the times are within the allowed range
         if (startTime < startOfRange) {
           startTime = startOfRange;
-          endTime = startTime.plus({hours: 3});
+          endTime = startTime.plus({minute: local.defaultStreamLength});
         }
 
         if (endTime > endOfRange) {
           endTime = endOfRange;
           // If adjusting end time would make start time before end time, adjust start time too
           if (endTime.diff(startTime, 'hours').hours < 0) {
-            startTime = endTime.minus({hours: 3});
+            startTime = endTime.minus({minute: local.defaultStreamLength});
             // If this would put start time before the allowed range, alert and return
             if (startTime < startOfRange) {
               const errorMsg = "Cannot add more streams as they would fall outside the allowed date range (December 1 to December 14)";
@@ -753,7 +795,7 @@ const useScheduleEditorHook = (id: number, userId: number,
         title: 'New stream',
         subtitle: '',
         description: '',
-        visible: false,
+        visible: local.defaultStreamVisibility,
         start: startTime.setZone('utc').toISO()!,
         end: endTime.setZone('utc').toISO()!,
         createdBy: userId,
@@ -765,17 +807,25 @@ const useScheduleEditorHook = (id: number, userId: number,
           store.setTable('streamParticipants', {});
         }
 
-        // Generate a new unique ID for the participant
-        const newParticipantId = Date.now().toString();
-
-        const user = {
-          streamId: id,
-          userId: userId,
-          providerName: username,
-          provider: 'tiltify'
+        // Check if the user is already a participant in this stream
+        let userAlreadyAdded = false;
+        if (store.hasTable('streamParticipants')) {
+          const streamParticipants = store.getTable('streamParticipants');
+          for (const participantId in streamParticipants) {
+            const participantEntry = streamParticipants[participantId];
+            if (participantEntry.streamId === id && participantEntry.userId === userId) {
+              userAlreadyAdded = true;
+              console.log('User is already a participant in this stream:', username, 'with userId:', userId);
+              break;
+            }
+          }
         }
 
-        if (id) {
+        // Only add the user if they're not already a participant
+        if (!userAlreadyAdded && id) {
+          // Generate a new unique ID for the participant
+          const newParticipantId = Date.now().toString();
+
           // Add the current user as a participant using the ID returned by addRow
           store.setRow('streamParticipants', newParticipantId, {
             streamId: id,
@@ -916,6 +966,32 @@ const useScheduleEditorHook = (id: number, userId: number,
       throw error;
     }
   }
+
+  const updateDefaultStreamVisibility = (visible: boolean) => {
+    startAction('updateDefaultStreamVisibility');
+    try {
+      store.setValue('defaultStreamVisibility', visible);
+      stopAction('updateDefaultStreamVisibility');
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : 'An unknown error occurred';
+      setLastError('updateDefaultStreamVisibility', errorMsg);
+      stopAction('updateDefaultStreamVisibility');
+      throw error;
+    }
+  }
+
+  const updateDefaultStreamLength = (length: number) => {
+    startAction('updateDefaultStreamLength');
+    try {
+      store.setValue('defaultStreamLength', length);
+      stopAction('updateDefaultStreamLength');
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : 'An unknown error occurred';
+      setLastError('updateDefaultStreamLength', errorMsg);
+      stopAction('updateDefaultStreamLength');
+      throw error;
+    }
+  }
   // endregion
 
   // region Stream Utility Functions
@@ -940,6 +1016,33 @@ const useScheduleEditorHook = (id: number, userId: number,
     }
     return days;
   };
+
+
+  const hideStream = (id: number) => {
+    store.setCell('streams', `${id}`, 'visible', false)
+  }
+
+  const showStream = (id: number) => {
+    store.setCell('streams', `${id}`, 'visible', true)
+  }
+
+  const hideStreams = (ids: number[]) => {
+    for (let id of ids) {
+      hideStream(id);
+    }
+  }
+
+  const showStreams = (ids: number[]) => {
+    for (let id of ids) {
+      showStream(id);
+    }
+  }
+
+  const deleteStreams = (ids: number[]) => {
+    for (let id of ids) {
+      deleteStream(id);
+    }
+  }
 
   const saveStream = (stream: StreamType) => {
     startAction('saveStream');
@@ -982,8 +1085,21 @@ const useScheduleEditorHook = (id: number, userId: number,
       }
 
       // Add new tags
+      // Create a set to track unique tags
+      const uniqueTags = new Set<string>();
+
       for (const tagItem of stream.tags) {
         const sanitizedTag = sanitizeTag(tagItem.tag);
+
+        // Skip if this tag is already added (check by tag value)
+        if (uniqueTags.has(sanitizedTag)) {
+          console.log('Skipping duplicate tag:', sanitizedTag);
+          continue;
+        }
+
+        // Add to our set of unique tags
+        uniqueTags.add(sanitizedTag);
+
         const newTagId = Date.now().toString() + Math.random().toString(36).substring(2, 9);
         store.setRow('streamTags', newTagId, {
           streamId: stream.id,
@@ -1008,7 +1124,19 @@ const useScheduleEditorHook = (id: number, userId: number,
       }
 
       // Add new participants
+      // Create a set to track unique participants by userId
+      const uniqueParticipants = new Set<number>();
+
       for (const participant of stream.participants) {
+        // Skip if this participant is already added (check by userId)
+        if (uniqueParticipants.has(participant.userId)) {
+          console.log('Skipping duplicate participant:', participant.name, 'with userId:', participant.userId);
+          continue;
+        }
+
+        // Add to our set of unique participants
+        uniqueParticipants.add(participant.userId);
+
         const newParticipantId = Date.now().toString() + Math.random().toString(36).substring(2, 9);
         store.setRow('streamParticipants', newParticipantId, {
           streamId: stream.id,
@@ -1142,11 +1270,16 @@ const useScheduleEditorHook = (id: number, userId: number,
     updateScheduleSlug,
     updateScheduleVisibility,
     updateAlwaysAddSelfToStream,
+    updateDefaultStreamVisibility,
+    updateDefaultStreamLength,
     getStreamsByDay,
     getAllDays,
     fetchTags,
     saveSchedule,
     deleteSchedule,
+    hideStreams,
+    showStreams,
+    deleteStreams,
     // Action state
     action: action
   }

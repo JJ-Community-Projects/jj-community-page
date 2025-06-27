@@ -3,7 +3,15 @@ import {UserSchedulesProvider, useUserSchedules} from "../providers/UserSchedule
 import type {User} from "../../../../../lib/auth/User.ts";
 import {Dialog} from "@kobalte/core/dialog";
 import {createModalSignal} from "../../../../../lib/createModalSignal.ts";
-import {FaRegularStar, FaSolidStar, FaRegularEye, FaRegularEyeSlash, FaRegularPenToSquare, FaSolidTrash} from "solid-icons/fa";
+import {
+  FaRegularEye,
+  FaRegularEyeSlash,
+  FaRegularPenToSquare,
+  FaRegularStar,
+  FaSolidChevronLeft,
+  FaSolidStar,
+  FaSolidTrash
+} from "solid-icons/fa";
 
 interface SchedulesListProps {
   user: User
@@ -32,11 +40,9 @@ const SchedulesListContent: Component = () => {
     <div class="max-w-6xl mx-auto px-4 py-8 flex flex-col gap-4">
       <div class="bg-white rounded-2xl shadow-xl p-6 mb-6">
         <div class="flex flex-col gap-4">
-          <div>
-            <a href={`/admin`} class="text-primary hover:underline">
-              &larr; Back to Admin
-            </a>
-          </div>
+          <a href={`/admin`} class="text-primary hover:underline flex flex-row gap-1 items-center">
+            <FaSolidChevronLeft/><p>Back to Admin</p>
+          </a>
           <div class="flex justify-between items-center">
             <h2 class="text-xl font-bold">Your Schedules</h2>
             <button
@@ -48,7 +54,10 @@ const SchedulesListContent: Component = () => {
             </button>
           </div>
           <p class="text-gray-600">
-            You can create as many schedules as you want, but only one can be set as your primary schedule for each year. In most cases, you'll only need one per year. Your primary schedule will be highlighted on your page, while any other schedules—whether from the same year or different years—will still be available to view from your page.
+            You can create as many schedules as you want, but only one can be set as your primary schedule for each
+            year. In most cases, you'll only need one per year. Your primary schedule will be highlighted on your page,
+            while any other schedules—whether from the same year or different years—will still be available to view from
+            your page.
           </p>
           <Show when={action.createSchedule.lastErrorMessage}>
             <div class="text-red-500">
@@ -109,7 +118,7 @@ const SchedulesListItem: Component<{
         <a href={`/admin/schedules/${props.schedule.id}/edit`}
            class="bg-primary hover:bg-primary-600 text-white px-3 py-1 rounded-lg transition-all"
            title="Edit">
-          <FaRegularPenToSquare />
+          <FaRegularPenToSquare/>
         </a>
         <SchedulePrimaryButton schedule={props.schedule}/>
         <ScheduleVisibilityButton schedule={props.schedule}/>
@@ -148,7 +157,7 @@ const SchedulePrimaryButton: Component<{
       class="bg-accent hover:bg-accent-400 text-white px-3 py-1 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
       title={props.schedule.primary ? 'Primary' : 'Set Primary'}
     >
-      {props.schedule.primary ? <FaSolidStar /> : <FaRegularStar />}
+      {props.schedule.primary ? <FaSolidStar/> : <FaRegularStar/>}
     </button>
   )
 }
@@ -181,7 +190,7 @@ const ScheduleVisibilityButton: Component<{
       class="bg-primary hover:bg-primary-600 text-white px-3 py-1 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
       title={props.schedule.visible ? 'Make Private' : 'Make Public'}
     >
-      {props.schedule.visible ? <FaRegularEye /> : <FaRegularEyeSlash />}
+      {props.schedule.visible ? <FaRegularEye/> : <FaRegularEyeSlash/>}
     </button>
   )
 }
@@ -217,7 +226,7 @@ const ScheduleDeleteButton: Component<{
         class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         title="Delete"
       >
-        <FaSolidTrash />
+        <FaSolidTrash/>
       </button>
 
       <Dialog open={modal.isOpen()} onOpenChange={modal.setOpen}>

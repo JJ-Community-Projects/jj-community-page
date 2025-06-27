@@ -18,17 +18,24 @@ export function getTags() {
     'GMod',
     'OpenTTD',
     'Music',
+    'Art',
+    'Painting',
+    '3D-Modeling',
     'Stocking Stuffers',
     'JJ Classics',
+    'Speedrun',
+    'First Jingle Jam',
+    'Variety',
+    'Community'
   ];
 
   return {
     tags: otherTags.map((str) => ({
-      tag: str.toLowerCase(),
+      tag: str.toLowerCase().replace('\s','-'),
       label: str
     })),
     charityTags: charities.map((str) => ({
-      tag: str.toLowerCase(),
+      tag: str.toLowerCase().replace('\s','-'),
       label: str,
     }))
   };

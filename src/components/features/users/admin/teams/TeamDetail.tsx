@@ -5,6 +5,7 @@ import type {User} from "../../../../../lib/auth/User.ts";
 import {Dialog} from "@kobalte/core/dialog";
 import {createModalSignal, type ModalSignal} from "../../../../../lib/createModalSignal.ts";
 import {actions} from "astro:actions";
+import {FaSolidChevronLeft} from "solid-icons/fa";
 
 interface TeamDetailProps {
   user: User;
@@ -49,8 +50,8 @@ const TeamDetailContent: Component<{ teamId: number }> = (props) => {
       <div class="bg-white rounded-2xl shadow-xl p-6 mb-6">
         <div class="flex justify-between items-center">
           <div class="flex items-center gap-4">
-            <a href={`/admin/teams`} class="text-primary hover:underline">
-              &larr; Back to Teams
+            <a href={`/admin/teams`} class="text-primary hover:underline flex flex-row gap-1 items-center">
+              <FaSolidChevronLeft/><p>Back to Teams</p>
             </a>
             <h2 class="text-xl font-bold">{local.name}</h2>
           </div>

@@ -309,6 +309,127 @@ const AlwaysAddSelfToStreamCheckbox: Component = () => {
   );
 };
 
+// Default stream visibility checkbox component
+const DefaultStreamVisibilityCheckbox: Component = () => {
+  const {
+    local,
+    updateDefaultStreamVisibility
+  } = useScheduleEditor();
+
+  // Handler to update the default stream visibility setting
+  const onChangeDefaultStreamVisibility = debounce((checked: boolean) => {
+    updateDefaultStreamVisibility(checked);
+  }, 200);
+
+  return (
+    <Checkbox
+      name="defaultStreamVisibility"
+      class="items-center inline-flex cursor-pointer"
+      checked={local.defaultStreamVisibility}
+      onChange={onChangeDefaultStreamVisibility}
+    >
+      <Checkbox.Input class="sr-only"/>
+      <Checkbox.Control
+        class="h-5 w-5 rounded border border-gray-300 bg-white text-blue-600 focus:ring-blue-500 data-[checked]:bg-blue-600 data-[checked]:border-blue-600">
+        <Checkbox.Indicator>
+          <svg class="h-4 w-4 text-white" viewBox="0 0 8 8">
+            <path stroke="currentColor" stroke-width="1.5" fill="none" d="M1,4 L3,6 L7,2"/>
+          </svg>
+        </Checkbox.Indicator>
+      </Checkbox.Control>
+      <Checkbox.Label class="ml-2 text-sm font-medium">Default Stream Visibility</Checkbox.Label>
+      <Checkbox.Description class="text-xs text-gray-500 ml-2">
+        When checked, new streams will be visible by default.
+      </Checkbox.Description>
+    </Checkbox>
+  );
+};
+
+// Default stream length field component
+const DefaultStreamLengthField: Component = () => {
+  const {
+    local,
+    updateDefaultStreamLength,
+    action
+  } = useScheduleEditor();
+
+  // Handler to update the default stream length
+  const onChangeDefaultStreamLength = debounce((value: string) => {
+    updateDefaultStreamLength(parseInt(value));
+  }, 200);
+
+  // Function to adjust the default stream length
+  const adjustLength = (adjustment: number) => {
+    const currentLength = local.defaultStreamLength;
+    const newLength = Math.max(30, currentLength + adjustment); // Ensure minimum of 30 minutes
+    updateDefaultStreamLength(newLength);
+  };
+
+  return (
+    <TextField
+      name="defaultStreamLength"
+      class="flex flex-col"
+      value={local.defaultStreamLength.toString()}
+      onChange={onChangeDefaultStreamLength}
+      disabled={action.updateDefaultStreamLength.actionInProgress}
+    >
+      <TextField.Label class="text-sm font-medium mb-1">Default Stream Length (minutes): </TextField.Label>
+      <div class="flex flex-row items-center gap-2">
+        <div class="relative flex-1">
+          <TextField.Input
+            type="number"
+            min={30}
+            step={5}
+            class="border border-gray-300 rounded-lg px-3 py-2 w-full disabled:opacity-50 disabled:cursor-not-allowed"
+          />
+          <Show when={action.updateDefaultStreamLength.actionInProgress}>
+            <div class="absolute right-3 top-1/2 transform -translate-y-1/2">
+              <div class="animate-spin h-4 w-4 border-2 border-accent border-t-transparent rounded-full"></div>
+            </div>
+          </Show>
+        </div>
+        <button
+          type="button"
+          disabled={local.defaultStreamLength <= 30}
+          class="bg-accent hover:bg-accent-600 text-white px-3 py-2 rounded-lg transition-all text-xxs disabled:opacity-50 disabled:cursor-not-allowed"
+          title="Decrease length by 30 minutes"
+          onClick={() => adjustLength(-30)}
+        >
+          -30m
+        </button>
+        <button
+          type="button"
+          disabled={local.defaultStreamLength <= 15}
+          class="bg-accent hover:bg-accent-600 text-white px-3 py-2 rounded-lg transition-all text-xxs disabled:opacity-50 disabled:cursor-not-allowed"
+          title="Decrease length by 15 minutes"
+          onClick={() => adjustLength(-15)}
+        >
+          -15m
+        </button>
+        <button
+          type="button"
+          class="bg-accent hover:bg-accent-600 text-white px-3 py-2 rounded-lg transition-all text-xxs"
+          title="Increase length by 15 minutes"
+          onClick={() => adjustLength(15)}
+        >
+          +15m
+        </button>
+        <button
+          type="button"
+          class="bg-accent hover:bg-accent-600 text-white px-3 py-2 rounded-lg transition-all text-xxs"
+          title="Increase length by 30 minutes"
+          onClick={() => adjustLength(30)}
+        >
+          +30m
+        </button>
+      </div>
+      <TextField.Description class="text-xs text-gray-500 mt-1">
+        The default length in minutes for newly created streams.
+      </TextField.Description>
+    </TextField>
+  );
+};
+
 export const ScheduleEditorSettings: Component = () => {
   const {
     action
@@ -322,13 +443,17 @@ export const ScheduleEditorSettings: Component = () => {
                   action.updateScheduleYear.lastErrorMessage ||
                   action.updateScheduleSlug.lastErrorMessage ||
                   action.updateScheduleVisibility.lastErrorMessage ||
-                  action.updateAlwaysAddSelfToStream.lastErrorMessage}>
+                  action.updateAlwaysAddSelfToStream.lastErrorMessage ||
+                  action.updateDefaultStreamVisibility.lastErrorMessage ||
+                  action.updateDefaultStreamLength.lastErrorMessage}>
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-4">
           {action.updateScheduleTitle.lastErrorMessage ||
            action.updateScheduleYear.lastErrorMessage ||
            action.updateScheduleSlug.lastErrorMessage ||
            action.updateScheduleVisibility.lastErrorMessage ||
-           action.updateAlwaysAddSelfToStream.lastErrorMessage}
+           action.updateAlwaysAddSelfToStream.lastErrorMessage ||
+           action.updateDefaultStreamVisibility.lastErrorMessage ||
+           action.updateDefaultStreamLength.lastErrorMessage}
         </div>
       </Show>
 
@@ -339,7 +464,11 @@ export const ScheduleEditorSettings: Component = () => {
         </div>
         <ScheduleSlugField />
         <ScheduleVisibilityCheckbox />
+
+        <h3 class="text-lg font-semibold mt-4 mb-2">Stream Settings</h3>
         <AlwaysAddSelfToStreamCheckbox />
+        <DefaultStreamVisibilityCheckbox />
+        <DefaultStreamLengthField />
       </div>
     </div>
   );

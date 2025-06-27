@@ -217,6 +217,10 @@ export interface ScheduleType {
   streams: StreamType[];
   /** Whether to automatically add the current user to new streams */
   alwaysAddSelfToStream: boolean;
+  /** The initial visibility of a newly created stream */
+  defaultStreamVisibility: boolean;
+  /** The length of a newly created Stream */
+  defaultStreamLength: number;
 }
 
 // ==========================================
@@ -288,6 +292,14 @@ export type HookActions = {
     lastErrorMessage?: string
   },
   updateAlwaysAddSelfToStream: {
+    actionInProgress: boolean,
+    lastErrorMessage?: string
+  },
+  updateDefaultStreamVisibility: {
+    actionInProgress: boolean,
+    lastErrorMessage?: string
+  },
+  updateDefaultStreamLength: {
     actionInProgress: boolean,
     lastErrorMessage?: string
   },
