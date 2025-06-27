@@ -52,9 +52,11 @@ const useScheduleEditorHook = (id: number, userId: number,
   onMount(async () => {
     const hostname = window.location.hostname
     const port = window.location.port
+    const protocol = window.location.protocol
+    const ws = (protocol === "http:" || protocol === "http") ? "wss" : "ws";
     const clientSynchronizer = await createWsSynchronizer(
       store,
-      new ReconnectingWebSocket(`ws://${hostname}:${port}/api/ws/schedules/${id}/editor?userId=${userId}`),
+      new ReconnectingWebSocket(`${ws}://${hostname}:${port}/api/ws/schedules/${id}/editor?userId=${userId}`),
     );
     await clientSynchronizer.startSync()
     setSync(clientSynchronizer)

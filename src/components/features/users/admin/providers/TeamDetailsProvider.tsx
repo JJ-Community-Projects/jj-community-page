@@ -46,7 +46,12 @@ const initHookState: HookActions = {
 }
 
 const useTeamHook = (teamId: number, user: User) => {
-  const {clientStore: store, addListener} = useTinystore(`ws://localhost:3000/api/ws/teams/${teamId}`)
+  const hostname = window.location.hostname
+  const port = window.location.port
+  const protocol = window.location.protocol
+  const ws = (protocol === "http:" || protocol === "http") ? "wss" : "ws";
+
+  const {clientStore: store, addListener} = useTinystore(`${ws}://${hostname}:${port}/api/ws/teams/${teamId}`)
 
   const [action, setAction] = createStore<HookActions>(initHookState)
 

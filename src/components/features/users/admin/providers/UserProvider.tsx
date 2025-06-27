@@ -151,8 +151,12 @@ const initHookState: HookActions = {
 }
 
 const useUserHook = (user: User) => {
+  const hostname = window.location.hostname
+  const port = window.location.port
+  const protocol = window.location.protocol
+  const ws = (protocol === "http:" || protocol === "http") ? "wss" : "ws";
 
-  const {clientStore: store, addListener} = useTinystore(`ws://localhost:3000/api/ws/users/${user.id}`)
+  const {clientStore: store, addListener} = useTinystore(`${ws}://${hostname}:${port}/api/ws/users/${user.id}`)
 
   const [action, setAction] = createStore<HookActions>(initHookState)
 
