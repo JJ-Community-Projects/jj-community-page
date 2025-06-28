@@ -1,9 +1,8 @@
 import {RateLimiter} from "./RateLimiter.ts";
 
-
 export class UserRateLimiter extends RateLimiter {
   protected allowedRequestPerMinute(): number {
-    return 60;
+    return 120;
   }
 
   protected gracePeriodMs(): number {
