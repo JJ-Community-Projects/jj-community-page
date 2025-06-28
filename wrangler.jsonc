@@ -22,9 +22,11 @@
     {
       "tag": "v1",
       "new_sqlite_classes": [
+        "JingleJamData",
         "ScheduleEditorDO",
         "UserDO",
-        "TeamDO"
+        "TeamDO",
+        "UserRateLimiter"
       ]
     }
   ],
@@ -46,6 +48,10 @@
       {
         "name": "TeamDO",
         "class_name": "TeamDO"
+      },
+      {
+        "name": "UserRateLimiter",
+        "class_name": "UserRateLimiter"
       }
     ]
   },
@@ -68,10 +74,139 @@
   },
   "env": {
     "prod": {
-      "route": "jinglejam.ostof.dev"
+      "routes": [
+        {
+          "pattern": "beta.jinglejam.ostof.dev",
+          "custom_domain": true
+        }
+      ],
+      "observability": {
+        "enabled": true
+      },
+      "migrations": [
+        {
+          "tag": "v1",
+          "new_sqlite_classes": [
+            "JingleJamData",
+            "ScheduleEditorDO",
+            "UserDO",
+            "TeamDO",
+            "UserRateLimiter"
+          ]
+        }
+      ],
+      "durable_objects": {
+        "bindings": [
+          // TODO
+          {
+            "name": "ScheduleEditorDO",
+            "class_name": "ScheduleEditorDO"
+          },
+          {
+            "name": "JingleJamData",
+            "class_name": "JingleJamData"
+          },
+          {
+            "name": "UserDO",
+            "class_name": "UserDO"
+          },
+          {
+            "name": "TeamDO",
+            "class_name": "TeamDO"
+          },
+          {
+            "name": "UserRateLimiter",
+            "class_name": "UserRateLimiter"
+          }
+        ]
+      },
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "beta-d1-jj",
+          "database_id": "7385a91b-14db-4254-8906-edf20d6bb68c",
+          "migrations_dir": "drizzle"
+        }
+      ],
+      "kv_namespaces": [
+        {
+          "binding": "KV",
+          "id": "9f2c6f601baf4a07a89a5887a641e4fb"
+        }
+      ],
+      "vars": {
+        "JJ_DASHBOARD_URL": "https://dashboard.jinglejam.co.uk/api/tiltify"
+      }
     },
     "beta": {
-      "route": "beta.jinglejam.ostof.dev"
+      "routes": [
+        {
+          "pattern": "beta.jinglejam.ostof.dev",
+          "custom_domain": true
+        }
+      ],
+      "observability": {
+        "enabled": true
+      },
+      "migrations": [
+        {
+          "tag": "v1",
+          "new_sqlite_classes": [
+            "ScheduleEditorDO",
+            "UserDO",
+            "TeamDO",
+            "JingleJamData"
+          ]
+        },
+        {
+          "tag": "v2",
+          "new_sqlite_classes": [
+            "UserRateLimiter"
+          ]
+        }
+      ],
+      "durable_objects": {
+        "bindings": [
+          // TODO
+          {
+            "name": "ScheduleEditorDO",
+            "class_name": "ScheduleEditorDO"
+          },
+          {
+            "name": "JingleJamData",
+            "class_name": "JingleJamData"
+          },
+          {
+            "name": "UserDO",
+            "class_name": "UserDO"
+          },
+          {
+            "name": "TeamDO",
+            "class_name": "TeamDO"
+          },
+          {
+            "name": "UserRateLimiter",
+            "class_name": "UserRateLimiter"
+          }
+        ]
+      },
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "beta-d1-jj",
+          "database_id": "b32d1f6f-5f53-487f-a355-4d9e9b9a0658",
+          "migrations_dir": "drizzle"
+        }
+      ],
+      "kv_namespaces": [
+        {
+          "binding": "KV",
+          "id": "9f2c6f601baf4a07a89a5887a641e4fb"
+        }
+      ],
+      "vars": {
+        "JJ_DASHBOARD_URL": "https://dashboard.jinglejam.co.uk/api/tiltify"
+      }
     }
   }
 
