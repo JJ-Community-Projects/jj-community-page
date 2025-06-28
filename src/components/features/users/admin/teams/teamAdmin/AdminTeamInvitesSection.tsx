@@ -95,7 +95,7 @@ const UserSearchInvite: Component = (props) => {
 
     setIsSearching(true);
     try {
-      const {data, error} = await actions.users.search(query);
+      const {data, error} = await actions.users.search({searchTerm: query, includeSelf: false});
       if (error) {
         console.error("Search error:", error);
         setError("Failed to search for users");
