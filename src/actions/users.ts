@@ -485,38 +485,6 @@ export const users = {
   }),
 
   /**
-   * Refreshes the user's Durable Object by reloading schedules from the database.
-   * Input: None
-   * Action: Loads the user's schedules into their UserDO from the database.
-   * Returns: A string indicating completion.
-   */
-  refreshDO: defineAction({
-    handler: async (_, context) => {
-      // Check if user is authenticated
-      const {session, user} = context.locals
-      if (!session || !user) {
-        throw new ActionError({code: 'UNAUTHORIZED'});
-      }
-
-      const userId = user.id;
-      const stub = await getRPCUserDO(context, userId);
-
-      // Load user schedules
-      try {
-        await stub.loadUserSchedules();
-      } catch (error) {
-        console.error('Error loading user schedules:', error);
-        throw new ActionError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to load user schedules'
-        });
-      }
-
-      return 'done';
-    }
-  }),
-
-  /**
    * Searches for users by username.
    * Input: searchTerm (string) - The term to search for in usernames
    * Action: Performs a fuzzy search on usernames in the database.
@@ -727,20 +695,41 @@ export const users = {
     }),
     handler: async ({userId, term, limit}, context) => {
       try {
+        // Get the search term in lowercase
+        const searchTermLower = term.toLowerCase();
+
         const users = UserRepo.action(context);
         // Get user's existing tags to filter out from suggestions
         const userTagsList = await users.getUserTags(userId);
+        // Get the default tags from the getTags function
+        const {tags: defaultTags, charityTags} = getTags();
+
+        // Filter charity tags that match the search term and aren't already in the user's tags
+        const filteredCharityTags = charityTags
+          .filter(tag =>
+            !userTagValues.includes(tag.tag) &&
+            tag.tag.includes(searchTermLower)
+          )
+          .map(tag => ({
+            ...tag,
+            count: 0 // Default count since we're not querying the database
+          }));
+
+        if (term === '') {
+          return {
+            tags: [],
+            defaultTags: [],
+            charityTags: filteredCharityTags
+          };
+        }
+
         // Get matching tags based on search term
         const matchingTags = await users.getSuggestedTagsForUserBySearchTerm(userId, term, limit);
 
-        // Get the default tags from the getTags function
-        const {tags: defaultTags, charityTags} = getTags();
 
         // Extract user tags to filter default and charity tags
         const userTagValues = userTagsList.map(t => t.tag);
 
-        // Get the search term in lowercase
-        const searchTermLower = term.toLowerCase();
 
         // Filter default tags that match the search term and aren't already in the user's tags
         const filteredDefaultTags = defaultTags
@@ -753,16 +742,6 @@ export const users = {
             count: 0 // Default count since we're not querying the database
           }));
 
-        // Filter charity tags that match the search term and aren't already in the user's tags
-        const filteredCharityTags = charityTags
-          .filter(tag =>
-            !userTagValues.includes(tag.tag) &&
-            tag.tag.includes(searchTermLower)
-          )
-          .map(tag => ({
-            ...tag,
-            count: 0 // Default count since we're not querying the database
-          }));
 
         // If we still don't have enough tags, add more default tags that aren't in the user's tags
         // (regardless of whether they match the search term)
