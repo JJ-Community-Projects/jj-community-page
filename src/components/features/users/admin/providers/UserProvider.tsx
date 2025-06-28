@@ -155,8 +155,11 @@ const useUserHook = (user: User) => {
   const port = window.location.port
   const protocol = window.location.protocol
   const ws = (protocol === "http:" || protocol === "http") ? "wss" : "ws";
-
-  const {clientStore: store, addListener} = useTinystore(`${ws}://${hostname}:${port}/api/ws/users/${user.id}`)
+  const isProd = import.meta.env.PROD
+  const url = isProd ? `wss://${hostname}/api/ws/users/${user.id}`:
+    `ws://${hostname}:${port}/api/ws/users/${user.id}`
+  console.log('useUserHook', url)
+  const {clientStore: store, addListener} = useTinystore(url)
 
   const [action, setAction] = createStore<HookActions>(initHookState)
 

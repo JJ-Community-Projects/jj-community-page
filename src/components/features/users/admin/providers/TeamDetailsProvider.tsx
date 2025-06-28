@@ -48,10 +48,11 @@ const initHookState: HookActions = {
 const useTeamHook = (teamId: number, user: User) => {
   const hostname = window.location.hostname
   const port = window.location.port
-  const protocol = window.location.protocol
-  const ws = (protocol === "http:" || protocol === "http") ? "wss" : "ws";
-
-  const {clientStore: store, addListener} = useTinystore(`${ws}://${hostname}:${port}/api/ws/teams/${teamId}`)
+  const isProd = import.meta.env.PROD
+  const url = isProd ? `wss://${hostname}/api/ws/teams/${teamId}`:
+    `ws://${hostname}:${port}/api/ws/teams/${teamId}`
+  console.log('useTeamHook', url)
+  const {clientStore: store, addListener} = useTinystore(url)
 
   const [action, setAction] = createStore<HookActions>(initHookState)
 
