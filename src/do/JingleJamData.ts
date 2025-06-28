@@ -59,7 +59,6 @@ export class JingleJamData extends DurableObject<Env> {
       console.log('JingleJamData', 'constructor', 'alarm', n);
     });
     const db = drizzle(env.DB);
-    console.log('JingleJamData', 'name', ctx.id.name);
 
     db.insert(durableObjectsTable).values({
       namespace: 'JingleJamData',

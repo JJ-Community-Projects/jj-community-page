@@ -1,5 +1,6 @@
 import type {APIRoute} from "astro";
 import {validateSessionToken} from "../../../../functions/session.ts";
+import {getRPCUserDO, getUserDO} from "../../../../actions/getDO.ts";
 
 export const ALL: APIRoute = async (ctx) => {
   const requestedUserId = ctx.params.userId;
@@ -37,15 +38,7 @@ export const ALL: APIRoute = async (ctx) => {
     return new Response('Forbidden: You can only access your own schedules', {status: 403});
   }*/
 
-  // Get the UserDO for this user
-
-  const UserDO = ctx.locals.runtime.env.UserDO;
-  if (!UserDO) {
-    return new Response("Durable object not found", {status: 404});
-  }
-
-  const userDOId = UserDO.idFromName(requestedUserId);
-  const stubUserDO = UserDO.get(userDOId);
+  const stubUserDO = await getUserDO(ctx, parseInt(requestedUserId))
   return stubUserDO.fetch(ctx.request)
   /*
   // await stubUserDO.setUserId(parseInt(requestedUserId));

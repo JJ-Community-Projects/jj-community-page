@@ -11,6 +11,7 @@ import {
   setSessionTokenCookie
 } from "../../../../functions/session.ts";
 import {getDB} from "../../../../lib/db/db.ts";
+import {getRPCUserDO} from "../../../../actions/getDO.ts";
 
 export const GET: APIRoute = async (ctx) => {
   const {locals, request} = ctx
@@ -78,9 +79,7 @@ export const GET: APIRoute = async (ctx) => {
     return ctx.redirect('/auth-error?error=session-creation-failed');
   }
   setSessionTokenCookie(ctx, sessionToken, session.expiresAt);
-  const DO = ctx.locals.runtime.env.UserDO
-  const doId = DO.idFromName(`${session.userId}`)
-
+  const stub = await getRPCUserDO(ctx, session.userId)
   return ctx.redirect(`/admin`);
 
 }

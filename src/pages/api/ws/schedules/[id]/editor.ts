@@ -1,23 +1,16 @@
 import type {APIRoute} from "astro";
+import {getScheduleEditorDO} from "../../../../../actions/getDO.ts";
 
 
 export const GET: APIRoute = async (ctx) => {
 
   // TODO auth check
-
-
   const id = ctx.params.id;
   if (!id) {
     throw new Error("id is required");
   }
 
-  const DO = ctx.locals.runtime.env.ScheduleEditorDO //  as unknown as DurableObjectNamespace<WsServerDurableObject<unknown>>
-
-  if (!DO) {
-    return new Response("Durable object not found", {status: 404});
-  }
-  const doId = DO.idFromName(id)
-  const stub = DO.get(doId)
-  await stub.loadFromDB()
+  const stub = await getScheduleEditorDO(ctx, parseInt(id))
+  await stub.loadFromDB(id)
   return stub.fetch(ctx.request)
 }

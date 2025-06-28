@@ -3,7 +3,7 @@ import {z} from "astro:content";
 import {createSlug, generateTeamSlugAlternatives} from "../functions/slug.ts";
 import {TeamRepo} from "../lib/db/repos/TeamRepo.ts";
 import {UserRepo} from "../lib/db/repos/UserRepo.ts";
-import {getTeamDO} from "./getDO.ts";
+import {getRPCTeamDO, getRPCUserDO} from "./getDO.ts";
 
 
 export const teams = {
@@ -55,7 +55,7 @@ export const teams = {
       });
 
       // Initialize TeamDO and add creator as a member
-      const teamStub = getTeamDO(ctx, team.id);
+      const teamStub = await getRPCTeamDO(ctx, team.id);
 
       try {
         teamStub.setTeam(team)
@@ -68,10 +68,7 @@ export const teams = {
 
       // Initialize UserDO and update user's team memberships
       try {
-        const UserDO = ctx.locals.runtime.env.UserDO
-        const userDoId = UserDO.idFromName(`${user.id}`)
-        const userStub = UserDO.get(userDoId)
-
+        const userStub = await getRPCUserDO(ctx, user.id)
         // Add team to user's memberships
         await userStub.addTeam({
           id: team.id,
@@ -145,7 +142,7 @@ export const teams = {
       });
 
       // Update TeamDO
-      const teamStub = getTeamDO(ctx, id);
+      const teamStub = await getRPCTeamDO(ctx, id);
 
       try {
         await teamStub.updateTeam({
@@ -194,7 +191,7 @@ export const teams = {
       const memberIds = members.map(member => member.userId);
 
       // Initialize TeamDO
-      const teamStub = getTeamDO(ctx, teamId);
+      const teamStub = await getRPCTeamDO(ctx, teamId);
 
       // Delete team
       try {
@@ -206,12 +203,10 @@ export const teams = {
 
       // Update UserDO for each team member
       if (memberIds.length > 0) {
-        const UserDO = ctx.locals.runtime.env.UserDO
 
         for (const memberId of memberIds) {
+          const userStub = await getRPCUserDO(ctx, memberId)
           try {
-            const userDoId = UserDO.idFromName(memberId.toString())
-            const userStub = UserDO.get(userDoId)
             await userStub.teamDeleted(teamId)
           } catch (e: any) {
             console.error(`Error updating UserDO for member ${memberId}:`, e);
@@ -255,7 +250,7 @@ export const teams = {
       }
 
       // Initialize TeamDO
-      const teamStub = getTeamDO(ctx, teamId);
+      const teamStub = await getRPCTeamDO(ctx, teamId);
 
       // Remove user from team
       try {
@@ -268,9 +263,7 @@ export const teams = {
       // Initialize UserDO
       let userStub;
       try {
-        const UserDO = ctx.locals.runtime.env.UserDO
-        const userDoId = UserDO.idFromName(user.id.toString())
-        userStub = UserDO.get(userDoId)
+        userStub = await getRPCUserDO(ctx, user.id)
       } catch (e: any) {
         console.error('Error initializing UserDO:', e);
         throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
@@ -326,7 +319,7 @@ export const teams = {
       }
 
       // Initialize TeamDO
-      const teamStub = getTeamDO(ctx, teamId);
+      const teamStub = await getRPCTeamDO(ctx, teamId);
 
       // Remove user from team
       try {
@@ -339,9 +332,7 @@ export const teams = {
       // Initialize UserDO
       let userStub;
       try {
-        const UserDO = ctx.locals.runtime.env.UserDO
-        const userDoId = UserDO.idFromName(userId.toString())
-        userStub = UserDO.get(userDoId)
+        userStub = await getRPCUserDO(ctx, userId)
       } catch (e: any) {
         console.error('Error initializing UserDO:', e);
         throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
@@ -496,7 +487,7 @@ export const teamInvites = {
       }
 
       // Initialize TeamDO and add invite
-      const teamStub = getTeamDO(ctx, teamId);
+      const teamStub = await getRPCTeamDO(ctx, teamId);
 
       console.log('invitedUserId', invitedUserId)
 
@@ -519,9 +510,7 @@ export const teamInvites = {
       // Initialize UserDO and add invite
       let userStub;
       try {
-        const UserDO = ctx.locals.runtime.env.UserDO
-        const userDoId = UserDO.idFromName(invitedUserId.toString())
-        userStub = UserDO.get(userDoId)
+        userStub = await getRPCUserDO(ctx, invitedUserId)
       } catch (e: any) {
         console.error('Error initializing UserDO:', e);
         throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
@@ -583,7 +572,7 @@ export const teamInvites = {
       }
 
       // Initialize TeamDO
-      const teamStub = getTeamDO(ctx, teamId);
+      const teamStub = await getRPCTeamDO(ctx, teamId);
 
       // Delete invite from TeamDO
       try {
@@ -596,9 +585,7 @@ export const teamInvites = {
       // Initialize UserDO
       let userStub;
       try {
-        const UserDO = ctx.locals.runtime.env.UserDO
-        const userDoId = UserDO.idFromName(invitedUserId.toString())
-        userStub = UserDO.get(userDoId)
+        userStub = await getRPCUserDO(ctx, invitedUserId)
       } catch (e: any) {
         console.error('Error initializing UserDO:', e);
         throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
@@ -646,7 +633,7 @@ export const teamInvites = {
       }
 
       // Initialize TeamDO
-      const teamStub = getTeamDO(ctx, teamId);
+      const teamStub = await getRPCTeamDO(ctx, teamId);
 
       // Add user as team member and delete invite
       try {
@@ -659,9 +646,7 @@ export const teamInvites = {
       // Initialize UserDO
       let userStub;
       try {
-        const UserDO = ctx.locals.runtime.env.UserDO
-        const userDoId = UserDO.idFromName(user.id.toString())
-        userStub = UserDO.get(userDoId)
+        userStub = await getRPCUserDO(ctx, user.id)
       } catch (e: any) {
         console.error('Error initializing UserDO:', e);
         throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
@@ -714,7 +699,7 @@ export const teamInvites = {
       }
 
       // Initialize TeamDO
-      const teamStub = getTeamDO(ctx, teamId);
+      const teamStub = await getRPCTeamDO(ctx, teamId);
 
       // Delete invite from TeamDO
       try {
@@ -727,9 +712,7 @@ export const teamInvites = {
       // Initialize UserDO
       let userStub;
       try {
-        const UserDO = ctx.locals.runtime.env.UserDO
-        const userDoId = UserDO.idFromName(user.id.toString())
-        userStub = UserDO.get(userDoId)
+        userStub = await getRPCUserDO(ctx, user.id)
       } catch (e: any) {
         console.error('Error initializing UserDO:', e);
         throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})

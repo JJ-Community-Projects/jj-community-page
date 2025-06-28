@@ -1,5 +1,5 @@
 import type {APIRoute} from "astro";
-import {validateSessionToken} from "../../../../functions/session.ts";
+import {getTeamDO} from "../../../../actions/getDO.ts";
 
 export const ALL: APIRoute = async (ctx) => {
   const requestedTeamId = ctx.params.teamId;
@@ -31,13 +31,7 @@ export const ALL: APIRoute = async (ctx) => {
   // For example, check if the user is a member or owner of the team
   */
 
-  // Get the TeamDO for this team
-  const TeamDO = ctx.locals.runtime.env.TeamDO;
-  if (!TeamDO) {
-    return new Response("Durable object not found", {status: 404});
-  }
-
-  const teamDOId = TeamDO.idFromName(requestedTeamId);
-  const stubTeamDO = TeamDO.get(teamDOId);
+  // Get the TeamDO for this team}
+  const stubTeamDO = await getTeamDO(ctx, parseInt(requestedTeamId))
   return stubTeamDO.fetch(ctx.request);
 };

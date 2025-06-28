@@ -1,4 +1,5 @@
 import type {APIRoute} from "astro";
+import {getRPCScheduleEditorDO} from "../../../actions/getDO.ts";
 
 export const GET: APIRoute = async (ctx) => {
   const DO = ctx.locals.runtime.env.ScheduleEditorDO //  as unknown as DurableObjectNamespace<WsServerDurableObject<unknown>>
@@ -6,12 +7,12 @@ export const GET: APIRoute = async (ctx) => {
     return new Response("Durable object not found", {status: 404});
   }
   const testId = ctx.params.testId
+
   if (!testId) {
     return new Response("Test id not found", {status: 404});
   }
 
-  const id = DO.idFromName(testId);
-  const stub = DO.get(id)
+  const stub = await getRPCScheduleEditorDO(ctx, parseInt(testId))
   const data = await stub.getTables()
 
   return new Response(JSON.stringify(data, null, 2), {

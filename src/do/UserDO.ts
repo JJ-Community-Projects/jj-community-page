@@ -6,31 +6,40 @@ import {TinybaseDO} from "./TinybaseDO.ts";
 import {validateSessionTokenFromEnv} from "../functions/session.ts";
 import {createUnauthorizedResponse} from "./utils.ts";
 import {users, userSocials, userStyles, userTags} from "../lib/db/schema/auth-schema.ts";
+import {RpcUserDO} from "./RpcUserDO.ts";
 
 
 export class UserDO extends TinybaseDO {
 
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
+  }
+
+  setMetaData(doIdentifier: string) {
+    return new RpcUserDO(doIdentifier, this, this.env);
+  }
+
+  init(doIdentifier: string) {
     this.ctx.blockConcurrencyWhile(async () => {
       this.createPersister();
-      await this.writeSchedulesToTinybase();
-      await this.loadTeamInvites();
-      await this.loadTeamMemberships();
-      await this.loadUserTags();
-      await this.loadUserSocials();
-      await this.loadUserStyles();
-      await this.loadUserSettings();
+      await this.writeSchedulesToTinybase(doIdentifier);
+      await this.loadTeamInvites(doIdentifier);
+      await this.loadTeamMemberships(doIdentifier);
+      await this.loadUserTags(doIdentifier);
+      await this.loadUserSocials(doIdentifier);
+      await this.loadUserStyles(doIdentifier);
+      await this.loadUserSettings(doIdentifier);
     });
   }
 
-  private async loadTeamMemberships() {
+  private async loadTeamMemberships(doIdentifier: string) {
     if (!this.store) {
       return;
     }
 
     try {
       const db = drizzle(this.env.DB);
+      const userId = this.parseUserId(doIdentifier);
 
       // Load team memberships with team information for this user
       const memberships = await db.select({
@@ -42,7 +51,7 @@ export class UserDO extends TinybaseDO {
       })
         .from(teamMembersTable)
         .innerJoin(teamsTable, eq(teamMembersTable.teamId, teamsTable.id))
-        .where(eq(teamMembersTable.userId, this.userId))
+        .where(eq(teamMembersTable.userId, userId))
         .all();
 
       // Update store with team memberships including team information
@@ -55,13 +64,14 @@ export class UserDO extends TinybaseDO {
   }
 
 
-  private async loadTeamInvites() {
+  private async loadTeamInvites(doIdentifier: string) {
     if (!this.store) {
       return;
     }
 
     try {
       const db = drizzle(this.env.DB);
+      const userId = this.parseUserId(doIdentifier);
 
       // Load team invites for this user with team information
       const invites = await db.select({
@@ -73,7 +83,7 @@ export class UserDO extends TinybaseDO {
       })
         .from(teamInvitesTable)
         .innerJoin(teamsTable, eq(teamInvitesTable.teamId, teamsTable.id))
-        .where(eq(teamInvitesTable.invitedUserId, this.userId))
+        .where(eq(teamInvitesTable.invitedUserId, userId))
         .all();
 
       // Update store with invites including team information
@@ -122,14 +132,13 @@ export class UserDO extends TinybaseDO {
 
 
   // This method is called internally by the system, not directly by clients
-  async loadUserSchedules() {
-    const userId = this.ctx.id.name
-    if (!userId) {
+  async loadUserSchedules(doIdentifier: string) {
+    if (!doIdentifier) {
       this.error('loadUserSchedules', 'No userId found.');
       return;
     }
-    this.log(userId, 'loadUserSchedules');
-    await this.ctx.storage.put('userId', userId);
+    this.log(doIdentifier, 'loadUserSchedules');
+    await this.ctx.storage.put('userId', doIdentifier);
 
 
     // Get database connection
@@ -142,7 +151,7 @@ export class UserDO extends TinybaseDO {
       const db = drizzle(this.env.DB);
       // Load schedules from database
       const schedules = await db.select().from(schedulesTable)
-        .where(eq(schedulesTable.ownerId, parseInt(userId)))
+        .where(eq(schedulesTable.ownerId, parseInt(doIdentifier)))
         .all();
       this.log('loadSchedules', 'D1', schedules);
 
@@ -192,22 +201,21 @@ export class UserDO extends TinybaseDO {
     return this.store?.getTables()
   }
 
-  private loadSchedulesFromD1() {
-    const id = this.ctx.id.name
-    if (!id) {
+  private loadSchedulesFromD1(doIdentifier: string) {
+    if (!doIdentifier) {
       return null;
     }
-    this.log('loadSchedulesFromD1', id);
+    this.log('loadSchedulesFromD1', doIdentifier);
     const db = drizzle(this.env.DB)
     return db.select().from(schedulesTable)
-      .where(eq(schedulesTable.ownerId, parseInt(id))).all()
+      .where(eq(schedulesTable.ownerId, parseInt(doIdentifier))).all()
   }
 
-  private async writeSchedulesToTinybase() {
+  private async writeSchedulesToTinybase(doIdentifier: string) {
     if (!this.store) {
       return
     }
-    const schedules = await this.loadSchedulesFromD1()
+    const schedules = await this.loadSchedulesFromD1(doIdentifier)
     if (!schedules) {
       return;
     }
@@ -227,22 +235,24 @@ export class UserDO extends TinybaseDO {
 
   }
 
-  private get userId() {
-    return parseInt(this.ctx.id.name ?? '')
+  // Helper method to parse user ID from string
+  private parseUserId(doIdentifier: string): number {
+    return parseInt(doIdentifier)
   }
 
-  private async loadUserTags() {
+  private async loadUserTags(doIdentifier: string) {
     if (!this.store) {
       return;
     }
 
     try {
       const db = drizzle(this.env.DB);
+      const userId = this.parseUserId(doIdentifier);
 
       // Load user tags from database
       const tags = await db.select()
         .from(userTags)
-        .where(eq(userTags.userId, this.userId))
+        .where(eq(userTags.userId, userId))
         .all();
 
       // Update store with user tags
@@ -258,7 +268,7 @@ export class UserDO extends TinybaseDO {
     }
   }
 
-  async addTag(tag: string, label: string) {
+  async addTag(doIdentifier: string, tag: string, label: string) {
     if (!this.store) {
       this.error('addTag', 'Store not initialized');
       return false;
@@ -267,6 +277,7 @@ export class UserDO extends TinybaseDO {
     try {
       // Sanitize tag (lowercase, no spaces)
       const sanitizedTag = tag.toLowerCase().trim().replace(/\s+/g, '-');
+      const userId = this.parseUserId(doIdentifier);
 
       // Check if tag already exists
       if (this.store.hasRow('userTags', sanitizedTag)) {
@@ -278,7 +289,7 @@ export class UserDO extends TinybaseDO {
       const db = drizzle(this.env.DB);
       await db.insert(userTags)
         .values({
-          userId: this.userId,
+          userId: userId,
           tag: sanitizedTag,
           label: label || sanitizedTag,
           addedAt: new Date()
@@ -299,7 +310,7 @@ export class UserDO extends TinybaseDO {
     }
   }
 
-  async removeTag(tag: string) {
+  async removeTag(doIdentifier: string, tag: string) {
     if (!this.store) {
       this.error('removeTag', 'Store not initialized');
       return false;
@@ -308,6 +319,7 @@ export class UserDO extends TinybaseDO {
     try {
       // Sanitize tag (lowercase, no spaces)
       const sanitizedTag = tag.toLowerCase().trim().replace(/\s+/g, '-');
+      const userId = this.parseUserId(doIdentifier);
 
       // Check if tag exists
       if (!this.store.hasRow('userTags', sanitizedTag)) {
@@ -320,7 +332,7 @@ export class UserDO extends TinybaseDO {
       await db.delete(userTags)
         .where(
           and(
-            eq(userTags.userId, this.userId),
+            eq(userTags.userId, userId),
             eq(userTags.tag, sanitizedTag)
           )
         );
@@ -337,7 +349,7 @@ export class UserDO extends TinybaseDO {
   }
 
 
-  async addInvite(team: { id: number, name: string, slug: string, ownerId: number }) {
+  async addInvite(doIdentifier: string, team: { id: number, name: string, slug: string, ownerId: number }) {
     const store = this.store;
     if (!store) {
       return
@@ -345,14 +357,15 @@ export class UserDO extends TinybaseDO {
     if (store.hasRow('invites', `${team.id}`)) {
       return
     }
+    const userId = this.parseUserId(doIdentifier);
     const db = drizzle(this.env.DB);
     await db.insert(teamInvitesTable)
       .values({
-        invitedUserId: this.userId,
+        invitedUserId: userId,
         teamId: team.id,
       }).onConflictDoNothing()
     this.store?.setRow('invites', `${team.id}`, {
-      invitedUserId: this.userId,
+      invitedUserId: userId,
       teamId: team.id,
       name: team.name,
       slug: team.slug,
@@ -360,16 +373,18 @@ export class UserDO extends TinybaseDO {
     })
   }
 
-  async addTeam(team: { id: number, name: string, slug: string, ownerId: number }) {
+  async addTeam(doIdentifier: string, team: { id: number, name: string, slug: string, ownerId: number }) {
     const store = this.store;
     if (!store) {
       return;
     }
 
+    const userId = this.parseUserId(doIdentifier);
+
     // Add the team to teamMembers with complete team information
     store.setRow('teamMembers', `${team.id}`, {
       teamId: team.id,
-      userId: this.userId,
+      userId: userId,
       name: team.name,
       slug: team.slug,
       ownerId: team.ownerId,
@@ -378,7 +393,7 @@ export class UserDO extends TinybaseDO {
     return true;
   }
 
-  async acceptInvite(team: { id: number, name: string, slug: string, ownerId: number }) {
+  async acceptInvite(doIdentifier: string, team: { id: number, name: string, slug: string, ownerId: number }) {
     const store = this.store;
     if (!store) {
       return;
@@ -395,8 +410,10 @@ export class UserDO extends TinybaseDO {
 
     // Add the team to teamMembers with complete team information
     if (team) {
+      const userId = this.parseUserId(doIdentifier);
       store.setRow('teamMembers', `${team.id}`, {
         teamId: team.id,
+        userId: userId,
         name: team.name,
         slug: team.slug,
         ownerId: team.ownerId,
@@ -409,7 +426,7 @@ export class UserDO extends TinybaseDO {
     return true;
   }
 
-  async rejectInvite(teamId: number) {
+  async rejectInvite(doIdentifier: string, teamId: number) {
     const store = this.store;
     if (!store) {
       return;
@@ -430,7 +447,7 @@ export class UserDO extends TinybaseDO {
     return true;
   }
 
-  async leaveTeam(teamId: number) {
+  async leaveTeam(doIdentifier: string, teamId: number) {
     const store = this.store;
     if (!store) {
       return;
@@ -451,13 +468,13 @@ export class UserDO extends TinybaseDO {
     return true;
   }
 
-  async removedFromTeam(teamId: number) {
+  async removedFromTeam(doIdentifier: string, teamId: number) {
     // This is essentially the same as leaveTeam but with a different name
     // to make the intent clearer when called from the remove user action
-    return this.leaveTeam(teamId);
+    return this.leaveTeam(doIdentifier, teamId);
   }
 
-  async teamDeleted(teamId: number) {
+  async teamDeleted(doIdentifier: string, teamId: number) {
     const store = this.store;
     if (!store) {
       return;
@@ -476,7 +493,7 @@ export class UserDO extends TinybaseDO {
     return true;
   }
 
-  async updateTeamInfo(updates: {
+  async updateTeamInfo(doIdentifier: string, updates: {
     teamId: number;
     name?: string;
     slug?: string;
@@ -559,7 +576,7 @@ export class UserDO extends TinybaseDO {
     return true;
   }
 
-  async deleteSchedule(scheduleId: number) {
+  async deleteSchedule(doIdentifier: string, scheduleId: number) {
     const store = this.store;
     if (!store) {
       this.error('deleteSchedule', 'Failed to access store');
@@ -582,10 +599,11 @@ export class UserDO extends TinybaseDO {
   /**
    * Set a schedule as primary and all other schedules with the same year as non-primary
    *
+   * @param doIdentifier - The user ID string
    * @param scheduleId - The ID of the schedule to set as primary
    * @returns Promise resolving to a boolean indicating success
    */
-  async setPrimarySchedule(scheduleId: number) {
+  async setPrimarySchedule(doIdentifier: string, scheduleId: number) {
     if (!this.store) {
       this.error('setPrimarySchedule', 'Store not initialized');
       return false;
@@ -594,6 +612,7 @@ export class UserDO extends TinybaseDO {
     try {
       // Get database connection
       const db = drizzle(this.env.DB);
+      const userId = this.parseUserId(doIdentifier);
 
       // Get the schedule to find its year
       const schedule = await db.select()
@@ -620,7 +639,7 @@ export class UserDO extends TinybaseDO {
         .where(
           and(
             eq(schedulesTable.year, schedule.year),
-            eq(schedulesTable.ownerId, this.userId),
+            eq(schedulesTable.ownerId, userId),
             not(eq(schedulesTable.id, scheduleId))
           )
         );
@@ -656,10 +675,11 @@ export class UserDO extends TinybaseDO {
   /**
    * Toggle the visibility of a schedule
    *
+   * @param doIdentifier - The user ID string
    * @param scheduleId - The ID of the schedule to toggle visibility
    * @returns Promise resolving to a boolean indicating success
    */
-  async toggleScheduleVisibility(scheduleId: number) {
+  async toggleScheduleVisibility(doIdentifier: string, scheduleId: number) {
     if (!this.store) {
       this.error('toggleScheduleVisibility', 'Store not initialized');
       return false;
@@ -703,32 +723,22 @@ export class UserDO extends TinybaseDO {
 
 
   async fetch(request: Request) {
-    const token = request.headers.get('token')
-    if (!token) {
-      return createUnauthorizedResponse()
-    }
-    const {user, session} = await validateSessionTokenFromEnv(this.env, token)
-    if (!user || !session) {
-      return createUnauthorizedResponse()
-    }
-    if (user.id !== this.userId) {
-      return createUnauthorizedResponse('wrong user id')
-    }
     return this.defaultFetch(request)
   }
 
-  private async loadUserSocials() {
+  private async loadUserSocials(doIdentifier: string) {
     if (!this.store) {
       return;
     }
 
     try {
       const db = drizzle(this.env.DB);
+      const userId = this.parseUserId(doIdentifier);
 
       // Load user socials from database
       const socials = await db.select()
         .from(userSocials)
-        .where(eq(userSocials.userId, this.userId))
+        .where(eq(userSocials.userId, userId))
         .all();
 
       // Update store with user socials
@@ -743,7 +753,7 @@ export class UserDO extends TinybaseDO {
     }
   }
 
-  async addSocial(provider: string, url: string) {
+  async addSocial(doIdentifier: string, provider: string, url: string) {
     if (!this.store) {
       this.error('addSocial', 'Store not initialized');
       return false;
@@ -758,12 +768,13 @@ export class UserDO extends TinybaseDO {
 
       // Normalize provider to lowercase
       const normalizedProvider = provider.toLowerCase();
+      const userId = this.parseUserId(doIdentifier);
 
       // Add social to database
       const db = drizzle(this.env.DB);
       await db.insert(userSocials)
         .values({
-          userId: this.userId,
+          userId: userId,
           provider: normalizedProvider,
           url: url
         })
@@ -786,7 +797,7 @@ export class UserDO extends TinybaseDO {
     }
   }
 
-  async removeSocial(provider: string) {
+  async removeSocial(doIdentifier: string, provider: string) {
     if (!this.store) {
       this.error('removeSocial', 'Store not initialized');
       return false;
@@ -795,6 +806,7 @@ export class UserDO extends TinybaseDO {
     try {
       // Normalize provider to lowercase
       const normalizedProvider = provider.toLowerCase();
+      const userId = this.parseUserId(doIdentifier);
 
       // Check if social exists
       if (!this.store.hasRow('userSocials', normalizedProvider)) {
@@ -807,7 +819,7 @@ export class UserDO extends TinybaseDO {
       await db.delete(userSocials)
         .where(
           and(
-            eq(userSocials.userId, this.userId),
+            eq(userSocials.userId, userId),
             eq(userSocials.provider, normalizedProvider)
           )
         );
@@ -823,18 +835,19 @@ export class UserDO extends TinybaseDO {
     }
   }
 
-  private async loadUserStyles() {
+  private async loadUserStyles(doIdentifier: string) {
     if (!this.store) {
       return;
     }
 
     try {
       const db = drizzle(this.env.DB);
+      const userId = this.parseUserId(doIdentifier);
 
       // Load user style from database
       const style = await db.select()
         .from(userStyles)
-        .where(eq(userStyles.userId, this.userId))
+        .where(eq(userStyles.userId, userId))
         .get();
 
       // Update store with user style if it exists
@@ -849,20 +862,21 @@ export class UserDO extends TinybaseDO {
     }
   }
 
-  private async loadUserSettings() {
+  private async loadUserSettings(doIdentifier: string) {
     if (!this.store) {
       return;
     }
 
     try {
       const db = drizzle(this.env.DB);
+      const userId = this.parseUserId(doIdentifier);
 
       // Load user settings from database
       const user = await db.select({
         primaryLiveStream: users.primaryLiveStream
       })
         .from(users)
-        .where(eq(users.id, this.userId))
+        .where(eq(users.id, userId))
         .get();
 
       // Initialize userSettings table if it doesn't exist
@@ -881,18 +895,20 @@ export class UserDO extends TinybaseDO {
     }
   }
 
-  async updateUserStyle(primaryColor: string, accentColor: string) {
+  async updateUserStyle(doIdentifier: string, primaryColor: string, accentColor: string) {
     if (!this.store) {
       this.error('updateUserStyle', 'Store not initialized');
       return false;
     }
 
     try {
+      const userId = this.parseUserId(doIdentifier);
+
       // Update style in database
       const db = drizzle(this.env.DB);
       await db.insert(userStyles)
         .values({
-          userId: this.userId,
+          userId: userId,
           primaryColor: primaryColor,
           accentColor: accentColor
         })
@@ -918,7 +934,7 @@ export class UserDO extends TinybaseDO {
     }
   }
 
-  async setPrimaryLiveStream(platform: string) {
+  async setPrimaryLiveStream(doIdentifier: string, platform: string) {
     if (!this.store) {
       this.error('setPrimaryLiveStream', 'Store not initialized');
       return false;
@@ -933,6 +949,7 @@ export class UserDO extends TinybaseDO {
 
       // Normalize platform to lowercase
       const normalizedPlatform = platform.toLowerCase();
+      const userId = this.parseUserId(doIdentifier);
 
       // Update primaryLiveStream in database
       const db = drizzle(this.env.DB);
@@ -940,7 +957,7 @@ export class UserDO extends TinybaseDO {
         .set({
           primaryLiveStream: normalizedPlatform
         })
-        .where(eq(users.id, this.userId));
+        .where(eq(users.id, userId));
 
       // Store the primaryLiveStream in the store
       if (!this.store.hasTable('userSettings')) {

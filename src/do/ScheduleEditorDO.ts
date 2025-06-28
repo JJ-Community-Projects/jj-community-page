@@ -3,6 +3,7 @@ import {drizzle} from "drizzle-orm/d1";
 import {DateTime} from "luxon";
 import {TinybaseDO} from "./TinybaseDO.ts";
 import type {MergeableStore} from "tinybase/mergeable-store";
+import {RpcScheduleEditorDO} from "./RpcScheduleEditorDO.ts";
 import {ScheduleRepo} from "../lib/db/repos/ScheduleRepo.ts";
 import {StreamRepo} from "../lib/db/repos/StreamRepo.ts";
 import {StreamTagRepo} from "../lib/db/repos/StreamTagRepo.ts";
@@ -56,24 +57,31 @@ export class ScheduleEditorDO extends TinybaseDO {
     this.streamRepo = new StreamRepo(db, 'do')
     this.tagRepo = new StreamTagRepo(db, 'do')
     this.participantRepo = new StreamParticipantsRepo(db, 'do')
-    this.ctx.blockConcurrencyWhile(async () => {
-      await this.init()
-    })
   }
 
   /**
-   * Gets the schedule ID from the Durable Object's name
-   * @returns The numeric ID of the schedule being edited
+   * Parses a schedule ID from a string
+   * @param doIdentifier - The string identifier to parse
+   * @returns The numeric ID of the schedule
    */
-  private get scheduleId(): number {
-    return parseInt(this.ctx.id.name!)
+  private parseScheduleId(doIdentifier: string): number {
+    return parseInt(doIdentifier);
+  }
+
+  /**
+   * Sets metadata for the Durable Object and returns an RPC wrapper
+   * @param doIdentifier - The string identifier for the schedule
+   * @returns An RpcScheduleEditorDO instance that wraps this DO
+   */
+  setMetaData(doIdentifier: string) {
+    return new RpcScheduleEditorDO(doIdentifier, this, this.env);
   }
 
   /**
    * Initializes the Durable Object by loading data from the database
    */
-  private async init(): Promise<void> {
-    await this.loadFromDB()
+  async init(doIdentifier: string): Promise<void> {
+    await this.loadFromDB(doIdentifier)
   }
 
   /**
@@ -131,9 +139,10 @@ export class ScheduleEditorDO extends TinybaseDO {
   /**
    * Loads the schedule and streams from the database and stores them in the persister's store
    * Retrieves schedule, streams, tags, and participants and populates the TinyBase store
+   * @param doIdentifier - The string identifier for the schedule
    */
-  async loadFromDB(): Promise<void> {
-    const id = this.scheduleId
+  async loadFromDB(doIdentifier: string): Promise<void> {
+    const id = this.parseScheduleId(doIdentifier)
 
     // Load schedule using ScheduleRepo
     const schedule = await this.scheduleRepo.findById(id);
@@ -270,8 +279,9 @@ export class ScheduleEditorDO extends TinybaseDO {
    * Writes the state from the persister store to D1
    * This method synchronizes the TinyBase store data with the Cloudflare D1 database
    * by performing updates, inserts, and deletes as needed for schedules, streams, and tags.
+   * @param doIdentifier - The string identifier for the schedule
    */
-  async saveToDB(): Promise<void> {
+  async saveToDB(doIdentifier: string): Promise<void> {
     // Get the TinyBase store and verify it exists
     const store = this.store
     if (!store) {
@@ -308,7 +318,7 @@ export class ScheduleEditorDO extends TinybaseDO {
     // Prepare data for updateSchedule
     const updateData: ScheduleUpdateData = {
       streams: {
-        creates: this.prepareStreamCreates(storeStreams, storeStreamIds, dbStreamIds),
+        creates: this.prepareStreamCreates(storeStreams, storeStreamIds, dbStreamIds, scheduleId),
         updates: this.prepareStreamUpdates(storeStreams, storeStreamIds, dbStreamIds),
         deletes: this.prepareStreamDeletes(dbStreamIds, storeStreamIds)
       },
@@ -329,9 +339,10 @@ export class ScheduleEditorDO extends TinybaseDO {
   /**
    * Toggle the visibility of the schedule
    * This method toggles the visibility of the schedule in both the database and the TinyBase store
+   * @param doIdentifier - The string identifier for the schedule
    * @returns Promise resolving to a boolean indicating success
    */
-  async toggleVisibility(): Promise<boolean> {
+  async toggleVisibility(doIdentifier: string): Promise<boolean> {
     // Get the TinyBase store and verify it exists
     const store = this.store;
     if (!store) {
@@ -345,7 +356,7 @@ export class ScheduleEditorDO extends TinybaseDO {
       const newVisibility = !currentVisibility;
 
       // Get the schedule ID
-      const scheduleId = this.scheduleId;
+      const scheduleId = this.parseScheduleId(doIdentifier);
 
       // Update the database
       await this.scheduleRepo.setVisibility(scheduleId, newVisibility);
@@ -367,9 +378,10 @@ export class ScheduleEditorDO extends TinybaseDO {
    * @param storeStreams - The streams table from the TinyBase store
    * @param storeStreamIds - Array of stream IDs from the store
    * @param dbStreamIds - Array of stream IDs from the database
+   * @param scheduleId - The ID of the schedule
    * @returns Array of stream objects formatted for database insertion
    */
-  private prepareStreamCreates(storeStreams: StreamsTable, storeStreamIds: number[], dbStreamIds: number[]): Array<{
+  private prepareStreamCreates(storeStreams: StreamsTable, storeStreamIds: number[], dbStreamIds: number[], scheduleId: number): Array<{
     id: number;
     scheduleId: number;
     title: string;
@@ -388,7 +400,7 @@ export class ScheduleEditorDO extends TinybaseDO {
         const stream = storeStreams[id.toString()];
         return {
           id,
-          scheduleId: this.scheduleId,
+          scheduleId,
           title: stream.title,
           subtitle: stream.subtitle ?? '',
           description: stream.description ?? '',
@@ -633,10 +645,9 @@ export class ScheduleEditorDO extends TinybaseDO {
   }
 
 
-  /*
   fetch(request: Request): Response | Promise<Response> {
     return super.defaultFetch(request);
-  }*/
+  }
 
   /*
   async fetch(request: Request): Promise<Response> {

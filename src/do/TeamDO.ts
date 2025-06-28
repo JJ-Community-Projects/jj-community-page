@@ -3,6 +3,7 @@ import {drizzle} from "drizzle-orm/d1";
 import {teamInvitesTable, teamMembersTable, teamsTable} from "../lib/db/schema/schema.ts";
 import {and, eq} from "drizzle-orm";
 import {accounts} from "../lib/db/schema/auth-schema.ts";
+import {RpcTeamDO} from "./RpcTeamDO.ts";
 
 
 export class TeamDO extends TinybaseDO {
@@ -11,41 +12,49 @@ export class TeamDO extends TinybaseDO {
     return "TeamDO";
   }
 
-  private get teamId() {
-    return parseInt(this.ctx.id.name!)
+  private parseTeamId(doIdentifier: string): number {
+    return parseInt(doIdentifier);
   }
 
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
+  }
+
+  init(doIdentifier: string) {
     this.ctx.blockConcurrencyWhile(async () => {
       this.createPersister();
-      await this.loadTeamData();
+      await this.loadTeamData(doIdentifier);
     });
   }
 
-  private async loadTeamData() {
+  setMetaData(doIdentifier: string) {
+    return new RpcTeamDO(doIdentifier, this, this.env);
+  }
+
+  private async loadTeamData(doIdentifier: string) {
     if (!this.store) {
       return;
     }
 
     try {
       const db = drizzle(this.env.DB);
+      const teamId = this.parseTeamId(doIdentifier);
 
       const team = await db.select()
         .from(teamsTable)
-        .where(eq(teamsTable.id, this.teamId))
+        .where(eq(teamsTable.id, teamId))
         .get()
 
       if (!team) {
         return
       }
 
-      this.setTeam(team);
+      this.setTeam(doIdentifier, team);
 
       // Load team invites
       const invites = await db.select()
         .from(teamInvitesTable)
-        .where(eq(teamInvitesTable.teamId, this.teamId))
+        .where(eq(teamInvitesTable.teamId, teamId))
         .all();
 
       // Load team members
@@ -55,7 +64,7 @@ export class TeamDO extends TinybaseDO {
         username: accounts.providerUsername
       })
         .from(teamMembersTable)
-        .where(eq(teamMembersTable.teamId, this.teamId))
+        .where(eq(teamMembersTable.teamId, teamId))
         .innerJoin(accounts, eq(teamMembersTable.userId, accounts.userId))
         .all();
 
@@ -72,7 +81,7 @@ export class TeamDO extends TinybaseDO {
     }
   }
 
-  async addInvite(invitedUserId: number, username: string) {
+  async addInvite(doIdentifier: string, invitedUserId: number, username: string) {
     const store = this.store
     if (!store) {
       return
@@ -80,9 +89,10 @@ export class TeamDO extends TinybaseDO {
     if (store.hasRow('invites', `${invitedUserId}`)) {
       return
     }
+    const teamId = this.parseTeamId(doIdentifier);
     const invite = {
       invitedUserId: invitedUserId,
-      teamId: this.teamId,
+      teamId: teamId,
       username: username
     }
     const db = drizzle(this.env.DB);
@@ -91,7 +101,7 @@ export class TeamDO extends TinybaseDO {
     this.store?.setRow('invites', `${invitedUserId}`, invite)
   }
 
-  async deleteInvite(invitedUserId: number) {
+  async deleteInvite(doIdentifier: string, invitedUserId: number) {
     const store = this.store
     if (!store) {
       return
@@ -100,14 +110,14 @@ export class TeamDO extends TinybaseDO {
       return
     }
     const db = drizzle(this.env.DB);
-    const teamId = this.teamId
+    const teamId = this.parseTeamId(doIdentifier);
     await db.delete(teamInvitesTable)
       .where(and(eq(teamInvitesTable.teamId, teamId), eq(teamInvitesTable.invitedUserId, invitedUserId)))
       .execute()
     store.delRow('invites', `${invitedUserId}`)
   }
 
-  async addTeamMember(userId: number, username: string) {
+  async addTeamMember(doIdentifier: string, userId: number, username: string) {
     const store = this.store
     if (!store) {
       return
@@ -117,9 +127,10 @@ export class TeamDO extends TinybaseDO {
     }
 
     const db = drizzle(this.env.DB);
+    const teamId = this.parseTeamId(doIdentifier);
     const member = {
       userId: userId,
-      teamId: this.teamId,
+      teamId: teamId,
       username: username
     }
     await db.insert(teamMembersTable)
@@ -128,7 +139,7 @@ export class TeamDO extends TinybaseDO {
     store.setRow('members', `${userId}`, member)
   }
 
-  async deleteTeamMember(userId: number) {
+  async deleteTeamMember(doIdentifier: string, userId: number) {
     const store = this.store
     if (!store) {
       return
@@ -137,27 +148,27 @@ export class TeamDO extends TinybaseDO {
       return
     }
     const db = drizzle(this.env.DB);
-    const teamId = this.teamId
+    const teamId = this.parseTeamId(doIdentifier);
     await db.delete(teamMembersTable)
       .where(and(eq(teamMembersTable.teamId, teamId), eq(teamMembersTable.userId, userId)))
       .execute()
     store.delRow('members', `${userId}`)
   }
 
-  async userLeaveTeam(userId: number) {
+  async userLeaveTeam(doIdentifier: string, userId: number) {
     // This is essentially the same as deleteTeamMember but with a different name
     // to make the intent clearer when called from the leave team action
-    return this.deleteTeamMember(userId);
+    return this.deleteTeamMember(doIdentifier, userId);
   }
 
-  async deleteTeam() {
+  async deleteTeam(doIdentifier: string) {
     const store = this.store;
     if (!store) {
       return;
     }
 
     const db = drizzle(this.env.DB);
-    const teamId = this.teamId;
+    const teamId = this.parseTeamId(doIdentifier);
 
     // Clear the store (this will be propagated to clients)
     store.delTable('members');
@@ -179,7 +190,7 @@ export class TeamDO extends TinybaseDO {
       .execute();
   }
 
-  async acceptInvite(userId: number, username: string) {
+  async acceptInvite(doIdentifier: string, userId: number, username: string) {
     const store = this.store
     if (!store) {
       return
@@ -192,15 +203,15 @@ export class TeamDO extends TinybaseDO {
     }
 
     // Add user as team member
-    await this.addTeamMember(userId, username);
+    await this.addTeamMember(doIdentifier, userId, username);
 
     // Delete the invite
-    await this.deleteInvite(userId);
+    await this.deleteInvite(doIdentifier, userId);
 
     return true;
   }
 
-  setTeam(team: {
+  setTeam(doIdentifier: string, team: {
             id: number
             name: string
             ownerId: number
@@ -213,8 +224,10 @@ export class TeamDO extends TinybaseDO {
       return
     }
 
+    const teamId = this.parseTeamId(doIdentifier);
+
     this.store.setValues({
-      teamId: this.teamId,
+      teamId: teamId,
       name: team.name,
       ownerId: team.ownerId,
       description: team.description ?? '',
@@ -222,11 +235,11 @@ export class TeamDO extends TinybaseDO {
       visible: team.visible,
     })
 
-    this.log('setTeam', this.teamId, team)
+    this.log('setTeam', teamId, team)
 
   }
 
-  async updateTeam(updates: {
+  async updateTeam(doIdentifier: string, updates: {
     name?: string
     slug?: string
     description?: string
@@ -235,6 +248,8 @@ export class TeamDO extends TinybaseDO {
     if (!this.store) {
       return
     }
+
+    const teamId = this.parseTeamId(doIdentifier);
 
     // Update only the provided fields
     const updateValues: Record<string, any> = {};
@@ -258,7 +273,7 @@ export class TeamDO extends TinybaseDO {
     // Apply updates to the store values
     this.store.setValues(updateValues);
 
-    this.log('updateTeam', this.teamId, updates);
+    this.log('updateTeam', teamId, updates);
 
     // Update invites in the store with the new team information
     if ((updates.name !== undefined || updates.slug !== undefined) && this.store.hasTable('invites')) {
@@ -267,7 +282,7 @@ export class TeamDO extends TinybaseDO {
         const invite = this.store.getRow('invites', inviteId);
         if (!invite) continue;
 
-        const updatedInvite = { ...invite };
+        const updatedInvite = {...invite};
 
         if (updates.name !== undefined) {
           updatedInvite.username = updates.name;
@@ -280,7 +295,7 @@ export class TeamDO extends TinybaseDO {
         this.store.setRow('invites', inviteId, updatedInvite);
       }
 
-      this.log('updateTeam', 'Updated invites for team', this.teamId);
+      this.log('updateTeam', 'Updated invites for team', teamId);
     }
 
     // Update all team members' UserDO with the new team information
@@ -290,7 +305,7 @@ export class TeamDO extends TinybaseDO {
       // Get all team members
       const members = await db.select()
         .from(teamMembersTable)
-        .where(eq(teamMembersTable.teamId, this.teamId))
+        .where(eq(teamMembersTable.teamId, teamId))
         .all();
 
       // Update each member's UserDO
@@ -300,8 +315,8 @@ export class TeamDO extends TinybaseDO {
           const userDoId = UserDO.idFromName(member.userId.toString());
           const userStub = UserDO.get(userDoId);
 
-          await userStub.updateTeamInfo({
-            teamId: this.teamId,
+          await userStub.updateTeamInfo(member.userId.toString(), {
+            teamId: teamId,
             ...updateValues
           });
         } catch (e) {
@@ -320,7 +335,7 @@ export class TeamDO extends TinybaseDO {
       // Get all team invites
       const invites = await db.select()
         .from(teamInvitesTable)
-        .where(eq(teamInvitesTable.teamId, this.teamId))
+        .where(eq(teamInvitesTable.teamId, teamId))
         .all();
 
       // Update each invited user's UserDO
@@ -330,8 +345,8 @@ export class TeamDO extends TinybaseDO {
           const userDoId = UserDO.idFromName(invite.invitedUserId.toString());
           const userStub = UserDO.get(userDoId);
 
-          await userStub.updateTeamInfo({
-            teamId: this.teamId,
+          await userStub.updateTeamInfo(invite.invitedUserId.toString(), {
+            teamId: teamId,
             ...updateValues
           });
         } catch (e) {

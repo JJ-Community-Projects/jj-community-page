@@ -49,6 +49,7 @@ export abstract class TinybaseDO extends WsServerDurableObject<Env> {
   private async addDOToTable(): Promise<void> {
     this.log(this.namespace(), 'addDOToTable')
     try {
+      // TODO fix move to child classes
       const db = drizzle(this.env.DB)
       await db.insert(durableObjectsTable)
         .values({

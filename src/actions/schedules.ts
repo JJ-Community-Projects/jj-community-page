@@ -4,7 +4,7 @@ import {z} from "astro:content";
 import {createSlug, generateScheduleSlugAlternatives} from "../functions/slug.ts";
 import {getTags} from "../functions/getTags.ts";
 import {ScheduleRepo} from "../lib/db/repos/ScheduleRepo.ts";
-import {getScheduleEditorDO, getUserDO} from "./getDO.ts";
+import {getRPCScheduleEditorDO, getRPCUserDO} from "./getDO.ts";
 import {StreamTagRepo} from "../lib/db/repos/StreamTagRepo.ts";
 
 
@@ -43,7 +43,7 @@ export const schedules = {
       }
 
       // Get the UserDO and toggle the schedule visibility
-      const stubUserDO = getUserDO(ctx, user.id);
+      const stubUserDO = await getRPCUserDO(ctx, user.id);
 
       try {
         await stubUserDO.toggleScheduleVisibility(scheduleId)
@@ -90,7 +90,7 @@ export const schedules = {
       }
 
       // Get the UserDO and set the schedule as primary
-      const stubUserDO = getUserDO(ctx, user.id);
+      const stubUserDO = await getRPCUserDO(ctx, user.id);
 
       try {
         await stubUserDO.setPrimarySchedule(scheduleId)
@@ -149,7 +149,7 @@ export const schedules = {
       })
 
       // Initialize the ScheduleEditorDO for this schedule
-      const stubScheduleEditorDO = getScheduleEditorDO(ctx, schedule.id);
+      const stubScheduleEditorDO = await getRPCScheduleEditorDO(ctx, schedule.id);
 
       try {
         await stubScheduleEditorDO.loadFromDB()
@@ -159,7 +159,7 @@ export const schedules = {
       }
 
       // Add the schedule to the UserDO
-      const stubUserDO = getUserDO(ctx, user.id);
+      const stubUserDO = await getRPCUserDO(ctx, user.id);
 
       try {
         await stubUserDO.addSchedule(schedule)
@@ -203,7 +203,7 @@ export const schedules = {
       }
 
       // Get the ScheduleEditorDO and save to DB
-      const stubScheduleEditorDO = getScheduleEditorDO(ctx, scheduleId);
+      const stubScheduleEditorDO = await getRPCScheduleEditorDO(ctx, scheduleId);
 
       try {
         await stubScheduleEditorDO.saveToDB()
@@ -248,7 +248,7 @@ export const schedules = {
       // Delete the schedule using repository
       await schedules.delete(scheduleId)
 
-      const stubUserDO = getUserDO(ctx, user.id);
+      const stubUserDO = await getRPCUserDO(ctx, user.id);
 
       try {
         await stubUserDO.deleteSchedule(schedule.id)
@@ -537,7 +537,7 @@ export const schedules = {
   getTables: defineAction({
     input: z.number(),
     handler: async (scheduleId, ctx) => {
-      const stubScheduleEditorDO = getScheduleEditorDO(ctx, scheduleId);
+      const stubScheduleEditorDO = await getRPCScheduleEditorDO(ctx, scheduleId);
 
       try {
         return await stubScheduleEditorDO.getTables()

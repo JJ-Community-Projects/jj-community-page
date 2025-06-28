@@ -4,7 +4,7 @@ import {getTags} from "../functions/getTags.ts";
 import {socialUrlRegex} from "../functions/socialUrlRegex.ts";
 import {getTiltifyTokenFromContext, getTiltifyUser} from "../functions/tiltify.ts";
 import {UserRepo} from "../lib/db/repos/UserRepo.ts";
-import {getUserDO} from "./getDO.ts";
+import {getRPCUserDO} from "./getDO.ts";
 
 export const users = {
   /**
@@ -32,7 +32,7 @@ export const users = {
       }
 
       const userId = user.id;
-      const stub = getUserDO(context, userId);
+      const stub = await getRPCUserDO(context, userId);
 
       // Update user style
       try {
@@ -113,7 +113,7 @@ export const users = {
 
       // 4. Set the user socials using the Tiltify data
       const userId = user.id;
-      const stub = getUserDO(context, userId);
+      const stub = await getRPCUserDO(context, userId);
 
       // Add socials from Tiltify data
       const socials = tiltifyUser.data.social;
@@ -283,7 +283,7 @@ export const users = {
       }
 
       const userId = user.id;
-      const stub = getUserDO(context, userId);
+      const stub = await getRPCUserDO(context, userId);
 
       // Add social
       try {
@@ -334,7 +334,7 @@ export const users = {
       }
 
       const userId = user.id;
-      const stub = getUserDO(context, userId);
+      const stub = await getRPCUserDO(context, userId);
 
       // Remove social
       try {
@@ -384,7 +384,7 @@ export const users = {
       }
 
       const userId = user.id;
-      const stub = getUserDO(context, userId);
+      const stub = await getRPCUserDO(context, userId);
 
       // Add tag
       try {
@@ -433,7 +433,7 @@ export const users = {
       }
 
       const userId = user.id;
-      const stub = getUserDO(context, userId);
+      const stub = await getRPCUserDO(context, userId);
 
       // Remove tag
       try {
@@ -499,7 +499,7 @@ export const users = {
       }
 
       const userId = user.id;
-      const stub = getUserDO(context, userId);
+      const stub = await getRPCUserDO(context, userId);
 
       // Load user schedules
       try {
@@ -579,7 +579,7 @@ export const users = {
       }
 
       const userId = user.id;
-      const stub = getUserDO(context, userId);
+      const stub = await getRPCUserDO(context, userId);
 
       console.log('getting table data')
       try {
@@ -895,7 +895,7 @@ export const users = {
       }
 
       const userId = user.id;
-      const stub = getUserDO(context, userId);
+      const stub = await getRPCUserDO(context, userId);
 
       // Set primary live stream platform
       try {
