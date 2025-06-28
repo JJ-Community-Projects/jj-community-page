@@ -1,5 +1,6 @@
 import {defineMiddleware} from "astro:middleware";
 import {deleteSessionTokenCookie, setSessionTokenCookie, validateSessionToken} from "./functions/session.ts";
+import {getActionContext} from "astro:actions";
 
 /**
  * Middleware that handles session validation and user authentication.
@@ -39,6 +40,33 @@ export const onRequest = defineMiddleware(async (context, next) => {
     console.log('middleware', 'websocket')
     return next()
   }
+
+
+  const {action} = getActionContext(context);
+
+
+  if (action?.calledFrom === 'rpc') {
+    const ip = context.request.headers.get("CF-Connecting-IP");
+    if (ip) {
+      try {
+        const UserRateLimiter = context.locals.runtime.env.UserRateLimiter
+        const id = UserRateLimiter.idFromName(ip);
+        const stub = UserRateLimiter.get(id);
+        const milliseconds_to_next_request =
+          await stub.getMillisecondsToNextRequest();
+        if (milliseconds_to_next_request > 0) {
+          // Alternatively one could sleep for the necessary length of time
+          return new Response("Rate limit exceeded", { status: 429 });
+        }
+      } catch (error) {
+        console.log(error);
+        // TODO
+        // return new Response("Could not connect to rate limiter", { status: 502 });
+      }
+    }
+  }
+
+
   try {
     if (token === null) {
       context.locals.session = null;
