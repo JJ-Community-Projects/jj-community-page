@@ -16,7 +16,7 @@ import {getActionContext} from "astro:actions";
  * @returns {Promise<Response>} The response from the next middleware or route handler
  */
 export const onRequest = defineMiddleware(async (context, next) => {
-  console.log('onRequest', context.url)
+  // console.log('onRequest', context.url)
   const token = context.cookies.get("session")?.value ?? null;
   const upgradeHeader = context.request.headers.get("upgrade");
   if (upgradeHeader && upgradeHeader.toLowerCase() === "websocket") {
@@ -37,7 +37,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
       context.request = newRequest;
     }
     // Bypass middleware for WebSocket upgrade requests
-    console.log('middleware', 'websocket')
+    // console.log('middleware', 'websocket')
     return next()
   }
 
