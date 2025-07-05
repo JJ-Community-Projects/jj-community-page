@@ -9,7 +9,8 @@
   "main": "./src/worker.js",
   "compatibility_date": "2025-04-07",
   "compatibility_flags": [
-    "nodejs_compat"
+    "nodejs_compat",
+    "global_fetch_strictly_public"
   ],
   "assets": {
     "binding": "ASSETS",
@@ -22,11 +23,12 @@
     {
       "tag": "v1",
       "new_sqlite_classes": [
-        "JingleJamData",
         "ScheduleEditorDO",
         "UserDO",
         "TeamDO",
-        "UserRateLimiter"
+        "JingleJamData",
+        "UserRateLimiter",
+        "TwitchAPIDO"
       ]
     }
   ],
@@ -52,14 +54,18 @@
       {
         "name": "UserRateLimiter",
         "class_name": "UserRateLimiter"
+      },
+      {
+        "name": "TwitchAPIDO",
+        "class_name": "TwitchAPIDO"
       }
     ]
   },
   "d1_databases": [
     {
       "binding": "DB",
-      "database_name": "prod-d1-jj",
-      "database_id": "7385a91b-14db-4254-8906-edf20d6bb68c",
+      "database_name": "beta-d1-jj",
+      "database_id": "b32d1f6f-5f53-487f-a355-4d9e9b9a0658",
       "migrations_dir": "drizzle"
     }
   ],
@@ -69,11 +75,65 @@
       "id": "9f2c6f601baf4a07a89a5887a641e4fb"
     }
   ],
+  "queues": {
+    "producers": [
+      {
+        "queue": "TWITCH_LIVE_CHECK",
+        "binding": "TWITCH_LIVE_CHECK"
+      },
+      {
+        "queue": "YOUTUBE_LIVE_CHECK",
+        "binding": "YOUTUBE_LIVE_CHECK"
+      },
+      {
+        "queue": "TWITCH_LIVE_NOTIFIER",
+        "binding": "TWITCH_LIVE_NOTIFIER"
+      }
+    ],
+    "consumers": [
+      {
+        "queue": "TWITCH_LIVE_CHECK",
+        "max_batch_size": 100,
+        "max_batch_timeout": 30
+      },
+      {
+        "queue": "YOUTUBE_LIVE_CHECK",
+        "max_batch_size": 5,
+        "max_batch_timeout": 30
+      },
+      {
+        "queue": "TWITCH_LIVE_NOTIFIER",
+        "max_batch_size": 10,
+        "max_batch_timeout": 5
+      }
+    ]
+  },
   "vars": {
-    "JJ_DASHBOARD_URL": "https://dashboard.jinglejam.co.uk/api/tiltify"
+    "ENVIRONMENT": "DEV",
+    "TWITCH_CLIENT_ID": "<PLACEHOLDER>",
+    "TWITCH_CLIENT_SECRET": "<PLACEHOLDER>",
+    "TILTIFY_CLIENT_ID": "<PLACEHOLDER>",
+    "TILTIFY_SECRET": "<PLACEHOLDER>",
+    "TILTIFY_API": "<PLACEHOLDER>",
+    "TILTIFY_REDIRECT_URI": "<PLACEHOLDER>",
+    "JJ_DASHBOARD_URL": "<PLACEHOLDER>",
+    "YOUTUBE_API_KEY": "<PLACEHOLDER>"
+  },
+  "triggers": {
+    "crons": [
+      "*/2 * * * *" // every 2 minutes
+    ]
   },
   "env": {
     "prod": {
+      "compatibility_flags": [
+        "nodejs_compat",
+        "global_fetch_strictly_public"
+      ],
+      "assets": {
+        "binding": "ASSETS",
+        "directory": "./dist"
+      },
       "routes": [
         {
           "pattern": "beta.jinglejam.ostof.dev",
@@ -135,10 +195,26 @@
         }
       ],
       "vars": {
-        "JJ_DASHBOARD_URL": "https://dashboard.jinglejam.co.uk/api/tiltify"
+        "ENVIRONMENT": "PRDD",
+        "TWITCH_CLIENT_ID": "<PLACEHOLDER>",
+        "TWITCH_CLIENT_SECRET": "<PLACEHOLDER>",
+        "TILTIFY_CLIENT_ID": "<PLACEHOLDER>",
+        "TILTIFY_SECRET": "<PLACEHOLDER>",
+        "TILTIFY_API": "<PLACEHOLDER>",
+        "TILTIFY_REDIRECT_URI": "<PLACEHOLDER>",
+        "JJ_DASHBOARD_URL": "<PLACEHOLDER>",
+        "YOUTUBE_API_KEY": "<PLACEHOLDER>"
       }
     },
     "beta": {
+      "compatibility_flags": [
+        "nodejs_compat",
+        "global_fetch_strictly_public"
+      ],
+      "assets": {
+        "binding": "ASSETS",
+        "directory": "./dist"
+      },
       "routes": [
         {
           "pattern": "beta.jinglejam.ostof.dev",
@@ -205,7 +281,15 @@
         }
       ],
       "vars": {
-        "JJ_DASHBOARD_URL": "https://dashboard.jinglejam.co.uk/api/tiltify"
+        "ENVIRONMENT": "BETA",
+        "TWITCH_CLIENT_ID": "<PLACEHOLDER>",
+        "TWITCH_CLIENT_SECRET": "<PLACEHOLDER>",
+        "TILTIFY_CLIENT_ID": "<PLACEHOLDER>",
+        "TILTIFY_SECRET": "<PLACEHOLDER>",
+        "TILTIFY_API": "<PLACEHOLDER>",
+        "TILTIFY_REDIRECT_URI": "<PLACEHOLDER>",
+        "JJ_DASHBOARD_URL": "<PLACEHOLDER>",
+        "YOUTUBE_API_KEY": "<PLACEHOLDER>"
       }
     }
   }
