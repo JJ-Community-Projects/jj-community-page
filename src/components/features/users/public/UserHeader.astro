@@ -1,34 +1,4 @@
 ---
-interface Props {
-  user: {
-    id: number;
-    createdAt: Date;
-    role: string;
-  };
-  account: {
-    userId: number;
-    provider: string;
-    providerId: string;
-    providerUsername: string;
-    createdAt: Date;
-    updatedAt: Date;
-    meta: any;
-  };
-  tags: {
-    userId: number;
-    tag: string;
-    label: string;
-    addedAt: Date;
-  }[];
-  socials: {
-    userId: number;
-    provider: string;
-    url: string;
-  }[];
-}
-
-const {user, account, tags, socials} = Astro.props;
-
 // Import social media components
 import Twitch from "./social/Twitch.astro";
 import Youtube from "./social/Youtube.astro";
@@ -38,11 +8,21 @@ import TikTok from "./social/TikTok.astro";
 import BlueSky from "./social/BlueSky.astro";
 import {GlobeIcon} from "../../../common/icons/JJIcons";
 import Tag from "../../../common/Tag.astro";
+import {type UserPageUI} from "../../../../lib/db/models/user-ui";
+
+interface Props {
+  user: UserPageUI
+}
+
+const {user} = Astro.props;
+
+const {name, tags, socials} = user
+
 ---
 
 <div class="bg-white rounded-lg p-6 mb-4 shadow-md">
     <div class="text-center mb-4">
-        <h1 class="text-3xl font-bold text-primary">{account.providerUsername}</h1>
+        <h1 class="text-3xl font-bold text-primary">{name}</h1>
     </div>
 
     <div class="mt-4">
