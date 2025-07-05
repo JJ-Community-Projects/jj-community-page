@@ -1,5 +1,7 @@
 import astroWorker from "../dist/_worker.js/index.js";
 import {scheduled} from "./cron/scheduled.js";
+import {TwitchLiveNotifierQueue} from "./queues/TwitchLiveNotifierQueue.js";
+import {TwitchLiveCheckQueue} from "./queues/TwitchLiveCheckQueue.js";
 // Export the main worker with a fetch handler.
 // Requests that aren’t meant for your Durable Object will be handled by the Astro worker.
 export default {
@@ -12,6 +14,10 @@ export default {
     },
     async queue(batch, env, ctx) {
         switch (batch.queue) {
+            case 'TWITCH_LIVE_NOTIFIER':
+                const notifier = new TwitchLiveNotifierQueue()
+                await notifier.handle(batch, env, ctx);
+                break
             case 'TWITCH_LIVE_CHECK':
                 const twitchLiveCheck = new TwitchLiveCheckQueue()
                 await twitchLiveCheck.handle(batch, env, ctx);

@@ -15,8 +15,8 @@ export const twitchChannelSchema = sqliteTable('twitch_channels', {
 })
 
 export const twitchStreamSchema = sqliteTable('twitch_streams', {
-  id: text('id').primaryKey(), // stream id
-  userId: text('user_id').notNull(), // twitch id, reference to twitchChannelSchema.id
+  streamId: text('id').primaryKey(), // stream id
+  twitchId: text('user_id').notNull(), // twitch id, reference to twitchChannelSchema.id
   userLogin: text('user_login').notNull(),
   userName: text('user_name').notNull(),
   gameId: text('game_id'),
