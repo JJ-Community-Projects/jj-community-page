@@ -1,7 +1,6 @@
 ---
 interface Props {
   socials: {
-    userId: number;
     provider: string;
     url: string;
   }[];
@@ -16,7 +15,7 @@ import Twitter from "./social/Twitter.astro";
 import Instagram from "./social/Instagram.astro";
 import TikTok from "./social/TikTok.astro";
 import BlueSky from "./social/BlueSky.astro";
-import { GlobeIcon } from "../../common/JJIcons";
+import { GlobeIcon } from "../../../common/icons/JJIcons";
 
 // Function to get display name based on provider
 const getDisplayName = (provider: string) => {
