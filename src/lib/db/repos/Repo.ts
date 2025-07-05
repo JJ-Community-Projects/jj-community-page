@@ -3,7 +3,7 @@ import type {SQLiteTableWithColumns, TableConfig} from "drizzle-orm/sqlite-core"
 import {DatabaseError} from "./DatabaseError";
 import type {BatchItem} from "drizzle-orm/batch";
 
-export type RepoEnv = 'action' | 'do'
+export type RepoEnv = 'action' | 'do' | 'queue' | 'cron' | 'api'
 
 export abstract class Repo<
   T extends TableConfig
