@@ -4,8 +4,8 @@ import {drizzle} from 'drizzle-orm/d1';
 import {extractCFBinding} from "../../lib/extractCFBinding";
 
 export function getDB(
-  source: APIContext | ActionAPIContext | App.Locals
+  source: APIContext | ActionAPIContext | App.Locals | Env
 ) {
   const binding = extractCFBinding(source)
-  return drizzle(binding.env.DB);
+  return drizzle(binding.DB);
 }
