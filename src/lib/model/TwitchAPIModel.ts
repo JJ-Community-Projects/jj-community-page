@@ -13,7 +13,7 @@ export interface TwitchUser {
   created_at: string;
 }
 
-export interface Stream {
+export interface TwitchStream {
   id: string;
   user_id: string;
   user_login: string;
@@ -31,7 +31,7 @@ export interface Stream {
 }
 
 export interface StreamData {
-  stream: Stream,
+  stream: TwitchStream,
   createdAt: string,
   updatedAt: string,
   endedAt?: string,
@@ -43,9 +43,22 @@ export interface UserResult {
 }
 /* eslint-enable camelcase */
 export interface StreamResult {
-  data: Stream[];
+  data: TwitchStream[];
+}
+
+export type TwitchAPIResult<T> = {
+  data: T
+  error: null,
+} | {
+  data: null,
+  error: {
+    status: number,
+    description: string,
+  }
 }
 
 export interface TokenData {
   access_token: string;
+  expires_in: number,
+  token_type: string
 }
