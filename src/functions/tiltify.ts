@@ -66,8 +66,8 @@ export async function getTiltifyTokenFromContext(ctx: AstroContext): Promise<str
   if (!session || !user) {
     return null
   }
-  const TILTIFY_CLIENT_ID = import.meta.env.TILTIFY_CLIENT_ID;
-  const TILTIFY_SECRET = import.meta.env.TILTIFY_SECRET;
+  const TILTIFY_CLIENT_ID = ctx.locals.runtime.env.TILTIFY_CLIENT_ID;
+  const TILTIFY_SECRET = ctx.locals.runtime.env.TILTIFY_SECRET;
 
   const db = getDB(ctx)
   const now = DateTime.now();
@@ -101,6 +101,7 @@ export async function getTiltifyTokenFromContext(ctx: AstroContext): Promise<str
       body
     ),
   })
+  console.log('refreshResponse', refreshResponse)
   if (!refreshResponse.ok) {
     console.log('prepTiltifyAPIRequest', await refreshResponse.json());
     return null;
@@ -191,6 +192,24 @@ export interface TiltifyAmountRaised {
   value: string;
 }
 
+/**
+ * @example
+ * {
+ *  "id":"438f3bd0-af3c-4f6d-8ff5-47d76d1737d9",
+ *  "description":"Account to access the api",
+ *  "url":"/@ostof",
+ *  "username":"ostof",
+ *  "slug":"ostof",
+ *  "avatar": {
+ *    "width":200,
+ *    "alt":"alt",
+ *    "src":"https://assets.tiltify.com/assets/default-avatar.png",
+ *    "height":200},
+ *    "social":{"twitch":"ostof","twitter":null,"facebook":null,"discord":null,"website":null,"snapchat":null,"instagram":null,"youtube":null,"tiktok":null},
+ *    "total_amount_raised":{"value":"0.00","currency":"USD"},
+ *    "legacy_id":177316
+ *  }
+ */
 export interface TiltifyUserData {
   avatar: TiltifyAvatar;
   description: string;
@@ -206,6 +225,8 @@ export interface TiltifyUserData {
 export interface TiltifyUserResponse {
   data: TiltifyUserData;
 }
+
+
 
 export async function getTiltifyUser(accessToken: string): Promise<TiltifyUserResponse | null> {
   try {
