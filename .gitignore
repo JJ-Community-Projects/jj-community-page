@@ -30,3 +30,10 @@ pnpm-debug.log*
 
 jingle-jam-firebase-adminsdk.json
 updateTwitchUser.js
+/.env.beta
+/.env.prod
+/.env.vars
+/.env.vars.beta
+/.env.vars.prod
+.dev.vars
+http/http-client.private.env.json
