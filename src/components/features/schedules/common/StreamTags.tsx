@@ -1,5 +1,5 @@
 import {type Component, For, Show} from "solid-js";
-import type {TagUI} from "../../../../lib/db/models/schedule-ui.ts";
+import type {TagUI} from "../../../../lib/db/models/TagUI.ts";
 import {TagPill} from "../../../common/TagPill.tsx";
 
 interface StreamTagsProps {
