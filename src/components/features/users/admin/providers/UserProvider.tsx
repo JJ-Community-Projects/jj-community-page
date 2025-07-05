@@ -3,6 +3,7 @@ import {createContext, onMount, type ParentComponent, useContext} from "solid-js
 import {actions} from "astro:actions";
 import {useTinystore} from "../../../../../lib/useTinystore.ts";
 import type {User} from "../../../../../lib/auth/User.ts";
+import type {TiltifyUserData} from "../../../../../functions/tiltify.ts";
 
 type HookActions = {
   createSchedule: {
@@ -154,9 +155,9 @@ const useUserHook = (user: User) => {
   const hostname = window.location.hostname
   const port = window.location.port
   const protocol = window.location.protocol
-  const ws = (protocol === "http:" || protocol === "http") ? "wss" : "ws";
-  const isProd = import.meta.env.PROD
-  const url = isProd ? `wss://${hostname}/api/ws/users/${user.id}`:
+  const ws = (protocol === "http:" || protocol === "http") ? "ws" : "wss";
+  const isProd = ws === 'wss';
+  const url = isProd ? `wss://${hostname}/api/ws/users/${user.id}` :
     `ws://${hostname}:${port}/api/ws/users/${user.id}`
   console.log('useUserHook', url)
   const {clientStore: store, addListener} = useTinystore(url)
@@ -179,6 +180,7 @@ const useUserHook = (user: User) => {
   }
 
   const [local, setLocal] = createStore<{
+    tiltify?: TiltifyUserData,
     schedules: {
       id: number;
       title: string;
@@ -210,6 +212,14 @@ const useUserHook = (user: User) => {
       accentColor: string;
     } | null,
     primaryLiveStream: string,
+    connectedChannels: {
+      twitch?: {
+        id: string,
+        login: string,
+        displayName: string
+        profileImageUrl: string
+      }
+    }
   }>({
     schedules: [],
     invites: [],
@@ -218,12 +228,23 @@ const useUserHook = (user: User) => {
     userSocials: [],
     userStyle: null,
     primaryLiveStream: 'twitch', // Default value
+    connectedChannels: {}
   });
 
   onMount(() => {
     //----------------------------------------------
     // Listeners for real-time updates
     //----------------------------------------------
+
+    addListener(
+      store.addValueListener('tiltify', (
+        s, id, newValue) => {
+        if (newValue) {
+          const value = newValue as string
+          setLocal('tiltify', JSON.parse(value))
+        }
+      })
+    )
 
     // Listen for changes to schedules
     addListener(store.addHasRowListener(
@@ -359,16 +380,48 @@ const useUserHook = (user: User) => {
 
     // Listen for changes to user settings (primaryLiveStream)
     addListener(store.addHasRowListener(
-      'userSettings', null,
+      'userSettings', 'primaryLiveStream',
       (s, __, rowId, added) => {
         console.log('userSettings', 'rowListener', rowId)
-        if (added && rowId === 'primaryLiveStream') {
+        if (added) {
           const value = s.getRow('userSettings', rowId);
           setLocal('primaryLiveStream', value.platform as string);
         }
       }
     ));
 
+    addListener(store.addRowListener(
+      'userSettings', 'primaryLiveStream',
+      (s, __, rowId, added) => {
+        console.log('userSettings', 'rowListener', rowId)
+        if (added) {
+          const value = s.getRow('userSettings', rowId);
+          setLocal('primaryLiveStream', value.platform as string);
+        }
+      }
+    ));
+
+    addListener(
+      store.addHasRowListener(
+        'connectedChannels',
+        'twitch',
+        (s, __, rowId, added) => {
+          if (added) {
+            const channel = s.getRow('connectedChannels', 'twitch');
+            if (channel) {
+              setLocal('connectedChannels', 'twitch', {
+                id: channel.id as string,
+                login: channel.login as string,
+                displayName: channel.displayName as string,
+                profileImageUrl: channel.profileImageUrl as string
+              })
+            }
+          } else {
+            setLocal('connectedChannels', 'twitch', undefined)
+          }
+        }
+      )
+    )
   })
 
 

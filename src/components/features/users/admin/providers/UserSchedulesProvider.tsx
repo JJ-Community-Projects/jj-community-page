@@ -42,7 +42,8 @@ const useUserSchedulesHook = (user: User) => {
   const hostname = window.location.hostname
   const port = window.location.port
   const protocol = window.location.protocol
-  const isProd = import.meta.env.PROD
+  const ws = (protocol === "http:" || protocol === "http") ? "ws" : "wss";
+  const isProd = ws === 'wss';
   const url = isProd ? `wss://${hostname}/api/ws/users/${user.id}`:
     `ws://${hostname}:${port}/api/ws/users/${user.id}`
   console.log('useUserSchedulesHook', url)

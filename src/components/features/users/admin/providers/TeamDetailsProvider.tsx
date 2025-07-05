@@ -48,7 +48,9 @@ const initHookState: HookActions = {
 const useTeamHook = (teamId: number, user: User) => {
   const hostname = window.location.hostname
   const port = window.location.port
-  const isProd = import.meta.env.PROD
+  const protocol = window.location.protocol
+  const ws = (protocol === "http:" || protocol === "http") ? "ws" : "wss";
+  const isProd = ws === 'wss';
   const url = isProd ? `wss://${hostname}/api/ws/teams/${teamId}`:
     `ws://${hostname}:${port}/api/ws/teams/${teamId}`
   console.log('useTeamHook', url)
