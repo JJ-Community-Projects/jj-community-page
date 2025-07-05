@@ -78,7 +78,7 @@ export abstract class TinybaseDO extends WsServerDurableObject<Env> {
       this.ctx.storage.sql,
       'fragmented',
       (sql, a) => {
-        console.log('TinybaseDO', 'onSqlCommand', sql);
+        // console.log('TinybaseDO', 'onSqlCommand', sql);
       },
       (e) => {
         console.error('TinybaseDO', e);
