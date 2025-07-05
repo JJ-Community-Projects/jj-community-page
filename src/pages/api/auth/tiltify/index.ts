@@ -5,8 +5,10 @@ import {generateState} from "arctic";
 export const GET: APIRoute = (ctx) => {
 
   const state = generateState();
+  console.log('ctx.request.url', ctx.request.url);
   const TILTIFY_CLIENT_ID = import.meta.env.TILTIFY_CLIENT_ID;
   const redirectUri = new URL("/api/auth/tiltify/callback/", ctx.request.url).toString();
+  console.log('redirectUri', redirectUri);
   // const authUrl = `https://v5api.tiltify.com/oauth/authorize?response_type=code&client_id=${TILTIFY_CLIENT_ID}&redirect_uri=${redirectUri}&scope=public&state=${state}`;
 
   const authUrl = new URL('https://v5api.tiltify.com/oauth/authorize')
