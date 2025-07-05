@@ -4,8 +4,9 @@ import {accounts, blockedAccounts, users, userSocials, userTags} from "../schema
 import type {InferSelectModel} from "drizzle-orm";
 import {and, desc, eq, like, not, notInArray, sql} from "drizzle-orm";
 import {DatabaseError} from "./DatabaseError";
-import {getTiltifyUser} from "../../../functions/tiltify";
+import {getTiltifyUser, type TiltifyUserData} from "../../../functions/tiltify";
 import type {ActionAPIContext} from "astro:actions";
+import {TwitchRepo} from "./TwitchRepo.ts";
 
 /**
  * Repository for working with users
@@ -880,4 +881,38 @@ export class UserRepo extends Repo<typeof users._['config']> {
       }
     }
   }
+
+
+  async getTiltifyMetaData(userId: number): Promise<TiltifyUserData | undefined> {
+    const tiltifyAccount = await this.db
+      .select({
+        meta: accounts.meta
+      })
+      .from(accounts)
+      .where(and(
+        eq(accounts.userId, userId),
+        eq(accounts.provider, 'tiltify')
+      )).get()
+    if (!tiltifyAccount) {
+      return undefined;
+    }
+    return tiltifyAccount.meta as TiltifyUserData
+  }
+
+  async getTwitchChannelByUserId(userId: number) {
+    const twitchRepo = new TwitchRepo(this.db, this.env);
+    return twitchRepo.getChannelByUserId(userId);
+  }
+
+  async getTwitchStreamByUserId(userId: number) {
+    // First get the channel to get its Twitch ID
+    const channel = await this.getTwitchChannelByUserId(userId);
+    if (!channel) return null;
+
+    // Then get the stream using the channel's Twitch ID
+    const twitchRepo = new TwitchRepo(this.db, this.env);
+    return twitchRepo.getStreamByUserId(channel.id);
+  }
+
+
 }
