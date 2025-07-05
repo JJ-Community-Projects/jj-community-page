@@ -1,16 +1,9 @@
-import type {DateTime} from "luxon";
 import type {InferSelectModel} from "drizzle-orm";
-import {streamsTable, teamsTable} from "../schema/schema.ts";
+import {streamsTable,} from "../schema/schema.ts";
 import type {Prettify} from "../../Prettify.ts";
 import type {Schedule} from "./schedule-base.ts";
+import type {TagUI} from "./TagUI.ts";
 
-/**
- * Type for a stream tag
- */
-export type TagUI = {
-  label: string;
-  tag: string
-}
 
 /**
  * Type for a stream participant
@@ -120,7 +113,6 @@ export type ScheduleUI = {
   weeks: ScheduleGroupedWeeks,
   stats: ScheduleUIStats
 }
-
 
 export type TeamScheduleUI = {
   streams: DetailedStream[],
