@@ -1,4 +1,16 @@
 import {type ActionAPIContext, ActionError} from "astro:actions";
+import type {RpcUserDO} from "../do/RpcUserDO.ts";
+import type {RpcTeamDO} from "../do/RpcTeamDO.ts";
+import type {RpcScheduleEditorDO} from "../do/RpcScheduleEditorDO.ts";
+
+
+type RPCResponse<R> = {
+  data: R,
+  error: null
+} | {
+  data: null,
+  error: any
+}
 
 /**
  * Retrieves a UserDO Durable Object stub for a given user ID.
@@ -42,8 +54,6 @@ export function getRPCUserDO(context: ActionAPIContext, userId: number) {
  *   - There's an error getting the Durable Object stub
  */
 export function getRPCScheduleEditorDO(context: ActionAPIContext, scheduleId: number) {
-
-
   // Get Durable Object stub
   try {
     const stub = getScheduleEditorDO(context, scheduleId);
@@ -249,5 +259,45 @@ export function getTeamDO(context: ActionAPIContext, teamId: number) {
       code: 'INTERNAL_SERVER_ERROR',
       message: 'Failed to access team data'
     });
+  }
+}
+
+export async function useRpcUserDO<R = void>(context: ActionAPIContext, userId: number, callback: (stub: Rpc.Stub<RpcUserDO>) => (R | Promise<R>), onError: (error: any) => void) {
+  try {
+    const stub = getUserDO(context, userId);
+    const rpc = await stub.setMetaData(`${userId}`)
+    const r = await callback(rpc);
+    (await rpc)[Symbol.dispose]?.()
+    return r
+  } catch (e: any) {
+    console.error(`useRpcUserDO`, e);
+    onError(e)
+  }
+}
+
+export async function useRpcTeamDO<R = void>(context: ActionAPIContext, teamId: number, callback: (stub: Rpc.Stub<RpcTeamDO>) => (R | Promise<R>), onError: (error: any) => void) {
+  try {
+    const stub = getTeamDO(context, teamId);
+    const rpc = await stub.setMetaData(`${teamId}`)
+    const r = await callback(rpc);
+    (await rpc)[Symbol.dispose]?.()
+    return r
+  } catch (e: any) {
+    console.error(`useRpcTeamDO`, e);
+    onError(e);
+  }
+}
+
+
+export async function useRpcScheduleEditorDO<R = void>(context: ActionAPIContext, teamId: number, callback: (stub: Rpc.Stub<RpcScheduleEditorDO>) => (R | Promise<R>), onError: (error: any) => void) {
+  try {
+    const stub = getScheduleEditorDO(context, teamId);
+    const rpc = await stub.setMetaData(`${teamId}`)
+    const r = await callback(rpc);
+    (await rpc)[Symbol.dispose]?.()
+    return r
+  } catch (e: any) {
+    console.error('useRpcScheduleEditorDO', e);
+    onError(e);
   }
 }

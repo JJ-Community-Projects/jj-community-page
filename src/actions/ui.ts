@@ -3,9 +3,10 @@ import {z} from "astro:content";
 import {ScheduleUIRepo} from "../lib/db/repos/ScheduleUIRepo.ts";
 import {fullJJExampleSchedule} from "../functions/exampleSchedule.ts";
 import {TeamRepo} from "../lib/db/repos/TeamRepo.ts";
+import {UserUIRepo} from "../lib/db/repos/UserUIRepo.ts";
 
 export const ui = {
-  user: {
+  users: {
     schedules: {
       byTiltifyName: defineAction({
         input: z.string(),
@@ -107,6 +108,33 @@ export const ui = {
         }
       })
     },
+
+    byId: defineAction({
+      input: z.number(),
+      handler: async (id, context) => {
+        const repo = UserUIRepo.action(context);
+        const data = await repo.getUserById(id)
+        if (!data) {
+          throw new ActionError({
+            code: 'NOT_FOUND',
+          })
+        }
+        return data
+      }
+    }),
+    bySlug: defineAction({
+      input: z.string(),
+      handler: async (slug, context) => {
+        const repo = UserUIRepo.action(context);
+        const data = await repo.getUserByName(slug)
+        if (!data) {
+          throw new ActionError({
+            code: 'NOT_FOUND',
+          })
+        }
+        return data
+      }
+    })
   },
   teams: {
     getById: defineAction({

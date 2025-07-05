@@ -3,7 +3,7 @@ import {z} from "astro:content";
 import {createSlug, generateTeamSlugAlternatives} from "../functions/slug.ts";
 import {TeamRepo} from "../lib/db/repos/TeamRepo.ts";
 import {UserRepo} from "../lib/db/repos/UserRepo.ts";
-import {getRPCTeamDO, getRPCUserDO} from "./getDO.ts";
+import {useRpcTeamDO, useRpcUserDO} from "./getDO.ts";
 
 
 export const teams = {
@@ -55,31 +55,26 @@ export const teams = {
       });
 
       // Initialize TeamDO and add creator as a member
-      const teamStub = await getRPCTeamDO(ctx, team.id);
-
-      try {
-        teamStub.setTeam(team)
+      await useRpcTeamDO(ctx, team.id, async (rpc) => {
+        rpc.setTeam(team);
         // Add team creator as a member
-        await teamStub.addTeamMember(user.id, user.tiltifyName)
-      } catch (e: any) {
-        console.error('Error initializing TeamDO or adding team creator as member:', e);
-        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
-      }
+        await rpc.addTeamMember(user.id, user.tiltifyName);
+      }, (error) => {
+        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: error.message});
+      });
 
       // Initialize UserDO and update user's team memberships
-      try {
-        const userStub = await getRPCUserDO(ctx, user.id)
+      await useRpcUserDO(ctx, user.id, async (rpc) => {
         // Add team to user's memberships
-        await userStub.addTeam({
+        await rpc.addTeam({
           id: team.id,
           name: team.name,
           slug: team.slug,
           ownerId: team.ownerId,
-        })
-      } catch (e: any) {
-        console.error('Error initializing UserDO or updating user team memberships:', e);
-        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
-      }
+        });
+      }, (error) => {
+        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: error.message});
+      });
 
       return team.id
     }
@@ -138,22 +133,19 @@ export const teams = {
       const updatedTeam = await teams.update(id, {
         name: name,
         slug: slug,
-        ...(visible !== undefined && { visible }),
+        ...(visible !== undefined && {visible}),
       });
 
       // Update TeamDO
-      const teamStub = await getRPCTeamDO(ctx, id);
-
-      try {
-        await teamStub.updateTeam({
+      await useRpcTeamDO(ctx, id, async (rpc) => {
+        await rpc.updateTeam({
           name: name,
           slug: slug,
-          ...(visible !== undefined && { visible }),
-        })
-      } catch (e: any) {
-        console.error('Error updating TeamDO:', e);
-        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
-      }
+          ...(visible !== undefined && {visible}),
+        });
+      }, (error) => {
+        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: error.message});
+      });
 
       return updatedTeam
     }
@@ -190,28 +182,21 @@ export const teams = {
       const members = await teams.getTeamMembers(teamId);
       const memberIds = members.map(member => member.userId);
 
-      // Initialize TeamDO
-      const teamStub = await getRPCTeamDO(ctx, teamId);
-
-      // Delete team
-      try {
-        await teamStub.deleteTeam()
-      } catch (e: any) {
-        console.error('Error deleting team in TeamDO:', e);
-        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
-      }
+      // Delete team in TeamDO
+      await useRpcTeamDO(ctx, teamId, async (rpc) => {
+        await rpc.deleteTeam();
+      }, (error) => {
+        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: error.message});
+      });
 
       // Update UserDO for each team member
       if (memberIds.length > 0) {
-
         for (const memberId of memberIds) {
-          const userStub = await getRPCUserDO(ctx, memberId)
-          try {
-            await userStub.teamDeleted(teamId)
-          } catch (e: any) {
-            console.error(`Error updating UserDO for member ${memberId}:`, e);
-            // Continue with other members even if one fails
-          }
+          await useRpcUserDO(ctx, memberId, async (rpc) => {
+            await rpc.teamDeleted(teamId);
+          }, (error) => {
+            throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: error.message});
+          });
         }
       }
 
@@ -249,34 +234,19 @@ export const teams = {
         })
       }
 
-      // Initialize TeamDO
-      const teamStub = await getRPCTeamDO(ctx, teamId);
-
-      // Remove user from team
-      try {
-        await teamStub.userLeaveTeam(user.id)
-      } catch (e: any) {
-        console.error('Error leaving team in TeamDO:', e);
-        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
-      }
-
-      // Initialize UserDO
-      let userStub;
-      try {
-        userStub = await getRPCUserDO(ctx, user.id)
-      } catch (e: any) {
-        console.error('Error initializing UserDO:', e);
-        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
-      }
+      // Remove user from team in TeamDO
+      await useRpcTeamDO(ctx, teamId, async (rpc) => {
+        await rpc.userLeaveTeam(user.id);
+      }, (error) => {
+        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: error.message});
+      });
 
       // Update UserDO state
-      try {
-        await userStub.leaveTeam(teamId)
-      } catch (e: any) {
-        console.error('Error updating UserDO after leaving team:', e);
-        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
-      }
-
+      await useRpcUserDO(ctx, user.id, async (rpc) => {
+        await rpc.leaveTeam(teamId);
+      }, (error) => {
+        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: error.message});
+      });
       return {success: true}
     }
   }),
@@ -318,34 +288,19 @@ export const teams = {
         throw new ActionError({code: 'FORBIDDEN', message: 'Team owner cannot remove themselves from the team'})
       }
 
-      // Initialize TeamDO
-      const teamStub = await getRPCTeamDO(ctx, teamId);
-
-      // Remove user from team
-      try {
-        await teamStub.deleteTeamMember(userId)
-      } catch (e: any) {
-        console.error('Error removing user from team in TeamDO:', e);
-        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
-      }
-
-      // Initialize UserDO
-      let userStub;
-      try {
-        userStub = await getRPCUserDO(ctx, userId)
-      } catch (e: any) {
-        console.error('Error initializing UserDO:', e);
-        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
-      }
+      // Remove user from team in TeamDO
+      await useRpcTeamDO(ctx, teamId, async (rpc) => {
+        await rpc.deleteTeamMember(user.id);
+      }, (error) => {
+        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: error.message});
+      });
 
       // Update UserDO state
-      try {
-        await userStub.removedFromTeam(teamId)
-      } catch (e: any) {
-        console.error('Error updating UserDO after removing user from team:', e);
-        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
-      }
-
+      await useRpcUserDO(ctx, userId, async (rpc) => {
+        await rpc.removedFromTeam(teamId);
+      }, (error) => {
+        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: error.message});
+      });
       return {success: true}
     }
   }),
@@ -486,9 +441,6 @@ export const teamInvites = {
         throw new ActionError({code: 'FORBIDDEN', message: 'Only team owners can invite users'})
       }
 
-      // Initialize TeamDO and add invite
-      const teamStub = await getRPCTeamDO(ctx, teamId);
-
       console.log('invitedUserId', invitedUserId)
 
       const userToInvite = await users.getAccountByProvider(invitedUserId, 'tiltify')
@@ -500,34 +452,24 @@ export const teamInvites = {
         throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: 'user not found'})
       }
 
-      try {
-        await teamStub.addInvite(invitedUserId, userToInvite.providerUsername)
-      } catch (e: any) {
-        console.error('Error adding invite to TeamDO:', e);
-        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
-      }
+      // Add invite to TeamDO
+      await useRpcTeamDO(ctx, teamId, async (rpc) => {
+        await rpc.addInvite(invitedUserId, userToInvite.providerUsername);
+      }, (error) => {
+        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: error.message});
+      });
 
-      // Initialize UserDO and add invite
-      let userStub;
-      try {
-        userStub = await getRPCUserDO(ctx, invitedUserId)
-      } catch (e: any) {
-        console.error('Error initializing UserDO:', e);
-        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
-      }
-
-      try {
-        await userStub.addInvite({
+      // Add invite to UserDO
+      await useRpcUserDO(ctx, invitedUserId, async (rpc) => {
+        await rpc.addInvite({
           id: team.id,
           name: team.name,
           slug: team.slug,
           ownerId: team.ownerId,
-        })
-      } catch (e: any) {
-        console.error('Error adding invite to UserDO:', e);
-        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
-      }
-
+        });
+      }, (error) => {
+        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: error.message});
+      });
       return {success: true}
     }
   }),
@@ -571,34 +513,19 @@ export const teamInvites = {
         throw new ActionError({code: 'NOT_FOUND', message: 'Invite not found'})
       }
 
-      // Initialize TeamDO
-      const teamStub = await getRPCTeamDO(ctx, teamId);
-
       // Delete invite from TeamDO
-      try {
-        await teamStub.deleteInvite(invitedUserId)
-      } catch (e: any) {
-        console.error('Error deleting invite in TeamDO:', e);
-        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
-      }
-
-      // Initialize UserDO
-      let userStub;
-      try {
-        userStub = await getRPCUserDO(ctx, invitedUserId)
-      } catch (e: any) {
-        console.error('Error initializing UserDO:', e);
-        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
-      }
+      await useRpcTeamDO(ctx, teamId, async (rpc) => {
+        await rpc.deleteInvite(invitedUserId);
+      }, (error) => {
+        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: error.message});
+      });
 
       // Update UserDO state
-      try {
-        await userStub.rejectInvite(teamId)
-      } catch (e: any) {
-        console.error('Error rejecting invite in UserDO:', e);
-        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
-      }
-
+      await useRpcUserDO(ctx, invitedUserId, async (rpc) => {
+        await rpc.rejectInvite(teamId);
+      }, (error) => {
+        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: error.message});
+      });
       return {success: true}
     }
   }),
@@ -632,38 +559,22 @@ export const teamInvites = {
         throw new ActionError({code: 'NOT_FOUND', message: 'Invite not found'})
       }
 
-      // Initialize TeamDO
-      const teamStub = await getRPCTeamDO(ctx, teamId);
+      await useRpcTeamDO(ctx, teamId, async (rpc) => {
+        await rpc.acceptInvite(user.id, user.tiltifyName)
+      }, (error) => {
+        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: error.message});
+      })
 
-      // Add user as team member and delete invite
-      try {
-        await teamStub.acceptInvite(user.id, user.tiltifyName)
-      } catch (e: any) {
-        console.error('Error accepting invite in TeamDO:', e);
-        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
-      }
-
-      // Initialize UserDO
-      let userStub;
-      try {
-        userStub = await getRPCUserDO(ctx, user.id)
-      } catch (e: any) {
-        console.error('Error initializing UserDO:', e);
-        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
-      }
-
-      // Update UserDO state with complete team object
-      try {
-        await userStub.acceptInvite({
+      await useRpcUserDO(ctx, user.id, async (rpc) => {
+        await rpc.acceptInvite({
           id: team.id,
           name: team.name,
           slug: team.slug,
           ownerId: team.ownerId,
         })
-      } catch (e: any) {
-        console.error('Error accepting invite in UserDO:', e);
-        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
-      }
+      }, (error) => {
+        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: error.message});
+      })
 
       return {success: true}
     }
@@ -698,33 +609,17 @@ export const teamInvites = {
         throw new ActionError({code: 'NOT_FOUND', message: 'Invite not found'})
       }
 
-      // Initialize TeamDO
-      const teamStub = await getRPCTeamDO(ctx, teamId);
+      await useRpcTeamDO(ctx, teamId, async (rpc) => {
+        await rpc.deleteInvite(user.id)
+      }, (error) => {
+        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: error.message});
+      })
 
-      // Delete invite from TeamDO
-      try {
-        await teamStub.deleteInvite(user.id)
-      } catch (e: any) {
-        console.error('Error deleting invite in TeamDO:', e);
-        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
-      }
-
-      // Initialize UserDO
-      let userStub;
-      try {
-        userStub = await getRPCUserDO(ctx, user.id)
-      } catch (e: any) {
-        console.error('Error initializing UserDO:', e);
-        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
-      }
-
-      // Update UserDO state
-      try {
-        await userStub.rejectInvite(teamId)
-      } catch (e: any) {
-        console.error('Error rejecting invite in UserDO:', e);
-        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
-      }
+      await useRpcUserDO(ctx, user.id, async (rpc) => {
+        await rpc.rejectInvite(teamId)
+      }, (error) => {
+        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: error.message});
+      })
 
       return {success: true}
     }

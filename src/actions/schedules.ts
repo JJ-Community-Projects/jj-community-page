@@ -4,7 +4,7 @@ import {z} from "astro:content";
 import {createSlug, generateScheduleSlugAlternatives} from "../functions/slug.ts";
 import {getTags} from "../functions/getTags.ts";
 import {ScheduleRepo} from "../lib/db/repos/ScheduleRepo.ts";
-import {getRPCScheduleEditorDO, getRPCUserDO} from "./getDO.ts";
+import {useRpcScheduleEditorDO, useRpcUserDO} from "./getDO.ts";
 import {StreamTagRepo} from "../lib/db/repos/StreamTagRepo.ts";
 
 
@@ -43,14 +43,11 @@ export const schedules = {
       }
 
       // Get the UserDO and toggle the schedule visibility
-      const stubUserDO = await getRPCUserDO(ctx, user.id);
-
-      try {
-        await stubUserDO.toggleScheduleVisibility(scheduleId)
-      } catch (e: any) {
-        console.error('Error toggling schedule visibility:', e);
-        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
-      }
+      await useRpcUserDO(ctx, user.id, async (rpc) => {
+        await rpc.toggleScheduleVisibility(scheduleId)
+      }, (error) => {
+        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: error.message});
+      })
 
       return {message: "Schedule visibility toggled successfully"}
     }
@@ -90,14 +87,11 @@ export const schedules = {
       }
 
       // Get the UserDO and set the schedule as primary
-      const stubUserDO = await getRPCUserDO(ctx, user.id);
-
-      try {
-        await stubUserDO.setPrimarySchedule(scheduleId)
-      } catch (e: any) {
-        console.error('Error setting schedule as primary:', e);
-        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
-      }
+      await useRpcUserDO(ctx, user.id, async (rpc) => {
+        await rpc.setPrimarySchedule(scheduleId)
+      }, (error) => {
+        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: error.message});
+      })
 
       return {message: "Schedule set as primary successfully"}
     }
@@ -134,7 +128,7 @@ export const schedules = {
 
       let title = `${user.tiltifyName}'s Schedule ${currentYear}`
       if (existingSchedule) {
-        title+=` ${existingSchedules.length}`
+        title += ` ${existingSchedules.length}`
       }
       const slug = createSlug(title)
 
@@ -149,24 +143,18 @@ export const schedules = {
       })
 
       // Initialize the ScheduleEditorDO for this schedule
-      const stubScheduleEditorDO = await getRPCScheduleEditorDO(ctx, schedule.id);
-
-      try {
-        await stubScheduleEditorDO.loadFromDB()
-      } catch (e: any) {
-        console.error('Error loading schedule from DB:', e);
-        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
-      }
+      await useRpcScheduleEditorDO(ctx, schedule.id, async (rpc) => {
+        await rpc.loadFromDB();
+      }, (error) => {
+        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: error.message});
+      });
 
       // Add the schedule to the UserDO
-      const stubUserDO = await getRPCUserDO(ctx, user.id);
-
-      try {
-        await stubUserDO.addSchedule(schedule)
-      } catch (e: any) {
-        console.error('Error adding schedule to UserDO:', e);
-        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
-      }
+      await useRpcUserDO(ctx, user.id, async (rpc) => {
+        await rpc.addSchedule(schedule);
+      }, (error) => {
+        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: error.message});
+      });
 
       return {schedule}
     }
@@ -203,14 +191,11 @@ export const schedules = {
       }
 
       // Get the ScheduleEditorDO and save to DB
-      const stubScheduleEditorDO = await getRPCScheduleEditorDO(ctx, scheduleId);
-
-      try {
-        await stubScheduleEditorDO.saveToDB()
-      } catch (e: any) {
-        console.error('Error saving schedule to DB:', e);
-        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
-      }
+      await useRpcScheduleEditorDO(ctx, scheduleId, async (rpc) => {
+        await rpc.saveToDB();
+      }, (error) => {
+        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: error.message});
+      });
 
       return {message: "Schedule saved successfully"}
     }
@@ -248,14 +233,11 @@ export const schedules = {
       // Delete the schedule using repository
       await schedules.delete(scheduleId)
 
-      const stubUserDO = await getRPCUserDO(ctx, user.id);
-
-      try {
-        await stubUserDO.deleteSchedule(schedule.id)
-      } catch (e: any) {
-        console.error('Error deleting schedule from UserDO:', e);
-        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
-      }
+      await useRpcUserDO(ctx, user.id, async (rpc) => {
+        await rpc.deleteSchedule(schedule.id);
+      }, (error) => {
+        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: error.message});
+      });
 
 
       return {message: "Schedule successfully deleted"}
@@ -537,14 +519,11 @@ export const schedules = {
   getTables: defineAction({
     input: z.number(),
     handler: async (scheduleId, ctx) => {
-      const stubScheduleEditorDO = await getRPCScheduleEditorDO(ctx, scheduleId);
-
-      try {
-        return await stubScheduleEditorDO.getTables()
-      } catch (e: any) {
-        console.error('Error getting tables from ScheduleEditorDO:', e);
-        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
-      }
+      return useRpcScheduleEditorDO(ctx, scheduleId, async (rpc) => {
+        return rpc.getTables();
+      }, (error) => {
+        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: error.message});
+      });
     }
   }),
 
@@ -582,7 +561,7 @@ export const schedules = {
         const schedules = ScheduleRepo.action(ctx);
         const nextSchedule = await schedules.findNextScheduleByTiltifyUsername(tiltifyUsername);
 
-        return { nextSchedule };
+        return {nextSchedule};
       } catch (e: any) {
         console.error('Error getting next schedule by tiltify username:', e);
         throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message});
