@@ -1,8 +1,7 @@
 import {RpcTarget} from "cloudflare:workers";
-import {UserDO} from "./UserDO.ts";
 import type {TeamDO} from "./TeamDO.ts";
-import {createUnauthorizedResponse} from "./utils.ts";
-import {validateSessionTokenFromEnv} from "../functions/session.ts";
+import type {InferSelectModel} from "drizzle-orm";
+import type {teamsTable} from "../lib/db/schema/schema.ts";
 
 
 export class RpcTeamDO extends RpcTarget {
@@ -55,6 +54,10 @@ export class RpcTeamDO extends RpcTarget {
     visible?: boolean;
   }) {
     return this.teamDO.updateTeam(this.doIdentifier, updates);
+  }
+
+  setTeam(team: InferSelectModel<typeof teamsTable>) {
+    return this.teamDO.setTeam(this.doIdentifier, team)
   }
 
   // Methods that don't need the identifier can be forwarded directly
