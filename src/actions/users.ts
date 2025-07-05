@@ -4,7 +4,7 @@ import {getTags} from "../functions/getTags.ts";
 import {socialUrlRegex} from "../functions/socialUrlRegex.ts";
 import {getTiltifyTokenFromContext, getTiltifyUser} from "../functions/tiltify.ts";
 import {UserRepo} from "../lib/db/repos/UserRepo.ts";
-import {getRPCUserDO} from "./getDO.ts";
+import {useRpcUserDO} from "./getDO.ts";
 
 export const users = {
   /**
@@ -32,33 +32,23 @@ export const users = {
       }
 
       const userId = user.id;
-      const stub = await getRPCUserDO(context, userId);
+      let result = await useRpcUserDO(context, userId, async (rpc) => {
+        return rpc.updateUserStyle(primaryColor, accentColor);
+      }, (error) => {
+        throw new ActionError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to update user style'
+        });
+      });
 
-      // Update user style
-      try {
-        let result;
-        try {
-          result = await stub.updateUserStyle(primaryColor, accentColor);
-          console.log('User style updated successfully');
-        } catch (error) {
-          console.error('Error in stub.updateUserStyle operation:', error);
-          throw error;
-        }
-
-        if (!result) {
-          throw new ActionError({
-            code: 'INTERNAL_SERVER_ERROR',
-            message: 'Failed to update user style'
-          });
-        }
-        return {success: true};
-      } catch (error) {
-        console.error('Error updating user style:', error);
+      if (!result) {
         throw new ActionError({
           code: 'INTERNAL_SERVER_ERROR',
           message: 'Failed to update user style'
         });
       }
+      return {success: true};
+
     }
   }),
   /**
@@ -113,13 +103,12 @@ export const users = {
 
       // 4. Set the user socials using the Tiltify data
       const userId = user.id;
-      const stub = await getRPCUserDO(context, userId);
 
       // Add socials from Tiltify data
       const socials = tiltifyUser.data.social;
-      const results = [];
+      const results: { provider: string, success: boolean }[] = [];
 
-      try {
+      await useRpcUserDO(context, userId, async (rpc) => {
         // Add Twitch social if available
         if (socials.twitch) {
           const twitchUrl = socials.twitch.startsWith('http')
@@ -127,7 +116,7 @@ export const users = {
             : `https://twitch.tv/${socials.twitch}`;
 
           try {
-            const result = await stub.addSocial('twitch', twitchUrl);
+            const result = await rpc.addSocial('twitch', twitchUrl);
             results.push({provider: 'twitch', success: !!result});
           } catch (error) {
             console.error('Error adding Twitch social:', error);
@@ -142,7 +131,7 @@ export const users = {
             : `https://twitter.com/${socials.twitter}`;
 
           try {
-            const result = await stub.addSocial('twitter', twitterUrl);
+            const result = await rpc.addSocial('twitter', twitterUrl);
             results.push({provider: 'twitter', success: !!result});
           } catch (error) {
             console.error('Error adding Twitter social:', error);
@@ -163,7 +152,7 @@ export const users = {
           }
 
           try {
-            const result = await stub.addSocial('youtube', youtubeUrl);
+            const result = await rpc.addSocial('youtube', youtubeUrl);
             results.push({provider: 'youtube', success: !!result});
           } catch (error) {
             console.error('Error adding YouTube social:', error);
@@ -178,7 +167,7 @@ export const users = {
             : `https://instagram.com/${socials.instagram}`;
 
           try {
-            const result = await stub.addSocial('instagram', instagramUrl);
+            const result = await rpc.addSocial('instagram', instagramUrl);
             results.push({provider: 'instagram', success: !!result});
           } catch (error) {
             console.error('Error adding Instagram social:', error);
@@ -193,25 +182,24 @@ export const users = {
             : `https://tiktok.com/@${socials.tiktok}`;
 
           try {
-            const result = await stub.addSocial('tiktok', tiktokUrl);
+            const result = await rpc.addSocial('tiktok', tiktokUrl);
             results.push({provider: 'tiktok', success: !!result});
           } catch (error) {
             console.error('Error adding TikTok social:', error);
             results.push({provider: 'tiktok', success: false});
           }
         }
-
-        return {
-          success: true,
-          results
-        };
-      } catch (error) {
-        console.error('Error setting user socials:', error);
+      }, (error) => {
         throw new ActionError({
           code: 'INTERNAL_SERVER_ERROR',
           message: 'Failed to set user socials'
         });
-      }
+      });
+
+      return {
+        success: true,
+        results
+      };
     }
   }),
 
@@ -283,33 +271,22 @@ export const users = {
       }
 
       const userId = user.id;
-      const stub = await getRPCUserDO(context, userId);
+      const result = await useRpcUserDO(context, userId, async (rpc) => {
+        return rpc.addSocial(provider.toLowerCase(), url);
+      }, (error) => {
+        throw new ActionError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to add social media link'
+        });
+      });
 
-      // Add social
-      try {
-        let result;
-        try {
-          result = await stub.addSocial(provider.toLowerCase(), url);
-          console.log('Social added successfully:', provider);
-        } catch (error) {
-          console.error('Error in stub.addSocial operation:', error);
-          throw error;
-        }
-
-        if (!result) {
-          throw new ActionError({
-            code: 'INTERNAL_SERVER_ERROR',
-            message: 'Failed to add social media link'
-          });
-        }
-        return {success: true};
-      } catch (error) {
-        console.error('Error adding social:', error);
+      if (!result) {
         throw new ActionError({
           code: 'INTERNAL_SERVER_ERROR',
           message: 'Failed to add social media link'
         });
       }
+      return {success: true};
     }
   }),
 
@@ -334,33 +311,23 @@ export const users = {
       }
 
       const userId = user.id;
-      const stub = await getRPCUserDO(context, userId);
+      const result = await useRpcUserDO(context, userId, async (rpc) => {
+        return rpc.removeSocial(provider.toLowerCase());
+      }, (error) => {
+        throw new ActionError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to remove social media link'
+        });
+      });
 
-      // Remove social
-      try {
-        let result;
-        try {
-          result = await stub.removeSocial(provider.toLowerCase());
-          console.log('Social removed successfully:', provider);
-        } catch (error) {
-          console.error('Error in stub.removeSocial operation:', error);
-          throw error;
-        }
-
-        if (!result) {
-          throw new ActionError({
-            code: 'INTERNAL_SERVER_ERROR',
-            message: 'Failed to remove social media link'
-          });
-        }
-        return {success: true};
-      } catch (error) {
-        console.error('Error removing social:', error);
+      if (!result) {
         throw new ActionError({
           code: 'INTERNAL_SERVER_ERROR',
           message: 'Failed to remove social media link'
         });
       }
+      return {success: true};
+
     }
   }),
   /**
@@ -384,33 +351,23 @@ export const users = {
       }
 
       const userId = user.id;
-      const stub = await getRPCUserDO(context, userId);
+      let result = await useRpcUserDO(context, userId, async (rpc) => {
+        return rpc.addTag(tag, label || tag);
+      }, (error) => {
+        throw new ActionError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to add tag'
+        });
+      });
 
-      // Add tag
-      try {
-        let result;
-        try {
-          result = await stub.addTag(tag, label || tag);
-          console.log('Tag added successfully:', tag);
-        } catch (error) {
-          console.error('Error in stub.addTag operation:', error);
-          throw error;
-        }
-
-        if (!result) {
-          throw new ActionError({
-            code: 'INTERNAL_SERVER_ERROR',
-            message: 'Failed to add tag'
-          });
-        }
-        return {success: true};
-      } catch (error) {
-        console.error('Error adding tag:', error);
+      if (!result) {
         throw new ActionError({
           code: 'INTERNAL_SERVER_ERROR',
           message: 'Failed to add tag'
         });
       }
+      return {success: true};
+
     }
   }),
 
@@ -433,18 +390,24 @@ export const users = {
       }
 
       const userId = user.id;
-      const stub = await getRPCUserDO(context, userId);
+      let result;
 
       // Remove tag
       try {
-        let result;
-        try {
-          result = await stub.removeTag(tag);
-          console.log('Tag removed successfully:', tag);
-        } catch (error) {
-          console.error('Error in stub.removeTag operation:', error);
-          throw error;
-        }
+        await useRpcUserDO(context, userId, async (rpc) => {
+          try {
+            result = await rpc.removeTag(tag);
+            console.log('Tag removed successfully:', tag);
+          } catch (error) {
+            console.error('Error in rpc.removeTag operation:', error);
+            throw error;
+          }
+        }, (error) => {
+          throw new ActionError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: 'Failed to remove tag'
+          });
+        });
 
         if (!result) {
           throw new ActionError({
@@ -547,11 +510,19 @@ export const users = {
       }
 
       const userId = user.id;
-      const stub = await getRPCUserDO(context, userId);
+      let tables;
 
       console.log('getting table data')
       try {
-        return await stub.getTables()
+        await useRpcUserDO(context, userId, async (rpc) => {
+          tables = await rpc.getTables();
+        }, (error) => {
+          throw new ActionError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: 'Failed to get tables from UserDO'
+          });
+        });
+        return tables;
       } catch (e: any) {
         console.error('Error getting tables from UserDO:', e);
         throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
@@ -874,18 +845,24 @@ export const users = {
       }
 
       const userId = user.id;
-      const stub = await getRPCUserDO(context, userId);
+      let result;
 
       // Set primary live stream platform
       try {
-        let result;
-        try {
-          result = await stub.setPrimaryLiveStream(platform.toLowerCase());
-          console.log('Primary live stream platform set successfully:', platform);
-        } catch (error) {
-          console.error('Error in stub.setPrimaryLiveStream operation:', error);
-          throw error;
-        }
+        await useRpcUserDO(context, userId, async (rpc) => {
+          try {
+            result = await rpc.setPrimaryLiveStream(platform.toLowerCase());
+            console.log('Primary live stream platform set successfully:', platform);
+          } catch (error) {
+            console.error('Error in rpc.setPrimaryLiveStream operation:', error);
+            throw error;
+          }
+        }, (error) => {
+          throw new ActionError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: 'Failed to set primary live stream platform'
+          });
+        });
 
         if (!result) {
           throw new ActionError({
