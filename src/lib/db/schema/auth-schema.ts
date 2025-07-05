@@ -1,5 +1,7 @@
+// src/lib/db/auth-schema.ts
 import {index, integer, primaryKey, sqliteTable, text, uniqueIndex,} from "drizzle-orm/sqlite-core";
 import {sql} from "drizzle-orm";
+import { drizzle } from "drizzle-orm/d1";
 
 export const users = sqliteTable("users", {
   id: integer({mode: 'number'}).primaryKey({autoIncrement: true}),
@@ -12,7 +14,7 @@ export const users = sqliteTable("users", {
 
 export const accounts =
   sqliteTable("accounts", {
-      userId: integer({mode: 'number'}).notNull()
+      userId: integer('user_id', {mode: 'number'}).notNull()
         .references(() => users.id, {onDelete: 'cascade'}),
       provider: text('provider').notNull(),
       providerId: text('provider_id').notNull().unique(),
@@ -39,7 +41,7 @@ export const accounts =
   );
 
 export const tokens = sqliteTable("tokens", {
-    userId: integer({mode: 'number'}).notNull()
+    userId: integer('user_id', {mode: 'number'}).notNull()
       .references(() => users.id, {onDelete: 'cascade'}),
     provider: text('provider').notNull(),
     accessToken: text("access_token").notNull(),
@@ -57,7 +59,7 @@ export const tokens = sqliteTable("tokens", {
 )
 
 export const userTags = sqliteTable("user_tags", {
-  userId: integer({mode: 'number'}).notNull().references(() => users.id, {onDelete: 'cascade'}),
+  userId: integer('user_id', {mode: 'number'}).notNull().references(() => users.id, {onDelete: 'cascade'}),
   tag: text('tag').notNull(),
   label: text('label').notNull(),
   addedAt: integer('added_at', {mode: 'timestamp'}).notNull().default(sql`(unixepoch()
@@ -68,8 +70,8 @@ export const userTags = sqliteTable("user_tags", {
 ])
 
 export const userSocials = sqliteTable("user_socials", {
-  userId: integer({mode: 'number'}).notNull().references(() => users.id, {onDelete: 'cascade'}),
-  provider: text('social').notNull(), // e.g. twitch, twitter, bsky
+  userId: integer('user_id', {mode: 'number'}).notNull().references(() => users.id, {onDelete: 'cascade'}),
+  provider: text('social').notNull(), // e.g. twitch, twitter, bsky, etc.
   url: text('url').notNull()
 }, (table) => [
   primaryKey({name: 'user_url_provider_pk', columns: [table.userId, table.provider]}),
@@ -86,7 +88,7 @@ export const blockedAccounts = sqliteTable("blocked_accounts", {
 })
 
 export const userStyles = sqliteTable("user_styles", {
-  userId: integer({mode: 'number'}).notNull().references(() => users.id, {onDelete: 'cascade'}),
+  userId: integer('user_id', {mode: 'number'}).notNull().references(() => users.id, {onDelete: 'cascade'}),
   primaryColor: text('primary_color').notNull().default('#E30E50'),
   accentColor: text('accent_color').notNull().default('#3584BF'),
 }, (table) => [
