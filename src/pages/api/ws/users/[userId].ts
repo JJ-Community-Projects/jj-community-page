@@ -1,6 +1,6 @@
 import type {APIRoute} from "astro";
 import {validateSessionToken} from "../../../../functions/session.ts";
-import {getRPCUserDO, getUserDO} from "../../../../actions/getDO.ts";
+import {getUserDO} from "../../../../actions/getDO.ts";
 
 export const ALL: APIRoute = async (ctx) => {
   const requestedUserId = ctx.params.userId;
