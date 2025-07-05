@@ -1,12 +1,12 @@
-import {schedulesTable, teamInvitesTable, teamMembersTable, teamsTable} from "../lib/db/schema/schema.ts";
+import {accounts, schedulesTable, teamInvitesTable, teamMembersTable, teamsTable} from "../lib/db/schema/schema.ts";
 import {drizzle} from "drizzle-orm/d1";
 import {and, eq} from "drizzle-orm";
 import type {Id, IdAddedOrRemoved} from "tinybase";
 import {TinybaseDO} from "./TinybaseDO.ts";
-import {validateSessionTokenFromEnv} from "../functions/session.ts";
-import {createUnauthorizedResponse} from "./utils.ts";
 import {users, userSocials, userStyles, userTags} from "../lib/db/schema/auth-schema.ts";
 import {RpcUserDO} from "./RpcUserDO.ts";
+import {TwitchRepo} from "../lib/db/repos/TwitchRepo.ts";
+import {UserRepo} from "../lib/db/repos/UserRepo.ts";
 
 
 export class UserDO extends TinybaseDO {
@@ -16,10 +16,16 @@ export class UserDO extends TinybaseDO {
   }
 
   setMetaData(doIdentifier: string) {
+    if (this.store) {
+      this.store.setValue('id', doIdentifier);
+    }
     return new RpcUserDO(doIdentifier, this, this.env);
   }
 
   init(doIdentifier: string) {
+    if (this.store) {
+      this.store.setValue('id', doIdentifier);
+    }
     this.ctx.blockConcurrencyWhile(async () => {
       this.createPersister();
       await this.writeSchedulesToTinybase(doIdentifier);
@@ -29,6 +35,8 @@ export class UserDO extends TinybaseDO {
       await this.loadUserSocials(doIdentifier);
       await this.loadUserStyles(doIdentifier);
       await this.loadUserSettings(doIdentifier);
+      await this.loadConnectedChannel(doIdentifier);
+      await this.loadTiltifyAccount(doIdentifier);
     });
   }
 
@@ -195,6 +203,13 @@ export class UserDO extends TinybaseDO {
   onClientId(pathId: Id, clientId: Id, addedOrRemoved: IdAddedOrRemoved) {
     super.onClientId(pathId, clientId, addedOrRemoved);
     // this.info((addedOrRemoved ? 'Added' : 'Removed') + ` client ${clientId} on path ${pathId}`,);
+
+    // When a client is added, sync with D1 to ensure data is up-to-date
+    if (addedOrRemoved) {
+      this.syncWithD1().catch(e => {
+        this.error('Error syncing with D1 in onClientId:', e);
+      });
+    }
   }
 
   public getTables() {
@@ -630,12 +645,12 @@ export class UserDO extends TinybaseDO {
 
       // 1. Set the target schedule as primary
       await db.update(schedulesTable)
-        .set({ primary: true })
+        .set({primary: true})
         .where(eq(schedulesTable.id, scheduleId));
 
       // 2. Set all other schedules with the same year as non-primary
       await db.update(schedulesTable)
-        .set({ primary: false })
+        .set({primary: false})
         .where(
           and(
             eq(schedulesTable.year, schedule.year),
@@ -657,8 +672,8 @@ export class UserDO extends TinybaseDO {
         for (const id of scheduleIds) {
           const storeSchedule = this.store!.getRow('schedules', id);
           if (storeSchedule &&
-              storeSchedule.year === schedule.year &&
-              parseInt(id) !== scheduleId) {
+            storeSchedule.year === schedule.year &&
+            parseInt(id) !== scheduleId) {
             this.store!.setCell('schedules', id, 'primary', false);
           }
         }
@@ -705,7 +720,7 @@ export class UserDO extends TinybaseDO {
 
       // Update the database
       await db.update(schedulesTable)
-        .set({ visible: newVisibility })
+        .set({visible: newVisibility})
         .where(eq(schedulesTable.id, scheduleId));
 
       // Update the store
@@ -780,7 +795,7 @@ export class UserDO extends TinybaseDO {
         })
         .onConflictDoUpdate({
           target: [userSocials.userId, userSocials.provider],
-          set: { url: url }
+          set: {url: url}
         });
 
       // Add social to store
@@ -790,11 +805,60 @@ export class UserDO extends TinybaseDO {
       });
 
       this.log('addSocial', 'Social added successfully', normalizedProvider);
+      if (provider === 'twitch') {
+        await this.fetchTwitchFromURL(doIdentifier, url)
+      } else if (provider === 'youtube') {
+        await this.fetchYoutubeFromURL(url)
+      }
       return true;
     } catch (e) {
       this.error('addSocial error:', e);
       return false;
     }
+  }
+
+  private async fetchTwitchFromURL(doIdentifier: string, url: string) {
+    const DO = this.env.TwitchAPIDO
+    const stub = DO.get(DO.idFromName(doIdentifier))
+    const components = url.split('/');
+    const name = components[components.length - 1];
+    const {data, error} = await stub.fetchUserByLogin(name)
+    if (error) {
+      this.error('fetchTwitchFromURL', error);
+      return
+    }
+
+    if (data.data.length === 0) {
+      this.error('fetchTwitchFromURL', 'no channel found');
+      return
+    }
+
+    const channel = data.data[0]
+
+    const db = drizzle(this.env.DB);
+    const twitchRepo = new TwitchRepo(db, 'do');
+
+    // Insert or update the channel
+    const dbChannel = await twitchRepo.insertChannel({
+      userId: parseInt(doIdentifier),
+      id: channel.id,
+      login: channel.login,
+      displayName: channel.display_name,
+      description: channel.description,
+      profileImageUrl: channel.profile_image_url,
+      offlineImageUrl: channel.offline_image_url,
+    });
+
+    this.store?.setRow('connectedChannels', 'twitch', {
+      id: dbChannel.id,
+      login: dbChannel.login,
+      displayName: dbChannel.displayName,
+      profileImageUrl: dbChannel.profileImageUrl ?? '',
+    })
+  }
+
+  private async fetchYoutubeFromURL(url: string) {
+    // TODO
   }
 
   async removeSocial(doIdentifier: string, provider: string) {
@@ -828,6 +892,12 @@ export class UserDO extends TinybaseDO {
       this.store.delRow('userSocials', normalizedProvider);
 
       this.log('removeSocial', 'Social removed successfully', normalizedProvider);
+
+      if (provider === 'twitch') {
+        const twitchRepo = new TwitchRepo(db, 'do');
+        await twitchRepo.deleteChannel(parseInt(doIdentifier));
+      }
+
       return true;
     } catch (e) {
       this.error('removeSocial error:', e);
@@ -893,6 +963,40 @@ export class UserDO extends TinybaseDO {
     } catch (e) {
       this.error('loadUserSettings error:', e);
     }
+  }
+
+  private async loadConnectedChannel(doIdentifier: string) {
+    if (!this.store) {
+      return;
+    }
+    const db = drizzle(this.env.DB);
+    const twitchRepo = new TwitchRepo(db, 'do');
+
+    const dbChannel = await twitchRepo.getChannelByUserId(parseInt(doIdentifier));
+    if (!dbChannel) {
+      this.store.delRow('connectedChannel', 'twitch')
+    } else {
+      this.store.setRow('connectedChannel', 'twitch', {
+        id: dbChannel.id,
+        login: dbChannel.login,
+        displayName: dbChannel.displayName,
+        profileImageUrl: dbChannel.profileImageUrl ?? '',
+      })
+    }
+  }
+
+  private async loadTiltifyAccount(doIdentifier: string) {
+    if (!this.store) {
+      return;
+    }
+
+    const db = drizzle(this.env.DB);
+    const repo = new UserRepo(db, 'do')
+    const account = await repo.getTiltifyMetaData(parseInt(doIdentifier))
+    if (!account) {
+      return;
+    }
+    this.store.setValue('tiltify', JSON.stringify(account));
   }
 
   async updateUserStyle(doIdentifier: string, primaryColor: string, accentColor: string) {
@@ -972,6 +1076,360 @@ export class UserDO extends TinybaseDO {
     } catch (e) {
       this.error('setPrimaryLiveStream error:', e);
       return false;
+    }
+  }
+
+
+  private async syncWithD1() {
+    if (!this.store) {
+      this.error('syncWithD1', 'store not initialized');
+      return
+    }
+    const valueId = this.store.getValue('id')
+    if (!valueId) {
+      this.error('syncWithD1', 'valueId not initialized');
+      return
+    }
+    const userId = `${valueId}`
+
+    if (!userId) {
+      this.error('syncWithD1', 'No userId found.');
+      return;
+    }
+
+    this.log('syncWithD1', 'Syncing with D1 for user', userId);
+
+    try {
+      await this.syncSchedules(userId);
+      await this.syncTeamInvites(userId);
+      await this.syncTeamMemberships(userId);
+      await this.syncUserTags(userId);
+      await this.syncUserSocials(userId);
+      await this.syncUserStyles(userId);
+      await this.syncUserSettings(userId);
+      await this.loadConnectedChannel(userId);
+      await this.loadTiltifyAccount(userId);
+
+      this.log('syncWithD1', 'Sync completed successfully');
+    } catch (e) {
+      this.error('syncWithD1 error:', e);
+    }
+  }
+
+  // Sync functions for all tables
+
+  private async syncSchedules(doIdentifier: string) {
+    if (!this.store) {
+      this.error('syncSchedules', 'Store not initialized');
+      return;
+    }
+
+    try {
+      const db = drizzle(this.env.DB);
+      const userId = this.parseUserId(doIdentifier);
+
+      // Load schedules from database
+      const schedules = await db.select()
+        .from(schedulesTable)
+        .where(eq(schedulesTable.ownerId, userId))
+        .all();
+
+      // Get current schedule IDs in store
+      const storeScheduleIds = new Set(this.store.getRowIds('schedules'));
+
+      // Track database schedule IDs
+      const dbScheduleIds = new Set<string>();
+
+      // Update or add schedules from database
+      for (const schedule of schedules) {
+        dbScheduleIds.add(`${schedule.id}`);
+
+        // Update or add to store
+        this.store.setRow('schedules', `${schedule.id}`, {
+          id: schedule.id,
+          title: schedule.title,
+          year: schedule.year,
+          visible: schedule.visible,
+          primary: schedule.primary,
+          slug: schedule.slug,
+        });
+      }
+
+      // Remove schedules that exist in store but not in database
+      for (const id of storeScheduleIds) {
+        if (!dbScheduleIds.has(id)) {
+          this.store.delRow('schedules', id);
+        }
+      }
+
+      this.log('syncSchedules', 'Schedules synced successfully');
+    } catch (e) {
+      this.error('syncSchedules error:', e);
+    }
+  }
+
+  private async syncTeamInvites(doIdentifier: string) {
+    if (!this.store) {
+      this.error('syncTeamInvites', 'Store not initialized');
+      return;
+    }
+
+    try {
+      const db = drizzle(this.env.DB);
+      const userId = this.parseUserId(doIdentifier);
+
+      // Load team invites from database
+      const invites = await db.select({
+        teamId: teamInvitesTable.teamId,
+        invitedUserId: teamInvitesTable.invitedUserId,
+        name: teamsTable.name,
+        slug: teamsTable.slug,
+        ownerId: teamsTable.ownerId
+      })
+        .from(teamInvitesTable)
+        .innerJoin(teamsTable, eq(teamInvitesTable.teamId, teamsTable.id))
+        .where(eq(teamInvitesTable.invitedUserId, userId))
+        .all();
+
+      // Get current invite IDs in store
+      const storeInviteIds = new Set(this.store.getRowIds('invites'));
+
+      // Track database invite IDs
+      const dbInviteIds = new Set<string>();
+
+      // Update or add invites from database
+      for (const invite of invites) {
+        dbInviteIds.add(`${invite.teamId}`);
+
+        // Update or add to store
+        this.store.setRow('invites', `${invite.teamId}`, invite);
+      }
+
+      // Remove invites that exist in store but not in database
+      for (const id of storeInviteIds) {
+        if (!dbInviteIds.has(id)) {
+          this.store.delRow('invites', id);
+        }
+      }
+
+      this.log('syncTeamInvites', 'Team invites synced successfully');
+    } catch (e) {
+      this.error('syncTeamInvites error:', e);
+    }
+  }
+
+  private async syncTeamMemberships(doIdentifier: string) {
+    if (!this.store) {
+      this.error('syncTeamMemberships', 'Store not initialized');
+      return;
+    }
+
+    try {
+      const db = drizzle(this.env.DB);
+      const userId = this.parseUserId(doIdentifier);
+
+      // Load team memberships from database
+      const memberships = await db.select({
+        teamId: teamMembersTable.teamId,
+        userId: teamMembersTable.userId,
+        name: teamsTable.name,
+        slug: teamsTable.slug,
+        ownerId: teamsTable.ownerId,
+      })
+        .from(teamMembersTable)
+        .innerJoin(teamsTable, eq(teamMembersTable.teamId, teamsTable.id))
+        .where(eq(teamMembersTable.userId, userId))
+        .all();
+
+      // Get current membership IDs in store
+      const storeMembershipIds = new Set(this.store.getRowIds('teamMembers'));
+
+      // Track database membership IDs
+      const dbMembershipIds = new Set<string>();
+
+      // Update or add memberships from database
+      for (const membership of memberships) {
+        dbMembershipIds.add(`${membership.teamId}`);
+
+        // Update or add to store
+        this.store.setRow('teamMembers', `${membership.teamId}`, membership);
+      }
+
+      // Remove memberships that exist in store but not in database
+      for (const id of storeMembershipIds) {
+        if (!dbMembershipIds.has(id)) {
+          this.store.delRow('teamMembers', id);
+        }
+      }
+
+      this.log('syncTeamMemberships', 'Team memberships synced successfully');
+    } catch (e) {
+      this.error('syncTeamMemberships error:', e);
+    }
+  }
+
+  private async syncUserTags(doIdentifier: string) {
+    if (!this.store) {
+      this.error('syncUserTags', 'Store not initialized');
+      return;
+    }
+
+    try {
+      const db = drizzle(this.env.DB);
+      const userId = this.parseUserId(doIdentifier);
+
+      // Load user tags from database
+      const tags = await db.select()
+        .from(userTags)
+        .where(eq(userTags.userId, userId))
+        .all();
+
+      // Get current tag IDs in store
+      const storeTagIds = new Set(this.store.getRowIds('userTags'));
+
+      // Track database tag IDs
+      const dbTagIds = new Set<string>();
+
+      // Update or add tags from database
+      for (const tag of tags) {
+        dbTagIds.add(tag.tag);
+
+        // Update or add to store
+        this.store.setRow('userTags', tag.tag, {
+          tag: tag.tag,
+          label: tag.label,
+          addedAt: tag.addedAt.toISOString()
+        });
+      }
+
+      // Remove tags that exist in store but not in database
+      for (const id of storeTagIds) {
+        if (!dbTagIds.has(id)) {
+          this.store.delRow('userTags', id);
+        }
+      }
+
+      this.log('syncUserTags', 'User tags synced successfully');
+    } catch (e) {
+      this.error('syncUserTags error:', e);
+    }
+  }
+
+  private async syncUserSocials(doIdentifier: string) {
+    if (!this.store) {
+      this.error('syncUserSocials', 'Store not initialized');
+      return;
+    }
+
+    try {
+      const db = drizzle(this.env.DB);
+      const userId = this.parseUserId(doIdentifier);
+
+      // Load user socials from database
+      const socials = await db.select()
+        .from(userSocials)
+        .where(eq(userSocials.userId, userId))
+        .all();
+
+      // Get current social IDs in store
+      const storeSocialIds = new Set(this.store.getRowIds('userSocials'));
+
+      // Track database social IDs
+      const dbSocialIds = new Set<string>();
+
+      // Update or add socials from database
+      for (const social of socials) {
+        dbSocialIds.add(social.provider);
+
+        // Update or add to store
+        this.store.setRow('userSocials', social.provider, {
+          provider: social.provider,
+          url: social.url
+        });
+      }
+
+      // Remove socials that exist in store but not in database
+      for (const id of storeSocialIds) {
+        if (!dbSocialIds.has(id)) {
+          this.store.delRow('userSocials', id);
+        }
+      }
+
+      this.log('syncUserSocials', 'User socials synced successfully');
+    } catch (e) {
+      this.error('syncUserSocials error:', e);
+    }
+  }
+
+  private async syncUserStyles(doIdentifier: string) {
+    if (!this.store) {
+      this.error('syncUserStyles', 'Store not initialized');
+      return;
+    }
+
+    try {
+      const db = drizzle(this.env.DB);
+      const userId = this.parseUserId(doIdentifier);
+
+      // Load user style from database
+      const style = await db.select()
+        .from(userStyles)
+        .where(eq(userStyles.userId, userId))
+        .get();
+
+      // Update store with user style if it exists
+      if (style) {
+        this.store.setRow('userStyle', 'style', {
+          primaryColor: style.primaryColor,
+          accentColor: style.accentColor
+        });
+      } else if (this.store.hasRow('userStyle', 'style')) {
+        // Remove style from store if it doesn't exist in database
+        this.store.delRow('userStyle', 'style');
+      }
+
+      this.log('syncUserStyles', 'User styles synced successfully');
+    } catch (e) {
+      this.error('syncUserStyles error:', e);
+    }
+  }
+
+  private async syncUserSettings(doIdentifier: string) {
+    if (!this.store) {
+      this.error('syncUserSettings', 'Store not initialized');
+      return;
+    }
+
+    try {
+      const db = drizzle(this.env.DB);
+      const userId = this.parseUserId(doIdentifier);
+
+      // Load user settings from database
+      const user = await db.select({
+        primaryLiveStream: users.primaryLiveStream
+      })
+        .from(users)
+        .where(eq(users.id, userId))
+        .get();
+
+      // Initialize userSettings table if it doesn't exist
+      if (!this.store.hasTable('userSettings')) {
+        this.store.setTable('userSettings', {});
+      }
+
+      // Update store with user settings if they exist
+      if (user && user.primaryLiveStream) {
+        this.store.setRow('userSettings', 'primaryLiveStream', {
+          platform: user.primaryLiveStream
+        });
+      } else if (this.store.hasRow('userSettings', 'primaryLiveStream')) {
+        // Remove settings from store if they don't exist in database
+        this.store.delRow('userSettings', 'primaryLiveStream');
+      }
+
+      this.log('syncUserSettings', 'User settings synced successfully');
+    } catch (e) {
+      this.error('syncUserSettings error:', e);
     }
   }
 }
