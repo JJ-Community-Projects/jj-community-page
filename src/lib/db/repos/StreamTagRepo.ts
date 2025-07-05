@@ -6,7 +6,7 @@ import {DatabaseError} from "./DatabaseError.ts";
 import {DateTime} from "luxon";
 import type {BatchItem} from "drizzle-orm/batch";
 import type {ActionAPIContext} from "astro:actions";
-import type {TagUI} from "../models/schedule-ui.ts";
+import type {TagUI} from "../models/TagUI.ts";
 
 export class StreamTagRepo extends Repo<typeof streamTagsTable._['config']> {
   constructor(db: DrizzleD1Database, env: RepoEnv) {
