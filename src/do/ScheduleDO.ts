@@ -1,23 +1,11 @@
-import {WsServerDurableObject} from "tinybase/synchronizers/synchronizer-ws-server-durable-object";
-import {createDurableObjectStoragePersister} from "tinybase/persisters/persister-durable-object-storage";
-import {createMergeableStore} from "tinybase";
+import {TinybaseDO} from "./TinybaseDO.ts";
 
 
-export class ScheduleDO extends WsServerDurableObject<Env> {
+export class ScheduleDO extends TinybaseDO {
 
-  constructor(ctx: DurableObjectState, env: Env) {
-    super(ctx, env);
-  }
+    protected namespace(): string {
+      return 'ScheduleDO'
+    }
 
-  createPersister() {
-    return createDurableObjectStoragePersister(
-      createMergeableStore(),
-      this.ctx.storage,
-    );
-  }
-
-  public save() {
-
-  }
 
 }

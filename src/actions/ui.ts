@@ -134,6 +134,17 @@ export const ui = {
         }
         return data
       }
+    }),
+    all: defineAction({
+      handler: async (_, context) => {
+        try {
+          const repo = UserUIRepo.action(context);
+          return await repo.getAllUsers();
+        } catch (e: any) {
+          console.error('Error getting all users:', e);
+          throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message});
+        }
+      }
     })
   },
   teams: {

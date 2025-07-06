@@ -69,7 +69,7 @@ export const GET: APIRoute = async (ctx) => {
     const sessionToken = generateSessionToken();
     const session = await createSession(ctx, sessionToken, existingAccount.userId);
     setSessionTokenCookie(ctx, sessionToken, session.expiresAt);
-    return ctx.redirect(`/admin`);
+    return ctx.redirect(`/dashboard`);
   }
 
   const sessionToken = generateSessionToken();
@@ -79,6 +79,6 @@ export const GET: APIRoute = async (ctx) => {
   }
   setSessionTokenCookie(ctx, sessionToken, session.expiresAt);
   // const stub = await getRPCUserDO(ctx, session.userId)
-  return ctx.redirect(`/admin`);
+  return ctx.redirect(`/dashboard`);
 
 }

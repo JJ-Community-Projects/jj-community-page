@@ -288,7 +288,6 @@ export async function useRpcTeamDO<R = void>(context: ActionAPIContext, teamId: 
   }
 }
 
-
 export async function useRpcScheduleEditorDO<R = void>(context: ActionAPIContext, teamId: number, callback: (stub: Rpc.Stub<RpcScheduleEditorDO>) => (R | Promise<R>), onError: (error: any) => void) {
   try {
     const stub = getScheduleEditorDO(context, teamId);
@@ -299,5 +298,62 @@ export async function useRpcScheduleEditorDO<R = void>(context: ActionAPIContext
   } catch (e: any) {
     console.error('useRpcScheduleEditorDO', e);
     onError(e);
+  }
+}
+
+
+
+export function getUserLiveStatusDO(context: ActionAPIContext, userId: number) {
+  // Get Durable Object reference
+  let DO;
+  try {
+    DO = context.locals.runtime.env.UserLiveStatusDO;
+  } catch (error) {
+    console.error('Error accessing UserDO:', error);
+    throw new ActionError({
+      code: 'INTERNAL_SERVER_ERROR',
+      message: 'Failed to access user data object'
+    });
+  }
+  if (!DO) {
+    throw new ActionError({
+      code: 'INTERNAL_SERVER_ERROR',
+      message: 'UserDO not available'
+    });
+  }
+  // Create Durable Object ID
+  let id;
+  try {
+    id = DO.idFromName(`${userId}`);
+  } catch (error) {
+    console.error('Error creating DO ID:', error);
+    throw new ActionError({
+      code: 'INTERNAL_SERVER_ERROR',
+      message: 'Failed to create user identifier'
+    });
+  }
+
+  // Get Durable Object stub
+  try {
+    return DO.get(id);
+  } catch (error) {
+    console.error('Error getting DO stub:', error);
+    throw new ActionError({
+      code: 'INTERNAL_SERVER_ERROR',
+      message: 'Failed to access user data'
+    });
+  }
+}
+
+export function getRPCUserLiveStatusDO(context: ActionAPIContext, userId: number) {
+  try {
+    const stub = getUserLiveStatusDO(context, userId);
+    return stub.setMetaData(`${userId}`)
+  } catch (error) {
+    console.error('Error getting RPC DO stub:', error);
+    throw new ActionError({
+      code: 'INTERNAL_SERVER_ERROR',
+      message: 'Failed to access user data'
+    });
   }
 }

@@ -1,6 +1,4 @@
 ---
-// Import social media components
-import Twitch from "./social/Twitch.astro";
 import Youtube from "./social/Youtube.astro";
 import Twitter from "./social/Twitter.astro";
 import Instagram from "./social/Instagram.astro";
@@ -9,6 +7,8 @@ import BlueSky from "./social/BlueSky.astro";
 import {GlobeIcon} from "../../../common/icons/JJIcons";
 import Tag from "../../../common/Tag.astro";
 import {type UserPageUI} from "../../../../lib/db/models/user-ui";
+import UserAvatar from "./UserAvatar";
+import {TwitchLive} from "./social/TwitchLive";
 
 interface Props {
   user: UserPageUI
@@ -18,10 +18,12 @@ const {user} = Astro.props;
 
 const {name, tags, socials} = user
 
+
 ---
 
 <div class="bg-white rounded-lg p-6 mb-4 shadow-md">
-    <div class="text-center mb-4">
+    <div class="flex flex-row items-center gap-4 mb-4 justify-center">
+        <UserAvatar client:only="solid-js"  user={user} size="sm" />
         <h1 class="text-3xl font-bold text-primary">{name}</h1>
     </div>
 
@@ -41,12 +43,12 @@ const {name, tags, socials} = user
 
     <div class="mt-6">
       {socials && socials.length > 0 ? (
-              <div class="flex flex-wrap justify-center gap-4">
+              <div class="flex flex-wrap justify-center items-start gap-4">
                 {socials.map((social) => {
                   const provider = social.provider.toLowerCase();
                   switch (provider) {
                     case 'twitch':
-                      return <Twitch url={social.url} name={provider.charAt(0).toUpperCase() + provider.slice(1)}/>;
+                      return <TwitchLive client:only="solid-js" url={social.url} userId={user.id} />
                     case 'youtube':
                       return <Youtube url={social.url} name={provider.charAt(0).toUpperCase() + provider.slice(1)}/>;
                     case 'twitter':

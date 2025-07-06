@@ -1,5 +1,4 @@
 import type {APIRoute} from "astro";
-import {getRPCUserDO} from "../../../actions/getDO.ts";
 
 export const GET: APIRoute = async (ctx) => {
   // Get the user ID from the URL parameters
@@ -34,7 +33,7 @@ export const GET: APIRoute = async (ctx) => {
     }*/
 
   // Get the UserDO for this user
-  const stubUserDO = await getRPCUserDO(ctx, parseInt(requestedUserId))
+  // const stubUserDO = await getRPCUserDO(ctx, parseInt(requestedUserId))
   // await stubUserDO.setUserId(parseInt(requestedUserId));
   // const tables = await stubUserDO.getTables();
 

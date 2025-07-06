@@ -22,6 +22,12 @@ export default {
                         lineHeight: '0.75rem',
                     },
                 ],
+                xxxs: [
+                    '0.5rem;',
+                    {
+                        lineHeight: '0.625rem',
+                    },
+                ],
             },
             colors: {
                 overlay: '#ffffff05',

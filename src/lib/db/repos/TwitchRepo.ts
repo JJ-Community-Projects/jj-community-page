@@ -6,6 +6,7 @@ import {DatabaseError} from "./DatabaseError.ts";
 import type {ActionAPIContext} from "astro:actions";
 import type {BatchItem} from "drizzle-orm/batch";
 import {TwitchLiveNotifierQueue} from "../../../queues/TwitchLiveNotifierQueue.ts";
+import {getDB} from "../db.ts";
 
 export class TwitchRepo extends Repo<typeof twitchChannelSchema._['config']> {
   constructor(db: DrizzleD1Database, env: RepoEnv) {
@@ -16,6 +17,9 @@ export class TwitchRepo extends Repo<typeof twitchChannelSchema._['config']> {
     return new TwitchRepo(drizzle(ctx.locals.runtime.env.DB), 'action')
   }
 
+  static withEnv(env: Env, repoEnv: RepoEnv) {
+    return new TwitchRepo(getDB(env), repoEnv)
+  }
   /**
    * Get all Twitch channels
    * @returns Promise resolving to an array of all Twitch channels
@@ -151,24 +155,24 @@ export class TwitchRepo extends Repo<typeof twitchChannelSchema._['config']> {
 
   /**
    * Get a Twitch stream by user ID (Twitch user ID)
-   * @param userId The Twitch user ID
+   * @param twitchId The Twitch user ID
    * @returns Promise resolving to the Twitch stream or null if not found
    *
    * SQL: `SELECT * FROM "twitch_streams" WHERE "twitch_streams"."userId" = ?`
    */
-  async getStreamByUserId(userId: string): Promise<InferSelectModel<typeof twitchStreamSchema> | null> {
+  async getStreamByUserId(twitchId: string): Promise<InferSelectModel<typeof twitchStreamSchema> | null> {
     try {
       const result = await this.db.select()
         .from(twitchStreamSchema)
-        .where(eq(twitchStreamSchema.twitchId, userId))
+        .where(eq(twitchStreamSchema.twitchId, twitchId))
         .get();
 
       return result || null;
     } catch (error) {
       if (this.env === 'action') {
-        throw new DatabaseError(`Failed to get Twitch stream for user ID: ${userId}`, error).toActionError();
+        throw new DatabaseError(`Failed to get Twitch stream for twitch ID: ${twitchId}`, error).toActionError();
       } else {
-        throw new DatabaseError(`Failed to get Twitch stream for user ID: ${userId}`, error);
+        throw new DatabaseError(`Failed to get Twitch stream for twitch ID: ${twitchId}`, error);
       }
     }
   }

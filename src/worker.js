@@ -35,3 +35,4 @@ export { UserDO } from "./do/UserDO.js";
 export { TeamDO } from "./do/TeamDO.js";
 export { UserRateLimiter } from "./do/rateLimiter/UserRateLimiter.js";
 export { TwitchAPIDO } from "./do/TwitchAPIDO.js";
+export { UserLiveStatusDO } from "./do/UserLiveStatusDO.js";

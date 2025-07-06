@@ -6,7 +6,7 @@ import {ScheduleDayVertical} from "../components/features/schedules/common/Sched
 import {ScheduleStreamCard} from "../components/features/schedules/common/StreamCard";
 import {fullJJExampleSchedule} from "../functions/exampleSchedule";
 import {WeekScheduleDesktopComponent} from "../components/features/schedules/desktop/WeekScheduleDesktopComponent";
-const {data, error} = await Astro.callAction(actions.ui.user.schedules.demo, {})
+const {data, error} = await Astro.callAction(actions.ui.users.schedules.demo, {})
 // const data = await fullJJExampleSchedule()
 const size = Buffer.byteLength(JSON.stringify(data))
 const kiloBytes = size / 1024;

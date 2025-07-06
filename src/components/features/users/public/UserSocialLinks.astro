@@ -1,12 +1,14 @@
 ---
+import {TwitchLive} from "./social/TwitchLive";
 interface Props {
+  userId: number,
   socials: {
     provider: string;
     url: string;
   }[];
 }
 
-const { socials } = Astro.props;
+const { socials, userId } = Astro.props;
 
 // Import social media components
 import Twitch from "./social/Twitch.astro";
@@ -36,7 +38,10 @@ const getDisplayName = (provider: string) => {
         const provider = social.provider.toLowerCase();
         switch (provider) {
           case 'twitch':
-            return <Twitch url={social.url} />;
+            return <>
+                <Twitch url={social.url} />
+                <TwitchLive client:only="solid-js" url={social.url} userId={userId} />
+            </>;
           case 'youtube':
             return <Youtube url={social.url} />;
           case 'twitter':

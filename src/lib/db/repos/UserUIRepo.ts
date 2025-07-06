@@ -5,9 +5,10 @@ import type {ActionAPIContext} from "astro:actions";
 import {accounts, users, userSocials, userStyles, userTags} from "../schema/auth-schema.ts";
 import {and, eq} from "drizzle-orm";
 import {ScheduleUIRepo} from "./ScheduleUIRepo.ts";
-import type {UserLiveState, UserStyle, UserPageUI} from "../models/user-ui.ts";
+import type {UserLiveState, UserPageUI, UserStyle} from "../models/user-ui.ts";
 import type {TiltifyUserData} from "../../../functions/tiltify.ts";
 import {teamMembersTable, teamsTable} from "../schema/jj-schema.ts";
+import {TwitchRepo} from "./TwitchRepo.ts";
 
 export class UserUIRepo {
   private db: DrizzleD1Database
@@ -51,7 +52,9 @@ export class UserUIRepo {
       .all()
 
     const tiltifyAccount = user.meta
-    const twitchChannel = await this.userRepo.getTwitchChannelByUserId(user.id)
+
+    const twitchRepo = new TwitchRepo(this.db, this.env);
+    const twitchChannel = await twitchRepo.getChannelByUserId(user.id)
 
     const userStyle = await this.db
       .select()
@@ -79,14 +82,17 @@ export class UserUIRepo {
       }
     };
 
+    const stream = twitchChannel ? await twitchRepo.getStreamByUserId(twitchChannel.id): null
+
     // Create the live state object
     const liveState: UserLiveState = {
       id: user.id,
       name: tiltifyAccount.username || '',
       slug: tiltifyAccount.slug || '',
-      isLive: false,
+      isLive: stream !== null,
+      primaryLiveStream: user.primaryLiveStream,
       channel: {
-        twitch: twitchChannel
+        twitch: twitchChannel ? twitchChannel : undefined
       }
     };
 
@@ -199,4 +205,37 @@ export class UserUIRepo {
       ).all();
   }
 
+  /**
+   * Get all users in the UserPageUI format
+   * @returns Promise<UserPageUI[]> Array of all users in UserPageUI format
+   */
+  async getAllUsers(): Promise<UserPageUI[]> {
+    // Get all users with their Tiltify account data
+    const allUsers = await this.db
+      .select({
+        id: users.id,
+        primaryLiveStream: users.primaryLiveStream,
+        role: users.role,
+        meta: accounts.meta
+      })
+      .from(users)
+      .innerJoin(
+        accounts,
+        eq(users.id, accounts.userId)
+      )
+      .where(
+        eq(accounts.provider, 'tiltify')
+      ).all();
+
+    // Transform each user into a UserPageUI object
+    const userPromises = allUsers.map(user => {
+      return this.getUserPageData({
+        ...user,
+        meta: user.meta as TiltifyUserData
+      });
+    });
+
+    // Wait for all transformations to complete
+    return Promise.all(userPromises);
+  }
 }

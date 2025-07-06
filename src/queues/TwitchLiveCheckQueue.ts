@@ -2,6 +2,7 @@ import type {MessageSendRequest} from "@cloudflare/workers-types/experimental/in
 import {getDB} from "../lib/db/db.ts";
 import {TwitchRepo} from "../lib/db/repos/TwitchRepo.ts";
 import type {StreamResult} from "../lib/model/TwitchAPIModel.ts";
+import {TwitchLiveNotifierQueue} from "./TwitchLiveNotifierQueue.ts";
 
 
 export class TwitchLiveCheckQueue {
@@ -101,9 +102,8 @@ export class TwitchLiveCheckQueue {
         await twitchRepo.insertMultipleStreams(streamsToInsert);
       }
 
-      // TODO update UserLiveStatusDO's
-
-
+      const notifier = new TwitchLiveNotifierQueue()
+      await notifier.send(ids, env)
       batch.ackAll()
       console.log('TwitchLiveCheckQueue', 'handle', 'done')
     } catch (e) {
@@ -114,17 +114,5 @@ export class TwitchLiveCheckQueue {
     }
   }
 
-
-  async handleLive(twitchId: string, stream: StreamResult): Promise<boolean> {
-
-
-    return true
-  }
-
-  async handleOffline(twitchId: string): Promise<boolean> {
-
-
-    return true
-  }
 
 }

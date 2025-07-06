@@ -32,7 +32,7 @@ export const AdminMobileNav: Component<MobileNavProps> = (props) => {
       </button>
       <div class={'mt-1 flex flex-col space-y-1 transition-all md:hidden text-white bg-accent p-2 rounded-2xl gap-2'}
            ref={setRef}>
-        <a href={`/${props.user!.tiltifyName}/admin`}>My Admin Page</a>
+        <a href={`/dashboard`}>My Dashboard</a>
         <a href="/overlays">Stream Overlays</a>
         <a href="/twitch-extension">Twitch Extension</a>
       </div>

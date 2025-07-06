@@ -34,6 +34,7 @@ export type UserLiveState = {
   name: string; // username, account table, tiltify
   slug: string; // user slug, account table, tiltify
   isLive: boolean; // has a twitch stream in twitchStreamSchema table
+  primaryLiveStream: string
   channel: {
     twitch?: InferSelectModel<typeof twitchChannelSchema>
     // TODO youtube

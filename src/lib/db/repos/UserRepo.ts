@@ -7,6 +7,7 @@ import {DatabaseError} from "./DatabaseError";
 import {getTiltifyUser, type TiltifyUserData} from "../../../functions/tiltify";
 import type {ActionAPIContext} from "astro:actions";
 import {TwitchRepo} from "./TwitchRepo.ts";
+import {getDB} from "../db.ts";
 
 /**
  * Repository for working with users
@@ -17,7 +18,11 @@ export class UserRepo extends Repo<typeof users._['config']> {
   }
 
   static action(ctx: ActionAPIContext) {
-    return new UserRepo(drizzle(ctx.locals.runtime.env.DB), 'action')
+    return new UserRepo(getDB(ctx), 'action')
+  }
+
+  static withEnv(env: Env, repoEnv: RepoEnv) {
+    return new UserRepo(getDB(env), repoEnv)
   }
 
   // region Basic User Operations

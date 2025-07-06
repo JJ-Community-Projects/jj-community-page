@@ -37,3 +37,4 @@ updateTwitchUser.js
 /.env.vars.prod
 .dev.vars
 http/http-client.private.env.json
+/http/secret/

@@ -27,9 +27,6 @@ export abstract class TinybaseDO extends WsServerDurableObject<Env> {
 
   protected constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
-    this.ctx.blockConcurrencyWhile(async () => {
-      await this.addDOToTable()
-    });
   }
 
   protected abstract namespace(): string;
@@ -46,7 +43,7 @@ export abstract class TinybaseDO extends WsServerDurableObject<Env> {
     console.error(this.namespace(), ...optionalParams);
   }
 
-  private async addDOToTable(): Promise<void> {
+  async addDOToTable(): Promise<void> {
     this.log(this.namespace(), 'addDOToTable')
     try {
       // TODO fix move to child classes
