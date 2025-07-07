@@ -826,7 +826,7 @@ export const users = {
   findAllTiltifyAccounts: defineAction({
     handler: (_, context) => {
       const repo = TiltifyRepo.action(context);
-      return repo.findAllAccounts();
+      return repo.getAllAccounts();
     }
   }),
 
