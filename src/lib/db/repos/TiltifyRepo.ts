@@ -35,7 +35,7 @@ export class TiltifyRepo {
     }
   }
 
-  async findAllAccounts(): Promise<InferSelectModel<typeof accounts>[]> {
+  async getAllAccounts(): Promise<InferSelectModel<typeof accounts>[]> {
     try {
       return this.db.select()
         .from(accounts)
