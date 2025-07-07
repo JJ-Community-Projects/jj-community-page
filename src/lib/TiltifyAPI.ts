@@ -5,6 +5,8 @@ import {tokens} from "./db/schema/auth-schema.ts";
 import {and, eq, type InferSelectModel} from "drizzle-orm";
 import {drizzle, type DrizzleD1Database} from "drizzle-orm/d1";
 import {TiltifyTokenCache} from "./db/cache/TiltifyTokenCache.ts";
+import {UserRepo} from "./db/repos/UserRepo.ts";
+import {TiltifyRepo} from "./db/repos/TiltifyRepo.ts";
 
 export type TiltifyToken = {
   accessToken: string
@@ -16,7 +18,7 @@ export type TiltifyToken = {
 }
 
 // Define types for the Tiltify user response
-export interface TiltifyAvatar {
+export interface TiltifyImage {
   alt: string;
   height: number;
   src: string;
@@ -35,19 +37,19 @@ export interface TiltifySocial {
   youtube?: string;
 }
 
-export interface TiltifyAmountRaised {
+export interface TiltifyMonetaryValue {
   currency: string;
   value: string;
 }
 
 export interface TiltifyUserData {
-  avatar: TiltifyAvatar;
+  avatar: TiltifyImage;
   description: string;
   id: string;
   legacy_id: number;
   slug: string;
   social: TiltifySocial;
-  total_amount_raised: TiltifyAmountRaised;
+  total_amount_raised: TiltifyMonetaryValue;
   url: string;
   username: string;
 }
@@ -56,15 +58,80 @@ export interface TiltifyUserResponse {
   data: TiltifyUserData;
 }
 
+export interface TiltifyCampaignAvatar {
+  alt: string;
+  height: number;
+  src: string;
+  width: number;
+}
+
+export interface TiltifyCampaignSocial {
+  discord?: string;
+  facebook?: string;
+  instagram?: string;
+  snapchat?: string;
+  tiktok?: string;
+  twitch?: string;
+  twitter?: string;
+  website?: string;
+  youtube?: string;
+}
+
+export interface TiltifyCampaignTotalAmountRaised {
+  currency: string;
+  value: string;
+}
+
+export interface TiltifyCampaignData {
+  avatar: TiltifyCampaignAvatar;
+  description: string;
+  id: string;
+  legacy_id: number;
+  name: string;
+  slug: string;
+  social: TiltifyCampaignSocial;
+  total_amount_raised: TiltifyCampaignTotalAmountRaised;
+  url: string;
+}
+
+export interface TiltifyCampaignMetadata {
+  after: string | null;
+  before: string | null;
+  limit: number;
+}
+
+export interface TiltifyCampaignsResponse {
+  data: TiltifyCampaignData[];
+  metadata: TiltifyCampaignMetadata;
+}
+
+export interface TiltifyErrorFields {
+  [key: string]: string[];
+}
+
+export interface TiltifyError {
+  fields: TiltifyErrorFields | null;
+  message: string;
+  status: number;
+}
+
+export interface TiltifyErrorResponse {
+  error: TiltifyError;
+}
+
 export class TiltifyAPI {
   private env: Env
   private db: DrizzleD1Database
   private tokenCache: TiltifyTokenCache
+  private userRepo: UserRepo
+  private tiltifyRepo: TiltifyRepo
 
   constructor(env: Env) {
     this.env = env;
     this.db = drizzle(env.DB)
     this.tokenCache = new TiltifyTokenCache(env)
+    this.userRepo = new UserRepo(env, 'api')
+    this.tiltifyRepo = new TiltifyRepo(env, 'api')
   }
 
   private async getNewToken(refreshToken: string): Promise<TiltifyToken | null> {
@@ -262,7 +329,7 @@ export class TiltifyAPI {
   }
 
 
-  private async getNewAppToken() {
+  private async getNewAppToken(): Promise<TiltifyToken | null> {
     const TILTIFY_CLIENT_ID = this.env.TILTIFY_CLIENT_ID;
     const TILTIFY_SECRET = this.env.TILTIFY_SECRET;
     const tokenRes = await fetch(`https://v5api.tiltify.com/oauth/token&client_id=${TILTIFY_CLIENT_ID}&client_secret=${TILTIFY_SECRET}&grant_type=client_credentials`, {
@@ -274,11 +341,12 @@ export class TiltifyAPI {
     } else {
       const token: any = await tokenRes.json();
       return {
-        accessToken: token.access_token,
-        createdAt: token.created_at,
-        expiresIn: token.expires_in,
-        scope: token.scope,
-        tokenType: token.token_type,
+        accessToken: token.access_token as string,
+        createdAt: token.created_at as string,
+        refreshToken: '',
+        expiresIn: token.expires_in as number,
+        scope: token.scope as string,
+        tokenType: token.token_type as string,
       }
     }
   }
@@ -295,10 +363,39 @@ export class TiltifyAPI {
       return null
     }
 
-    await this.tokenCache.storeToken('APP_TOKEN', token.accessToken)
+    await this.tokenCache.storeToken('APP_TOKEN', token)
 
     return token.accessToken
 
+  }
+
+  async getCampaignsByUser(tiltifyId: string): Promise<TiltifyCampaignsResponse | TiltifyErrorResponse> {
+    const resp = await fetch(`https://v5api.tiltify.com/api/public/users/${tiltifyId}/campaigns?
+    updated_after=2024-10-01T00:00:00.000000Z`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    })
+
+    if (!resp.ok) {
+      return (await resp.json()) as TiltifyErrorResponse
+    }
+
+    return (await resp.json()) as TiltifyCampaignsResponse
+  }
+
+  async getAllCampaigns() {
+    const token = await this.getAppToken()
+    if (!token) {
+      return null
+    }
+
+    const accounts = await this.tiltifyRepo.getAllAccounts()
+
+    const tiltifyIds = accounts.map(account => account.providerId)
+
+    return Promise.all(tiltifyIds.map(this.getCampaignsByUser))
   }
 
 }
