@@ -1,7 +1,7 @@
 import {drizzle, DrizzleD1Database} from "drizzle-orm/d1";
 import {Repo, type RepoEnv} from "./Repo";
 import {userTags} from "../schema/auth-schema";
-import type {InferSelectModel} from "drizzle-orm";
+import {type InferSelectModel, notInArray} from "drizzle-orm";
 import {and, desc, eq, like, not, sql} from "drizzle-orm";
 import {DatabaseError} from "./DatabaseError";
 import type {ActionAPIContext} from "astro:actions";
@@ -151,7 +151,16 @@ export class UserTagRepo extends Repo<typeof userTags._['config']> {
     count: number
   }[]> {
     try {
-      // Find popular tags not used by the user using a subquery
+      // First, get all tags used by the user
+      const userTagsResult = await this.db
+        .select({ tag: userTags.tag })
+        .from(userTags)
+        .where(eq(userTags.userId, userId))
+        .all();
+
+      const userTagValues = userTagsResult.map(t => t.tag);
+
+      // Find popular tags not used by the user
       return await this.db
         .select({
           tag: userTags.tag,
@@ -160,12 +169,9 @@ export class UserTagRepo extends Repo<typeof userTags._['config']> {
         })
         .from(userTags)
         .where(
-          not(
-            sql`EXISTS (
-              SELECT 1 FROM ${userTags} ut 
-              WHERE ut.tag = ${userTags.tag} AND ut.userId = ${userId}
-            )`
-          )
+          userTagValues.length > 0
+            ? notInArray(userTags.tag, userTagValues)
+            : undefined
         )
         .groupBy(userTags.tag)
         .orderBy((s) => {
@@ -173,7 +179,8 @@ export class UserTagRepo extends Repo<typeof userTags._['config']> {
         })
         .limit(limit)
         .all();
-    } catch (error) {
+    } catch (error: any) {
+      console.log('getSuggestedTagsForUser', error?.message, error);
       return this.handleError(`Failed to get suggested tags for user with id: ${userId}`, error);
     }
   }
@@ -195,7 +202,16 @@ export class UserTagRepo extends Repo<typeof userTags._['config']> {
     count: number
   }[]> {
     try {
-      // Find popular tags not used by the user and matching the search term using a subquery
+      // First, get all tags used by the user
+      const userTagsResult = await this.db
+        .select({ tag: userTags.tag })
+        .from(userTags)
+        .where(eq(userTags.userId, userId))
+        .all();
+
+      const userTagValues = userTagsResult.map(t => t.tag);
+
+      // Find popular tags not used by the user and matching the search term
       return await this.db
         .select({
           tag: userTags.tag,
@@ -205,12 +221,9 @@ export class UserTagRepo extends Repo<typeof userTags._['config']> {
         .from(userTags)
         .where(
           and(
-            not(
-              sql`EXISTS (
-                SELECT 1 FROM ${userTags} ut 
-                WHERE ut.tag = ${userTags.tag} AND ut.userId = ${userId}
-              )`
-            ),
+            userTagValues.length > 0
+              ? notInArray(userTags.tag, userTagValues)
+              : undefined,
             like(userTags.tag, `%${term.toLowerCase()}%`)
           )
         )
