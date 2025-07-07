@@ -3,7 +3,7 @@ import {createContext, onMount, type ParentComponent, useContext} from "solid-js
 import {actions} from "astro:actions";
 import {useTinystore} from "../../../../../lib/useTinystore.ts";
 import type {User} from "../../../../../lib/auth/User.ts";
-import type {TiltifyUserData} from "../../../../../functions/tiltify.ts";
+import type {TiltifyUserData} from "../../../../../lib/TiltifyAPI.ts";
 
 type HookActions = {
   createSchedule: {

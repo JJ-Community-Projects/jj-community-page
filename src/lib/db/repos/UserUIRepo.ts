@@ -6,7 +6,7 @@ import {accounts, users, userSocials, userStyles, userTags} from "../schema/auth
 import {and, eq} from "drizzle-orm";
 import {ScheduleUIRepo} from "./ScheduleUIRepo.ts";
 import type {UserLiveState, UserPageUI, UserStyle} from "../models/user-ui.ts";
-import type {TiltifyUserData} from "../../../functions/tiltify.ts";
+import type {TiltifyUserData} from "../../TiltifyAPI.ts";
 import {teamMembersTable, teamsTable} from "../schema/jj-schema.ts";
 import {TwitchRepo} from "./TwitchRepo.ts";
 

@@ -1,12 +1,11 @@
-import type {AstroContext} from "../../AstroContext.ts";
 import type {KVNamespacePutOptions} from "@cloudflare/workers-types/2021-11-03/index.ts";
 
 
 export abstract class Cache<T> {
   kv: KVNamespace
 
-  protected constructor(ctx: AstroContext) {
-    this.kv = ctx.locals.runtime.env.KV
+  constructor(env: Env) {
+    this.kv = env.KV
   }
 
   putStr(key: string, value: string, options?: KVNamespacePutOptions) {

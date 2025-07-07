@@ -2,7 +2,7 @@ import {ActionError, defineAction} from "astro:actions";
 import {z} from "astro:content";
 import {getTags} from "../functions/getTags.ts";
 import {socialUrlRegex} from "../functions/socialUrlRegex.ts";
-import {getTiltifyTokenFromContext, getTiltifyUser} from "../functions/tiltify.ts";
+import {TiltifyAPI} from "../lib/TiltifyAPI.ts";
 import {UserRepo} from "../lib/db/repos/UserRepo.ts";
 import {UserTagRepo} from "../lib/db/repos/UserTagRepo.ts";
 import {useRpcUserDO} from "./getDO.ts";
@@ -67,10 +67,11 @@ export const users = {
         throw new ActionError({code: 'UNAUTHORIZED'});
       }
 
+      const tiltifyAPI = new TiltifyAPI(context.locals.runtime.env);
       // 2. Get the user's Tiltify token
       let tiltifyToken;
       try {
-        tiltifyToken = await getTiltifyTokenFromContext(context);
+        tiltifyToken = await tiltifyAPI.getTokenFromContext(context);
         if (!tiltifyToken) {
           throw new ActionError({
             code: 'UNAUTHORIZED',
@@ -88,7 +89,7 @@ export const users = {
       // 3. Get the Tiltify user data
       let tiltifyUser;
       try {
-        tiltifyUser = await getTiltifyUser(tiltifyToken);
+        tiltifyUser = await tiltifyAPI.getUser(tiltifyToken);
         if (!tiltifyUser) {
           throw new ActionError({
             code: 'INTERNAL_SERVER_ERROR',

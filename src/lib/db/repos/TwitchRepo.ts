@@ -21,6 +21,7 @@ export class TwitchRepo extends Repo<typeof twitchChannelSchema._['config']> {
   static withEnv(env: Env, repoEnv: RepoEnv) {
     return new TwitchRepo(env, repoEnv)
   }
+
   /**
    * Get all Twitch channels
    * @returns Promise resolving to an array of all Twitch channels
@@ -64,6 +65,7 @@ export class TwitchRepo extends Repo<typeof twitchChannelSchema._['config']> {
       }
     }
   }
+
   /**
    * Get a Twitch channel by user ID
    * @param twitchId The twitch ID

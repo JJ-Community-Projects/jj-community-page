@@ -13,6 +13,11 @@ if (error) {
   console.error(error)
   return Astro.redirect("/");
 }
+
+if (!data) {
+  return Astro.redirect("/");
+}
+
 ---
 <BaseLayout>
     <UserAdminDashboardPage user={user} client:only="solid-js"/>

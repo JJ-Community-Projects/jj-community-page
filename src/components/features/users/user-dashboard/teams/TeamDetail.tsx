@@ -49,11 +49,14 @@ const TeamDetailContent: Component<{ teamId: number }> = (props) => {
       {/* Team Header */}
       <div class="bg-white rounded-2xl shadow-xl p-6 mb-6">
         <div class="flex justify-between items-center">
-          <div class="flex items-center gap-4">
-            <a href={`/dashboard/teams`} class="text-primary hover:underline flex flex-row gap-1 items-center">
-              <FaSolidChevronLeft/><p>Back to Teams</p>
-            </a>
-            <h2 class="text-xl font-bold">{local.name}</h2>
+          <div class="flex flex-col">
+            <div class="flex items-center gap-4">
+              <a href={`/dashboard/teams`} class="text-primary hover:underline flex flex-row gap-1 items-center">
+                <FaSolidChevronLeft/><p>Back to Teams</p>
+              </a>
+              <h2 class="text-xl font-bold">{local.name}</h2>
+            </div>
+            <a class="text-primary" href={`/teams/${local.slug}`}>jj.ostof.dev/teams/${local.slug}</a>
           </div>
           <button
             class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-all"

@@ -30,12 +30,14 @@ export const AdminTeamDetailHeader: Component = () => {
     <>
       <div class="bg-white rounded-2xl shadow-xl p-6 mb-6">
         <div class="flex justify-between items-center">
-          <div class="flex items-center gap-4">
+          <div class="flex flex-col">
             <a href={`/dashboard/teams`} class="text-primary hover:underline flex flex-row gap-1 items-center">
               <FaSolidChevronLeft/><p>Back to Teams</p>
             </a>
             <h1 class="text-2xl font-bold">Team Details</h1>
+            <a class="text-primary" href={`/teams/${local.slug}`}>jj.ostof.dev/teams/${local.slug}</a>
           </div>
+          
           <div class="flex gap-2">
             <button
               onClick={showDeleteDialog.open}

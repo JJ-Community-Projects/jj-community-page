@@ -1,0 +1,2712 @@
+{
+  "components": {
+    "responses": {},
+    "schemas": {
+      "CurrencyCode": {
+        "description": "ISO 4217 alphabetic currency code",
+        "example": "USD",
+        "pattern": "[A-Z]{3}",
+        "title": "CurrencyCode",
+        "type": "string"
+      },
+      "DonationMatch": {
+        "example": {
+          "active": true,
+          "amount": {
+            "currency": "USD",
+            "value": "182.32"
+          },
+          "completed_at": "2025-06-30T15:59:24.203941Z",
+          "donation_id": "287bf125-b190-48b6-a304-32db1f585ccc",
+          "ends_at": "2025-06-30T15:59:24.203938Z",
+          "id": "0ea69b8a-4bbc-488a-9b3a-c9704f3d241e",
+          "inserted_at": "2025-06-30T15:59:24.203920Z",
+          "matched_by": "Big Donor 1",
+          "pledged_amount": {
+            "currency": "USD",
+            "value": "182.32"
+          },
+          "started_at_amount": {
+            "currency": "USD",
+            "value": "182.32"
+          },
+          "starts_at": "2025-06-30T15:59:24.203934Z",
+          "total_amount_raised": {
+            "currency": "USD",
+            "value": "182.32"
+          },
+          "updated_at": "2025-06-30T15:59:24.203929Z"
+        },
+        "properties": {
+          "active": {
+            "description": "Whether or not the donation match is active",
+            "nullable": false,
+            "type": "boolean"
+          },
+          "amount": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Money"
+              }
+            ],
+            "description": "The amount of the donation match.",
+            "nullable": false
+          },
+          "completed_at": {
+            "description": "Moment when the donation match completed",
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "donation_id": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PublicId"
+              }
+            ],
+            "description": "Unique Identifier for the donation matches donation.",
+            "nullable": true
+          },
+          "ends_at": {
+            "description": "Moment when the donation match ends",
+            "format": "date-time",
+            "nullable": false,
+            "type": "string"
+          },
+          "id": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PublicId"
+              }
+            ],
+            "description": "Unique Identifier for the donation match."
+          },
+          "inserted_at": {
+            "description": "Moment when the donation match was created",
+            "format": "date-time",
+            "nullable": false,
+            "type": "string"
+          },
+          "match_type": {
+            "description": "The type of the match, either 'all' or 'amount'",
+            "nullable": false,
+            "type": "string"
+          },
+          "matched_by": {
+            "description": "The name of the person who started the donation match",
+            "nullable": false,
+            "type": "string"
+          },
+          "pledged_amount": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Money"
+              }
+            ],
+            "description": "The amount the donation match has pledged.",
+            "nullable": false
+          },
+          "started_at_amount": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Money"
+              }
+            ],
+            "description": "The amount raised the campaign had when the donation match was started.",
+            "nullable": false
+          },
+          "starts_at": {
+            "description": "Moment when the donation match starts",
+            "format": "date-time",
+            "nullable": false,
+            "type": "string"
+          },
+          "total_amount_raised": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Money"
+              }
+            ],
+            "description": "The amount the donation match has raised.",
+            "nullable": false
+          },
+          "updated_at": {
+            "description": "Moment when the donation match was last updated",
+            "format": "date-time",
+            "nullable": false,
+            "type": "string"
+          }
+        },
+        "required": [
+          "active",
+          "id",
+          "amount",
+          "inserted_at",
+          "updated_at",
+          "completed_at",
+          "starts_at",
+          "ends_at",
+          "donation_id",
+          "started_at_amount",
+          "total_amount_raised",
+          "pledged_amount",
+          "matched_by"
+        ],
+        "title": "DonationMatch",
+        "type": "object"
+      },
+      "ErrorResponse": {
+        "description": "Object returned in API errors",
+        "example": {
+          "error": {
+            "fields": null,
+            "message": "Not Found",
+            "status": 404
+          }
+        },
+        "properties": {
+          "error": {
+            "properties": {
+              "fields": {
+                "additionalProperties": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "nullable": true,
+                "type": "object"
+              },
+              "message": {
+                "description": "A human readable message describing the error.",
+                "nullable": false,
+                "type": "string"
+              },
+              "status": {
+                "description": "The HTTP status of the error",
+                "nullable": false,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "message",
+              "status"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "error"
+        ],
+        "title": "ErrorResponse",
+        "type": "object"
+      },
+      "Forbidden": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ErrorResponse"
+          }
+        ],
+        "description": "Object returned when requested resource is not allowed to be access, for example in the case of premium features.",
+        "example": {
+          "error": {
+            "fields": null,
+            "message": "Forbidden",
+            "status": 403
+          }
+        },
+        "title": "Forbidden",
+        "type": "object"
+      },
+      "GiftMatch": {
+        "example": {
+          "active": true,
+          "amount": {
+            "currency": "USD",
+            "value": "182.32"
+          },
+          "completed_at": "2025-06-30T15:59:24.268612Z",
+          "contribution_id": "d0158d47-1a5b-4f72-9ef8-34efb4abc249",
+          "ends_at": "2025-06-30T15:59:24.268607Z",
+          "id": "f2ea09cd-e49f-4dd1-9053-74da6b54751a",
+          "inserted_at": "2025-06-30T15:59:24.268578Z",
+          "matched_by": "Big Donor 1",
+          "pledged_amount": {
+            "currency": "USD",
+            "value": "182.32"
+          },
+          "started_at_amount": {
+            "currency": "USD",
+            "value": "182.32"
+          },
+          "starts_at": "2025-06-30T15:59:24.268602Z",
+          "total_amount_raised": {
+            "currency": "USD",
+            "value": "182.32"
+          },
+          "updated_at": "2025-06-30T15:59:24.268596Z"
+        },
+        "properties": {
+          "active": {
+            "description": "Whether or not the donation match is active",
+            "nullable": false,
+            "type": "boolean"
+          },
+          "amount": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Money"
+              }
+            ],
+            "description": "The amount of the donation match.",
+            "nullable": false
+          },
+          "completed_at": {
+            "description": "Moment when the donation match completed",
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "contribution_id": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PublicId"
+              }
+            ],
+            "description": "Unique Identifier for the donation matches contribution.",
+            "nullable": true
+          },
+          "ends_at": {
+            "description": "Moment when the donation match ends",
+            "format": "date-time",
+            "nullable": false,
+            "type": "string"
+          },
+          "id": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PublicId"
+              }
+            ],
+            "description": "Unique Identifier for the donation match."
+          },
+          "inserted_at": {
+            "description": "Moment when the donation match was created",
+            "format": "date-time",
+            "nullable": false,
+            "type": "string"
+          },
+          "match_type": {
+            "description": "The type of the match, either 'all' or 'amount'",
+            "nullable": false,
+            "type": "string"
+          },
+          "matched_by": {
+            "description": "The name of the person who started the donation match",
+            "nullable": false,
+            "type": "string"
+          },
+          "pledged_amount": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Money"
+              }
+            ],
+            "description": "The amount the donation match has pledged.",
+            "nullable": false
+          },
+          "started_at_amount": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Money"
+              }
+            ],
+            "description": "The amount raised the campaign had when the donation match was started.",
+            "nullable": false
+          },
+          "starts_at": {
+            "description": "Moment when the donation match starts",
+            "format": "date-time",
+            "nullable": false,
+            "type": "string"
+          },
+          "total_amount_raised": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Money"
+              }
+            ],
+            "description": "The amount the donation match has raised.",
+            "nullable": false
+          },
+          "updated_at": {
+            "description": "Moment when the donation match was last updated",
+            "format": "date-time",
+            "nullable": false,
+            "type": "string"
+          }
+        },
+        "required": [
+          "active",
+          "id",
+          "amount",
+          "inserted_at",
+          "updated_at",
+          "completed_at",
+          "starts_at",
+          "ends_at",
+          "started_at_amount",
+          "total_amount_raised",
+          "pledged_amount",
+          "matched_by",
+          "contribution_id"
+        ],
+        "title": "GiftMatch",
+        "type": "object"
+      },
+      "LegacyId": {
+        "deprecated": true,
+        "description": "Legacy numeric ID of the object. If your app is dependent on this field, please migrate to id. This will be deprecated in the next version of the API.",
+        "example": 994976185,
+        "title": "LegacyId",
+        "type": "number"
+      },
+      "Money": {
+        "description": "Schema defining monetary amount in given currency",
+        "example": {
+          "currency": "USD",
+          "value": "182.32"
+        },
+        "nullable": true,
+        "properties": {
+          "currency": {
+            "$ref": "#/components/schemas/CurrencyCode"
+          },
+          "value": {
+            "description": "Monetary amount",
+            "type": "string"
+          }
+        },
+        "required": [
+          "value",
+          "currency"
+        ],
+        "title": "Money",
+        "type": "object"
+      },
+      "NotFound": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ErrorResponse"
+          }
+        ],
+        "description": "Object returned when requested resource cannot be found.",
+        "example": {
+          "error": {
+            "fields": null,
+            "message": "Not Found",
+            "status": 404
+          }
+        },
+        "title": "NotFound",
+        "type": "object"
+      },
+      "PaginatedResponse": {
+        "description": "Object returned for paginated API responses",
+        "example": {
+          "data": [],
+          "metadata": {
+            "after": "bGlnaHQgwd==",
+            "before": null,
+            "limit": 10
+          }
+        },
+        "properties": {
+          "data": {
+            "items": {
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "metadata": {
+            "example": {
+              "after": "bGlnaHQgwd==",
+              "before": null,
+              "limit": 10
+            },
+            "properties": {
+              "after": {
+                "description": "The cursor to the next page if it exists",
+                "nullable": true,
+                "type": "string"
+              },
+              "before": {
+                "description": "The cursor to the previous page if it exists",
+                "nullable": true,
+                "type": "string"
+              },
+              "limit": {
+                "description": "The requested record limit",
+                "type": "number"
+              }
+            },
+            "required": [
+              "after",
+              "before",
+              "limit"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "PaginatedResponse",
+        "type": "object"
+      },
+      "PublicId": {
+        "description": "Unique Identifier for the Object. UUID",
+        "example": "893623fa-cadb-448b-8cec-2f8f6f49d4ca",
+        "format": "uuid",
+        "title": "PublicId",
+        "type": "string"
+      },
+      "RewardClaim": {
+        "description": "A reward claim describing a reward and its quantity",
+        "example": {
+          "id": "3217ef06-d773-4d84-8000-b94781be81f0",
+          "quantity": 1,
+          "reward_id": "520b597c-7c9c-4edc-8272-562bf3e2c359"
+        },
+        "nullable": false,
+        "properties": {
+          "id": {
+            "description": "Public ID for the reward claim",
+            "type": "string"
+          },
+          "quantity": {
+            "description": "Quantity claimed",
+            "type": "integer"
+          },
+          "reward_id": {
+            "description": "Public ID for the reward",
+            "type": "string"
+          }
+        },
+        "title": "RewardClaim",
+        "type": "object"
+      },
+      "SimpleFact": {
+        "example": {
+          "id": "9f7dd842-a64d-4495-a422-d31565b963df",
+          "name": "My Campaign Name",
+          "usage_type": "campaign"
+        },
+        "properties": {
+          "id": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PublicId"
+              }
+            ],
+            "description": "Unique Identifier for the fact."
+          },
+          "name": {
+            "description": "Name of the fact",
+            "nullable": false,
+            "type": "string"
+          },
+          "usage_type": {
+            "description": "The usage type of this fact.",
+            "enum": [
+              "auction_house",
+              "campaign",
+              "cause",
+              "fundraising_event_activation",
+              "personal_campaign",
+              "team_campaign",
+              "team_event"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "usage_type"
+        ],
+        "title": "SimpleFact",
+        "type": "object"
+      },
+      "Unauthorized": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ErrorResponse"
+          }
+        ],
+        "description": "Object returned when requester is not authorized.",
+        "example": {
+          "error": {
+            "fields": null,
+            "message": "Unauthorized",
+            "status": 401
+          }
+        },
+        "title": "Unauthorized",
+        "type": "object"
+      },
+      "UnprocessableEntity": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ErrorResponse"
+          }
+        ],
+        "description": "Object returned when requester has provided invalid parameters.",
+        "example": {
+          "error": {
+            "fields": {
+              "campaign_id": [
+                "invalid"
+              ]
+            },
+            "message": "Unprocessible Entity",
+            "status": 422
+          }
+        },
+        "title": "UnprocessableEntity",
+        "type": "object"
+      },
+      "WebhookEndpoint": {
+        "example": {
+          "activated_at": "2025-06-30T15:59:22.743787Z",
+          "deactivated_at": null,
+          "description": "My Webhook Endpoint for Tiltify Fundraisers.",
+          "id": "03ecffe0-f92c-4c84-9328-0ce30d92e3e4",
+          "inserted_at": "2025-06-30T15:59:22.743827Z",
+          "status": "active",
+          "updated_at": "2025-06-30T15:59:22.743831Z",
+          "url": "https://webhooks.tiltify.test/endpoint"
+        },
+        "properties": {
+          "activated_at": {
+            "description": "When this webhook endpoint was last activated",
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "deactivated_at": {
+            "description": "When this webhook endpoint was last deactivated",
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "description": {
+            "description": "The user provided description for the webhook endpoint.",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "$ref": "#/components/schemas/PublicId"
+          },
+          "inserted_at": {
+            "description": "When the campaign was created",
+            "format": "date-time",
+            "nullable": false,
+            "type": "string"
+          },
+          "status": {
+            "description": "The current status of the webhook endpoint",
+            "enum": [
+              "active",
+              "inactive"
+            ],
+            "nullable": false,
+            "type": "string"
+          },
+          "updated_at": {
+            "description": "When the campaign details were last updated",
+            "format": "date-time",
+            "nullable": false,
+            "type": "string"
+          },
+          "url": {
+            "description": "The user provided url for the webhook endpoint.",
+            "nullable": false,
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "description",
+          "url",
+          "inserted_at",
+          "updated_at",
+          "activated_at",
+          "deactivated_at"
+        ],
+        "title": "WebhookEndpoint",
+        "type": "object"
+      },
+      "WebhookRelayContribution": {
+        "example": {
+          "amount": {
+            "currency": "USD",
+            "value": "182.32"
+          },
+          "completed_at": "2025-06-30T15:59:24.080879Z",
+          "donor_comment": "Keep up the great work!",
+          "donor_name": "Test Name",
+          "gift_matches": [],
+          "id": "215087e6-ae68-4b9c-8421-3252d1117e70",
+          "is_match": false,
+          "payment_status": "completed",
+          "personal_campaign_id": "2c19274e-12ae-43a7-8f2b-4d71fb358952",
+          "poll_id": "f8abc81c-bd19-49a6-94fb-5a0d24371044",
+          "poll_option_id": "6a1e8c87-68b4-43e1-a877-bf6f754c4856",
+          "reward_claims": [
+            {
+              "id": "fe07572d-fd61-463b-ae89-371d2820c735",
+              "quantity": 1,
+              "reward_id": "8a4e685c-4e3a-476e-a544-9097b04ed4f0"
+            }
+          ],
+          "target_id": "42887687-380f-466e-b541-d4bf5f4095f9"
+        },
+        "properties": {
+          "amount": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Money"
+              }
+            ],
+            "description": "The amount donated.",
+            "nullable": false
+          },
+          "completed_at": {
+            "description": "Timestamp of when the contribution was completed.",
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "donor_comment": {
+            "description": "Note left by donor",
+            "nullable": true,
+            "type": "string"
+          },
+          "donor_name": {
+            "description": "Publically visible donor name. This may be set to 'Anonymous' if the contribution was anonymous or moderated.",
+            "nullable": false,
+            "type": "string"
+          },
+          "gift_matches": {
+            "description": "The list of matches consumed by this contribution",
+            "items": {
+              "$ref": "#/components/schemas/GiftMatch"
+            },
+            "nullable": false,
+            "type": "array"
+          },
+          "id": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PublicId"
+              }
+            ],
+            "description": "Unique Identifier for the contribution."
+          },
+          "is_match": {
+            "description": "Whether or not the contribution is the result of a GiftMatch",
+            "nullable": false,
+            "type": "boolean"
+          },
+          "payment_status": {
+            "description": "The current payment status of the donation",
+            "enum": [
+              "completed",
+              "cancelled",
+              "pending"
+            ],
+            "nullable": false,
+            "type": "string"
+          },
+          "personal_campaign_id": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PublicId"
+              }
+            ],
+            "description": "ID of the campaign donated to",
+            "nullable": true
+          },
+          "poll_id": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PublicId"
+              }
+            ],
+            "description": "The ID for a Poll, if one was donated toward.",
+            "nullable": true
+          },
+          "poll_option_id": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PublicId"
+              }
+            ],
+            "description": "The ID for a PollOption, if one was donated toward.",
+            "nullable": true
+          },
+          "reward_claims": {
+            "items": {
+              "$ref": "#/components/schemas/RewardClaim"
+            },
+            "nullable": true,
+            "type": "array"
+          },
+          "target_id": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PublicId"
+              }
+            ],
+            "description": "The ID for a Target, if one was donated toward.",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "amount",
+          "completed_at",
+          "payment_status",
+          "target_id",
+          "donor_name",
+          "donor_comment",
+          "poll_option_id",
+          "poll_id",
+          "is_match",
+          "gift_matches",
+          "personal_campaign_id",
+          "reward_claims"
+        ],
+        "title": "WebhookRelayContribution",
+        "type": "object"
+      },
+      "WebhookRelayDonation": {
+        "example": {
+          "amount": {
+            "currency": "USD",
+            "value": "182.32"
+          },
+          "campaign_id": "fad4d063-7ad5-4070-8df4-e8e56b737f4c",
+          "cause_id": "0653425e-efd8-4ef2-b849-fc4f76868dbf",
+          "completed_at": "2025-06-30T15:59:24.202582Z",
+          "donation_matches": [
+            {
+              "active": true,
+              "amount": {
+                "currency": "USD",
+                "value": "182.32"
+              },
+              "completed_at": "2025-06-30T15:59:24.203941Z",
+              "donation_id": "287bf125-b190-48b6-a304-32db1f585ccc",
+              "ends_at": "2025-06-30T15:59:24.203938Z",
+              "id": "0ea69b8a-4bbc-488a-9b3a-c9704f3d241e",
+              "inserted_at": "2025-06-30T15:59:24.203920Z",
+              "matched_by": "Big Donor 1",
+              "pledged_amount": {
+                "currency": "USD",
+                "value": "182.32"
+              },
+              "started_at_amount": {
+                "currency": "USD",
+                "value": "182.32"
+              },
+              "starts_at": "2025-06-30T15:59:24.203934Z",
+              "total_amount_raised": {
+                "currency": "USD",
+                "value": "182.32"
+              },
+              "updated_at": "2025-06-30T15:59:24.203929Z"
+            }
+          ],
+          "donor_comment": "Keep up the great work!",
+          "donor_name": "Test Name",
+          "facts": [
+            {
+              "id": "9f7dd842-a64d-4495-a422-d31565b963df",
+              "name": "Charity",
+              "usage_type": "cause"
+            },
+            {
+              "id": "9f7dd842-a64d-4495-a422-d31565b963df",
+              "name": "Massive Fundraiser",
+              "usage_type": "fundraising_event_activation"
+            },
+            {
+              "id": "9f7dd842-a64d-4495-a422-d31565b963df",
+              "name": "My Campaign",
+              "usage_type": "campaign"
+            }
+          ],
+          "fundraising_event_id": "40ea787f-72de-484d-ac6d-2a24a7730afa",
+          "id": "c14a15b9-29f6-4da6-a42e-1f42ea4091e5",
+          "legacy_id": 282633623,
+          "payment_status": "completed",
+          "poll_id": "456522e9-c307-4018-bd97-3ca05bf6c2e6",
+          "poll_option_id": "8309ea7d-9aeb-4dec-9b0c-67fd578d785f",
+          "reward_claims": [
+            {
+              "id": "389912a7-3d2b-43b1-b17d-a18e6bd0e9a0",
+              "quantity": 1,
+              "reward_id": "4f9eae43-91b6-4aeb-bc01-c85092f77457"
+            }
+          ],
+          "reward_id": "fe082716-780e-4e4f-91ce-8f4ad70f3165",
+          "sustained": false,
+          "target_id": "c467f53d-ea2a-4676-b1ac-56d5d9860c82",
+          "team_event_id": "dd32f90d-318f-400f-8e84-f10d7b398dd9"
+        },
+        "properties": {
+          "amount": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Money"
+              }
+            ],
+            "description": "The amount donated.",
+            "nullable": false
+          },
+          "campaign_id": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PublicId"
+              }
+            ],
+            "description": "ID of the campaign donated to",
+            "nullable": true
+          },
+          "cause_id": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PublicId"
+              }
+            ],
+            "description": "ID of the cause donated to",
+            "nullable": false
+          },
+          "completed_at": {
+            "description": "Timestamp of when the donation was completed.",
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "donation_matches": {
+            "items": {
+              "$ref": "#/components/schemas/DonationMatch"
+            },
+            "nullable": true,
+            "type": "array"
+          },
+          "donor_comment": {
+            "description": "Note left by donor",
+            "nullable": true,
+            "type": "string"
+          },
+          "donor_name": {
+            "description": "Publically visible donor name. This may be set to 'Anonymous' if the donation was anonymous or moderated.",
+            "nullable": false,
+            "type": "string"
+          },
+          "facts": {
+            "items": {
+              "$ref": "#/components/schemas/SimpleFact"
+            },
+            "nullable": false,
+            "type": "array"
+          },
+          "fundraising_event_id": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PublicId"
+              }
+            ],
+            "description": "ID of the fundraising event donated to",
+            "nullable": true
+          },
+          "id": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PublicId"
+              }
+            ],
+            "description": "Unique Identifier for the donation."
+          },
+          "legacy_id": {
+            "$ref": "#/components/schemas/LegacyId"
+          },
+          "payment_status": {
+            "description": "The current payment status of the donation",
+            "enum": [
+              "completed",
+              "cancelled",
+              "pending"
+            ],
+            "nullable": false,
+            "type": "string"
+          },
+          "poll_id": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PublicId"
+              }
+            ],
+            "description": "The ID for a Poll, if one was donated toward.",
+            "nullable": true
+          },
+          "poll_option_id": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PublicId"
+              }
+            ],
+            "description": "The ID for a PollOption, if one was donated toward.",
+            "nullable": true
+          },
+          "reward_claims": {
+            "items": {
+              "$ref": "#/components/schemas/RewardClaim"
+            },
+            "nullable": true,
+            "type": "array"
+          },
+          "reward_id": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PublicId"
+              }
+            ],
+            "deprecated": true,
+            "description": "The ID for a Reward, if one was donated toward. Deprecated because donations may now have multiple rewards.",
+            "nullable": true
+          },
+          "sustained": {
+            "description": "Whether or not the donation is a part of a monthly donation.",
+            "nullable": true,
+            "type": "boolean"
+          },
+          "target_id": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PublicId"
+              }
+            ],
+            "description": "The ID for a Target, if one was donated toward.",
+            "nullable": true
+          },
+          "team_event_id": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PublicId"
+              }
+            ],
+            "description": "The ID of a team event if it exists",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "cause_id",
+          "amount",
+          "completed_at",
+          "payment_status",
+          "target_id",
+          "campaign_id",
+          "donor_name",
+          "donor_comment",
+          "sustained",
+          "donation_matches",
+          "reward_id",
+          "poll_option_id",
+          "fundraising_event_id",
+          "team_event_id",
+          "poll_id",
+          "facts",
+          "legacy_id",
+          "reward_claims"
+        ],
+        "title": "WebhookRelayDonation",
+        "type": "object"
+      },
+      "WebhookRelayKey": {
+        "example": {
+          "client_key": "565ec7060b06d73326e790e0e83dea985b5d222304b4ae9f46b568ec2a2ea09c",
+          "donation": {
+            "amount": {
+              "currency": "USD",
+              "value": "182.32"
+            },
+            "campaign_id": "fad4d063-7ad5-4070-8df4-e8e56b737f4c",
+            "cause_id": "0653425e-efd8-4ef2-b849-fc4f76868dbf",
+            "completed_at": "2025-06-30T15:59:24.202582Z",
+            "donation_matches": [
+              {
+                "active": true,
+                "amount": {
+                  "currency": "USD",
+                  "value": "182.32"
+                },
+                "completed_at": "2025-06-30T15:59:24.203941Z",
+                "donation_id": "287bf125-b190-48b6-a304-32db1f585ccc",
+                "ends_at": "2025-06-30T15:59:24.203938Z",
+                "id": "0ea69b8a-4bbc-488a-9b3a-c9704f3d241e",
+                "inserted_at": "2025-06-30T15:59:24.203920Z",
+                "matched_by": "Big Donor 1",
+                "pledged_amount": {
+                  "currency": "USD",
+                  "value": "182.32"
+                },
+                "started_at_amount": {
+                  "currency": "USD",
+                  "value": "182.32"
+                },
+                "starts_at": "2025-06-30T15:59:24.203934Z",
+                "total_amount_raised": {
+                  "currency": "USD",
+                  "value": "182.32"
+                },
+                "updated_at": "2025-06-30T15:59:24.203929Z"
+              }
+            ],
+            "donor_comment": "Keep up the great work!",
+            "donor_name": "Test Name",
+            "facts": [
+              {
+                "id": "9f7dd842-a64d-4495-a422-d31565b963df",
+                "name": "Charity",
+                "usage_type": "cause"
+              },
+              {
+                "id": "9f7dd842-a64d-4495-a422-d31565b963df",
+                "name": "Massive Fundraiser",
+                "usage_type": "fundraising_event_activation"
+              },
+              {
+                "id": "9f7dd842-a64d-4495-a422-d31565b963df",
+                "name": "My Campaign",
+                "usage_type": "campaign"
+              }
+            ],
+            "fundraising_event_id": "40ea787f-72de-484d-ac6d-2a24a7730afa",
+            "id": "c14a15b9-29f6-4da6-a42e-1f42ea4091e5",
+            "legacy_id": 282633623,
+            "payment_status": "completed",
+            "poll_id": "456522e9-c307-4018-bd97-3ca05bf6c2e6",
+            "poll_option_id": "8309ea7d-9aeb-4dec-9b0c-67fd578d785f",
+            "reward_claims": [
+              {
+                "id": "389912a7-3d2b-43b1-b17d-a18e6bd0e9a0",
+                "quantity": 1,
+                "reward_id": "4f9eae43-91b6-4aeb-bc01-c85092f77457"
+              }
+            ],
+            "reward_id": "fe082716-780e-4e4f-91ce-8f4ad70f3165",
+            "sustained": false,
+            "target_id": "c467f53d-ea2a-4676-b1ac-56d5d9860c82",
+            "team_event_id": "dd32f90d-318f-400f-8e84-f10d7b398dd9"
+          },
+          "id": "dfd4a36a-3b95-44c2-b7ea-ad7823c94acd",
+          "inserted_at": "2025-07-01T23:05:32.311251Z",
+          "metadata": "Q3VzdG9tIE1ldGFkYXRhIFN0cmluZw==",
+          "updated_at": "2025-07-01T23:05:32.311259Z",
+          "webhook_relay_id": "bd120d75-3d68-4853-a309-45793a5acec4"
+        },
+        "properties": {
+          "client_key": {
+            "description": "The Client Key used when linking to the donate form that will relay a donation.",
+            "nullable": false,
+            "type": "string"
+          },
+          "contribution": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/WebhookRelayContribution"
+              }
+            ],
+            "description": "The Contribution that has been associated with this relay key.",
+            "nullable": true
+          },
+          "donation": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/WebhookRelayDonation"
+              }
+            ],
+            "description": "The Donation that has been associated with this relay key.",
+            "nullable": true
+          },
+          "id": {
+            "description": "This will either be the ID passed when generating the webhook relay key, or an autogenerated uuid.",
+            "nullable": false,
+            "type": "string"
+          },
+          "inserted_at": {
+            "description": "When the webhook subscription was created",
+            "format": "date-time",
+            "nullable": false,
+            "type": "string"
+          },
+          "metadata": {
+            "description": "The custom metadata associated with this relay key",
+            "nullable": true,
+            "type": "string"
+          },
+          "updated_at": {
+            "description": "When the webhook subscription was last updated",
+            "format": "date-time",
+            "nullable": false,
+            "type": "string"
+          },
+          "webhook_relay_id": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PublicId"
+              }
+            ],
+            "description": "The ID for the WebhookRelay this WebhookRelayKey belongs to",
+            "nullable": false
+          }
+        },
+        "required": [
+          "id",
+          "metadata",
+          "inserted_at",
+          "updated_at",
+          "donation",
+          "webhook_relay_id",
+          "client_key"
+        ],
+        "title": "WebhookRelayKey",
+        "type": "object"
+      },
+      "WebhookRelayKeyPaginatedResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/PaginatedResponse"
+          }
+        ],
+        "example": {
+          "data": [
+            {
+              "client_key": "565ec7060b06d73326e790e0e83dea985b5d222304b4ae9f46b568ec2a2ea09c",
+              "donation": {
+                "amount": {
+                  "currency": "USD",
+                  "value": "182.32"
+                },
+                "campaign_id": "fad4d063-7ad5-4070-8df4-e8e56b737f4c",
+                "cause_id": "0653425e-efd8-4ef2-b849-fc4f76868dbf",
+                "completed_at": "2025-06-30T15:59:24.202582Z",
+                "donation_matches": [
+                  {
+                    "active": true,
+                    "amount": {
+                      "currency": "USD",
+                      "value": "182.32"
+                    },
+                    "completed_at": "2025-06-30T15:59:24.203941Z",
+                    "donation_id": "287bf125-b190-48b6-a304-32db1f585ccc",
+                    "ends_at": "2025-06-30T15:59:24.203938Z",
+                    "id": "0ea69b8a-4bbc-488a-9b3a-c9704f3d241e",
+                    "inserted_at": "2025-06-30T15:59:24.203920Z",
+                    "matched_by": "Big Donor 1",
+                    "pledged_amount": {
+                      "currency": "USD",
+                      "value": "182.32"
+                    },
+                    "started_at_amount": {
+                      "currency": "USD",
+                      "value": "182.32"
+                    },
+                    "starts_at": "2025-06-30T15:59:24.203934Z",
+                    "total_amount_raised": {
+                      "currency": "USD",
+                      "value": "182.32"
+                    },
+                    "updated_at": "2025-06-30T15:59:24.203929Z"
+                  }
+                ],
+                "donor_comment": "Keep up the great work!",
+                "donor_name": "Test Name",
+                "facts": [
+                  {
+                    "id": "9f7dd842-a64d-4495-a422-d31565b963df",
+                    "name": "Charity",
+                    "usage_type": "cause"
+                  },
+                  {
+                    "id": "9f7dd842-a64d-4495-a422-d31565b963df",
+                    "name": "Massive Fundraiser",
+                    "usage_type": "fundraising_event_activation"
+                  },
+                  {
+                    "id": "9f7dd842-a64d-4495-a422-d31565b963df",
+                    "name": "My Campaign",
+                    "usage_type": "campaign"
+                  }
+                ],
+                "fundraising_event_id": "40ea787f-72de-484d-ac6d-2a24a7730afa",
+                "id": "c14a15b9-29f6-4da6-a42e-1f42ea4091e5",
+                "legacy_id": 282633623,
+                "payment_status": "completed",
+                "poll_id": "456522e9-c307-4018-bd97-3ca05bf6c2e6",
+                "poll_option_id": "8309ea7d-9aeb-4dec-9b0c-67fd578d785f",
+                "reward_claims": [
+                  {
+                    "id": "389912a7-3d2b-43b1-b17d-a18e6bd0e9a0",
+                    "quantity": 1,
+                    "reward_id": "4f9eae43-91b6-4aeb-bc01-c85092f77457"
+                  }
+                ],
+                "reward_id": "fe082716-780e-4e4f-91ce-8f4ad70f3165",
+                "sustained": false,
+                "target_id": "c467f53d-ea2a-4676-b1ac-56d5d9860c82",
+                "team_event_id": "dd32f90d-318f-400f-8e84-f10d7b398dd9"
+              },
+              "id": "dfd4a36a-3b95-44c2-b7ea-ad7823c94acd",
+              "inserted_at": "2025-07-01T23:05:32.311251Z",
+              "metadata": "Q3VzdG9tIE1ldGFkYXRhIFN0cmluZw==",
+              "updated_at": "2025-07-01T23:05:32.311259Z",
+              "webhook_relay_id": "bd120d75-3d68-4853-a309-45793a5acec4"
+            }
+          ],
+          "metadata": {
+            "after": "bGlnaHQgwd==",
+            "before": null,
+            "limit": 10
+          }
+        },
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/WebhookRelayKey"
+            },
+            "type": "array"
+          },
+          "metadata": {
+            "example": {
+              "after": "bGlnaHQgwd==",
+              "before": null,
+              "limit": 10
+            },
+            "properties": {
+              "after": {
+                "description": "The cursor to the next page if it exists",
+                "nullable": true,
+                "type": "string"
+              },
+              "before": {
+                "description": "The cursor to the previous page if it exists",
+                "nullable": true,
+                "type": "string"
+              },
+              "limit": {
+                "description": "The requested record limit",
+                "type": "number"
+              }
+            },
+            "required": [
+              "after",
+              "before",
+              "limit"
+            ],
+            "type": "object"
+          }
+        },
+        "title": "WebhookRelayKeyPaginatedResponse",
+        "type": "object"
+      },
+      "WebhookRelayKeyResponse": {
+        "example": {
+          "data": {
+            "client_key": "565ec7060b06d73326e790e0e83dea985b5d222304b4ae9f46b568ec2a2ea09c",
+            "donation": {
+              "amount": {
+                "currency": "USD",
+                "value": "182.32"
+              },
+              "campaign_id": "fad4d063-7ad5-4070-8df4-e8e56b737f4c",
+              "cause_id": "0653425e-efd8-4ef2-b849-fc4f76868dbf",
+              "completed_at": "2025-06-30T15:59:24.202582Z",
+              "donation_matches": [
+                {
+                  "active": true,
+                  "amount": {
+                    "currency": "USD",
+                    "value": "182.32"
+                  },
+                  "completed_at": "2025-06-30T15:59:24.203941Z",
+                  "donation_id": "287bf125-b190-48b6-a304-32db1f585ccc",
+                  "ends_at": "2025-06-30T15:59:24.203938Z",
+                  "id": "0ea69b8a-4bbc-488a-9b3a-c9704f3d241e",
+                  "inserted_at": "2025-06-30T15:59:24.203920Z",
+                  "matched_by": "Big Donor 1",
+                  "pledged_amount": {
+                    "currency": "USD",
+                    "value": "182.32"
+                  },
+                  "started_at_amount": {
+                    "currency": "USD",
+                    "value": "182.32"
+                  },
+                  "starts_at": "2025-06-30T15:59:24.203934Z",
+                  "total_amount_raised": {
+                    "currency": "USD",
+                    "value": "182.32"
+                  },
+                  "updated_at": "2025-06-30T15:59:24.203929Z"
+                }
+              ],
+              "donor_comment": "Keep up the great work!",
+              "donor_name": "Test Name",
+              "facts": [
+                {
+                  "id": "9f7dd842-a64d-4495-a422-d31565b963df",
+                  "name": "Charity",
+                  "usage_type": "cause"
+                },
+                {
+                  "id": "9f7dd842-a64d-4495-a422-d31565b963df",
+                  "name": "Massive Fundraiser",
+                  "usage_type": "fundraising_event_activation"
+                },
+                {
+                  "id": "9f7dd842-a64d-4495-a422-d31565b963df",
+                  "name": "My Campaign",
+                  "usage_type": "campaign"
+                }
+              ],
+              "fundraising_event_id": "40ea787f-72de-484d-ac6d-2a24a7730afa",
+              "id": "c14a15b9-29f6-4da6-a42e-1f42ea4091e5",
+              "legacy_id": 282633623,
+              "payment_status": "completed",
+              "poll_id": "456522e9-c307-4018-bd97-3ca05bf6c2e6",
+              "poll_option_id": "8309ea7d-9aeb-4dec-9b0c-67fd578d785f",
+              "reward_claims": [
+                {
+                  "id": "389912a7-3d2b-43b1-b17d-a18e6bd0e9a0",
+                  "quantity": 1,
+                  "reward_id": "4f9eae43-91b6-4aeb-bc01-c85092f77457"
+                }
+              ],
+              "reward_id": "fe082716-780e-4e4f-91ce-8f4ad70f3165",
+              "sustained": false,
+              "target_id": "c467f53d-ea2a-4676-b1ac-56d5d9860c82",
+              "team_event_id": "dd32f90d-318f-400f-8e84-f10d7b398dd9"
+            },
+            "id": "dfd4a36a-3b95-44c2-b7ea-ad7823c94acd",
+            "inserted_at": "2025-07-01T23:05:32.311251Z",
+            "metadata": "Q3VzdG9tIE1ldGFkYXRhIFN0cmluZw==",
+            "updated_at": "2025-07-01T23:05:32.311259Z",
+            "webhook_relay_id": "bd120d75-3d68-4853-a309-45793a5acec4"
+          }
+        },
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/WebhookRelayKey"
+          }
+        },
+        "title": "WebhookRelayKeyResponse",
+        "type": "object"
+      },
+      "WebhookSubscription": {
+        "example": {
+          "event_id": "828cbe87-b65d-456c-8193-8a719434b86b",
+          "event_types": [
+            "public:direct:donation_updated",
+            "public:direct:fact_updated"
+          ],
+          "id": "11582c26-a8fb-4010-aae5-39a655cc54f5",
+          "inserted_at": "2025-07-01T23:05:32.301698Z",
+          "updated_at": "2025-07-01T23:05:32.309760Z",
+          "webhook_endpoint_id": "8f26f5bc-fe6a-4d5e-ab9a-ea4f5cf29901"
+        },
+        "properties": {
+          "event_id": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PublicId"
+              }
+            ],
+            "description": "The ID for the Event this subscription belongs to",
+            "nullable": true
+          },
+          "event_types": {
+            "description": "The list of event types this subscription is subscribed to",
+            "items": {
+              "enum": [
+                "private:direct:auction_bid_amount_updated",
+                "private:direct:donation_updated",
+                "private:direct:fact_updated",
+                "private:indirect:donation_updated",
+                "private:indirect:fact_updated",
+                "public:direct:auction_bid_amount_updated",
+                "public:direct:donation_updated",
+                "public:direct:fact_updated",
+                "public:indirect:donation_updated",
+                "public:indirect:fact_updated"
+              ],
+              "type": "string"
+            },
+            "nullable": false,
+            "type": "array"
+          },
+          "id": {
+            "$ref": "#/components/schemas/PublicId"
+          },
+          "inserted_at": {
+            "description": "When the webhook subscription was created",
+            "format": "date-time",
+            "nullable": false,
+            "type": "string"
+          },
+          "updated_at": {
+            "description": "When the webhook subscription was last updated",
+            "format": "date-time",
+            "nullable": false,
+            "type": "string"
+          },
+          "webhook_endpoint_id": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PublicId"
+              }
+            ],
+            "description": "The ID for the WebhookEndpoint this subscription belongs to",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "inserted_at",
+          "updated_at",
+          "event_id",
+          "event_types",
+          "webhook_endpoint_id"
+        ],
+        "title": "WebhookSubscription",
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "authorization": {
+        "flows": {
+          "authorizationCode": {
+            "authorizationUrl": "https://v5api.tiltify.com/oauth/authorize",
+            "scopes": {
+              "webhooks:write": "Allows managing webhook resources."
+            },
+            "tokenUrl": "https://v5api.tiltify.com/oauth/token"
+          },
+          "clientCredentials": {
+            "authorizationUrl": "https://v5api.tiltify.com/oauth/authorize",
+            "scopes": {
+              "webhooks:write": "Allows managing webhook resources."
+            },
+            "tokenUrl": "https://v5api.tiltify.com/oauth/token"
+          }
+        },
+        "in": "header",
+        "scheme": "bearer",
+        "type": "http"
+      }
+    }
+  },
+  "info": {
+    "description": "This is the private API for Tiltify. It includes endpoints that require specific oauth scopes in order to access. It can be considered as an extension to the public api, but with additional endpoints that may return sensitive information.\n\n### Authorization\n#\nPlease see the [public api](https://v5api.tiltify.com/api/public) documentation for additional authorization instructions.\n\n",
+    "title": "V5ApiPrivate",
+    "version": "1.0"
+  },
+  "openapi": "3.0.0",
+  "paths": {
+    "/api/private/webhook_endpoints/{webhook_endpoint_id}/activate": {
+      "post": {
+        "callbacks": {},
+        "description": "### Requires scope:`webhooks:write`\n\nThis endpoint will activate a given webhook endpoint. Webhook endpoints may be deactivated if they fail to respond sucessfully to our webhooks. This endpoint can be called programatically to ensure that your webhook endpoint is enabled when your listening application starts.\n\n",
+        "operationId": "activateWebhookEndpoint",
+        "parameters": [
+          {
+            "description": "Webhook Endpoint ID",
+            "in": "path",
+            "name": "webhook_endpoint_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WebhookEndpoint"
+                }
+              }
+            },
+            "description": "Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Unauthorized"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "appliction/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Forbidden"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFound"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableEntity"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "security": [
+          {
+            "authorization": [
+              "webhooks:write"
+            ]
+          }
+        ],
+        "summary": "Activates a webhook endpoint",
+        "tags": [
+          "webhook"
+        ]
+      }
+    },
+    "/api/private/webhook_endpoints/{webhook_endpoint_id}/webhook_subscriptions/{event_id}": {
+      "delete": {
+        "callbacks": {},
+        "description": "### Requires scope:`webhooks:write`\n\nDeletes a Webhook Subscription to a given webhook_endpoint_id and event_id. This will either delete an existing webhook subscription to the given event or return a null value if the subscription no longer exists.\n",
+        "operationId": "deleteWebhookSubscription",
+        "parameters": [
+          {
+            "description": "Webhook Endpoint ID",
+            "in": "path",
+            "name": "webhook_endpoint_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Campaign/Team Campaign/Fundraising Event public_id",
+            "in": "path",
+            "name": "event_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WebhookSubscription"
+                }
+              }
+            },
+            "description": "Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Unauthorized"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "appliction/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Forbidden"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFound"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableEntity"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "security": [
+          {
+            "authorization": [
+              "webhooks:write"
+            ]
+          }
+        ],
+        "summary": "Deletes a Webhook Subscription",
+        "tags": [
+          "webhook"
+        ]
+      },
+      "put": {
+        "callbacks": {},
+        "description": "### Requires scope:`webhooks:write`\n\nCreates or Updates a Webhook Subscription to a given webhook_endpoint_id and event_id. This will either update an existing webhook subscription to the given event, or create a new one with the provided event types.\n\n### Event Types\n\nEvent types consist of a scope, locality, and event.\n\n#### Scope\n\nThe `public` scope is always available, and the `private` scope is not currently available through the API.\n\n#### Locality\n\nThis describes the source of the event, whether `direct` to the subscribed event, or `indirect` when the event occurs on one of the children of that event. For example all events under a fundraising event, or the campaigns under a team campaign.\n\n#### Event\n\nThis describes the event that is going to be send via webhook. `donation_updated` will send donation events, and `fact_updated` will send event updates, for example if you need to get the totals raised by a given event.\n\n#### List of supported event_types:\n* public:direct:auction_bid_amount_updated\n* public:direct:donation_updated\n* public:direct:fact_updated\n* public:indirect:donation_updated\n* public:indirect:fact_updated\n\n\n",
+        "operationId": "putWebhookSubscription",
+        "parameters": [
+          {
+            "description": "Webhook Endpoint ID",
+            "in": "path",
+            "name": "webhook_endpoint_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Campaign/Team Campaign/Fundraising Event public_id",
+            "in": "path",
+            "name": "event_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "example": {
+                  "event_types": [
+                    "public:direct:donation_updated"
+                  ]
+                },
+                "properties": {
+                  "event_types": {
+                    "description": "The list of event types this subscription should be subscribed to.",
+                    "items": {
+                      "enum": [
+                        "private:direct:auction_bid_amount_updated",
+                        "private:direct:donation_updated",
+                        "private:direct:fact_updated",
+                        "private:indirect:donation_updated",
+                        "private:indirect:fact_updated",
+                        "public:direct:auction_bid_amount_updated",
+                        "public:direct:donation_updated",
+                        "public:direct:fact_updated",
+                        "public:indirect:donation_updated",
+                        "public:indirect:fact_updated"
+                      ],
+                      "type": "string"
+                    },
+                    "nullable": false,
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "event_types"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "description": "PUT request body to update a webhook subscription",
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WebhookSubscription"
+                }
+              }
+            },
+            "description": "Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Unauthorized"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "appliction/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Forbidden"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFound"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableEntity"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "security": [
+          {
+            "authorization": [
+              "webhooks:write"
+            ]
+          }
+        ],
+        "summary": "Creates or Updates a Webhook Subscription",
+        "tags": [
+          "webhook"
+        ]
+      }
+    },
+    "/api/private/webhook_enpdoints/{webhook_endpoint_id}/webhook_subscriptions/{event_id}": {
+      "put": {
+        "callbacks": {},
+        "deprecated": true,
+        "description": "Use [putWebhookSubscription](#tag/webhook/operation/putWebhookSubscription) instead. This operation was deprecated due to a spelling error.\n",
+        "operationId": "putWebhookSubscriptionDeprecated",
+        "parameters": [
+          {
+            "description": "Webhook Endpoint ID",
+            "in": "path",
+            "name": "webhook_endpoint_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Campaign/Team Campaign/Fundraising Event public_id",
+            "in": "path",
+            "name": "event_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "example": {
+                  "event_types": [
+                    "public:direct:donation_updated"
+                  ]
+                },
+                "properties": {
+                  "event_types": {
+                    "description": "The list of event types this subscription should be subscribed to.",
+                    "items": {
+                      "enum": [
+                        "private:direct:auction_bid_amount_updated",
+                        "private:direct:donation_updated",
+                        "private:direct:fact_updated",
+                        "private:indirect:donation_updated",
+                        "private:indirect:fact_updated",
+                        "public:direct:auction_bid_amount_updated",
+                        "public:direct:donation_updated",
+                        "public:direct:fact_updated",
+                        "public:indirect:donation_updated",
+                        "public:indirect:fact_updated"
+                      ],
+                      "type": "string"
+                    },
+                    "nullable": false,
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "event_types"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "description": "PUT request body to update a webhook subscription",
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WebhookSubscription"
+                }
+              }
+            },
+            "description": "Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Unauthorized"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "appliction/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Forbidden"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFound"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableEntity"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "security": [
+          {
+            "authorization": [
+              "webhooks:write"
+            ]
+          }
+        ],
+        "summary": "Creates or Updates a Webhook Subscription",
+        "tags": [
+          "webhook"
+        ]
+      }
+    },
+    "/api/private/webhook_relays/{webhook_relay_id}/webhook_relay_keys": {
+      "get": {
+        "callbacks": {},
+        "description": "Returns Webhook Relay Keys for a Webhook Relay",
+        "operationId": "getRelayKeys",
+        "parameters": [
+          {
+            "description": "Webhook Relay ID",
+            "in": "path",
+            "name": "webhook_relay_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Returns records after the given cursor",
+            "in": "query",
+            "name": "after",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Returns records before the given cursor",
+            "in": "query",
+            "name": "before",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "",
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 10,
+              "description": "The number of items to return per page. (Max: 100)",
+              "maximum": 100,
+              "minimum": 1,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/PaginatedResponse"
+                    }
+                  ],
+                  "example": {
+                    "data": [
+                      {
+                        "client_key": "565ec7060b06d73326e790e0e83dea985b5d222304b4ae9f46b568ec2a2ea09c",
+                        "donation": {
+                          "amount": {
+                            "currency": "USD",
+                            "value": "182.32"
+                          },
+                          "campaign_id": "fad4d063-7ad5-4070-8df4-e8e56b737f4c",
+                          "cause_id": "0653425e-efd8-4ef2-b849-fc4f76868dbf",
+                          "completed_at": "2025-06-30T15:59:24.202582Z",
+                          "donation_matches": [
+                            {
+                              "active": true,
+                              "amount": {
+                                "currency": "USD",
+                                "value": "182.32"
+                              },
+                              "completed_at": "2025-06-30T15:59:24.203941Z",
+                              "donation_id": "287bf125-b190-48b6-a304-32db1f585ccc",
+                              "ends_at": "2025-06-30T15:59:24.203938Z",
+                              "id": "0ea69b8a-4bbc-488a-9b3a-c9704f3d241e",
+                              "inserted_at": "2025-06-30T15:59:24.203920Z",
+                              "matched_by": "Big Donor 1",
+                              "pledged_amount": {
+                                "currency": "USD",
+                                "value": "182.32"
+                              },
+                              "started_at_amount": {
+                                "currency": "USD",
+                                "value": "182.32"
+                              },
+                              "starts_at": "2025-06-30T15:59:24.203934Z",
+                              "total_amount_raised": {
+                                "currency": "USD",
+                                "value": "182.32"
+                              },
+                              "updated_at": "2025-06-30T15:59:24.203929Z"
+                            }
+                          ],
+                          "donor_comment": "Keep up the great work!",
+                          "donor_name": "Test Name",
+                          "facts": [
+                            {
+                              "id": "9f7dd842-a64d-4495-a422-d31565b963df",
+                              "name": "Charity",
+                              "usage_type": "cause"
+                            },
+                            {
+                              "id": "9f7dd842-a64d-4495-a422-d31565b963df",
+                              "name": "Massive Fundraiser",
+                              "usage_type": "fundraising_event_activation"
+                            },
+                            {
+                              "id": "9f7dd842-a64d-4495-a422-d31565b963df",
+                              "name": "My Campaign",
+                              "usage_type": "campaign"
+                            }
+                          ],
+                          "fundraising_event_id": "40ea787f-72de-484d-ac6d-2a24a7730afa",
+                          "id": "c14a15b9-29f6-4da6-a42e-1f42ea4091e5",
+                          "legacy_id": 282633623,
+                          "payment_status": "completed",
+                          "poll_id": "456522e9-c307-4018-bd97-3ca05bf6c2e6",
+                          "poll_option_id": "8309ea7d-9aeb-4dec-9b0c-67fd578d785f",
+                          "reward_claims": [
+                            {
+                              "id": "389912a7-3d2b-43b1-b17d-a18e6bd0e9a0",
+                              "quantity": 1,
+                              "reward_id": "4f9eae43-91b6-4aeb-bc01-c85092f77457"
+                            }
+                          ],
+                          "reward_id": "fe082716-780e-4e4f-91ce-8f4ad70f3165",
+                          "sustained": false,
+                          "target_id": "c467f53d-ea2a-4676-b1ac-56d5d9860c82",
+                          "team_event_id": "dd32f90d-318f-400f-8e84-f10d7b398dd9"
+                        },
+                        "id": "dfd4a36a-3b95-44c2-b7ea-ad7823c94acd",
+                        "inserted_at": "2025-07-01T23:05:32.311251Z",
+                        "metadata": "Q3VzdG9tIE1ldGFkYXRhIFN0cmluZw==",
+                        "updated_at": "2025-07-01T23:05:32.311259Z",
+                        "webhook_relay_id": "bd120d75-3d68-4853-a309-45793a5acec4"
+                      }
+                    ],
+                    "metadata": {
+                      "after": "bGlnaHQgwd==",
+                      "before": null,
+                      "limit": 10
+                    }
+                  },
+                  "properties": {
+                    "data": {
+                      "items": {
+                        "$ref": "#/components/schemas/WebhookRelayKey"
+                      },
+                      "type": "array"
+                    },
+                    "metadata": {
+                      "example": {
+                        "after": "bGlnaHQgwd==",
+                        "before": null,
+                        "limit": 10
+                      },
+                      "properties": {
+                        "after": {
+                          "description": "The cursor to the next page if it exists",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "before": {
+                          "description": "The cursor to the previous page if it exists",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "limit": {
+                          "description": "The requested record limit",
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "after",
+                        "before",
+                        "limit"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "title": "WebhookRelayKeyPaginatedResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Unauthorized"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "appliction/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Forbidden"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFound"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableEntity"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "security": [
+          {
+            "authorization": [
+              "webhooks:write"
+            ]
+          }
+        ],
+        "summary": "List Relay Keys by Webhook Relay ID",
+        "tags": [
+          "webhook"
+        ]
+      },
+      "post": {
+        "callbacks": {},
+        "description": "### Requires scope:`webhooks:write`\n\nCreates a new Webhook Relay Key.\n",
+        "operationId": "createWebhookRelayKey",
+        "parameters": [
+          {
+            "description": "Webhook Relay ID",
+            "in": "path",
+            "name": "webhook_relay_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "example": {
+                  "id": "internal_2Oycg8ksnPDz9ku2RhDuVuvEfmV",
+                  "metadata": "Q3VzdG9tIE1ldGFkYXRhIFN0cmluZw=="
+                },
+                "properties": {
+                  "id": {
+                    "description": "An Optional ID that you can use to lookup the Relay Key. If you do not pass one, we will generate an UUID for you.",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "metadata": {
+                    "description": "An Optional string of metadata that will be associated with the relay key. Metadata will be stored, and sent to your webhook endpoint as is.",
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "description": "POST request body to create a webhook relay key",
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WebhookRelayKey"
+                }
+              }
+            },
+            "description": "Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Unauthorized"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "appliction/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Forbidden"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFound"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableEntity"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "security": [
+          {
+            "authorization": [
+              "webhooks:write"
+            ]
+          }
+        ],
+        "summary": "Creates a new Webhook Relay Key",
+        "tags": [
+          "webhook"
+        ]
+      }
+    },
+    "/api/private/webhook_relays/{webhook_relay_id}/webhook_relay_keys/{webhook_relay_key_id}": {
+      "get": {
+        "callbacks": {},
+        "description": "Returns a Webhook Relay Key by its ID",
+        "operationId": "getRelayKey",
+        "parameters": [
+          {
+            "description": "Webhook Relay ID",
+            "in": "path",
+            "name": "webhook_relay_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Webhook Relay Key ID",
+            "in": "path",
+            "name": "webhook_relay_key_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "data": {
+                      "client_key": "565ec7060b06d73326e790e0e83dea985b5d222304b4ae9f46b568ec2a2ea09c",
+                      "donation": {
+                        "amount": {
+                          "currency": "USD",
+                          "value": "182.32"
+                        },
+                        "campaign_id": "fad4d063-7ad5-4070-8df4-e8e56b737f4c",
+                        "cause_id": "0653425e-efd8-4ef2-b849-fc4f76868dbf",
+                        "completed_at": "2025-06-30T15:59:24.202582Z",
+                        "donation_matches": [
+                          {
+                            "active": true,
+                            "amount": {
+                              "currency": "USD",
+                              "value": "182.32"
+                            },
+                            "completed_at": "2025-06-30T15:59:24.203941Z",
+                            "donation_id": "287bf125-b190-48b6-a304-32db1f585ccc",
+                            "ends_at": "2025-06-30T15:59:24.203938Z",
+                            "id": "0ea69b8a-4bbc-488a-9b3a-c9704f3d241e",
+                            "inserted_at": "2025-06-30T15:59:24.203920Z",
+                            "matched_by": "Big Donor 1",
+                            "pledged_amount": {
+                              "currency": "USD",
+                              "value": "182.32"
+                            },
+                            "started_at_amount": {
+                              "currency": "USD",
+                              "value": "182.32"
+                            },
+                            "starts_at": "2025-06-30T15:59:24.203934Z",
+                            "total_amount_raised": {
+                              "currency": "USD",
+                              "value": "182.32"
+                            },
+                            "updated_at": "2025-06-30T15:59:24.203929Z"
+                          }
+                        ],
+                        "donor_comment": "Keep up the great work!",
+                        "donor_name": "Test Name",
+                        "facts": [
+                          {
+                            "id": "9f7dd842-a64d-4495-a422-d31565b963df",
+                            "name": "Charity",
+                            "usage_type": "cause"
+                          },
+                          {
+                            "id": "9f7dd842-a64d-4495-a422-d31565b963df",
+                            "name": "Massive Fundraiser",
+                            "usage_type": "fundraising_event_activation"
+                          },
+                          {
+                            "id": "9f7dd842-a64d-4495-a422-d31565b963df",
+                            "name": "My Campaign",
+                            "usage_type": "campaign"
+                          }
+                        ],
+                        "fundraising_event_id": "40ea787f-72de-484d-ac6d-2a24a7730afa",
+                        "id": "c14a15b9-29f6-4da6-a42e-1f42ea4091e5",
+                        "legacy_id": 282633623,
+                        "payment_status": "completed",
+                        "poll_id": "456522e9-c307-4018-bd97-3ca05bf6c2e6",
+                        "poll_option_id": "8309ea7d-9aeb-4dec-9b0c-67fd578d785f",
+                        "reward_claims": [
+                          {
+                            "id": "389912a7-3d2b-43b1-b17d-a18e6bd0e9a0",
+                            "quantity": 1,
+                            "reward_id": "4f9eae43-91b6-4aeb-bc01-c85092f77457"
+                          }
+                        ],
+                        "reward_id": "fe082716-780e-4e4f-91ce-8f4ad70f3165",
+                        "sustained": false,
+                        "target_id": "c467f53d-ea2a-4676-b1ac-56d5d9860c82",
+                        "team_event_id": "dd32f90d-318f-400f-8e84-f10d7b398dd9"
+                      },
+                      "id": "dfd4a36a-3b95-44c2-b7ea-ad7823c94acd",
+                      "inserted_at": "2025-07-01T23:05:32.311251Z",
+                      "metadata": "Q3VzdG9tIE1ldGFkYXRhIFN0cmluZw==",
+                      "updated_at": "2025-07-01T23:05:32.311259Z",
+                      "webhook_relay_id": "bd120d75-3d68-4853-a309-45793a5acec4"
+                    }
+                  },
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/WebhookRelayKey"
+                    }
+                  },
+                  "title": "WebhookRelayKeyResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Unauthorized"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "appliction/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Forbidden"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFound"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnprocessableEntity"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "security": [
+          {
+            "authorization": [
+              "webhooks:write"
+            ]
+          }
+        ],
+        "summary": "Returns a Webhook Relay Key by ID",
+        "tags": [
+          "webhook"
+        ]
+      }
+    },
+    "/oauth/authorize": {
+      "get": {
+        "callbacks": {},
+        "deprecated": false,
+        "description": "Returns a `code` through the applications `redirect_uri` to be used with the `/token` with the `authorization_code` grant.",
+        "operationId": "V5ApiWeb.Oauth.Authorize",
+        "parameters": [
+          {
+            "description": "Client Id",
+            "in": "query",
+            "name": "client_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Redirect URI",
+            "in": "query",
+            "name": "redirect_uri",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Response Type",
+            "in": "query",
+            "name": "response_type",
+            "required": true,
+            "schema": {
+              "enum": [
+                "code"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "description": "Scope",
+            "in": "query",
+            "name": "scope",
+            "required": false,
+            "schema": {
+              "default": "public",
+              "enum": [
+                "public",
+                "cause",
+                "webhooks:write"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {},
+        "summary": "Authorize",
+        "tags": [
+          "oauth"
+        ]
+      }
+    },
+    "/oauth/token": {
+      "post": {
+        "callbacks": {},
+        "deprecated": false,
+        "description": "Returns an access and refresh token with a provided client id, secret, and grant type. Tokens expire in `7200` seconds.",
+        "operationId": "V5ApiWeb.Oauth.Token",
+        "parameters": [
+          {
+            "description": "Client Id",
+            "in": "query",
+            "name": "client_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Client Secret",
+            "in": "query",
+            "name": "client_secret",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Grant Type",
+            "in": "query",
+            "name": "grant_type",
+            "required": true,
+            "schema": {
+              "default": "client_credentials",
+              "enum": [
+                "client_credentials",
+                "authorization_code",
+                "refresh_token"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "description": "Authorization Code; `*required` if using `authorization_code` grant type",
+            "in": "query",
+            "name": "code",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Refresh Token; `*required` if using `refresh_token` grant type",
+            "in": "query",
+            "name": "refresh_token",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Scope",
+            "in": "query",
+            "name": "scope",
+            "required": false,
+            "schema": {
+              "default": "public",
+              "enum": [
+                "public",
+                "cause",
+                "webhooks:write"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "access_token": "ab6a592346444dea97170837e104d8a5ab6a592346444dea97170837e104d8a5",
+                  "created_at": "2023-01-27T19:32:03Z",
+                  "expires_in": 7200,
+                  "refresh_token": "njjjytm3otetmgrjmi00yjawlwe4zgytzjixy2mzm2y3njawcg121231999393a3",
+                  "scope": "public",
+                  "token_type": "bearer"
+                }
+              }
+            },
+            "description": "Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Unauthorized"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFound"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "error": "invalid_client",
+                  "error_description": "Client authentication failed due to unknown client, no client authentication included, or unsupported authentication method."
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Token",
+        "tags": [
+          "oauth"
+        ]
+      }
+    }
+  },
+  "security": [
+    {
+      "authorization": []
+    }
+  ],
+  "servers": [],
+  "tags": [
+    {
+      "description": "OAuth 2.0 endpoints",
+      "name": "oauth",
+      "x-displayName": "OAuth"
+    },
+    {
+      "description": "Webhook endpoints",
+      "name": "webhook",
+      "x-displayName": "Webhook"
+    }
+  ],
+  "x-tagGroups": [
+    {
+      "name": "API Reference",
+      "tags": [
+        "oauth",
+        "webhook"
+      ]
+    }
+  ]
+}

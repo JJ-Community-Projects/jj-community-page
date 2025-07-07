@@ -3,7 +3,7 @@ import {drizzle} from "drizzle-orm/d1";
 import {accounts, users} from "../../../../lib/db/schema/auth-schema.ts";
 import {and, eq} from "drizzle-orm";
 import {Configuration, UserApi} from "../../../../lib/externalAPI/tiltify/api/src";
-import {getTiltifyTokenFromCode, getTiltifyUser, type TiltifyUserResponse} from "../../../../functions/tiltify.ts";
+import {TiltifyAPI, type TiltifyUserResponse} from "../../../../lib/TiltifyAPI.ts";
 import {
   createNewUserSession,
   createSession,
@@ -31,10 +31,11 @@ export const GET: APIRoute = async (ctx) => {
   }
   // endregion
 
+  const tiltifyAPI = new TiltifyAPI(ctx.locals.runtime.env);
   // region get tiltify token
   let tokenData
   try {
-    tokenData = await getTiltifyTokenFromCode(ctx)
+    tokenData = await tiltifyAPI.getTokenFromCode(ctx)
     if (!tokenData) {
       return ctx.redirect('/auth-error?error=token-exchange-failed');
     }
@@ -45,7 +46,7 @@ export const GET: APIRoute = async (ctx) => {
 
   let tiltifyUser: TiltifyUserResponse
   try {
-    const resp = await getTiltifyUser(tokenData.accessToken) // userAPI.v5ApiWebPublicUserControllerCurrentUser()
+    const resp = await tiltifyAPI.getUser(tokenData.accessToken) // userAPI.v5ApiWebPublicUserControllerCurrentUser()
     if (!resp) {
       return ctx.redirect('/auth-error?error=user-fetch-failed');
     }

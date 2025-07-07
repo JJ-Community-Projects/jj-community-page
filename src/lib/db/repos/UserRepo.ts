@@ -4,7 +4,7 @@ import {accounts, blockedAccounts, users, userSocials, userTags} from "../schema
 import type {InferSelectModel} from "drizzle-orm";
 import {and, desc, eq, like, not, notInArray, sql} from "drizzle-orm";
 import {DatabaseError} from "./DatabaseError";
-import {getTiltifyUser, type TiltifyUserData} from "../../../functions/tiltify";
+import {TiltifyAPI, type TiltifyUserData} from "../../TiltifyAPI.ts";
 import type {ActionAPIContext} from "astro:actions";
 import {TwitchRepo} from "./TwitchRepo.ts";
 import {UserTagRepo} from "./UserTagRepo.ts";
