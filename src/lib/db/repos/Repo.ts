@@ -1,4 +1,4 @@
-import {DrizzleD1Database} from "drizzle-orm/d1";
+import {drizzle, DrizzleD1Database} from "drizzle-orm/d1";
 import type {SQLiteTableWithColumns, TableConfig} from "drizzle-orm/sqlite-core";
 import {DatabaseError} from "./DatabaseError";
 import type {BatchItem} from "drizzle-orm/batch";
@@ -10,12 +10,14 @@ export abstract class Repo<
 > {
   protected db: DrizzleD1Database;
   protected table: SQLiteTableWithColumns<T>;
-  protected env: RepoEnv
+  protected repoEnv: RepoEnv
+  protected env: Env
 
-  protected constructor(db: DrizzleD1Database, table: SQLiteTableWithColumns<T>, env: RepoEnv) {
-    this.db = db;
+  protected constructor(env: Env,  repoEnv: RepoEnv,table: SQLiteTableWithColumns<T>) {
+    this.db = drizzle(env.DB);
     this.table = table;
     this.env = env;
+    this.repoEnv = repoEnv;
   }
 
   /**
@@ -36,11 +38,15 @@ export abstract class Repo<
       await this.db.batch([firstOp, ...restOps] as const);
     } catch (error) {
       console.log('Repo', 'executeBatch', error);
-      if (this.env === 'action') {
+      if (this.repoEnv === 'action') {
         throw new DatabaseError("Failed to execute batch operations", error).toActionError();
       } else {
         throw new DatabaseError("Failed to execute batch operations", error);
       }
     }
+  }
+
+  protected isAction() {
+    return this.repoEnv === 'action';
   }
 }

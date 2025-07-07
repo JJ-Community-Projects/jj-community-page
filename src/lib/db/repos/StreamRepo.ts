@@ -11,12 +11,13 @@ import {StreamTagRepo} from "./StreamTagRepo.ts";
 import {StreamParticipantsRepo} from "./StreamParticipantsRepo.ts";
 
 export class StreamRepo extends Repo<typeof streamsTable._['config']> {
-  constructor(db: DrizzleD1Database, env: RepoEnv) {
-    super(db, streamsTable, env);
+
+  constructor(env: Env, repoEnv: RepoEnv) {
+    super(env, repoEnv, streamsTable);
   }
 
   static action(ctx: ActionAPIContext) {
-    return new StreamRepo(drizzle(ctx.locals.runtime.env.DB), 'action')
+    return new StreamRepo(ctx.locals.runtime.env, 'action')
   }
 
   /**
@@ -38,8 +39,8 @@ export class StreamRepo extends Repo<typeof streamsTable._['config']> {
         .all();
 
       // Create instances of the repos we need
-      const tagRepo = new StreamTagRepo(this.db, this.env);
-      const participantRepo = new StreamParticipantsRepo(this.db, this.env);
+      const tagRepo = new StreamTagRepo(this.env, this.repoEnv);
+      const participantRepo = new StreamParticipantsRepo(this.env, this.repoEnv);
 
       // Fetch all tags and participants for all streams in the schedule at once using the UI-specific methods
       const tagsByStreamId = await tagRepo.findTagsUIGroupedByStream(scheduleId);
@@ -54,7 +55,7 @@ export class StreamRepo extends Repo<typeof streamsTable._['config']> {
 
       return result;
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to find streams with details for schedule ID: ${scheduleId}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to find streams with details for schedule ID: ${scheduleId}`, error);
@@ -81,8 +82,8 @@ export class StreamRepo extends Repo<typeof streamsTable._['config']> {
         .all();
 
       // Create instances of the repos we need
-      const tagRepo = new StreamTagRepo(this.db, this.env);
-      const participantRepo = new StreamParticipantsRepo(this.db, this.env);
+      const tagRepo = new StreamTagRepo(this.env, this.repoEnv);
+      const participantRepo = new StreamParticipantsRepo(this.env, this.repoEnv);
 
       // Fetch all tags and participants for all streams in the schedule at once using the UI-specific methods
       const tagsByStreamId = await tagRepo.findTagsGroupedByStream(scheduleId);
@@ -97,7 +98,7 @@ export class StreamRepo extends Repo<typeof streamsTable._['config']> {
 
       return result;
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to find streams with details for schedule ID: ${scheduleId}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to find streams with details for schedule ID: ${scheduleId}`, error);
@@ -119,7 +120,7 @@ export class StreamRepo extends Repo<typeof streamsTable._['config']> {
         .where(eq(streamsTable.scheduleId, scheduleId))
         .all();
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to find streams by schedule ID: ${scheduleId}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to find streams by schedule ID: ${scheduleId}`, error);
@@ -147,7 +148,7 @@ export class StreamRepo extends Repo<typeof streamsTable._['config']> {
 
       return result || null;
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to find stream by ID: ${streamId} in schedule: ${scheduleId}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to find stream by ID: ${streamId} in schedule: ${scheduleId}`, error);
@@ -177,7 +178,7 @@ export class StreamRepo extends Repo<typeof streamsTable._['config']> {
 
       return result;
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to create stream for schedule: ${data.scheduleId}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to create stream for schedule: ${data.scheduleId}`, error);
@@ -215,7 +216,7 @@ export class StreamRepo extends Repo<typeof streamsTable._['config']> {
 
       return result;
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to update stream with ID: ${streamId} in schedule: ${scheduleId}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to update stream with ID: ${streamId} in schedule: ${scheduleId}`, error);
@@ -242,7 +243,7 @@ export class StreamRepo extends Repo<typeof streamsTable._['config']> {
 
       return result.length > 0;
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to delete stream with ID: ${streamId} in schedule: ${scheduleId}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to delete stream with ID: ${streamId} in schedule: ${scheduleId}`, error);
@@ -269,7 +270,7 @@ export class StreamRepo extends Repo<typeof streamsTable._['config']> {
       // Execute all operations in a single batch
       await this.executeBatch(operations);
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError("Failed to bulk write streams", error).toActionError();
       } else {
         throw new DatabaseError("Failed to bulk write streams", error);

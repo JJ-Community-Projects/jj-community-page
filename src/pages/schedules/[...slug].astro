@@ -10,7 +10,7 @@ if (!slug) {
   return Astro.redirect('/error')
 }
 
-const {data, error} = await Astro.callAction(actions.ui.user.schedules.byScheduleSlug, slug)
+const {data, error} = await Astro.callAction(actions.ui.users.schedules.byScheduleSlug, slug)
 console.log('error', error)
 console.log('data', data)
 ---

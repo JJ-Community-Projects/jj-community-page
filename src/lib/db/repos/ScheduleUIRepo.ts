@@ -23,16 +23,22 @@ import {DatabaseError} from "./DatabaseError";
 
 export class ScheduleUIRepo {
   private db: DrizzleD1Database;
-  private env: RepoEnv
+  private env: Env;
+  private repoEnv: RepoEnv
   private scheduleRepo: ScheduleRepo;
+  private streamTagRepo: StreamTagRepo;
+  private streamParticipantsRepo: StreamParticipantsRepo;
 
-  constructor(db: DrizzleD1Database, env: RepoEnv) {
-    this.db = db;
+  constructor(env: Env, repoEnv: RepoEnv) {
+    this.db = drizzle(env.DB);
     this.env = env;
-    this.scheduleRepo = new ScheduleRepo(db, env);
+    this.repoEnv = repoEnv;
+    this.scheduleRepo = new ScheduleRepo(this.env, repoEnv);
+    this.streamTagRepo = new StreamTagRepo(this.env, repoEnv);
+    this.streamParticipantsRepo = new StreamParticipantsRepo(this.env, repoEnv);
   }
   static action(ctx: ActionAPIContext) {
-    return new ScheduleUIRepo(drizzle(ctx.locals.runtime.env.DB), 'action')
+    return new ScheduleUIRepo(ctx.locals.runtime.env, 'action')
   }
 
   /**
@@ -720,9 +726,7 @@ export class ScheduleUIRepo {
         return null
       }
 
-      // Create instances of the repos we need for tags and participants
-      const tagRepo = new StreamTagRepo(this.db, this.env);
-      const participantRepo = new StreamParticipantsRepo(this.db, this.env);
+      // Use the repos initialized in the constructor
 
       // Prepare the result object
       const result: TeamScheduleUI = {
@@ -739,8 +743,8 @@ export class ScheduleUIRepo {
         const scheduleId = schedule.id;
 
         // Fetch all tags and participants for all streams in the schedule at once
-        const tagsByStreamId = await tagRepo.findTagsUIGroupedByStream(scheduleId);
-        const participantsByStreamId = await participantRepo.findParticipantsUIByStream(scheduleId);
+        const tagsByStreamId = await this.streamTagRepo.findTagsUIGroupedByStream(scheduleId);
+        const participantsByStreamId = await this.streamParticipantsRepo.findParticipantsUIByStream(scheduleId);
 
         // Enhance each stream with its tags and participants
         const enhancedStreams = streams.map(stream => {
@@ -771,7 +775,7 @@ export class ScheduleUIRepo {
       return result;
     } catch (error) {
       console.log('ScheduleUI', 'getTeamSchedule', error);
-      if (this.env === 'action') {
+      if (this.repoEnv === 'action') {
         throw new DatabaseError(`Failed to get team schedule for team with id: ${teamId}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to get team schedule for team with id: ${teamId}`, error);

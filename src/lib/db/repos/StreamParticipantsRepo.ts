@@ -1,5 +1,5 @@
 import {Repo, type RepoEnv} from "./Repo.ts";
-import {streamParticipantsTable} from "../schema/schema.ts";
+import {streamParticipantsTable, users} from "../schema/schema.ts";
 import {accounts, userStyles} from "../schema/auth-schema.ts";
 import {drizzle, DrizzleD1Database} from "drizzle-orm/d1";
 import {and, eq, type InferSelectModel, sql} from "drizzle-orm";
@@ -9,12 +9,14 @@ import type {ActionAPIContext} from "astro:actions";
 import type {ParticipantUI} from "../models/schedule-ui.ts";
 
 export class StreamParticipantsRepo extends Repo<typeof streamParticipantsTable._['config']> {
-  constructor(db: DrizzleD1Database, env: RepoEnv) {
-    super(db, streamParticipantsTable, env);
+
+  constructor(env: Env, repoEnv: RepoEnv) {
+    super(env, repoEnv, streamParticipantsTable);
+    this.env = env;
   }
 
   static action(ctx: ActionAPIContext) {
-    return new StreamParticipantsRepo(drizzle(ctx.locals.runtime.env.DB), 'action')
+    return new StreamParticipantsRepo(ctx.locals.runtime.env, 'action')
   }
 
   /**
@@ -35,7 +37,7 @@ export class StreamParticipantsRepo extends Repo<typeof streamParticipantsTable.
         ))
         .all();
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to find participants for stream: ${streamId} in schedule: ${scheduleId}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to find participants for stream: ${streamId} in schedule: ${scheduleId}`, error);
@@ -64,7 +66,7 @@ export class StreamParticipantsRepo extends Repo<typeof streamParticipantsTable.
 
       return result;
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to add participant: ${userId} to stream: ${streamId} in schedule: ${scheduleId}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to add participant: ${userId} to stream: ${streamId} in schedule: ${scheduleId}`, error);
@@ -93,7 +95,7 @@ export class StreamParticipantsRepo extends Repo<typeof streamParticipantsTable.
 
       return result.length > 0;
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to remove participant: ${userId} from stream: ${streamId} in schedule: ${scheduleId}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to remove participant: ${userId} from stream: ${streamId} in schedule: ${scheduleId}`, error);
@@ -125,7 +127,7 @@ export class StreamParticipantsRepo extends Repo<typeof streamParticipantsTable.
 
       await this.executeBatch(operations);
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError("Failed to bulk add stream participants", error).toActionError();
       } else {
         throw new DatabaseError("Failed to bulk add stream participants", error);
@@ -157,7 +159,7 @@ export class StreamParticipantsRepo extends Repo<typeof streamParticipantsTable.
 
       await this.executeBatch(operations);
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError("Failed to bulk remove stream participants", error).toActionError();
       } else {
         throw new DatabaseError("Failed to bulk remove stream participants", error);
@@ -192,7 +194,7 @@ export class StreamParticipantsRepo extends Repo<typeof streamParticipantsTable.
       // Execute all operations in a single batch
       await this.executeBatch(operations);
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError("Failed to bulk write participants", error).toActionError();
       } else {
         throw new DatabaseError("Failed to bulk write participants", error);
@@ -303,7 +305,7 @@ export class StreamParticipantsRepo extends Repo<typeof streamParticipantsTable.
 
       return participantsByStreamId;
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to find participants grouped by stream for schedule ID: ${scheduleId}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to find participants grouped by stream for schedule ID: ${scheduleId}`, error);
@@ -319,6 +321,7 @@ export class StreamParticipantsRepo extends Repo<typeof streamParticipantsTable.
         userId: streamParticipantsTable.userId,
         tiltifyName: accounts.providerUsername,
         providerId: accounts.providerId,
+        primaryLiveStream: users.primaryLiveStream,
         meta: accounts.meta,
         style: {
           primaryColor: userStyles.primaryColor,
@@ -336,6 +339,10 @@ export class StreamParticipantsRepo extends Repo<typeof streamParticipantsTable.
       .leftJoin(
         userStyles,
         eq(streamParticipantsTable.userId, userStyles.userId)
+      )
+      .leftJoin(
+        users,
+        eq(streamParticipantsTable.userId, users.id)
       )
       .where(eq(streamParticipantsTable.scheduleId, scheduleId))
       .all();
@@ -382,7 +389,7 @@ export class StreamParticipantsRepo extends Repo<typeof streamParticipantsTable.
 
       return participantsByStreamId;
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to find ParticipantUI grouped by stream for schedule ID: ${scheduleId}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to find ParticipantUI grouped by stream for schedule ID: ${scheduleId}`, error);

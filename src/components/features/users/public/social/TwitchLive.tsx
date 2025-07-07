@@ -23,7 +23,7 @@ export const TwitchLive: Component<TwitchLiveProps> = (props) => {
     >
       <TwitchIcon class="size-6" />
       <Show when={isLive()} fallback={<p class="text-xxs">{name}</p>}>
-        <div class="bg-red-500 animate-pulse text-white text-xxxs font-bold px-0.5 py-0.25 rounded-full z-10 group-hover:bg-twitch">
+        <div class="bg-red-500 animate-pulse text-white text-xxxs font-bold px-0.5 py-0.25 mt-0.5 rounded-full z-10 group-hover:bg-twitch">
           LIVE
         </div>
       </Show>

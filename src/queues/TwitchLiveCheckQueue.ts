@@ -70,8 +70,7 @@ export class TwitchLiveCheckQueue {
     const notLiveIds = ids.filter(id => !liveIds.includes(id))
 
     // Get database connection and create TwitchRepo instance
-    const db = getDB(env)
-    const twitchRepo = new TwitchRepo(db, 'queue');
+    const twitchRepo = new TwitchRepo(env, 'queue');
 
     try {
       // Delete entries for users who are not live

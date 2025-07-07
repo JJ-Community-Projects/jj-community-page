@@ -13,16 +13,17 @@ import {getDB} from "../db.ts";
  * Repository for working with users
  */
 export class UserRepo extends Repo<typeof users._['config']> {
-  constructor(db: DrizzleD1Database, env: RepoEnv) {
-    super(db, users, env);
+
+  constructor(env: Env, repoEnv: RepoEnv) {
+    super(env, repoEnv, users);
   }
 
   static action(ctx: ActionAPIContext) {
-    return new UserRepo(getDB(ctx), 'action')
+    return new UserRepo(ctx.locals.runtime.env, 'action')
   }
 
   static withEnv(env: Env, repoEnv: RepoEnv) {
-    return new UserRepo(getDB(env), repoEnv)
+    return new UserRepo(env, repoEnv)
   }
 
   // region Basic User Operations
@@ -43,7 +44,7 @@ export class UserRepo extends Repo<typeof users._['config']> {
 
       return result || null;
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to find user by id: ${id}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to find user by id: ${id}`, error);
@@ -63,7 +64,7 @@ export class UserRepo extends Repo<typeof users._['config']> {
         .from(this.table)
         .all();
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError("Failed to find all users", error).toActionError();
       } else {
         throw new DatabaseError("Failed to find all users", error);
@@ -78,7 +79,7 @@ export class UserRepo extends Repo<typeof users._['config']> {
         .where(eq(accounts.provider, 'tiltify'))
         .all();
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError("Failed to find all tiltify accounts", error).toActionError();
       } else {
         throw new DatabaseError("Failed to find all tiltify accounts", error);
@@ -101,7 +102,7 @@ export class UserRepo extends Repo<typeof users._['config']> {
 
       return result;
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError("Failed to create user", error).toActionError();
       } else {
         throw new DatabaseError("Failed to create user", error);
@@ -128,7 +129,7 @@ export class UserRepo extends Repo<typeof users._['config']> {
 
       return result;
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to update user with id: ${id}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to update user with id: ${id}`, error);
@@ -152,7 +153,7 @@ export class UserRepo extends Repo<typeof users._['config']> {
 
       return result.results.length > 0;
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to delete user with id: ${id}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to delete user with id: ${id}`, error);
@@ -176,7 +177,7 @@ export class UserRepo extends Repo<typeof users._['config']> {
         .where(eq(accounts.userId, userId))
         .all();
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to get accounts for user with id: ${userId}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to get accounts for user with id: ${userId}`, error);
@@ -194,7 +195,7 @@ export class UserRepo extends Repo<typeof users._['config']> {
         ))
         .get();
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to get accounts for user with id: ${userId} with provider ${provider}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to get accounts for user with id: ${userId} with provider ${provider}`, error);
@@ -216,7 +217,7 @@ export class UserRepo extends Repo<typeof users._['config']> {
       // Get the Tiltify user data
       const tiltifyUser = await getTiltifyUser(tiltifyToken);
       if (!tiltifyUser) {
-        if (this.env === 'action') {
+        if (this.isAction()) {
           throw new DatabaseError('Failed to get Tiltify user data', null).toActionError();
         } else {
           throw new DatabaseError('Failed to get Tiltify user data', null);
@@ -312,7 +313,7 @@ export class UserRepo extends Repo<typeof users._['config']> {
         results
       };
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError('Failed to fetch socials from Tiltify', error).toActionError();
       } else {
         throw new DatabaseError('Failed to fetch socials from Tiltify', error);
@@ -368,7 +369,7 @@ export class UserRepo extends Repo<typeof users._['config']> {
       }
 
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to search users with term: ${searchTerm}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to search users with term: ${searchTerm}`, error);
@@ -393,7 +394,7 @@ export class UserRepo extends Repo<typeof users._['config']> {
         .where(eq(userTags.userId, userId))
         .all();
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to get tags for user with id: ${userId}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to get tags for user with id: ${userId}`, error);
@@ -423,7 +424,7 @@ export class UserRepo extends Repo<typeof users._['config']> {
 
       return result;
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to add tag ${tag} to user with id: ${userId}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to add tag ${tag} to user with id: ${userId}`, error);
@@ -452,7 +453,7 @@ export class UserRepo extends Repo<typeof users._['config']> {
 
       return result.results.length > 0;
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to remove tag ${tag} from user with id: ${userId}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to remove tag ${tag} from user with id: ${userId}`, error);
@@ -485,7 +486,7 @@ export class UserRepo extends Repo<typeof users._['config']> {
         .limit(limit)
         .all();
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to get popular tags`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to get popular tags`, error);
@@ -540,7 +541,7 @@ export class UserRepo extends Repo<typeof users._['config']> {
         .limit(limit)
         .all();
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to get suggested tags for user with id: ${userId}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to get suggested tags for user with id: ${userId}`, error);
@@ -599,7 +600,7 @@ export class UserRepo extends Repo<typeof users._['config']> {
         .limit(limit)
         .all();
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to get suggested tags for user with id: ${userId} and term: ${term}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to get suggested tags for user with id: ${userId} and term: ${term}`, error);
@@ -624,7 +625,7 @@ export class UserRepo extends Repo<typeof users._['config']> {
         .where(eq(userSocials.userId, userId))
         .all();
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to get social media links for user with id: ${userId}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to get social media links for user with id: ${userId}`, error);
@@ -681,7 +682,7 @@ export class UserRepo extends Repo<typeof users._['config']> {
         return result;
       }
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to add social media link for provider ${provider} to user with id: ${userId}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to add social media link for provider ${provider} to user with id: ${userId}`, error);
@@ -710,7 +711,7 @@ export class UserRepo extends Repo<typeof users._['config']> {
 
       return result.results.length > 0;
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to remove social media link for provider ${provider} from user with id: ${userId}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to remove social media link for provider ${provider} from user with id: ${userId}`, error);
@@ -768,7 +769,7 @@ export class UserRepo extends Repo<typeof users._['config']> {
     } catch (error) {
       console.error('Error in getUserByTiltifyUsername:', error);
 
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to get user by tiltify username: ${tiltifyUsername}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to get user by tiltify username: ${tiltifyUsername}`, error);
@@ -807,7 +808,7 @@ export class UserRepo extends Repo<typeof users._['config']> {
       // If no result or no blockedAccount found, the account is not blocked
       return !!result?.blockedAccount;
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to check if tiltify account is blocked for username: ${tiltifyUsername}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to check if tiltify account is blocked for username: ${tiltifyUsername}`, error);
@@ -879,7 +880,7 @@ export class UserRepo extends Repo<typeof users._['config']> {
 
       return recommendations;
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to get recommended users for user with id: ${currentUserId}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to get recommended users for user with id: ${currentUserId}`, error);
@@ -905,7 +906,7 @@ export class UserRepo extends Repo<typeof users._['config']> {
   }
 
   async getTwitchChannelByUserId(userId: number) {
-    const twitchRepo = new TwitchRepo(this.db, this.env);
+    const twitchRepo = new TwitchRepo(this.env, this.repoEnv);
     return twitchRepo.getChannelByUserId(userId);
   }
 
@@ -915,7 +916,7 @@ export class UserRepo extends Repo<typeof users._['config']> {
     if (!channel) return null;
 
     // Then get the stream using the channel's Twitch ID
-    const twitchRepo = new TwitchRepo(this.db, this.env);
+    const twitchRepo = new TwitchRepo(this.env, this.repoEnv);
     return twitchRepo.getStreamByUserId(channel.id);
   }
 

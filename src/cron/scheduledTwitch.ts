@@ -8,8 +8,7 @@ export async function scheduledTwitch(
   ctx: ExecutionContext
 ) {
   console.log('scheduledTwitch')
-  const db = getDB(env)
-  const twitchRepo = new TwitchRepo(db, 'cron');
+  const twitchRepo = new TwitchRepo(env, 'cron');
 
   // Get all Twitch channels
   const twitchChannels = await twitchRepo.getAllChannels();

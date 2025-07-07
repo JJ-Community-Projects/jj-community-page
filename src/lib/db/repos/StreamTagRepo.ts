@@ -9,12 +9,13 @@ import type {ActionAPIContext} from "astro:actions";
 import type {TagUI} from "../models/TagUI.ts";
 
 export class StreamTagRepo extends Repo<typeof streamTagsTable._['config']> {
-  constructor(db: DrizzleD1Database, env: RepoEnv) {
-    super(db, streamTagsTable, env);
+
+  constructor(env: Env, repoEnv: RepoEnv) {
+    super(env, repoEnv, streamTagsTable);
   }
 
   static action(ctx: ActionAPIContext) {
-    return new StreamTagRepo(drizzle(ctx.locals.runtime.env.DB), 'action')
+    return new StreamTagRepo(ctx.locals.runtime.env, 'action')
   }
 
   /**
@@ -35,7 +36,7 @@ export class StreamTagRepo extends Repo<typeof streamTagsTable._['config']> {
         ))
         .all();
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to find tags for stream: ${streamId} in schedule: ${scheduleId}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to find tags for stream: ${streamId} in schedule: ${scheduleId}`, error);
@@ -64,7 +65,7 @@ export class StreamTagRepo extends Repo<typeof streamTagsTable._['config']> {
 
       return tagsByStreamId;
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to find tags grouped by stream for schedule ID: ${scheduleId}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to find tags grouped by stream for schedule ID: ${scheduleId}`, error);
@@ -97,7 +98,7 @@ export class StreamTagRepo extends Repo<typeof streamTagsTable._['config']> {
 
       return tagsByStreamId;
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to find TagUI grouped by stream for schedule ID: ${scheduleId}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to find TagUI grouped by stream for schedule ID: ${scheduleId}`, error);
@@ -132,7 +133,7 @@ export class StreamTagRepo extends Repo<typeof streamTagsTable._['config']> {
 
       return result;
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to add tag: ${tag} to stream: ${streamId} in schedule: ${scheduleId}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to add tag: ${tag} to stream: ${streamId} in schedule: ${scheduleId}`, error);
@@ -163,7 +164,7 @@ export class StreamTagRepo extends Repo<typeof streamTagsTable._['config']> {
 
       return result.length > 0;
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to remove tag: ${tag} from stream: ${streamId} in schedule: ${scheduleId}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to remove tag: ${tag} from stream: ${streamId} in schedule: ${scheduleId}`, error);
@@ -189,7 +190,7 @@ export class StreamTagRepo extends Repo<typeof streamTagsTable._['config']> {
         .limit(limit)
         .all();
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError('Failed to get popular tags', error).toActionError()
       } else {
         throw new DatabaseError('Failed to get popular tags', error);
@@ -218,7 +219,7 @@ export class StreamTagRepo extends Repo<typeof streamTagsTable._['config']> {
         .limit(limit)
         .all();
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError('Failed to get suggested tags', error).toActionError()
       } else {
         throw new DatabaseError('Failed to get suggested tags', error);
@@ -250,7 +251,7 @@ export class StreamTagRepo extends Repo<typeof streamTagsTable._['config']> {
         .limit(limit)
         .all();
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError('Failed to get suggested tags', error).toActionError()
       } else {
         throw new DatabaseError('Failed to get suggested tags', error);
@@ -288,7 +289,7 @@ export class StreamTagRepo extends Repo<typeof streamTagsTable._['config']> {
 
       await this.executeBatch(operations);
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError("Failed to bulk add stream tags", error).toActionError();
       } else {
         throw new DatabaseError("Failed to bulk add stream tags", error);
@@ -318,7 +319,7 @@ export class StreamTagRepo extends Repo<typeof streamTagsTable._['config']> {
 
       await this.executeBatch(operations);
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError("Failed to bulk remove stream tags", error).toActionError();
       } else {
         throw new DatabaseError("Failed to bulk remove stream tags", error);
@@ -353,7 +354,7 @@ export class StreamTagRepo extends Repo<typeof streamTagsTable._['config']> {
       // Execute all operations in a single batch
       await this.executeBatch(operations);
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError("Failed to bulk write tags", error).toActionError();
       } else {
         throw new DatabaseError("Failed to bulk write tags", error);

@@ -52,11 +52,10 @@ export class ScheduleEditorDO extends TinybaseDO {
    */
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env)
-    const db = drizzle(env.DB)
-    this.scheduleRepo = new ScheduleRepo(db, 'do')
-    this.streamRepo = new StreamRepo(db, 'do')
-    this.tagRepo = new StreamTagRepo(db, 'do')
-    this.participantRepo = new StreamParticipantsRepo(db, 'do')
+    this.scheduleRepo = new ScheduleRepo(env, 'do')
+    this.streamRepo = new StreamRepo(env, 'do')
+    this.tagRepo = new StreamTagRepo(env, 'do')
+    this.participantRepo = new StreamParticipantsRepo(env, 'do')
   }
 
   /**

@@ -12,19 +12,23 @@ import {TwitchRepo} from "./TwitchRepo.ts";
 
 export class UserUIRepo {
   private db: DrizzleD1Database
-  private env: RepoEnv
+  private repoEnv: RepoEnv
   private userRepo: UserRepo;
   private scheduleUIRepo: ScheduleUIRepo;
+  private twitchRepo: TwitchRepo;
+  private env: Env
 
-  constructor(db: DrizzleD1Database, env: RepoEnv) {
-    this.db = db;
+  constructor(env: Env, repoEnv: RepoEnv) {
+    this.db = drizzle(env.DB);
     this.env = env;
-    this.userRepo = new UserRepo(db, env);
-    this.scheduleUIRepo = new ScheduleUIRepo(db, env);
+    this.repoEnv = repoEnv;
+    this.userRepo = new UserRepo(this.env, repoEnv);
+    this.scheduleUIRepo = new ScheduleUIRepo(this.env, repoEnv);
+    this.twitchRepo = new TwitchRepo(this.env, repoEnv);
   }
 
   static action(ctx: ActionAPIContext) {
-    return new UserUIRepo(drizzle(ctx.locals.runtime.env.DB), 'action')
+    return new UserUIRepo(ctx.locals.runtime.env, 'action')
   }
 
   private async getUserPageData(user: {
@@ -53,36 +57,14 @@ export class UserUIRepo {
 
     const tiltifyAccount = user.meta
 
-    const twitchRepo = new TwitchRepo(this.db, this.env);
-    const twitchChannel = await twitchRepo.getChannelByUserId(user.id)
-
-    const userStyle = await this.db
-      .select()
-      .from(userStyles)
-      .where(eq(userStyles.userId, user.id))
-      .get()
+    const twitchChannel = await this.twitchRepo.getChannelByUserId(user.id)
 
     const schedule = await this.scheduleUIRepo.getCurrentPrimary(user.id)
 
-    // Determine profile image URL based on requirements
-    let profileImageUrl = '';
-    if (twitchChannel && twitchChannel.profileImageUrl) {
-      profileImageUrl = twitchChannel.profileImageUrl;
-    } else if (tiltifyAccount && tiltifyAccount.avatar && tiltifyAccount.avatar.src) {
-      profileImageUrl = tiltifyAccount.avatar.src;
-    }
+    // Get the user's style using the getUserStyle method
+    const style = await this.getUserStyle(user.id);
 
-    // Create the style object
-    const style: UserStyle = {
-      primaryColor: userStyle?.primaryColor || '#E30E50',
-      accentColor: userStyle?.accentColor || '#3584BF',
-      profileImage: {
-        default: profileImageUrl,
-        mobile: profileImageUrl
-      }
-    };
-
-    const stream = twitchChannel ? await twitchRepo.getStreamByUserId(twitchChannel.id): null
+    const stream = twitchChannel ? await this.twitchRepo.getStreamByUserId(twitchChannel.id): null
 
     // Create the live state object
     const liveState: UserLiveState = {
@@ -237,5 +219,48 @@ export class UserUIRepo {
 
     // Wait for all transformations to complete
     return Promise.all(userPromises);
+  }
+
+  /**
+   * Get the UserStyle for a specific user
+   * @param userId The ID of the user
+   * @returns Promise<UserStyle> The user's style information
+   */
+  async getUserStyle(userId: number): Promise<UserStyle> {
+    // Get the user's Tiltify data
+    const userData = await this.getTiltifyAndUserDataById(userId);
+
+    // Get the user's style from the database
+    const userStyle = await this.db
+      .select()
+      .from(userStyles)
+      .where(eq(userStyles.userId, userId))
+      .get();
+
+    // Get the user's Twitch channel
+    const twitchChannel = await this.twitchRepo.getChannelByUserId(userId);
+
+    // Determine profile image URL based on requirements
+    let profileImageUrl = '';
+    if (twitchChannel && twitchChannel.profileImageUrl) {
+      profileImageUrl = twitchChannel.profileImageUrl;
+    } else if (userData && userData.meta && userData.meta.avatar && userData.meta.avatar.src) {
+      profileImageUrl = userData.meta.avatar.src;
+    }
+
+    // Create and return the style object
+    return {
+      primaryColor: userStyle?.primaryColor || '#E30E50',
+      accentColor: userStyle?.accentColor || '#3584BF',
+      profileImage: {
+        default: profileImageUrl,
+        mobile: profileImageUrl
+      }
+    };
+  }
+
+
+  private getCachedUserPageUI(userId: number) {
+
   }
 }

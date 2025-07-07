@@ -153,9 +153,8 @@ export const UserTagsSection: Component = () => {
   };
 
   return (
-    <div class="bg-white rounded-2xl shadow-xl p-6 mb-6">
+    <div class="bg-white p-6">
       <div class="flex justify-between items-center mb-4">
-        <h3 class="text-xl font-bold">User Tags</h3>
         <button
           type="button"
           onClick={modal.open}

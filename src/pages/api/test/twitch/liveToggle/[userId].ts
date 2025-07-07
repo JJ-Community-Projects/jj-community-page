@@ -11,8 +11,7 @@ export const GET: APIRoute = async (ctx) => {
   }
 
   // Get database connection and create TwitchRepo instance
-  const db = getDB(ctx);
-  const twitchRepo = new TwitchRepo(db, 'api');
+  const twitchRepo = new TwitchRepo(ctx.locals.runtime.env, 'api');
 
   try {
     // Get the twitch channel by userId

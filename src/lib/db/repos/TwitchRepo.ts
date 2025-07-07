@@ -9,16 +9,17 @@ import {TwitchLiveNotifierQueue} from "../../../queues/TwitchLiveNotifierQueue.t
 import {getDB} from "../db.ts";
 
 export class TwitchRepo extends Repo<typeof twitchChannelSchema._['config']> {
-  constructor(db: DrizzleD1Database, env: RepoEnv) {
-    super(db, twitchChannelSchema, env);
+
+  constructor(env: Env, repoEnv: RepoEnv) {
+    super(env, repoEnv, twitchChannelSchema);
   }
 
   static action(ctx: ActionAPIContext) {
-    return new TwitchRepo(drizzle(ctx.locals.runtime.env.DB), 'action')
+    return new TwitchRepo(ctx.locals.runtime.env, 'action')
   }
 
   static withEnv(env: Env, repoEnv: RepoEnv) {
-    return new TwitchRepo(getDB(env), repoEnv)
+    return new TwitchRepo(env, repoEnv)
   }
   /**
    * Get all Twitch channels
@@ -32,7 +33,7 @@ export class TwitchRepo extends Repo<typeof twitchChannelSchema._['config']> {
         .from(twitchChannelSchema)
         .all();
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError("Failed to get all Twitch channels", error).toActionError();
       } else {
         throw new DatabaseError("Failed to get all Twitch channels", error);
@@ -56,7 +57,7 @@ export class TwitchRepo extends Repo<typeof twitchChannelSchema._['config']> {
 
       return result || null;
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to get Twitch channel for user ID: ${userId}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to get Twitch channel for user ID: ${userId}`, error);
@@ -79,7 +80,7 @@ export class TwitchRepo extends Repo<typeof twitchChannelSchema._['config']> {
 
       return result || null;
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to get Twitch channel for twitch ID: ${twitchId}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to get Twitch channel for twitch ID: ${twitchId}`, error);
@@ -102,7 +103,7 @@ export class TwitchRepo extends Repo<typeof twitchChannelSchema._['config']> {
 
       return result;
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to insert Twitch channel for user ID: ${data.userId}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to insert Twitch channel for user ID: ${data.userId}`, error);
@@ -125,7 +126,7 @@ export class TwitchRepo extends Repo<typeof twitchChannelSchema._['config']> {
 
       return result.length > 0;
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to delete Twitch channel for user ID: ${userId}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to delete Twitch channel for user ID: ${userId}`, error);
@@ -145,7 +146,7 @@ export class TwitchRepo extends Repo<typeof twitchChannelSchema._['config']> {
         .from(twitchStreamSchema)
         .all();
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError("Failed to get all Twitch streams", error).toActionError();
       } else {
         throw new DatabaseError("Failed to get all Twitch streams", error);
@@ -169,7 +170,7 @@ export class TwitchRepo extends Repo<typeof twitchChannelSchema._['config']> {
 
       return result || null;
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to get Twitch stream for twitch ID: ${twitchId}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to get Twitch stream for twitch ID: ${twitchId}`, error);
@@ -192,7 +193,7 @@ export class TwitchRepo extends Repo<typeof twitchChannelSchema._['config']> {
 
       return result;
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to insert Twitch stream for user ID: ${data.twitchId}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to insert Twitch stream for user ID: ${data.twitchId}`, error);
@@ -215,7 +216,7 @@ export class TwitchRepo extends Repo<typeof twitchChannelSchema._['config']> {
 
       return result.length > 0;
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to delete Twitch stream for Twitch ID: ${twitchId}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to delete Twitch stream for Twitch ID: ${twitchId}`, error);
@@ -243,7 +244,7 @@ export class TwitchRepo extends Repo<typeof twitchChannelSchema._['config']> {
       // TODO queue TwitchLiveNotifierQueue
 
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError("Failed to insert multiple Twitch streams", error).toActionError();
       } else {
         throw new DatabaseError("Failed to insert multiple Twitch streams", error);
@@ -266,7 +267,7 @@ export class TwitchRepo extends Repo<typeof twitchChannelSchema._['config']> {
       // Execute all operations in a single batch
       await this.executeBatch(operations);
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError("Failed to delete multiple Twitch streams", error).toActionError();
       } else {
         throw new DatabaseError("Failed to delete multiple Twitch streams", error);

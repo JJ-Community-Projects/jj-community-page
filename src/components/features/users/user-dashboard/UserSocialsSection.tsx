@@ -601,9 +601,8 @@ export const UserSocialsSection: Component = () => {
   };
 
   return (
-    <div class="bg-white rounded-2xl shadow-xl p-6 mb-6">
-      <div class="flex justify-between items-center mb-4">
-        <h2 class="text-xl font-bold">Social Media Links</h2>
+    <div class="bg-white p-6">
+      <div class="flex justify-end mb-4">
         <button
           type="button"
           onClick={handleFetchSocialsFromTiltify}

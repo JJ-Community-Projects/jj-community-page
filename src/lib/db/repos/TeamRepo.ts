@@ -12,12 +12,15 @@ import {accounts} from "../schema/auth-schema";
  * Repository for working with teams
  */
 export class TeamRepo extends Repo<typeof teamsTable._['config']> {
-  constructor(db: DrizzleD1Database, env: RepoEnv) {
-    super(db, teamsTable, env);
+  private userRepo: UserRepo;
+
+  constructor(env: Env, repoEnv: RepoEnv) {
+    super(env, repoEnv, teamsTable);
+    this.userRepo = new UserRepo(this.env, this.repoEnv);
   }
 
   static action(ctx: ActionAPIContext) {
-    return new TeamRepo(drizzle(ctx.locals.runtime.env.DB), 'action')
+    return new TeamRepo(ctx.locals.runtime.env, 'action')
   }
 
   // region Basic Team Operations
@@ -37,7 +40,7 @@ export class TeamRepo extends Repo<typeof teamsTable._['config']> {
 
       return result || null;
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to find team by id: ${id}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to find team by id: ${id}`, error);
@@ -61,7 +64,7 @@ export class TeamRepo extends Repo<typeof teamsTable._['config']> {
 
       return result || null;
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to find team by slug: ${slug}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to find team by slug: ${slug}`, error);
@@ -83,7 +86,7 @@ export class TeamRepo extends Repo<typeof teamsTable._['config']> {
         .where(eq(this.table.ownerId, ownerId))
         .all();
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to find teams by owner ID: ${ownerId}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to find teams by owner ID: ${ownerId}`, error);
@@ -104,7 +107,7 @@ export class TeamRepo extends Repo<typeof teamsTable._['config']> {
         .where(eq(this.table.visible, true))
         .all();
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError("Failed to find visible teams", error).toActionError();
       } else {
         throw new DatabaseError("Failed to find visible teams", error);
@@ -165,7 +168,7 @@ export class TeamRepo extends Repo<typeof teamsTable._['config']> {
 
       return allTeams;
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to find visible teams for user with id: ${userId}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to find visible teams for user with id: ${userId}`, error);
@@ -241,7 +244,7 @@ export class TeamRepo extends Repo<typeof teamsTable._['config']> {
 
       return allTeams;
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to find visible teams for user with Tiltify username: ${username}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to find visible teams for user with Tiltify username: ${username}`, error);
@@ -261,7 +264,7 @@ export class TeamRepo extends Repo<typeof teamsTable._['config']> {
         .from(this.table)
         .all();
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError("Failed to find all teams", error).toActionError();
       } else {
         throw new DatabaseError("Failed to find all teams", error);
@@ -284,7 +287,7 @@ export class TeamRepo extends Repo<typeof teamsTable._['config']> {
 
       return result;
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError("Failed to create team", error).toActionError();
       } else {
         throw new DatabaseError("Failed to create team", error);
@@ -309,7 +312,7 @@ export class TeamRepo extends Repo<typeof teamsTable._['config']> {
 
       return result;
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to update team with id: ${id}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to update team with id: ${id}`, error);
@@ -332,7 +335,7 @@ export class TeamRepo extends Repo<typeof teamsTable._['config']> {
 
       return result.results.length > 0;
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to delete team with id: ${id}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to delete team with id: ${id}`, error);
@@ -358,7 +361,7 @@ export class TeamRepo extends Repo<typeof teamsTable._['config']> {
         .all();
     } catch (error) {
       console.log('TeamRepo', 'getTeamMembers', error)
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to get members for team with id: ${teamId}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to get members for team with id: ${teamId}`, error);
@@ -385,7 +388,7 @@ export class TeamRepo extends Repo<typeof teamsTable._['config']> {
 
       return result;
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to add user ${userId} to team with id: ${teamId}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to add user ${userId} to team with id: ${teamId}`, error);
@@ -414,7 +417,7 @@ export class TeamRepo extends Repo<typeof teamsTable._['config']> {
 
       return result.results.length > 0;
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to remove user ${userId} from team with id: ${teamId}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to remove user ${userId} from team with id: ${teamId}`, error);
@@ -444,7 +447,7 @@ export class TeamRepo extends Repo<typeof teamsTable._['config']> {
 
       return !!result;
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to check if user ${userId} is a member of team with id: ${teamId}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to check if user ${userId} is a member of team with id: ${teamId}`, error);
@@ -469,7 +472,7 @@ export class TeamRepo extends Repo<typeof teamsTable._['config']> {
         .where(eq(teamInvitesTable.teamId, teamId))
         .all();
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to get invites for team with id: ${teamId}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to get invites for team with id: ${teamId}`, error);
@@ -491,7 +494,7 @@ export class TeamRepo extends Repo<typeof teamsTable._['config']> {
         .where(eq(teamInvitesTable.invitedUserId, userId))
         .all();
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to get invites for user with id: ${userId}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to get invites for user with id: ${userId}`, error);
@@ -518,7 +521,7 @@ export class TeamRepo extends Repo<typeof teamsTable._['config']> {
 
       return result;
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to add invite for user ${invitedUserId} to team with id: ${teamId}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to add invite for user ${invitedUserId} to team with id: ${teamId}`, error);
@@ -547,7 +550,7 @@ export class TeamRepo extends Repo<typeof teamsTable._['config']> {
 
       return result.results.length > 0;
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to delete invite for user ${invitedUserId} from team with id: ${teamId}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to delete invite for user ${invitedUserId} from team with id: ${teamId}`, error);
@@ -577,7 +580,7 @@ export class TeamRepo extends Repo<typeof teamsTable._['config']> {
 
       return !!result;
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to check if user ${invitedUserId} has been invited to team with id: ${teamId}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to check if user ${invitedUserId} has been invited to team with id: ${teamId}`, error);
@@ -612,7 +615,7 @@ export class TeamRepo extends Repo<typeof teamsTable._['config']> {
 
       return true;
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to accept invite for user ${invitedUserId} to team with id: ${teamId}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to accept invite for user ${invitedUserId} to team with id: ${teamId}`, error);
@@ -632,7 +635,7 @@ export class TeamRepo extends Repo<typeof teamsTable._['config']> {
     try {
       return await this.deleteInvite(teamId, invitedUserId);
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to reject invite for user ${invitedUserId} to team with id: ${teamId}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to reject invite for user ${invitedUserId} to team with id: ${teamId}`, error);
@@ -656,11 +659,10 @@ export class TeamRepo extends Repo<typeof teamsTable._['config']> {
    */
   async findTeamsByTiltifyUsername(tiltifyUsername: string): Promise<InferSelectModel<typeof teamsTable>[]> {
     try {
-      // Create a UserRepo instance to find the user by tiltify username
-      const userRepo = new UserRepo(this.db, this.env);
+      // Use the userRepo initialized in the constructor
 
       // Get the user data by tiltify username
-      const userData = await userRepo.getUserByTiltifyUsername(tiltifyUsername);
+      const userData = await this.userRepo.getUserByTiltifyUsername(tiltifyUsername);
 
       // If no user found, return empty array
       if (!userData) {
@@ -689,7 +691,7 @@ export class TeamRepo extends Repo<typeof teamsTable._['config']> {
       // Combine owned and member teams
       return [...ownedTeams, ...memberTeams];
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to find teams for tiltify username: ${tiltifyUsername}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to find teams for tiltify username: ${tiltifyUsername}`, error);
@@ -713,9 +715,6 @@ export class TeamRepo extends Repo<typeof teamsTable._['config']> {
     try {
       // Get all visible teams
       const visibleTeams = await this.findVisible();
-
-      // Create a UserRepo instance to find tiltify usernames
-      const userRepo = new UserRepo(this.db, this.env);
 
       // Process each team to add member count and owner tiltify username
       const result = [];
@@ -750,7 +749,7 @@ export class TeamRepo extends Repo<typeof teamsTable._['config']> {
 
       return result;
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError("Failed to find visible teams with member count", error).toActionError();
       } else {
         throw new DatabaseError("Failed to find visible teams with member count", error);

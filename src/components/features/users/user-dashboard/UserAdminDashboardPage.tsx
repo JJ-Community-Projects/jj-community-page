@@ -5,6 +5,7 @@ import {UserTagsSection} from "./UserTagsSection.tsx";
 import {UserSocialsSection} from "./UserSocialsSection.tsx";
 import {UserStylesSection} from "./UserStylesSection.tsx";
 import {DebugJSONView} from "../../../common/DebugJSONView.tsx";
+import "./UserAdminDashboardPage.css";
 
 
 const ProfileCard: Component = () => {
@@ -23,7 +24,7 @@ const ProfileCard: Component = () => {
     return ''
   }
   return (
-    <div class="bg-white rounded-2xl shadow-xl p-6 mb-6">
+    <div class="bg-white rounded-2xl shadow-xl p-6">
       <div class="flex justify-between items-center mb-4">
         <div class={'flex flex-col'}>
           <div class={'flex flex-col'}>
@@ -112,10 +113,10 @@ const TeamCard: Component = () => {
 }
 
 const Root: Component = () => {
-  const {user, local} = useUser();
+  const {local} = useUser();
 
   return (
-    <div class="max-w-6xl mx-auto px-4 py-8 flex flex-col gap-4">
+    <div class="w-6xl mx-auto px-4 py-8 flex flex-col gap-4">
       {/* Profile Card with Tiltify Links */}
       <ProfileCard/>
 

@@ -14,16 +14,16 @@ const baseClasses = "rounded-full px-2 py-1 text-sm inline-flex items-center";
 let variantClasses = "";
 switch(variant) {
   case 'interactive':
-    variantClasses = "bg-accent-200 hover:bg-accent-300 text-white cursor-pointer transition-colors";
+    variantClasses = "bg-accent-200 hover:bg-accent-300 text-white cursor-pointer transition-colors text-xs";
     break;
   case 'charity':
-    variantClasses = "bg-primary-200 hover:bg-primary-300 text-white cursor-pointer transition-colors";
+    variantClasses = "bg-primary-200 hover:bg-primary-300 text-white cursor-pointer transition-colors text-xs";
     break;
   case 'selected':
-    variantClasses = "bg-accent/10 text-accent";
+    variantClasses = "bg-accent/10 text-accent text-xs";
     break;
   default:
-    variantClasses = "bg-accent-100 text-accent-800";
+    variantClasses = "bg-accent-100 text-accent-800 text-xs";
     break;
 }
 

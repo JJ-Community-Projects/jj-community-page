@@ -835,8 +835,7 @@ export class UserDO extends TinybaseDO {
 
     const channel = data.data[0]
 
-    const db = drizzle(this.env.DB);
-    const twitchRepo = new TwitchRepo(db, 'do');
+    const twitchRepo = new TwitchRepo(this.env, 'do');
 
     // Insert or update the channel
     const dbChannel = await twitchRepo.insertChannel({
@@ -894,7 +893,7 @@ export class UserDO extends TinybaseDO {
       this.log('removeSocial', 'Social removed successfully', normalizedProvider);
 
       if (provider === 'twitch') {
-        const twitchRepo = new TwitchRepo(db, 'do');
+        const twitchRepo = new TwitchRepo(this.env, 'do');
         await twitchRepo.deleteChannel(parseInt(doIdentifier));
       }
 
@@ -969,8 +968,7 @@ export class UserDO extends TinybaseDO {
     if (!this.store) {
       return;
     }
-    const db = drizzle(this.env.DB);
-    const twitchRepo = new TwitchRepo(db, 'do');
+    const twitchRepo = new TwitchRepo(this.env, 'do');
 
     const dbChannel = await twitchRepo.getChannelByUserId(parseInt(doIdentifier));
     if (!dbChannel) {
@@ -990,8 +988,7 @@ export class UserDO extends TinybaseDO {
       return;
     }
 
-    const db = drizzle(this.env.DB);
-    const repo = new UserRepo(db, 'do')
+    const repo = new UserRepo(this.env, 'do')
     const account = await repo.getTiltifyMetaData(parseInt(doIdentifier))
     if (!account) {
       return;

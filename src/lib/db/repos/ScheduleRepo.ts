@@ -17,12 +17,21 @@ import {TeamRepo} from "./TeamRepo.ts";
  * Repository for working with schedules
  */
 export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
-  constructor(db: DrizzleD1Database, env: RepoEnv) {
-    super(db, schedulesTable, env);
+  private streamRepo: StreamRepo;
+  private streamTagRepo: StreamTagRepo;
+  private streamParticipantsRepo: StreamParticipantsRepo;
+  private teamRepo: TeamRepo;
+
+  constructor(env: Env, repoEnv: RepoEnv) {
+    super(env, repoEnv,schedulesTable);
+    this.streamRepo = new StreamRepo(this.env, this.repoEnv);
+    this.streamTagRepo = new StreamTagRepo(this.env, this.repoEnv);
+    this.streamParticipantsRepo = new StreamParticipantsRepo(this.env, this.repoEnv);
+    this.teamRepo = new TeamRepo(this.env, this.repoEnv);
   }
 
   static action(ctx: ActionAPIContext) {
-    return new ScheduleRepo(drizzle(ctx.locals.runtime.env.DB), 'action')
+    return new ScheduleRepo(ctx.locals.runtime.env, 'action')
   }
 
   /**
@@ -41,7 +50,7 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
 
       return result || null;
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to find record by id: ${id}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to find record by id: ${id}`, error);
@@ -65,7 +74,7 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
 
       return result || null;
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to find schedule by slug: ${slug}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to find schedule by slug: ${slug}`, error);
@@ -87,7 +96,7 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
         .where(eq(this.table.ownerId, ownerId))
         .all();
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to find schedules by owner ID: ${ownerId}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to find schedules by owner ID: ${ownerId}`, error);
@@ -108,7 +117,7 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
         .where(eq(this.table.visible, true))
         .all();
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError("Failed to find visible schedules", error).toActionError();
       } else {
         throw new DatabaseError("Failed to find visible schedules", error);
@@ -128,7 +137,7 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
         .from(this.table)
         .all();
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError("Failed to find all records", error).toActionError();
       } else {
         throw new DatabaseError("Failed to find all records", error);
@@ -151,7 +160,7 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
 
       return result;
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError("Failed to create record", error).toActionError();
       } else {
         throw new DatabaseError("Failed to create record", error);
@@ -179,7 +188,7 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
 
       return result;
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to update record with id: ${id}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to update record with id: ${id}`, error);
@@ -206,7 +215,7 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
       return result.length > 0;
     } catch (error) {
       console.log('ScheduleRepo', 'delete', error)
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to delete record with id: ${id}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to delete record with id: ${id}`, error);
@@ -231,7 +240,7 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
 
       return result;
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to set visibility for schedule with id: ${id}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to set visibility for schedule with id: ${id}`, error);
@@ -281,22 +290,20 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
     }
   ): Promise<void> {
     try {
-      const streamRepo = new StreamRepo(this.db, this.env);
-      const tagRepo = new StreamTagRepo(this.db, this.env);
-      const participantRepo = new StreamParticipantsRepo(this.db, this.env);
+      // Use the repos initialized in the constructor
 
       // Collect operations from each repository
       const operations: BatchItem<'sqlite'>[] = [
-        ...streamRepo.getStreamOperations(scheduleId, data.streams),
-        ...tagRepo.getStreamTagsOperations(scheduleId, data.tags),
-        ...participantRepo.getStreamParticipantsOperations(scheduleId, data.participants)
+        ...this.streamRepo.getStreamOperations(scheduleId, data.streams),
+        ...this.streamTagRepo.getStreamTagsOperations(scheduleId, data.tags),
+        ...this.streamParticipantsRepo.getStreamParticipantsOperations(scheduleId, data.participants)
       ];
       // Execute all operations in a single batch
       await this.executeBatch(operations);
     } catch (error) {
 
       console.error('ScheduleRepo', 'updateSchedule', error);
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError("Failed to update schedule", error).toActionError();
       } else {
         throw new DatabaseError("Failed to update schedule", error);
@@ -370,7 +377,7 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
         streams: streams
       };
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to find next schedule for user: ${userId}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to find next schedule for user: ${userId}`, error);
@@ -419,7 +426,7 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
       // Extract and return the schedules
       return schedules.map(result => result.schedule);
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to find schedules for tiltify username: ${tiltifyUsername}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to find schedules for tiltify username: ${tiltifyUsername}`, error);
@@ -489,7 +496,7 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
         streams: streams
       };
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to find next schedule for tiltify username: ${tiltifyUsername}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to find next schedule for tiltify username: ${tiltifyUsername}`, error);
@@ -519,16 +526,14 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
         return null;
       }
 
-      // Create instances of the repos we need
-      const tagRepo = new StreamTagRepo(this.db, this.env);
-      const participantRepo = new StreamParticipantsRepo(this.db, this.env);
+      // Use the repos initialized in the constructor
 
       // Get the schedule ID
       const scheduleId = basicResult.schedule.id;
 
       // Fetch all tags and participants for all streams in the schedule at once
-      const tagsByStreamId = await tagRepo.findTagsUIGroupedByStream(scheduleId);
-      const participantsByStreamId = await participantRepo.findParticipantsUIByStream(scheduleId);
+      const tagsByStreamId = await this.streamTagRepo.findTagsUIGroupedByStream(scheduleId);
+      const participantsByStreamId = await this.streamParticipantsRepo.findParticipantsUIByStream(scheduleId);
 
       // Enhance each stream with its tags and participants
       const enhancedStreams = basicResult.streams.map(stream => {
@@ -545,7 +550,7 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
         streams: enhancedStreams
       };
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to find next schedule with full details for tiltify username: ${tiltifyUsername}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to find next schedule with full details for tiltify username: ${tiltifyUsername}`, error);
@@ -589,13 +594,11 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
         .all();
       console.log(streams)
 
-      // Create instances of the repos we need
-      const tagRepo = new StreamTagRepo(this.db, this.env);
-      const participantRepo = new StreamParticipantsRepo(this.db, this.env);
+      // Use the repos initialized in the constructor
 
       // Fetch all tags and participants for all streams in the schedule at once
-      const tagsByStreamId = await tagRepo.findTagsUIGroupedByStream(schedule.id);
-      const participantsByStreamId = await participantRepo.findParticipantsUIByStream(schedule.id);
+      const tagsByStreamId = await this.streamTagRepo.findTagsUIGroupedByStream(schedule.id);
+      const participantsByStreamId = await this.streamParticipantsRepo.findParticipantsUIByStream(schedule.id);
 
       // Enhance each stream with its tags and participants
       const enhancedStreams = streams.map(stream => {
@@ -612,7 +615,7 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
         streams: enhancedStreams
       };
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to find schedule with full details by slug: ${slug}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to find schedule with full details by slug: ${slug}`, error);
@@ -665,7 +668,7 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
       // Return the updated schedule
       return await this.findById(scheduleId) as Schedule;
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to set schedule ${scheduleId} as primary`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to set schedule ${scheduleId} as primary`, error);
@@ -694,7 +697,7 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
 
       return result || null;
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to find primary schedule for user: ${userId}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to find primary schedule for user: ${userId}`, error);
@@ -723,7 +726,7 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
 
       return result || null;
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to find primary schedule by slug: ${slug}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to find primary schedule by slug: ${slug}`, error);
@@ -766,7 +769,7 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
 
       return scheduleResult.schedule;
     } catch (error) {
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to find primary schedule for tiltify username: ${tiltifyUsername}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to find primary schedule for tiltify username: ${tiltifyUsername}`, error);
@@ -784,9 +787,8 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
       // Get the current year for filtering
       const currentYear = new Date().getFullYear();
 
-      // Get all team members
-      const teamRepo = new TeamRepo(this.db, this.env);
-      const teamMembers = await teamRepo.getTeamMembers(teamId);
+      // Get all team members using the repo initialized in the constructor
+      const teamMembers = await this.teamRepo.getTeamMembers(teamId);
 
       if (!teamMembers || teamMembers.length === 0) {
         return [];
@@ -811,7 +813,7 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
       return schedules.filter(schedule => userIds.includes(schedule.ownerId));
     } catch (error) {
       console.log('ScheduleRepo', 'getTeamMembersSchedules', error);
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to get team members schedules for team: ${teamId}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to get team members schedules for team: ${teamId}`, error);
@@ -859,7 +861,7 @@ export class ScheduleRepo extends Repo<typeof schedulesTable._['config']> {
       return schedulesWithStreams;
     } catch (error) {
       console.log('ScheduleRep', 'getTeamMembersSchedulesWithDetails', error);
-      if (this.env === 'action') {
+      if (this.isAction()) {
         throw new DatabaseError(`Failed to get team members schedules with details for team: ${teamId}`, error).toActionError();
       } else {
         throw new DatabaseError(`Failed to get team members schedules with details for team: ${teamId}`, error);
