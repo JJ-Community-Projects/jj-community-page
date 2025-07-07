@@ -4,7 +4,9 @@ import {getTags} from "../functions/getTags.ts";
 import {socialUrlRegex} from "../functions/socialUrlRegex.ts";
 import {getTiltifyTokenFromContext, getTiltifyUser} from "../functions/tiltify.ts";
 import {UserRepo} from "../lib/db/repos/UserRepo.ts";
+import {UserTagRepo} from "../lib/db/repos/UserTagRepo.ts";
 import {useRpcUserDO} from "./getDO.ts";
+import {TiltifyRepo} from "../lib/db/repos/TiltifyRepo.ts";
 
 export const users = {
   /**
@@ -440,9 +442,9 @@ export const users = {
         throw new ActionError({code: 'UNAUTHORIZED'});
       }
 
-      // Get user tags using UserRepo
-      const users = UserRepo.action(context);
-      const tags = await users.getUserTags(user.id);
+      // Get user tags using UserTagRepo
+      const userTags = UserTagRepo.action(context);
+      const tags = await userTags.getUserTags(user.id);
       return tags;
     }
   }),
@@ -489,9 +491,14 @@ export const users = {
       }
 
       // Query for Tiltify account using UserRepo
-      const users = UserRepo.action(context);
-      const accounts = await users.getAccounts(user.id);
-      return accounts.find(account => account.provider === 'tiltify');
+      const users = TiltifyRepo.action(context);
+      const account = await users.getAccount(user.id)
+
+      if (!account) {
+        throw new ActionError({code: 'NOT_FOUND'});
+      }
+
+      return account;
     }
   }),
 
@@ -540,8 +547,8 @@ export const users = {
     input: z.number().default(5),
     handler: async (limit, context) => {
       try {
-        const users = UserRepo.action(context);
-        const popularTags = await users.getPopularTags(limit);
+        const userTags = UserTagRepo.action(context);
+        const popularTags = await userTags.getPopularTags(limit);
 
         // If there are not enough tags found, supplement with tags from getTags function
         if (popularTags.length < limit) {
@@ -606,11 +613,11 @@ export const users = {
     }),
     handler: async ({userId, limit}, context) => {
       try {
-        const users = UserRepo.action(context);
+        const userTagsRepo = UserTagRepo.action(context);
         // Get user's existing tags to filter out from suggestions
-        const userTagsList = await users.getUserTags(userId);
+        const userTagsList = await userTagsRepo.getUserTags(userId);
         // Get suggested tags for the user
-        const popularTags = await users.getSuggestedTagsForUser(userId, limit);
+        const popularTags = await userTagsRepo.getSuggestedTagsForUser(userId, limit);
 
         // Get the default tags from the getTags function
         const {tags: defaultTags, charityTags} = getTags();
@@ -669,9 +676,11 @@ export const users = {
         // Get the search term in lowercase
         const searchTermLower = term.toLowerCase();
 
-        const users = UserRepo.action(context);
+        const userTagsRepo = UserTagRepo.action(context);
         // Get user's existing tags to filter out from suggestions
-        const userTagsList = await users.getUserTags(userId);
+        const userTagsList = await userTagsRepo.getUserTags(userId);
+        // Extract user tags to filter default and charity tags
+        const userTagValues = userTagsList.map(t => t.tag);
         // Get the default tags from the getTags function
         const {tags: defaultTags, charityTags} = getTags();
 
@@ -695,11 +704,7 @@ export const users = {
         }
 
         // Get matching tags based on search term
-        const matchingTags = await users.getSuggestedTagsForUserBySearchTerm(userId, term, limit);
-
-
-        // Extract user tags to filter default and charity tags
-        const userTagValues = userTagsList.map(t => t.tag);
+        const matchingTags = await userTagsRepo.getSuggestedTagsForUserBySearchTerm(userId, term, limit);
 
 
         // Filter default tags that match the search term and aren't already in the user's tags
@@ -819,8 +824,8 @@ export const users = {
   }),
   findAllTiltifyAccounts: defineAction({
     handler: (_, context) => {
-      const repo = UserRepo.action(context);
-      return repo.findAllTiltifyAccounts();
+      const repo = TiltifyRepo.action(context);
+      return repo.findAllAccounts();
     }
   }),
 

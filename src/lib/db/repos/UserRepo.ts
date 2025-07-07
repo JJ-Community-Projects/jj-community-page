@@ -7,6 +7,7 @@ import {DatabaseError} from "./DatabaseError";
 import {getTiltifyUser, type TiltifyUserData} from "../../../functions/tiltify";
 import type {ActionAPIContext} from "astro:actions";
 import {TwitchRepo} from "./TwitchRepo.ts";
+import {UserTagRepo} from "./UserTagRepo.ts";
 import {getDB} from "../db.ts";
 
 /**
@@ -16,6 +17,20 @@ export class UserRepo extends Repo<typeof users._['config']> {
 
   constructor(env: Env, repoEnv: RepoEnv) {
     super(env, repoEnv, users);
+  }
+
+  /**
+   * Helper method to handle database errors consistently
+   * @param message Error message
+   * @param error Original error
+   * @throws DatabaseError
+   */
+  private handleError(message: string, error: any): never {
+    if (this.isAction()) {
+      throw new DatabaseError(message, error).toActionError();
+    } else {
+      throw new DatabaseError(message, error);
+    }
   }
 
   static action(ctx: ActionAPIContext) {
@@ -36,7 +51,6 @@ export class UserRepo extends Repo<typeof users._['config']> {
    */
   async findById(id: number): Promise<InferSelectModel<typeof users> | null> {
     try {
-
       const result = await this.db.select()
         .from(this.table)
         .where(eq(this.table.id, id))
@@ -44,11 +58,7 @@ export class UserRepo extends Repo<typeof users._['config']> {
 
       return result || null;
     } catch (error) {
-      if (this.isAction()) {
-        throw new DatabaseError(`Failed to find user by id: ${id}`, error).toActionError();
-      } else {
-        throw new DatabaseError(`Failed to find user by id: ${id}`, error);
-      }
+      return this.handleError(`Failed to find user by id: ${id}`, error);
     }
   }
 
@@ -64,26 +74,7 @@ export class UserRepo extends Repo<typeof users._['config']> {
         .from(this.table)
         .all();
     } catch (error) {
-      if (this.isAction()) {
-        throw new DatabaseError("Failed to find all users", error).toActionError();
-      } else {
-        throw new DatabaseError("Failed to find all users", error);
-      }
-    }
-  }
-
-  async findAllTiltifyAccounts(): Promise<InferSelectModel<typeof accounts>[]> {
-    try {
-      return this.db.select()
-        .from(accounts)
-        .where(eq(accounts.provider, 'tiltify'))
-        .all();
-    } catch (error) {
-      if (this.isAction()) {
-        throw new DatabaseError("Failed to find all tiltify accounts", error).toActionError();
-      } else {
-        throw new DatabaseError("Failed to find all tiltify accounts", error);
-      }
+      return this.handleError("Failed to find all users", error);
     }
   }
 
@@ -102,11 +93,7 @@ export class UserRepo extends Repo<typeof users._['config']> {
 
       return result;
     } catch (error) {
-      if (this.isAction()) {
-        throw new DatabaseError("Failed to create user", error).toActionError();
-      } else {
-        throw new DatabaseError("Failed to create user", error);
-      }
+      return this.handleError("Failed to create user", error);
     }
   }
 
@@ -129,11 +116,7 @@ export class UserRepo extends Repo<typeof users._['config']> {
 
       return result;
     } catch (error) {
-      if (this.isAction()) {
-        throw new DatabaseError(`Failed to update user with id: ${id}`, error).toActionError();
-      } else {
-        throw new DatabaseError(`Failed to update user with id: ${id}`, error);
-      }
+      return this.handleError(`Failed to update user with id: ${id}`, error);
     }
   }
 
@@ -146,44 +129,19 @@ export class UserRepo extends Repo<typeof users._['config']> {
    */
   async delete(id: number): Promise<boolean> {
     try {
-
       const result = await this.db.delete(this.table)
         .where(eq(this.table.id, id))
         .run();
 
       return result.results.length > 0;
     } catch (error) {
-      if (this.isAction()) {
-        throw new DatabaseError(`Failed to delete user with id: ${id}`, error).toActionError();
-      } else {
-        throw new DatabaseError(`Failed to delete user with id: ${id}`, error);
-      }
+      return this.handleError(`Failed to delete user with id: ${id}`, error);
     }
   }
+
 
   // endregion Basic User Operations
 
-  /**
-   * Get all accounts for a user
-   * @param userId The user ID
-   * @returns Promise resolving to an array of accounts
-   *
-   * SQL: `SELECT * FROM "accounts" WHERE "accounts"."userId" = ?`
-   */
-  async getAccounts(userId: number): Promise<InferSelectModel<typeof accounts>[]> {
-    try {
-      return await this.db.select()
-        .from(accounts)
-        .where(eq(accounts.userId, userId))
-        .all();
-    } catch (error) {
-      if (this.isAction()) {
-        throw new DatabaseError(`Failed to get accounts for user with id: ${userId}`, error).toActionError();
-      } else {
-        throw new DatabaseError(`Failed to get accounts for user with id: ${userId}`, error);
-      }
-    }
-  }
 
   async getAccountByProvider(userId: number, provider: string) {
     try {
@@ -195,129 +153,7 @@ export class UserRepo extends Repo<typeof users._['config']> {
         ))
         .get();
     } catch (error) {
-      if (this.isAction()) {
-        throw new DatabaseError(`Failed to get accounts for user with id: ${userId} with provider ${provider}`, error).toActionError();
-      } else {
-        throw new DatabaseError(`Failed to get accounts for user with id: ${userId} with provider ${provider}`, error);
-      }
-    }
-  }
-
-  /**
-   * Fetch social media links from Tiltify and add them to the user's profile
-   * @param tiltifyToken The Tiltify API token
-   * @param userId The user ID
-   * @returns Promise resolving to an object with the results of adding each social media link
-   */
-  async fetchSocialsFromTiltify(tiltifyToken: string, userId: number): Promise<{
-    success: boolean,
-    results: { provider: string, success: boolean }[]
-  }> {
-    try {
-      // Get the Tiltify user data
-      const tiltifyUser = await getTiltifyUser(tiltifyToken);
-      if (!tiltifyUser) {
-        if (this.isAction()) {
-          throw new DatabaseError('Failed to get Tiltify user data', null).toActionError();
-        } else {
-          throw new DatabaseError('Failed to get Tiltify user data', null);
-        }
-      }
-
-      const socials = tiltifyUser.data.social;
-      const results: { provider: string, success: boolean }[] = [];
-
-      // Add Twitch social if available
-      if (socials.twitch) {
-        const twitchUrl = socials.twitch.startsWith('http')
-          ? socials.twitch
-          : `https://twitch.tv/${socials.twitch}`;
-
-        try {
-          const result = await this.addSocial(userId, 'twitch', twitchUrl);
-          results.push({provider: 'twitch', success: !!result});
-        } catch (error) {
-          console.error('Error adding Twitch social:', error);
-          results.push({provider: 'twitch', success: false});
-        }
-      }
-
-      // Add Twitter social if available
-      if (socials.twitter) {
-        const twitterUrl = socials.twitter.startsWith('http')
-          ? socials.twitter
-          : `https://twitter.com/${socials.twitter}`;
-
-        try {
-          const result = await this.addSocial(userId, 'twitter', twitterUrl);
-          results.push({provider: 'twitter', success: !!result});
-        } catch (error) {
-          console.error('Error adding Twitter social:', error);
-          results.push({provider: 'twitter', success: false});
-        }
-      }
-
-      // Add YouTube social if available
-      if (socials.youtube) {
-        let youtubeUrl = socials.youtube;
-        if (!youtubeUrl.startsWith('http')) {
-          // Check if it's a channel ID or username
-          if (youtubeUrl.startsWith('UC')) {
-            youtubeUrl = `https://youtube.com/channel/${youtubeUrl}`;
-          } else {
-            youtubeUrl = `https://youtube.com/@${youtubeUrl}`;
-          }
-        }
-
-        try {
-          const result = await this.addSocial(userId, 'youtube', youtubeUrl);
-          results.push({provider: 'youtube', success: !!result});
-        } catch (error) {
-          console.error('Error adding YouTube social:', error);
-          results.push({provider: 'youtube', success: false});
-        }
-      }
-
-      // Add Instagram social if available
-      if (socials.instagram) {
-        const instagramUrl = socials.instagram.startsWith('http')
-          ? socials.instagram
-          : `https://instagram.com/${socials.instagram}`;
-
-        try {
-          const result = await this.addSocial(userId, 'instagram', instagramUrl);
-          results.push({provider: 'instagram', success: !!result});
-        } catch (error) {
-          console.error('Error adding Instagram social:', error);
-          results.push({provider: 'instagram', success: false});
-        }
-      }
-
-      // Add TikTok social if available
-      if (socials.tiktok) {
-        const tiktokUrl = socials.tiktok.startsWith('http')
-          ? socials.tiktok
-          : `https://tiktok.com/@${socials.tiktok}`;
-
-        try {
-          const result = await this.addSocial(userId, 'tiktok', tiktokUrl);
-          results.push({provider: 'tiktok', success: !!result});
-        } catch (error) {
-          console.error('Error adding TikTok social:', error);
-          results.push({provider: 'tiktok', success: false});
-        }
-      }
-
-      return {
-        success: true,
-        results
-      };
-    } catch (error) {
-      if (this.isAction()) {
-        throw new DatabaseError('Failed to fetch socials from Tiltify', error).toActionError();
-      } else {
-        throw new DatabaseError('Failed to fetch socials from Tiltify', error);
-      }
+      return this.handleError(`Failed to get accounts for user with id: ${userId} with provider ${provider}`, error);
     }
   }
 
@@ -369,245 +205,15 @@ export class UserRepo extends Repo<typeof users._['config']> {
       }
 
     } catch (error) {
-      if (this.isAction()) {
-        throw new DatabaseError(`Failed to search users with term: ${searchTerm}`, error).toActionError();
-      } else {
-        throw new DatabaseError(`Failed to search users with term: ${searchTerm}`, error);
-      }
+      return this.handleError(`Failed to search users with term: ${searchTerm}`, error);
     }
   }
 
   // endregion User Search Operations
 
   // region User Tags Operations
-  /**
-   * Get all tags for a user
-   * @param userId The user ID
-   * @returns Promise resolving to an array of user tags
-   *
-   * SQL: `SELECT * FROM "userTags" WHERE "userTags"."userId" = ?`
-   */
-  async getUserTags(userId: number): Promise<InferSelectModel<typeof userTags>[]> {
-    try {
-      return await this.db.select()
-        .from(userTags)
-        .where(eq(userTags.userId, userId))
-        .all();
-    } catch (error) {
-      if (this.isAction()) {
-        throw new DatabaseError(`Failed to get tags for user with id: ${userId}`, error).toActionError();
-      } else {
-        throw new DatabaseError(`Failed to get tags for user with id: ${userId}`, error);
-      }
-    }
-  }
-
-  /**
-   * Add a tag to a user
-   * @param userId The user ID
-   * @param tag The tag to add
-   * @param label The label for the tag
-   * @returns Promise resolving to the created tag
-   *
-   * SQL: `INSERT INTO "userTags" ("userId", "tag", "label", "addedAt") VALUES (?, ?, ?, ?) RETURNING *`
-   */
-  async addTag(userId: number, tag: string, label: string): Promise<InferSelectModel<typeof userTags>> {
-    try {
-      const [result] = await this.db.insert(userTags)
-        .values({
-          userId,
-          tag,
-          label,
-          addedAt: new Date()
-        })
-        .returning();
-
-      return result;
-    } catch (error) {
-      if (this.isAction()) {
-        throw new DatabaseError(`Failed to add tag ${tag} to user with id: ${userId}`, error).toActionError();
-      } else {
-        throw new DatabaseError(`Failed to add tag ${tag} to user with id: ${userId}`, error);
-      }
-    }
-  }
-
-  /**
-   * Remove a tag from a user
-   * @param userId The user ID
-   * @param tag The tag to remove
-   * @returns Promise resolving to a boolean indicating if the tag was removed
-   *
-   * SQL: `DELETE FROM "userTags" WHERE ("userTags"."userId" = ? AND "userTags"."tag" = ?)`
-   */
-  async removeTag(userId: number, tag: string): Promise<boolean> {
-    try {
-      const result = await this.db.delete(userTags)
-        .where(
-          and(
-            eq(userTags.userId, userId),
-            eq(userTags.tag, tag)
-          )
-        )
-        .run();
-
-      return result.results.length > 0;
-    } catch (error) {
-      if (this.isAction()) {
-        throw new DatabaseError(`Failed to remove tag ${tag} from user with id: ${userId}`, error).toActionError();
-      } else {
-        throw new DatabaseError(`Failed to remove tag ${tag} from user with id: ${userId}`, error);
-      }
-    }
-  }
-
-  /**
-   * Get popular tags across all users
-   * @param limit Maximum number of tags to return
-   * @returns Promise resolving to an array of popular tags with counts
-   *
-   * SQL: `SELECT "userTags"."tag", "userTags"."label", count("userTags"."tag") as "count" FROM "userTags" GROUP BY "userTags"."tag" ORDER BY "count" DESC LIMIT ?`
-   */
-  async getPopularTags(limit: number = 5): Promise<{ tag: string, label: string, count: number }[]> {
-    try {
-      return await this.db
-        .select({
-          tag: userTags.tag,
-          label: userTags.label,
-          count: sql<number>`count(
-          ${userTags.tag}
-          )`.as('count')
-        })
-        .from(userTags)
-        .groupBy(userTags.tag)
-        .orderBy((s) => {
-          return desc(s.count);
-        })
-        .limit(limit)
-        .all();
-    } catch (error) {
-      if (this.isAction()) {
-        throw new DatabaseError(`Failed to get popular tags`, error).toActionError();
-      } else {
-        throw new DatabaseError(`Failed to get popular tags`, error);
-      }
-    }
-  }
-
-  /**
-   * Get suggested tags for a user
-   * @param userId The user ID
-   * @param limit Maximum number of tags to return
-   * @returns Promise resolving to an array of suggested tags
-   *
-   * SQL:
-   * 1. `SELECT "userTags"."tag" FROM "userTags" WHERE "userTags"."userId" = ?`
-   * 2. `SELECT "userTags"."tag", "userTags"."label", count("userTags"."tag") as "count" FROM "userTags" WHERE "userTags"."tag" NOT IN (?) GROUP BY "userTags"."tag" ORDER BY "count" DESC LIMIT ?`
-   */
-  async getSuggestedTagsForUser(userId: number, limit: number = 5): Promise<{
-    tag: string,
-    label: string,
-    count: number
-  }[]> {
-    try {
-      // Get user's existing tags
-      const userTagsList = await this.db
-        .select({
-          tag: userTags.tag,
-        })
-        .from(userTags)
-        .where(eq(userTags.userId, userId))
-        .all();
-
-      const userTagValues = userTagsList.map(t => t.tag);
-
-      // Find popular tags not used by the user
-      return await this.db
-        .select({
-          tag: userTags.tag,
-          label: userTags.label,
-          count: sql<number>`count(
-          ${userTags.tag}
-          )`.as('count')
-        })
-        .from(userTags)
-        .where(
-          notInArray(userTags.tag, userTagValues)
-        )
-        .groupBy(userTags.tag)
-        .orderBy((s) => {
-          return desc(s.count);
-        })
-        .limit(limit)
-        .all();
-    } catch (error) {
-      if (this.isAction()) {
-        throw new DatabaseError(`Failed to get suggested tags for user with id: ${userId}`, error).toActionError();
-      } else {
-        throw new DatabaseError(`Failed to get suggested tags for user with id: ${userId}`, error);
-      }
-    }
-  }
-
-  /**
-   * Get suggested tags for a user by search term
-   * @param userId The user ID
-   * @param term The search term
-   * @param limit Maximum number of tags to return
-   * @returns Promise resolving to an array of suggested tags matching the search term
-   *
-   * SQL:
-   * 1. `SELECT "userTags"."tag" FROM "userTags" WHERE "userTags"."userId" = ?`
-   * 2. `SELECT "userTags"."tag", "userTags"."label", count("userTags"."tag") as "count" FROM "userTags" WHERE ("userTags"."tag" NOT IN (?) AND "userTags"."tag" LIKE ?) GROUP BY "userTags"."tag" ORDER BY "count" DESC LIMIT ?`
-   */
-  async getSuggestedTagsForUserBySearchTerm(userId: number, term: string, limit: number = 5): Promise<{
-    tag: string,
-    label: string,
-    count: number
-  }[]> {
-    try {
-      // Get user's existing tags
-      const userTagsList = await this.db
-        .select({
-          tag: userTags.tag,
-        })
-        .from(userTags)
-        .where(eq(userTags.userId, userId))
-        .all();
-
-      const userTagValues = userTagsList.map(t => t.tag);
-
-      // Find popular tags not used by the user and matching the search term
-      return await this.db
-        .select({
-          tag: userTags.tag,
-          label: userTags.label,
-          count: sql<number>`count(
-          ${userTags.tag}
-          )`.as('count')
-        })
-        .from(userTags)
-        .where(
-          and(
-            notInArray(userTags.tag, userTagValues),
-            like(userTags.tag, `%${term.toLowerCase()}%`)
-          )
-        )
-        .groupBy(userTags.tag)
-        .orderBy((s) => {
-          return desc(s.count);
-        })
-        .limit(limit)
-        .all();
-    } catch (error) {
-      if (this.isAction()) {
-        throw new DatabaseError(`Failed to get suggested tags for user with id: ${userId} and term: ${term}`, error).toActionError();
-      } else {
-        throw new DatabaseError(`Failed to get suggested tags for user with id: ${userId} and term: ${term}`, error);
-      }
-    }
-  }
-
+  // All user tag related functionality has been moved to UserTagRepo
+  // If this functionality is required, the UserTagRepo should be directly used
   // endregion User Tags Operations
 
   // region User Socials Operations
@@ -625,11 +231,7 @@ export class UserRepo extends Repo<typeof users._['config']> {
         .where(eq(userSocials.userId, userId))
         .all();
     } catch (error) {
-      if (this.isAction()) {
-        throw new DatabaseError(`Failed to get social media links for user with id: ${userId}`, error).toActionError();
-      } else {
-        throw new DatabaseError(`Failed to get social media links for user with id: ${userId}`, error);
-      }
+      return this.handleError(`Failed to get social media links for user with id: ${userId}`, error);
     }
   }
 
@@ -682,11 +284,7 @@ export class UserRepo extends Repo<typeof users._['config']> {
         return result;
       }
     } catch (error) {
-      if (this.isAction()) {
-        throw new DatabaseError(`Failed to add social media link for provider ${provider} to user with id: ${userId}`, error).toActionError();
-      } else {
-        throw new DatabaseError(`Failed to add social media link for provider ${provider} to user with id: ${userId}`, error);
-      }
+      return this.handleError(`Failed to add social media link for provider ${provider} to user with id: ${userId}`, error);
     }
   }
 
@@ -711,11 +309,75 @@ export class UserRepo extends Repo<typeof users._['config']> {
 
       return result.results.length > 0;
     } catch (error) {
-      if (this.isAction()) {
-        throw new DatabaseError(`Failed to remove social media link for provider ${provider} from user with id: ${userId}`, error).toActionError();
-      } else {
-        throw new DatabaseError(`Failed to remove social media link for provider ${provider} from user with id: ${userId}`, error);
+      return this.handleError(`Failed to remove social media link for provider ${provider} from user with id: ${userId}`, error);
+    }
+  }
+
+  /**
+   * Add multiple social media links to a user in a single batch operation
+   * @param userId The user ID
+   * @param socials Array of social media objects with provider and url
+   * @returns Promise resolving to an array of created/updated social media links
+   */
+  async addSocialsBatch(userId: number, socials: { provider: string, url: string }[]): Promise<InferSelectModel<typeof userSocials>[]> {
+    try {
+      if (socials.length === 0) {
+        return [];
       }
+
+      // Get existing socials for this user
+      const existingSocials = await this.db.select()
+        .from(userSocials)
+        .where(eq(userSocials.userId, userId))
+        .all();
+
+      // Separate socials into those that need to be updated and those that need to be inserted
+      const toUpdate: { provider: string, url: string }[] = [];
+      const toInsert: { userId: number, provider: string, url: string }[] = [];
+
+      socials.forEach(social => {
+        const existing = existingSocials.find(es => es.provider === social.provider);
+        if (existing) {
+          toUpdate.push(social);
+        } else {
+          toInsert.push({
+            userId,
+            provider: social.provider,
+            url: social.url
+          });
+        }
+      });
+
+      const results: InferSelectModel<typeof userSocials>[] = [];
+
+      // Use a transaction to ensure all operations succeed or fail together
+      await this.db.transaction(async (tx) => {
+        // Handle updates
+        for (const social of toUpdate) {
+          const [updated] = await tx.update(userSocials)
+            .set({ url: social.url })
+            .where(
+              and(
+                eq(userSocials.userId, userId),
+                eq(userSocials.provider, social.provider)
+              )
+            )
+            .returning();
+          results.push(updated);
+        }
+
+        // Handle inserts
+        if (toInsert.length > 0) {
+          const inserted = await tx.insert(userSocials)
+            .values(toInsert)
+            .returning();
+          results.push(...inserted);
+        }
+      });
+
+      return results;
+    } catch (error) {
+      return this.handleError(`Failed to add social media links in batch for user with id: ${userId}`, error);
     }
   }
 
@@ -738,10 +400,11 @@ export class UserRepo extends Repo<typeof users._['config']> {
     tags: InferSelectModel<typeof userTags>[]
   } | null> {
     try {
-      // Query the accounts table to find the account with the given tiltify username
-      const result = await this.db.select({
+      // First, find the user and account
+      const userAccount = await this.db.select({
         user: users,
-        account: accounts
+        account: accounts,
+        userId: accounts.userId
       })
         .from(accounts)
         .innerJoin(users, eq(accounts.userId, users.id))
@@ -753,27 +416,31 @@ export class UserRepo extends Repo<typeof users._['config']> {
         )
         .get();
 
-      if (!result) {
+      if (!userAccount) {
         return null;
       }
 
-      // Get user socials and tags
-      const socials = await this.getUserSocials(result.user.id);
-      const tags = await this.getUserTags(result.user.id);
+      // Then fetch socials and tags in parallel
+      const [socials, tags] = await Promise.all([
+        this.db.select()
+          .from(userSocials)
+          .where(eq(userSocials.userId, userAccount.userId))
+          .all(),
+        this.db.select()
+          .from(userTags)
+          .where(eq(userTags.userId, userAccount.userId))
+          .all()
+      ]);
 
       return {
-        ...result,
+        user: userAccount.user,
+        account: userAccount.account,
         socials,
         tags
       };
     } catch (error) {
       console.error('Error in getUserByTiltifyUsername:', error);
-
-      if (this.isAction()) {
-        throw new DatabaseError(`Failed to get user by tiltify username: ${tiltifyUsername}`, error).toActionError();
-      } else {
-        throw new DatabaseError(`Failed to get user by tiltify username: ${tiltifyUsername}`, error);
-      }
+      return this.handleError(`Failed to get user by tiltify username: ${tiltifyUsername}`, error);
     }
   }
 
@@ -788,31 +455,26 @@ export class UserRepo extends Repo<typeof users._['config']> {
    */
   async isTiltifyAccountBlocked(tiltifyUsername: string): Promise<boolean> {
     try {
-      // Query accounts and join with blockedAccounts in a single query
-      const result = await this.db.select({
-        blockedAccount: blockedAccounts
-      })
+      // Use EXISTS subquery to check if the account is blocked
+      const result = await this.db
+        .select({ exists: sql`1` })
         .from(accounts)
-        .leftJoin(blockedAccounts, and(
-          eq(accounts.providerId, blockedAccounts.providerId),
-          eq(blockedAccounts.provider, 'tiltify')
-        ))
         .where(
           and(
             eq(accounts.provider, 'tiltify'),
-            eq(accounts.providerUsername, tiltifyUsername)
+            eq(accounts.providerUsername, tiltifyUsername),
+            sql`EXISTS (
+              SELECT 1 FROM ${blockedAccounts}
+              WHERE ${blockedAccounts.providerId} = ${accounts.providerId}
+              AND ${blockedAccounts.provider} = 'tiltify'
+            )`
           )
         )
         .get();
 
-      // If no result or no blockedAccount found, the account is not blocked
-      return !!result?.blockedAccount;
+      return !!result;
     } catch (error) {
-      if (this.isAction()) {
-        throw new DatabaseError(`Failed to check if tiltify account is blocked for username: ${tiltifyUsername}`, error).toActionError();
-      } else {
-        throw new DatabaseError(`Failed to check if tiltify account is blocked for username: ${tiltifyUsername}`, error);
-      }
+      return this.handleError(`Failed to check if tiltify account is blocked for username: ${tiltifyUsername}`, error);
     }
   }
 
@@ -869,7 +531,7 @@ export class UserRepo extends Repo<typeof users._['config']> {
         )
         // Filter: only include tags belonging to the current user
         // Exclude the current user from recommendations
-        .where(and(eq(userTags.userId, currentUserId), not(eq(userTags.userId, currentUserId))))
+        .where(and(eq(userTags.userId, currentUserId), sql`commonTagCount >= 2`))
         // Group by user to count common tags per user
         .groupBy(users.id)
         // Sort by number of common tags (highest first)
@@ -880,45 +542,28 @@ export class UserRepo extends Repo<typeof users._['config']> {
 
       return recommendations;
     } catch (error) {
-      if (this.isAction()) {
-        throw new DatabaseError(`Failed to get recommended users for user with id: ${currentUserId}`, error).toActionError();
-      } else {
-        throw new DatabaseError(`Failed to get recommended users for user with id: ${currentUserId}`, error);
-      }
+      return this.handleError(`Failed to get recommended users for user with id: ${currentUserId}`, error);
     }
   }
 
 
   async getTiltifyMetaData(userId: number): Promise<TiltifyUserData | undefined> {
-    const tiltifyAccount = await this.db
-      .select({
-        meta: accounts.meta
-      })
-      .from(accounts)
-      .where(and(
-        eq(accounts.userId, userId),
-        eq(accounts.provider, 'tiltify')
-      )).get()
-    if (!tiltifyAccount) {
-      return undefined;
+    try {
+      // Fetch from database
+      const tiltifyAccount = await this.db
+        .select({
+          meta: accounts.meta
+        })
+        .from(accounts)
+        .where(and(
+          eq(accounts.userId, userId),
+          eq(accounts.provider, 'tiltify')
+        )).get();
+
+      return tiltifyAccount ? (tiltifyAccount.meta as TiltifyUserData) : undefined;
+    } catch (error) {
+      return this.handleError(`Failed to get Tiltify metadata for user with id: ${userId}`, error);
     }
-    return tiltifyAccount.meta as TiltifyUserData
   }
-
-  async getTwitchChannelByUserId(userId: number) {
-    const twitchRepo = new TwitchRepo(this.env, this.repoEnv);
-    return twitchRepo.getChannelByUserId(userId);
-  }
-
-  async getTwitchStreamByUserId(userId: number) {
-    // First get the channel to get its Twitch ID
-    const channel = await this.getTwitchChannelByUserId(userId);
-    if (!channel) return null;
-
-    // Then get the stream using the channel's Twitch ID
-    const twitchRepo = new TwitchRepo(this.env, this.repoEnv);
-    return twitchRepo.getStreamByUserId(channel.id);
-  }
-
 
 }
