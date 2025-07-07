@@ -41,14 +41,15 @@ export type UserLiveState = {
   }
 }
 
+export type UserProfileImages = {
+  default: string;
+  mobile: string;
+}
 
 export type UserStyle = {
   primaryColor: string;
   accentColor: string;
-  profileImage: {
-    default: string;
-    mobile: string;
-  }
+  profileImage: UserProfileImages
 }
 
 export type UserSocial = {

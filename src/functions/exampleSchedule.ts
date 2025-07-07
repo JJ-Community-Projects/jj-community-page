@@ -6,8 +6,6 @@ import type {
   ScheduleUITime,
   ScheduleWeekUI,
   DetailedStream,
-  ParticipantUI,
-  TagUI
 } from "../lib/db/models/schedule-ui.ts";
 import {DateTime} from "luxon";
 import {loadScheduleFromContent} from "../content/loadScheduleFromContent.ts";
@@ -52,7 +50,7 @@ function stringToNumber(s: string): number {
   return Math.abs(hash % MOD);
 }
 
-
+/*
 function yogsFullStreamToDetailedStream(stream: FullStream): DetailedStream {
   // Convert creators to participants
   const participants: ParticipantUI[] = stream.creators.map((creator, index) => ({
@@ -89,12 +87,14 @@ function yogsFullStreamToDetailedStream(stream: FullStream): DetailedStream {
     twitchVodUrl: stream.vods?.find((v) => v.type === 'twitch')?.link ?? null,
   };
 }
+*/
 
 
 /**
  * Returns the Yogs jingle jam schedule in the new schedule format
  * src/content/scheduleDays/2024
  */
+/*
 export async function fullJJExampleSchedule(): Promise<ScheduleUI> {
   const fullSchedule = await loadScheduleFromContent('2024')
 
@@ -130,10 +130,12 @@ export async function fullJJExampleSchedule(): Promise<ScheduleUI> {
     stats
   };
 }
+*/
 
 /**
  * Groups streams by their start day
  */
+/*
 function groupStreamsByDay(streams: DetailedStream[]): ScheduleDayUI[] {
   // Map to store days with their streams
   const dayMap = new Map<string, ScheduleDayUI>();
@@ -159,6 +161,7 @@ function groupStreamsByDay(streams: DetailedStream[]): ScheduleDayUI[] {
   // Convert map to array and sort by date
   return Array.from(dayMap.values()).sort((a, b) => a.date.toMillis() - b.date.toMillis());
 }
+*/
 
 /**
  * Finds common time patterns across days in a schedule
@@ -170,6 +173,7 @@ function groupStreamsByDay(streams: DetailedStream[]): ScheduleDayUI[] {
  * @param toleranceMinutes - Tolerance in minutes for considering times as similar (default: 10)
  * @returns Array of ScheduleUITime objects with common start and end times
  */
+/*
 function findCommonTimePatterns(days: ScheduleDayUI[], toleranceMinutes: number = 10): ScheduleUITime[] {
   if (!days || days.length === 0) {
     return [];
@@ -269,10 +273,12 @@ function findCommonTimePatterns(days: ScheduleDayUI[], toleranceMinutes: number 
     };
   });
 }
+*/
 
 /**
  * Groups days into weeks based on specific date ranges for Jingle Jam
  */
+/*
 function groupDaysIntoWeeks(days: ScheduleDayUI[]): ScheduleGroupedWeeks {
   // Define the date ranges for weeks
   const currentYear = 2025; // Hard-coded for the example
@@ -372,6 +378,7 @@ function groupDaysIntoWeeks(days: ScheduleDayUI[]): ScheduleGroupedWeeks {
 
   return groupedWeeks;
 }
+*/
 
 /**
  * Ensures a week has the specified number of days, adding placeholder days if necessary
@@ -381,6 +388,7 @@ function groupDaysIntoWeeks(days: ScheduleDayUI[]): ScheduleGroupedWeeks {
  * @param numberOfDays - The number of days the week should have
  * @param existingDays - Map of existing days with streams
  */
+/*
 function ensureFullWeek(
   week: ScheduleWeekUI,
   startDate: DateTime,
@@ -413,10 +421,11 @@ function ensureFullWeek(
     }
   }
 }
-
+*/
 /**
  * Calculate statistics for a schedule
  */
+/*
 function calculateStats(weeks: ScheduleGroupedWeeks): ScheduleUIStats {
   // Count weeks with days - a week counts if it has at least one day with streams
   const weeksWithDays = Object.values(weeks).filter(week => week.days.length > 0).length;
@@ -536,3 +545,5 @@ function calculateStats(weeks: ScheduleGroupedWeeks): ScheduleUIStats {
     hasMultiDayStreams
   };
 }
+
+*/

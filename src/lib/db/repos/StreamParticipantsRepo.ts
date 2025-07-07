@@ -1,12 +1,13 @@
 import {Repo, type RepoEnv} from "./Repo.ts";
-import {streamParticipantsTable, users} from "../schema/schema.ts";
+import {streamParticipantsTable, twitchChannelSchema, twitchStreamSchema, users} from "../schema/schema.ts";
 import {accounts, userStyles} from "../schema/auth-schema.ts";
-import {drizzle, DrizzleD1Database} from "drizzle-orm/d1";
-import {and, eq, type InferSelectModel, sql} from "drizzle-orm";
+import {and, eq, type InferSelectModel} from "drizzle-orm";
 import {DatabaseError} from "./DatabaseError.ts";
 import type {BatchItem} from "drizzle-orm/batch";
 import type {ActionAPIContext} from "astro:actions";
 import type {ParticipantUI} from "../models/schedule-ui.ts";
+import type {TiltifyUserData} from "../../TiltifyAPI.ts";
+import type {UserProfileImages} from "../models/user-ui.ts";
 
 export class StreamParticipantsRepo extends Repo<typeof streamParticipantsTable._['config']> {
 
@@ -313,86 +314,158 @@ export class StreamParticipantsRepo extends Repo<typeof streamParticipantsTable.
     }
   }
 
-  async findParticipantsUIByStream(scheduleId: number): Promise<Record<number, ParticipantUI[]>> {
-    try {
-      // Join streamParticipantsTable with accounts and userStyles to get participant information
-      const participants = await this.db.select({
-        streamId: streamParticipantsTable.streamId,
-        userId: streamParticipantsTable.userId,
-        tiltifyName: accounts.providerUsername,
-        providerId: accounts.providerId,
-        primaryLiveStream: users.primaryLiveStream,
-        meta: accounts.meta,
-        style: {
-          primaryColor: userStyles.primaryColor,
-          accentColor: userStyles.accentColor
-        }
-      })
-      .from(streamParticipantsTable)
+  /**
+   * Find all users that are part of a stream in a schedule
+   * @param scheduleId The schedule ID
+   * @returns Promise resolving to an array of users who are participants in any stream in the schedule
+   *
+   * SQL: `SELECT * FROM "users" INNER JOIN "stream_participants" ON "stream_participants"."userId" = "users"."id" WHERE "stream_participants"."scheduleId" = ?`
+   */
+  findUsersBySchedule(scheduleId: number) {
+    return this.db.select({
+      id: users.id,
+      streamId: streamParticipantsTable.streamId,
+      primaryLiveStream: users.primaryLiveStream,
+    })
+      .from(users)
       .innerJoin(
-        accounts,
-        and(
-          eq(streamParticipantsTable.userId, accounts.userId),
-          eq(accounts.provider, 'tiltify')
-        )
-      )
-      .leftJoin(
-        userStyles,
-        eq(streamParticipantsTable.userId, userStyles.userId)
-      )
-      .leftJoin(
-        users,
+        streamParticipantsTable,
         eq(streamParticipantsTable.userId, users.id)
       )
       .where(eq(streamParticipantsTable.scheduleId, scheduleId))
       .all();
+  }
 
-      // Organize participants by streamId for efficient lookup
+  findTiltifyAccountsBySchedule(scheduleId: number) {
+    return this.db.select({
+      userId: accounts.userId,
+      name: accounts.providerUsername,
+      meta: accounts.meta,
+      streamId: streamParticipantsTable.streamId,
+    })
+      .from(accounts)
+      .innerJoin(
+        streamParticipantsTable,
+        eq(streamParticipantsTable.userId, accounts.userId)
+      )
+      .where(
+        and(
+          eq(accounts.provider, 'tiltify'),
+          eq(streamParticipantsTable.scheduleId, scheduleId)
+        )
+      )
+      .all().then((accounts) => {
+        return accounts.map((account) => {
+          return {
+            ...account,
+            meta: account.meta ? account.meta as TiltifyUserData : null,
+          }
+        })
+      });
+  }
+
+  findUserStyleBySchedule(scheduleId: number) {
+    return this.db.select({
+      userId: userStyles.userId,
+      primaryColor: userStyles.primaryColor,
+      accentColor: userStyles.accentColor,
+      streamId: streamParticipantsTable.streamId,
+    }).from(userStyles)
+      .innerJoin(
+        streamParticipantsTable,
+        eq(streamParticipantsTable.userId, userStyles.userId)
+      )
+      .where(
+        eq(streamParticipantsTable.scheduleId, scheduleId)
+      )
+      .all()
+  }
+
+  findTwitchChannelBySchedule(scheduleId: number) {
+    return this.db.select().from(twitchChannelSchema)
+      .innerJoin(
+        streamParticipantsTable,
+        eq(streamParticipantsTable.userId, twitchChannelSchema.userId)
+      ).leftJoin(twitchStreamSchema, eq(twitchChannelSchema.id, twitchStreamSchema.twitchId))
+      .where(
+        eq(streamParticipantsTable.scheduleId, scheduleId)
+      )
+      .all()
+  }
+
+
+  async findParticipantsUIByStream(scheduleId: number): Promise<Record<number, ParticipantUI[]>> {
+    try {
+      // Get data from the three required methods
+      const users = await this.findUsersBySchedule(scheduleId);
+      const tiltifyAccounts = await this.findTiltifyAccountsBySchedule(scheduleId);
+      const userStyles = await this.findUserStyleBySchedule(scheduleId);
+      const twitchChannels = await this.findTwitchChannelBySchedule(scheduleId);
+      console.log('findParticipantsUIByStream', 'twitchChannels', twitchChannels)
+      // Create maps for efficient lookups
+      // const userMap = new Map(users.map(user => [user.id, user]));
+      const tiltifyMap = new Map(tiltifyAccounts.map(account => [account.userId, account]));
+      const styleMap = new Map(userStyles.map(style => [style.userId, style]));
+      const twitchMap = new Map(twitchChannels.map(channel => [channel.stream_participants.userId, channel]));
+
+      // Organize participants by streamId
       const participantsByStreamId: Record<number, ParticipantUI[]> = {};
 
-      // Group participants by streamId and transform to ParticipantUI format
-      for (const participant of participants) {
-        if (!participantsByStreamId[participant.streamId]) {
-          participantsByStreamId[participant.streamId] = [];
+      // Process all users to create ParticipantUIV2 objects
+      for (const user of users) {
+        if (!participantsByStreamId[user.streamId]) {
+          participantsByStreamId[user.streamId] = [];
         }
 
-        // Extract image from meta if available
-        let img: string | undefined = undefined;
-        if (participant.meta) {
-          try {
-            const meta = JSON.parse(participant.meta as string);
-            img = meta.avatar ? meta.avatar : undefined;
-          } catch (e) {
-            // Ignore parsing errors
-          }
+        const tiltifyAccount = tiltifyMap.get(user.id);
+        const userStyle = styleMap.get(user.id);
+        const twitchChannel = twitchMap.get(user.id);
+
+        const isLiveOnTwitch = twitchChannel?.twitch_streams !== null
+
+        const img: UserProfileImages = {
+          default: '',
+          mobile: ''
         }
 
-        // Add participant in ParticipantUI format
+        if (twitchChannel?.twitch_channels) {
+          img.default = twitchChannel.twitch_channels.profileImageUrl ?? ''
+          img.mobile = twitchChannel.twitch_channels.profileImageUrl?.replace('300x300', '70x70') ?? ''
+        } else if (tiltifyAccount?.meta?.avatar) {
+          img.default = tiltifyAccount?.meta?.avatar.src ?? '';
+          img.mobile = tiltifyAccount?.meta?.avatar.src ?? '';
+        }
+
+        // Create the ParticipantUIV2 object
         const participantUI: ParticipantUI = {
-          tiltifyName: participant.tiltifyName,
-          label: participant.tiltifyName,
-          id: participant.userId,
-          img
+          id: user.id,
+          label: tiltifyAccount?.name || `User ${user.id}`,
+          style: {
+            primaryColor: userStyle?.primaryColor || '#E30E50',
+            accentColor: userStyle?.accentColor || '#3584BF',
+            profileImage: img
+          },
+          liveState: {
+            id: user.id,
+            name: tiltifyAccount?.name || `User ${user.id}`,
+            slug: tiltifyAccount?.meta?.slug || `user-${user.id}`,
+            isLive: isLiveOnTwitch,
+            primaryLiveStream: user.primaryLiveStream || '',
+            channel: {
+              twitch: isLiveOnTwitch ? twitchChannel?.twitch_channels : undefined,
+            }
+          }
         };
 
-        // Add style if primaryColor and accentColor are available
-        /*
-        if (participant.primaryColor && participant.accentColor) {
-          participantUI.style = {
-            primaryColor: participant.primaryColor,
-            accentColor: participant.accentColor
-          };
-        }*/
-
-        participantsByStreamId[participant.streamId].push(participantUI);
+        participantsByStreamId[user.streamId].push(participantUI);
       }
 
       return participantsByStreamId;
     } catch (error) {
       if (this.isAction()) {
-        throw new DatabaseError(`Failed to find ParticipantUI grouped by stream for schedule ID: ${scheduleId}`, error).toActionError();
+        throw new DatabaseError(`Failed to find ParticipantUIV2 grouped by stream for schedule ID: ${scheduleId}`, error).toActionError();
       } else {
-        throw new DatabaseError(`Failed to find ParticipantUI grouped by stream for schedule ID: ${scheduleId}`, error);
+        throw new DatabaseError(`Failed to find ParticipantUIV2 grouped by stream for schedule ID: ${scheduleId}`, error);
       }
     }
   }

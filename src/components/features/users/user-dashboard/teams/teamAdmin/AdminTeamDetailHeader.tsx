@@ -37,7 +37,7 @@ export const AdminTeamDetailHeader: Component = () => {
             <h1 class="text-2xl font-bold">Team Details</h1>
             <a class="text-primary" href={`/teams/${local.slug}`}>jj.ostof.dev/teams/${local.slug}</a>
           </div>
-          
+
           <div class="flex gap-2">
             <button
               onClick={showDeleteDialog.open}

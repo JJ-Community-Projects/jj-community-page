@@ -1,7 +1,6 @@
 import {ActionError, defineAction} from "astro:actions";
 import {z} from "astro:content";
 import {ScheduleUIRepo} from "../lib/db/repos/ScheduleUIRepo.ts";
-import {fullJJExampleSchedule} from "../functions/exampleSchedule.ts";
 import {TeamRepo} from "../lib/db/repos/TeamRepo.ts";
 import {UserUIRepo} from "../lib/db/repos/UserUIRepo.ts";
 
@@ -48,11 +47,6 @@ export const ui = {
           }
 
           return schedule;
-        }
-      }),
-      demo: defineAction({
-        handler: (_, context) => {
-          return fullJJExampleSchedule()
         }
       }),
       getCurrentPrimaryBySlug: defineAction({

@@ -3,20 +3,16 @@ import {streamsTable,} from "../schema/schema.ts";
 import type {Prettify} from "../../Prettify.ts";
 import type {Schedule} from "./schedule-base.ts";
 import type {TagUI} from "./TagUI.ts";
-
+import type {UserLiveState, UserStyle} from "./user-ui.ts";
 
 /**
  * Type for a stream participant
  */
 export type ParticipantUI = {
-  tiltifyName: string,
-  label: string,
   id: number,
-  img?: string,
-  style?: {
-    primaryColor: string,
-    accentColor: string,
-  }
+  label: string,
+  style: UserStyle;
+  liveState: UserLiveState
 }
 
 /**

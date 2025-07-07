@@ -95,7 +95,7 @@ const UserLiveAvatar: Component<UserLiveAvatarProps> = (props) => {
 
       {/* LIVE label */}
       <Show when={liveStatus.isLive}>
-        <div class={`absolute ${sizeClasses[size].labelBottom} left-1/2 transform -translate-x-1/2 bg-[#9146FF] text-white font-bold ${sizeClasses[size].liveLabel} rounded-sm flex items-center ${sizeClasses[size].labelGap} z-20 shadow-lg`}>
+        <div class={`absolute ${sizeClasses[size].labelBottom} left-1/2 transform -translate-x-1/2 bg-twitch text-white font-bold ${sizeClasses[size].liveLabel} rounded-sm flex items-center ${sizeClasses[size].labelGap} z-20 shadow-lg`}>
           <span>LIVE</span>
           <span class={`relative flex ${sizeClasses[size].liveDot}`}>
             <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75 duration-700" />
