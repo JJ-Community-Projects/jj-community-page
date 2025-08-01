@@ -2,11 +2,16 @@
 import {integer, sqliteTable, text} from "drizzle-orm/sqlite-core";
 import {users} from "./auth-schema.ts";
 
+/**
+ * Twitch channels table that stores information about users' Twitch channels.
+ * Contains profile data fetched from the Twitch API.
+ * Each record is linked to a user in the users table.
+ */
 export const twitchChannelSchema = sqliteTable('twitch_channels', {
   userId: integer('user_id', {mode: 'number'}).notNull().references(() => users.id, {
     onDelete: 'cascade'
   }),
-  id: text('id').primaryKey(), // twitch id
+  id: text('id').primaryKey().notNull(), // twitch id
   login: text('login').notNull(),
   displayName: text('display_name').notNull(),
   description: text('description'),
@@ -14,6 +19,11 @@ export const twitchChannelSchema = sqliteTable('twitch_channels', {
   offlineImageUrl: text('offline_image_url'),
 })
 
+/**
+ * Twitch streams table that stores information about active Twitch streams.
+ * Contains stream data fetched from the Twitch API.
+ * Used to display live status and stream details on the platform.
+ */
 export const twitchStreamSchema = sqliteTable('twitch_streams', {
   streamId: text('id').primaryKey(), // stream id
   twitchId: text('user_id').notNull(), // twitch id, reference to twitchChannelSchema.id

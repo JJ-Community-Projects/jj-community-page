@@ -1,8 +1,12 @@
-// src/lib/db/schema.ts
+// src/lib/db/jj-schema.ts
 import {sql} from 'drizzle-orm';
 import {foreignKey, integer, primaryKey, sqliteTable, text, uniqueIndex} from 'drizzle-orm/sqlite-core';
-import {users} from "./auth-schema.ts";
+import {users} from "./auth-schema";
 
+/**
+ * Durable Objects table that tracks Cloudflare Durable Objects used in the application.
+ * Used for managing stateful components across the platform.
+ */
 export const durableObjectsTable = sqliteTable('durable_objects', {
     namespace: text('namespace').notNull(),
     id: text('id').notNull(),
@@ -15,6 +19,11 @@ export const durableObjectsTable = sqliteTable('durable_objects', {
 // integer('timestamp1', { mode: 'timestamp' })
 //     .notNull()
 //     .default(sql`((unixepoch()))`),
+/**
+ * Schedules table that stores information about JingleJam event schedules.
+ * Each schedule represents a collection of streams for a specific year.
+ * Contains metadata like title, visibility, and ownership information.
+ */
 export const schedulesTable = sqliteTable('schedules', {
     id: integer().primaryKey({autoIncrement: true}).notNull(),
     title: text('title').notNull(),
@@ -34,6 +43,11 @@ export const schedulesTable = sqliteTable('schedules', {
   ]
 );
 
+/**
+ * Editors table that tracks which users have permission to edit specific schedules.
+ * Represents a many-to-many relationship between users and schedules.
+ * Used for collaborative schedule management.
+ */
 export const editorsTable = sqliteTable('editors', {
     scheduleId: integer('schedule_id').references(() => schedulesTable.id, {onDelete: 'cascade'}).notNull(),
     userId: integer('user_id').references(() => users.id, {onDelete: 'cascade'}).notNull(),
@@ -44,6 +58,11 @@ export const editorsTable = sqliteTable('editors', {
 );
 
 
+/**
+ * Streams table that stores information about individual streaming events.
+ * Each stream belongs to a schedule and has a specific time slot and metadata.
+ * Contains details like title, description, and links to VODs.
+ */
 export const streamsTable = sqliteTable('streams', {
     id: integer('id').notNull(),
     scheduleId: integer('schedule_id').references(() => schedulesTable.id, {onDelete: "cascade"}).notNull(),
@@ -62,6 +81,11 @@ export const streamsTable = sqliteTable('streams', {
   ]
 );
 
+/**
+ * Stream tags table that stores categorization labels for streams.
+ * Used for filtering and grouping streams by various attributes.
+ * Each stream can have multiple tags.
+ */
 export const streamTagsTable = sqliteTable('stream_tags', {
     streamId: integer('stream_id').notNull(),
     scheduleId: integer('schedule_id').notNull(),
@@ -79,6 +103,11 @@ export const streamTagsTable = sqliteTable('stream_tags', {
   ]
 )
 
+/**
+ * Stream participants table that tracks which users are participating in specific streams.
+ * Represents a many-to-many relationship between users and streams.
+ * Used to display creator information on stream cards and pages.
+ */
 export const streamParticipantsTable = sqliteTable('stream_participants', {
   scheduleId: integer('schedule_id').notNull(),
   streamId: integer('stream_id').notNull(),
@@ -98,6 +127,11 @@ export const streamParticipantsTable = sqliteTable('stream_participants', {
 ])
 
 
+/**
+ * Teams table that stores information about creator teams.
+ * Teams allow multiple creators to collaborate and organize together.
+ * Contains metadata like name, description, and visibility settings.
+ */
 export const teamsTable = sqliteTable('teams', {
     id: integer('team_id').primaryKey({autoIncrement: true}).notNull(),
     ownerId: integer('owner_id').references(() => users.id, {onDelete: 'cascade'}).notNull(),
@@ -111,6 +145,11 @@ export const teamsTable = sqliteTable('teams', {
   ]
 )
 
+/**
+ * Team members table that tracks which users belong to specific teams.
+ * Represents a many-to-many relationship between users and teams.
+ * Used for team management and displaying team rosters.
+ */
 export const teamMembersTable = sqliteTable('team_members', {
     teamId: integer('team_id').references(() => teamsTable.id, {onDelete: 'cascade'}).notNull(),
     userId: integer('user_id').references(() => users.id, {onDelete: 'cascade'}).notNull(),
@@ -120,6 +159,11 @@ export const teamMembersTable = sqliteTable('team_members', {
   ]
 )
 
+/**
+ * Team invites table that tracks pending invitations to join teams.
+ * Used for team recruitment and membership management.
+ * Each record represents an invitation from a team to a user.
+ */
 export const teamInvitesTable = sqliteTable('team_invites', {
     teamId: integer('team_id').references(() => teamsTable.id, {onDelete: 'cascade'}).notNull(),
     invitedUserId: integer('invite_id').references(() => users.id).notNull(),
