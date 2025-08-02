@@ -1,8 +1,7 @@
 import {ActionError, defineAction} from "astro:actions";
 import {z} from "astro:content";
-import {ScheduleUIRepo} from "../lib/db/repos/ScheduleUIRepo.ts";
-import {TeamRepo} from "../lib/db/repos/TeamRepo.ts";
-import {UserUIRepo} from "../lib/db/repos/UserUIRepo.ts";
+import {TeamRepo} from "../lib/db/repos/teams/TeamRepo.ts";
+import {UserService} from "../lib/db/services/users/UserService.ts";
 
 export const ui = {
   users: {
@@ -119,7 +118,7 @@ export const ui = {
     bySlug: defineAction({
       input: z.string(),
       handler: async (slug, context) => {
-        const repo = UserUIRepo.action(context);
+        const repo = UserService.action(context);
         const data = await repo.getUserByName(slug)
         if (!data) {
           throw new ActionError({

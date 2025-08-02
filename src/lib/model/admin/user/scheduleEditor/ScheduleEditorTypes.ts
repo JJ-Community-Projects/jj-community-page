@@ -100,13 +100,11 @@ export interface TagsTable {
 export interface ParticipantsTable {
   [id: string]: {
     /** ID of the stream this participant belongs to */
-    streamId: string;
+    streamId: number;
     /** User ID of the participant */
     userId: number;
     /** Display name of the participant */
-    providerName: string;
-    /** Service provider (e.g., Twitch, YouTube) */
-    provider: string;
+    username: string;
   };
 }
 

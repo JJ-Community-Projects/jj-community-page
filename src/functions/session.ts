@@ -99,7 +99,7 @@ async function saveTiltifySocials(db: DrizzleD1Database, userId: number, social:
  */
 export function transformRawSession(rawSession: string): Session {
   try {
-    console.log('transformRawSession', rawSession);
+    // console.log('transformRawSession', rawSession);
     const parsedSession = JSON.parse(rawSession);
     return {
       ...parsedSession,

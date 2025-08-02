@@ -5,6 +5,7 @@ import UserHeader from "../../components/features/users/public/UserHeader.astro"
 import UserSchedule from "../../components/features/users/public/UserSchedule.astro";
 import UserTeams from "../../components/features/users/public/UserTeams.astro";
 import {ActiveSchedule} from "../../components/features/users/public/schedule/ActiveSchedule";
+import {OtherStreams} from "../../components/features/users/public/schedule/OtherStreams";
 
 const {username} = Astro.params;
 
@@ -35,6 +36,13 @@ if (user === undefined) {
               <div class="w-full bg-white rounded-lg p-6 mb-4 shadow-md">
                   <ActiveSchedule client:load initSchedule={user.schedule}/>
               </div>
+      )}
+
+      {/* Display OtherStreams component only if there are streams */}
+      {user.otherStreams && user.otherStreams.length > 0 && (
+          <div class="w-full bg-white rounded-lg p-6 mb-4 shadow-md">
+              <OtherStreams client:load streams={user.otherStreams}/>
+          </div>
       )}
 
         <UserSchedule tiltifyUsername={username}/>

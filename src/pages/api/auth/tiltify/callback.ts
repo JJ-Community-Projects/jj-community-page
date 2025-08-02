@@ -2,8 +2,9 @@ import type {APIRoute} from "astro";
 import {drizzle} from "drizzle-orm/d1";
 import {accounts, users} from "../../../../lib/db/schema/auth-schema.ts";
 import {and, eq} from "drizzle-orm";
-import {Configuration, UserApi} from "../../../../lib/externalAPI/tiltify/api/src";
-import {TiltifyAPI, type TiltifyUserResponse} from "../../../../lib/TiltifyAPI.ts";
+import {Configuration, UserApi} from "../../../../lib/externalAPI/gen/tiltify/api/src";
+import {TiltifyWebService} from "../../../../lib/externalAPI/TiltifyWebService.ts";
+import type {TiltifyUserResponse} from "../../../../lib/model/TiltifyAPIModel.ts";
 import {
   createNewUserSession,
   createSession,
@@ -31,7 +32,7 @@ export const GET: APIRoute = async (ctx) => {
   }
   // endregion
 
-  const tiltifyAPI = new TiltifyAPI(ctx.locals.runtime.env);
+  const tiltifyAPI = new TiltifyWebService(ctx.locals.runtime.env, 'api');
   // region get tiltify token
   let tokenData
   try {
@@ -46,19 +47,19 @@ export const GET: APIRoute = async (ctx) => {
 
   let tiltifyUser: TiltifyUserResponse
   try {
-    const resp = await tiltifyAPI.getUser(tokenData.accessToken) // userAPI.v5ApiWebPublicUserControllerCurrentUser()
-    if (!resp) {
+    const resp = await tiltifyAPI.getUser(tokenData.accessToken)
+    if (resp.error || !resp.data) {
       return ctx.redirect('/auth-error?error=user-fetch-failed');
     }
-    tiltifyUser = resp
+    tiltifyUser = resp.data
   } catch (e) {
     console.error('api/auth/tiltify/callback', e);
     return ctx.redirect('/auth-error?error=user-fetch-failed');
   }
   // endregion
 
-  const tiltifyId = tiltifyUser.data.id;
-  const tiltifyUsername = tiltifyUser.data.username;
+  const tiltifyId = tiltifyUser.id;
+  const tiltifyUsername = tiltifyUser.username;
 
   const db = getDB(ctx)
   let existingAccount = await db.select()

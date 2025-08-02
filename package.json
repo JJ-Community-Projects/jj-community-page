@@ -3,6 +3,7 @@
   "type": "module",
   "version": "0.0.1",
   "scripts": {
+    "find-errors": "npx tsc --noEmit",
     "dev": "node before.js && astro dev",
     "start": "astro dev --verbose",
     "build": "astro build",
@@ -20,7 +21,12 @@
     "drizzle:d1": "bash ./run_migration.sh",
     "deployCurrentScheduletoFirestore": "node deployCurrentScheduleToFirestore.js",
     "updateTwitchUser": "node updateTwitchUser.js",
-    "openapi-generator-cli:tiltify": "openapi-generator-cli generate -i ./src/lib/externalAPI/tiltify/spec.json -g typescript-fetch -o ./src/lib/externalAPI/tiltify/api/ --additional-properties=npmName=tiltify"
+
+    "db:generate": "drizzle-kit generate",
+    "db:migrate:dev": "wrangler d1 migrations apply DB --local",
+    "db:dev": "npm run db:generate && npm run db:migrate:dev",
+
+    "openapi-generator-cli:tiltify": "openapi-generator-cli generate -i src/lib/externalAPI/gen/tiltify/spec.json -g typescript-fetch -o ./src/lib/externalAPI/tiltify/api/ --additional-properties=npmName=tiltify"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.4",

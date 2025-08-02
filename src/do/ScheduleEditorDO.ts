@@ -4,23 +4,30 @@ import {DateTime} from "luxon";
 import {TinybaseDO} from "./TinybaseDO.ts";
 import type {MergeableStore} from "tinybase/mergeable-store";
 import {RpcScheduleEditorDO} from "./RpcScheduleEditorDO.ts";
-import {ScheduleRepo} from "../lib/db/repos/ScheduleRepo.ts";
-import {StreamRepo} from "../lib/db/repos/StreamRepo.ts";
-import {StreamTagRepo} from "../lib/db/repos/StreamTagRepo.ts";
-import {StreamParticipantsRepo} from "../lib/db/repos/StreamParticipantsRepo.ts";
 import type {
-  DBSchedule,
-  DBStreamParticipant,
-  DBStreamTag,
-  DBStreamWithDetails,
+  Schedule,
+  StreamParticipant,
+  StreamTag,
+  DetailedStream,
+  ScheduleUpdateInput, StreamParticipantDisplay
+} from "../lib/db/types/schedule.ts";
+import type { User } from "../lib/db/types/user.ts";
+
+// TinyBase store types - still needed for the store structure
+import type {
   ParticipantsTable,
-  ScheduleUpdateData,
   StreamsTable,
   TagsTable
 } from "../lib/model/admin/user/scheduleEditor/ScheduleEditorTypes";
+import {ScheduleRepo} from "../lib/db/repos/schedules/ScheduleRepo.ts";
+import {StreamRepo} from "../lib/db/repos/schedules/StreamRepo.ts";
+import {StreamTagRepo} from "../lib/db/repos/schedules/StreamTagRepo.ts";
+import {StreamParticipantRepo} from "../lib/db/repos/schedules/StreamParticipantRepo.ts";
+import {ScheduleService} from "../lib/db/services/schedules/ScheduleService.ts";
 
 /**
- * This file uses types from ScheduleEditorTypes.ts
+ * This file uses types from src/lib/db/types/schedule.ts
+ * TinyBase store types are still imported from ScheduleEditorTypes.ts
  */
 
 /**
@@ -35,7 +42,9 @@ export class ScheduleEditorDO extends TinybaseDO {
   /** Repository for stream tag database operations */
   private tagRepo: StreamTagRepo
   /** Repository for stream participant database operations */
-  private participantRepo: StreamParticipantsRepo
+  private participantRepo: StreamParticipantRepo
+
+  private scheduleService: ScheduleService
 
   /**
    * Returns the namespace identifier for this Durable Object
@@ -55,7 +64,8 @@ export class ScheduleEditorDO extends TinybaseDO {
     this.scheduleRepo = new ScheduleRepo(env, 'do')
     this.streamRepo = new StreamRepo(env, 'do')
     this.tagRepo = new StreamTagRepo(env, 'do')
-    this.participantRepo = new StreamParticipantsRepo(env, 'do')
+    this.participantRepo = new StreamParticipantRepo(env, 'do')
+    this.scheduleService = new ScheduleService(env, 'do')
   }
 
   /**
@@ -157,14 +167,14 @@ export class ScheduleEditorDO extends TinybaseDO {
     }
 
 
-    // Load streams with details using StreamRepo
-    const streamsWithDetails = await this.streamRepo.findStreamsWithDetails(id);
+    // Load streams with details using ScheduleService
+    const streamsWithDetails = await this.scheduleService.findStreamsWithDetails(id);
     this.log('ScheduleEditorDO', 'loadFromDB', schedule, streamsWithDetails.length);
 
     // Extract streams, tags, and participants from the result
     const streams = streamsWithDetails.map(s => ({...s}));
     const tags = streamsWithDetails.flatMap(s => s.tags);
-    const participants = streamsWithDetails.flatMap(s => s.participants);
+    const participants = await this.participantRepo.findAllStreamParticipantDisplayBySchedule(id) // streamsWithDetails.flatMap(s => s.participants);
 
     const store = this.store;
     if (!store) {
@@ -195,7 +205,7 @@ export class ScheduleEditorDO extends TinybaseDO {
    * @param store - The MergeableStore instance to update
    * @param schedule - The schedule data to store
    */
-  private setScheduleValuesInStore(store: MergeableStore, schedule: DBSchedule) {
+  private setScheduleValuesInStore(store: MergeableStore, schedule: Schedule) {
     store.setValue('id', schedule.id);
     store.setValue('title', schedule.title);
     store.setValue('slug', schedule.slug);
@@ -205,11 +215,11 @@ export class ScheduleEditorDO extends TinybaseDO {
 
   /**
    * Processes streams data for the TinyBase store
-   * Converts StreamWithDetails objects to the format expected by the store
+   * Converts DetailedStream objects to the format expected by the store
    * @param streams - Array of stream objects with their details
    * @returns A StreamsTable object ready to be stored in TinyBase
    */
-  private processStreamsForStore(streams: DBStreamWithDetails[]): StreamsTable {
+  private processStreamsForStore(streams: DetailedStream[]): StreamsTable {
     const tinyStreamsTable: StreamsTable = {};
 
     for (const stream of streams) {
@@ -235,7 +245,7 @@ export class ScheduleEditorDO extends TinybaseDO {
    * @param tags - Array of stream tag objects
    * @returns A TagsTable object ready to be stored in TinyBase
    */
-  private processTagsForStore(tags: DBStreamTag[]): TagsTable {
+  private processTagsForStore(tags: StreamTag[]): TagsTable {
     const tagsTable: TagsTable = {};
 
     for (let i = 0; i < tags.length; i++) {
@@ -252,22 +262,24 @@ export class ScheduleEditorDO extends TinybaseDO {
 
   /**
    * Processes participants data for the TinyBase store
-   * Converts StreamParticipant objects to the format expected by the store
-   * @param participants - Array of stream participant objects
+   * Converts User objects to the format expected by the store
+   * @param participants - Array of user objects that are participants in streams
    * @returns A ParticipantsTable object ready to be stored in TinyBase
    */
-  private processParticipantsForStore(participants: DBStreamParticipant[]): ParticipantsTable {
+  private processParticipantsForStore(participants: StreamParticipantDisplay[]): ParticipantsTable {
     const participantsTable: ParticipantsTable = {};
 
     // Note: We only store the basic participant info here
     // The UI will need to fetch additional user details as needed
     for (let i = 0; i < participants.length; i++) {
       const participant = participants[i];
+      // The streamId is not directly available in the User object
+      // It needs to be derived from the context or passed separately
+      // For now, we'll use a placeholder that will be filled in by the UI
       participantsTable[`${i}`] = {
-        streamId: participant.streamId.toString(),
+        streamId: participant.streamId, // This will be set correctly by the UI when displaying participants
         userId: participant.userId,
-        providerName: "", // These will be populated by the UI when displaying participants
-        provider: ""
+        username:participant.username, // These will be populated by the UI when displaying participants
       };
     }
 
@@ -308,14 +320,14 @@ export class ScheduleEditorDO extends TinybaseDO {
     const {storeStreams, storeTags, storeParticipants} = this.getDataFromStore(store);
 
     // Fetch existing streams with details from the database for comparison
-    const streams = await this.streamRepo.findStreamsWithDetails(scheduleId);
+    const streams = await this.scheduleService.findStreamsWithDetails(scheduleId);
 
     // Extract IDs for comparison between store and database
     const storeStreamIds = Object.keys(storeStreams).map(id => parseInt(id));
     const dbStreamIds = streams.map(stream => stream.id);
 
     // Prepare data for updateSchedule
-    const updateData: ScheduleUpdateData = {
+    const updateData: ScheduleUpdateInput = {
       streams: {
         creates: this.prepareStreamCreates(storeStreams, storeStreamIds, dbStreamIds, scheduleId),
         updates: this.prepareStreamUpdates(storeStreams, storeStreamIds, dbStreamIds),
@@ -526,7 +538,7 @@ export class ScheduleEditorDO extends TinybaseDO {
    * @param storeStreamIds - Array of stream IDs from the store
    * @returns Array of tag objects to be deleted from the database
    */
-  private prepareTagDeletes(streams: DBStreamWithDetails[], storeTags: TagsTable, storeStreamIds: number[]): Array<{
+  private prepareTagDeletes(streams: DetailedStream[], storeTags: TagsTable, storeStreamIds: number[]): Array<{
     streamId: number;
     tag: string
   }> {
@@ -581,7 +593,7 @@ export class ScheduleEditorDO extends TinybaseDO {
 
     for (const participantId in storeParticipants) {
       const participant = storeParticipants[participantId];
-      const streamId = parseInt(participant.streamId);
+      const streamId = (participant.streamId);
 
       // Only include participants for streams that exist in the store
       if (storeStreamIds.includes(streamId)) {
@@ -603,7 +615,7 @@ export class ScheduleEditorDO extends TinybaseDO {
    * @param storeStreamIds - Array of stream IDs from the store
    * @returns Array of participant objects to be deleted from the database
    */
-  private prepareParticipantDeletes(streams: DBStreamWithDetails[], storeParticipants: ParticipantsTable, storeStreamIds: number[]): Array<{
+  private prepareParticipantDeletes(streams: DetailedStream[], storeParticipants: ParticipantsTable, storeStreamIds: number[]): Array<{
     streamId: number;
     userId: number
   }> {
@@ -613,7 +625,7 @@ export class ScheduleEditorDO extends TinybaseDO {
     // Create a map of participants in the store
     for (const participantId in storeParticipants) {
       const participant = storeParticipants[participantId];
-      const streamId = parseInt(participant.streamId);
+      const streamId = (participant.streamId);
       const key = `${streamId}:${participant.userId}`;
       storeParticipantMap[key] = true;
     }

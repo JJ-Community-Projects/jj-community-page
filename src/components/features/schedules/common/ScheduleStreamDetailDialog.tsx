@@ -6,6 +6,7 @@ import {type ModalSignal} from "../../../../lib/createModalSignal.ts";
 import {getStreamColor} from "../../../../functions/jjDatesToColors.ts";
 import {Dialog} from "@kobalte/core";
 import {AiOutlineClose} from "solid-icons/ai";
+import {FaBrandsTwitch, FaBrandsYoutube} from "solid-icons/fa";
 import {getTextColor} from "../../../../lib/utils/textColors.ts";
 import {StreamTags} from "./StreamTags";
 import {StreamParticipants} from "./StreamParticipants";
@@ -112,6 +113,33 @@ export const ScheduleStreamDetailDialog: Component<ScheduleStreamDetailDialogPro
                           </span>
                       </div>
                       </div>
+                    </div>
+                  </Show>
+
+                  <Show when={stream().youtubeVodUrl || stream().twitchVodUrl}>
+                    <div class="flex flex-row gap-2 py-2">
+                      <Show when={stream().youtubeVodUrl}>
+                        <a
+                          href={stream().youtubeVodUrl!}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          class="transition-all bg-youtube/10 hover:bg-youtube/20 flex flex-row items-center gap-1 rounded-full px-3 py-1 text-black"
+                        >
+                          <FaBrandsYoutube size={16} class="text-youtube" />
+                          YouTube VOD
+                        </a>
+                      </Show>
+                      <Show when={stream().twitchVodUrl}>
+                        <a
+                          href={stream().twitchVodUrl!}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          class="transition-all bg-twitch/10 hover:bg-twitch/20 flex flex-row items-center gap-1 rounded-full px-3 py-1 text-black"
+                        >
+                          <FaBrandsTwitch size={16} class="text-twitch" />
+                          Twitch VOD
+                        </a>
+                      </Show>
                     </div>
                   </Show>
 

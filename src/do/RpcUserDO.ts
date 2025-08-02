@@ -118,4 +118,8 @@ export class RpcUserDO extends RpcTarget {
     }
     return this.userDO.fetch(request)
   }
+
+  refresh() {
+    return this.userDO.refresh(this.doIdentifier)
+  }
 }

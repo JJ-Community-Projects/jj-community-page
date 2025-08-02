@@ -1,12 +1,13 @@
-import {accounts, schedulesTable, teamInvitesTable, teamMembersTable, teamsTable} from "../lib/db/schema/schema.ts";
+import {schedulesTable, teamInvitesTable, teamMembersTable, teamsTable} from "../lib/db/schema/schema.ts";
 import {drizzle} from "drizzle-orm/d1";
 import {and, eq} from "drizzle-orm";
 import type {Id, IdAddedOrRemoved} from "tinybase";
 import {TinybaseDO} from "./TinybaseDO.ts";
 import {users, userSocials, userStyles, userTags} from "../lib/db/schema/auth-schema.ts";
 import {RpcUserDO} from "./RpcUserDO.ts";
-import {TwitchRepo} from "../lib/db/repos/TwitchRepo.ts";
-import {UserRepo} from "../lib/db/repos/UserRepo.ts";
+import {TwitchWebService} from "../lib/externalAPI/TwitchWebService.ts";
+import {TwitchChannelRepo} from "../lib/db/repos/twitch/TwitchChannelRepo.ts";
+import {TiltifyRepo} from "../lib/db/repos/tiltify/TiltifyRepo.ts";
 
 
 export class UserDO extends TinybaseDO {
@@ -737,6 +738,11 @@ export class UserDO extends TinybaseDO {
   }
 
 
+  async addFriendRequest() {
+
+  }
+
+
   async fetch(request: Request) {
     return this.defaultFetch(request)
   }
@@ -818,11 +824,10 @@ export class UserDO extends TinybaseDO {
   }
 
   private async fetchTwitchFromURL(doIdentifier: string, url: string) {
-    const DO = this.env.TwitchAPIDO
-    const stub = DO.get(DO.idFromName(doIdentifier))
+    const twitchService = new TwitchWebService(this.env, 'do');
     const components = url.split('/');
     const name = components[components.length - 1];
-    const {data, error} = await stub.fetchUserByLogin(name)
+    const {data, error} = await twitchService.fetchUserByLogin(name)
     if (error) {
       this.error('fetchTwitchFromURL', error);
       return
@@ -835,10 +840,10 @@ export class UserDO extends TinybaseDO {
 
     const channel = data.data[0]
 
-    const twitchRepo = new TwitchRepo(this.env, 'do');
+    const twitchRepo = new TwitchChannelRepo(this.env, 'do');
 
     // Insert or update the channel
-    const dbChannel = await twitchRepo.insertChannel({
+    const dbChannel = await twitchRepo.create({
       userId: parseInt(doIdentifier),
       id: channel.id,
       login: channel.login,
@@ -893,8 +898,8 @@ export class UserDO extends TinybaseDO {
       this.log('removeSocial', 'Social removed successfully', normalizedProvider);
 
       if (provider === 'twitch') {
-        const twitchRepo = new TwitchRepo(this.env, 'do');
-        await twitchRepo.deleteChannel(parseInt(doIdentifier));
+        const twitchRepo = new TwitchChannelRepo(this.env, 'do');
+        await twitchRepo.deleteByUserId(parseInt(doIdentifier));
       }
 
       return true;
@@ -968,9 +973,9 @@ export class UserDO extends TinybaseDO {
     if (!this.store) {
       return;
     }
-    const twitchRepo = new TwitchRepo(this.env, 'do');
+    const twitchRepo = new TwitchChannelRepo(this.env, 'do');
 
-    const dbChannel = await twitchRepo.getChannelByUserId(parseInt(doIdentifier));
+    const dbChannel = await twitchRepo.findByUserId(parseInt(doIdentifier));
     if (!dbChannel) {
       this.store.delRow('connectedChannel', 'twitch')
     } else {
@@ -988,8 +993,8 @@ export class UserDO extends TinybaseDO {
       return;
     }
 
-    const repo = new UserRepo(this.env, 'do')
-    const account = await repo.getTiltifyMetaData(parseInt(doIdentifier))
+    const repo = new TiltifyRepo(this.env, 'do')
+    const account = await repo.findByUserId(parseInt(doIdentifier))
     if (!account) {
       return;
     }
@@ -1428,5 +1433,19 @@ export class UserDO extends TinybaseDO {
     } catch (e) {
       this.error('syncUserSettings error:', e);
     }
+  }
+
+  refresh(doIdentifier: string) {
+    return Promise.all([
+      this.writeSchedulesToTinybase(doIdentifier),
+      this.loadTeamInvites(doIdentifier),
+      this.loadTeamMemberships(doIdentifier),
+      this.loadUserTags(doIdentifier),
+      this.loadUserSocials(doIdentifier),
+      this.loadUserStyles(doIdentifier),
+      this.loadUserSettings(doIdentifier),
+      this.loadConnectedChannel(doIdentifier),
+      this.loadTiltifyAccount(doIdentifier),
+    ])
   }
 }

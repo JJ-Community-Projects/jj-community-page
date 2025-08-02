@@ -1,0 +1,37 @@
+---
+import {actions} from "astro:actions";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+const {user, session} = Astro.locals
+
+const {data, error: isAdminError} = await Astro.callAction(actions.users.isAdmin, {})
+
+if (isAdminError) {
+  console.error(isAdminError)
+  return Astro.redirect('/')
+}
+
+if (data === undefined) {
+  return Astro.redirect('/')
+}
+
+if (!data) {
+  return Astro.redirect('/')
+}
+
+const {data: campaigns, error} = await Astro.callAction(actions.tiltify.getAllCampaigns, {})
+
+if (error) {
+  console.error(error)
+  return Astro.redirect('/')
+}
+---
+
+<BaseLayout>
+
+    <div class="flex flex-col gap-1">
+        <pre class="text-white">{
+          JSON.stringify(campaigns, null, 4)
+        }</pre>
+    </div>
+
+</BaseLayout>

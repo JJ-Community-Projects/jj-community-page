@@ -28,7 +28,7 @@
         "TeamDO",
         "JingleJamData",
         "UserRateLimiter",
-        "TwitchAPIDO"
+        "UserLiveStatusDO"
       ]
     }
   ],
@@ -56,8 +56,8 @@
         "class_name": "UserRateLimiter"
       },
       {
-        "name": "TwitchAPIDO",
-        "class_name": "TwitchAPIDO"
+        "name": "UserLiveStatusDO",
+        "class_name": "UserLiveStatusDO"
       }
     ]
   },
@@ -94,7 +94,7 @@
       {
         "queue": "TWITCH_LIVE_CHECK",
         "max_batch_size": 100,
-        "max_batch_timeout": 30
+        "max_batch_timeout": 10
       },
       {
         "queue": "YOUTUBE_LIVE_CHECK",
@@ -103,7 +103,7 @@
       },
       {
         "queue": "TWITCH_LIVE_NOTIFIER",
-        "max_batch_size": 10,
+        "max_batch_size": 1,
         "max_batch_timeout": 5
       }
     ]

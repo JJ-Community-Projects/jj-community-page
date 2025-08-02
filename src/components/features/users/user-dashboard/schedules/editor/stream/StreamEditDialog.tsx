@@ -26,8 +26,7 @@ export const StreamEditDialog: Component = (props) => {
           </div>
           {/* Scrollable Content */}
           <div class="flex-1 overflow-y-auto p-6">
-            <ScheduleEditorStreamEditDialogBody
-            />
+            <ScheduleEditorStreamEditDialogBody/>
           </div>
 
           {/* Fixed Footer with Controls */}

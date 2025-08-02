@@ -7,6 +7,8 @@ import {getStreamColor, getStreamColors} from "../../../../functions/jjDatesToCo
 import {getTextColor} from "../../../../lib/utils/textColors.ts";
 import {ScheduleStreamDetailDialog} from "./ScheduleStreamDetailDialog.tsx";
 import {twMerge} from "tailwind-merge";
+import {ParticipantCountIcon} from "../../../common/icons/ParticipantCountIcon.tsx";
+import {FaBrandsTwitch, FaBrandsYoutube} from "solid-icons/fa";
 
 /**
  * Custom hook that manages state for schedule stream cards
@@ -20,25 +22,25 @@ const useScheduleStreamState = (stream: DetailedStream) => {
   // Convert UTC dates from backend to DateTime objects
   const getStreamStartDateTime = () => {
     // Create DateTime from JS Date, assuming it's in UTC, then convert to local time
-    return DateTime.fromJSDate(stream.start, { zone: 'utc' }).toLocal();
+    return DateTime.fromJSDate(stream.start, {zone: 'utc'}).toLocal();
   };
 
   const getStreamEndDateTime = () => {
     // Create DateTime from JS Date, assuming it's in UTC, then convert to local time
-    return DateTime.fromJSDate(stream.end, { zone: 'utc' }).toLocal();
+    return DateTime.fromJSDate(stream.end, {zone: 'utc'}).toLocal();
   };
 
   // Calculate the highlight color using getStreamColor
   const getHighlightColor = () => {
     // For color calculation, we still use UTC to maintain consistent colors
-    const startDate = DateTime.fromJSDate(stream.start, { zone: 'utc' });
+    const startDate = DateTime.fromJSDate(stream.start, {zone: 'utc'});
     return getStreamColor(startDate);
   };
 
   // Calculate the highlight color using getStreamColor
   const getHighlightColors = () => {
     // For color calculation, we still use UTC to maintain consistent colors
-    const startDate = DateTime.fromJSDate(stream.start, { zone: 'utc' });
+    const startDate = DateTime.fromJSDate(stream.start, {zone: 'utc'});
     return getStreamColors(startDate);
   };
 
@@ -289,7 +291,8 @@ const ScheduleStreamCardBottomBar: Component<ScheduleStreamCardProps> = (props) 
         onClick={() => modal.open()}
       >
         <div class="flex-grow flex flex-col text-center py-4 px-5">
-          <div class="flex flex-col items-center justify-center w-full transition-transform origin-center group-hover:scale-105">
+          <div
+            class="flex flex-col items-center justify-center w-full transition-transform origin-center group-hover:scale-105">
             <p class="text-lg font-bold tracking-widest uppercase text-pretty line-clamp-2">{props.stream.title}</p>
             <Show when={props.stream.subtitle}>
               <p class="text-sm tracking-widest uppercase text-pretty line-clamp-1">{props.stream.subtitle}</p>
@@ -341,7 +344,8 @@ const ScheduleStreamCardBottomBarHover: Component<ScheduleStreamCardProps> = (pr
           class="absolute inset-0 z-0 bg-gradient-to-t from-[var(--highlight-color)] to-[var(--highlight-color)] opacity-0 group-hover:opacity-100 rounded-2xl origin-bottom transform scale-y-0 group-hover:scale-y-100 transition-all ease-in-out duration-500"
         />
 
-        <div class="flex-grow flex flex-col text-center py-4 px-5 relative z-2 group-hover:text-[var(--text-color)] transition-colors duration-300">
+        <div
+          class="flex-grow flex flex-col text-center py-4 px-5 relative z-2 group-hover:text-[var(--text-color)] transition-colors duration-300">
           <div class="flex flex-col items-center justify-center w-full">
             <p class="text-lg font-bold tracking-widest uppercase text-pretty line-clamp-2">{props.stream.title}</p>
             <Show when={props.stream.subtitle}>
@@ -387,11 +391,14 @@ const ScheduleStreamCardTopBar: Component<ScheduleStreamCardProps> = (props) => 
       >
         {/* colored stripe at top */}
         <div
-          class={twMerge("h-4 w-full rounded-t-2xl", isLive() && 'animate-pulse')}
-          style={{'background-color': highlightColor}}/>
+          class={twMerge("h-6 w-full rounded-t-2xl", isLive() && 'animate-pulse')}
+          style={{'background-color': highlightColor}}>
+          <VerticalIndicatorBar stream={props.stream}/>
+        </div>
 
         <div class="flex-grow flex flex-col text-center py-4 px-5">
-          <div class="flex flex-col items-center justify-center w-full transition-transform origin-center group-hover:scale-105">
+          <div
+            class="flex flex-col items-center justify-center w-full transition-transform origin-center group-hover:scale-105">
             <p class="text-lg font-bold tracking-widest uppercase text-pretty line-clamp-2">{props.stream.title}</p>
             <Show when={props.stream.subtitle}>
               <p class="text-sm tracking-widest uppercase text-pretty line-clamp-1">{props.stream.subtitle}</p>
@@ -435,15 +442,20 @@ const ScheduleStreamCardTopBarHover: Component<ScheduleStreamCardProps> = (props
       >
         {/* colored stripe at top */}
         <div
-          class={twMerge("h-4 w-full rounded-t-2xl", isLive() && 'animate-pulse')}
-          style={{'background-color': highlightColor}}/>
+          class={twMerge("h-6 w-full rounded-t-2xl", isLive() && 'animate-pulse')}
+          style={{'background-color': highlightColor}}>
+          <VerticalIndicatorBar stream={props.stream}/>
+        </div>
 
         {/* Overlay that animates from top to bottom on hover */}
         <div
           class="absolute inset-0 z-0 bg-gradient-to-b from-[var(--highlight-color)] to-[var(--highlight-color)] opacity-0 group-hover:opacity-100 rounded-2xl origin-top transform scale-y-0 group-hover:scale-y-100 transition-all ease-in-out duration-500"
-        />
+        >
+          <VerticalIndicatorBar stream={props.stream}/>
+        </div>
 
-        <div class="flex-grow flex flex-col text-center py-4 px-5 relative z-2 group-hover:text-[var(--text-color)] transition-colors duration-300">
+        <div
+          class="flex-grow flex flex-col text-center py-4 px-5 relative z-2 group-hover:text-[var(--text-color)] transition-colors duration-300">
           <div class="flex flex-col items-center justify-center w-full">
             <p class="text-lg font-bold tracking-widest uppercase text-pretty line-clamp-2">{props.stream.title}</p>
             <Show when={props.stream.subtitle}>
@@ -516,4 +528,28 @@ const LiveStreamPulseWrapper: Component<LiveStreamPulseWrapperProps> = (props) =
       </Match>
     </Switch>
   );
+}
+
+
+const VerticalIndicatorBar: Component<{ stream: DetailedStream }> = (props) => {
+  const showParticipants = () => props.stream.participants.length >= 2
+  const showTwitch = () => {
+    return props.stream.twitchVodUrl !== null && props.stream.twitchVodUrl !== ''
+  }
+  const showYoutube = () => {
+    return props.stream.youtubeVodUrl !== null && props.stream.youtubeVodUrl !== ''
+  }
+  return (
+    <div class={'flex flex-row justify-start gap-1 text-[var(--text-color)] px-2 py-1'}>
+      <Show when={showParticipants()}>
+        <ParticipantCountIcon count={props.stream.participants.length}/>
+      </Show>
+      <Show when={showTwitch()}>
+        <FaBrandsTwitch/>
+      </Show>
+      <Show when={showYoutube()}>
+        <FaBrandsYoutube/>
+      </Show>
+    </div>
+  )
 }

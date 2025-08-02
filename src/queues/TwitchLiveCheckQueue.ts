@@ -1,8 +1,8 @@
 import type {MessageSendRequest} from "@cloudflare/workers-types/experimental/index.ts";
-import {getDB} from "../lib/db/db.ts";
-import {TwitchRepo} from "../lib/db/repos/TwitchRepo.ts";
-import type {StreamResult} from "../lib/model/TwitchAPIModel.ts";
 import {TwitchLiveNotifierQueue} from "./TwitchLiveNotifierQueue.ts";
+import {TwitchWebService} from "../lib/externalAPI/TwitchWebService.ts";
+import {TwitchChannelRepo} from "../lib/db/repos/twitch/TwitchChannelRepo.ts";
+import {TwitchStreamRepo} from "../lib/db/repos/twitch/TwitchStreamRepo.ts";
 
 
 export class TwitchLiveCheckQueue {
@@ -39,21 +39,11 @@ export class TwitchLiveCheckQueue {
     const messages = batch.messages
     const ids = messages.map(message => message.body)
 
-    // Get the TwitchAPI Durable Object to fetch stream data
-    const DO = env.TwitchAPIDO
-    const id = DO.idFromName("TwitchLiveCheckQueue")
-    const stub = DO.get(id)
-
-    // If we can't get the DO, retry the batch
-    if (!stub) {
-      batch.retryAll({
-        delaySeconds: 10,
-      })
-      return
-    }
+    // Create TwitchWebService to fetch stream data
+    const twitchService = new TwitchWebService(env, 'queue');
 
     // Fetch stream data for the user IDs
-    const {data, error} = await stub.fetchStreamsByUserIds(ids)
+    const {data, error} = await twitchService.fetchStreamsByUserIds(ids)
 
     // If there's an error, retry the batch
     if (error) {
@@ -70,12 +60,12 @@ export class TwitchLiveCheckQueue {
     const notLiveIds = ids.filter(id => !liveIds.includes(id))
 
     // Get database connection and create TwitchRepo instance
-    const twitchRepo = new TwitchRepo(env, 'queue');
+    const twitchRepo = new TwitchStreamRepo(env, 'queue');
 
     try {
       // Delete entries for users who are not live
       if (notLiveIds.length > 0) {
-        await twitchRepo.deleteMultipleStreams(notLiveIds);
+        await twitchRepo.deleteMultiple(notLiveIds);
       }
 
       // Prepare stream data for insertion
@@ -92,13 +82,12 @@ export class TwitchLiveCheckQueue {
         startedAt: stream.started_at,
         language: stream.language,
         thumbnailUrl: stream.thumbnail_url,
-        tagIds: stream.tag_ids ? JSON.stringify(stream.tag_ids) : null,
         isMature: stream.is_mature
       }));
 
       // Insert entries for users who are live
       if (streamsToInsert.length > 0) {
-        await twitchRepo.insertMultipleStreams(streamsToInsert);
+        await twitchRepo.insertMultiple(streamsToInsert);
       }
 
       const notifier = new TwitchLiveNotifierQueue()

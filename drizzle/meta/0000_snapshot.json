@@ -1,14 +1,14 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "5781fa4c-24c9-4105-8237-f4f76b88f3a3",
+  "id": "7017192a-c5eb-407c-9e00-5bde651b4181",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "accounts": {
       "name": "accounts",
       "columns": {
-        "userId": {
-          "name": "userId",
+        "user_id": {
+          "name": "user_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
@@ -41,7 +41,7 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "(current_timestamp)"
+          "default": "((unixepoch())\n                     )"
         },
         "updated_at": {
           "name": "updated_at",
@@ -49,7 +49,7 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "(current_timestamp)"
+          "default": "((unixepoch())\n                     )"
         },
         "meta": {
           "name": "meta",
@@ -70,7 +70,7 @@
         "unique_index_user_id_provider": {
           "name": "unique_index_user_id_provider",
           "columns": [
-            "userId",
+            "user_id",
             "provider"
           ],
           "isUnique": true
@@ -78,7 +78,7 @@
         "index_user_id": {
           "name": "index_user_id",
           "columns": [
-            "userId"
+            "user_id"
           ],
           "isUnique": false
         },
@@ -91,12 +91,12 @@
         }
       },
       "foreignKeys": {
-        "accounts_userId_users_id_fk": {
-          "name": "accounts_userId_users_id_fk",
+        "accounts_user_id_users_id_fk": {
+          "name": "accounts_user_id_users_id_fk",
           "tableFrom": "accounts",
           "tableTo": "users",
           "columnsFrom": [
-            "userId"
+            "user_id"
           ],
           "columnsTo": [
             "id"
@@ -108,7 +108,7 @@
       "compositePrimaryKeys": {
         "pk": {
           "columns": [
-            "userId",
+            "user_id",
             "provider"
           ],
           "name": "pk"
@@ -117,8 +117,8 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "blockedAccounts": {
-      "name": "blockedAccounts",
+    "blocked_accounts": {
+      "name": "blocked_accounts",
       "columns": {
         "provider_id": {
           "name": "provider_id",
@@ -147,14 +147,14 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "(current_timestamp)"
+          "default": "((unixepoch())\n                 )"
         }
       },
       "indexes": {},
       "foreignKeys": {
-        "blockedAccounts_provider_id_accounts_provider_id_fk": {
-          "name": "blockedAccounts_provider_id_accounts_provider_id_fk",
-          "tableFrom": "blockedAccounts",
+        "blocked_accounts_provider_id_accounts_provider_id_fk": {
+          "name": "blocked_accounts_provider_id_accounts_provider_id_fk",
+          "tableFrom": "blocked_accounts",
           "tableTo": "accounts",
           "columnsFrom": [
             "provider_id"
@@ -173,8 +173,8 @@
     "tokens": {
       "name": "tokens",
       "columns": {
-        "userId": {
-          "name": "userId",
+        "user_id": {
+          "name": "user_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
@@ -211,12 +211,12 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "tokens_userId_users_id_fk": {
-          "name": "tokens_userId_users_id_fk",
+        "tokens_user_id_users_id_fk": {
+          "name": "tokens_user_id_users_id_fk",
           "tableFrom": "tokens",
           "tableTo": "users",
           "columnsFrom": [
-            "userId"
+            "user_id"
           ],
           "columnsTo": [
             "id"
@@ -228,7 +228,7 @@
       "compositePrimaryKeys": {
         "pk": {
           "columns": [
-            "userId",
+            "user_id",
             "provider"
           ],
           "name": "pk"
@@ -237,11 +237,11 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "userSocials": {
-      "name": "userSocials",
+    "user_socials": {
+      "name": "user_socials",
       "columns": {
-        "userId": {
-          "name": "userId",
+        "user_id": {
+          "name": "user_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
@@ -266,19 +266,19 @@
         "unique_user_url_provider": {
           "name": "unique_user_url_provider",
           "columns": [
-            "userId",
+            "user_id",
             "social"
           ],
           "isUnique": true
         }
       },
       "foreignKeys": {
-        "userSocials_userId_users_id_fk": {
-          "name": "userSocials_userId_users_id_fk",
-          "tableFrom": "userSocials",
+        "user_socials_user_id_users_id_fk": {
+          "name": "user_socials_user_id_users_id_fk",
+          "tableFrom": "user_socials",
           "tableTo": "users",
           "columnsFrom": [
-            "userId"
+            "user_id"
           ],
           "columnsTo": [
             "id"
@@ -290,7 +290,7 @@
       "compositePrimaryKeys": {
         "user_url_provider_pk": {
           "columns": [
-            "userId",
+            "user_id",
             "social"
           ],
           "name": "user_url_provider_pk"
@@ -299,11 +299,11 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "userStyles": {
-      "name": "userStyles",
+    "user_styles": {
+      "name": "user_styles",
       "columns": {
-        "userId": {
-          "name": "userId",
+        "user_id": {
+          "name": "user_id",
           "type": "integer",
           "primaryKey": true,
           "notNull": true,
@@ -328,12 +328,12 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "userStyles_userId_users_id_fk": {
-          "name": "userStyles_userId_users_id_fk",
-          "tableFrom": "userStyles",
+        "user_styles_user_id_users_id_fk": {
+          "name": "user_styles_user_id_users_id_fk",
+          "tableFrom": "user_styles",
           "tableTo": "users",
           "columnsFrom": [
-            "userId"
+            "user_id"
           ],
           "columnsTo": [
             "id"
@@ -346,11 +346,11 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "userTags": {
-      "name": "userTags",
+    "user_tags": {
+      "name": "user_tags",
       "columns": {
-        "userId": {
-          "name": "userId",
+        "user_id": {
+          "name": "user_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
@@ -376,26 +376,26 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "CURRENT_TIMESTAMP"
+          "default": "(unixepoch()\n                                                                          )"
         }
       },
       "indexes": {
         "unique_user_tag": {
           "name": "unique_user_tag",
           "columns": [
-            "userId",
+            "user_id",
             "tag"
           ],
           "isUnique": true
         }
       },
       "foreignKeys": {
-        "userTags_userId_users_id_fk": {
-          "name": "userTags_userId_users_id_fk",
-          "tableFrom": "userTags",
+        "user_tags_user_id_users_id_fk": {
+          "name": "user_tags_user_id_users_id_fk",
+          "tableFrom": "user_tags",
           "tableTo": "users",
           "columnsFrom": [
-            "userId"
+            "user_id"
           ],
           "columnsTo": [
             "id"
@@ -407,7 +407,7 @@
       "compositePrimaryKeys": {
         "user_tag_pk": {
           "columns": [
-            "userId",
+            "user_id",
             "tag"
           ],
           "name": "user_tag_pk"
@@ -432,7 +432,7 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "(current_timestamp)"
+          "default": "((unixepoch())\n                 )"
         },
         "role": {
           "name": "role",
@@ -441,6 +441,14 @@
           "notNull": true,
           "autoincrement": false,
           "default": "'user'"
+        },
+        "primaryLiveStream": {
+          "name": "primaryLiveStream",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'twitch'"
         }
       },
       "indexes": {},
@@ -489,14 +497,14 @@
           "name": "schedule_id",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         },
         "user_id": {
           "name": "user_id",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         }
       },
@@ -521,7 +529,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         },
         "editors_user_id_users_id_fk": {
@@ -534,7 +542,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -580,6 +588,14 @@
           "notNull": true,
           "autoincrement": false
         },
+        "primary": {
+          "name": "primary",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
+        },
         "owner_id": {
           "name": "owner_id",
           "type": "integer",
@@ -593,7 +609,7 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "CURRENT_TIMESTAMP"
+          "default": "(unixepoch()\n                                                                                )"
         },
         "updated_at": {
           "name": "updated_at",
@@ -601,7 +617,7 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "CURRENT_TIMESTAMP"
+          "default": "(unixepoch()\n                                                                                )"
         }
       },
       "indexes": {
@@ -746,7 +762,7 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "CURRENT_TIMESTAMP"
+          "default": "(unixepoch())"
         }
       },
       "indexes": {},
@@ -874,7 +890,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         },
         "streams_created_by_users_id_fk": {
@@ -942,7 +958,7 @@
           "columnsTo": [
             "team_id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         },
         "team_invites_invite_id_users_id_fk": {
@@ -1015,7 +1031,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
@@ -1104,9 +1120,528 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "checkConstraints": {}
+    },
+    "twitch_channels": {
+      "name": "twitch_channels",
+      "columns": {
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "login": {
+          "name": "login",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "display_name": {
+          "name": "display_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "profile_image_url": {
+          "name": "profile_image_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "offline_image_url": {
+          "name": "offline_image_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "twitch_channels_user_id_users_id_fk": {
+          "name": "twitch_channels_user_id_users_id_fk",
+          "tableFrom": "twitch_channels",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "twitch_streams": {
+      "name": "twitch_streams",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "user_login": {
+          "name": "user_login",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "user_name": {
+          "name": "user_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "game_id": {
+          "name": "game_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "game_name": {
+          "name": "game_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "type": {
+          "name": "type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "viewer_count": {
+          "name": "viewer_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "started_at": {
+          "name": "started_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "language": {
+          "name": "language",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "thumbnail_url": {
+          "name": "thumbnail_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "tag_ids": {
+          "name": "tag_ids",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "is_mature": {
+          "name": "is_mature",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "youtube_channel": {
+      "name": "youtube_channel",
+      "columns": {
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "kind": {
+          "name": "kind",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "etag": {
+          "name": "etag",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "youtube_channel_user_id_users_id_fk": {
+          "name": "youtube_channel_user_id_users_id_fk",
+          "tableFrom": "youtube_channel",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "youtube_localized": {
+      "name": "youtube_localized",
+      "columns": {
+        "channel_id": {
+          "name": "channel_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "youtube_localized_channel_id_youtube_channel_id_fk": {
+          "name": "youtube_localized_channel_id_youtube_channel_id_fk",
+          "tableFrom": "youtube_localized",
+          "tableTo": "youtube_channel",
+          "columnsFrom": [
+            "channel_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "youtube_snippet": {
+      "name": "youtube_snippet",
+      "columns": {
+        "channel_id": {
+          "name": "channel_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "customUrl": {
+          "name": "customUrl",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "publishedAt": {
+          "name": "publishedAt",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "country": {
+          "name": "country",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "youtube_snippet_channel_id_youtube_channel_id_fk": {
+          "name": "youtube_snippet_channel_id_youtube_channel_id_fk",
+          "tableFrom": "youtube_snippet",
+          "tableTo": "youtube_channel",
+          "columnsFrom": [
+            "channel_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "youtube_thumbnail": {
+      "name": "youtube_thumbnail",
+      "columns": {
+        "channel_id": {
+          "name": "channel_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "resolution": {
+          "name": "resolution",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "url": {
+          "name": "url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "width": {
+          "name": "width",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "height": {
+          "name": "height",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "youtube_thumbnail_channel_id_youtube_channel_id_fk": {
+          "name": "youtube_thumbnail_channel_id_youtube_channel_id_fk",
+          "tableFrom": "youtube_thumbnail",
+          "tableTo": "youtube_channel",
+          "columnsFrom": [
+            "channel_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "pk": {
+          "columns": [
+            "channel_id",
+            "resolution"
+          ],
+          "name": "pk"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraints": {}
     }
   },
-  "views": {},
+  "views": {
+    "schedule_ui": {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        }
+      },
+      "name": "schedule_ui",
+      "isExisting": false,
+      "definition": "select \"id\", json_object(\n      'id',        \"id\",\n      'title',     \"title\",\n      'slug',      \"slug\",\n      'year',      \"year\",\n      'visible',   \"visible\",\n      'primary',   \"primary\",\n      'ownerId',   \"owner_id\",\n      'createdAt', \"created_at\",\n      'updatedAt', \"updated_at\"\n    ) as \"schedule\", (\n      SELECT json_group_array(\n        json_object(\n          'id',    str.id,\n          'scheduleId', str.schedule_id,\n          'title', str.title,\n          'subtitle', str.subtitle,\n          'description', str.description,\n          'youtubeVodUrl', str.youtube_vod_url,\n          'twitchVodUrl', str.twitch_vod_url,\n          'start', str.start_time,\n          'end',   str.end_time,\n          'visible', str.visible,\n          'createdBy', str.created_by,\n\n          'tags', (\n            SELECT json_group_array(\n              json_object('tag', tag.tag, 'label', tag.label)\n            )\n            FROM \"stream_tags\" AS tag\n            WHERE tag.schedule_id = \"id\"\n              AND tag.stream_id    = str.id\n          ),\n\n          'participants', (\n            SELECT json_group_array(\n              json_object(\n                'id', u.id,\n                'tiltifyName', COALESCE(soc.url, ''),\n                'label', COALESCE(ut.label, ''),\n                'img', NULL,\n                'style', json_object(\n                  'primaryColor', us.primary_color,\n                  'accentColor', us.accent_color\n                )\n              )\n            )\n            FROM \"stream_participants\" AS sp\n            JOIN \"users\"    AS u   ON u.id = sp.user_id\n            LEFT JOIN \"user_socials\" AS soc ON soc.user_id = u.id AND soc.provider = 'tiltify'\n            LEFT JOIN \"user_tags\"    AS ut  ON ut.user_id  = u.id\n            LEFT JOIN \"user_styles\"  AS us  ON us.user_id  = u.id\n            WHERE sp.schedule_id = \"id\"\n              AND sp.stream_id   = str.id\n          )\n        )\n      )\n      FROM \"streams\" AS str\n      WHERE str.schedule_id = \"id\"\n    ) as \"streams\" from \"schedules\""
+    },
+    "social_names_view": {
+      "columns": {
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "social": {
+          "name": "social",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "url": {
+          "name": "url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "name": "social_names_view",
+      "isExisting": false,
+      "definition": "select \"user_id\", \"social\", \"url\", substr(url, length(url) - instr(reverse(url), '/') + 2) as \"name\" from \"user_socials\""
+    },
+    "stream_participants_ui_view": {
+      "columns": {
+        "stream_id": {
+          "name": "stream_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "schedule_id": {
+          "name": "schedule_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "provider_username": {
+          "name": "provider_username",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "provider_id": {
+          "name": "provider_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "meta": {
+          "name": "meta",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "primary_color": {
+          "name": "primary_color",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'#E30E50'"
+        },
+        "accent_color": {
+          "name": "accent_color",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'#3584BF'"
+        }
+      },
+      "name": "stream_participants_ui_view",
+      "isExisting": false,
+      "definition": "select \"stream_participants\".\"stream_id\", \"stream_participants\".\"schedule_id\", \"stream_participants\".\"user_id\", \"accounts\".\"provider_username\", \"accounts\".\"provider_id\", \"accounts\".\"meta\", \"user_styles\".\"primary_color\", \"user_styles\".\"accent_color\" from \"stream_participants\" inner join \"accounts\" on (\"stream_participants\".\"user_id\" = \"accounts\".\"user_id\" and \"accounts\".\"provider\" = 'tiltify') left join \"user_styles\" on \"stream_participants\".\"user_id\" = \"user_styles\".\"user_id\""
+    }
+  },
   "enums": {},
   "_meta": {
     "schemas": {},

@@ -96,7 +96,7 @@ export class TeamDO extends TinybaseDO {
       username: username
     }
     const db = drizzle(this.env.DB);
-    await db.insert(teamInvitesTable)
+    const [x] = await db.insert(teamInvitesTable)
       .values(invite).onConflictDoNothing()
     this.store?.setRow('invites', `${invitedUserId}`, invite)
   }
