@@ -1,8 +1,6 @@
-import {drizzle, DrizzleD1Database} from "drizzle-orm/d1";
 import {Repo, type RepoEnv} from "./Repo";
 import {userTags} from "../schema/auth-schema";
-import {type InferSelectModel, notInArray} from "drizzle-orm";
-import {and, desc, eq, like, not, sql} from "drizzle-orm";
+import {and, desc, eq, type InferSelectModel, like, notInArray, sql} from "drizzle-orm";
 import {DatabaseError} from "./DatabaseError";
 import type {ActionAPIContext} from "astro:actions";
 
@@ -12,20 +10,6 @@ import type {ActionAPIContext} from "astro:actions";
 export class UserTagRepo extends Repo<typeof userTags._['config']> {
   constructor(env: Env, repoEnv: RepoEnv) {
     super(env, repoEnv, userTags);
-  }
-
-  /**
-   * Helper method to handle database errors consistently
-   * @param message Error message
-   * @param error Original error
-   * @throws DatabaseError
-   */
-  private handleError(message: string, error: any): never {
-    if (this.isAction()) {
-      throw new DatabaseError(message, error).toActionError();
-    } else {
-      throw new DatabaseError(message, error);
-    }
   }
 
   static action(ctx: ActionAPIContext) {
@@ -282,6 +266,20 @@ export class UserTagRepo extends Repo<typeof userTags._['config']> {
       return [...existingTags.filter(et => tags.some(t => t.tag === et.tag)), ...insertedTags];
     } catch (error) {
       return this.handleError(`Failed to add tags in batch for user with id: ${userId}`, error);
+    }
+  }
+
+  /**
+   * Helper method to handle database errors consistently
+   * @param message Error message
+   * @param error Original error
+   * @throws DatabaseError
+   */
+  private handleError(message: string, error: any): never {
+    if (this.isAction()) {
+      throw new DatabaseError(message, error).toActionError();
+    } else {
+      throw new DatabaseError(message, error);
     }
   }
 }

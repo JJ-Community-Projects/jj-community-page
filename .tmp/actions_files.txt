@@ -1,0 +1,2845 @@
+================================================================================
+CONSOLIDATED FILE CONTENTS
+================================================================================
+Search Directory: src/actions
+File Pattern: *.ts
+Generated: Sun Aug 10 20:35:11 CEST 2025
+================================================================================
+
+
+================================================================================
+FILE: src/actions/auth.ts
+================================================================================
+
+import {ActionError, defineAction} from "astro:actions";
+import {getDB} from "../lib/db/db.ts";
+import {accounts} from "../lib/db/schema/auth-schema.ts";
+import {eq} from "drizzle-orm";
+
+
+export const auth = {
+  getAccounts: defineAction({
+    handler: async (_, context) => {
+      const {session, user} = context.locals
+
+      if (!session || !user) {
+        throw new ActionError({ code: 'UNAUTHORIZED' });
+      }
+
+      const userId = user.id;
+
+
+      const db = getDB(context)
+      const account = await db.select()
+        .from(accounts)
+        .where(eq(accounts.userId, userId))
+        .all()
+
+      if (!account) {
+        throw new ActionError({ code: 'NOT_FOUND' });
+      }
+      return account;
+    }
+  })
+}
+
+
+================================================================================
+END OF FILE: src/actions/auth.ts
+================================================================================
+
+
+================================================================================
+FILE: src/actions/getDO.ts
+================================================================================
+
+import {type ActionAPIContext, ActionError} from "astro:actions";
+import type {RpcUserDO} from "../do/RpcUserDO.ts";
+import type {RpcTeamDO} from "../do/RpcTeamDO.ts";
+import type {RpcScheduleEditorDO} from "../do/RpcScheduleEditorDO.ts";
+
+
+type RPCResponse<R> = {
+  data: R,
+  error: null
+} | {
+  data: null,
+  error: any
+}
+
+/**
+ * Retrieves a UserDO Durable Object stub for a given user ID.
+ *
+ * IMPORTANT: This function can only be called inside Astro actions.
+ * It requires the ActionAPIContext which is only available within action handlers.
+ *
+ * @param context - The Astro action context containing runtime environment
+ * @param userId - The numeric ID of the user to get the Durable Object for
+ * @returns A Durable Object stub that can be used to interact with the UserDO
+ * @throws ActionError with INTERNAL_SERVER_ERROR code if:
+ *   - The UserDO is not accessible in the environment
+ *   - There's an error creating the Durable Object ID
+ *   - There's an error getting the Durable Object stub
+ */
+export function getRPCUserDO(context: ActionAPIContext, userId: number) {
+  try {
+    const stub = getUserDO(context, userId);
+    return stub.setMetaData(`${userId}`)
+  } catch (error) {
+    console.error('Error getting RPC DO stub:', error);
+    throw new ActionError({
+      code: 'INTERNAL_SERVER_ERROR',
+      message: 'Failed to access user data'
+    });
+  }
+}
+
+/**
+ * Retrieves a ScheduleEditorDO Durable Object stub for a given schedule ID.
+ *
+ * IMPORTANT: This function can only be called inside Astro actions.
+ * It requires the ActionAPIContext which is only available within action handlers.
+ *
+ * @param context - The Astro action context containing runtime environment
+ * @param scheduleId - The numeric ID of the schedule to get the Durable Object for
+ * @returns A Durable Object stub that can be used to interact with the ScheduleEditorDO
+ * @throws ActionError with INTERNAL_SERVER_ERROR code if:
+ *   - The ScheduleEditorDO is not accessible in the environment
+ *   - There's an error creating the Durable Object ID
+ *   - There's an error getting the Durable Object stub
+ */
+export function getRPCScheduleEditorDO(context: ActionAPIContext, scheduleId: number) {
+  // Get Durable Object stub
+  try {
+    const stub = getScheduleEditorDO(context, scheduleId);
+    return stub.setMetaData(`${scheduleId}`);
+  } catch (error) {
+    console.error('Error getting RPC DO stub:', error);
+    throw new ActionError({
+      code: 'INTERNAL_SERVER_ERROR',
+      message: 'Failed to access schedule data'
+    });
+  }
+}
+
+/**
+ * Retrieves a TeamDO Durable Object stub for a given team ID.
+ *
+ * IMPORTANT: This function can only be called inside Astro actions.
+ * It requires the ActionAPIContext which is only available within action handlers.
+ *
+ * @param context - The Astro action context containing runtime environment
+ * @param teamId - The numeric ID of the team to get the Durable Object for
+ * @returns A Durable Object stub that can be used to interact with the TeamDO
+ * @throws ActionError with INTERNAL_SERVER_ERROR code if:
+ *   - The TeamDO is not accessible in the environment
+ *   - There's an error creating the Durable Object ID
+ *   - There's an error getting the Durable Object stub
+ */
+export function getRPCTeamDO(context: ActionAPIContext, teamId: number) {
+  try {
+    const stub = getTeamDO(context, teamId);
+    return stub.setMetaData(`${teamId}`);
+  } catch (error) {
+    console.error('Error getting DO stub:', error);
+    throw new ActionError({
+      code: 'INTERNAL_SERVER_ERROR',
+      message: 'Failed to access team data'
+    });
+  }
+}
+
+/**
+ * Retrieves a UserDO Durable Object stub for a given user ID.
+ *
+ * IMPORTANT: This function can only be called inside Astro actions.
+ * It requires the ActionAPIContext which is only available within action handlers.
+ *
+ * @param context - The Astro action context containing runtime environment
+ * @param userId - The numeric ID of the user to get the Durable Object for
+ * @returns A Durable Object stub that can be used to interact with the UserDO
+ * @throws ActionError with INTERNAL_SERVER_ERROR code if:
+ *   - The UserDO is not accessible in the environment
+ *   - There's an error creating the Durable Object ID
+ *   - There's an error getting the Durable Object stub
+ */
+export function getUserDO(context: ActionAPIContext, userId: number) {
+  // Get Durable Object reference
+  let DO;
+  try {
+    DO = context.locals.runtime.env.UserDO;
+  } catch (error) {
+    console.error('Error accessing UserDO:', error);
+    throw new ActionError({
+      code: 'INTERNAL_SERVER_ERROR',
+      message: 'Failed to access user data object'
+    });
+  }
+  if (!DO) {
+    throw new ActionError({
+      code: 'INTERNAL_SERVER_ERROR',
+      message: 'UserDO not available'
+    });
+  }
+  // Create Durable Object ID
+  let id;
+  try {
+    id = DO.idFromName(`${userId}`);
+  } catch (error) {
+    console.error('Error creating DO ID:', error);
+    throw new ActionError({
+      code: 'INTERNAL_SERVER_ERROR',
+      message: 'Failed to create user identifier'
+    });
+  }
+
+  // Get Durable Object stub
+  try {
+    return DO.get(id);
+  } catch (error) {
+    console.error('Error getting DO stub:', error);
+    throw new ActionError({
+      code: 'INTERNAL_SERVER_ERROR',
+      message: 'Failed to access user data'
+    });
+  }
+}
+
+/**
+ * Retrieves a ScheduleEditorDO Durable Object stub for a given schedule ID.
+ *
+ * IMPORTANT: This function can only be called inside Astro actions.
+ * It requires the ActionAPIContext which is only available within action handlers.
+ *
+ * @param context - The Astro action context containing runtime environment
+ * @param scheduleId - The numeric ID of the schedule to get the Durable Object for
+ * @returns A Durable Object stub that can be used to interact with the ScheduleEditorDO
+ * @throws ActionError with INTERNAL_SERVER_ERROR code if:
+ *   - The ScheduleEditorDO is not accessible in the environment
+ *   - There's an error creating the Durable Object ID
+ *   - There's an error getting the Durable Object stub
+ */
+export function getScheduleEditorDO(context: ActionAPIContext, scheduleId: number) {
+  // Get Durable Object reference
+  let DO;
+  try {
+    DO = context.locals.runtime.env.ScheduleEditorDO;
+  } catch (error) {
+    console.error('Error accessing ScheduleEditorDO:', error);
+    throw new ActionError({
+      code: 'INTERNAL_SERVER_ERROR',
+      message: 'Failed to access schedule editor object'
+    });
+  }
+  if (!DO) {
+    throw new ActionError({
+      code: 'INTERNAL_SERVER_ERROR',
+      message: 'ScheduleEditorDO not available'
+    });
+  }
+  // Create Durable Object ID
+  let id;
+  try {
+    id = DO.idFromName(`${scheduleId}`);
+  } catch (error) {
+    console.error('Error creating DO ID:', error);
+    throw new ActionError({
+      code: 'INTERNAL_SERVER_ERROR',
+      message: 'Failed to create schedule identifier'
+    });
+  }
+
+  // Get Durable Object stub
+  try {
+    return DO.get(id);
+  } catch (error) {
+    console.error('Error getting DO stub:', error);
+    throw new ActionError({
+      code: 'INTERNAL_SERVER_ERROR',
+      message: 'Failed to access schedule data'
+    });
+  }
+}
+
+/**
+ * Retrieves a TeamDO Durable Object stub for a given team ID.
+ *
+ * IMPORTANT: This function can only be called inside Astro actions.
+ * It requires the ActionAPIContext which is only available within action handlers.
+ *
+ * @param context - The Astro action context containing runtime environment
+ * @param teamId - The numeric ID of the team to get the Durable Object for
+ * @returns A Durable Object stub that can be used to interact with the TeamDO
+ * @throws ActionError with INTERNAL_SERVER_ERROR code if:
+ *   - The TeamDO is not accessible in the environment
+ *   - There's an error creating the Durable Object ID
+ *   - There's an error getting the Durable Object stub
+ */
+export function getTeamDO(context: ActionAPIContext, teamId: number) {
+  // Get Durable Object reference
+  let DO;
+  try {
+    DO = context.locals.runtime.env.TeamDO;
+  } catch (error) {
+    console.error('Error accessing TeamDO:', error);
+    throw new ActionError({
+      code: 'INTERNAL_SERVER_ERROR',
+      message: 'Failed to access team data object'
+    });
+  }
+  if (!DO) {
+    throw new ActionError({
+      code: 'INTERNAL_SERVER_ERROR',
+      message: 'TeamDO not available'
+    });
+  }
+  // Create Durable Object ID
+  let id;
+  try {
+    id = DO.idFromName(`${teamId}`);
+  } catch (error) {
+    console.error('Error creating DO ID:', error);
+    throw new ActionError({
+      code: 'INTERNAL_SERVER_ERROR',
+      message: 'Failed to create team identifier'
+    });
+  }
+
+  // Get Durable Object stub
+  try {
+    return DO.get(id);
+  } catch (error) {
+    console.error('Error getting DO stub:', error);
+    throw new ActionError({
+      code: 'INTERNAL_SERVER_ERROR',
+      message: 'Failed to access team data'
+    });
+  }
+}
+
+export async function useRpcUserDO<R = void>(context: ActionAPIContext, userId: number, callback: (stub: Rpc.Stub<RpcUserDO>) => (R | Promise<R>), onError: (error: any) => void) {
+  try {
+    const stub = getUserDO(context, userId);
+    const rpc = await stub.setMetaData(`${userId}`)
+    const r = await callback(rpc);
+    (await rpc)[Symbol.dispose]?.()
+    return r
+  } catch (e: any) {
+    console.error(`useRpcUserDO`, e);
+    onError(e)
+  }
+}
+
+export async function useRpcTeamDO<R = void>(context: ActionAPIContext, teamId: number, callback: (stub: Rpc.Stub<RpcTeamDO>) => (R | Promise<R>), onError: (error: any) => void) {
+  try {
+    const stub = getTeamDO(context, teamId);
+    const rpc = await stub.setMetaData(`${teamId}`)
+    const r = await callback(rpc);
+    (await rpc)[Symbol.dispose]?.()
+    return r
+  } catch (e: any) {
+    console.error(`useRpcTeamDO`, e);
+    onError(e);
+  }
+}
+
+export async function useRpcScheduleEditorDO<R = void>(context: ActionAPIContext, teamId: number, callback: (stub: Rpc.Stub<RpcScheduleEditorDO>) => (R | Promise<R>), onError: (error: any) => void) {
+  try {
+    const stub = getScheduleEditorDO(context, teamId);
+    const rpc = await stub.setMetaData(`${teamId}`)
+    const r = await callback(rpc);
+    (await rpc)[Symbol.dispose]?.()
+    return r
+  } catch (e: any) {
+    console.error('useRpcScheduleEditorDO', e);
+    onError(e);
+  }
+}
+
+
+================================================================================
+END OF FILE: src/actions/getDO.ts
+================================================================================
+
+
+================================================================================
+FILE: src/actions/index.ts
+================================================================================
+
+import { auth } from "./auth";
+import {schedules} from "./schedules.ts";
+import {users} from "./users.ts";
+import {teamInvites, teams} from "./teams.ts";
+import {ui} from "./ui.ts";
+import {twitch} from "./twitch.ts";
+
+export const server = {
+  auth,
+  schedules,
+  users,
+  teams,
+  teamInvites,
+  ui,
+  twitch
+}
+
+
+================================================================================
+END OF FILE: src/actions/index.ts
+================================================================================
+
+
+================================================================================
+FILE: src/actions/other.ts
+================================================================================
+
+import {defineAction} from "astro:actions";
+import {z} from "astro:content";
+
+
+export const other = {
+  profanity: defineAction({
+    input: z.string(),
+    handler: async (message, ctx) =>{
+      const res = await fetch('https://vector.profanity.dev', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message }),
+      })
+
+      if (res.ok) {
+        const json: {
+          isProfanity: boolean,
+          score: number,
+        } = await res.json()
+        return json
+      } else {
+
+      }
+    }
+  })
+}
+
+
+================================================================================
+END OF FILE: src/actions/other.ts
+================================================================================
+
+
+================================================================================
+FILE: src/actions/schedules.ts
+================================================================================
+
+import {ActionError, defineAction} from "astro:actions";
+import {DateTime} from "luxon";
+import {z} from "astro:content";
+import {createSlug, generateScheduleSlugAlternatives} from "../functions/slug.ts";
+import {getTags} from "../functions/getTags.ts";
+import {ScheduleRepo} from "../lib/db/repos/ScheduleRepo.ts";
+import {useRpcScheduleEditorDO, useRpcUserDO} from "./getDO.ts";
+import {StreamTagRepo} from "../lib/db/repos/StreamTagRepo.ts";
+
+
+export const schedules = {
+  /**
+   * Toggles the visibility of a schedule.
+   * Input: An object containing:
+   *   - scheduleId (number) - The ID of the schedule to toggle visibility
+   * Action: Verifies the user owns the schedule and then toggles its visibility using the UserDO.
+   * Returns: An object with a success message.
+   */
+  toggleVisibility: defineAction({
+    input: z.object({
+      scheduleId: z.number(),
+    }),
+    handler: async ({scheduleId}, ctx) => {
+      const {session, user} = ctx.locals
+      if (!session) {
+        throw new ActionError({code: 'UNAUTHORIZED'})
+      }
+      if (!scheduleId) {
+        throw new ActionError({code: 'BAD_REQUEST', message: 'Schedule ID is required'})
+      }
+
+      // Get the schedule from the database to check ownership
+      const schedules = ScheduleRepo.action(ctx)
+      const schedule = await schedules.findById(scheduleId)
+
+      if (!schedule) {
+        throw new ActionError({code: 'NOT_FOUND', message: 'Schedule not found'})
+      }
+
+      // Check if the user owns this schedule
+      if (schedule.ownerId !== user.id) {
+        throw new ActionError({code: 'FORBIDDEN', message: 'You do not have permission to modify this schedule'})
+      }
+
+      // Get the UserDO and toggle the schedule visibility
+      await useRpcUserDO(ctx, user.id, async (rpc) => {
+        await rpc.toggleScheduleVisibility(scheduleId)
+      }, (error) => {
+        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: error.message});
+      })
+
+      return {message: "Schedule visibility toggled successfully"}
+    }
+  }),
+
+  /**
+   * Sets a schedule as primary and all other schedules with the same year as non-primary.
+   * Input: An object containing:
+   *   - scheduleId (number) - The ID of the schedule to set as primary
+   * Action: Verifies the user owns the schedule and then sets it as primary using the UserDO.
+   * Returns: An object with a success message.
+   */
+  setPrimary: defineAction({
+    input: z.object({
+      scheduleId: z.number(),
+    }),
+    handler: async ({scheduleId}, ctx) => {
+      const {session, user} = ctx.locals
+      if (!session) {
+        throw new ActionError({code: 'UNAUTHORIZED'})
+      }
+      if (!scheduleId) {
+        throw new ActionError({code: 'BAD_REQUEST', message: 'Schedule ID is required'})
+      }
+
+      // Get the schedule from the database to check ownership
+      const schedules = ScheduleRepo.action(ctx)
+      const schedule = await schedules.findById(scheduleId)
+
+      if (!schedule) {
+        throw new ActionError({code: 'NOT_FOUND', message: 'Schedule not found'})
+      }
+
+      // Check if the user owns this schedule
+      if (schedule.ownerId !== user.id) {
+        throw new ActionError({code: 'FORBIDDEN', message: 'You do not have permission to modify this schedule'})
+      }
+
+      // Get the UserDO and set the schedule as primary
+      await useRpcUserDO(ctx, user.id, async (rpc) => {
+        await rpc.setPrimarySchedule(scheduleId)
+      }, (error) => {
+        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: error.message});
+      })
+
+      return {message: "Schedule set as primary successfully"}
+    }
+  }),
+  /**
+   * Creates a new schedule for the authenticated user.
+   * Input: None
+   * Action: Creates a new schedule for the current year, initializes the ScheduleEditorDO,
+   *         and adds the schedule to the UserDO.
+   * Returns: An object containing the created schedule.
+   */
+  create: defineAction({
+    handler: async (_, ctx) => {
+      const {session, user} = ctx.locals
+      if (!session) {
+        throw new ActionError({code: 'UNAUTHORIZED'})
+      }
+
+      const schedules = ScheduleRepo.action(ctx)
+      const currentYear = DateTime.now().year
+
+      // Check if user already has a schedule
+      const existingSchedules = await schedules.findByOwnerId(user.id)
+
+      const allSchedulesWithCurrentYear = existingSchedules.filter(schedule => schedule.year === currentYear)
+
+      const existingSchedule = existingSchedules.find(schedule => schedule.year === currentYear)
+
+      const shouldBePrimary = allSchedulesWithCurrentYear.length === 0
+      /*
+      if (existingSchedule) {
+        throw new ActionError({code: 'BAD_REQUEST', message: 'Schedule for this year already exists'})
+      }*/
+
+      let title = `${user.tiltifyName}'s Schedule ${currentYear}`
+      if (existingSchedule) {
+        title += ` ${existingSchedules.length}`
+      }
+      const slug = createSlug(title)
+
+      // Create schedule using repository
+      const schedule = await schedules.create({
+        ownerId: user.id,
+        title: title,
+        year: currentYear,
+        slug: slug,
+        visible: false,
+        primary: shouldBePrimary
+      })
+
+      // Initialize the ScheduleEditorDO for this schedule
+      await useRpcScheduleEditorDO(ctx, schedule.id, async (rpc) => {
+        await rpc.loadFromDB();
+      }, (error) => {
+        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: error.message});
+      });
+
+      // Add the schedule to the UserDO
+      await useRpcUserDO(ctx, user.id, async (rpc) => {
+        await rpc.addSchedule(schedule);
+      }, (error) => {
+        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: error.message});
+      });
+
+      return {schedule}
+    }
+  }),
+  /**
+   * Saves the current state of a schedule to the database.
+   * Input: scheduleId (number) - The ID of the schedule to save
+   * Action: Verifies the user owns the schedule and then saves the schedule's current state from the ScheduleEditorDO to the database.
+   * Returns: An object with a success message.
+   */
+  save: defineAction({
+    input: z.number(),
+    handler: async (scheduleId, ctx) => {
+      const {session, user} = ctx.locals
+      if (!session) {
+        throw new ActionError({code: 'UNAUTHORIZED'})
+      }
+
+      if (!scheduleId) {
+        throw new ActionError({code: 'BAD_REQUEST', message: 'Schedule ID is required'})
+      }
+
+      // Get the schedule from the database to check ownership
+      const schedules = ScheduleRepo.action(ctx)
+      const schedule = await schedules.findById(scheduleId)
+
+      if (!schedule) {
+        throw new ActionError({code: 'NOT_FOUND', message: 'Schedule not found'})
+      }
+
+      // Check if the user owns this schedule
+      if (schedule.ownerId !== user.id) {
+        throw new ActionError({code: 'FORBIDDEN', message: 'You do not have permission to edit this schedule'})
+      }
+
+      // Get the ScheduleEditorDO and save to DB
+      await useRpcScheduleEditorDO(ctx, scheduleId, async (rpc) => {
+        await rpc.saveToDB();
+      }, (error) => {
+        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: error.message});
+      });
+
+      return {message: "Schedule saved successfully"}
+    }
+  }),
+  /**
+   * Deletes a schedule owned by the authenticated user.
+   * Input: scheduleId (number) - The ID of the schedule to delete
+   * Action: Verifies the user owns the schedule, deletes it from the database, and removes it from the UserDO.
+   * Returns: An object with a success message.
+   */
+  delete: defineAction({
+    input: z.number(),
+    handler: async (scheduleId, ctx) => {
+      const {session, user} = ctx.locals
+      if (!session) {
+        throw new ActionError({code: 'UNAUTHORIZED'})
+      }
+      if (!scheduleId) {
+        throw new ActionError({code: 'BAD_REQUEST', message: 'Schedule ID is required'})
+      }
+
+      // Get the schedule from the database to check ownership
+      const schedules = ScheduleRepo.action(ctx)
+      const schedule = await schedules.findById(scheduleId)
+
+      if (!schedule) {
+        throw new ActionError({code: 'NOT_FOUND', message: 'Schedule not found'})
+      }
+
+      // Check if the user owns this schedule
+      if (schedule.ownerId !== user.id) {
+        throw new ActionError({code: 'FORBIDDEN', message: 'You do not have permission to edit this schedule'})
+      }
+
+      // Delete the schedule using repository
+      await schedules.delete(scheduleId)
+
+      await useRpcUserDO(ctx, user.id, async (rpc) => {
+        await rpc.deleteSchedule(schedule.id);
+      }, (error) => {
+        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: error.message});
+      });
+
+
+      return {message: "Schedule successfully deleted"}
+    }
+  }),
+
+  /**
+   * Checks if a slug is valid and available for use.
+   * Input: An object containing:
+   *   - id (number) - The ID of the schedule
+   *   - slug (string) - The slug to validate
+   *   - title (string, optional) - The title of the schedule
+   * Action: Validates if the provided slug is available for use and generates alternatives if not.
+   * Returns: An object with isValid flag and an array of suggested alternatives if the slug is not valid.
+   */
+  isSlugValid: defineAction({
+    input: z.object({
+      id: z.number(),
+      slug: z.string(),
+      title: z.string().optional(),
+    }),
+    handler: async ({id, slug, title}, ctx) => {
+      const {session, user} = ctx.locals
+      if (!session) {
+        throw new ActionError({code: 'UNAUTHORIZED'})
+      }
+      if (!slug) {
+        throw new ActionError({code: 'BAD_REQUEST', message: 'Slug is required'})
+      }
+
+      // Note: We're still using generateScheduleSlugAlternatives which uses direct DB access
+      // This is because the function is in a separate file and modifying it is outside the scope
+      // of the current migration task
+
+      // Get alternatives using the generateScheduleSlugAlternatives function
+      // If it returns alternatives, the slug is not valid
+      const alternatives = await generateScheduleSlugAlternatives(ctx, slug, 3, id);
+
+      // If alternatives is empty, the slug is valid
+      if (alternatives.length === 0) {
+        return {
+          isValid: true,
+          suggestions: []
+        };
+      }
+
+      // Add title as a suggestion if provided and different from slug
+      let allAlternatives = [...alternatives];
+
+      if (title && title.toLowerCase() !== slug.toLowerCase()) {
+        const titleSlug = createSlug(title);
+        // Check if this slug is valid using generateScheduleSlugAlternatives
+        // If it returns an empty array, the slug is valid
+        const titleAlternatives = await generateScheduleSlugAlternatives(ctx, titleSlug, 0, id);
+        if (titleAlternatives.length === 0) {
+          allAlternatives.push(titleSlug);
+        }
+      }
+
+      return {
+        isValid: false,
+        suggestions: allAlternatives
+      };
+    }
+  }),
+
+  /**
+   * Retrieves the most popular tags used across all schedules.
+   * Input: limit (number, default: 5) - The maximum number of popular tags to return
+   * Action: Queries the database for the most frequently used tags and supplements with default tags if needed.
+   * Returns: An object containing popular tags, default tags, and charity tags with their usage counts.
+   */
+  getPopularTags: defineAction({
+    input: z.number().default(5),
+    handler: async (limit, ctx) => {
+      const tagsRepo = StreamTagRepo.action(ctx);
+
+      // Since ScheduleRepo doesn't have a method for getting popular tags,
+      // we'll use the db property to create a custom query
+
+      // 1. Get all tags from the database, ordered by count
+      // Note: We're using the db property directly since there's no specific method for this
+      const popularTags = await tagsRepo.getPopularTags(limit);
+
+      // 2. If there are not enough tags found, supplement with tags from getTags function
+      if (popularTags.length < limit) {
+        // Get default tags and charity tags
+        const {tags: defaultTags, charityTags} = getTags();
+
+        // Convert default tags to the same format as database tags
+        const formattedDefaultTags = defaultTags.map(tag => ({
+          ...tag,
+          count: 0 // Default count since we're not querying the database
+        }));
+
+        // Convert charity tags to the same format as database tags
+        const formattedCharityTags = charityTags.map(tag => ({
+          ...tag,
+          count: 0 // Default count since we're not querying the database
+        }));
+
+        // Filter out default tags that are already in the popular tags
+        const existingTags = popularTags.map(t => t.tag);
+        const filteredDefaultTags = formattedDefaultTags.filter(tag => !existingTags.includes(tag.tag));
+
+        // Add enough default tags to reach the limit
+        const additionalTags = filteredDefaultTags.slice(0, limit - popularTags.length);
+
+        // Return combined results
+        return {
+          tags: popularTags,
+          defaultTags: additionalTags,
+          charityTags: formattedCharityTags
+        };
+      }
+
+      // If we have enough popular tags, just return them
+      return {
+        tags: popularTags,
+        defaultTags: [],
+        charityTags: []
+      };
+    }
+  }),
+  /**
+   * Retrieves suggested tags for a specific stream.
+   * Input: An object containing:
+   *   - streamId (number) - The ID of the stream
+   *   - scheduleId (number) - The ID of the schedule
+   *   - limit (number, default: 5) - The maximum number of suggested tags to return
+   * Action: Finds popular tags that aren't already used in the stream.
+   * Returns: An object containing suggested tags, default tags, and charity tags that aren't already used in the stream.
+   */
+  getSuggestedTagsForStream: defineAction({
+    input: z.object({
+      streamId: z.number(),
+      scheduleId: z.number(),
+      limit: z.number().default(5),
+    }),
+    handler: async ({streamId, scheduleId, limit}, ctx) => {
+      const tagsRepo = StreamTagRepo.action(ctx);
+
+      // 1. Search all tags of the stream using ScheduleRepo
+      const streamTags = await tagsRepo.findStreamTags(streamId, scheduleId);
+      const streamTagValues = streamTags.map(t => t.tag);
+
+      // 2. Find the most used tags that aren't part of the stream
+      const popularTags = await tagsRepo.getSuggestedTagsForStream(
+        streamId,
+        scheduleId,
+        limit,
+        streamTagValues
+      )
+
+      // 3. Get the default tags from the getTags function
+      const {tags: defaultTags, charityTags} = getTags();
+
+      // 4. Return an object with charityTags and tags, excluding tags already part of the stream
+      const filteredCharityTags = charityTags
+        .filter(tag => !streamTagValues.includes(tag.tag))
+        .map(tag => ({
+          ...tag,
+          count: 0 // Default count since we're not querying the database
+        }));
+
+      const filteredDefaultTags = defaultTags
+        .filter(tag => !streamTagValues.includes(tag.tag))
+        .map(tag => ({
+          ...tag,
+          count: 0 // Default count since we're not querying the database
+        }));
+
+      return {
+        tags: popularTags,
+        defaultTags: filteredDefaultTags,
+        charityTags: filteredCharityTags
+      };
+    }
+  }),
+  /**
+   * Retrieves suggested tags for a stream that match a search term.
+   * Input: An object containing:
+   *   - streamId (number) - The ID of the stream
+   *   - scheduleId (number) - The ID of the schedule
+   *   - term (string) - The search term to match against tags
+   *   - limit (number, default: 5) - The maximum number of suggested tags to return
+   * Action: Finds tags that match the search term and aren't already used in the stream.
+   * Returns: An object containing matching tags from the database, default tags, and charity tags.
+   */
+  getSuggestedTagsForStreamBySearchTerm: defineAction({
+    input: z.object({
+      streamId: z.number(),
+      scheduleId: z.number(),
+      term: z.string(),
+      limit: z.number().default(5),
+    }),
+    handler: async ({streamId, scheduleId, term, limit}, ctx) => {
+      const tagsRepo = StreamTagRepo.action(ctx);
+
+      // 1. Search all tags of the stream using ScheduleRepo
+      const streamTags = await tagsRepo.findStreamTags(streamId, scheduleId);
+      const streamTagValues = streamTags.map(t => t.tag);
+
+      // 2. Find the most used tags that aren't part of the stream and match the search term
+      // Note: We're using the db property directly since there's no specific method for this
+      const databaseTags = await tagsRepo.getSuggestedTagsForStreamBySearchTerm(
+        streamId,
+        scheduleId,
+        limit,
+        streamTagValues,
+        term
+      )
+
+      // 3. Get the default tags from the getTags function
+      const {tags: defaultTags, charityTags} = getTags();
+
+      // 4. If we don't have enough tags from the database, supplement with default tags
+      const searchTermLower = term.toLowerCase();
+
+      // Filter default tags that match the search term and aren't already in the stream
+      const filteredDefaultTags = defaultTags
+        .filter(tag =>
+          !streamTagValues.includes(tag.tag) &&
+          tag.tag.includes(searchTermLower)
+        )
+        .map(tag => ({
+          ...tag,
+          count: 0 // Default count since we're not querying the database
+        }));
+
+      // Filter charity tags that match the search term and aren't already in the stream
+      const filteredCharityTags = charityTags
+        .filter(tag =>
+          !streamTagValues.includes(tag.tag) &&
+          tag.tag.includes(searchTermLower)
+        )
+        .map(tag => ({
+          ...tag,
+          count: 0 // Default count since we're not querying the database
+        }));
+
+      // 5. If we still don't have enough tags, add more default tags that aren't in the stream
+      // (regardless of whether they match the search term)
+      let additionalDefaultTags: {
+        label: string,
+        tag: string
+        count: number
+      }[] = [];
+      if (databaseTags.length + filteredDefaultTags.length + filteredCharityTags.length < limit) {
+        additionalDefaultTags = defaultTags
+          .filter(tag =>
+            !streamTagValues.includes(tag.tag) &&
+            !tag.tag.includes(searchTermLower) // Only include tags that haven't been included yet
+          )
+          .map(tag => ({
+            ...tag,
+            count: 0
+          }))
+          .slice(0, limit - (databaseTags.length + filteredDefaultTags.length + filteredCharityTags.length));
+      }
+
+      // Combine all filtered default tags
+      const allFilteredDefaultTags = [...filteredDefaultTags, ...additionalDefaultTags];
+
+      return {
+        tags: databaseTags,
+        defaultTags: allFilteredDefaultTags,
+        charityTags: filteredCharityTags
+      };
+    }
+  }),
+
+  /**
+   * Retrieves the tables data from a schedule's ScheduleEditorDO.
+   * Input: scheduleId (number) - The ID of the schedule
+   * Action: Gets the tables data from the ScheduleEditorDO for the specified schedule.
+   * Returns: The tables data from the ScheduleEditorDO.
+   */
+  getTables: defineAction({
+    input: z.number(),
+    handler: async (scheduleId, ctx) => {
+      return useRpcScheduleEditorDO(ctx, scheduleId, async (rpc) => {
+        return rpc.getTables();
+      }, (error) => {
+        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: error.message});
+      });
+    }
+  }),
+
+  /**
+   * Retrieves all schedules owned by a user with a given tiltify username.
+   * Input: tiltifyUsername (string) - The tiltify username to find schedules for
+   * Action: Uses the ScheduleRepo to find all schedules owned by the user with the given tiltify username.
+   * Returns: An array of schedules owned by the user.
+   */
+  getSchedulesByTiltifyUsername: defineAction({
+    input: z.string(),
+    handler: async (tiltifyUsername, ctx) => {
+      try {
+        const schedulesRepo = ScheduleRepo.action(ctx);
+        const schedules = await schedulesRepo.findSchedulesByTiltifyUsername(tiltifyUsername);
+
+        return schedules;
+      } catch (e: any) {
+        console.error('Error getting schedules by tiltify username:', e);
+        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message});
+      }
+    }
+  }),
+
+  /**
+   * Retrieves the next schedule for a user with a given tiltify username.
+   * Input: tiltifyUsername (string) - The tiltify username to find the next schedule for
+   * Action: Uses the ScheduleRepo to find the next schedule for the user with the given tiltify username.
+   * Returns: An object containing the schedule and its streams, or null if none found.
+   */
+  getNextScheduleByTiltifyUsername: defineAction({
+    input: z.string(),
+    handler: async (tiltifyUsername, ctx) => {
+      try {
+        const schedules = ScheduleRepo.action(ctx);
+        const nextSchedule = await schedules.findNextScheduleByTiltifyUsername(tiltifyUsername);
+
+        return {nextSchedule};
+      } catch (e: any) {
+        console.error('Error getting next schedule by tiltify username:', e);
+        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message});
+      }
+    }
+  }),
+}
+
+
+================================================================================
+END OF FILE: src/actions/schedules.ts
+================================================================================
+
+
+================================================================================
+FILE: src/actions/teams.ts
+================================================================================
+
+import {ActionError, defineAction} from "astro:actions";
+import {z} from "astro:content";
+import {createSlug, generateTeamSlugAlternatives} from "../functions/slug.ts";
+import {TeamRepo} from "../lib/db/repos/TeamRepo.ts";
+import {UserRepo} from "../lib/db/repos/UserRepo.ts";
+import {useRpcTeamDO, useRpcUserDO} from "./getDO.ts";
+
+
+export const teams = {
+  /**
+   * Creates a new team with the authenticated user as owner.
+   * Input: An object containing:
+   *   - name (string) - The name of the team
+   *   - slug (string) - The slug for the team URL
+   * Action: Creates a team in the database, initializes the TeamDO, and adds the creator as a member.
+   * Returns: The ID of the created team.
+   */
+  create: defineAction({
+    input: z.object({
+      name: z.string(),
+      slug: z.string(),
+    }),
+    handler: async ({name, slug}, ctx) => {
+      const {user, session} = ctx.locals;
+      if (!user || !session) {
+        throw new ActionError({code: 'UNAUTHORIZED'})
+      }
+      if (!slug) {
+        throw new ActionError({code: 'BAD_REQUEST', message: 'slug is required'})
+      }
+      if (!name) {
+        throw new ActionError({code: 'BAD_REQUEST', message: 'name is required'})
+      }
+
+      // Create a proper slug using the createSlug function
+      slug = createSlug(slug);
+
+      if (!slug) {
+        throw new ActionError({code: 'BAD_REQUEST', message: 'Invalid slug'})
+      }
+
+      const teams = TeamRepo.action(ctx);
+
+      // Check if slug is available
+      const existingTeam = await teams.findBySlug(slug);
+      if (existingTeam) {
+        throw new ActionError({code: 'BAD_REQUEST', message: 'slug is used'})
+      }
+
+      // Create team in database
+      const team = await teams.create({
+        name: name,
+        slug: slug,
+        ownerId: user.id,
+      });
+
+      // Initialize TeamDO and add creator as a member
+      await useRpcTeamDO(ctx, team.id, async (rpc) => {
+        rpc.setTeam(team);
+        // Add team creator as a member
+        await rpc.addTeamMember(user.id, user.tiltifyName);
+      }, (error) => {
+        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: error.message});
+      });
+
+      // Initialize UserDO and update user's team memberships
+      await useRpcUserDO(ctx, user.id, async (rpc) => {
+        // Add team to user's memberships
+        await rpc.addTeam({
+          id: team.id,
+          name: team.name,
+          slug: team.slug,
+          ownerId: team.ownerId,
+        });
+      }, (error) => {
+        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: error.message});
+      });
+
+      return team.id
+    }
+  }),
+  /**
+   * Updates an existing team's information.
+   * Input: An object containing:
+   *   - id (number) - The ID of the team to update
+   *   - name (string) - The new name for the team
+   *   - slug (string) - The new slug for the team URL
+   * Action: Verifies the user is the team owner and updates the team information in the database and TeamDO.
+   * Returns: The updated team object.
+   */
+  update: defineAction({
+    input: z.object({
+      id: z.number(),
+      name: z.string(),
+      slug: z.string(),
+      visible: z.boolean().optional(),
+    }),
+    handler: async ({id, name, slug, visible}, ctx) => {
+      const {user, session} = ctx.locals;
+      if (!user || !session) {
+        throw new ActionError({code: 'UNAUTHORIZED'})
+      }
+      if (!slug) {
+        throw new ActionError({code: 'BAD_REQUEST', message: 'slug is required'})
+      }
+      if (!name) {
+        throw new ActionError({code: 'BAD_REQUEST', message: 'name is required'})
+      }
+
+      const teams = TeamRepo.action(ctx);
+
+      // Check if team exists and user is the owner
+      const team = await teams.findById(id);
+
+      if (!team) {
+        throw new ActionError({code: 'NOT_FOUND', message: 'Team not found'})
+      }
+
+      // Ensure only team owners can update teams
+      if (team.ownerId !== user.id) {
+        throw new ActionError({code: 'FORBIDDEN', message: 'Only team owners can update teams'})
+      }
+
+      // Check if slug is available (if it's changed)
+      if (slug !== team.slug) {
+        const existingTeam = await teams.findBySlug(slug);
+        if (existingTeam) {
+          throw new ActionError({code: 'BAD_REQUEST', message: 'slug is already in use'})
+        }
+      }
+
+      // Update team in database
+      const updatedTeam = await teams.update(id, {
+        name: name,
+        slug: slug,
+        ...(visible !== undefined && {visible}),
+      });
+
+      // Update TeamDO
+      await useRpcTeamDO(ctx, id, async (rpc) => {
+        await rpc.updateTeam({
+          name: name,
+          slug: slug,
+          ...(visible !== undefined && {visible}),
+        });
+      }, (error) => {
+        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: error.message});
+      });
+
+      return updatedTeam
+    }
+  }),
+  /**
+   * Deletes a team owned by the authenticated user.
+   * Input: teamId (number) - The ID of the team to delete
+   * Action: Verifies the user is the team owner, deletes the team from the database, and updates all team members' UserDOs.
+   * Returns: An object with a success flag.
+   */
+  deleteTeam: defineAction({
+    input: z.number(),
+    handler: async (teamId, ctx) => {
+      const {user, session} = ctx.locals;
+      if (!user || !session) {
+        throw new ActionError({code: 'UNAUTHORIZED'})
+      }
+
+      const teams = TeamRepo.action(ctx);
+
+      // Check if team exists and user is the owner
+      const team = await teams.findById(teamId);
+
+      if (!team) {
+        throw new ActionError({code: 'NOT_FOUND', message: 'Team not found'})
+      }
+
+      // Ensure only team owners can delete teams
+      if (team.ownerId !== user.id) {
+        throw new ActionError({code: 'FORBIDDEN', message: 'Only team owners can delete teams'})
+      }
+
+      // Get all team members from the database
+      const members = await teams.getTeamMembers(teamId);
+      const memberIds = members.map(member => member.userId);
+
+      // Delete team in TeamDO
+      await useRpcTeamDO(ctx, teamId, async (rpc) => {
+        await rpc.deleteTeam();
+      }, (error) => {
+        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: error.message});
+      });
+
+      // Update UserDO for each team member
+      if (memberIds.length > 0) {
+        for (const memberId of memberIds) {
+          await useRpcUserDO(ctx, memberId, async (rpc) => {
+            await rpc.teamDeleted(teamId);
+          }, (error) => {
+            throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: error.message});
+          });
+        }
+      }
+
+      return {success: true}
+    }
+  }),
+  /**
+   * Allows a team member to leave a team.
+   * Input: teamId (number) - The ID of the team to leave
+   * Action: Verifies the user is not the team owner, removes them from the team in the database, and updates both TeamDO and UserDO.
+   * Returns: An object with a success flag.
+   */
+  leaveTeam: defineAction({
+    input: z.number(),
+    handler: async (teamId, ctx) => {
+      const {user, session} = ctx.locals;
+      if (!user || !session) {
+        throw new ActionError({code: 'UNAUTHORIZED'})
+      }
+
+      const teams = TeamRepo.action(ctx);
+
+      // Check if team exists
+      const team = await teams.findById(teamId);
+
+      if (!team) {
+        throw new ActionError({code: 'NOT_FOUND', message: 'Team not found'})
+      }
+
+      // Prevent team owner from leaving their own team
+      if (team.ownerId === user.id) {
+        throw new ActionError({
+          code: 'FORBIDDEN',
+          message: 'Team owner cannot leave their own team. Transfer ownership or delete the team instead.'
+        })
+      }
+
+      // Remove user from team in TeamDO
+      await useRpcTeamDO(ctx, teamId, async (rpc) => {
+        await rpc.userLeaveTeam(user.id);
+      }, (error) => {
+        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: error.message});
+      });
+
+      // Update UserDO state
+      await useRpcUserDO(ctx, user.id, async (rpc) => {
+        await rpc.leaveTeam(teamId);
+      }, (error) => {
+        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: error.message});
+      });
+      return {success: true}
+    }
+  }),
+  /**
+   * Allows a team owner to remove a user from their team.
+   * Input: An object containing:
+   *   - userId (number) - The ID of the user to remove
+   *   - teamId (number) - The ID of the team
+   * Action: Verifies the authenticated user is the team owner, removes the specified user from the team, and updates both TeamDO and UserDO.
+   * Returns: An object with a success flag.
+   */
+  removeUser: defineAction({
+    input: z.object({
+      userId: z.number(),
+      teamId: z.number(),
+    }),
+    handler: async ({userId, teamId}, ctx) => {
+      const {user, session} = ctx.locals;
+      if (!user || !session) {
+        throw new ActionError({code: 'UNAUTHORIZED'})
+      }
+
+      const teams = TeamRepo.action(ctx);
+
+      // Check if team exists and user is the owner
+      const team = await teams.findById(teamId);
+
+      if (!team) {
+        throw new ActionError({code: 'NOT_FOUND', message: 'Team not found'})
+      }
+
+      // Ensure only team owners can remove users
+      if (team.ownerId !== user.id) {
+        throw new ActionError({code: 'FORBIDDEN', message: 'Only team owners can remove users'})
+      }
+
+      // Prevent team owner from removing themselves
+      if (userId === user.id) {
+        throw new ActionError({code: 'FORBIDDEN', message: 'Team owner cannot remove themselves from the team'})
+      }
+
+      // Remove user from team in TeamDO
+      await useRpcTeamDO(ctx, teamId, async (rpc) => {
+        await rpc.deleteTeamMember(user.id);
+      }, (error) => {
+        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: error.message});
+      });
+
+      // Update UserDO state
+      await useRpcUserDO(ctx, userId, async (rpc) => {
+        await rpc.removedFromTeam(teamId);
+      }, (error) => {
+        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: error.message});
+      });
+      return {success: true}
+    }
+  }),
+  /**
+   * Checks if a slug is valid and available for use with a team.
+   * Input: An object containing:
+   *   - slug (string) - The slug to validate
+   *   - tiltifyName (string, optional) - The Tiltify username to generate alternative suggestions
+   * Action: Validates if the provided slug is available for use and generates alternatives if not.
+   * Returns: An object with isValid flag and an array of suggested alternatives if the slug is not valid.
+   */
+  isSlugValid: defineAction({
+    input: z.object({
+      slug: z.string(),
+      tiltifyName: z.string().optional(),
+    }),
+    handler: async ({slug, tiltifyName}, ctx) => {
+      const {user, session} = ctx.locals;
+      if (!user || !session) {
+        throw new ActionError({code: 'UNAUTHORIZED'})
+      }
+      if (!slug) {
+        throw new ActionError({code: 'BAD_REQUEST', message: 'slug is required'})
+      }
+
+      // Note: We're still using generateTeamSlugAlternatives which uses direct DB access
+      // This is because the function is in a separate file and modifying it is outside the scope
+      // of the current migration task
+
+      // Get alternatives using the generateTeamSlugAlternatives function
+      // If it returns alternatives, the slug is not valid
+      const alternatives = await generateTeamSlugAlternatives(ctx, slug, 3);
+
+      // If alternatives is empty, the slug is valid
+      if (alternatives.length === 0) {
+        return {
+          isValid: true,
+          suggestions: []
+        };
+      }
+
+      // Add tiltifyName as a suggestion if provided and different from slug
+      let allAlternatives = [...alternatives];
+
+      if (tiltifyName && tiltifyName.toLowerCase() !== slug.toLowerCase()) {
+        const tiltifySlug = createSlug(tiltifyName);
+        // Check if this slug is valid using generateTeamSlugAlternatives
+        // If it returns an empty array, the slug is valid
+        const tiltifyAlternatives = await generateTeamSlugAlternatives(ctx, tiltifySlug, 0);
+        if (tiltifyAlternatives.length === 0) {
+          allAlternatives.push(tiltifySlug);
+        }
+      } else if (user.tiltifyName && user.tiltifyName.toLowerCase() !== slug.toLowerCase()) {
+        const userTiltifySlug = createSlug(user.tiltifyName);
+        // Check if this slug is valid using generateTeamSlugAlternatives
+        // If it returns an empty array, the slug is valid
+        const userTiltifyAlternatives = await generateTeamSlugAlternatives(ctx, userTiltifySlug, 0);
+        if (userTiltifyAlternatives.length === 0) {
+          allAlternatives.push(userTiltifySlug);
+        }
+      }
+
+      return {
+        isValid: false,
+        suggestions: allAlternatives
+      };
+    }
+  }),
+
+  /**
+   * Retrieves all teams a user is a member of given a tiltify username.
+   * Input: tiltifyUsername (string) - The tiltify username to find teams for
+   * Action: Uses the TeamRepo to find all teams the user is a member of.
+   * Returns: An array of teams the user is a member of.
+   */
+  getTeamsByTiltifyUsername: defineAction({
+    input: z.string(),
+    handler: async (tiltifyUsername, ctx) => {
+      try {
+        const teamsRepo = TeamRepo.action(ctx);
+        const teams = await teamsRepo.findVisibleByTiltifyUsername(tiltifyUsername);
+
+        return {teams};
+      } catch (e: any) {
+        console.error('Error getting teams by tiltify username:', e);
+        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message});
+      }
+    }
+  }),
+
+  findVisible: defineAction({
+    handler: (_, ctx) => {
+      const repo = TeamRepo.action(ctx);
+      return repo.findVisible()
+    }
+  }),
+
+  findAllVisibleWithMemberCount: defineAction({
+    handler: (_, ctx) => {
+      const repo = TeamRepo.action(ctx);
+      return repo.findAllVisibleWithMemberCount()
+    }
+  })
+}
+
+export const teamInvites = {
+  /**
+   * Invites a user to join a team.
+   * Input: An object containing:
+   *   - invitedUserId (number) - The ID of the user to invite
+   *   - teamId (number) - The ID of the team
+   * Action: Verifies the authenticated user is the team owner, creates an invitation in the database, and updates both TeamDO and UserDO.
+   * Returns: An object with a success flag.
+   */
+  invite: defineAction({
+    input: z.object({
+      invitedUserId: z.number(),
+      teamId: z.number(),
+    }),
+    handler: async ({invitedUserId, teamId}, ctx) => {
+      const {user, session} = ctx.locals;
+      if (!user || !session) {
+        throw new ActionError({code: 'UNAUTHORIZED'})
+      }
+
+      const teams = TeamRepo.action(ctx);
+      const users = UserRepo.action(ctx);
+
+      // Check if team exists and user is the owner
+      const team = await teams.findById(teamId);
+
+      if (!team) {
+        throw new ActionError({code: 'NOT_FOUND', message: 'Team not found'})
+      }
+
+      // Ensure only team owners can invite people
+      if (team.ownerId !== user.id) {
+        throw new ActionError({code: 'FORBIDDEN', message: 'Only team owners can invite users'})
+      }
+
+      console.log('invitedUserId', invitedUserId)
+
+      const userToInvite = await users.getAccountByProvider(invitedUserId, 'tiltify')
+
+      console.log('userToInvite', userToInvite)
+
+      if (!userToInvite) {
+        console.error('Error initializing UserToInvite:', 'user not found');
+        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: 'user not found'})
+      }
+
+      // Add invite to TeamDO
+      await useRpcTeamDO(ctx, teamId, async (rpc) => {
+        await rpc.addInvite(invitedUserId, userToInvite.providerUsername);
+      }, (error) => {
+        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: error.message});
+      });
+
+      // Add invite to UserDO
+      await useRpcUserDO(ctx, invitedUserId, async (rpc) => {
+        await rpc.addInvite({
+          id: team.id,
+          name: team.name,
+          slug: team.slug,
+          ownerId: team.ownerId,
+        });
+      }, (error) => {
+        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: error.message});
+      });
+      return {success: true}
+    }
+  }),
+  /**
+   * Removes an invitation to a team.
+   * Input: An object containing:
+   *   - invitedUserId (number) - The ID of the user whose invitation is being removed
+   *   - teamId (number) - The ID of the team
+   * Action: Verifies the authenticated user is the team owner, removes the invitation from the database, and updates both TeamDO and UserDO.
+   * Returns: An object with a success flag.
+   */
+  removeInvite: defineAction({
+    input: z.object({
+      invitedUserId: z.number(),
+      teamId: z.number(),
+    }),
+    handler: async ({invitedUserId, teamId}, ctx) => {
+      const {user, session} = ctx.locals;
+      if (!user || !session) {
+        throw new ActionError({code: 'UNAUTHORIZED'})
+      }
+
+      const teams = TeamRepo.action(ctx);
+
+      // Check if team exists and user is the owner
+      const team = await teams.findById(teamId);
+
+      if (!team) {
+        throw new ActionError({code: 'NOT_FOUND', message: 'Team not found'})
+      }
+
+      // Ensure only team owners can remove invites
+      if (team.ownerId !== user.id) {
+        throw new ActionError({code: 'FORBIDDEN', message: 'Only team owners can remove invites'})
+      }
+
+      // Check if invite exists
+      const hasInvite = await teams.hasInvite(teamId, invitedUserId);
+
+      if (!hasInvite) {
+        throw new ActionError({code: 'NOT_FOUND', message: 'Invite not found'})
+      }
+
+      // Delete invite from TeamDO
+      await useRpcTeamDO(ctx, teamId, async (rpc) => {
+        await rpc.deleteInvite(invitedUserId);
+      }, (error) => {
+        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: error.message});
+      });
+
+      // Update UserDO state
+      await useRpcUserDO(ctx, invitedUserId, async (rpc) => {
+        await rpc.rejectInvite(teamId);
+      }, (error) => {
+        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: error.message});
+      });
+      return {success: true}
+    }
+  }),
+  /**
+   * Accepts an invitation to join a team.
+   * Input: teamId (number) - The ID of the team whose invitation is being accepted
+   * Action: Verifies the authenticated user has an invitation, adds them as a team member, and updates both TeamDO and UserDO.
+   * Returns: An object with a success flag.
+   */
+  acceptInvite: defineAction({
+    input: z.number(),
+    handler: async (teamId, ctx) => {
+      const {user, session} = ctx.locals;
+      if (!user || !session) {
+        throw new ActionError({code: 'UNAUTHORIZED'})
+      }
+
+      const teams = TeamRepo.action(ctx);
+
+      // Check if team exists
+      const team = await teams.findById(teamId);
+
+      if (!team) {
+        throw new ActionError({code: 'NOT_FOUND', message: 'Team not found'})
+      }
+
+      // Check if user has an invite
+      const hasInvite = await teams.hasInvite(teamId, user.id);
+
+      if (!hasInvite) {
+        throw new ActionError({code: 'NOT_FOUND', message: 'Invite not found'})
+      }
+
+      await useRpcTeamDO(ctx, teamId, async (rpc) => {
+        await rpc.acceptInvite(user.id, user.tiltifyName)
+      }, (error) => {
+        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: error.message});
+      })
+
+      await useRpcUserDO(ctx, user.id, async (rpc) => {
+        await rpc.acceptInvite({
+          id: team.id,
+          name: team.name,
+          slug: team.slug,
+          ownerId: team.ownerId,
+        })
+      }, (error) => {
+        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: error.message});
+      })
+
+      return {success: true}
+    }
+  }),
+  /**
+   * Rejects an invitation to join a team.
+   * Input: teamId (number) - The ID of the team whose invitation is being rejected
+   * Action: Verifies the authenticated user has an invitation, removes the invitation from the database, and updates both TeamDO and UserDO.
+   * Returns: An object with a success flag.
+   */
+  rejectInvite: defineAction({
+    input: z.number(),
+    handler: async (teamId, ctx) => {
+      const {user, session} = ctx.locals;
+      if (!user || !session) {
+        throw new ActionError({code: 'UNAUTHORIZED'})
+      }
+
+      const teams = TeamRepo.action(ctx);
+
+      // Check if team exists
+      const team = await teams.findById(teamId);
+
+      if (!team) {
+        throw new ActionError({code: 'NOT_FOUND', message: 'Team not found'})
+      }
+
+      // Check if user has an invite
+      const hasInvite = await teams.hasInvite(teamId, user.id);
+
+      if (!hasInvite) {
+        throw new ActionError({code: 'NOT_FOUND', message: 'Invite not found'})
+      }
+
+      await useRpcTeamDO(ctx, teamId, async (rpc) => {
+        await rpc.deleteInvite(user.id)
+      }, (error) => {
+        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: error.message});
+      })
+
+      await useRpcUserDO(ctx, user.id, async (rpc) => {
+        await rpc.rejectInvite(teamId)
+      }, (error) => {
+        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: error.message});
+      })
+
+      return {success: true}
+    }
+  }),
+}
+
+
+================================================================================
+END OF FILE: src/actions/teams.ts
+================================================================================
+
+
+================================================================================
+FILE: src/actions/tiltify.ts
+================================================================================
+
+import {ActionError, defineAction} from "astro:actions";
+import {z} from 'astro:schema';
+import {getDB} from "../lib/db/db.ts";
+import {editorsTable, schedulesTable, streamsTable} from "../lib/db/schema/schema.ts";
+import {and, eq} from "drizzle-orm";
+import type {ScheduleInsert} from "../lib/db/dbModels.ts";
+
+
+export const tiltify = {
+  getUserById: defineAction({
+    input: z.string(),
+    handler:(input, ctx)=>{
+
+    }
+  })
+}
+
+
+================================================================================
+END OF FILE: src/actions/tiltify.ts
+================================================================================
+
+
+================================================================================
+FILE: src/actions/twitch.ts
+================================================================================
+
+import {ActionError, defineAction} from "astro:actions";
+import {z} from "astro:content";
+
+
+export const twitch = {
+  validatedTwitchUrl: defineAction({
+    input: z.string().url(),
+    handler: async (url, context) => {
+      const {session, user} = context.locals
+      if (!session || !user) {
+        throw new ActionError({code: 'UNAUTHORIZED'});
+      }
+      const userId = user.id;
+
+      const DO = context.locals.runtime.env.TwitchAPIDO
+      const DO_ID = DO.idFromName(userId);
+      const stub = DO.get(DO_ID)
+
+      if (!stub) {
+        throw new ActionError({code: 'INTERNAL_SERVER_ERROR'});
+      }
+
+      const components = url.split('/')
+      const name = components[components.length - 1];
+
+      const {data, error} = await stub.fetchUserByLogin(name)
+
+      if (error) {
+        throw new ActionError({code: 'BAD_REQUEST', message: error.description});
+      }
+      if(data.data.length === 0){
+        throw new ActionError({code: 'NOT_FOUND'});
+      }
+
+      return data.data[0]
+    }
+  })
+}
+
+
+================================================================================
+END OF FILE: src/actions/twitch.ts
+================================================================================
+
+
+================================================================================
+FILE: src/actions/ui.ts
+================================================================================
+
+import {ActionError, defineAction} from "astro:actions";
+import {z} from "astro:content";
+import {ScheduleUIRepo} from "../lib/db/repos/ScheduleUIRepo.ts";
+import {TeamRepo} from "../lib/db/repos/TeamRepo.ts";
+import {UserUIRepo} from "../lib/db/repos/UserUIRepo.ts";
+
+export const ui = {
+  users: {
+    schedules: {
+      byTiltifyName: defineAction({
+        input: z.string(),
+        handler: (tiltifyUsername: string, ctx) => {
+          try {
+            const repo = ScheduleUIRepo.action(ctx);
+            return repo.findNextScheduleByTiltifyUsernameFormated(tiltifyUsername);
+          } catch (e: any) {
+            console.error('Error getting next schedule by tiltify username:', e);
+            throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message});
+          }
+        }
+      }),
+      byScheduleSlug: defineAction({
+        input: z.string(),
+        handler: async (slug: string, ctx) => {
+          let repo: ScheduleUIRepo;
+
+          try {
+            console.log('ui.user.schedules.byScheduleSlug', slug)
+            repo = ScheduleUIRepo.action(ctx);
+          } catch (e: any) {
+            console.error('Error getting schedule by slug:', e);
+            throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message});
+          }
+
+          console.log('ui.user.schedules.byScheduleSlug', slug)
+          const schedule = await repo.getScheduleBySlug(slug);
+          if (!schedule) {
+            throw new ActionError({code: 'NOT_FOUND', message: 'Schedule not found.'});
+          }
+
+          if (!schedule.schedule) {
+            throw new ActionError({code: 'NOT_FOUND', message: 'Schedule not found.'});
+          }
+
+          if (!schedule.schedule.visible) {
+            throw new ActionError({code: 'NOT_FOUND', message: 'Schedule is set to private'});
+          }
+
+          return schedule;
+        }
+      }),
+      getCurrentPrimaryBySlug: defineAction({
+        input: z.string(),
+        handler: async (slug: string, ctx) => {
+          try {
+            const repo = ScheduleUIRepo.action(ctx);
+            const schedule = await repo.getCurrentPrimaryBySlug(slug);
+
+            if (!schedule) {
+              throw new ActionError({code: 'NOT_FOUND', message: 'Primary schedule not found for this user.'});
+            }
+
+            if (!schedule.schedule) {
+              throw new ActionError({code: 'NOT_FOUND', message: 'Schedule not found.'});
+            }
+
+            if (!schedule.schedule.visible) {
+              throw new ActionError({code: 'NOT_FOUND', message: 'Schedule is set to private'});
+            }
+
+            return schedule;
+          } catch (e: any) {
+            console.error('Error getting primary schedule by slug:', e);
+            throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message});
+          }
+        }
+      }),
+      getCurrentPrimaryByTiltifyUsername: defineAction({
+        input: z.string(),
+        handler: async (tiltifyUsername: string, ctx) => {
+          try {
+            const repo = ScheduleUIRepo.action(ctx);
+            const schedule = await repo.getCurrentPrimaryByTiltifyUsername(tiltifyUsername);
+
+            if (!schedule) {
+              throw new ActionError({code: 'NOT_FOUND', message: 'Primary schedule not found for this user.'});
+            }
+
+            if (!schedule.schedule) {
+              throw new ActionError({code: 'NOT_FOUND', message: 'Schedule not found.'});
+            }
+
+            if (!schedule.schedule.visible) {
+              throw new ActionError({code: 'NOT_FOUND', message: 'Schedule is set to private'});
+            }
+
+            return schedule;
+          } catch (e: any) {
+            console.error('Error getting primary schedule by tiltify username:', e);
+            throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message});
+          }
+        }
+      })
+    },
+
+    byId: defineAction({
+      input: z.number(),
+      handler: async (id, context) => {
+        const repo = UserUIRepo.action(context);
+        const data = await repo.getUserById(id)
+        if (!data) {
+          throw new ActionError({
+            code: 'NOT_FOUND',
+          })
+        }
+        return data
+      }
+    }),
+    bySlug: defineAction({
+      input: z.string(),
+      handler: async (slug, context) => {
+        const repo = UserUIRepo.action(context);
+        const data = await repo.getUserByName(slug)
+        if (!data) {
+          throw new ActionError({
+            code: 'NOT_FOUND',
+          })
+        }
+        return data
+      }
+    }),
+    all: defineAction({
+      handler: async (_, context) => {
+        try {
+          const repo = UserUIRepo.action(context);
+          return await repo.getAllUsers();
+        } catch (e: any) {
+          console.error('Error getting all users:', e);
+          throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message});
+        }
+      }
+    })
+  },
+  teams: {
+    getById: defineAction({
+      input: z.number(),
+      handler: async (teamId, context) => {
+        const teamRepo =  TeamRepo.action(context);
+        const team = await teamRepo.findById(teamId);
+        if (!team) {
+          return null;
+        }
+        const scheduleRepo = ScheduleUIRepo.action(context);
+        const teamSchedule = await scheduleRepo.getTeamSchedule(teamId);
+        if (!teamSchedule) {
+          throw new ActionError({code: 'NOT_FOUND', message: 'Schedule not found.'});
+        }
+        return {
+          team: team,
+          ...teamSchedule,
+        }
+      }
+    }),
+    getBySlug: defineAction({
+      input: z.string(),
+      handler: async (slug, context) => {
+        const teamRepo =  TeamRepo.action(context);
+        const team = await teamRepo.findBySlug(slug);
+        if (!team) {
+          return null;
+        }
+        const scheduleRepo = ScheduleUIRepo.action(context);
+        const teamSchedule = await scheduleRepo.getTeamSchedule(team.id);
+        if (!teamSchedule) {
+          throw new ActionError({code: 'NOT_FOUND', message: 'Schedule not found.'});
+        }
+        return {
+          team: team,
+          ...teamSchedule,
+        }
+      }
+    })
+  }
+}
+
+
+================================================================================
+END OF FILE: src/actions/ui.ts
+================================================================================
+
+
+================================================================================
+FILE: src/actions/users.ts
+================================================================================
+
+import {ActionError, defineAction} from "astro:actions";
+import {z} from "astro:content";
+import {getTags} from "../functions/getTags.ts";
+import {socialUrlRegex} from "../functions/socialUrlRegex.ts";
+import {TiltifyAPI} from "../lib/TiltifyAPI.ts";
+import {UserRepo} from "../lib/db/repos/UserRepo.ts";
+import {UserTagRepo} from "../lib/db/repos/UserTagRepo.ts";
+import {useRpcUserDO} from "./getDO.ts";
+import {TiltifyRepo} from "../lib/db/repos/TiltifyRepo.ts";
+
+export const users = {
+  /**
+   * Updates the user's style preferences.
+   * Input: An object containing:
+   *   - primaryColor (string) - The primary color in hex format
+   *   - accentColor (string) - The accent color in hex format
+   * Action: Updates the user's style preferences in the database and UserDO.
+   * Returns: An object with a success flag.
+   */
+  updateUserStyle: defineAction({
+    input: z.object({
+      primaryColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/, {
+        message: "Primary color must be a valid hex color code (e.g., #E30E50)"
+      }),
+      accentColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/, {
+        message: "Accent color must be a valid hex color code (e.g., #3584BF)"
+      })
+    }),
+    handler: async ({primaryColor, accentColor}, context) => {
+      // Check if user is authenticated
+      const {session, user} = context.locals
+      if (!session || !user) {
+        throw new ActionError({code: 'UNAUTHORIZED'});
+      }
+
+      const userId = user.id;
+      let result = await useRpcUserDO(context, userId, async (rpc) => {
+        return rpc.updateUserStyle(primaryColor, accentColor);
+      }, (error) => {
+        throw new ActionError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to update user style'
+        });
+      });
+
+      if (!result) {
+        throw new ActionError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to update user style'
+        });
+      }
+      return {success: true};
+
+    }
+  }),
+  /**
+   * Fetches social media links from the user's Tiltify account and adds them to their profile.
+   * Input: None
+   * Action: Retrieves the user's Tiltify token, fetches their social media links from Tiltify, and adds them to the UserDO.
+   * Returns: An object with success status and results for each social media platform.
+   */
+  fetchSocialsFromTiltify: defineAction({
+    handler: async (_, context) => {
+      // 1. Check if user is authenticated
+      const {session, user} = context.locals
+      if (!session || !user) {
+        throw new ActionError({code: 'UNAUTHORIZED'});
+      }
+
+      const tiltifyAPI = new TiltifyAPI(context.locals.runtime.env);
+      // 2. Get the user's Tiltify token
+      let tiltifyToken;
+      try {
+        tiltifyToken = await tiltifyAPI.getTokenFromContext(context);
+        if (!tiltifyToken) {
+          throw new ActionError({
+            code: 'UNAUTHORIZED',
+            message: 'No Tiltify token found for user'
+          });
+        }
+      } catch (error) {
+        console.error('Error getting Tiltify token:', error);
+        throw new ActionError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to get Tiltify token'
+        });
+      }
+
+      // 3. Get the Tiltify user data
+      let tiltifyUser;
+      try {
+        tiltifyUser = await tiltifyAPI.getUser(tiltifyToken);
+        if (!tiltifyUser) {
+          throw new ActionError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: 'Failed to get Tiltify user data'
+          });
+        }
+      } catch (error) {
+        console.error('Error getting Tiltify user data:', error);
+        throw new ActionError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to get Tiltify user data'
+        });
+      }
+
+      // 4. Set the user socials using the Tiltify data
+      const userId = user.id;
+
+      // Add socials from Tiltify data
+      const socials = tiltifyUser.data.social;
+      const results: { provider: string, success: boolean }[] = [];
+
+      await useRpcUserDO(context, userId, async (rpc) => {
+        // Add Twitch social if available
+        if (socials.twitch) {
+          const twitchUrl = socials.twitch.startsWith('http')
+            ? socials.twitch
+            : `https://twitch.tv/${socials.twitch}`;
+
+          try {
+            const result = await rpc.addSocial('twitch', twitchUrl);
+            results.push({provider: 'twitch', success: !!result});
+          } catch (error) {
+            console.error('Error adding Twitch social:', error);
+            results.push({provider: 'twitch', success: false});
+          }
+        }
+
+        // Add Twitter social if available
+        if (socials.twitter) {
+          const twitterUrl = socials.twitter.startsWith('http')
+            ? socials.twitter
+            : `https://twitter.com/${socials.twitter}`;
+
+          try {
+            const result = await rpc.addSocial('twitter', twitterUrl);
+            results.push({provider: 'twitter', success: !!result});
+          } catch (error) {
+            console.error('Error adding Twitter social:', error);
+            results.push({provider: 'twitter', success: false});
+          }
+        }
+
+        // Add YouTube social if available
+        if (socials.youtube) {
+          let youtubeUrl = socials.youtube;
+          if (!youtubeUrl.startsWith('http')) {
+            // Check if it's a channel ID or username
+            if (youtubeUrl.startsWith('UC')) {
+              youtubeUrl = `https://youtube.com/channel/${youtubeUrl}`;
+            } else {
+              youtubeUrl = `https://youtube.com/@${youtubeUrl}`;
+            }
+          }
+
+          try {
+            const result = await rpc.addSocial('youtube', youtubeUrl);
+            results.push({provider: 'youtube', success: !!result});
+          } catch (error) {
+            console.error('Error adding YouTube social:', error);
+            results.push({provider: 'youtube', success: false});
+          }
+        }
+
+        // Add Instagram social if available
+        if (socials.instagram) {
+          const instagramUrl = socials.instagram.startsWith('http')
+            ? socials.instagram
+            : `https://instagram.com/${socials.instagram}`;
+
+          try {
+            const result = await rpc.addSocial('instagram', instagramUrl);
+            results.push({provider: 'instagram', success: !!result});
+          } catch (error) {
+            console.error('Error adding Instagram social:', error);
+            results.push({provider: 'instagram', success: false});
+          }
+        }
+
+        // Add TikTok social if available
+        if (socials.tiktok) {
+          const tiktokUrl = socials.tiktok.startsWith('http')
+            ? socials.tiktok
+            : `https://tiktok.com/@${socials.tiktok}`;
+
+          try {
+            const result = await rpc.addSocial('tiktok', tiktokUrl);
+            results.push({provider: 'tiktok', success: !!result});
+          } catch (error) {
+            console.error('Error adding TikTok social:', error);
+            results.push({provider: 'tiktok', success: false});
+          }
+        }
+      }, (error) => {
+        throw new ActionError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to set user socials'
+        });
+      });
+
+      return {
+        success: true,
+        results
+      };
+    }
+  }),
+
+  /**
+   * Adds a social media link to the user's profile.
+   * Input: An object containing:
+   *   - provider (string) - The social media platform (twitch, twitter, bsky, youtube, instagram, tiktok)
+   *   - url (string) - The URL of the user's social media profile
+   * Action: Validates the URL format and adds the social media link to the UserDO.
+   * Returns: An object with a success flag.
+   */
+  addSocial: defineAction({
+    input: z.object({
+      provider: z.string().refine(val => ['twitch', 'twitter', 'bsky', 'youtube', 'instagram', 'tiktok'].includes(val.toLowerCase()), {
+        message: "Provider must be one of: twitch, twitter, bsky, youtube, instagram, tiktok"
+      }),
+      url: z.string()
+    })
+      .refine(
+        (data) => {
+          const regexes = socialUrlRegex();
+          const provider = data.provider.toLowerCase();
+          const url = data.url;
+
+          if (provider === 'twitch') {
+            return regexes.twitch.test(url);
+          } else if (provider === 'twitter') {
+            return regexes.twitter.test(url);
+          } else if (provider === 'bsky') {
+            return regexes.bsky.test(url);
+          } else if (provider === 'youtube') {
+            return regexes.youtube.test(url);
+          } else if (provider === 'instagram') {
+            return regexes.instagram.test(url);
+          } else if (provider === 'tiktok') {
+            return regexes.tiktok.test(url);
+          }
+          return false;
+        },
+        (data) => {
+          const provider = data.provider.toLowerCase();
+          let message = "Please enter a valid URL";
+
+          if (provider === 'twitch') {
+            message = "Please enter a valid Twitch URL (e.g., https://twitch.tv/username)";
+          } else if (provider === 'twitter') {
+            message = "Please enter a valid Twitter/X URL (e.g., https://twitter.com/username or https://x.com/username)";
+          } else if (provider === 'bsky') {
+            message = "Please enter a valid Bluesky URL (e.g., https://bsky.app/profile/user@domain.com)";
+          } else if (provider === 'youtube') {
+            message = "Please enter a valid YouTube URL (e.g., https://youtube.com/@username or https://youtube.com/channel/CHANNEL_ID)";
+          } else if (provider === 'instagram') {
+            message = "Please enter a valid Instagram URL (e.g., https://instagram.com/username)";
+          } else if (provider === 'tiktok') {
+            message = "Please enter a valid TikTok URL (e.g., https://tiktok.com/@username)";
+          }
+
+          return {
+            message,
+            path: ["url"] // This ensures the error is associated with the url field
+          };
+        }
+      ),
+    handler: async ({provider, url}, context) => {
+      // Check if user is authenticated
+      const {session, user} = context.locals
+      if (!session || !user) {
+        throw new ActionError({code: 'UNAUTHORIZED'});
+      }
+
+      const userId = user.id;
+      const result = await useRpcUserDO(context, userId, async (rpc) => {
+        return rpc.addSocial(provider.toLowerCase(), url);
+      }, (error) => {
+        throw new ActionError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to add social media link'
+        });
+      });
+
+      if (!result) {
+        throw new ActionError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to add social media link'
+        });
+      }
+      return {success: true};
+    }
+  }),
+
+  /**
+   * Removes a social media link from the user's profile.
+   * Input: An object containing:
+   *   - provider (string) - The social media platform to remove (twitch, twitter, bsky, youtube, instagram, tiktok)
+   * Action: Removes the specified social media link from the UserDO.
+   * Returns: An object with a success flag.
+   */
+  removeSocial: defineAction({
+    input: z.object({
+      provider: z.string().refine(val => ['twitch', 'twitter', 'bsky', 'youtube', 'instagram', 'tiktok'].includes(val.toLowerCase()), {
+        message: "Provider must be one of: twitch, twitter, bsky, youtube, instagram, tiktok"
+      })
+    }),
+    handler: async ({provider}, context) => {
+      // Check if user is authenticated
+      const {session, user} = context.locals
+      if (!session || !user) {
+        throw new ActionError({code: 'UNAUTHORIZED'});
+      }
+
+      const userId = user.id;
+      const result = await useRpcUserDO(context, userId, async (rpc) => {
+        return rpc.removeSocial(provider.toLowerCase());
+      }, (error) => {
+        throw new ActionError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to remove social media link'
+        });
+      });
+
+      if (!result) {
+        throw new ActionError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to remove social media link'
+        });
+      }
+      return {success: true};
+
+    }
+  }),
+  /**
+   * Adds a tag to the user's profile.
+   * Input: An object containing:
+   *   - tag (string) - The tag to add
+   *   - label (string, optional) - The display label for the tag
+   * Action: Adds the specified tag to the UserDO.
+   * Returns: An object with a success flag.
+   */
+  addTag: defineAction({
+    input: z.object({
+      tag: z.string(),
+      label: z.string().optional()
+    }),
+    handler: async ({tag, label}, context) => {
+      // Check if user is authenticated
+      const {session, user} = context.locals
+      if (!session || !user) {
+        throw new ActionError({code: 'UNAUTHORIZED'});
+      }
+
+      const userId = user.id;
+      let result = await useRpcUserDO(context, userId, async (rpc) => {
+        return rpc.addTag(tag, label || tag);
+      }, (error) => {
+        throw new ActionError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to add tag'
+        });
+      });
+
+      if (!result) {
+        throw new ActionError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to add tag'
+        });
+      }
+      return {success: true};
+
+    }
+  }),
+
+  /**
+   * Removes a tag from the user's profile.
+   * Input: An object containing:
+   *   - tag (string) - The tag to remove
+   * Action: Removes the specified tag from the UserDO.
+   * Returns: An object with a success flag.
+   */
+  removeTag: defineAction({
+    input: z.object({
+      tag: z.string()
+    }),
+    handler: async ({tag}, context) => {
+      // Check if user is authenticated
+      const {session, user} = context.locals
+      if (!session || !user) {
+        throw new ActionError({code: 'UNAUTHORIZED'});
+      }
+
+      const userId = user.id;
+      let result;
+
+      // Remove tag
+      try {
+        await useRpcUserDO(context, userId, async (rpc) => {
+          try {
+            result = await rpc.removeTag(tag);
+            console.log('Tag removed successfully:', tag);
+          } catch (error) {
+            console.error('Error in rpc.removeTag operation:', error);
+            throw error;
+          }
+        }, (error) => {
+          throw new ActionError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: 'Failed to remove tag'
+          });
+        });
+
+        if (!result) {
+          throw new ActionError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: 'Failed to remove tag'
+          });
+        }
+        return {success: true};
+      } catch (error) {
+        console.error('Error removing tag:', error);
+        throw new ActionError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to remove tag'
+        });
+      }
+    }
+  }),
+
+  /**
+   * Retrieves all tags associated with the authenticated user.
+   * Input: None
+   * Action: Queries the database for all tags belonging to the authenticated user.
+   * Returns: An array of user tags.
+   */
+  getUserTags: defineAction({
+    handler: async (_, context) => {
+      // Check if user is authenticated
+      const {session, user} = context.locals
+      if (!session || !user) {
+        throw new ActionError({code: 'UNAUTHORIZED'});
+      }
+
+      // Get user tags using UserTagRepo
+      const userTags = UserTagRepo.action(context);
+      const tags = await userTags.getUserTags(user.id);
+      return tags;
+    }
+  }),
+
+  /**
+   * Searches for users by username.
+   * Input: searchTerm (string) - The term to search for in usernames
+   * Action: Performs a fuzzy search on usernames in the database.
+   * Returns: An array of matching user accounts.
+   */
+  search: defineAction({
+    input: z.object({
+      searchTerm: z.string(),
+      includeSelf: z.boolean(),
+    }),
+    handler: async ({searchTerm, includeSelf}, context) => {
+      // Check if user is authenticated
+      const {session, user} = context.locals
+      if (!session || !user) {
+        throw new ActionError({code: 'UNAUTHORIZED'});
+      }
+
+      console.log(`Searching ${searchTerm}`);
+
+      // Perform search using UserRepo
+      const users = UserRepo.action(context);
+      const foundAccounts = await users.searchUser(searchTerm, includeSelf, user.id, 5);
+      return foundAccounts;
+    }
+  }),
+
+  /**
+   * Retrieves the authenticated user's Tiltify account information.
+   * Input: None
+   * Action: Queries the database for the user's Tiltify account.
+   * Returns: The user's Tiltify account information.
+   */
+  getTiltifyAccount: defineAction({
+    handler: async (_, context) => {
+      // Check if user is authenticated
+      const {session, user} = context.locals
+      if (!session || !user) {
+        throw new ActionError({code: 'UNAUTHORIZED'});
+      }
+
+      // Query for Tiltify account using UserRepo
+      const users = TiltifyRepo.action(context);
+      const account = await users.getAccount(user.id)
+
+      if (!account) {
+        throw new ActionError({code: 'NOT_FOUND'});
+      }
+
+      return account;
+    }
+  }),
+
+  /**
+   * Retrieves the tables data from the authenticated user's UserDO.
+   * Input: None
+   * Action: Gets the tables data from the UserDO for the authenticated user.
+   * Returns: The tables data from the UserDO.
+   */
+  getTables: defineAction({
+    handler: async (_, context) => {
+      // Check if user is authenticated
+      const {session, user} = context.locals
+      if (!session || !user) {
+        throw new ActionError({code: 'UNAUTHORIZED'});
+      }
+
+      const userId = user.id;
+      let tables;
+
+      console.log('getting table data')
+      try {
+        await useRpcUserDO(context, userId, async (rpc) => {
+          tables = await rpc.getTables();
+        }, (error) => {
+          throw new ActionError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: 'Failed to get tables from UserDO'
+          });
+        });
+        return tables;
+      } catch (e: any) {
+        console.error('Error getting tables from UserDO:', e);
+        throw new ActionError({code: 'INTERNAL_SERVER_ERROR', message: e.message})
+      }
+    }
+  }),
+
+  /**
+   * Retrieves the most popular user tags.
+   * Input: limit (number, default: 5) - The maximum number of popular tags to return
+   * Action: Queries the database for the most frequently used user tags and supplements with default tags if needed.
+   * Returns: An object containing popular tags, default tags, and charity tags with their usage counts.
+   */
+  getPopularTags: defineAction({
+    input: z.number().default(5),
+    handler: async (limit, context) => {
+      try {
+        const userTags = UserTagRepo.action(context);
+        const popularTags = await userTags.getPopularTags(limit);
+
+        // If there are not enough tags found, supplement with tags from getTags function
+        if (popularTags.length < limit) {
+          // Get default tags and charity tags
+          const {tags: defaultTags, charityTags} = getTags();
+
+          // Convert default tags to the same format as database tags
+          const formattedDefaultTags = defaultTags.map(tag => ({
+            ...tag,
+            count: 0 // Default count since we're not querying the database
+          }));
+
+          // Convert charity tags to the same format as database tags
+          const formattedCharityTags = charityTags.map(tag => ({
+            ...tag,
+            count: 0 // Default count since we're not querying the database
+          }));
+
+          // Filter out default tags that are already in the popular tags
+          const existingTags = popularTags.map(t => t.tag);
+          const filteredDefaultTags = formattedDefaultTags.filter(tag => !existingTags.includes(tag.tag));
+
+          // Add enough default tags to reach the limit
+          const additionalTags = filteredDefaultTags.slice(0, limit - popularTags.length);
+
+          // Return combined results
+          return {
+            tags: popularTags,
+            defaultTags: additionalTags,
+            charityTags: formattedCharityTags
+          };
+        }
+
+        // If we have enough popular tags, just return them
+        return {
+          tags: popularTags,
+          defaultTags: [],
+          charityTags: []
+        };
+      } catch (error) {
+        console.error('Error retrieving popular tags:', error);
+        throw new ActionError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to retrieve popular tags'
+        });
+      }
+    }
+  }),
+
+  /**
+   * Retrieves suggested tags for a specific user.
+   * Input: An object containing:
+   *   - userId (number) - The ID of the user
+   *   - limit (number, default: 5) - The maximum number of suggested tags to return
+   * Action: Finds popular tags that aren't already used by the specified user.
+   * Returns: An object containing suggested tags, default tags, and charity tags that aren't already used by the user.
+   */
+  getSuggestedTagsForUser: defineAction({
+    input: z.object({
+      userId: z.number(),
+      limit: z.number().default(5),
+    }),
+    handler: async ({userId, limit}, context) => {
+      try {
+        const userTagsRepo = UserTagRepo.action(context);
+        // Get user's existing tags to filter out from suggestions
+        const userTagsList = await userTagsRepo.getUserTags(userId);
+        // Get suggested tags for the user
+        const popularTags = await userTagsRepo.getSuggestedTagsForUser(userId, limit);
+
+        // Get the default tags from the getTags function
+        const {tags: defaultTags, charityTags} = getTags();
+
+        // Extract user tags to filter default and charity tags
+        const userTagValues = userTagsList.map(t => t.tag);
+
+        // Filter charity tags that aren't already part of the user's tags
+        const filteredCharityTags = charityTags
+          .filter(tag => !userTagValues.includes(tag.tag))
+          .map(tag => ({
+            ...tag,
+            count: 0 // Default count since we're not querying the database
+          }));
+
+        // Filter default tags that aren't already part of the user's tags
+        const filteredDefaultTags = defaultTags
+          .filter(tag => !userTagValues.includes(tag.tag))
+          .map(tag => ({
+            ...tag,
+            count: 0 // Default count since we're not querying the database
+          }));
+
+        return {
+          tags: popularTags,
+          defaultTags: filteredDefaultTags,
+          charityTags: filteredCharityTags
+        };
+      } catch (error) {
+        console.error('Error retrieving suggested tags:', error);
+        throw new ActionError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to retrieve suggested tags'
+        });
+      }
+    }
+  }),
+
+  /**
+   * Retrieves suggested tags for a user that match a search term.
+   * Input: An object containing:
+   *   - userId (number) - The ID of the user
+   *   - term (string) - The search term to match against tags
+   *   - limit (number, default: 5) - The maximum number of suggested tags to return
+   * Action: Finds tags that match the search term and aren't already used by the specified user.
+   * Returns: An object containing matching tags from the database, default tags, and charity tags.
+   */
+  getSuggestedTagsForUserBySearchTerm: defineAction({
+    input: z.object({
+      userId: z.number(),
+      term: z.string(),
+      limit: z.number().default(5),
+    }),
+    handler: async ({userId, term, limit}, context) => {
+      try {
+        // Get the search term in lowercase
+        const searchTermLower = term.toLowerCase();
+
+        const userTagsRepo = UserTagRepo.action(context);
+        // Get user's existing tags to filter out from suggestions
+        const userTagsList = await userTagsRepo.getUserTags(userId);
+        // Extract user tags to filter default and charity tags
+        const userTagValues = userTagsList.map(t => t.tag);
+        // Get the default tags from the getTags function
+        const {tags: defaultTags, charityTags} = getTags();
+
+        // Filter charity tags that match the search term and aren't already in the user's tags
+        const filteredCharityTags = charityTags
+          .filter(tag =>
+            !userTagValues.includes(tag.tag) &&
+            tag.tag.includes(searchTermLower)
+          )
+          .map(tag => ({
+            ...tag,
+            count: 0 // Default count since we're not querying the database
+          }));
+
+        if (term === '') {
+          return {
+            tags: [],
+            defaultTags: [],
+            charityTags: filteredCharityTags
+          };
+        }
+
+        // Get matching tags based on search term
+        const matchingTags = await userTagsRepo.getSuggestedTagsForUserBySearchTerm(userId, term, limit);
+
+
+        // Filter default tags that match the search term and aren't already in the user's tags
+        const filteredDefaultTags = defaultTags
+          .filter(tag =>
+            !userTagValues.includes(tag.tag) &&
+            tag.tag.includes(searchTermLower)
+          )
+          .map(tag => ({
+            ...tag,
+            count: 0 // Default count since we're not querying the database
+          }));
+
+
+        // If we still don't have enough tags, add more default tags that aren't in the user's tags
+        // (regardless of whether they match the search term)
+        let additionalDefaultTags: {
+          label: string,
+          tag: string
+          count: number
+        }[] = [];
+        if (matchingTags.length + filteredDefaultTags.length + filteredCharityTags.length < limit) {
+          additionalDefaultTags = defaultTags
+            .filter(tag =>
+              !userTagValues.includes(tag.tag) &&
+              !tag.tag.includes(searchTermLower) // Only include tags that haven't been included yet
+            )
+            .map(tag => ({
+              ...tag,
+              count: 0
+            }))
+            .slice(0, limit - (matchingTags.length + filteredDefaultTags.length + filteredCharityTags.length));
+        }
+
+        // Combine all filtered default tags
+        const allFilteredDefaultTags = [...filteredDefaultTags, ...additionalDefaultTags];
+
+        return {
+          tags: matchingTags,
+          defaultTags: allFilteredDefaultTags,
+          charityTags: filteredCharityTags
+        };
+      } catch (error) {
+        console.error('Error retrieving suggested tags by search term:', error);
+        throw new ActionError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to retrieve suggested tags'
+        });
+      }
+    }
+  }),
+
+  /**
+   * Retrieves user data, tiltify account data, user socials, and user tags for a given tiltify username.
+   * Input: tiltifyUserName (string) - The tiltify username to look up
+   * Action: Queries the database for user, account, socials, and tags information associated with the tiltify username.
+   * Returns: An object containing user data, tiltify account data, user socials, and user tags, or null if not found.
+   */
+  getUserByTiltifyUsername: defineAction({
+    input: z.string(),
+    handler: async (providerUsername, context) => {
+      try {
+        // Create UserRepo instance
+        const userRepo = UserRepo.action(context);
+
+        // Call the getUserByTiltifyUsername method
+        const tiltifyUser = await userRepo.getUserByTiltifyUsername(providerUsername);
+
+        if (!tiltifyUser) {
+          return null;
+        }
+
+        return tiltifyUser;
+      } catch (error) {
+        console.error('Error getting user by Tiltify username:', error);
+        throw new ActionError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to get user data by Tiltify username'
+        });
+      }
+    }
+  }),
+
+  /**
+   * Checks if a tiltify account is blocked.
+   * Input: tiltifyUserName (string) - The tiltify username to check
+   * Action: Queries the database to determine if the tiltify account is in the blockedAccounts table.
+   * Returns: A boolean indicating if the account is blocked.
+   */
+  isTiltifyAccountBlocked: defineAction({
+    input: z.string(),
+    handler: async (providerUsername, context) => {
+      try {
+        // Create UserRepo instance
+        const userRepo = UserRepo.action(context);
+
+        // Call the isTiltifyAccountBlocked method
+        const isBlocked = await userRepo.isTiltifyAccountBlocked(providerUsername);
+
+        return isBlocked;
+      } catch (error) {
+        console.error('Error checking if Tiltify account is blocked:', error);
+        throw new ActionError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to check if Tiltify account is blocked'
+        });
+      }
+    }
+  }),
+
+
+  findAllUsers: defineAction({
+    handler: (_, context) => {
+      const repo = UserRepo.action(context);
+      return repo.findAll();
+    }
+  }),
+  findAllTiltifyAccounts: defineAction({
+    handler: (_, context) => {
+      const repo = TiltifyRepo.action(context);
+      return repo.getAllAccounts();
+    }
+  }),
+
+  /**
+   * Sets the user's primary live streaming platform.
+   * Input: An object containing:
+   *   - platform (string) - The platform to set as primary (twitch, youtube, tiktok)
+   * Action: Updates the user's primaryLiveStream setting in the database and UserDO.
+   * Returns: An object with a success flag.
+   */
+  setPrimaryLiveStream: defineAction({
+    input: z.object({
+      platform: z.string().refine(val => ['twitch', 'youtube', 'tiktok'].includes(val.toLowerCase()), {
+        message: "Platform must be one of: twitch, youtube, tiktok"
+      })
+    }),
+    handler: async ({platform}, context) => {
+      // Check if user is authenticated
+      const {session, user} = context.locals
+      if (!session || !user) {
+        throw new ActionError({code: 'UNAUTHORIZED'});
+      }
+
+      const userId = user.id;
+      let result;
+
+      // Set primary live stream platform
+      try {
+        await useRpcUserDO(context, userId, async (rpc) => {
+          try {
+            result = await rpc.setPrimaryLiveStream(platform.toLowerCase());
+            console.log('Primary live stream platform set successfully:', platform);
+          } catch (error) {
+            console.error('Error in rpc.setPrimaryLiveStream operation:', error);
+            throw error;
+          }
+        }, (error) => {
+          throw new ActionError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: 'Failed to set primary live stream platform'
+          });
+        });
+
+        if (!result) {
+          throw new ActionError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: 'Failed to set primary live stream platform'
+          });
+        }
+        return {success: true};
+      } catch (error) {
+        console.error('Error setting primary live stream platform:', error);
+        throw new ActionError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to set primary live stream platform'
+        });
+      }
+    }
+  })
+}
+
+
+================================================================================
+END OF FILE: src/actions/users.ts
+================================================================================
+
+
+================================================================================
+FILE: src/actions/utils.ts
+================================================================================
+
+import {ActionError, type ActionAPIContext} from "astro:actions";
+
+
+export function handleUnauthorized(context: ActionAPIContext) {
+  const {session, user} = context.locals
+  if (!session || !user) {
+    throw new ActionError({code: 'UNAUTHORIZED'});
+  }
+}
+
+
+================================================================================
+END OF FILE: src/actions/utils.ts
+================================================================================
+
+
+================================================================================
+SUMMARY
+================================================================================
+Total files processed: 11
+Generated: Sun Aug 10 20:35:11 CEST 2025
+================================================================================

@@ -1,0 +1,935 @@
+================================================================================
+CONSOLIDATED FILE CONTENTS
+================================================================================
+Search Directory: src/lib/orpc
+File Pattern: contract.ts
+Generated: Sun Aug 10 20:34:41 CEST 2025
+================================================================================
+
+
+================================================================================
+FILE: src/lib/orpc/private/auth/contract.ts
+================================================================================
+
+import { oc } from '@orpc/contract'
+import { z } from 'zod'
+
+export const authContract = {
+  getAccounts: oc
+    .input(z.void())
+    .output(z.array(z.object({
+      id: z.string(),
+      userId: z.string(),
+      provider: z.string(),
+      providerAccountId: z.string(),
+      type: z.string().optional(),
+      scope: z.string().optional(),
+      id_token: z.string().optional(),
+      session_state: z.string().optional()
+    })))
+}
+
+
+================================================================================
+END OF FILE: src/lib/orpc/private/auth/contract.ts
+================================================================================
+
+
+================================================================================
+FILE: src/lib/orpc/private/integrations/twitch/contract.ts
+================================================================================
+
+import { oc } from '@orpc/contract'
+import { z } from 'zod'
+
+export const twitchContract = {
+  validateTwitchUrl: oc
+    .input(z.string().url())
+    .output(z.object({
+      id: z.string(),
+      login: z.string(),
+      display_name: z.string(),
+      type: z.string(),
+      broadcaster_type: z.string(),
+      description: z.string(),
+      profile_image_url: z.string(),
+      offline_image_url: z.string(),
+      view_count: z.number(),
+      created_at: z.string()
+    }))
+}
+
+
+================================================================================
+END OF FILE: src/lib/orpc/private/integrations/twitch/contract.ts
+================================================================================
+
+
+================================================================================
+FILE: src/lib/orpc/private/teams/contract.ts
+================================================================================
+
+import {oc} from '@orpc/contract';
+import {z} from 'zod';
+import {SuccessSchema, UserIdSchema} from "../schemas/common.ts";
+import {SlugValidationSchema, TeamIdSchema} from "../schemas/teams.ts";
+
+/**
+ * Private teams contracts for authenticated team management operations.
+ * These endpoints handle team CRUD, member management, and invite operations.
+ */
+
+/**
+ * Team CRUD Operations
+ */
+
+/**
+ * Create a new team
+ * Input: name and slug
+ * Output: team ID
+ */
+const createContract = oc
+  .input(z.object({
+    name: z.string().min(1, "Team name is required").max(100, "Team name must be 100 characters or less"),
+    slug: z.string().min(1, "Team slug is required").max(50, "Team slug must be 50 characters or less")
+  }))
+  .output(TeamIdSchema);
+
+/**
+ * Update team information
+ * Input: team ID, name, slug, and optional visibility
+ * Output: success flag
+ */
+const updateContract = oc
+  .input(z.object({
+    teamId: z.number().positive("Team ID must be positive"),
+    name: z.string().min(1, "Team name is required").max(100, "Team name must be 100 characters or less"),
+    slug: z.string().min(1, "Team slug is required").max(50, "Team slug must be 50 characters or less"),
+    visible: z.boolean().optional()
+  }))
+  .output(SuccessSchema);
+
+/**
+ * Delete a team
+ * Input: team ID
+ * Output: success flag
+ */
+const deleteContract = oc
+  .input(z.object({
+    teamId: z.number().positive("Team ID must be positive")
+  }))
+  .output(SuccessSchema);
+
+/**
+ * Validate slug availability
+ * Input: slug and optional tiltify name for suggestions
+ * Output: validation result with suggestions
+ */
+const validateSlugContract = oc
+  .input(z.object({
+    slug: z.string().min(1, "Slug is required"),
+    tiltifyName: z.string().optional()
+  }))
+  .output(SlugValidationSchema);
+
+/**
+ * Team Member Operations
+ */
+
+/**
+ * Leave a team (for non-owners)
+ * Input: team ID
+ * Output: success flag
+ */
+const leaveTeamContract = oc
+  .input(z.object({
+    teamId: z.number().positive("Team ID must be positive")
+  }))
+  .output(SuccessSchema);
+
+/**
+ * Remove a member from team (owner only)
+ * Input: user ID and team ID
+ * Output: success flag
+ */
+const removeMemberContract = oc
+  .input(z.object({
+    userId: UserIdSchema,
+    teamId: z.number().positive("Team ID must be positive")
+  }))
+  .output(SuccessSchema);
+
+/**
+ * Team Invite Operations
+ */
+
+/**
+ * Create an invite to join team (owner only)
+ * Input: invited user ID and team ID
+ * Output: success flag
+ */
+const createInviteContract = oc
+  .input(z.object({
+    invitedUserId: UserIdSchema,
+    teamId: z.number().positive("Team ID must be positive")
+  }))
+  .output(SuccessSchema);
+
+/**
+ * Delete an invite (owner only)
+ * Input: invited user ID and team ID
+ * Output: success flag
+ */
+const deleteInviteContract = oc
+  .input(z.object({
+    invitedUserId: z.number().positive("Invited user ID must be positive"),
+    teamId: z.number().positive("Team ID must be positive")
+  }))
+  .output(SuccessSchema);
+
+/**
+ * Accept an invite to join team
+ * Input: team ID
+ * Output: success flag
+ */
+const acceptInviteContract = oc
+  .input(z.object({
+    teamId: z.number().positive("Team ID must be positive")
+  }))
+  .output(SuccessSchema);
+
+/**
+ * Reject an invite to join team
+ * Input: team ID
+ * Output: success flag
+ */
+const rejectInviteContract = oc
+  .input(z.object({
+    teamId: z.number().positive("Team ID must be positive")
+  }))
+  .output(SuccessSchema);
+
+export const privateTeamsContract = {
+  // Team CRUD Operations
+  create: createContract,
+  update: updateContract,
+  delete: deleteContract,
+  validateSlug: validateSlugContract,
+
+  // Team Member Operations
+  leaveTeam: leaveTeamContract,
+  removeMember: removeMemberContract,
+
+  // Team Invite Operations
+  createInvite: createInviteContract,
+  deleteInvite: deleteInviteContract,
+  acceptInvite: acceptInviteContract,
+  rejectInvite: rejectInviteContract
+};
+
+
+================================================================================
+END OF FILE: src/lib/orpc/private/teams/contract.ts
+================================================================================
+
+
+================================================================================
+FILE: src/lib/orpc/private/users/editProfile/profile/contract.ts
+================================================================================
+
+import {oc} from '@orpc/contract'
+import z from "zod";
+import {HexColorSchema, SuccessSchema} from "../../../schemas/common.ts";
+import {StreamingPlatformSchema} from "../../../schemas/users.ts";
+
+/**
+ * Profile management contracts for user style and streaming preferences.
+ * These endpoints handle direct database operations for user profile customization.
+ */
+
+/**
+ * Update user's primary color preference
+ * Input: primaryColor (hex color string)
+ * Output: success flag
+ */
+const updatePrimaryColorContract = oc
+  .input(z.object({
+    primaryColor: HexColorSchema
+  }))
+  .output(SuccessSchema)
+
+/**
+ * Update user's accent color preference
+ * Input: accentColor (hex color string)
+ * Output: success flag
+ */
+const updateAccentColorContract = oc
+  .input(z.object({
+    accentColor: HexColorSchema
+  }))
+  .output(SuccessSchema)
+
+/**
+ * Update user's primary live streaming platform
+ * Input: platform (twitch, youtube, or tiktok)
+ * Output: success flag
+ */
+const updatePrimaryLiveStreamContract = oc
+  .input(z.object({
+    platform: StreamingPlatformSchema
+  }))
+  .output(SuccessSchema)
+
+export const profileContract = {
+  style: {
+    updatePrimaryColorContract,
+    updateAccentColorContract,
+  },
+  streaming: {
+    updatePrimaryLiveStreamContract,
+  }
+}
+
+
+================================================================================
+END OF FILE: src/lib/orpc/private/users/editProfile/profile/contract.ts
+================================================================================
+
+
+================================================================================
+FILE: src/lib/orpc/private/users/editProfile/relations/blocks/contract.ts
+================================================================================
+
+import {oc} from '@orpc/contract'
+import {z} from 'zod';
+import {SuccessSchema, UserIdSchema} from "../../../../schemas/common.ts";
+import {UserDisplaySchema} from "../../../../schemas/users.ts";
+
+// Block user contract
+export const blockUserContract = oc
+  .input(z.object({
+    blockedUserId: UserIdSchema
+  }))
+  .output(SuccessSchema);
+
+// Unblock user contract
+export const unblockUserContract = oc
+  .input(z.object({
+    blockedUserId: UserIdSchema
+  }))
+  .output(SuccessSchema);
+
+// List blocked users contract
+export const listBlockedUsersContract = oc
+  .output(z.array(UserDisplaySchema));
+
+export const blockContract = oc.router({
+  blockUser: blockUserContract,
+  unblockUser: unblockUserContract,
+  listBlockedUsers: listBlockedUsersContract
+});
+
+
+================================================================================
+END OF FILE: src/lib/orpc/private/users/editProfile/relations/blocks/contract.ts
+================================================================================
+
+
+================================================================================
+FILE: src/lib/orpc/private/users/editProfile/relations/friends/contract.ts
+================================================================================
+
+import {oc} from '@orpc/contract'
+import {z} from 'zod';
+import {SuccessSchema, UserIdSchema} from "../../../../schemas/common.ts";
+
+// Send friend request contract
+export const sendFriendRequestContract = oc
+  .input(z.object({
+    toUserId: UserIdSchema
+  }))
+  .output(SuccessSchema);
+
+// Accept friend request contract
+export const acceptFriendRequestContract = oc
+  .input(z.object({
+    fromUserId: UserIdSchema
+  }))
+  .output(SuccessSchema);
+
+// Decline friend request contract
+export const declineFriendRequestContract = oc
+  .input(z.object({
+    fromUserId: UserIdSchema
+  }))
+  .output(SuccessSchema);
+
+// Remove friend contract (unfriend)
+export const removeFriendContract = oc
+  .input(z.object({
+    friendUserId: UserIdSchema
+  }))
+  .output(SuccessSchema);
+
+export const friendsContract = oc.router({
+  sendFriendRequest: sendFriendRequestContract,
+  acceptFriendRequest: acceptFriendRequestContract,
+  declineFriendRequest: declineFriendRequestContract,
+  removeFriend: removeFriendContract,
+});
+
+
+================================================================================
+END OF FILE: src/lib/orpc/private/users/editProfile/relations/friends/contract.ts
+================================================================================
+
+
+================================================================================
+FILE: src/lib/orpc/private/users/editProfile/social/platforms/contract.ts
+================================================================================
+
+import {oc} from '@orpc/contract'
+import {z} from 'zod';
+import {socialUrlRegex} from "../../../../../../../functions/socialUrlRegex.ts";
+import {SuccessSchema} from "../../../../schemas/common.ts";
+import {SocialProviderSchema} from "../../../../schemas/social.ts";
+
+// Add social contract
+export const addSocialContract = oc
+  .input(z.object({
+    provider: SocialProviderSchema,
+    url: z.string().url()
+  }).refine((data) => {
+    const regexes = socialUrlRegex();
+    return regexes[data.provider]?.test(data.url);
+  }, "Invalid URL format for the specified provider"))
+  .output(SuccessSchema);
+
+// Remove social contract
+export const removeSocialContract = oc
+  .input(z.object({
+    provider: SocialProviderSchema
+  }))
+  .output(SuccessSchema);
+
+// Platforms contract combining all platform operations
+export const platformsContract = oc.router({
+  add: addSocialContract,
+  remove: removeSocialContract
+});
+
+
+================================================================================
+END OF FILE: src/lib/orpc/private/users/editProfile/social/platforms/contract.ts
+================================================================================
+
+
+================================================================================
+FILE: src/lib/orpc/private/users/editProfile/social/tiltify/contract.ts
+================================================================================
+
+import {oc} from '@orpc/contract'
+import {z} from 'zod';
+import {SocialImportResultSchema} from "../../../../schemas/social.ts";
+
+// Import from Tiltify contract
+export const importFromTiltifyContract = oc
+  .input(z.void()) // No input required, uses authenticated user context
+  .output(z.object({
+    success: z.boolean(),
+    results: z.array(SocialImportResultSchema)
+  }));
+
+// Tiltify contract combining all Tiltify operations
+export const tiltifyContract = oc.router({
+  import: importFromTiltifyContract
+});
+
+
+================================================================================
+END OF FILE: src/lib/orpc/private/users/editProfile/social/tiltify/contract.ts
+================================================================================
+
+
+================================================================================
+FILE: src/lib/orpc/private/users/editProfile/tags/contract.ts
+================================================================================
+
+import {oc} from '@orpc/contract'
+import z from "zod";
+import {PaginationLimitSchema, SuccessSchema} from "../../../schemas/common.ts";
+import {UserDisplaySchema} from "../../../schemas/users.ts";
+import {TagSearchResultSchema, UserTagSchema} from "../../../schemas/tags.ts";
+
+
+// Input schemas for tag operations
+const RemoveUserTagInputSchema = z.object({
+  tag: z.string(),
+})
+
+const FindUsersByTagInputSchema = z.object({
+  tag: z.string(),
+  limit: PaginationLimitSchema(),
+})
+
+// Tags Contracts
+/**
+ * Add a tag to a user for categorization and filtering
+ */
+const addUserTagContract = oc
+  .input(
+    z.object({
+      tag: z.string().min(1),
+      label: z.string().min(1),
+    })
+  )
+  .output(
+    z.object({
+      userId: z.number(),
+      tag: z.string(),
+      label: z.string(),
+      addedAt: z.date(),
+    })
+  )
+
+/**
+ * Remove a tag from a user
+ */
+const removeUserTagContract = oc
+  .input(RemoveUserTagInputSchema)
+  .output(SuccessSchema)
+
+/**
+ * Get all tags for the authenticated user
+ */
+const getUserTagsContract = oc
+  .input(z.object({}))
+  .output(z.array(UserTagSchema))
+
+/**
+ * List all available tags with usage counts
+ */
+const listTagsContract = oc
+  .input(z.object({}))
+  .output(z.array(TagSearchResultSchema))
+
+/**
+ * Find users by a specific tag
+ */
+const findUsersByTagContract = oc
+  .input(FindUsersByTagInputSchema)
+  .output(z.array(UserDisplaySchema))
+
+export const tagsContract = {
+  addUserTagContract,
+  removeUserTagContract,
+  getUserTagsContract,
+  listTagsContract,
+  findUsersByTagContract,
+}
+
+
+================================================================================
+END OF FILE: src/lib/orpc/private/users/editProfile/tags/contract.ts
+================================================================================
+
+
+================================================================================
+FILE: src/lib/orpc/private/users/editProfile/tags/popular/contract.ts
+================================================================================
+
+import {oc} from '@orpc/contract'
+import z from "zod";
+import {PaginationLimitSchema} from "../../../../schemas/common.ts";
+import {PopularTagsResponseSchema} from "../../../../schemas/tags.ts";
+
+/**
+ * Get popular tags with optional limit
+ */
+const listPopularTagsContract = oc
+  .input(z.object({
+    limit: PaginationLimitSchema(1, 50, 5)
+  }))
+  .output(PopularTagsResponseSchema)
+
+export const popularTagsContract = {
+  listPopularTagsContract,
+}
+
+
+================================================================================
+END OF FILE: src/lib/orpc/private/users/editProfile/tags/popular/contract.ts
+================================================================================
+
+
+================================================================================
+FILE: src/lib/orpc/private/users/editProfile/tags/suggestions/contract.ts
+================================================================================
+
+import {oc} from '@orpc/contract'
+import z from "zod";
+import {PaginationLimitSchema} from "../../../../schemas/common.ts";
+import {SuggestedTagsResponseSchema} from "../../../../schemas/tags.ts";
+
+/**
+ * Get suggested tags for a specific user
+ */
+const getSuggestedTagsForUserContract = oc
+  .input(z.object({
+    limit: PaginationLimitSchema(1, 50, 5)
+  }))
+  .output(SuggestedTagsResponseSchema)
+
+/**
+ * Get suggested tags for a user filtered by search term
+ */
+const getSuggestedTagsBySearchTermContract = oc
+  .input(z.object({
+    term: z.string(),
+    limit: PaginationLimitSchema(1, 50, 5)
+  }))
+  .output(SuggestedTagsResponseSchema)
+
+export const suggestionsContract = {
+  getSuggestedTagsForUserContract,
+  getSuggestedTagsBySearchTermContract,
+}
+
+
+================================================================================
+END OF FILE: src/lib/orpc/private/users/editProfile/tags/suggestions/contract.ts
+================================================================================
+
+
+================================================================================
+FILE: src/lib/orpc/private/utils/contract.ts
+================================================================================
+
+import { oc } from '@orpc/contract'
+import { z } from 'zod'
+
+export const utilsContract = {
+  checkProfanity: oc
+    .input(z.string())
+    .output(z.object({
+      isProfanity: z.boolean(),
+      score: z.number()
+    }))
+}
+
+
+================================================================================
+END OF FILE: src/lib/orpc/private/utils/contract.ts
+================================================================================
+
+
+================================================================================
+FILE: src/lib/orpc/public/schedules/contract.ts
+================================================================================
+
+import {oc} from "@orpc/contract";
+import {UserSlugSchema} from "../schemas/users.ts";
+import {FullScheduleSchema, ScheduleInfoSchema} from "../schemas/schedule.ts";
+import z from "zod";
+
+/**
+ * Schema for input that includes both user slug and year.
+ * Used for year-specific schedule queries.
+ */
+const UserSlugWithYearSchema = z.object({
+  userSlug: UserSlugSchema,
+  year: z.number().int().positive(),
+});
+
+/**
+ * Contract for getting the primary schedule information for a user by their slug.
+ * Returns only the basic schedule metadata without streams or participants.
+ * The primary schedule is the main/featured schedule for the user's current year.
+ */
+const getPrimaryScheduleInfoByUserSlugContract = oc
+  .input(UserSlugSchema)
+  .output(ScheduleInfoSchema);
+
+/**
+ * Contract for getting the primary full schedule data for a user by their slug.
+ * Returns complete schedule information including all streams, participants, and organized data.
+ * The primary schedule is the main/featured schedule for the user's current year.
+ */
+const getPrimaryFullScheduleByUserSlugContract = oc
+  .input(UserSlugSchema)
+  .output(FullScheduleSchema);
+
+/**
+ * Contract for getting all schedule information entries for a user by their slug.
+ * Returns an array of schedule metadata for all schedules owned by the user.
+ * Does not include detailed stream data or participants.
+ */
+const getScheduleInfoByUserSlugContract = oc
+  .input(UserSlugSchema)
+  .output(z.array(ScheduleInfoSchema));
+
+/**
+ * Contract for getting all full schedule data for a user by their slug.
+ * Returns an array of complete schedule information including streams and participants.
+ * Includes all schedules owned by the user with their complete datasets.
+ */
+const getFullScheduleByUserSlugContract = oc
+  .input(UserSlugSchema)
+  .output(z.array(FullScheduleSchema));
+
+/**
+ * Contract for getting the primary schedule information for a user by their slug for a specific year.
+ * Returns only the basic schedule metadata without streams or participants.
+ * The primary schedule is the main/featured schedule for the user in the specified year.
+ */
+const getPrimaryScheduleInfoByUserSlugAndYearContract = oc
+  .input(UserSlugWithYearSchema)
+  .output(ScheduleInfoSchema);
+
+/**
+ * Contract for getting the primary full schedule data for a user by their slug for a specific year.
+ * Returns complete schedule information including all streams, participants, and organized data.
+ * The primary schedule is the main/featured schedule for the user in the specified year.
+ */
+const getPrimaryFullScheduleByUserSlugAndYearContract = oc
+  .input(UserSlugWithYearSchema)
+  .output(FullScheduleSchema);
+
+/**
+ * Contract for getting all schedule information entries for a user by their slug for a specific year.
+ * Returns an array of schedule metadata for all schedules owned by the user in the specified year.
+ * Does not include detailed stream data or participants.
+ */
+const getScheduleInfoByUserSlugAndYearContract = oc
+  .input(UserSlugWithYearSchema)
+  .output(z.array(ScheduleInfoSchema));
+
+/**
+ * Contract for getting all full schedule data for a user by their slug for a specific year.
+ * Returns an array of complete schedule information including streams and participants.
+ * Includes all schedules owned by the user in the specified year with their complete datasets.
+ */
+const getFullScheduleByUserSlugAndYearContract = oc
+  .input(UserSlugWithYearSchema)
+  .output(z.array(FullScheduleSchema));
+
+
+export const contracts = {
+  getPrimaryScheduleInfoByUserSlugContract,
+  getPrimaryFullScheduleByUserSlugContract,
+  getScheduleInfoByUserSlugContract,
+  getFullScheduleByUserSlugContract,
+  getPrimaryScheduleInfoByUserSlugAndYearContract,
+  getPrimaryFullScheduleByUserSlugAndYearContract,
+  getScheduleInfoByUserSlugAndYearContract,
+  getFullScheduleByUserSlugAndYearContract,
+}
+
+
+================================================================================
+END OF FILE: src/lib/orpc/public/schedules/contract.ts
+================================================================================
+
+
+================================================================================
+FILE: src/lib/orpc/public/teams/contract.ts
+================================================================================
+
+import {oc} from '@orpc/contract';
+import {z} from 'zod';
+import {TeamSchema} from "../schemas/teams.ts";
+import {UserDisplaySchema} from "../schemas/users.ts";
+
+/**
+ * Public teams contracts for retrieving team information without authentication.
+ * These endpoints handle read-only operations for visible teams and their members.
+ */
+
+
+
+// Team with member count schema
+const teamWithMemberCountSchema = TeamSchema.extend({
+  memberCount: z.number()
+});
+
+// Team with owner info schema
+const teamWithOwnerSchema = TeamSchema.extend({
+  ownerName: z.string(),
+  ownerTiltifyName: z.string()
+});
+
+
+/**
+ * Find all visible teams
+ * Input: none
+ * Output: array of visible teams
+ */
+const findVisibleContract = oc
+  .output(z.array(TeamSchema));
+
+/**
+ * Find all visible teams with member count
+ * Input: none
+ * Output: array of visible teams with member counts
+ */
+const findAllVisibleWithMemberCountContract = oc
+  .output(z.array(teamWithMemberCountSchema));
+
+/**
+ * Get team by slug (public team viewing)
+ * Input: slug (string)
+ * Output: team with owner info or null
+ */
+const getBySlugContract = oc
+  .input(z.object({
+    slug: z.string().min(1, "Team slug is required")
+  }))
+  .output(z.object({
+    team: teamWithOwnerSchema.nullable()
+  }));
+
+/**
+ * Get team members by team ID (public member listing)
+ * Input: teamId (number)
+ * Output: array of team members
+ */
+const getMembersContract = oc
+  .input(z.object({
+    teamId: z.number().positive("Team ID must be positive")
+  }))
+  .output(z.object({
+    members: z.array(UserDisplaySchema)
+  }));
+
+
+const getTeamSchedulesContract = oc
+  .input(z.object({
+    slug: z.string().min(1, "Team slug is required")
+  }))
+  .output(z.array(z.object({})));
+
+export const publicTeamsContract = {
+  findVisible: findVisibleContract,
+  findAllVisibleWithMemberCount: findAllVisibleWithMemberCountContract,
+  getBySlug: getBySlugContract,
+  getMembers: getMembersContract
+};
+
+
+================================================================================
+END OF FILE: src/lib/orpc/public/teams/contract.ts
+================================================================================
+
+
+================================================================================
+FILE: src/lib/orpc/public/users/contract.ts
+================================================================================
+
+import {oc} from '@orpc/contract'
+import {UserDisplaySchema, UserPaginationSchema, UserProfileDataSchema, UserSlugSchema} from "../schemas/users.ts";
+
+
+export const getUserBySlugContract = oc.input(UserSlugSchema)
+  .output(UserDisplaySchema)
+
+export const getUserProfileBySlugContract = oc.input(UserSlugSchema)
+  .output(UserProfileDataSchema)
+
+export const getAllUsersPagedContract = oc.input(UserPaginationSchema)
+  .output(UserDisplaySchema.array())
+
+export const getAllUsersContract = oc
+  .output(UserDisplaySchema.array())
+
+export const usersContracts = {
+  getUserBySlugContract,
+  getUserProfileBySlugContract,
+  getAllUsersPagedContract,
+  getAllUsersContract
+}
+
+
+================================================================================
+END OF FILE: src/lib/orpc/public/users/contract.ts
+================================================================================
+
+
+================================================================================
+FILE: src/lib/orpc/public/users/discovery/contract.ts
+================================================================================
+
+import {oc} from '@orpc/contract'
+import {z} from 'zod';
+import {UserDisplaySchema} from "../../schemas/users.ts";
+
+const UserIdSchema = z.number().int().positive();
+
+// Search by username using userDisplayView for comprehensive user data
+export const searchByUsernameDisplayContract = oc
+  .input(z.object({
+    limit: z.number().min(1).max(10).default(5),
+    searchTerm: z.string().min(1, 'Search term must not be empty')
+  }))
+  .output(z.array(UserDisplaySchema));
+
+export const searchByUsernameContract = oc
+  .input(z.object({
+    limit: z.number().min(1).max(10).default(5),
+    searchTerm: z.string().min(1, 'Search term must not be empty')
+  }))
+  .output(z.array(z.object({
+    userId: z.number(),
+    tiltifyUsername: z.string().nullable(),
+    twitchUsername: z.string().nullable()
+  })));
+
+export const searchSimilarUsersDisplayContract = oc
+  .input(z.object({
+    userId: UserIdSchema,
+    limit: z.number().min(1).max(10).default(5),
+  }))
+  .output(z.array(UserDisplaySchema));
+
+export const discoveryContract = {
+  byUsernameDisplay: searchByUsernameDisplayContract,
+  searchByUsername: searchByUsernameContract,
+  searchSimilarUsersDisplay: searchSimilarUsersDisplayContract,
+}
+
+
+================================================================================
+END OF FILE: src/lib/orpc/public/users/discovery/contract.ts
+================================================================================
+
+
+================================================================================
+FILE: src/lib/orpc/public/users/relations/contract.ts
+================================================================================
+
+import {oc} from '@orpc/contract'
+import {z} from 'zod';
+import {UserDisplaySchema, UserIdSchema} from "../../schemas/users.ts";
+
+// List friends by user ID contract
+export const listFriendsByUserIdContract = oc
+  .input(z.object({
+    userId: UserIdSchema
+  }))
+  .output(z.array(UserDisplaySchema));
+
+export const friendsContract = oc.router({
+  listFriendsByUserId: listFriendsByUserIdContract,
+});
+
+
+================================================================================
+END OF FILE: src/lib/orpc/public/users/relations/contract.ts
+================================================================================
+
+
+================================================================================
+SUMMARY
+================================================================================
+Total files processed: 17
+Generated: Sun Aug 10 20:34:41 CEST 2025
+================================================================================

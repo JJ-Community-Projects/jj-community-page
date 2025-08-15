@@ -21,20 +21,6 @@ export class TiltifyRepo {
     return new TiltifyRepo(ctx.locals.runtime.env, 'action')
   }
 
-  /**
-   * Helper method to handle database errors consistently
-   * @param message Error message
-   * @param error Original error
-   * @throws DatabaseError
-   */
-  private handleError(message: string, error: any): never {
-    if (this.repoEnv === 'action') {
-      throw new DatabaseError(message, error).toActionError();
-    } else {
-      throw new DatabaseError(message, error);
-    }
-  }
-
   async getAllAccounts(): Promise<InferSelectModel<typeof accounts>[]> {
     try {
       return this.db.select()
@@ -61,6 +47,20 @@ export class TiltifyRepo {
         .get();
     } catch (error) {
       return this.handleError(`Failed to get accounts for user with id: ${userId}`, error);
+    }
+  }
+
+  /**
+   * Helper method to handle database errors consistently
+   * @param message Error message
+   * @param error Original error
+   * @throws DatabaseError
+   */
+  private handleError(message: string, error: any): never {
+    if (this.repoEnv === 'action') {
+      throw new DatabaseError(message, error).toActionError();
+    } else {
+      throw new DatabaseError(message, error);
     }
   }
 }

@@ -1,0 +1,1942 @@
+================================================================================
+CONSOLIDATED FILE CONTENTS
+================================================================================
+Search Directory: src/lib/orpc
+File Pattern: impl.ts
+Generated: Sat Aug  9 15:01:31 CEST 2025
+================================================================================
+
+
+================================================================================
+FILE: src/lib/orpc/private/teams/impl.ts
+================================================================================
+
+import { privateTeamsContract } from './contract.ts';
+import { teamsOwnerMiddleware } from './middleware.ts';
+import { implement, ORPCError } from '@orpc/server';
+import { dbMiddleware } from '../../middleware/dbMiddleware.ts';
+import { authMiddleware } from '../../middleware/authMiddleware.ts';
+import { teamsTable, teamMembersTable, teamInvitesTable } from '../../../db/schema/jj-schema.ts';
+import { users } from '../../../db/schema/auth-schema.ts';
+import { eq, and } from 'drizzle-orm';
+import { createSlug, generateTeamSlugAlternatives } from '../../../../functions/slug.ts';
+
+const os = implement(privateTeamsContract)
+  .use(dbMiddleware);
+
+/**
+ * Team CRUD Operations
+ */
+
+/**
+ * Create a new team with the authenticated user as owner
+ * Validates slug availability and creates team with owner as member
+ */
+const create = os.create
+  .use(authMiddleware)
+  .handler(async ({ context, input }) => {
+    const db = context.db;
+    const userId = context.userId;
+    const { name, slug } = input;
+
+    // Create a proper slug using the createSlug function
+    const validSlug = createSlug(slug);
+    if (!validSlug) {
+      throw new ORPCError('BAD_REQUEST', { message: 'Invalid slug format' });
+    }
+
+    try {
+      const teamId = await db.transaction(async (tx) => {
+        // Check if slug is available
+        const existingTeam = await tx.select()
+          .from(teamsTable)
+          .where(eq(teamsTable.slug, validSlug))
+          .get();
+
+        if (existingTeam) {
+          throw new ORPCError('CONFLICT', { message: 'Slug is already in use' });
+        }
+
+        // Create team
+        const [team] = await tx.insert(teamsTable)
+          .values({
+            name: name,
+            slug: validSlug,
+            ownerId: userId,
+            visible: false
+          })
+          .returning();
+
+        // Add creator as member
+        await tx.insert(teamMembersTable)
+          .values({
+            teamId: team.id,
+            userId: userId
+          });
+
+        return team.id;
+      });
+
+      return { teamId };
+    } catch (error) {
+      if (error instanceof ORPCError) throw error;
+      console.error('Error creating team:', error);
+      throw new ORPCError('INTERNAL_SERVER_ERROR', { message: 'Failed to create team' });
+    }
+  });
+
+/**
+ * Update team information (owner only)
+ * Validates slug uniqueness if changed
+ */
+const update = os.update
+  .use(authMiddleware)
+  .use(teamsOwnerMiddleware)
+  .handler(async ({ context, input }) => {
+    const db = context.db;
+    const team = context.team; // From teamsOwnerMiddleware
+    const { name, slug, visible } = input;
+
+    try {
+      // Check slug uniqueness if changed
+      if (slug !== team.slug) {
+        const validSlug = createSlug(slug);
+        if (!validSlug) {
+          throw new ORPCError('BAD_REQUEST', { message: 'Invalid slug format' });
+        }
+
+        const existingTeam = await db.select()
+          .from(teamsTable)
+          .where(eq(teamsTable.slug, validSlug))
+          .get();
+
+        if (existingTeam) {
+          throw new ORPCError('CONFLICT', { message: 'Slug is already in use' });
+        }
+      }
+
+      await db.update(teamsTable)
+        .set({
+          name: name,
+          slug: createSlug(slug),
+          ...(visible !== undefined && { visible: visible })
+        })
+        .where(eq(teamsTable.id, input.teamId));
+
+      return { success: true };
+    } catch (error) {
+      if (error instanceof ORPCError) throw error;
+      console.error('Error updating team:', error);
+      throw new ORPCError('INTERNAL_SERVER_ERROR', { message: 'Failed to update team' });
+    }
+  });
+
+/**
+ * Delete a team (owner only)
+ * Cascades to remove all members and invites
+ */
+const deleteTeam = os.delete
+  .use(authMiddleware)
+  .use(teamsOwnerMiddleware)
+  .handler(async ({ context, input }) => {
+    const db = context.db;
+
+    try {
+      await db.delete(teamsTable)
+        .where(eq(teamsTable.id, input.teamId));
+
+      return { success: true };
+    } catch (error) {
+      console.error('Error deleting team:', error);
+      throw new ORPCError('INTERNAL_SERVER_ERROR', { message: 'Failed to delete team' });
+    }
+  });
+
+/**
+ * Validate slug availability and generate suggestions
+ * Uses existing slug generation functions
+ */
+const validateSlug = os.validateSlug
+  .use(authMiddleware)
+  .handler(async ({ context, input }) => {
+    const { slug, tiltifyName } = input;
+    const user = context.user;
+
+    if (!slug) {
+      throw new ORPCError('BAD_REQUEST', { message: 'Slug is required' });
+    }
+
+    try {
+      // Get alternatives using the generateTeamSlugAlternatives function
+      // If it returns alternatives, the slug is not valid
+      const alternatives = await generateTeamSlugAlternatives(context.ctx, slug, 3);
+
+      // If alternatives is empty, the slug is valid
+      if (alternatives.length === 0) {
+        return {
+          isValid: true,
+          suggestions: []
+        };
+      }
+
+      // Add tiltifyName as a suggestion if provided and different from slug
+      let allAlternatives = [...alternatives];
+
+      if (tiltifyName && tiltifyName.toLowerCase() !== slug.toLowerCase()) {
+        const tiltifySlug = createSlug(tiltifyName);
+        // Check if this slug is valid using generateTeamSlugAlternatives
+        // If it returns an empty array, the slug is valid
+        const tiltifyAlternatives = await generateTeamSlugAlternatives(context.ctx, tiltifySlug, 0);
+        if (tiltifyAlternatives.length === 0) {
+          allAlternatives.push(tiltifySlug);
+        }
+      } else if (user.tiltifyName && user.tiltifyName.toLowerCase() !== slug.toLowerCase()) {
+        const userTiltifySlug = createSlug(user.tiltifyName);
+        // Check if this slug is valid using generateTeamSlugAlternatives
+        // If it returns an empty array, the slug is valid
+        const userTiltifyAlternatives = await generateTeamSlugAlternatives(context.ctx, userTiltifySlug, 0);
+        if (userTiltifyAlternatives.length === 0) {
+          allAlternatives.push(userTiltifySlug);
+        }
+      }
+
+      return {
+        isValid: false,
+        suggestions: allAlternatives
+      };
+    } catch (error) {
+      console.error('Error validating slug:', error);
+      throw new ORPCError('INTERNAL_SERVER_ERROR', { message: 'Failed to validate slug' });
+    }
+  });
+
+/**
+ * Team Member Operations
+ */
+
+/**
+ * Leave a team (for non-owners)
+ * Prevents team owner from leaving their own team
+ */
+const leaveTeam = os.leaveTeam
+  .use(authMiddleware)
+  .handler(async ({ context, input }) => {
+    const db = context.db;
+    const userId = context.userId;
+    const { teamId } = input;
+
+    try {
+      // Check if team exists
+      const team = await db.select()
+        .from(teamsTable)
+        .where(eq(teamsTable.id, teamId))
+        .get();
+
+      if (!team) {
+        throw new ORPCError('NOT_FOUND', { message: 'Team not found' });
+      }
+
+      // Prevent team owner from leaving their own team
+      if (team.ownerId === userId) {
+        throw new ORPCError('FORBIDDEN', { message: 'Team owner cannot leave their own team. Transfer ownership or delete the team instead.' });
+      }
+
+      // Check if user is actually a member
+      const membership = await db.select()
+        .from(teamMembersTable)
+        .where(and(
+          eq(teamMembersTable.teamId, teamId),
+          eq(teamMembersTable.userId, userId)
+        ))
+        .get();
+
+      if (!membership) {
+        throw new ORPCError('NOT_FOUND', { message: 'You are not a member of this team' });
+      }
+
+      // Remove user from team
+      await db.delete(teamMembersTable)
+        .where(and(
+          eq(teamMembersTable.teamId, teamId),
+          eq(teamMembersTable.userId, userId)
+        ));
+
+      return { success: true };
+    } catch (error) {
+      if (error instanceof ORPCError) throw error;
+      console.error('Error leaving team:', error);
+      throw new ORPCError('INTERNAL_SERVER_ERROR', { message: 'Failed to leave team' });
+    }
+  });
+
+/**
+ * Remove a member from team (owner only)
+ * Prevents owner from removing themselves
+ */
+const removeMember = os.removeMember
+  .use(authMiddleware)
+  .use(teamsOwnerMiddleware)
+  .handler(async ({ context, input }) => {
+    const db = context.db;
+    const userId = context.userId;
+    const { userId: targetUserId, teamId } = input;
+
+    // Prevent team owner from removing themselves
+    if (targetUserId === userId) {
+      throw new ORPCError('FORBIDDEN', { message: 'Team owner cannot remove themselves from the team' });
+    }
+
+    try {
+      // Check if target user is actually a member
+      const membership = await db.select()
+        .from(teamMembersTable)
+        .where(and(
+          eq(teamMembersTable.teamId, teamId),
+          eq(teamMembersTable.userId, targetUserId)
+        ))
+        .get();
+
+      if (!membership) {
+        throw new ORPCError('NOT_FOUND', { message: 'User is not a member of this team' });
+      }
+
+      // Remove user from team
+      await db.delete(teamMembersTable)
+        .where(and(
+          eq(teamMembersTable.teamId, teamId),
+          eq(teamMembersTable.userId, targetUserId)
+        ));
+
+      return { success: true };
+    } catch (error) {
+      if (error instanceof ORPCError) throw error;
+      console.error('Error removing team member:', error);
+      throw new ORPCError('INTERNAL_SERVER_ERROR', { message: 'Failed to remove team member' });
+    }
+  });
+
+/**
+ * Team Invite Operations
+ */
+
+/**
+ * Create an invite to join team (owner only)
+ * Validates that user exists and is not already a member or invited
+ */
+const createInvite = os.createInvite
+  .use(authMiddleware)
+  .use(teamsOwnerMiddleware)
+  .handler(async ({ context, input }) => {
+    const db = context.db;
+    const { invitedUserId, teamId } = input;
+
+    try {
+      // Check if invited user exists
+      const invitedUser = await db.select()
+        .from(users)
+        .where(eq(users.id, invitedUserId))
+        .get();
+
+      if (!invitedUser) {
+        throw new ORPCError('NOT_FOUND', { message: 'User not found' });
+      }
+
+      // Check if user is already a team member
+      const existingMember = await db.select()
+        .from(teamMembersTable)
+        .where(and(
+          eq(teamMembersTable.teamId, teamId),
+          eq(teamMembersTable.userId, invitedUserId)
+        ))
+        .get();
+
+      if (existingMember) {
+        throw new ORPCError('CONFLICT', { message: 'User is already a member of this team' });
+      }
+
+      // Create invite (using onConflictDoNothing to handle duplicate invites gracefully)
+      await db.insert(teamInvitesTable)
+        .values({
+          teamId: teamId,
+          invitedUserId: invitedUserId
+        })
+        .onConflictDoNothing();
+
+      return { success: true };
+    } catch (error) {
+      if (error instanceof ORPCError) throw error;
+      console.error('Error creating team invite:', error);
+      throw new ORPCError('INTERNAL_SERVER_ERROR', { message: 'Failed to create team invite' });
+    }
+  });
+
+/**
+ * Delete an invite (owner only)
+ * Removes pending invitation
+ */
+const deleteInvite = os.deleteInvite
+  .use(authMiddleware)
+  .use(teamsOwnerMiddleware)
+  .handler(async ({ context, input }) => {
+    const db = context.db;
+    const { invitedUserId, teamId } = input;
+
+    try {
+      // Check if invite exists
+      const invite = await db.select()
+        .from(teamInvitesTable)
+        .where(and(
+          eq(teamInvitesTable.teamId, teamId),
+          eq(teamInvitesTable.invitedUserId, invitedUserId)
+        ))
+        .get();
+
+      if (!invite) {
+        throw new ORPCError('NOT_FOUND', { message: 'Invite not found' });
+      }
+
+      // Delete invite
+      await db.delete(teamInvitesTable)
+        .where(and(
+          eq(teamInvitesTable.teamId, teamId),
+          eq(teamInvitesTable.invitedUserId, invitedUserId)
+        ));
+
+      return { success: true };
+    } catch (error) {
+      if (error instanceof ORPCError) throw error;
+      console.error('Error deleting team invite:', error);
+      throw new ORPCError('INTERNAL_SERVER_ERROR', { message: 'Failed to delete team invite' });
+    }
+  });
+
+/**
+ * Accept an invite to join team
+ * Validates invite exists and adds user as member
+ */
+const acceptInvite = os.acceptInvite
+  .use(authMiddleware)
+  .handler(async ({ context, input }) => {
+    const db = context.db;
+    const userId = context.userId;
+    const { teamId } = input;
+
+    try {
+      // Check if team exists
+      const team = await db.select()
+        .from(teamsTable)
+        .where(eq(teamsTable.id, teamId))
+        .get();
+
+      if (!team) {
+        throw new ORPCError('NOT_FOUND', { message: 'Team not found' });
+      }
+
+      // Check if user has an invite
+      const invite = await db.select()
+        .from(teamInvitesTable)
+        .where(and(
+          eq(teamInvitesTable.teamId, teamId),
+          eq(teamInvitesTable.invitedUserId, userId)
+        ))
+        .get();
+
+      if (!invite) {
+        throw new ORPCError('NOT_FOUND', { message: 'Invite not found' });
+      }
+
+      // Accept invite: remove invite and add as member
+      await db.transaction(async (tx) => {
+        await tx.delete(teamInvitesTable)
+          .where(and(
+            eq(teamInvitesTable.teamId, teamId),
+            eq(teamInvitesTable.invitedUserId, userId)
+          ));
+
+        await tx.insert(teamMembersTable)
+          .values({
+            teamId: teamId,
+            userId: userId
+          });
+      });
+
+      return { success: true };
+    } catch (error) {
+      if (error instanceof ORPCError) throw error;
+      console.error('Error accepting team invite:', error);
+      throw new ORPCError('INTERNAL_SERVER_ERROR', { message: 'Failed to accept team invite' });
+    }
+  });
+
+/**
+ * Reject an invite to join team
+ * Removes pending invitation
+ */
+const rejectInvite = os.rejectInvite
+  .use(authMiddleware)
+  .handler(async ({ context, input }) => {
+    const db = context.db;
+    const userId = context.userId;
+    const { teamId } = input;
+
+    try {
+      // Check if team exists
+      const team = await db.select()
+        .from(teamsTable)
+        .where(eq(teamsTable.id, teamId))
+        .get();
+
+      if (!team) {
+        throw new ORPCError('NOT_FOUND', { message: 'Team not found' });
+      }
+
+      // Check if user has an invite
+      const invite = await db.select()
+        .from(teamInvitesTable)
+        .where(and(
+          eq(teamInvitesTable.teamId, teamId),
+          eq(teamInvitesTable.invitedUserId, userId)
+        ))
+        .get();
+
+      if (!invite) {
+        throw new ORPCError('NOT_FOUND', { message: 'Invite not found' });
+      }
+
+      // Delete invite
+      await db.delete(teamInvitesTable)
+        .where(and(
+          eq(teamInvitesTable.teamId, teamId),
+          eq(teamInvitesTable.invitedUserId, userId)
+        ));
+
+      return { success: true };
+    } catch (error) {
+      if (error instanceof ORPCError) throw error;
+      console.error('Error rejecting team invite:', error);
+      throw new ORPCError('INTERNAL_SERVER_ERROR', { message: 'Failed to reject team invite' });
+    }
+  });
+
+export const privateTeamsRouter = {
+  // Team CRUD Operations
+  create,
+  update,
+  delete: deleteTeam,
+  validateSlug,
+
+  // Team Member Operations
+  leaveTeam,
+  removeMember,
+
+  // Team Invite Operations
+  createInvite,
+  deleteInvite,
+  acceptInvite,
+  rejectInvite
+};
+
+
+================================================================================
+END OF FILE: src/lib/orpc/private/teams/impl.ts
+================================================================================
+
+
+================================================================================
+FILE: src/lib/orpc/private/users/editProfile/profile/impl.ts
+================================================================================
+
+import {profileContract} from './contract.ts';
+import {implement, ORPCError} from '@orpc/server'
+import {dbMiddleware} from "../../../../middleware/dbMiddleware.ts";
+import {authMiddleware} from "../../../../middleware/authMiddleware.ts";
+import {users, userStyles} from "../../../../../db/schema/auth-schema.ts";
+import {eq} from "drizzle-orm";
+
+const os = implement(profileContract)
+  .use(dbMiddleware)
+
+/**
+ * Update user's primary color preference
+ * Uses upsert pattern to insert or update the userStyles record
+ */
+const updatePrimaryColor = os.style.updatePrimaryColorContract
+  .use(authMiddleware)
+  .handler(async ({context, input}) => {
+    const db = context.db;
+    const userId = context.userId;
+
+    try {
+      await db.insert(userStyles)
+        .values({
+          userId: userId,
+          primaryColor: input.primaryColor
+        })
+        .onConflictDoUpdate({
+          target: userStyles.userId,
+          set: {
+            primaryColor: input.primaryColor
+          }
+        });
+
+      return {success: true};
+    } catch (error) {
+      console.error('Error updating primary color:', error);
+      throw new ORPCError('INTERNAL_SERVER_ERROR', {
+        message: 'Failed to update primary color'
+      });
+    }
+  })
+
+/**
+ * Update user's accent color preference
+ * Uses upsert pattern to insert or update the userStyles record
+ */
+const updateAccentColor = os.style.updateAccentColorContract
+  .use(authMiddleware)
+  .handler(async ({context, input}) => {
+    const db = context.db;
+    const userId = context.userId;
+
+    try {
+      await db.insert(userStyles)
+        .values({
+          userId: userId,
+          accentColor: input.accentColor
+        })
+        .onConflictDoUpdate({
+          target: userStyles.userId,
+          set: {
+            accentColor: input.accentColor
+          }
+        });
+
+      return {success: true};
+    } catch (error) {
+      console.error('Error updating accent color:', error);
+      throw new ORPCError('INTERNAL_SERVER_ERROR', {
+        message: 'Failed to update accent color'
+      });
+    }
+  })
+
+/**
+ * Update user's primary live streaming platform
+ * Updates the primaryLiveStream field in the users table
+ */
+const updatePrimaryLiveStream = os.streaming.updatePrimaryLiveStreamContract
+  .use(authMiddleware)
+  .handler(async ({context, input}) => {
+    const db = context.db;
+    const userId = context.userId;
+
+    try {
+      await db.update(users)
+        .set({
+          primaryLiveStream: input.platform
+        })
+        .where(eq(users.id, userId));
+
+      return {success: true};
+    } catch (error) {
+      console.error('Error updating primary live stream platform:', error);
+      throw new ORPCError('INTERNAL_SERVER_ERROR', {
+        message: 'Failed to update primary live stream platform'
+      });
+    }
+  })
+
+export const profileRouter = {
+  updatePrimaryColor,
+  updateAccentColor,
+  updatePrimaryLiveStream,
+}
+
+
+================================================================================
+END OF FILE: src/lib/orpc/private/users/editProfile/profile/impl.ts
+================================================================================
+
+
+================================================================================
+FILE: src/lib/orpc/private/users/editProfile/relations/blocks/impl.ts
+================================================================================
+
+import {blockContract} from './contract.ts';
+import {implement} from '@orpc/server';
+import {dbMiddleware} from '../../../../../middleware/dbMiddleware.ts';
+import {authMiddleware} from '../../../../../middleware/authMiddleware.ts';
+import {blockedUsers, friendRequests, friendsTable} from '../../../../../../db/schema/auth-schema.ts';
+import {userDisplayView} from '../../../../../../db/schema/views-schema.ts';
+import {and, eq, or} from 'drizzle-orm';
+
+const os = implement(blockContract)
+  .use(dbMiddleware);
+
+// Block user implementation
+const blockUser = os.blockUser
+  .use(authMiddleware)
+  .handler(async ({ context, input }) => {
+    const db = context.db;
+    const userId = context.userId;
+    const { blockedUserId } = input;
+
+    // Prevent blocking yourself
+    if (userId === blockedUserId) {
+      throw new Error('Cannot block yourself');
+    }
+
+    // Check if user is already blocked
+    const existingBlock = await db.select()
+      .from(blockedUsers)
+      .where(
+        and(
+          eq(blockedUsers.userId, userId),
+          eq(blockedUsers.blockedUser, blockedUserId)
+        )
+      )
+      .get();
+
+    if (existingBlock) {
+      throw new Error('User is already blocked');
+    }
+
+    // Remove any existing friendship and friend requests, then block user
+    await db.batch([
+      // Remove friendship if exists
+      db.delete(friendsTable)
+        .where(
+          or(
+            and(eq(friendsTable.fromUserId, userId), eq(friendsTable.toUserId, blockedUserId)),
+            and(eq(friendsTable.fromUserId, blockedUserId), eq(friendsTable.toUserId, userId))
+          )
+        ),
+      // Remove any pending friend requests
+      db.delete(friendRequests)
+        .where(
+          or(
+            and(eq(friendRequests.fromUserId, userId), eq(friendRequests.toUserId, blockedUserId)),
+            and(eq(friendRequests.fromUserId, blockedUserId), eq(friendRequests.toUserId, userId))
+          )
+        ),
+      // Add block
+      db.insert(blockedUsers)
+        .values({
+          userId: userId,
+          blockedUser: blockedUserId
+        })
+    ]);
+
+    return { success: true };
+  });
+
+// Unblock user implementation
+const unblockUser = os.unblockUser
+  .use(authMiddleware)
+  .handler(async ({ context, input }) => {
+    const db = context.db;
+    const userId = context.userId;
+    const { blockedUserId } = input;
+
+    // Check if user is blocked
+    const existingBlock = await db.select()
+      .from(blockedUsers)
+      .where(
+        and(
+          eq(blockedUsers.userId, userId),
+          eq(blockedUsers.blockedUser, blockedUserId)
+        )
+      )
+      .get();
+
+    if (!existingBlock) {
+      throw new Error('User is not blocked');
+    }
+
+    // Remove the block
+    await db.delete(blockedUsers)
+      .where(
+        and(
+          eq(blockedUsers.userId, userId),
+          eq(blockedUsers.blockedUser, blockedUserId)
+        )
+      );
+
+    return { success: true };
+  });
+
+// List blocked users implementation
+const listBlockedUsers = os.listBlockedUsers
+  .use(authMiddleware)
+  .handler(async ({ context }) => {
+    const db = context.db;
+    const userId = context.userId;
+
+    // Get all users blocked by the current user
+    const blockedUsersList = await db.select({
+      userId: userDisplayView.userId,
+      primaryLiveStream: userDisplayView.primaryLiveStream,
+      role: userDisplayView.role,
+      createdAt: userDisplayView.createdAt,
+      username: userDisplayView.username,
+      profileImage: userDisplayView.profileImage,
+      twitchLogin: userDisplayView.twitchLogin,
+      tiltifySlug: userDisplayView.tiltifySlug,
+      tiltifyUrl: userDisplayView.tiltifyUrl,
+      primaryColor: userDisplayView.primaryColor,
+      accentColor: userDisplayView.accentColor,
+    })
+      .from(blockedUsers)
+      .innerJoin(userDisplayView, eq(blockedUsers.blockedUser, userDisplayView.userId))
+      .where(eq(blockedUsers.userId, userId))
+      .all();
+
+    return blockedUsersList;
+  });
+
+export const blockRouter = {
+  blockUser,
+  unblockUser,
+  listBlockedUsers
+};
+
+
+================================================================================
+END OF FILE: src/lib/orpc/private/users/editProfile/relations/blocks/impl.ts
+================================================================================
+
+
+================================================================================
+FILE: src/lib/orpc/private/users/editProfile/relations/friends/impl.ts
+================================================================================
+
+import {friendsContract} from './contract.ts';
+import {implement} from '@orpc/server';
+import {dbMiddleware} from '../../../../../middleware/dbMiddleware.ts';
+import {authMiddleware} from '../../../../../middleware/authMiddleware.ts';
+import {blockedUsers, friendRequests, friendsTable} from '../../../../../../db/schema/auth-schema.ts';
+import {and, eq, or} from 'drizzle-orm';
+
+const os = implement(friendsContract)
+  .use(dbMiddleware);
+
+// Send friend request implementation
+const sendFriendRequest = os.sendFriendRequest
+  .use(authMiddleware)
+  .handler(async ({ context, input }) => {
+    const db = context.db;
+    const userId = context.userId;
+    const { toUserId } = input;
+
+    // Prevent sending friend request to yourself
+    if (userId === toUserId) {
+      throw new Error('Cannot send friend request to yourself');
+    }
+
+    // Check if users are already friends
+    const existingFriendship = await db.select()
+      .from(friendsTable)
+      .where(
+        or(
+          and(eq(friendsTable.fromUserId, userId), eq(friendsTable.toUserId, toUserId)),
+          and(eq(friendsTable.fromUserId, toUserId), eq(friendsTable.toUserId, userId))
+        )
+      )
+      .get();
+
+    if (existingFriendship) {
+      throw new Error('Users are already friends');
+    }
+
+    // Check if friend request already exists
+    const existingRequest = await db.select()
+      .from(friendRequests)
+      .where(
+        or(
+          and(eq(friendRequests.fromUserId, userId), eq(friendRequests.toUserId, toUserId)),
+          and(eq(friendRequests.fromUserId, toUserId), eq(friendRequests.toUserId, userId))
+        )
+      )
+      .get();
+
+    if (existingRequest) {
+      throw new Error('Friend request already exists');
+    }
+
+    // Check if either user has blocked the other
+    const blockExists = await db.select()
+      .from(blockedUsers)
+      .where(
+        or(
+          and(eq(blockedUsers.userId, userId), eq(blockedUsers.blockedUser, toUserId)),
+          and(eq(blockedUsers.userId, toUserId), eq(blockedUsers.blockedUser, userId))
+        )
+      )
+      .get();
+
+    if (blockExists) {
+      throw new Error('Cannot send friend request to blocked user');
+    }
+
+    // Insert friend request
+    await db.insert(friendRequests)
+      .values({
+        fromUserId: userId,
+        toUserId: toUserId
+      });
+
+    return { success: true };
+  });
+
+// Accept friend request implementation
+const acceptFriendRequest = os.acceptFriendRequest
+  .use(authMiddleware)
+  .handler(async ({ context, input }) => {
+    const db = context.db;
+    const userId = context.userId;
+    const { fromUserId } = input;
+
+    // Check if friend request exists
+    const friendRequest = await db.select()
+      .from(friendRequests)
+      .where(
+        and(
+          eq(friendRequests.fromUserId, fromUserId),
+          eq(friendRequests.toUserId, userId)
+        )
+      )
+      .get();
+
+    if (!friendRequest) {
+      throw new Error('Friend request not found');
+    }
+
+    // Remove the friend request and add friendship in a transaction
+    await db.batch([
+      db.delete(friendRequests)
+        .where(
+          and(
+            eq(friendRequests.fromUserId, fromUserId),
+            eq(friendRequests.toUserId, userId)
+          )
+        ),
+      db.insert(friendsTable)
+        .values({
+          fromUserId: fromUserId,
+          toUserId: userId
+        })
+    ]);
+
+    return { success: true };
+  });
+
+// Decline friend request implementation
+const declineFriendRequest = os.declineFriendRequest
+  .use(authMiddleware)
+  .handler(async ({ context, input }) => {
+    const db = context.db;
+    const userId = context.userId;
+    const { fromUserId } = input;
+
+    // Check if friend request exists
+    const friendRequest = await db.select()
+      .from(friendRequests)
+      .where(
+        and(
+          eq(friendRequests.fromUserId, fromUserId),
+          eq(friendRequests.toUserId, userId)
+        )
+      )
+      .get();
+
+    if (!friendRequest) {
+      throw new Error('Friend request not found');
+    }
+
+    // Remove the friend request
+    await db.delete(friendRequests)
+      .where(
+        and(
+          eq(friendRequests.fromUserId, fromUserId),
+          eq(friendRequests.toUserId, userId)
+        )
+      );
+
+    return { success: true };
+  });
+
+// Remove friend implementation
+const removeFriend = os.removeFriend
+  .use(authMiddleware)
+  .handler(async ({ context, input }) => {
+    const db = context.db;
+    const userId = context.userId;
+    const { friendUserId } = input;
+
+    // Check if friendship exists
+    const friendship = await db.select()
+      .from(friendsTable)
+      .where(
+        or(
+          and(eq(friendsTable.fromUserId, userId), eq(friendsTable.toUserId, friendUserId)),
+          and(eq(friendsTable.fromUserId, friendUserId), eq(friendsTable.toUserId, userId))
+        )
+      )
+      .get();
+
+    if (!friendship) {
+      throw new Error('Friendship not found');
+    }
+
+    // Remove the friendship
+    await db.delete(friendsTable)
+      .where(
+        or(
+          and(eq(friendsTable.fromUserId, userId), eq(friendsTable.toUserId, friendUserId)),
+          and(eq(friendsTable.fromUserId, friendUserId), eq(friendsTable.toUserId, userId))
+        )
+      );
+
+    return { success: true };
+  });
+
+
+export const friendsRouter = {
+  sendFriendRequest,
+  acceptFriendRequest,
+  declineFriendRequest,
+  removeFriend,
+};
+
+
+================================================================================
+END OF FILE: src/lib/orpc/private/users/editProfile/relations/friends/impl.ts
+================================================================================
+
+
+================================================================================
+FILE: src/lib/orpc/private/users/editProfile/social/platforms/impl.ts
+================================================================================
+
+import {platformsContract} from './contract.ts';
+import {implement} from '@orpc/server';
+import {dbMiddleware} from '../../../../../middleware/dbMiddleware.ts';
+import {authMiddleware} from '../../../../../middleware/authMiddleware.ts';
+import {userSocials} from '../../../../../../db/schema/auth-schema.ts';
+import {and, eq} from 'drizzle-orm';
+
+const os = implement(platformsContract)
+  .use(dbMiddleware);
+
+const addSocial = os.add
+  .use(authMiddleware)
+  .handler(async ({ context, input }) => {
+    const db = context.db;
+    const userId = context.userId;
+
+    // Insert or update the social media link in the database
+    await db.insert(userSocials)
+      .values({
+        userId: userId,
+        provider: input.provider,
+        url: input.url
+      })
+      .onConflictDoUpdate({
+        target: [userSocials.userId, userSocials.provider],
+        set: { url: input.url }
+      });
+
+    return { success: true };
+  });
+
+const removeSocial = os.remove
+  .use(authMiddleware)
+  .handler(async ({ context, input }) => {
+    const db = context.db;
+    const userId = context.userId;
+
+    // Delete the social media link from the database
+    await db.delete(userSocials)
+      .where(and(
+        eq(userSocials.userId, userId),
+        eq(userSocials.provider, input.provider)
+      ));
+
+    return { success: true };
+  });
+
+export const platformsRouter = { add: addSocial, remove: removeSocial };
+
+
+================================================================================
+END OF FILE: src/lib/orpc/private/users/editProfile/social/platforms/impl.ts
+================================================================================
+
+
+================================================================================
+FILE: src/lib/orpc/private/users/editProfile/social/tiltify/impl.ts
+================================================================================
+
+import {tiltifyContract} from './contract.ts';
+import {implement, ORPCError} from '@orpc/server';
+import {dbMiddleware} from '../../../../../middleware/dbMiddleware.ts';
+import {authMiddleware} from '../../../../../middleware/authMiddleware.ts';
+import {userSocials} from '../../../../../../db/schema/auth-schema.ts';
+import {TiltifyAPI} from "../../../../../../TiltifyAPI.ts";
+
+const os = implement(tiltifyContract)
+  .use(dbMiddleware);
+
+// Helper function to format social URLs based on platform
+function formatSocialUrl(platform: string, value: string): string {
+  if (value.startsWith('http')) {
+    return value;
+  }
+
+  switch (platform) {
+    case 'twitch':
+      return `https://twitch.tv/${value}`;
+    case 'twitter':
+      return `https://twitter.com/${value}`;
+    case 'youtube':
+      // Check if it's a channel ID or username
+      if (value.startsWith('UC')) {
+        return `https://youtube.com/channel/${value}`;
+      } else {
+        return `https://youtube.com/@${value}`;
+      }
+    case 'instagram':
+      return `https://instagram.com/${value}`;
+    case 'tiktok':
+      return `https://tiktok.com/@${value}`;
+    default:
+      return value;
+  }
+}
+
+const importFromTiltify = os.import
+  .use(authMiddleware)
+  .handler(async ({context}) => {
+    const db = context.db;
+    const userId = context.userId;
+
+    // Get Tiltify API instance
+    const tiltifyAPI = new TiltifyAPI(context.ctx.locals.runtime.env);
+
+    // Get user's Tiltify token
+    let tiltifyToken: string | null;
+    try {
+      tiltifyToken = await tiltifyAPI.getTokenFromContext(context.ctx);
+      if (!tiltifyToken) {
+        throw new ORPCError('UNAUTHORIZED', {
+          message: 'No Tiltify token found for user'
+        });
+      }
+    } catch (error) {
+      console.error('Error getting Tiltify token:', error);
+      throw new ORPCError('INTERNAL_SERVER_ERROR', {
+        message: 'Failed to get Tiltify token'
+      });
+    }
+
+    // Get Tiltify user data
+    let tiltifyUser;
+    try {
+      tiltifyUser = await tiltifyAPI.getUser(tiltifyToken);
+    } catch (error) {
+      console.error('Error getting Tiltify user data:', error);
+      throw new ORPCError('INTERNAL_SERVER_ERROR', {
+        message: 'Failed to get Tiltify user data'
+      });
+    }
+
+    if (!tiltifyUser) {
+      throw new ORPCError('INTERNAL_SERVER_ERROR', {
+        message: 'Failed to get Tiltify user data'
+      });
+    }
+
+    // Process social media links
+    const socials = tiltifyUser.data.social;
+    const results: { provider: string, success: boolean }[] = [];
+
+    // Handle each social platform (twitch, twitter, youtube, instagram, tiktok)
+    const socialPlatforms = [
+      { platform: 'twitch', value: socials.twitch },
+      { platform: 'twitter', value: socials.twitter },
+      { platform: 'youtube', value: socials.youtube },
+      { platform: 'instagram', value: socials.instagram },
+      { platform: 'tiktok', value: socials.tiktok }
+    ];
+
+    for (const { platform, value } of socialPlatforms) {
+      if (value) {
+        try {
+          const url = formatSocialUrl(platform, value);
+          await db.insert(userSocials)
+            .values({
+              userId,
+              provider: platform,
+              url
+            })
+            .onConflictDoUpdate({
+              target: [userSocials.userId, userSocials.provider],
+              set: {url}
+            });
+          results.push({provider: platform, success: true});
+        } catch (error) {
+          console.error(`Error adding ${platform} social:`, error);
+          results.push({provider: platform, success: false});
+        }
+      }
+    }
+
+    return {success: true, results};
+  });
+
+export const tiltifyRouter = {import: importFromTiltify};
+
+
+================================================================================
+END OF FILE: src/lib/orpc/private/users/editProfile/social/tiltify/impl.ts
+================================================================================
+
+
+================================================================================
+FILE: src/lib/orpc/private/users/editProfile/tags/impl.ts
+================================================================================
+
+import {tagsContract} from './contract.ts';
+import {implement} from '@orpc/server'
+import {dbMiddleware} from "../../../../middleware/dbMiddleware.ts";
+import {userTags} from "../../../../../db/schema/auth-schema.ts";
+import {authMiddleware} from "../../../../middleware/authMiddleware.ts";
+import {and, eq} from "drizzle-orm";
+import {suggestionsRouter} from "./suggestions/impl.ts";
+import {popularTagsRouter} from "./popular/impl.ts";
+
+const os = implement(tagsContract)
+  .use(dbMiddleware)
+
+const addUserTag = os.addUserTagContract
+  .use(authMiddleware)
+  .handler(async ({context, input}) => {
+    const db = context.db
+    const userId = context.userId
+
+    // Insert the tag into the database
+    const [result] = await db.insert(userTags).values({
+      userId: userId,
+      tag: input.tag,
+      label: input.label,
+    }).returning()
+
+    return {
+      userId: result.userId,
+      tag: result.tag,
+      label: result.label,
+      addedAt: result.addedAt
+    }
+  })
+
+const removeUserTag = os.removeUserTagContract
+  .use(authMiddleware)
+  .handler(async ({context, input}) => {
+    const db = context.db
+    const userId = context.userId
+
+    // Delete the tag from the database
+    await db.delete(userTags)
+      .where(and(
+        eq(userTags.userId, userId),
+        eq(userTags.tag, input.tag)
+      ))
+
+    return {success: true}
+  })
+
+const getUserTags = os.getUserTagsContract
+  .use(authMiddleware)
+  .handler(async ({context}) => {
+    const db = context.db
+    const userId = context.userId
+    // Get all tags for the authenticated user
+    return db.select()
+      .from(userTags)
+      .where(eq(userTags.userId, userId))
+      .all()
+  })
+
+export const tagsRouter = {
+  add: addUserTag, remove: removeUserTag, getUserTags,
+
+  find: {
+    ...suggestionsRouter,
+    ...popularTagsRouter,
+  }
+}
+
+
+================================================================================
+END OF FILE: src/lib/orpc/private/users/editProfile/tags/impl.ts
+================================================================================
+
+
+================================================================================
+FILE: src/lib/orpc/private/users/editProfile/tags/popular/impl.ts
+================================================================================
+
+import {popularTagsContract} from './contract.ts';
+import {implement} from '@orpc/server'
+import {dbMiddleware} from "../../../../../middleware/dbMiddleware.ts";
+import {userTags} from "../../../../../../db/schema/auth-schema.ts";
+import {count, desc} from "drizzle-orm";
+import {getTags} from "../../../../../../../functions/getTags.ts";
+
+const os = implement(popularTagsContract)
+  .use(dbMiddleware)
+
+const listPopularTags = os.listPopularTagsContract
+  .handler(async ({context, input}) => {
+    const db = context.db
+    const limit = input.limit
+
+    // Get popular tags from database with usage counts
+    const popularTags = await db.select({
+      tag: userTags.tag,
+      label: userTags.label,
+      count: count(userTags.tag)
+    })
+    .from(userTags)
+    .groupBy(userTags.tag, userTags.label)
+    .orderBy(desc(count(userTags.tag)))
+    .limit(limit)
+    .all()
+
+    // Get default and charity tags from getTags function
+    const { tags: defaultTags, charityTags } = getTags()
+
+    // If we don't have enough popular tags, supplement with default tags
+    if (popularTags.length < limit) {
+      const existingTags = popularTags.map(t => t.tag)
+
+      // Filter out default tags that are already in popular tags
+      const filteredDefaultTags = defaultTags
+        .filter(tag => !existingTags.includes(tag.tag))
+        .slice(0, limit - popularTags.length)
+        .map(tag => ({ ...tag, count: 0 }))
+
+      // Format charity tags with count 0
+      const formattedCharityTags = charityTags.map(tag => ({ ...tag, count: 0 }))
+
+      return {
+        tags: popularTags,
+        defaultTags: filteredDefaultTags,
+        charityTags: formattedCharityTags
+      }
+    }
+
+    // If we have enough popular tags, just return them with empty default/charity arrays
+    return {
+      tags: popularTags,
+      defaultTags: [],
+      charityTags: []
+    }
+  })
+
+export const popularTagsRouter = { listPopularTags }
+
+
+================================================================================
+END OF FILE: src/lib/orpc/private/users/editProfile/tags/popular/impl.ts
+================================================================================
+
+
+================================================================================
+FILE: src/lib/orpc/private/users/editProfile/tags/suggestions/impl.ts
+================================================================================
+
+import {suggestionsContract} from './contract.ts';
+import {implement} from '@orpc/server'
+import {dbMiddleware} from "../../../../../middleware/dbMiddleware.ts";
+import {userTags} from "../../../../../../db/schema/auth-schema.ts";
+import {and, count, desc, eq, like, notInArray} from "drizzle-orm";
+import {getTags} from "../../../../../../../functions/getTags.ts";
+import {authMiddleware} from "../../../../../middleware/authMiddleware.ts";
+
+const os = implement(suggestionsContract)
+  .use(dbMiddleware)
+
+const getSuggestedTagsForUser = os.getSuggestedTagsForUserContract
+  .use(authMiddleware)
+  .handler(async ({context, input}) => {
+    const db = context.db
+    const { limit } = input
+    const userId = context.userId
+
+    // Get user's existing tags to filter them out
+    const userTagsList = await db.select()
+      .from(userTags)
+      .where(eq(userTags.userId, userId))
+      .all()
+
+    const userTagValues = userTagsList.map(t => t.tag)
+
+    // Get popular tags not used by the user
+    let suggestedTags = []
+    if (userTagValues.length > 0) {
+      suggestedTags = await db.select({
+        tag: userTags.tag,
+        label: userTags.label,
+        count: count(userTags.tag)
+      })
+      .from(userTags)
+      .where(notInArray(userTags.tag, userTagValues))
+      .groupBy(userTags.tag, userTags.label)
+      .orderBy(desc(count(userTags.tag)))
+      .limit(limit)
+      .all()
+    } else {
+      // If user has no tags, get all popular tags
+      suggestedTags = await db.select({
+        tag: userTags.tag,
+        label: userTags.label,
+        count: count(userTags.tag)
+      })
+      .from(userTags)
+      .groupBy(userTags.tag, userTags.label)
+      .orderBy(desc(count(userTags.tag)))
+      .limit(limit)
+      .all()
+    }
+
+    // Get default and charity tags from getTags function
+    const { tags: defaultTags, charityTags } = getTags()
+
+    // Filter default tags that aren't already used by the user
+    const filteredDefaultTags = defaultTags
+      .filter(tag => !userTagValues.includes(tag.tag))
+      .map(tag => ({ ...tag, count: 0 }))
+
+    // Filter charity tags that aren't already used by the user
+    const filteredCharityTags = charityTags
+      .filter(tag => !userTagValues.includes(tag.tag))
+      .map(tag => ({ ...tag, count: 0 }))
+
+    return {
+      tags: suggestedTags,
+      defaultTags: filteredDefaultTags,
+      charityTags: filteredCharityTags
+    }
+  })
+
+const getSuggestedTagsBySearchTerm = os.getSuggestedTagsBySearchTermContract
+  .use(authMiddleware)
+  .handler(async ({context, input}) => {
+    const db = context.db
+    const { term, limit } = input
+    const userId = context.userId
+    const searchTermLower = term.toLowerCase()
+
+    // Get user's existing tags to filter them out
+    const userTagsList = await db.select()
+      .from(userTags)
+      .where(eq(userTags.userId, userId))
+      .all()
+
+    const userTagValues = userTagsList.map(t => t.tag)
+    const { tags: defaultTags, charityTags } = getTags()
+
+    // Filter charity tags that match search term and aren't in user's tags
+    const filteredCharityTags = charityTags
+      .filter(tag =>
+        !userTagValues.includes(tag.tag) &&
+        tag.tag.includes(searchTermLower)
+      )
+      .map(tag => ({ ...tag, count: 0 }))
+
+    // If search term is empty, return only charity tags
+    if (term === '') {
+      return {
+        tags: [],
+        defaultTags: [],
+        charityTags: filteredCharityTags
+      }
+    }
+
+    // Get matching tags from database that aren't used by user
+    let matchingTags = []
+    if (userTagValues.length > 0) {
+      matchingTags = await db.select({
+        tag: userTags.tag,
+        label: userTags.label,
+        count: count(userTags.tag)
+      })
+      .from(userTags)
+      .where(and(
+        notInArray(userTags.tag, userTagValues),
+        like(userTags.tag, `%${term}%`)
+      ))
+      .groupBy(userTags.tag, userTags.label)
+      .orderBy(desc(count(userTags.tag)))
+      .limit(limit)
+      .all()
+    } else {
+      // If user has no tags, search all tags
+      matchingTags = await db.select({
+        tag: userTags.tag,
+        label: userTags.label,
+        count: count(userTags.tag)
+      })
+      .from(userTags)
+      .where(like(userTags.tag, `%${term}%`))
+      .groupBy(userTags.tag, userTags.label)
+      .orderBy(desc(count(userTags.tag)))
+      .limit(limit)
+      .all()
+    }
+
+    // Filter default tags that match search term and aren't in user's tags
+    const filteredDefaultTags = defaultTags
+      .filter(tag =>
+        !userTagValues.includes(tag.tag) &&
+        tag.tag.includes(searchTermLower)
+      )
+      .map(tag => ({ ...tag, count: 0 }))
+
+    return {
+      tags: matchingTags,
+      defaultTags: filteredDefaultTags,
+      charityTags: filteredCharityTags
+    }
+  })
+
+export const suggestionsRouter = { getSuggestedTagsForUser, getSuggestedTagsBySearchTerm }
+
+
+================================================================================
+END OF FILE: src/lib/orpc/private/users/editProfile/tags/suggestions/impl.ts
+================================================================================
+
+
+================================================================================
+FILE: src/lib/orpc/public/teams/impl.ts
+================================================================================
+
+import {publicTeamsContract} from './contract.ts';
+import {implement, ORPCError} from '@orpc/server';
+import {dbMiddleware} from '../../middleware/dbMiddleware.ts';
+import {teamMembersTable, teamsTable} from '../../../db/schema/jj-schema.ts';
+import {accounts, users} from '../../../db/schema/auth-schema.ts';
+import {userDisplayView} from '../../../db/schema/views-schema.ts';
+import {and, count, eq} from 'drizzle-orm';
+
+const os = implement(publicTeamsContract)
+  .use(dbMiddleware);
+
+/**
+ * Find all visible teams
+ * Returns all teams where visible = true
+ */
+const findVisible = os.findVisible
+  .handler(async ({ context }) => {
+    const db = context.db;
+
+    try {
+      const teams = await db.select()
+        .from(teamsTable)
+        .where(eq(teamsTable.visible, true))
+        .all();
+
+      return teams;
+    } catch (error) {
+      console.error('Error finding visible teams:', error);
+      throw new ORPCError('INTERNAL_SERVER_ERROR', {
+        message: 'Failed to retrieve visible teams'
+      });
+    }
+  });
+
+/**
+ * Find all visible teams with member count
+ * Returns all visible teams with their member counts
+ */
+const findAllVisibleWithMemberCount = os.findAllVisibleWithMemberCount
+  .handler(async ({ context }) => {
+    const db = context.db;
+
+    try {
+      const teams = await db.select({
+        id: teamsTable.id,
+        name: teamsTable.name,
+        slug: teamsTable.slug,
+        description: teamsTable.description,
+        visible: teamsTable.visible,
+        ownerId: teamsTable.ownerId,
+        memberCount: count(teamMembersTable.userId)
+      })
+      .from(teamsTable)
+      .leftJoin(teamMembersTable, eq(teamsTable.id, teamMembersTable.teamId))
+      .where(eq(teamsTable.visible, true))
+      .groupBy(teamsTable.id)
+      .all();
+
+      return teams;
+    } catch (error) {
+      console.error('Error finding visible teams with member count:', error);
+      throw new ORPCError('INTERNAL_SERVER_ERROR', {
+        message: 'Failed to retrieve teams with member counts'
+      });
+    }
+  });
+
+/**
+ * Get team by slug with owner information
+ * Returns team details with owner info for public viewing
+ */
+const getBySlug = os.getBySlug
+  .handler(async ({ context, input }) => {
+    const db = context.db;
+    const { slug } = input;
+
+    try {
+      const team = await db.select({
+        id: teamsTable.id,
+        name: teamsTable.name,
+        slug: teamsTable.slug,
+        description: teamsTable.description,
+        visible: teamsTable.visible,
+        ownerId: teamsTable.ownerId,
+        ownerName: accounts.providerUsername,
+        ownerTiltifyName: accounts.providerUsername
+      })
+      .from(teamsTable)
+      .innerJoin(users, eq(teamsTable.ownerId, users.id))
+      .innerJoin(accounts, and(
+        eq(users.id, accounts.userId),
+        eq(accounts.provider, 'tiltify')
+      ))
+      .where(and(
+        eq(teamsTable.slug, slug),
+        eq(teamsTable.visible, true)
+      ))
+      .get();
+
+      return { team: team || null };
+    } catch (error) {
+      console.error('Error getting team by slug:', error);
+      throw new ORPCError('INTERNAL_SERVER_ERROR', {
+        message: 'Failed to retrieve team'
+      });
+    }
+  });
+
+/**
+ * Get team members by team ID in user display format
+ * Returns team member details for public viewing (only for visible teams)
+ */
+const getMembers = os.getMembers
+  .handler(async ({ context, input }) => {
+    const db = context.db;
+    const { teamId } = input;
+
+    try {
+      // First check if team exists and is visible
+      const team = await db.select()
+        .from(teamsTable)
+        .where(and(
+          eq(teamsTable.id, teamId),
+          eq(teamsTable.visible, true)
+        ))
+        .get();
+
+      if (!team) {
+        throw new ORPCError('NOT_FOUND', {
+          message: 'Team not found or not visible'
+        });
+      }
+
+      // Get team members in user display format
+      const members = await db.select({
+        userId: userDisplayView.userId,
+        primaryLiveStream: userDisplayView.primaryLiveStream,
+        role: userDisplayView.role,
+        createdAt: userDisplayView.createdAt,
+        username: userDisplayView.username,
+        profileImage: userDisplayView.profileImage,
+        twitchLogin: userDisplayView.twitchLogin,
+        tiltifySlug: userDisplayView.tiltifySlug,
+        tiltifyUrl: userDisplayView.tiltifyUrl,
+        primaryColor: userDisplayView.primaryColor,
+        accentColor: userDisplayView.accentColor
+      })
+      .from(teamMembersTable)
+      .innerJoin(userDisplayView, eq(teamMembersTable.userId, userDisplayView.userId))
+      .where(eq(teamMembersTable.teamId, teamId))
+      .all();
+
+      return { members };
+    } catch (error) {
+      if (error instanceof ORPCError) throw error;
+      console.error('Error getting team members:', error);
+      throw new ORPCError('INTERNAL_SERVER_ERROR', {
+        message: 'Failed to retrieve team members'
+      });
+    }
+  });
+
+export const publicTeamsRouter = {
+  findVisible,
+  findAllVisibleWithMemberCount,
+  getBySlug,
+  getMembers
+};
+
+
+================================================================================
+END OF FILE: src/lib/orpc/public/teams/impl.ts
+================================================================================
+
+
+================================================================================
+FILE: src/lib/orpc/public/users/discovery/impl.ts
+================================================================================
+
+import {discoveryContract} from './contract.ts';
+import {implement, ORPCError} from '@orpc/server';
+import {dbMiddleware} from '../../../middleware/dbMiddleware.ts';
+import {userDisplayView, usersSearchView} from '../../../../db/schema/views-schema.ts';
+import {eq, like, or} from 'drizzle-orm';
+import {userTags} from "../../../../db/schema/auth-schema.ts";
+
+const os = implement(discoveryContract)
+  .use(dbMiddleware);
+
+const searchByUsernameDisplay = os.byUsernameDisplay
+  .handler(async ({context, input}) => {
+    const db = context.db;
+    const {limit, searchTerm} = input;
+
+    try {
+      // Search using usersSearchView to find matching users, then get display data from userDisplayView
+      const searchPattern = `%${searchTerm.toLowerCase()}%`;
+
+      const results = await db.select({
+        userId: userDisplayView.userId,
+        primaryLiveStream: userDisplayView.primaryLiveStream,
+        role: userDisplayView.role,
+        createdAt: userDisplayView.createdAt,
+        username: userDisplayView.username,
+        profileImage: userDisplayView.profileImage,
+        twitchLogin: userDisplayView.twitchLogin,
+        tiltifySlug: userDisplayView.tiltifySlug,
+        tiltifyUrl: userDisplayView.tiltifyUrl,
+        primaryColor: userDisplayView.primaryColor,
+        accentColor: userDisplayView.accentColor
+      })
+        .from(userDisplayView)
+        .innerJoin(usersSearchView, eq(userDisplayView.userId, usersSearchView.userId))
+        .where(
+          or(
+            like(usersSearchView.tiltifyUsername, searchPattern),
+            like(usersSearchView.twitchUsername, searchPattern)
+          )
+        )
+        .limit(limit) // Limit results to prevent overwhelming responses
+        .all();
+
+      return results;
+    } catch (error) {
+      console.error('Error searching users with display data:', error);
+      throw new ORPCError('INTERNAL_SERVER_ERROR', {
+        message: 'Failed to search users with display data'
+      });
+    }
+  });
+
+const searchByUsername = os.searchByUsername
+  .handler(async ({context, input}) => {
+    const db = context.db;
+    const {limit, searchTerm} = input;
+
+    try {
+      // Search in usersSearchView by checking if the term is like the tiltify or twitch username
+      const searchPattern = `%${searchTerm.toLowerCase()}%`;
+
+      const results = await db.select({
+        userId: usersSearchView.userId,
+        tiltifyUsername: usersSearchView.tiltifyUsername,
+        twitchUsername: usersSearchView.twitchUsername
+      })
+        .from(usersSearchView)
+        .where(
+          or(
+            like(usersSearchView.tiltifyUsername, searchPattern),
+            like(usersSearchView.twitchUsername, searchPattern)
+          )
+        )
+        .limit(limit) // Limit results to prevent overwhelming responses
+        .all();
+
+      return results;
+    } catch (error) {
+      console.error('Error searching users by username:', error);
+      throw new ORPCError('INTERNAL_SERVER_ERROR', {
+        message: 'Failed to search users by username'
+      });
+    }
+  });
+
+const searchSimilarUsers = os.searchSimilarUsersDisplay
+  .handler(async ({context, input}) => {
+    const db = context.db
+    const {limit, userId} = input
+
+    const tagsResult = await db.select({
+      tag: userTags.tag
+    })
+      .from(userTags)
+      .where(
+        eq(
+          userTags.userId, userId
+        )
+      )
+      .all()
+
+    if (tagsResult.length === 0) {
+      return []
+    }
+
+    const tags = tagsResult.map(result => result.tag)
+
+    // TODO
+
+
+    return []
+  })
+
+export const discoverRouter = {
+  byUsernameDisplay: searchByUsernameDisplay,
+  byUsername: searchByUsername,
+  similarUsers: searchSimilarUsers
+};
+
+
+================================================================================
+END OF FILE: src/lib/orpc/public/users/discovery/impl.ts
+================================================================================
+
+
+================================================================================
+FILE: src/lib/orpc/public/users/impl.ts
+================================================================================
+
+import {usersContracts} from './contract.ts';
+import {implement, ORPCError} from '@orpc/server';
+import {dbMiddleware} from "../../middleware/dbMiddleware.ts";
+import {userDisplayView} from '../../../db/schema/views-schema.ts';
+import {eq} from 'drizzle-orm';
+
+const os = implement(usersContracts)
+  .use(dbMiddleware);
+
+
+export const getUserBySlug = os.getUserBySlugContract
+  .handler(async ({context, input}) => {
+    const db = context.db
+    const slug = input
+
+    // Query user by tiltify slug
+    const user = await db.select({
+      userId: userDisplayView.userId,
+      primaryLiveStream: userDisplayView.primaryLiveStream,
+      role: userDisplayView.role,
+      createdAt: userDisplayView.createdAt,
+      username: userDisplayView.username,
+      profileImage: userDisplayView.profileImage,
+      twitchLogin: userDisplayView.twitchLogin,
+      tiltifySlug: userDisplayView.tiltifySlug,
+      tiltifyUrl: userDisplayView.tiltifyUrl,
+      primaryColor: userDisplayView.primaryColor,
+      accentColor: userDisplayView.accentColor,
+    })
+      .from(userDisplayView)
+      .where(eq(userDisplayView.tiltifySlug, slug))
+      .get();
+
+    if (!user) {
+      throw new ORPCError('NOT_FOUND', {
+        message: 'User not found'
+
+      });
+    }
+
+    return user;
+  })
+
+
+================================================================================
+END OF FILE: src/lib/orpc/public/users/impl.ts
+================================================================================
+
+
+================================================================================
+FILE: src/lib/orpc/public/users/relations/impl.ts
+================================================================================
+
+import {friendsContract} from './contract.ts';
+import {implement} from '@orpc/server';
+import {dbMiddleware} from "../../../middleware/dbMiddleware.ts";
+import {friendsTable} from '../../../../db/schema/auth-schema.ts';
+import {userDisplayView} from '../../../../db/schema/views-schema.ts';
+import {eq} from 'drizzle-orm';
+
+const os = implement(friendsContract)
+  .use(dbMiddleware);
+
+// List friends by user ID implementation
+const listFriendsByUserId = os.listFriendsByUserId
+  .handler(async ({context, input}) => {
+    const db = context.db;
+    const {userId} = input;
+
+    // Get all friends of the specified user
+    return db.select({
+      userId: userDisplayView.userId,
+      primaryLiveStream: userDisplayView.primaryLiveStream,
+      role: userDisplayView.role,
+      createdAt: userDisplayView.createdAt,
+      username: userDisplayView.username,
+      profileImage: userDisplayView.profileImage,
+      twitchLogin: userDisplayView.twitchLogin,
+      tiltifySlug: userDisplayView.tiltifySlug,
+      tiltifyUrl: userDisplayView.tiltifyUrl,
+      primaryColor: userDisplayView.primaryColor,
+      accentColor: userDisplayView.accentColor,
+    })
+      .from(friendsTable)
+      .innerJoin(userDisplayView,
+        eq(userDisplayView.userId, friendsTable.toUserId),
+      )
+      .where(
+        eq(friendsTable.fromUserId, userId),
+      )
+      .all();
+  });
+
+export const friendsRouter = {
+  listFriendsByUserId,
+};
+
+
+================================================================================
+END OF FILE: src/lib/orpc/public/users/relations/impl.ts
+================================================================================
+
+
+================================================================================
+SUMMARY
+================================================================================
+Total files processed: 13
+Generated: Sat Aug  9 15:01:31 CEST 2025
+================================================================================
