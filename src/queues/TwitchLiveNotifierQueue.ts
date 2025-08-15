@@ -1,7 +1,4 @@
 import type {MessageSendRequest} from "@cloudflare/workers-types/experimental/index.ts";
-import {UserRepo} from "../lib/db/repos/UserRepo.ts";
-import {TwitchRepo} from "../lib/db/repos/TwitchRepo.ts";
-import type {UserLiveState} from "../lib/db/models/user-ui.ts";
 
 
 export class TwitchLiveNotifierQueue {
@@ -39,6 +36,7 @@ export class TwitchLiveNotifierQueue {
   }
 
   private async handleSingleId(twitchId: string, env: Env): Promise<boolean> {
+    /*
     console.log('TwitchLiveNotifierQueue', 'handleSingleId', twitchId)
     const userRepo = UserRepo.withEnv(env, 'queue')
     const twitchRepo = TwitchRepo.withEnv(env, 'queue')
@@ -109,6 +107,7 @@ export class TwitchLiveNotifierQueue {
 
     console.log('TwitchLiveNotifierQueue', 'handleSingleId', twitchId, 'done')
 
+    */
     return true
   }
 
