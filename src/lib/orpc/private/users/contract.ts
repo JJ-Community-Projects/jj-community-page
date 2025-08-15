@@ -1,5 +1,5 @@
 import {oc} from '@orpc/contract';
-import {UserDisplaySchema} from "../schemas/users.ts";
+import {UserDisplaySchema} from "../../schemas/users.ts";
 
 /**
  * Private users contracts for authenticated user operations.

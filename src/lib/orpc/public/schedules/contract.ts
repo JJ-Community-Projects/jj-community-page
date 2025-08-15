@@ -1,6 +1,7 @@
 import {oc} from "@orpc/contract";
-import {UserSlugSchema} from "../schemas/users.ts";
-import {FullScheduleSchema, ScheduleInfoSchema} from "../schemas/schedule.ts";
+import {UserIdSchema as UserSlugSchema} from "../../schemas/users.ts";
+import {FullScheduleSchema} from "../schemas/schedule.ts";
+import {ScheduleInfoSchema} from "../../schemas/schedules.ts";
 import z from "zod";
 
 /**

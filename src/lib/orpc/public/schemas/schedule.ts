@@ -1,46 +1,13 @@
 import {z} from 'zod';
-import {UserDisplaySchema} from "./users.ts";
+import {UserDisplaySchema} from "../../schemas/users.ts";
+import {TagSchema as StreamTagSchema} from "../../schemas/tags.ts";
+import {ScheduleInfoSchema} from "../../schemas/schedules.ts";
 
 /**
  * Public schedule contracts for retrieving schedule and stream information without authentication.
  * These schemas handle read-only operations for visible schedules and their associated streams.
  */
 
-/**
- * Schema for basic schedule information based on the schedulesTable structure.
- * Represents a single schedule event (e.g., JingleJam 2024) with metadata.
- */
-export const ScheduleInfoSchema = z.object({
-  /** Unique identifier for the schedule */
-  id: z.number().int().positive(),
-  /** Display title of the schedule (e.g., "JingleJam 2024") */
-  title: z.string(),
-  /** URL-friendly slug for the schedule (e.g., "jinglejam-2024") */
-  slug: z.string(),
-  /** Year this schedule belongs to */
-  year: z.number().int(),
-  /** Whether this schedule is publicly visible */
-  visible: z.boolean(),
-  /** Whether this is the primary/main schedule for the year */
-  primary: z.boolean(),
-  /** User ID of the schedule owner/creator */
-  ownerId: z.number().int().positive(),
-  /** Timestamp when the schedule was created */
-  createdAt: z.date(),
-  /** Timestamp when the schedule was last updated */
-  updatedAt: z.date(),
-});
-
-/**
- * Schema for stream tags based on the streamTagsTable structure.
- * Represents categorization tags for streams (e.g., "minecraft", "charity").
- */
-export const StreamTagSchema = z.object({
-  /** Unique tag identifier/slug (e.g., "minecraft", "charity-stream") */
-  tag: z.string(),
-  /** Human-readable display label for the tag (e.g., "Minecraft", "Charity Stream") */
-  label: z.string(),
-});
 
 
 /**

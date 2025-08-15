@@ -3,14 +3,13 @@ import {z} from 'zod';
 import {
   CreateScheduleResponseSchema,
   NextScheduleResponseSchema,
-  PopularTagsResponseSchema,
   ScheduleSchema,
   SchedulesListSchema,
   SlugValidationSchema,
   SuccessMessageSchema,
-  SuggestedTagsResponseSchema,
   TablesDataSchema
 } from "../schemas/schedules.ts";
+import {PopularTagsResponseSchema, SuggestedTagsResponseSchema} from "../../schemas/tags.ts";
 
 /**
  * Private schedules contracts for authenticated schedule management operations.
@@ -190,9 +189,6 @@ export const privateSchedulesContract = {
   getPopularTags: getPopularTagsContract,
   getSuggestedTagsForStream: getSuggestedTagsForStreamContract,
   getSuggestedTagsForStreamBySearchTerm: getSuggestedTagsForStreamBySearchTermContract,
-
-  // Schedule Data Operations
-  getTables: getTablesContract,
 
   // Schedule Query Operations
   getSchedulesByTiltifyUsername: getSchedulesByTiltifyUsernameContract,

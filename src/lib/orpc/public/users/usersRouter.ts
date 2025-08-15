@@ -11,8 +11,13 @@ import {
 } from "./impl.ts";
 
 export const usersRouter = os.router({
-  search: discoverRouter,
-  friends: friendsRouter,
+  // Flattened search procedures
+  searchByName: discoverRouter.byUsername,
+  searchByNameDisplay: discoverRouter.byUsernameDisplay,
+  searchSimilarUsers: discoverRouter.similarUsers,
+  // Flattened friends procedures
+  getFriends: friendsRouter.listFriendsByUserId,
+  // Existing procedures
   getUserBySlug: getUserBySlug,
   getUserProfileBySlug: getUserProfileBySlug,
   getAllUsersPaged: getAllUsersPaged,

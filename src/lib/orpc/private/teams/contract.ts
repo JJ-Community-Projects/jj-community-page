@@ -1,9 +1,9 @@
 import {oc} from '@orpc/contract';
 import {z} from 'zod';
-import {SuccessSchema, UserIdSchema} from "../schemas/common.ts";
+import {SuccessSchema, UserIdSchema} from "../../schemas/common.ts";
 import {SlugValidationSchema, TeamIdSchema} from "../schemas/teams.ts";
 import {TeamSchema} from "../../public/schemas/teams.ts";
-import {UserDisplaySchema} from "../schemas/users.ts";
+import {UserDisplaySchema} from "../../schemas/users.ts";
 
 /**
  * Private teams contracts for authenticated team management operations.

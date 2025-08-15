@@ -1,22 +1,30 @@
 import {os} from '@orpc/server'
-import {editProfileRouter} from "./users/editProfile/editProfileRouter.ts";
 import {privateUsersRouter} from "./users/impl.ts";
-import {schedulesRouter} from "./schedules/schedulesRouter.ts";
-import {twitchRouter} from "./integrations/twitch/twitchRouter.ts";
-import {utilsRouter} from "./utils/utilsRouter.ts";
 import {authMiddleware} from "../middleware/authMiddleware.ts";
 import {privateTeamsRouter} from "./teams/impl.ts";
+import {profileRouter} from "./profile/impl.ts";
+import {friendsRouter} from "./friends/impl.ts";
+import {blockRouter} from "./blocking/impl.ts";
+import {tagsRouter} from "./tags/impl.ts";
+import {adminTagsRouter} from "./tagsAdmin/impl.ts";
+import {streamTagsRouter} from "./tagsStream/impl.ts";
+import {twitchRouter} from "./twitch/twitchRouter.ts";
+import {privateSchedulesRouter} from "./schedules/impl.ts";
+import {socialRouter} from "./social/impl.ts";
 
 
 export const privateRouter = os
   .use(authMiddleware)
   .router({
     users: privateUsersRouter,
-    editProfile: editProfileRouter,
+    profile: profileRouter,
+    social: socialRouter,
+    friends: friendsRouter,
+    blocking: blockRouter,
+    tags: tagsRouter,
+    adminTags: adminTagsRouter,
+    streamTags: streamTagsRouter,
     teams: privateTeamsRouter,
-    schedules: schedulesRouter,
-    integrations: {
-      twitch: twitchRouter
-    },
-    utils: utilsRouter,
+    schedules: privateSchedulesRouter,
+    twitch: twitchRouter,
   })

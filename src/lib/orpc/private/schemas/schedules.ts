@@ -62,46 +62,6 @@ export const SlugValidationSchema = z.object({
   suggestions: z.array(z.string())
 });
 
-/**
- * Schema for tag information with usage count.
- * Used for tag-related operations that return tag data with popularity metrics.
- */
-export const TagWithCountSchema = z.object({
-  /** The display label for the tag */
-  label: z.string(),
-  /** The actual tag value */
-  tag: z.string(),
-  /** The number of times this tag has been used */
-  count: z.number()
-});
-
-/**
- * Schema for popular tags response.
- * Returns popular tags along with default and charity tag options.
- * Used in: schedules contract for getPopularTags operation
- */
-export const PopularTagsResponseSchema = z.object({
-  /** Popular tags from the database with usage counts */
-  tags: z.array(TagWithCountSchema),
-  /** Default fallback tags when not enough popular tags exist */
-  defaultTags: z.array(TagWithCountSchema),
-  /** Charity-related tags available for use */
-  charityTags: z.array(TagWithCountSchema)
-});
-
-/**
- * Schema for suggested tags response.
- * Returns suggested tags for a stream along with default and charity tag options.
- * Used in: schedules contract for getSuggestedTagsForStream and getSuggestedTagsForStreamBySearchTerm operations
- */
-export const SuggestedTagsResponseSchema = z.object({
-  /** Suggested tags from the database based on popularity/search */
-  tags: z.array(TagWithCountSchema),
-  /** Default tags that match criteria and aren't already used */
-  defaultTags: z.array(TagWithCountSchema),
-  /** Charity tags that match criteria and aren't already used */
-  charityTags: z.array(TagWithCountSchema)
-});
 
 /**
  * Schema for tables data from ScheduleEditorDO.

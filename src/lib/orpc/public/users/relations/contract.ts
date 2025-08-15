@@ -1,6 +1,6 @@
 import {oc} from '@orpc/contract'
 import {z} from 'zod';
-import {UserDisplaySchema, UserIdSchema} from "../../schemas/users.ts";
+import {UserDisplaySchema, UserIdSchema} from "../../../schemas/users.ts";
 
 // List friends by user ID contract
 export const listFriendsByUserIdContract = oc
