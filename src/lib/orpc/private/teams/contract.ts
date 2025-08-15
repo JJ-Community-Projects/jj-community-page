@@ -1,0 +1,250 @@
+import {oc} from '@orpc/contract';
+import {z} from 'zod';
+import {SuccessSchema, UserIdSchema} from "../schemas/common.ts";
+import {SlugValidationSchema, TeamIdSchema} from "../schemas/teams.ts";
+import {TeamSchema} from "../../public/schemas/teams.ts";
+import {UserDisplaySchema} from "../schemas/users.ts";
+
+/**
+ * Private teams contracts for authenticated team management operations.
+ * These endpoints handle team CRUD, member management, and invite operations.
+ */
+
+/**
+ * Team CRUD Operations
+ */
+
+/**
+ * Create a new team
+ * Input: name and slug
+ * Output: team ID
+ */
+const createContract = oc
+  .input(z.object({
+    name: z.string().min(1, "Team name is required").max(100, "Team name must be 100 characters or less"),
+    slug: z.string().min(1, "Team slug is required").max(50, "Team slug must be 50 characters or less")
+  }))
+  .output(TeamIdSchema);
+
+/**
+ * Update team information
+ * Input: team ID, name, slug, and optional visibility
+ * Output: success flag
+ */
+const updateContract = oc
+  .input(z.object({
+    teamId: z.number().positive("Team ID must be positive"),
+    name: z.string().min(1, "Team name is required").max(100, "Team name must be 100 characters or less"),
+    slug: z.string().min(1, "Team slug is required").max(50, "Team slug must be 50 characters or less"),
+    visible: z.boolean().optional()
+  }))
+  .output(SuccessSchema);
+
+/**
+ * Delete a team
+ * Input: team ID
+ * Output: success flag
+ */
+const deleteContract = oc
+  .input(z.object({
+    teamId: z.number().positive("Team ID must be positive")
+  }))
+  .output(SuccessSchema);
+
+/**
+ * Validate slug availability
+ * Input: slug and optional tiltify name for suggestions
+ * Output: validation result with suggestions
+ */
+const validateSlugContract = oc
+  .input(z.object({
+    slug: z.string().min(1, "Slug is required"),
+    tiltifyName: z.string().optional()
+  }))
+  .output(SlugValidationSchema);
+
+/**
+ * Team Member Operations
+ */
+
+/**
+ * Leave a team (for non-owners)
+ * Input: team ID
+ * Output: success flag
+ */
+const leaveTeamContract = oc
+  .input(z.object({
+    teamId: z.number().positive("Team ID must be positive")
+  }))
+  .output(SuccessSchema);
+
+/**
+ * Remove a member from team (owner only)
+ * Input: user ID and team ID
+ * Output: success flag
+ */
+const removeMemberContract = oc
+  .input(z.object({
+    userId: UserIdSchema,
+    teamId: z.number().positive("Team ID must be positive")
+  }))
+  .output(SuccessSchema);
+
+/**
+ * Team Invite Operations
+ */
+
+/**
+ * Create an invite to join team (owner only)
+ * Input: invited user ID and team ID
+ * Output: success flag
+ */
+const createInviteContract = oc
+  .input(z.object({
+    invitedUserId: UserIdSchema,
+    teamId: z.number().positive("Team ID must be positive")
+  }))
+  .output(SuccessSchema);
+
+/**
+ * Delete an invite (owner only)
+ * Input: invited user ID and team ID
+ * Output: success flag
+ */
+const deleteInviteContract = oc
+  .input(z.object({
+    invitedUserId: z.number().positive("Invited user ID must be positive"),
+    teamId: z.number().positive("Team ID must be positive")
+  }))
+  .output(SuccessSchema);
+
+/**
+ * Accept an invite to join team
+ * Input: team ID
+ * Output: success flag
+ */
+const acceptInviteContract = oc
+  .input(z.object({
+    teamId: z.number().positive("Team ID must be positive")
+  }))
+  .output(SuccessSchema);
+
+/**
+ * Reject an invite to join team
+ * Input: team ID
+ * Output: success flag
+ */
+const rejectInviteContract = oc
+  .input(z.object({
+    teamId: z.number().positive("Team ID must be positive")
+  }))
+  .output(SuccessSchema);
+
+/**
+ * Get all teams for the authenticated user (owned or member)
+ * Uses authMiddleware to access user ID from context
+ */
+const getTeamContract = oc
+  .output(TeamSchema.array())
+
+/**
+ * Get all teams where the current user is the owner
+ * Uses authMiddleware to access user ID from context
+ */
+const getOwnedTeamsContract = oc
+  .output(TeamSchema.array())
+
+/**
+ * Get all teams where the current user is not the owner (member only)
+ * Uses authMiddleware to access user ID from context
+ */
+const getNonOwnedTeamsContract = oc
+  .output(TeamSchema.array())
+
+/**
+ * Get all team members as UserDisplaySchema (owner only)
+ * Input: team ID
+ * Output: array of UserDisplaySchema
+ */
+const getTeamMembersContract = oc
+  .input(z.object({
+    teamId: z.number().positive("Team ID must be positive")
+  }))
+  .output(UserDisplaySchema.array());
+
+/**
+ * Get team member count (owner only)
+ * Input: team ID
+ * Output: count number
+ */
+const getTeamMemberCountContract = oc
+  .input(z.object({
+    teamId: z.number().positive("Team ID must be positive")
+  }))
+  .output(z.object({
+    count: z.number()
+  }));
+
+/**
+ * Get team invite count (owner only)
+ * Input: team ID
+ * Output: count number
+ */
+const getTeamInviteCountContract = oc
+  .input(z.object({
+    teamId: z.number().positive("Team ID must be positive")
+  }))
+  .output(z.object({
+    count: z.number()
+  }));
+
+/**
+ * Get user invite count (authenticated user)
+ * Returns the number of pending team invitations for the authenticated user
+ * No input required - uses authenticated user ID from context
+ * Output: count number
+ */
+const getUserInviteCountContract = oc
+  .output(z.object({
+    count: z.number()
+  }));
+
+/**
+ * Get user invites (authenticated user)
+ * Returns detailed information about pending team invitations for the authenticated user
+ * No input required - uses authenticated user ID from context
+ * Output: array of invite details with team information
+ */
+const getUserInvitesContract = oc
+  .output(z.array(z.object({
+    teamId: z.number(),
+    name: z.string()
+  })));
+
+export const privateTeamsContract = {
+  // Team CRUD Operations
+  create: createContract,
+  update: updateContract,
+  delete: deleteContract,
+  validateSlug: validateSlugContract,
+
+  // Team Member Operations
+  leaveTeam: leaveTeamContract,
+  removeMember: removeMemberContract,
+
+  // Team Invite Operations
+  createInvite: createInviteContract,
+  deleteInvite: deleteInviteContract,
+  acceptInvite: acceptInviteContract,
+  rejectInvite: rejectInviteContract,
+
+  // Team Query Operations
+  getTeam: getTeamContract,
+  getOwnedTeams: getOwnedTeamsContract,
+  getNonOwnedTeams: getNonOwnedTeamsContract,
+  getTeamMembers: getTeamMembersContract,
+  getTeamMemberCount: getTeamMemberCountContract,
+  getTeamInviteCount: getTeamInviteCountContract,
+  getUserInviteCount: getUserInviteCountContract,
+  getUserInvites: getUserInvitesContract
+};
