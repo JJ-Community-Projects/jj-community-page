@@ -4,48 +4,48 @@ import {socialUrlRegex} from "../../../../functions/socialUrlRegex.ts";
 import {FaSolidArrowsRotate, FaSolidTrash} from "solid-icons/fa";
 import {PrimaryLivePlatform} from "./PrimaryLivePlatform.tsx";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/solid-query";
-import {orpc} from "../../../../lib/orpc/client/client.ts";
+import {orpc} from "../../../../lib/orpc/client.ts";
 
 const useHook = () => {
 
   const queryClient = useQueryClient();
 
   const socialsQuery = useQuery(() =>
-    orpc.private.editProfile.social.get.queryOptions({
+    orpc.private.social.getSocial.queryOptions({
       staleTime: 30_000,
     })
   );
 
   const importFromTiltify = useMutation(() =>
-    orpc.private.editProfile.social.importFromTiltify.mutationOptions({
+    orpc.private.social.importFromTiltify.mutationOptions({
       onSuccess: async () => {
         // Invalidate and refetch socials after successful add
         await queryClient.invalidateQueries({
-          queryKey: orpc.private.editProfile.social.get.key()
+          queryKey: orpc.private.social.getSocial.key()
         });
         await queryClient.invalidateQueries({
-          queryKey: orpc.private.integrations.twitch.getTwitchChannel.key()
+          queryKey: orpc.private.twitch.getTwitchChannel.key()
         });
       },
     })
   );
 
   const twitchChannelQuery = useQuery(() =>
-    orpc.private.integrations.twitch.getTwitchChannel.queryOptions({
+    orpc.private.twitch.getTwitchChannel.queryOptions({
       staleTime: 30_000,
     })
   );
 
   const addMutation = useMutation(() =>
-    orpc.private.editProfile.social.add.mutationOptions({
+    orpc.private.social.addSocial.mutationOptions({
       onSuccess: async ({provider}) => {
         // Invalidate and refetch socials after successful add
         await queryClient.invalidateQueries({
-          queryKey: orpc.private.editProfile.social.get.key()
+          queryKey: orpc.private.social.getSocial.key()
         });
         if (provider === 'twitch') {
           await queryClient.invalidateQueries({
-            queryKey: orpc.private.integrations.twitch.getTwitchChannel.key()
+            queryKey: orpc.private.twitch.getTwitchChannel.key()
           });
         }
       },
@@ -56,15 +56,15 @@ const useHook = () => {
   );
 
   const removeMutation = useMutation(() =>
-    orpc.private.editProfile.social.remove.mutationOptions({
+    orpc.private.social.removeSocial.mutationOptions({
       onSuccess: async ({provider}) => {
         // Invalidate and refetch socials after successful remove
         await queryClient.invalidateQueries({
-          queryKey: orpc.private.editProfile.social.get.key()
+          queryKey: orpc.private.social.getSocial.key()
         });
         if (provider === 'twitch') {
           await queryClient.invalidateQueries({
-            queryKey: orpc.private.integrations.twitch.getTwitchChannel.key()
+            queryKey: orpc.private.twitch.getTwitchChannel.key()
           });
         }
       },

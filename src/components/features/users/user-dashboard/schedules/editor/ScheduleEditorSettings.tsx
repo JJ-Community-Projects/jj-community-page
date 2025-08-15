@@ -7,7 +7,7 @@ import {FaRegularCircle, FaRegularCircleCheck, FaRegularCircleXmark} from "solid
 import {actions} from "astro:actions";
 import {createStore} from "solid-js/store";
 import {useMutation} from "@tanstack/solid-query";
-import {orpc} from "../../../../../../lib/orpc/client/client.ts";
+import {orpc} from "../../../../../../lib/orpc/client.ts";
 
 const Correct = () => {
   return (

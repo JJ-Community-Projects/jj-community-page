@@ -6,12 +6,12 @@ import {createModalSignal} from "../../../../lib/createModalSignal.ts";
 import {debounce} from "@solid-primitives/scheduled";
 import {FaRegularCircle} from "solid-icons/fa";
 import "./UserTagsSection.css";
-import {orpc} from "../../../../lib/orpc/client/client.ts";
+import {orpc} from "../../../../lib/orpc/client.ts";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/solid-query";
 
 export const UserTagsSection: Component = () => {
   const queryClient = useQueryClient();
-  const t = orpc.private.editProfile.tags;
+  const t = orpc.private.tags;
 
   // State for tag input and dialog
   const [tagInput, setTagInput] = createSignal("");
@@ -30,7 +30,7 @@ export const UserTagsSection: Component = () => {
 
   // TanStack Queries
   const suggestionsQuery = useQuery(() =>
-    t.find.suggestions.getSuggestedTagsForUser.queryOptions({
+    t.getTagSuggestions.queryOptions({
       input: {
         limit: 5
       },
@@ -39,7 +39,7 @@ export const UserTagsSection: Component = () => {
     })
   );
 
-  const searchQuery = useQuery(() => t.find.suggestions.getSuggestedTagsBySearchTerm.queryOptions({
+  const searchQuery = useQuery(() => t.getTagSuggestionsBySearchTerm.queryOptions({
       input: {
         term: debouncedInput(),
         limit: 5
@@ -54,7 +54,7 @@ export const UserTagsSection: Component = () => {
   }));
 
   // TanStack Mutations
-  const addTagMutation = useMutation(() => t.add.mutationOptions({
+  const addTagMutation = useMutation(() => t.addTag.mutationOptions({
       onSuccess: () => {
         queryClient.invalidateQueries({queryKey: t.getUserTags.key()});
       },
@@ -64,7 +64,7 @@ export const UserTagsSection: Component = () => {
     })
   );
 
-  const removeTagMutation = useMutation(() => t.remove.mutationOptions({
+  const removeTagMutation = useMutation(() => t.removeTag.mutationOptions({
     onSuccess: () => {
       queryClient.invalidateQueries({queryKey: t.getUserTags.key()});
     },

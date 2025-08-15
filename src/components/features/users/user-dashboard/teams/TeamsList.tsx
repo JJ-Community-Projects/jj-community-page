@@ -5,7 +5,7 @@ import {ConfirmationDialog} from "../../../../common/dialogs/ConfirmationDialog.
 import {createModalSignal} from "../../../../../lib/createModalSignal.ts";
 import {CreateTeamDialog} from "./teamAdmin/CreateTeamDialog.tsx";
 import {FaSolidChevronLeft} from "solid-icons/fa";
-import {orpc} from "../../../../../lib/orpc/client/client.ts";
+import {orpc} from "../../../../../lib/orpc/client.ts";
 import {QueryComponent} from "../../../../common/QueryComponent.tsx";
 import {useMutation, useQueryClient} from "@tanstack/solid-query";
 

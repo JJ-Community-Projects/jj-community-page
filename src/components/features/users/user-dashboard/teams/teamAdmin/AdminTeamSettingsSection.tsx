@@ -7,7 +7,7 @@ import {debounce} from "@solid-primitives/scheduled";
 import {TextField} from "@kobalte/core/text-field";
 import {Checkbox} from "@kobalte/core/checkbox";
 import {useMutation, useQuery} from "@tanstack/solid-query";
-import {orpc} from "../../../../../../lib/orpc/client/client.ts";
+import {orpc} from "../../../../../../lib/orpc/client.ts";
 
 const Correct = () => {
   return (

@@ -1,27 +1,27 @@
 import {type Component, createMemo, createSignal, Match, Show, Switch} from "solid-js";
 import {RadioGroup} from "@kobalte/core/radio-group";
 import {useMutation, useQueries, useQueryClient} from "@tanstack/solid-query";
-import {orpc} from "../../../../lib/orpc/client/client.ts";
+import {orpc} from "../../../../lib/orpc/client.ts";
 
 export const PrimaryLivePlatform: Component = () => {
 
   const client = useQueryClient();
 
   const mutation = useMutation(() =>
-    orpc.private.editProfile.profile.updatePrimaryLiveStream.mutationOptions({
+    orpc.private.profile.updatePrimaryLiveStream.mutationOptions({
       onSuccess: async () => {
         await client.invalidateQueries({
-          queryKey: orpc.private.editProfile.profile.getPrimaryLiveStream.key()
+          queryKey: orpc.private.profile.getPrimaryLiveStream.key()
         })
         await client.invalidateQueries({
-          queryKey: orpc.private.editProfile.social.get.key()
+          queryKey: orpc.private.social.getSocial.key()
         })
       }
     })
   )
 
   const [primaryLiveStream, socials] = useQueries(() => ({
-    queries: [orpc.private.editProfile.profile.getPrimaryLiveStream.queryOptions(), orpc.private.editProfile.social.get.queryOptions()]
+    queries: [orpc.private.profile.getPrimaryLiveStream.queryOptions(), orpc.private.social.getSocial.queryOptions()]
   }))
   // Both queries have data - render the main component
   const [selectedPlatform, setSelectedPlatform] = createSignal(primaryLiveStream.data);

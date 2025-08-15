@@ -6,7 +6,7 @@ import {UserSocialsSection} from "./UserSocialsSection.tsx";
 import {UserStylesSection} from "./UserStylesSection.tsx";
 import {DebugJSONView} from "../../../common/DebugJSONView.tsx";
 import "./UserAdminDashboardPage.css";
-import {orpc} from "../../../../lib/orpc/client/client.ts";
+import {orpc} from "../../../../lib/orpc/client.ts";
 import {QueryClientProvider, useQuery, useQueryClient} from "@tanstack/solid-query";
 import {QueryClient} from "@tanstack/query-core";
 
