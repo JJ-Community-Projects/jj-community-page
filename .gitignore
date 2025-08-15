@@ -39,3 +39,4 @@ updateTwitchUser.js
 http/http-client.private.env.json
 /http/secret/
 /.junie/
+/.tmp/
