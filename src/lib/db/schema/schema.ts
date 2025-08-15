@@ -1,5 +1,6 @@
 export * from './auth-schema.ts'
 export * from './jj-schema.ts'
+export * from './tags-schema.ts'
 export * from './twitch-channel-schema.ts'
 export * from './youtube-channel-schema.ts'
 export * from './views-schema.ts'

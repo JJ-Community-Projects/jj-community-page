@@ -81,27 +81,6 @@ export const streamsTable = sqliteTable('streams', {
   ]
 );
 
-/**
- * Stream tags table that stores categorization labels for streams.
- * Used for filtering and grouping streams by various attributes.
- * Each stream can have multiple tags.
- */
-export const streamTagsTable = sqliteTable('stream_tags', {
-    streamId: integer('stream_id').notNull(),
-    scheduleId: integer('schedule_id').notNull(),
-    tag: text('tag').notNull(),
-    label: text('label').notNull(),
-    addedAt: integer('added_at', {mode: 'timestamp'}).notNull().default(sql`(unixepoch())`),
-  },
-  (table) => [
-    primaryKey({name: 'stream_tags_pk', columns: [table.scheduleId, table.streamId, table.tag]}),
-    foreignKey({
-      name: 'stream_schedule_fk',
-      columns: [table.scheduleId, table.streamId],
-      foreignColumns: [streamsTable.scheduleId, streamsTable.id],
-    }).onDelete('cascade'),
-  ]
-)
 
 /**
  * Stream participants table that tracks which users are participating in specific streams.

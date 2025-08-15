@@ -1,7 +1,6 @@
 // src/lib/db/auth-schema.ts
 import {index, integer, primaryKey, sqliteTable, text, uniqueIndex,} from "drizzle-orm/sqlite-core";
 import {sql} from "drizzle-orm";
-import { drizzle } from "drizzle-orm/d1";
 
 /**
  * Core users table that stores basic user information and roles.
@@ -71,23 +70,6 @@ export const tokens = sqliteTable("tokens", {
     ]
   }
 )
-
-/**
- * User tags table that stores categorization labels for users.
- * Used for filtering and grouping users by various attributes.
- * Each user can have multiple tags.
- */
-export const userTags = sqliteTable("user_tags", {
-  userId: integer('user_id', {mode: 'number'}).notNull().references(() => users.id, {onDelete: 'cascade'}),
-  tag: text('tag').notNull(),
-  label: text('label').notNull(),
-  addedAt: integer('added_at', {mode: 'timestamp'}).notNull().default(sql`(unixepoch()
-                                                                          )`),
-}, (table) => [
-  primaryKey({name: 'user_tag_pk', columns: [table.userId, table.tag]}),
-  uniqueIndex('unique_user_tag').on(table.userId, table.tag)
-])
-
 
 /**
  * User socials table that stores links to users' social media profiles.
