@@ -6,6 +6,8 @@ import {createStore} from "solid-js/store";
 import {debounce} from "@solid-primitives/scheduled";
 import {TextField} from "@kobalte/core/text-field";
 import {Checkbox} from "@kobalte/core/checkbox";
+import {useMutation, useQuery} from "@tanstack/solid-query";
+import {orpc} from "../../../../../../lib/orpc/client/client.ts";
 
 const Correct = () => {
   return (
@@ -28,6 +30,8 @@ export const AdminTeamSettingsSection: Component = () => {
   const {local, updateTeam, action} = useTeamDetail();
   const {isTeamSlugUnique} = useUser();
 
+  const updateTeamMutation = useMutation(() => orpc.private.teams.update.mutationOptions({}));
+  const validateSlugQuery = useQuery(() => orpc.private.teams.validateSlug.queryOptions({}))
 
   const [state, setState] = createStore<{
     name: string,

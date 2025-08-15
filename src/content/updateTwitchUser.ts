@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import * as yaml from 'yaml';
-import {getToken, getTwitchDataByLogins} from "../lib/twitchAPI.ts";
+import {getToken, getTwitchDataByLogins} from "../lib/twitchAPIFuncs.ts";
 
 export async function updateTwitchUser() {
   console.log("Updating twitch users");

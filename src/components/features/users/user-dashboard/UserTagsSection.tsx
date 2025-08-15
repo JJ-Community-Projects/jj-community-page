@@ -1,50 +1,17 @@
-import {
-  type Component,
-  createSignal,
-  For,
-  Switch,
-  Match,
-  createResource,
-  type Signal
-} from "solid-js";
-import { TextField } from "@kobalte/core/text-field";
-import { Dialog } from "@kobalte/core/dialog";
-import { Accordion } from "@kobalte/core/accordion";
-import { createModalSignal } from "../../../../lib/createModalSignal.ts";
-import { useUser } from "./providers/UserProvider.tsx";
-import { debounce } from "@solid-primitives/scheduled";
-import { FaRegularCircle } from "solid-icons/fa";
-import { createStore, reconcile, unwrap } from "solid-js/store";
+import {type Component, createSignal, For, Match, Switch} from "solid-js";
+import {TextField} from "@kobalte/core/text-field";
+import {Dialog} from "@kobalte/core/dialog";
+import {Accordion} from "@kobalte/core/accordion";
+import {createModalSignal} from "../../../../lib/createModalSignal.ts";
+import {debounce} from "@solid-primitives/scheduled";
+import {FaRegularCircle} from "solid-icons/fa";
 import "./UserTagsSection.css";
-
-
-function createDeepSignal<T>(value: T): Signal<T> {
-  const [store, setStore] = createStore({
-    value,
-  })
-  return [
-    () => store.value,
-    (v: T) => {
-      const unwrapped = unwrap(store.value)
-      typeof v === "function" && (v = v(unwrapped))
-      setStore("value", reconcile(v))
-      return store.value
-    },
-  ] as Signal<T>
-}
+import {orpc} from "../../../../lib/orpc/client/client.ts";
+import {useMutation, useQuery, useQueryClient} from "@tanstack/solid-query";
 
 export const UserTagsSection: Component = () => {
-  // Get user context
-  const {
-    local,
-    user,
-    addTag,
-    removeTag,
-    getPopularTags,
-    getSuggestedTagsForUser,
-    getSuggestedTagsForUserBySearchTerm,
-    action
-  } = useUser();
+  const queryClient = useQueryClient();
+  const t = orpc.private.editProfile.tags;
 
   // State for tag input and dialog
   const [tagInput, setTagInput] = createSignal("");
@@ -54,55 +21,83 @@ export const UserTagsSection: Component = () => {
   // State for tag search and suggestions
   const [searchInput, setSearchInput] = createSignal("");
   const [debouncedInput, setDebouncedInput] = createSignal("");
-  const [refetchTrigger, setRefetchTrigger] = createSignal(0);
-
-  // Source signal for createResource - combines debounced input and refetch trigger
-  const tagSource = () => ({
-    input: debouncedInput(),
-    trigger: refetchTrigger(),
-    userId: user.id
-  });
 
   // Debounced input handler
   const debouncedSetSearchInput = debounce((value: string) => {
     setDebouncedInput(value);
   }, 1000);
 
-  // Fetch tags function for createResource
-  const fetchTags = async (source: { input: string, trigger: number, userId: number }) => {
-    console.log('fetchTags', source);
-    if (source.input && source.input.length > 0) {
-      return getSuggestedTagsForUserBySearchTerm(source.userId, source.input);
-    } else {
-      return getSuggestedTagsForUser(source.userId);
+
+  // TanStack Queries
+  const suggestionsQuery = useQuery(() =>
+    t.find.suggestions.getSuggestedTagsForUser.queryOptions({
+      input: {
+        limit: 5
+      },
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      gcTime: 10 * 60 * 1000, // 10 minutes
+    })
+  );
+
+  const searchQuery = useQuery(() => t.find.suggestions.getSuggestedTagsBySearchTerm.queryOptions({
+      input: {
+        term: debouncedInput(),
+        limit: 5
+      },
+      enabled: () => debouncedInput().length > 0,
+      staleTime: 30 * 1000,
+    })
+  );
+
+  const getUserTagsQuery = useQuery(() => t.getUserTags.queryOptions({
+    staleTime: 2 * 60 * 1000, // 2 minutes
+  }));
+
+  // TanStack Mutations
+  const addTagMutation = useMutation(() => t.add.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({queryKey: t.getUserTags.key()});
+      },
+      onError: (error) => {
+        console.error('Failed to add tag:', error);
+      }
+    })
+  );
+
+  const removeTagMutation = useMutation(() => t.remove.mutationOptions({
+    onSuccess: () => {
+      queryClient.invalidateQueries({queryKey: t.getUserTags.key()});
+    },
+    onError: (error) => {
+      console.error('Failed to remove tag:', error);
     }
+  }));
+
+  // Computed values
+  const combinedData = () => {
+    const searchTerm = debouncedInput();
+    if (searchTerm.length > 0) {
+      return searchQuery.data || {tags: [], defaultTags: [], charityTags: []};
+    }
+    return suggestionsQuery.data || {tags: [], defaultTags: [], charityTags: []};
   };
 
-  // Create resource for fetching tags
-  const [data, { refetch }] = createResource(tagSource, fetchTags, {
-    storage: createDeepSignal
-  });
+  const suggestedTags = () => combinedData().tags || [];
+  const defaultTags = () => combinedData().defaultTags || [];
+  const charityTags = () => combinedData().charityTags || [];
+  const userTags = () => getUserTagsQuery.data || [];
 
-  // Helper functions for UI - use data.latest to prevent UI flickering during loading
-  const suggestedTags = () => {
-    return (data.latest?.tags || []);
-  };
+  const isLoadingTags = () => suggestionsQuery.isLoading ||
+    searchQuery.isLoading ||
+    addTagMutation.isPending ||
+    removeTagMutation.isPending;
 
-  const defaultTags = () => {
-    return (data.latest?.defaultTags || []);
-  };
-
-  const charityTags = () => {
-    return (data.latest?.charityTags || []);
-  };
-
-  const isLoadingTags = () => data.loading ||
-    action.getSuggestedTagsForUser.actionInProgress ||
-    action.getSuggestedTagsForUserBySearchTerm.actionInProgress;
+  const hasTagsError = () => !!suggestionsQuery.error ||
+    !!searchQuery.error ||
+    !!addTagMutation.error ||
+    !!removeTagMutation.error;
 
   const hasTags = () => (suggestedTags().length > 0 || defaultTags().length > 0 || charityTags().length > 0);
-  const hasTagsError = () => !!action.getSuggestedTagsForUser.lastErrorMessage ||
-    !!action.getSuggestedTagsForUserBySearchTerm.lastErrorMessage;
 
   // Handle adding a new tag
   const handleAddTag = async () => {
@@ -112,12 +107,10 @@ export const UserTagsSection: Component = () => {
     if (!tag) return;
 
     try {
-      await addTag(tag, label);
+      await addTagMutation.mutateAsync({tag, label});
       setTagInput("");
       setTagLabel("");
       modal.close();
-      // Trigger refetch after adding a tag
-      setRefetchTrigger(prev => prev + 1);
     } catch (error) {
       console.error("Error adding tag:", error);
     }
@@ -126,9 +119,7 @@ export const UserTagsSection: Component = () => {
   // Handle removing a tag
   const handleRemoveTag = async (tag: string) => {
     try {
-      await removeTag(tag);
-      // Trigger refetch after removing a tag
-      setRefetchTrigger(prev => prev + 1);
+      await removeTagMutation.mutateAsync({tag});
     } catch (error) {
       console.error("Error removing tag:", error);
     }
@@ -139,13 +130,11 @@ export const UserTagsSection: Component = () => {
     event.preventDefault();
     event.stopPropagation();
 
-    if (!local.userTags.some(t => t.tag.toLowerCase() === tag.toLowerCase())) {
+    if (!userTags().some(t => t.tag.toLowerCase() === tag.toLowerCase())) {
       try {
-        await addTag(tag, label || tag);
+        await addTagMutation.mutateAsync({tag, label: label || tag});
         setSearchInput("");
         setDebouncedInput("");
-        // Trigger refetch after selecting a tag
-        setRefetchTrigger(prev => prev + 1);
       } catch (error) {
         console.error("Error adding tag:", error);
       }
@@ -168,7 +157,8 @@ export const UserTagsSection: Component = () => {
       <Accordion class="mb-4" collapsible={true} defaultValue={[]}>
         <Accordion.Item value="explanation" class="border border-gray-200 rounded-lg">
           <Accordion.Header>
-            <Accordion.Trigger class="flex justify-between items-center w-full px-4 py-2 text-left text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg">
+            <Accordion.Trigger
+              class="flex justify-between items-center w-full px-4 py-2 text-left text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-lg">
               <span>About User Tags</span>
               <svg
                 class="w-5 h-5 transform transition-transform duration-200 accordion__item-trigger-icon"
@@ -183,9 +173,14 @@ export const UserTagsSection: Component = () => {
           </Accordion.Header>
           <Accordion.Content class="px-4 pt-0 pb-2 text-sm text-gray-600">
             <div class="pt-2">
-              <p>Tags help others discover streamers with similar interests and causes. Add regular tags to show off your favorite games, hobbies, or communities — and don't forget to add a charity tag to highlight the cause you're fundraising for.</p>
-              <p class="mt-2">This makes it easier for viewers to connect with you and support the charity you care about most.</p>
-              <p class="mt-2">You can pick from suggested tags, search for existing ones, or create your own custom tags — it's quick and easy! The more relevant your tags, the easier it is for viewers to connect with you and support your stream.</p>
+              <p>Tags help others discover streamers with similar interests and causes. Add regular tags to show off
+                your favorite games, hobbies, or communities — and don't forget to add a charity tag to highlight the
+                cause you're fundraising for.</p>
+              <p class="mt-2">This makes it easier for viewers to connect with you and support the charity you care
+                about most.</p>
+              <p class="mt-2">You can pick from suggested tags, search for existing ones, or create your own custom tags
+                — it's quick and easy! The more relevant your tags, the easier it is for viewers to connect with you and
+                support your stream.</p>
             </div>
           </Accordion.Content>
         </Accordion.Item>
@@ -220,18 +215,18 @@ export const UserTagsSection: Component = () => {
           {/* State indicator for fetch process */}
           <div class="flex items-center gap-1">
             <Switch>
-              <Match when={data.loading}>
+              <Match when={isLoadingTags()}>
                 <span class="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">
                   <FaRegularCircle class="inline mr-1 text-blue-500 animate-ping" size={8}/>
                   Loading
                 </span>
               </Match>
-              <Match when={data.error}>
+              <Match when={hasTagsError()}>
                 <span class="text-xs bg-red-100 text-red-800 px-2 py-0.5 rounded-full">
                   Error
                 </span>
               </Match>
-              <Match when={data.state === 'ready'}>
+              <Match when={!isLoadingTags() && !hasTagsError()}>
                 <span class="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded-full">
                   Ready
                 </span>
@@ -247,23 +242,25 @@ export const UserTagsSection: Component = () => {
           </div>
         }>
           {/* Error state */}
-          <Match when={data.error}>
+          <Match when={hasTagsError()}>
             <div class="flex flex-wrap gap-2 min-h-[28px]">
-              <p class="text-xs text-red-500 mb-1">Error loading tags: {hasTagsError() ?
-                (action.getSuggestedTagsForUser.lastErrorMessage || action.getSuggestedTagsForUserBySearchTerm.lastErrorMessage) :
-                "Unknown error"}</p>
+              <p class="text-xs text-red-500 mb-1">Error loading tags: {
+                suggestionsQuery.error?.message ||
+                searchQuery.error?.message ||
+                "Unknown error"
+              }</p>
             </div>
           </Match>
 
           {/* Loading state */}
-          <Match when={data.loading && !data.latest}>
+          <Match when={isLoadingTags() && !hasTags()}>
             <div class="flex flex-wrap gap-2 min-h-[28px]">
               <p class="text-xs text-gray-500">Loading tags...</p>
             </div>
           </Match>
 
           {/* Data state */}
-          <Match when={data.latest && hasTags()}>
+          <Match when={hasTags()}>
             <div class="flex flex-wrap gap-2 min-h-[28px]">
               {/* Suggested tags */}
               <For each={suggestedTags()}>
@@ -312,27 +309,29 @@ export const UserTagsSection: Component = () => {
       <div class="mt-4">
         <p class="text-sm font-medium text-gray-700 mb-2">Your Tags:</p>
         <Switch>
-          <Match when={action.addTag.actionInProgress || action.removeTag.actionInProgress}>
+          <Match when={getUserTagsQuery.isLoading || addTagMutation.isPending || removeTagMutation.isPending}>
             <div class="flex justify-center items-center p-4">
               <p class="text-gray-500">Loading...</p>
             </div>
           </Match>
 
-          <Match when={action.addTag.lastErrorMessage || action.removeTag.lastErrorMessage}>
+          <Match when={getUserTagsQuery.error || addTagMutation.error || removeTagMutation.error}>
             <div class="flex justify-center items-center p-4">
-              <p class="text-red-500">Error: {action.addTag.lastErrorMessage || action.removeTag.lastErrorMessage}</p>
+              <p
+                class="text-red-500">Error: {getUserTagsQuery.error?.message || addTagMutation.error?.message || removeTagMutation.error?.message}</p>
             </div>
           </Match>
 
-          <Match when={local.userTags.length === 0}>
+          <Match when={userTags().length === 0}>
             <div class="flex justify-center items-center p-4">
-              <p class="text-gray-500">No tags added yet. Click on a suggested Tag or "Add Tag" to add your first tag.</p>
+              <p class="text-gray-500">No tags added yet. Click on a suggested Tag or "Add Tag" to add your first
+                tag.</p>
             </div>
           </Match>
 
-          <Match when={local.userTags.length > 0}>
+          <Match when={userTags().length > 0}>
             <div class="flex flex-wrap gap-2">
-              <For each={local.userTags}>
+              <For each={userTags()}>
                 {(tag) => (
                   <div class="flex items-center bg-accent/10 text-accent px-3 py-1.5 rounded-full text-sm">
                     {tag.label}
@@ -364,7 +363,8 @@ export const UserTagsSection: Component = () => {
             <Dialog.Content class="bg-white rounded-xl shadow-xl p-6 w-full max-w-md">
               <Dialog.Title class="text-xl font-bold mb-4">Add Tag</Dialog.Title>
               <Dialog.Description class="text-gray-600 mb-4">
-                Add a new tag to your profile. Tags can be used to categorize your content and make it easier for others to find.
+                Add a new tag to your profile. Tags can be used to categorize your content and make it easier for others
+                to find.
               </Dialog.Description>
 
               <div class="space-y-4">
@@ -380,7 +380,8 @@ export const UserTagsSection: Component = () => {
                 </TextField>
 
                 <TextField value={tagLabel()} onChange={setTagLabel}>
-                  <TextField.Label class="block text-sm font-medium text-gray-700 mb-1">Display Label (optional)</TextField.Label>
+                  <TextField.Label class="block text-sm font-medium text-gray-700 mb-1">Display Label
+                    (optional)</TextField.Label>
                   <TextField.Input
                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-accent"
                     placeholder="Enter display label"

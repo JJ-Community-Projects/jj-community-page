@@ -4,6 +4,7 @@ import {actions} from "astro:actions";
 import {useTinystore} from "../../../../../lib/useTinystore.ts";
 import type {User} from "../../../../../lib/auth/User.ts";
 import type {TiltifyUserData} from "../../../../../lib/TiltifyAPI.ts";
+import {orpc} from "../../../../../lib/orpc/client/client.ts";
 
 type HookActions = {
   createSchedule: {

@@ -38,3 +38,4 @@ updateTwitchUser.js
 .dev.vars
 http/http-client.private.env.json
 /http/secret/
+/.junie/

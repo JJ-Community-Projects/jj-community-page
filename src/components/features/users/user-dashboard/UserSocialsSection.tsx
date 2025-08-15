@@ -1,20 +1,96 @@
 import {type Component, createMemo, createSignal, Show,} from "solid-js";
 import {TextField} from "@kobalte/core/text-field";
-import {useUser} from "./providers/UserProvider.tsx";
 import {socialUrlRegex} from "../../../../functions/socialUrlRegex.ts";
 import {FaSolidArrowsRotate, FaSolidTrash} from "solid-icons/fa";
 import {PrimaryLivePlatform} from "./PrimaryLivePlatform.tsx";
+import {useMutation, useQuery, useQueryClient} from "@tanstack/solid-query";
+import {orpc} from "../../../../lib/orpc/client/client.ts";
+
+const useHook = () => {
+
+  const queryClient = useQueryClient();
+
+  const socialsQuery = useQuery(() =>
+    orpc.private.editProfile.social.get.queryOptions({
+      staleTime: 30_000,
+    })
+  );
+
+  const importFromTiltify = useMutation(() =>
+    orpc.private.editProfile.social.importFromTiltify.mutationOptions({
+      onSuccess: async () => {
+        // Invalidate and refetch socials after successful add
+        await queryClient.invalidateQueries({
+          queryKey: orpc.private.editProfile.social.get.key()
+        });
+        await queryClient.invalidateQueries({
+          queryKey: orpc.private.integrations.twitch.getTwitchChannel.key()
+        });
+      },
+    })
+  );
+
+  const twitchChannelQuery = useQuery(() =>
+    orpc.private.integrations.twitch.getTwitchChannel.queryOptions({
+      staleTime: 30_000,
+    })
+  );
+
+  const addMutation = useMutation(() =>
+    orpc.private.editProfile.social.add.mutationOptions({
+      onSuccess: async ({provider}) => {
+        // Invalidate and refetch socials after successful add
+        await queryClient.invalidateQueries({
+          queryKey: orpc.private.editProfile.social.get.key()
+        });
+        if (provider === 'twitch') {
+          await queryClient.invalidateQueries({
+            queryKey: orpc.private.integrations.twitch.getTwitchChannel.key()
+          });
+        }
+      },
+      onError: (error) => {
+        console.error("Failed to add social:", error);
+      }
+    })
+  );
+
+  const removeMutation = useMutation(() =>
+    orpc.private.editProfile.social.remove.mutationOptions({
+      onSuccess: async ({provider}) => {
+        // Invalidate and refetch socials after successful remove
+        await queryClient.invalidateQueries({
+          queryKey: orpc.private.editProfile.social.get.key()
+        });
+        if (provider === 'twitch') {
+          await queryClient.invalidateQueries({
+            queryKey: orpc.private.integrations.twitch.getTwitchChannel.key()
+          });
+        }
+      },
+      onError: (error) => {
+        console.error("Failed to remove social:", error);
+      }
+    })
+  );
+
+  return {
+    socialsQuery, twitchChannelQuery, addMutation, removeMutation, importFromTiltify
+  }
+}
 
 // Twitch Social Component
 const TwitchSocial: Component = () => {
-  const {local, addSocial, removeSocial, action} = useUser();
-  const [url, setUrl] = createSignal("");
-  const [error, setError] = createSignal("");
+
+  const {twitchChannelQuery, addMutation, removeMutation, socialsQuery} = useHook()
+
+  const [url, setUrl] = createSignal<string>('')
+  const [error, setError] = createSignal<string>('')
 
   const regexes = socialUrlRegex();
 
-  const twitchChannel = () => local.connectedChannels.twitch
-  const twitchChannelImg = () => local.connectedChannels.twitch?.profileImageUrl.replace('300x300', '70x70')
+  const twitchChannel = () => twitchChannelQuery.data
+  const twitchChannelImg = () => twitchChannelQuery.data?.profileImageUrl?.replace('300x300', '70x70')
 
   const hasTwitchChannel = () => twitchChannel() !== undefined
 
@@ -30,7 +106,7 @@ const TwitchSocial: Component = () => {
     }
 
     try {
-      await addSocial("twitch", url());
+      await addMutation.mutate({provider: "twitch", url: url()});
       setUrl("");
       setError("");
     } catch (error) {
@@ -39,7 +115,7 @@ const TwitchSocial: Component = () => {
   };
 
   const social = createMemo(() =>
-    local.userSocials.find(s => s.provider === "twitch")
+    socialsQuery.data?.find(s => s.provider === "twitch")
   );
 
   return (
@@ -59,9 +135,9 @@ const TwitchSocial: Component = () => {
             </a>
             <button
               type="button"
-              onClick={() => removeSocial("twitch")}
+              onClick={() => removeMutation.mutate({provider: "twitch"})}
               class="text-red-500 hover:text-red-700"
-              disabled={action.removeSocial.actionInProgress}
+              disabled={removeMutation.isPending}
             >
               <FaSolidTrash/>
             </button>
@@ -89,7 +165,7 @@ const TwitchSocial: Component = () => {
                 type="button"
                 onClick={handleAdd}
                 class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700"
-                disabled={action.addSocial.actionInProgress || !url()}
+                disabled={addMutation.isPending || !url()}
               >
                 Add
               </button>
@@ -116,7 +192,8 @@ const TwitchSocial: Component = () => {
 
 // YouTube Social Component
 const YouTubeSocial: Component = () => {
-  const {local, addSocial, removeSocial, action} = useUser();
+
+  const {twitchChannelQuery, addMutation, removeMutation, socialsQuery} = useHook()
   const [url, setUrl] = createSignal("");
   const [error, setError] = createSignal("");
 
@@ -134,7 +211,7 @@ const YouTubeSocial: Component = () => {
     }
 
     try {
-      await addSocial("youtube", url());
+      await addMutation.mutate({provider: "youtube", url: url()});
       setUrl("");
       setError("");
     } catch (error) {
@@ -143,7 +220,7 @@ const YouTubeSocial: Component = () => {
   };
 
   const social = createMemo(() =>
-    local.userSocials.find(s => s.provider === "youtube")
+    socialsQuery.data?.find(s => s.provider === "youtube")
   );
 
   return (
@@ -163,9 +240,9 @@ const YouTubeSocial: Component = () => {
             </a>
             <button
               type="button"
-              onClick={() => removeSocial("youtube")}
+              onClick={() => removeMutation.mutate({provider: "youtube"})}
               class="text-red-500 hover:text-red-700"
-              disabled={action.removeSocial.actionInProgress}
+              disabled={removeMutation.isPending}
             >
               <FaSolidTrash/>
             </button>
@@ -193,7 +270,7 @@ const YouTubeSocial: Component = () => {
                 type="button"
                 onClick={handleAdd}
                 class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
-                disabled={action.addSocial.actionInProgress || !url()}
+                disabled={addMutation.isPending || !url()}
               >
                 Add
               </button>
@@ -210,7 +287,7 @@ const YouTubeSocial: Component = () => {
 
 // Bluesky Social Component
 const BlueSkySocial: Component = () => {
-  const {local, addSocial, removeSocial, action} = useUser();
+  const {addMutation, removeMutation, socialsQuery} = useHook();
   const [url, setUrl] = createSignal("");
   const [error, setError] = createSignal("");
 
@@ -228,7 +305,7 @@ const BlueSkySocial: Component = () => {
     }
 
     try {
-      await addSocial("bsky", url());
+      await addMutation.mutate({provider: "bsky", url: url()});
       setUrl("");
       setError("");
     } catch (error) {
@@ -237,7 +314,7 @@ const BlueSkySocial: Component = () => {
   };
 
   const social = createMemo(() =>
-    local.userSocials.find(s => s.provider === "bsky")
+    socialsQuery.data?.find(s => s.provider === "bsky")
   );
 
   return (
@@ -257,9 +334,9 @@ const BlueSkySocial: Component = () => {
             </a>
             <button
               type="button"
-              onClick={() => removeSocial("bsky")}
+              onClick={() => removeMutation.mutate({provider: "bsky"})}
               class="text-red-500 hover:text-red-700"
-              disabled={action.removeSocial.actionInProgress}
+              disabled={removeMutation.isPending}
             >
               <FaSolidTrash/>
             </button>
@@ -287,7 +364,7 @@ const BlueSkySocial: Component = () => {
                 type="button"
                 onClick={handleAdd}
                 class="px-4 py-2 bg-sky-500 text-white rounded-md hover:bg-sky-600"
-                disabled={action.addSocial.actionInProgress || !url()}
+                disabled={addMutation.isPending || !url()}
               >
                 Add
               </button>
@@ -304,7 +381,7 @@ const BlueSkySocial: Component = () => {
 
 // Twitter Social Component
 const TwitterSocial: Component = () => {
-  const {local, addSocial, removeSocial, action} = useUser();
+  const {addMutation, removeMutation, socialsQuery} = useHook();
   const [url, setUrl] = createSignal("");
   const [error, setError] = createSignal("");
 
@@ -322,7 +399,7 @@ const TwitterSocial: Component = () => {
     }
 
     try {
-      await addSocial("twitter", url());
+      await addMutation.mutate({provider: "twitter", url: url()});
       setUrl("");
       setError("");
     } catch (error) {
@@ -331,7 +408,7 @@ const TwitterSocial: Component = () => {
   };
 
   const social = createMemo(() =>
-    local.userSocials.find(s => s.provider === "twitter")
+    socialsQuery.data?.find(s => s.provider === "twitter")
   );
 
   return (
@@ -351,9 +428,9 @@ const TwitterSocial: Component = () => {
             </a>
             <button
               type="button"
-              onClick={() => removeSocial("twitter")}
+              onClick={() => removeMutation.mutate({provider: "twitter"})}
               class="text-red-500 hover:text-red-700"
-              disabled={action.removeSocial.actionInProgress}
+              disabled={removeMutation.isPending}
             >
               <FaSolidTrash/>
             </button>
@@ -381,7 +458,7 @@ const TwitterSocial: Component = () => {
                 type="button"
                 onClick={handleAdd}
                 class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
-                disabled={action.addSocial.actionInProgress || !url()}
+                disabled={addMutation.isPending || !url()}
               >
                 Add
               </button>
@@ -398,7 +475,7 @@ const TwitterSocial: Component = () => {
 
 // TikTok Social Component
 const TikTokSocial: Component = () => {
-  const {local, addSocial, removeSocial, action} = useUser();
+  const {addMutation, removeMutation, socialsQuery} = useHook();
   const [url, setUrl] = createSignal("");
   const [error, setError] = createSignal("");
 
@@ -416,7 +493,7 @@ const TikTokSocial: Component = () => {
     }
 
     try {
-      await addSocial("tiktok", url());
+      await addMutation.mutate({provider: "tiktok", url: url()});
       setUrl("");
       setError("");
     } catch (error) {
@@ -425,7 +502,7 @@ const TikTokSocial: Component = () => {
   };
 
   const social = createMemo(() =>
-    local.userSocials.find(s => s.provider === "tiktok")
+    socialsQuery.data?.find(s => s.provider === "tiktok")
   );
 
   return (
@@ -445,9 +522,9 @@ const TikTokSocial: Component = () => {
             </a>
             <button
               type="button"
-              onClick={() => removeSocial("tiktok")}
+              onClick={() => removeMutation.mutate({provider: "tiktok"})}
               class="text-red-500 hover:text-red-700"
-              disabled={action.removeSocial.actionInProgress}
+              disabled={removeMutation.isPending}
             >
               <FaSolidTrash/>
             </button>
@@ -475,7 +552,7 @@ const TikTokSocial: Component = () => {
                 type="button"
                 onClick={handleAdd}
                 class="px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800"
-                disabled={action.addSocial.actionInProgress || !url()}
+                disabled={addMutation.isPending || !url()}
               >
                 Add
               </button>
@@ -492,7 +569,7 @@ const TikTokSocial: Component = () => {
 
 // Instagram Social Component
 const InstagramSocial: Component = () => {
-  const {local, addSocial, removeSocial, action} = useUser();
+  const {addMutation, removeMutation, socialsQuery} = useHook();
   const [url, setUrl] = createSignal("");
   const [error, setError] = createSignal("");
 
@@ -510,7 +587,7 @@ const InstagramSocial: Component = () => {
     }
 
     try {
-      await addSocial("instagram", url());
+      await addMutation.mutate({provider: "instagram", url: url()});
       setUrl("");
       setError("");
     } catch (error) {
@@ -519,7 +596,7 @@ const InstagramSocial: Component = () => {
   };
 
   const social = createMemo(() =>
-    local.userSocials.find(s => s.provider === "instagram")
+    socialsQuery.data?.find(s => s.provider === "instagram")
   );
 
   return (
@@ -539,9 +616,9 @@ const InstagramSocial: Component = () => {
             </a>
             <button
               type="button"
-              onClick={() => removeSocial("instagram")}
+              onClick={() => removeMutation.mutate({provider: "instagram"})}
               class="text-red-500 hover:text-red-700"
-              disabled={action.removeSocial.actionInProgress}
+              disabled={removeMutation.isPending}
             >
               <FaSolidTrash/>
             </button>
@@ -569,7 +646,7 @@ const InstagramSocial: Component = () => {
                 type="button"
                 onClick={handleAdd}
                 class="px-4 py-2 bg-pink-600 text-white rounded-md hover:bg-pink-700"
-                disabled={action.addSocial.actionInProgress || !url()}
+                disabled={addMutation.isPending || !url()}
               >
                 Add
               </button>
@@ -586,32 +663,20 @@ const InstagramSocial: Component = () => {
 
 export const UserSocialsSection: Component = () => {
   // Get user context
-  const {
-    fetchSocialsFromTiltify,
-    action
-  } = useUser();
-
-  // Handle fetching socials from Tiltify
-  const handleFetchSocialsFromTiltify = async () => {
-    try {
-      await fetchSocialsFromTiltify();
-    } catch (error) {
-      console.error("Failed to fetch socials from Tiltify:", error);
-    }
-  };
+  const {importFromTiltify} = useHook()
 
   return (
     <div class="bg-white p-6">
       <div class="flex justify-end mb-4">
         <button
           type="button"
-          onClick={handleFetchSocialsFromTiltify}
+          onClick={() => importFromTiltify.mutate()}
           class="flex items-center gap-2 px-4 py-2 bg-accent text-white rounded-md hover:bg-accent-400 transition-colors"
-          disabled={action.fetchSocialsFromTiltify.actionInProgress}
+          disabled={importFromTiltify.isPending}
           title="Import social links from Tiltify"
         >
           <FaSolidArrowsRotate
-            class={action.fetchSocialsFromTiltify.actionInProgress ? "animate-spin" : ""}
+            class={importFromTiltify.isPending ? "animate-spin" : ""}
           />
           <span>Import from Tiltify</span>
         </button>

@@ -1,5 +1,5 @@
 import {type Component, createSignal, For} from "solid-js";
-import {UserProvider, useUser} from "../providers/UserProvider.tsx";
+import {UserProvider} from "../providers/UserProvider.tsx";
 import {TeamDetailsProvider, useTeamDetail} from "../providers/TeamDetailsProvider.tsx";
 import type {User} from "../../../../../lib/auth/User.ts";
 import {Dialog} from "@kobalte/core/dialog";
@@ -23,7 +23,6 @@ export const TeamDetail: Component<TeamDetailProps> = (props) => {
 };
 
 const TeamDetailContent: Component<{ teamId: number }> = (props) => {
-  const {user} = useUser();
   const {local, teamId, removeUser} = useTeamDetail();
 
   const leaveDialog = createModalSignal();

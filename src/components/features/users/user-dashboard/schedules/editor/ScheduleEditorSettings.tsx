@@ -1,4 +1,4 @@
-import {Show, type Component, createSignal, For, createEffect} from "solid-js";
+import {type Component, createEffect, For, Show} from "solid-js";
 import {useScheduleEditor} from "../../providers/ScheduleEditorProvider.tsx";
 import {debounce} from "@solid-primitives/scheduled";
 import {TextField} from "@kobalte/core/text-field";
@@ -6,6 +6,8 @@ import {Checkbox} from "@kobalte/core/checkbox";
 import {FaRegularCircle, FaRegularCircleCheck, FaRegularCircleXmark} from "solid-icons/fa";
 import {actions} from "astro:actions";
 import {createStore} from "solid-js/store";
+import {useMutation} from "@tanstack/solid-query";
+import {orpc} from "../../../../../../lib/orpc/client/client.ts";
 
 const Correct = () => {
   return (
@@ -121,6 +123,12 @@ const ScheduleSlugField: Component = () => {
     }
     return undefined;
   };
+
+  const x = useMutation(
+    orpc.private.schedules.validateSlug.mutationOptions
+  )
+
+
 
   // Create debounced function for slug validation
   const checkSlugUnique = debounce(async (slug: string) => {

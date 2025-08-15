@@ -48,6 +48,9 @@ const t = title || 'Jingle Jam Community';
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="manifest" href="/site.webmanifest">
     <script is:inline src="/script.js"/>
+    <script type="module">
+      import { QueryClient } from 'https://esm.sh/@tanstack/solid-query'
+    </script>
   {
     canonical &&
           <link rel="canonical" href={canonical}/>

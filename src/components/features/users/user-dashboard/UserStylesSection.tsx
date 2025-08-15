@@ -1,24 +1,25 @@
-import {
-  type Component,
-  createSignal,
-  Show,
-  createResource,
-  createEffect,
-} from "solid-js";
-import { TextField } from "@kobalte/core/text-field";
-import { Dialog } from "@kobalte/core/dialog";
-import { createModalSignal } from "../../../../lib/createModalSignal.ts";
-import { useUser } from "./providers/UserProvider.tsx";
+import {type Component, createEffect, createSignal, Show,} from "solid-js";
+import {TextField} from "@kobalte/core/text-field";
+import {Dialog} from "@kobalte/core/dialog";
+import {createModalSignal} from "../../../../lib/createModalSignal.ts";
+import {useMutation, useQuery, useQueryClient} from "@tanstack/solid-query";
+import {orpc} from "../../../../lib/orpc/client/client.ts";
 
 export const UserStylesSection: Component = () => {
-  // Get user context
-  const {
-    local,
-    user,
-    updateUserStyle,
-    action
-  } = useUser();
 
+  const queryClient = useQueryClient();
+
+  const {data} = useQuery(() => {
+    return orpc.private.editProfile.profile.getStyle.queryOptions({})
+  })
+
+  const updateStyle = useMutation(() =>
+    orpc.private.editProfile.profile.updateStyle.mutationOptions({
+      onSuccess: () => queryClient.invalidateQueries({
+        queryKey: orpc.private.editProfile.profile.getStyle.key()
+      })
+    })
+  )
   // State for color inputs and dialog
   const DEFAULT_PRIMARY_COLOR = "#E30E50";
   const DEFAULT_ACCENT_COLOR = "#3584BF";
@@ -28,16 +29,19 @@ export const UserStylesSection: Component = () => {
 
   // Update local state when user style changes
   createEffect(() => {
-    if (local.userStyle) {
-      setPrimaryColor(local.userStyle.primaryColor);
-      setAccentColor(local.userStyle.accentColor);
+    if (data) {
+      setPrimaryColor(data?.primaryColor ?? DEFAULT_PRIMARY_COLOR);
+      setAccentColor(data?.accentColor ?? DEFAULT_ACCENT_COLOR);
     }
   });
 
   // Handle saving user styles
   const handleSaveStyles = async () => {
     try {
-      await updateUserStyle(primaryColor(), accentColor());
+      updateStyle.mutate({
+        primaryColor: primaryColor(),
+        accentColor: accentColor()
+      })
       modal.close();
     } catch (error) {
       console.error("Error saving styles:", error);
@@ -58,16 +62,16 @@ export const UserStylesSection: Component = () => {
           type="button"
           onClick={modal.open}
           class="bg-accent text-white px-4 py-2 rounded-lg hover:bg-accent-600 transition-all"
-          disabled={action.updateUserStyle.actionInProgress}
+          disabled={updateStyle.isPending}
         >
-          {action.updateUserStyle.actionInProgress ? 'Saving...' : 'Edit Colors'}
+          {updateStyle.isPending ? 'Saving...' : 'Edit Colors'}
         </button>
       </div>
 
       {/* Error Message */}
-      <Show when={action.updateUserStyle.lastErrorMessage}>
+      <Show when={updateStyle.isError}>
         <div class="mb-4 p-3 bg-red-100 text-red-800 rounded-md">
-          Error: {action.updateUserStyle.lastErrorMessage}
+          Error: {updateStyle.error?.message}
         </div>
       </Show>
 
@@ -78,7 +82,7 @@ export const UserStylesSection: Component = () => {
           <div class="flex flex-col items-center">
             <div
               class="w-16 h-16 rounded-lg shadow-md"
-              style={{ "background-color": primaryColor() }}
+              style={{"background-color": primaryColor()}}
             ></div>
             <span class="text-sm mt-1">Primary</span>
             <span class="text-xs text-gray-500">{primaryColor()}</span>
@@ -86,7 +90,7 @@ export const UserStylesSection: Component = () => {
           <div class="flex flex-col items-center">
             <div
               class="w-16 h-16 rounded-lg shadow-md"
-              style={{ "background-color": accentColor() }}
+              style={{"background-color": accentColor()}}
             ></div>
             <span class="text-sm mt-1">Accent</span>
             <span class="text-xs text-gray-500">{accentColor()}</span>
@@ -111,7 +115,7 @@ export const UserStylesSection: Component = () => {
                   <div class="flex gap-2 items-center">
                     <div
                       class="w-8 h-8 rounded-md shadow-sm"
-                      style={{ "background-color": primaryColor() }}
+                      style={{"background-color": primaryColor()}}
                     ></div>
                     <TextField.Input
                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-accent"
@@ -129,7 +133,7 @@ export const UserStylesSection: Component = () => {
                   <div class="flex gap-2 items-center">
                     <div
                       class="w-8 h-8 rounded-md shadow-sm"
-                      style={{ "background-color": accentColor() }}
+                      style={{"background-color": accentColor()}}
                     ></div>
                     <TextField.Input
                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-accent"
@@ -148,7 +152,7 @@ export const UserStylesSection: Component = () => {
                   type="button"
                   class="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
                   onClick={modal.close}
-                  disabled={action.updateUserStyle.actionInProgress}
+                  disabled={updateStyle.isPending}
                 >
                   Cancel
                 </button>
@@ -156,7 +160,7 @@ export const UserStylesSection: Component = () => {
                   type="button"
                   class="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
                   onClick={handleResetColors}
-                  disabled={action.updateUserStyle.actionInProgress}
+                  disabled={updateStyle.isPending}
                 >
                   Reset to Default
                 </button>
@@ -164,16 +168,16 @@ export const UserStylesSection: Component = () => {
                   type="button"
                   class="px-4 py-2 bg-accent text-white rounded-md hover:bg-accent-600"
                   onClick={handleSaveStyles}
-                  disabled={action.updateUserStyle.actionInProgress}
+                  disabled={updateStyle.isPending}
                 >
-                  {action.updateUserStyle.actionInProgress ? 'Saving...' : 'Save Colors'}
+                  {updateStyle.isPending ? 'Saving...' : 'Save Colors'}
                 </button>
               </div>
 
               {/* Error Message */}
-              <Show when={action.updateUserStyle.lastErrorMessage}>
+              <Show when={updateStyle.isError}>
                 <div class="mt-4 p-3 bg-red-100 text-red-800 rounded-md text-sm">
-                  Error: {action.updateUserStyle.lastErrorMessage}
+                  Error: {updateStyle.error?.message}
                 </div>
               </Show>
             </Dialog.Content>
