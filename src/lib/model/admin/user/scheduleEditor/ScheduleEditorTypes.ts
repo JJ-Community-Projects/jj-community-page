@@ -6,9 +6,10 @@
  * TinyBase store structure used for real-time collaboration.
  */
 
-import { DateTime } from "luxon";
-import type { InferSelectModel } from "drizzle-orm";
-import { schedulesTable, streamParticipantsTable, streamTagsTable, streamsTable } from "../../../../../lib/db/schema/schema";
+import {DateTime} from "luxon";
+import type {InferSelectModel} from "drizzle-orm";
+import type {schedulesTable, streamParticipantsTable, streamsTable} from "../../../../db/schema/jj-schema.ts";
+import type {streamTags} from "../../../../db/schema/tags-schema.ts";
 
 // ==========================================
 // Database Types
@@ -30,7 +31,7 @@ export type DBStream = InferSelectModel<typeof streamsTable>;
  * Represents a stream tag from the database
  * Type derived from the streamTagsTable schema
  */
-export type DBStreamTag = InferSelectModel<typeof streamTagsTable>;
+export type DBStreamTag = InferSelectModel<typeof streamTags>;
 
 /**
  * Represents a stream participant from the database
