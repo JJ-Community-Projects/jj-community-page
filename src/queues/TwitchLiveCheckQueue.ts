@@ -1,8 +1,4 @@
 import type {MessageSendRequest} from "@cloudflare/workers-types/experimental/index.ts";
-import {getDB} from "../lib/db/db.ts";
-import {TwitchRepo} from "../lib/db/repos/TwitchRepo.ts";
-import type {StreamResult} from "../lib/model/TwitchAPIModel.ts";
-import {TwitchLiveNotifierQueue} from "./TwitchLiveNotifierQueue.ts";
 
 
 export class TwitchLiveCheckQueue {
@@ -38,6 +34,9 @@ export class TwitchLiveCheckQueue {
     // Extract user IDs from the message batch
     const messages = batch.messages
     const ids = messages.map(message => message.body)
+    batch.ackAll()
+
+    /*
 
     // Get the TwitchAPI Durable Object to fetch stream data
     const DO = env.TwitchAPIDO
@@ -110,7 +109,7 @@ export class TwitchLiveCheckQueue {
       batch.retryAll({
         delaySeconds: 10,
       })
-    }
+    }*/
   }
 
 

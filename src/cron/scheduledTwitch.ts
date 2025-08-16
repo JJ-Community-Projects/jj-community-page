@@ -1,6 +1,6 @@
 import {getDB} from "../lib/db/db.ts";
-import {TwitchRepo} from "../lib/db/repos/TwitchRepo.ts";
 import {TwitchLiveCheckQueue} from "../queues/TwitchLiveCheckQueue.ts";
+import {twitchChannelSchema} from "../lib/db/schema/twitch-channel-schema.ts";
 
 export async function scheduledTwitch(
   controller: ScheduledController,
@@ -8,10 +8,11 @@ export async function scheduledTwitch(
   ctx: ExecutionContext
 ) {
   console.log('scheduledTwitch')
-  const twitchRepo = new TwitchRepo(env, 'cron');
-
+  const db = getDB(env)
   // Get all Twitch channels
-  const twitchChannels = await twitchRepo.getAllChannels();
+  const twitchChannels = await db.select()
+    .from(twitchChannelSchema)
+    .all();
 
   // Extract channel IDs
   const ids = twitchChannels.map((channel) => channel.id)

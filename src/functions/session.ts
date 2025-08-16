@@ -1,13 +1,13 @@
-import {getDB} from "../lib/db/db.ts";
+import {getDB, type JJDatabase} from "../lib/db/db.ts";
 import {accounts, tokens, users, userSocials, userStyles} from "../lib/db/schema/auth-schema.ts";
 import type {Session} from "../lib/auth/Session.ts";
 import type {User} from "../lib/auth/User.ts";
 import {encodeBase32, encodeHexLowerCase} from "@oslojs/encoding";
 import {sha256} from "@oslojs/crypto/sha2";
 import {eq} from "drizzle-orm";
-import type {TiltifyToken, TiltifyUserData, TiltifySocial} from "./tiltify.ts";
+import type {TiltifySocial, TiltifyToken, TiltifyUserData} from "./tiltify.ts";
 import type {AstroContext} from "../lib/AstroContext.ts";
-import {drizzle, type DrizzleD1Database} from "drizzle-orm/d1";
+import {drizzle} from "drizzle-orm/d1";
 import {socialUrlRegex} from "./socialUrlRegex.ts";
 
 /**
@@ -17,7 +17,7 @@ import {socialUrlRegex} from "./socialUrlRegex.ts";
  * @param userId - The user ID
  * @param social - The social media information from Tiltify
  */
-async function saveTiltifySocials(db: DrizzleD1Database, userId: number, social: TiltifySocial) {
+async function saveTiltifySocials(db: JJDatabase, userId: number, social: TiltifySocial) {
   try {
     // Get regex patterns for validation
     const regexes = socialUrlRegex();

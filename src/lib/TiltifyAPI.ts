@@ -5,8 +5,6 @@ import {tokens} from "./db/schema/auth-schema.ts";
 import {and, eq, type InferSelectModel} from "drizzle-orm";
 import {drizzle, type DrizzleD1Database} from "drizzle-orm/d1";
 import {TiltifyTokenCache} from "./db/cache/TiltifyTokenCache.ts";
-import {UserRepo} from "./db/repos/UserRepo.ts";
-import {TiltifyRepo} from "./db/repos/TiltifyRepo.ts";
 
 export type TiltifyToken = {
   accessToken: string
@@ -123,38 +121,11 @@ export class TiltifyAPI {
   private env: Env
   private db: DrizzleD1Database
   private tokenCache: TiltifyTokenCache
-  private userRepo: UserRepo
-  private tiltifyRepo: TiltifyRepo
 
   constructor(env: Env) {
     this.env = env;
     this.db = drizzle(env.DB)
     this.tokenCache = new TiltifyTokenCache(env)
-    this.userRepo = new UserRepo(env, 'api')
-    this.tiltifyRepo = new TiltifyRepo(env, 'api')
-  }
-
-  private async getNewToken(refreshToken: string): Promise<TiltifyToken | null> {
-    const TILTIFY_CLIENT_ID = this.env.TILTIFY_CLIENT_ID;
-    const TILTIFY_SECRET = this.env.TILTIFY_SECRET;
-
-    const body = {
-      "client_id": TILTIFY_CLIENT_ID,
-      "client_secret": TILTIFY_SECRET,
-      "refresh_token": refreshToken,
-      "grant_type": "refresh_token"
-    }
-    const refreshResponse = await fetch('https://v5api.tiltify.com/oauth/token', {
-      method: 'POST',
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify(
-        body
-      ),
-    })
-    if (!refreshResponse.ok) {
-      return null;
-    }
-    return refreshResponse.json();
   }
 
   async saveTokenToDB(userId: number, token: TiltifyToken) {
@@ -328,29 +299,6 @@ export class TiltifyAPI {
     }
   }
 
-
-  private async getNewAppToken(): Promise<TiltifyToken | null> {
-    const TILTIFY_CLIENT_ID = this.env.TILTIFY_CLIENT_ID;
-    const TILTIFY_SECRET = this.env.TILTIFY_SECRET;
-    const tokenRes = await fetch(`https://v5api.tiltify.com/oauth/token&client_id=${TILTIFY_CLIENT_ID}&client_secret=${TILTIFY_SECRET}&grant_type=client_credentials`, {
-      method: 'POST',
-      headers: {"Content-Type": "application/json"},
-    })
-    if (!tokenRes.ok) {
-      return null;
-    } else {
-      const token: any = await tokenRes.json();
-      return {
-        accessToken: token.access_token as string,
-        createdAt: token.created_at as string,
-        refreshToken: '',
-        expiresIn: token.expires_in as number,
-        scope: token.scope as string,
-        tokenType: token.token_type as string,
-      }
-    }
-  }
-
   async getAppToken() {
     const tokenFromCache = await this.tokenCache.getToken('APP_TOKEN');
     if (tokenFromCache) {
@@ -385,17 +333,49 @@ export class TiltifyAPI {
     return (await resp.json()) as TiltifyCampaignsResponse
   }
 
-  async getAllCampaigns() {
-    const token = await this.getAppToken()
-    if (!token) {
-      return null
+  private async getNewToken(refreshToken: string): Promise<TiltifyToken | null> {
+    const TILTIFY_CLIENT_ID = this.env.TILTIFY_CLIENT_ID;
+    const TILTIFY_SECRET = this.env.TILTIFY_SECRET;
+
+    const body = {
+      "client_id": TILTIFY_CLIENT_ID,
+      "client_secret": TILTIFY_SECRET,
+      "refresh_token": refreshToken,
+      "grant_type": "refresh_token"
     }
+    const refreshResponse = await fetch('https://v5api.tiltify.com/oauth/token', {
+      method: 'POST',
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify(
+        body
+      ),
+    })
+    if (!refreshResponse.ok) {
+      return null;
+    }
+    return refreshResponse.json();
+  }
 
-    const accounts = await this.tiltifyRepo.getAllAccounts()
-
-    const tiltifyIds = accounts.map(account => account.providerId)
-
-    return Promise.all(tiltifyIds.map(this.getCampaignsByUser))
+  private async getNewAppToken(): Promise<TiltifyToken | null> {
+    const TILTIFY_CLIENT_ID = this.env.TILTIFY_CLIENT_ID;
+    const TILTIFY_SECRET = this.env.TILTIFY_SECRET;
+    const tokenRes = await fetch(`https://v5api.tiltify.com/oauth/token&client_id=${TILTIFY_CLIENT_ID}&client_secret=${TILTIFY_SECRET}&grant_type=client_credentials`, {
+      method: 'POST',
+      headers: {"Content-Type": "application/json"},
+    })
+    if (!tokenRes.ok) {
+      return null;
+    } else {
+      const token: any = await tokenRes.json();
+      return {
+        accessToken: token.access_token as string,
+        createdAt: token.created_at as string,
+        refreshToken: '',
+        expiresIn: token.expires_in as number,
+        scope: token.scope as string,
+        tokenType: token.token_type as string,
+      }
+    }
   }
 
 }

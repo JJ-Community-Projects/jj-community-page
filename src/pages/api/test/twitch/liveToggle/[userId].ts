@@ -1,7 +1,4 @@
 import type {APIRoute} from "astro";
-import {TwitchRepo} from "../../../../../lib/db/repos/TwitchRepo.ts";
-import {getDB} from "../../../../../lib/db/db.ts";
-import {TwitchLiveNotifierQueue} from "../../../../../queues/TwitchLiveNotifierQueue.ts";
 
 export const GET: APIRoute = async (ctx) => {
   // Get the userId from the URL parameters
@@ -10,6 +7,9 @@ export const GET: APIRoute = async (ctx) => {
     return new Response('User ID is required', {status: 400});
   }
 
+  return new Response('Live Notifier', {status: 200});
+
+  /*
   // Get database connection and create TwitchRepo instance
   const twitchRepo = new TwitchRepo(ctx.locals.runtime.env, 'api');
 
@@ -75,5 +75,5 @@ export const GET: APIRoute = async (ctx) => {
   } catch (error) {
     console.error('Error in liveToggle endpoint:', error);
     return new Response('Internal Server Error', {status: 500});
-  }
+  }*/
 }
