@@ -31,6 +31,7 @@
     "@kobalte/core": "^0.13.10",
     "@orpc/client": "^1.7.9",
     "@orpc/contract": "^1.7.9",
+    "@orpc/experimental-durable-event-iterator": "^1.8.1",
     "@orpc/openapi": "^1.7.11",
     "@orpc/server": "^1.7.9",
     "@orpc/tanstack-query": "^1.7.11",
