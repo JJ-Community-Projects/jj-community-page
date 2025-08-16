@@ -1,4 +1,4 @@
-import {getDB, type JJDatabase} from "../lib/db/db.ts";
+import {getDB, type JJDrizzleDatabase} from "../lib/db/db.ts";
 import {accounts, tokens, users, userSocials, userStyles} from "../lib/db/schema/auth-schema.ts";
 import type {Session} from "../lib/auth/Session.ts";
 import type {User} from "../lib/auth/User.ts";
@@ -17,7 +17,7 @@ import {socialUrlRegex} from "./socialUrlRegex.ts";
  * @param userId - The user ID
  * @param social - The social media information from Tiltify
  */
-async function saveTiltifySocials(db: JJDatabase, userId: number, social: TiltifySocial) {
+async function saveTiltifySocials(db: JJDrizzleDatabase, userId: number, social: TiltifySocial) {
   try {
     // Get regex patterns for validation
     const regexes = socialUrlRegex();

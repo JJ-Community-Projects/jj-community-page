@@ -16,7 +16,7 @@ import type {
   StreamsTable,
   TagsTable
 } from "../lib/model/admin/user/scheduleEditor/ScheduleEditorTypes";
-import {getDB, type JJDatabase} from "../lib/db/db";
+import {getDB, type JJDrizzleDatabase} from "../lib/db/db";
 
 // ==========================================
 // Tag Operation Types
@@ -100,7 +100,7 @@ interface TagOperation {
  */
 export class ScheduleEditorDO extends TinybaseDO {
   /** Direct database access for all operations */
-  private db: JJDatabase
+  private db: JJDrizzleDatabase
 
   /**
    * Initializes the ScheduleEditorDO with direct database access
