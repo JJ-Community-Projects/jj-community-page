@@ -1,6 +1,4 @@
-import {os} from '@orpc/server'
 import {privateUsersRouter} from "./users/impl.ts";
-import {authMiddleware} from "../middleware/authMiddleware.ts";
 import {privateTeamsRouter} from "./teams/impl.ts";
 import {profileRouter} from "./profile/impl.ts";
 import {friendsRouter} from "./friends/impl.ts";
@@ -13,9 +11,7 @@ import {privateSchedulesRouter} from "./schedules/impl.ts";
 import {socialRouter} from "./social/impl.ts";
 
 
-export const privateRouter = os
-  .use(authMiddleware)
-  .router({
+export const privateRouter = {
     users: privateUsersRouter,
     profile: profileRouter,
     social: socialRouter,
@@ -27,4 +23,4 @@ export const privateRouter = os
     teams: privateTeamsRouter,
     schedules: privateSchedulesRouter,
     twitch: twitchRouter,
-  })
+  }
