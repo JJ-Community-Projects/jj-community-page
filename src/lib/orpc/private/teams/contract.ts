@@ -144,7 +144,7 @@ const rejectInviteContract = oc
  * Get all teams for the authenticated user (owned or member)
  * Uses authMiddleware to access user ID from context
  */
-const getTeamContract = oc
+const getUserTeamsContract = oc
   .output(TeamSchema.array())
 
 /**
@@ -221,30 +221,55 @@ const getUserInvitesContract = oc
     name: z.string()
   })));
 
+/**
+ * Get all invites for a specific team (owner only)
+ * Returns detailed information about all pending invitations for the specified team
+ * Input: team ID
+ * Output: array of invite details with user information
+ */
+const getTeamInvitesContract = oc
+  .input(z.object({
+    teamId: z.number().positive("Team ID must be positive")
+  }))
+  .output(UserDisplaySchema.array());
+
+/**
+ * Get a specific team by ID
+ * Input: team ID
+ * Output: team schema
+ */
+const getTeamByIdContract = oc
+  .input(z.object({
+    teamId: z.number().positive("Team ID must be positive")
+  }))
+  .output(TeamSchema);
+
 export const privateTeamsContract = {
   // Team CRUD Operations
-  create: createContract,
-  update: updateContract,
-  delete: deleteContract,
-  validateSlug: validateSlugContract,
+  createContract,
+  updateContract,
+  deleteContract,
+  validateSlugContract,
 
   // Team Member Operations
-  leaveTeam: leaveTeamContract,
-  removeMember: removeMemberContract,
+  leaveTeamContract,
+  removeMemberContract,
 
   // Team Invite Operations
-  createInvite: createInviteContract,
-  deleteInvite: deleteInviteContract,
-  acceptInvite: acceptInviteContract,
-  rejectInvite: rejectInviteContract,
+  createInviteContract,
+  deleteInviteContract,
+  acceptInviteContract,
+  rejectInviteContract,
 
   // Team Query Operations
-  getTeam: getTeamContract,
-  getOwnedTeams: getOwnedTeamsContract,
-  getNonOwnedTeams: getNonOwnedTeamsContract,
-  getTeamMembers: getTeamMembersContract,
-  getTeamMemberCount: getTeamMemberCountContract,
-  getTeamInviteCount: getTeamInviteCountContract,
-  getUserInviteCount: getUserInviteCountContract,
-  getUserInvites: getUserInvitesContract
+  getTeamContract: getUserTeamsContract,
+  getTeamByIdContract,
+  getOwnedTeamsContract,
+  getNonOwnedTeamsContract,
+  getTeamMembersContract,
+  getTeamMemberCountContract,
+  getTeamInviteCountContract,
+  getTeamInvitesContract,
+  getUserInviteCountContract,
+  getUserInvitesContract
 };

@@ -20,7 +20,7 @@ const os = implement(privateTeamsContract)
  * Create a new team with the authenticated user as owner
  * Validates slug availability and creates team with owner as member
  */
-const create = os.create
+const create = os.createContract
   .use(authMiddleware)
   .handler(async ({ context, input }) => {
     const db = context.db;
@@ -77,7 +77,7 @@ const create = os.create
  * Update team information (owner only)
  * Validates slug uniqueness if changed
  */
-const update = os.update
+const update = os.updateContract
   .use(authMiddleware)
   .use(teamsOwnerMiddleware)
   .handler(async ({ context, input }) => {
@@ -123,7 +123,7 @@ const update = os.update
  * Delete a team (owner only)
  * Cascades to remove all members and invites
  */
-const deleteTeam = os.delete
+const deleteTeam = os.deleteContract
   .use(authMiddleware)
   .use(teamsOwnerMiddleware)
   .handler(async ({ context, input }) => {
@@ -144,7 +144,7 @@ const deleteTeam = os.delete
  * Validate slug availability and generate suggestions
  * Uses existing slug generation functions
  */
-const validateSlug = os.validateSlug
+const validateSlug = os.validateSlugContract
   .use(authMiddleware)
   .handler(async ({ context, input }) => {
     const { slug, tiltifyName } = input;
@@ -206,7 +206,7 @@ const validateSlug = os.validateSlug
  * Leave a team (for non-owners)
  * Prevents team owner from leaving their own team
  */
-const leaveTeam = os.leaveTeam
+const leaveTeam = os.leaveTeamContract
   .use(authMiddleware)
   .handler(async ({ context, input }) => {
     const db = context.db;
@@ -261,7 +261,7 @@ const leaveTeam = os.leaveTeam
  * Remove a member from team (owner only)
  * Prevents owner from removing themselves
  */
-const removeMember = os.removeMember
+const removeMember = os.removeMemberContract
   .use(authMiddleware)
   .use(teamsOwnerMiddleware)
   .handler(async ({ context, input }) => {
@@ -311,7 +311,7 @@ const removeMember = os.removeMember
  * Create an invite to join team (owner only)
  * Validates that user exists and is not already a member or invited
  */
-const createInvite = os.createInvite
+const createInvite = os.createInviteContract
   .use(authMiddleware)
   .use(teamsOwnerMiddleware)
   .handler(async ({ context, input }) => {
@@ -362,7 +362,7 @@ const createInvite = os.createInvite
  * Delete an invite (owner only)
  * Removes pending invitation
  */
-const deleteInvite = os.deleteInvite
+const deleteInvite = os.deleteInviteContract
   .use(authMiddleware)
   .use(teamsOwnerMiddleware)
   .handler(async ({ context, input }) => {
@@ -402,7 +402,7 @@ const deleteInvite = os.deleteInvite
  * Accept an invite to join team
  * Validates invite exists and adds user as member
  */
-const acceptInvite = os.acceptInvite
+const acceptInvite = os.acceptInviteContract
   .use(authMiddleware)
   .handler(async ({ context, input }) => {
     const db = context.db;
@@ -460,7 +460,7 @@ const acceptInvite = os.acceptInvite
  * Reject an invite to join team
  * Removes pending invitation
  */
-const rejectInvite = os.rejectInvite
+const rejectInvite = os.rejectInviteContract
   .use(authMiddleware)
   .handler(async ({ context, input }) => {
     const db = context.db;
@@ -509,7 +509,7 @@ const rejectInvite = os.rejectInvite
 /**
  * Get all teams for the authenticated user (owned or member)
  */
-const getTeam = os.getTeam
+const getUserTeams = os.getTeamContract
   .use(authMiddleware)
   .handler(async ({ context }) => {
     const db = context.db;
@@ -554,7 +554,7 @@ const getTeam = os.getTeam
 /**
  * Get all teams where the current user is the owner
  */
-const getOwnedTeams = os.getOwnedTeams
+const getOwnedTeams = os.getOwnedTeamsContract
   .use(authMiddleware)
   .handler(async ({ context }) => {
     const db = context.db;
@@ -577,7 +577,7 @@ const getOwnedTeams = os.getOwnedTeams
 /**
  * Get all teams where the current user is not the owner (member only)
  */
-const getNonOwnedTeams = os.getNonOwnedTeams
+const getNonOwnedTeams = os.getNonOwnedTeamsContract
   .use(authMiddleware)
   .handler(async ({ context }) => {
     const db = context.db;
@@ -614,7 +614,7 @@ const getNonOwnedTeams = os.getNonOwnedTeams
 /**
  * Get all team members as UserDisplaySchema (owner only)
  */
-const getTeamMembers = os.getTeamMembers
+const getTeamMembers = os.getTeamMembersContract
   .use(authMiddleware)
   .use(teamsOwnerMiddleware)
   .handler(async ({ context, input }) => {
@@ -651,7 +651,7 @@ const getTeamMembers = os.getTeamMembers
 /**
  * Get team member count (owner only)
  */
-const getTeamMemberCount = os.getTeamMemberCount
+const getTeamMemberCount = os.getTeamMemberCountContract
   .use(authMiddleware)
   .use(teamsOwnerMiddleware)
   .handler(async ({ context, input }) => {
@@ -674,7 +674,7 @@ const getTeamMemberCount = os.getTeamMemberCount
 /**
  * Get team invite count (owner only)
  */
-const getTeamInviteCount = os.getTeamInviteCount
+const getTeamInviteCount = os.getTeamInviteCountContract
   .use(authMiddleware)
   .use(teamsOwnerMiddleware)
   .handler(async ({ context, input }) => {
@@ -697,7 +697,7 @@ const getTeamInviteCount = os.getTeamInviteCount
 /**
  * Get user invite count (authenticated user)
  */
-const getUserInviteCount = os.getUserInviteCount
+const getUserInviteCount = os.getUserInviteCountContract
   .use(authMiddleware)
   .handler(async ({ context }) => {
     const db = context.db;
@@ -719,7 +719,7 @@ const getUserInviteCount = os.getUserInviteCount
 /**
  * Get user invites (authenticated user)
  */
-const getUserInvites = os.getUserInvites
+const getUserInvites = os.getUserInvitesContract
   .use(authMiddleware)
   .handler(async ({ context }) => {
     const db = context.db;
@@ -742,6 +742,91 @@ const getUserInvites = os.getUserInvites
     }
   });
 
+/**
+ * Get all invites for a specific team (owner only)
+ */
+const getTeamInvites = os.getTeamInvitesContract
+  .use(authMiddleware)
+  .use(teamsOwnerMiddleware)
+  .handler(async ({ context, input }) => {
+    const db = context.db;
+    const { teamId } = input;
+
+    try {
+      // Join team invites with user display view to get UserDisplaySchema
+      const invites = await db.select({
+        userId: userDisplayView.userId,
+        primaryLiveStream: userDisplayView.primaryLiveStream,
+        role: userDisplayView.role,
+        createdAt: userDisplayView.createdAt,
+        username: userDisplayView.username,
+        profileImage: userDisplayView.profileImage,
+        twitchLogin: userDisplayView.twitchLogin,
+        tiltifySlug: userDisplayView.tiltifySlug,
+        tiltifyUrl: userDisplayView.tiltifyUrl,
+        primaryColor: userDisplayView.primaryColor,
+        accentColor: userDisplayView.accentColor,
+      })
+      .from(teamInvitesTable)
+      .innerJoin(userDisplayView, eq(teamInvitesTable.invitedUserId, userDisplayView.userId))
+      .where(eq(teamInvitesTable.teamId, teamId))
+      .all();
+
+      return invites;
+    } catch (error) {
+      console.error('Error getting team invites:', error);
+      throw new ORPCError('INTERNAL_SERVER_ERROR', { message: 'Failed to get team invites' });
+    }
+  });
+
+/**
+ * Get a specific team by ID
+ * User must be either owner or member of the team
+ */
+const getTeamById = os.getTeamByIdContract
+  .use(authMiddleware)
+  .handler(async ({ context, input }) => {
+    const db = context.db;
+    const userId = context.userId;
+    const { teamId } = input;
+
+    try {
+      // Get the team
+      const team = await db.select()
+        .from(teamsTable)
+        .where(eq(teamsTable.id, teamId))
+        .get();
+
+      if (!team) {
+        throw new ORPCError('NOT_FOUND', { message: 'Team not found' });
+      }
+
+      // Check if user has access to this team (either as owner or member)
+      const isOwner = team.ownerId === userId;
+
+      if (!isOwner) {
+        // Check if user is a member
+        const membership = await db.select()
+          .from(teamMembersTable)
+          .where(and(
+            eq(teamMembersTable.teamId, teamId),
+            eq(teamMembersTable.userId, userId)
+          ))
+          .get();
+
+        if (!membership) {
+          throw new ORPCError('FORBIDDEN', { message: 'You do not have access to this team' });
+        }
+      }
+
+      return team;
+    } catch (error) {
+      if (error instanceof ORPCError) throw error;
+      console.error('Error getting team by ID:', error);
+      throw new ORPCError('INTERNAL_SERVER_ERROR', { message: 'Failed to get team' });
+    }
+  });
+
 export const privateTeamsRouter = {
   // Team CRUD Operations
   create,
@@ -760,12 +845,14 @@ export const privateTeamsRouter = {
   rejectInvite,
 
   // Team Query Operations
-  getTeam,
+  getUserTeams,
+  getTeamById,
   getOwnedTeams,
   getNonOwnedTeams,
   getTeamMembers,
   getTeamMemberCount,
   getTeamInviteCount,
+  getTeamInvites,
   getUserInviteCount,
   getUserInvites
 };
