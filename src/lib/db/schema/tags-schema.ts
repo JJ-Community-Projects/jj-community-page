@@ -131,7 +131,7 @@ export const tagAliases = sqliteTable("tag_aliases", {
  * Updated user tags table - Links users to admin-managed tags
  * Replaces the old string-based tag system with references to central tags
  */
-export const userTags = sqliteTable("user_tags", {
+export const userTagsTable = sqliteTable("user_tags", {
   /** ID of the user who has this tag */
   userId: integer('user_id', {mode: 'number'}).notNull()
     .references(() => users.id, {onDelete: 'cascade'}),
@@ -158,7 +158,7 @@ export const userTags = sqliteTable("user_tags", {
  * Updated stream tags table - Links streams to admin-managed tags
  * Maintains the complex composite foreign key relationship with streams
  */
-export const streamTags = sqliteTable('stream_tags', {
+export const streamTagsTable = sqliteTable('stream_tags', {
   /** ID of the stream within its schedule */
   streamId: integer('stream_id').notNull(),
 
@@ -187,6 +187,8 @@ export const streamTags = sqliteTable('stream_tags', {
   index('idx_stream_tags_tag_id').on(table.tagId),
   // Index for efficient stream-based tag lookups
   index('idx_stream_tags_stream').on(table.scheduleId, table.streamId),
+  // Index for efficient schedule-based tag lookups
+  index('idx_stream_tags_schedule').on(table.scheduleId),
 ]);
 
 /**
@@ -203,12 +205,12 @@ export type TagAlias = typeof tagAliases.$inferSelect;
 export type NewTagAlias = typeof tagAliases.$inferInsert;
 
 // User tag relationship types
-export type UserTag = typeof userTags.$inferSelect;
-export type NewUserTag = typeof userTags.$inferInsert;
+export type UserTag = typeof userTagsTable.$inferSelect;
+export type NewUserTag = typeof userTagsTable.$inferInsert;
 
 // Stream tag relationship types
-export type StreamTag = typeof streamTags.$inferSelect;
-export type NewStreamTag = typeof streamTags.$inferInsert;
+export type StreamTag = typeof streamTagsTable.$inferSelect;
+export type NewStreamTag = typeof streamTagsTable.$inferInsert;
 
 /**
  * Tag with aliases - for admin management operations
