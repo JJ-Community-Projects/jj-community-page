@@ -5,6 +5,10 @@ import {eq, not} from "drizzle-orm";
 import type {AstroContext} from "../lib/AstroContext.ts";
 
 export async function getBlockedNames(ctx: AstroContext) {
+  return getBlockedNamesLocals(ctx.locals);
+}
+
+export async function getBlockedNamesLocals(locals: App.Locals) {
   // Get creator names from content
   const creators: {name: string}[] = [] // await loadAllCreatorsFromContent();
   const creatorNames = creators.map((creator) => {
@@ -12,8 +16,8 @@ export async function getBlockedNames(ctx: AstroContext) {
   });
 
   // Get all provider usernames from accounts except the current user's
-  const db = getDB(ctx);
-  const currentUser = ctx.locals.user;
+  const db = getDB(locals.runtime.env);
+  const currentUser = locals.user;
 
 
   if (currentUser) {
