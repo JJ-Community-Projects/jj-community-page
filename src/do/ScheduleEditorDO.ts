@@ -5,7 +5,7 @@ import type {MergeableStore} from "tinybase/mergeable-store";
 import {RpcScheduleEditorDO} from "./RpcScheduleEditorDO";
 import {schedulesTable, streamParticipantsTable, streamsTable} from "../lib/db/schema/schema";
 import type {NewTag, Tag} from "../lib/db/schema/tags-schema";
-import {streamTags, tagAliases, tags} from "../lib/db/schema/tags-schema";
+import {streamTagsTable, tagAliases, tags} from "../lib/db/schema/tags-schema";
 import {and, eq, or} from "drizzle-orm";
 import type {BatchItem} from "drizzle-orm/batch";
 import type {
@@ -213,16 +213,16 @@ export class ScheduleEditorDO extends TinybaseDO {
 
     // Get all stream tags for this schedule with tag details
     const allStreamTags = await this.db.select({
-      streamId: streamTags.streamId,
-      scheduleId: streamTags.scheduleId,
-      tagId: streamTags.tagId,
+      streamId: streamTagsTable.streamId,
+      scheduleId: streamTagsTable.scheduleId,
+      tagId: streamTagsTable.tagId,
       tagName: tags.name,
       tagSlug: tags.slug,
-      addedAt: streamTags.addedAt
+      addedAt: streamTagsTable.addedAt
     })
-      .from(streamTags)
-      .leftJoin(tags, eq(streamTags.tagId, tags.id))
-      .where(eq(streamTags.scheduleId, id))
+      .from(streamTagsTable)
+      .leftJoin(tags, eq(streamTagsTable.tagId, tags.id))
+      .where(eq(streamTagsTable.scheduleId, id))
       .all();
 
     // Get all stream participants for this schedule
@@ -562,15 +562,15 @@ export class ScheduleEditorDO extends TinybaseDO {
   ): Promise<void> {
     // Get current tag assignments from the database
     const existingStreamTags = await this.db.select({
-      streamId: streamTags.streamId,
-      scheduleId: streamTags.scheduleId,
-      tagId: streamTags.tagId,
+      streamId: streamTagsTable.streamId,
+      scheduleId: streamTagsTable.scheduleId,
+      tagId: streamTagsTable.tagId,
       tagName: tags.name,
       tagSlug: tags.slug
     })
-      .from(streamTags)
-      .leftJoin(tags, eq(streamTags.tagId, tags.id))
-      .where(eq(streamTags.scheduleId, scheduleId))
+      .from(streamTagsTable)
+      .leftJoin(tags, eq(streamTagsTable.tagId, tags.id))
+      .where(eq(streamTagsTable.scheduleId, scheduleId))
       .all();
 
     // Create maps for efficient lookups
@@ -634,7 +634,7 @@ export class ScheduleEditorDO extends TinybaseDO {
 
         // Add operation to assign tag to stream
         batchOperations.push(
-          this.db.insert(streamTags)
+          this.db.insert(streamTagsTable)
             .values({
               streamId: tagToAdd.streamId,
               scheduleId,
@@ -652,11 +652,11 @@ export class ScheduleEditorDO extends TinybaseDO {
     // Process tag removals
     for (const tagToRemove of tagsToRemove) {
       batchOperations.push(
-        this.db.delete(streamTags)
+        this.db.delete(streamTagsTable)
           .where(and(
-            eq(streamTags.streamId, tagToRemove.streamId),
-            eq(streamTags.scheduleId, scheduleId),
-            eq(streamTags.tagId, tagToRemove.tagId)
+            eq(streamTagsTable.streamId, tagToRemove.streamId),
+            eq(streamTagsTable.scheduleId, scheduleId),
+            eq(streamTagsTable.tagId, tagToRemove.tagId)
           ))
       );
     }
