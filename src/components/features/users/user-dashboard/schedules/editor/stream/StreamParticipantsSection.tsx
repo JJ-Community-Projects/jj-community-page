@@ -1,11 +1,12 @@
 import {type Component, createMemo, createSignal, For, Show} from "solid-js";
-import type { Participant } from "../../../../../../../lib/model/admin/user/scheduleEditor/ScheduleEditorTypes";
+import type {Participant} from "../../../../../../../lib/model/admin/user/scheduleEditor/ScheduleEditorTypes";
 import {TextField} from "@kobalte/core/text-field";
 import {debounce} from "@solid-primitives/scheduled";
 import {FaRegularCircle} from "solid-icons/fa";
 import {useScheduleEditor} from "../../../providers/ScheduleEditorProvider.tsx";
-import {actions} from "astro:actions";
 import {useStreamEditor} from "./ScheduleEditorStreamEditDialogBodyProvider.tsx";
+import {useQuery} from "@tanstack/solid-query";
+import {orpc} from "../../../../../../../lib/orpc/client.ts";
 
 const useParticipants = () => {
   const {stream, addParticipant, removeParticipant} = useStreamEditor()
@@ -15,73 +16,61 @@ const useParticipants = () => {
     return stream?.participants || [];
   });
 
-  // State for search input and results
+  // State for search input
   const [searchText, setSearchText] = createSignal("");
-  const [searchResults, setSearchResults] = createSignal<Participant[]>([]);
-  const [isSearching, setIsSearching] = createSignal(false);
-  const [error, setError] = createSignal("");
+
+  // oRPC query for user search
+  const searchQuery = useQuery(() => orpc.public.users.searchByName.queryOptions({
+    input: {
+      searchTerm: searchText()
+    },
+    enabled: () => searchText().length > 0,
+  }));
+
+  // Computed search results with participant filtering
+  const searchResults = createMemo(() => {
+    if (!searchQuery.data) return [];
+
+    // Filter out users that are already participants and transform data
+    return searchQuery.data.filter(user =>
+      !participants().some(p => p.userId === user.userId)
+    ).map((user) => ({
+      userId: user.userId,
+      provider: user.twitchUsername ? 'twitch' : 'tiltify',
+      name: user.twitchUsername || user.tiltifyUsername || 'Unknown User',
+    })) as Participant[];
+  });
 
   // Debounced search function
   const debouncedSearch = debounce(async (query: string) => {
-    if (!query.trim()) {
-      setSearchResults([]);
-      setIsSearching(false);
-      return;
-    }
-
-    setIsSearching(true);
-    try {
-      const {data, error} = await actions.users.search({searchTerm: query, includeSelf: true});
-      if (error) {
-        console.error("Search error:", error);
-        setError("Failed to search for users");
-        setSearchResults([]);
-      } else {
-        // Filter out users that are already participants
-        const filteredResults = data?.filter(user =>
-          !participants().some(p => p.userId === user.userId)
-        ).map(({userId, provider, providerName}) => {
-          return {
-            userId,
-            provider: provider,
-            name: providerName,
-          }
-        }) || [];
-        setSearchResults(filteredResults);
-        setError("");
-      }
-    } catch (err) {
-      console.error("Search error:", err);
-      setError("An unexpected error occurred");
-      setSearchResults([]);
-    } finally {
-      setIsSearching(false);
-    }
+    setSearchText(query);
   }, 500);
 
   // Handle input change
   const handleSearchChange = (value: string) => {
-    setSearchText(value);
     debouncedSearch(value);
   };
 
   // Handle adding a participant
   const handleAddParticipant = (participant: Participant) => {
-    // addParticipant(props.streamId, user.userId, user.name, user.provider);
-    addParticipant(participant)
+    addParticipant(participant);
     setSearchText("");
-    setSearchResults([]);
   };
 
   // Handle removing a participant
   const handleRemoveParticipant = (userId: number) => {
-    // removeParticipant(props.streamId, userId);
     removeParticipant(userId);
   };
 
   return {
-    searchText, handleSearchChange, isSearching, error, searchResults, handleAddParticipant,
-    participants, handleRemoveParticipant
+    searchText,
+    handleSearchChange,
+    isSearching: () => searchQuery.isPending,
+    error: () => searchQuery.error?.message || "",
+    searchResults,
+    handleAddParticipant,
+    participants,
+    handleRemoveParticipant
   }
 }
 

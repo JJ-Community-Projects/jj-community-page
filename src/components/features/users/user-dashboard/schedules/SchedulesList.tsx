@@ -1,5 +1,6 @@
 import {type Component, For, Show} from "solid-js";
-import {UserSchedulesProvider, useUserSchedules} from "../providers/UserSchedulesProvider.tsx";
+import {useMutation, useQuery, useQueryClient} from "@tanstack/solid-query";
+import {orpc} from "../../../../../lib/orpc/client.ts";
 import type {User} from "../../../../../lib/auth/User.ts";
 import {Dialog} from "@kobalte/core/dialog";
 import {createModalSignal} from "../../../../../lib/createModalSignal.ts";
@@ -12,6 +13,7 @@ import {
   FaSolidStar,
   FaSolidTrash
 } from "solid-icons/fa";
+import {action} from "@solidjs/router";
 
 interface SchedulesListProps {
   user: User
@@ -19,20 +21,37 @@ interface SchedulesListProps {
 
 export const SchedulesList: Component<SchedulesListProps> = (props) => {
   return (
-    <UserSchedulesProvider user={props.user}>
-      <SchedulesListContent/>
-    </UserSchedulesProvider>
+    <SchedulesListContent user={props.user}/>
   );
 };
 
-const SchedulesListContent: Component = () => {
-  const {local, createSchedule, toggleVisibility, action} = useUserSchedules();
+const SchedulesListContent: Component<{user: User}> = (props) => {
+  const queryClient = useQueryClient();
+  const schedules = orpc.private.schedules;
+
+  // Query for user schedules
+  const schedulesQuery = useQuery(() =>
+    schedules.getSchedules.queryOptions({
+      staleTime: 30 * 1000, // 30 seconds
+    })
+  );
+
+  // Mutation for creating schedules
+  const createScheduleMutation = useMutation(() =>
+    schedules.create.mutationOptions({
+      onSuccess: async () => {
+        // Invalidate schedules query to refresh the list
+        await queryClient.invalidateQueries({queryKey: schedules.getSchedules.queryKey()});
+      },
+    })
+  );
+
   const addSchedule = async () => {
     try {
-      await createSchedule();
+      await createScheduleMutation.mutateAsync();
     } catch (error) {
       console.error("Failed to create schedule:", error);
-      // Error is already handled by the action state
+      // Error is handled by the mutation state
     }
   };
 
@@ -48,9 +67,9 @@ const SchedulesListContent: Component = () => {
             <button
               class="bg-accent hover:bg-accent-400 text-white px-4 py-2 rounded-lg transition-all"
               onClick={addSchedule}
-              disabled={action.createSchedule.actionInProgress}
+              disabled={createScheduleMutation.isPending}
             >
-              {action.createSchedule.actionInProgress ? 'Creating...' : 'Add Schedule'}
+              {createScheduleMutation.isPending ? 'Creating...' : 'Add Schedule'}
             </button>
           </div>
           <p class="text-gray-600">
@@ -59,21 +78,26 @@ const SchedulesListContent: Component = () => {
             while any other schedules—whether from the same year or different years—will still be available to view from
             your page.
           </p>
-          <Show when={action.createSchedule.lastErrorMessage}>
+          <Show when={createScheduleMutation.error}>
             <div class="text-red-500">
-              {action.createSchedule.lastErrorMessage}
+              {createScheduleMutation.error?.message || 'Failed to create schedule'}
             </div>
           </Show>
         </div>
       </div>
 
-      <Show when={local.schedules.length > 0} fallback={
+      <Show when={schedulesQuery.data && schedulesQuery.data.length > 0} fallback={
         <div class="bg-white rounded-2xl shadow-xl p-6 text-center">
-          <p class="text-gray-500">No schedules yet. Create one to get started!</p>
+          <Show when={schedulesQuery.isLoading}>
+            <p class="text-gray-500">Loading schedules...</p>
+          </Show>
+          <Show when={!schedulesQuery.isLoading}>
+            <p class="text-gray-500">No schedules yet. Create one to get started!</p>
+          </Show>
         </div>
       }>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <For each={local.schedules}>
+          <For each={schedulesQuery.data}>
             {schedule => (
               <SchedulesListItem schedule={schedule}/>
             )}
@@ -96,16 +120,6 @@ const SchedulesListItem: Component<{
     slug: string;
   }
 }> = (props) => {
-  const {setPrimarySchedule, toggleVisibility, action} = useUserSchedules();
-
-  const handleSetPrimary = async () => {
-    try {
-      await setPrimarySchedule(props.schedule.id);
-    } catch (error) {
-      console.error("Failed to set schedule as primary:", error);
-      // Error is already handled by the action state
-    }
-  };
   return (
 
     <div class="bg-white rounded-2xl shadow-xl p-6 flex flex-col">
@@ -138,22 +152,32 @@ const SchedulePrimaryButton: Component<{
     primary: boolean;
   }
 }> = (props) => {
+  const queryClient = useQueryClient();
+  const schedules = orpc.private.schedules;
 
-  const {setPrimarySchedule, action} = useUserSchedules();
+  const setPrimaryMutation = useMutation(() =>
+    schedules.setPrimary.mutationOptions({
+      onSuccess: async () => {
+        // Invalidate schedules query to refresh the list
+        await queryClient.invalidateQueries({queryKey: schedules.getSchedules.queryKey()});
+      },
+    })
+  );
 
   const handleSetPrimary = async () => {
     try {
-      await setPrimarySchedule(props.schedule.id);
+      await setPrimaryMutation.mutateAsync({
+        scheduleId: props.schedule.id
+      });
     } catch (error) {
       console.error("Failed to set schedule as primary:", error);
-      // Error is already handled by the action state
     }
   };
 
   return (
     <button
       onClick={() => handleSetPrimary()}
-      disabled={props.schedule.primary || action.setPrimarySchedule.actionInProgress}
+      disabled={props.schedule.primary || setPrimaryMutation.isPending}
       class="bg-accent hover:bg-accent-400 text-white px-3 py-1 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
       title={props.schedule.primary ? 'Primary' : 'Set Primary'}
     >
@@ -171,22 +195,32 @@ const ScheduleVisibilityButton: Component<{
     primary: boolean;
   }
 }> = (props) => {
+  const queryClient = useQueryClient();
+  const schedules = orpc.private.schedules;
 
-  const {toggleVisibility, action} = useUserSchedules();
+  const toggleVisibilityMutation = useMutation(() =>
+    schedules.toggleVisibility.mutationOptions({
+      onSuccess: async () => {
+        // Invalidate schedules query to refresh the list
+        await queryClient.invalidateQueries({queryKey: schedules.getSchedules.queryKey()});
+      },
+    })
+  );
 
   const handleToggleVisibility = async () => {
     try {
-      await toggleVisibility(props.schedule.id);
+      await toggleVisibilityMutation.mutateAsync({
+        scheduleId: props.schedule.id
+      });
     } catch (error) {
       console.error("Failed to toggle schedule visibility:", error);
-      // Error is already handled by the action state
     }
   };
 
   return (
     <button
       onClick={() => handleToggleVisibility()}
-      disabled={action.toggleVisibility.actionInProgress}
+      disabled={toggleVisibilityMutation.isPending}
       class="bg-primary hover:bg-primary-600 text-white px-3 py-1 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
       title={props.schedule.visible ? 'Make Private' : 'Make Public'}
     >
@@ -205,16 +239,25 @@ const ScheduleDeleteButton: Component<{
     slug: string
   }
 }> = (props) => {
-  const {deleteSchedule, action} = useUserSchedules();
+  const queryClient = useQueryClient();
+  const schedules = orpc.private.schedules;
   const modal = createModalSignal();
+
+  const deleteScheduleMutation = useMutation(() =>
+    schedules.delete.mutationOptions({
+      onSuccess: async () => {
+        // Invalidate schedules query to refresh the list
+        await queryClient.invalidateQueries({queryKey: schedules.getSchedules.queryKey()});
+      },
+    })
+  );
 
   const handleDelete = async () => {
     try {
-      await deleteSchedule(props.schedule.id);
+      await deleteScheduleMutation.mutateAsync(props.schedule.id);
       modal.close();
     } catch (error) {
       console.error("Failed to delete schedule:", error);
-      // Error is already handled by the action state
     }
   };
 
@@ -222,7 +265,7 @@ const ScheduleDeleteButton: Component<{
     <>
       <button
         onClick={modal.open}
-        disabled={action.deleteSchedule.actionInProgress}
+        disabled={deleteScheduleMutation.isPending}
         class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         title="Delete"
       >
@@ -239,9 +282,9 @@ const ScheduleDeleteButton: Component<{
                 Are you sure you want to delete "{props.schedule.title}"? This action cannot be undone.
               </Dialog.Description>
 
-              <Show when={action.deleteSchedule.lastErrorMessage}>
+              <Show when={deleteScheduleMutation.error}>
                 <div class="text-red-500 mb-4">
-                  {action.deleteSchedule.lastErrorMessage}
+                  {deleteScheduleMutation.error?.message || 'Failed to delete schedule'}
                 </div>
               </Show>
 
@@ -250,7 +293,7 @@ const ScheduleDeleteButton: Component<{
                   type="button"
                   class="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
                   onClick={modal.close}
-                  disabled={action.deleteSchedule.actionInProgress}
+                  disabled={deleteScheduleMutation.isPending}
                 >
                   Cancel
                 </button>
@@ -258,9 +301,9 @@ const ScheduleDeleteButton: Component<{
                   type="button"
                   class="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
                   onClick={handleDelete}
-                  disabled={action.deleteSchedule.actionInProgress}
+                  disabled={deleteScheduleMutation.isPending}
                 >
-                  {action.deleteSchedule.actionInProgress ? 'Deleting...' : 'Delete'}
+                  {deleteScheduleMutation.isPending ? 'Deleting...' : 'Delete'}
                 </button>
               </div>
             </Dialog.Content>

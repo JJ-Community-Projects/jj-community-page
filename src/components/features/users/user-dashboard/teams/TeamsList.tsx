@@ -67,7 +67,7 @@ const OwnedTeamsList: Component = () => {
       <h3 class="text-lg font-bold mb-4">Teams You Own</h3>
 
       <QueryComponent
-        queryOptions={() => orpc.private.teams.getOwnedTeams.queryOptions()}
+        queryOptions={() => orpc.private.teamsSSE.getUserTeamsAdminSSE.experimental_liveOptions()}
         loading={() => (
           <p class="text-gray-500 text-center py-4">Loading teams...</p>
         )}
@@ -83,12 +83,12 @@ const OwnedTeamsList: Component = () => {
           </div>
         )}
       >
-        {(ownedTeams) => (
-          <Show when={ownedTeams.length > 0} fallback={
+        {(result) => (
+          <Show when={result.teams.length > 0} fallback={
             <p class="text-gray-500 text-center py-4">You don't own any teams yet.</p>
           }>
             <div class="flex flex-col gap-3">
-              <For each={ownedTeams}>
+              <For each={result.teams}>
                 {(team) => (
                   <a
                     href={`/dashboard/teams/${team.id}`}
@@ -113,7 +113,7 @@ const MemberTeamsList: Component = () => {
       <h3 class="text-lg font-bold mb-4">Teams You're In</h3>
 
       <QueryComponent
-        queryOptions={() => orpc.private.teams.getNonOwnedTeams.queryOptions()}
+        queryOptions={() => orpc.private.teamsSSE.getUserTeamsSSE.experimental_liveOptions()}
         loading={() => (
           <p class="text-gray-500 text-center py-4">Loading teams...</p>
         )}
@@ -129,12 +129,12 @@ const MemberTeamsList: Component = () => {
           </div>
         )}
       >
-        {(memberTeams) => (
-          <Show when={memberTeams.length > 0} fallback={
+        {(result) => (
+          <Show when={result.teams.length > 0} fallback={
             <p class="text-gray-500 text-center py-4">You're not a member of any teams yet.</p>
           }>
             <div class="flex flex-col gap-3">
-              <For each={memberTeams}>
+              <For each={result.teams}>
                 {(team) => (
                   <a
                     href={`/dashboard/teams/${team.id}`}
@@ -202,7 +202,8 @@ const InvitesList: Component = () => {
       <h3 class="text-lg font-bold mb-4">Team Invitations</h3>
 
       <QueryComponent
-        queryOptions={() => orpc.private.teams.getUserInvites.queryOptions()}
+        // queryOptions={() => orpc.private.teams.getUserInvites.queryOptions()}
+        queryOptions={() => orpc.private.teamsSSE.getUserInvitesSSE.experimental_liveOptions()}
         loading={() => (
           <p class="text-gray-500 text-center py-4">Loading invitations...</p>
         )}
@@ -218,12 +219,12 @@ const InvitesList: Component = () => {
           </div>
         )}
       >
-        {(invites) => (
-          <Show when={invites.length > 0} fallback={
+        {(result) => (
+          <Show when={result.invites.length > 0} fallback={
             <p class="text-gray-500 text-center py-4">You don't have any team invitations.</p>
           }>
             <div class="flex flex-col gap-3">
-              <For each={invites}>
+              <For each={result.invites}>
                 {(invite) => (
                   <div class="border border-gray-200 rounded-lg p-4">
                     <div class="mb-2">

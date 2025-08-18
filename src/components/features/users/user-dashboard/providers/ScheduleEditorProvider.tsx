@@ -18,35 +18,24 @@
  * with the server and other connected clients in real-time.
  */
 
-import {createMergeableStore} from "tinybase/mergeable-store";
 import {createStore} from "solid-js/store";
 import {DateTime} from "luxon";
 import {sanitizeTag} from "../../../../../functions/slug.ts";
 import {createAction} from "../../../../../functions/createAction.ts";
 
-import {
-  createContext,
-  createEffect,
-  createSignal,
-  onCleanup,
-  onMount,
-  type ParentComponent,
-  useContext
-} from "solid-js";
+import {createContext, type ParentComponent, useContext} from "solid-js";
 
 import type {Row} from "tinybase/store";
 import type {
   HookActions,
+  Participant,
   ScheduleType,
   StreamType,
-  Tag,
-  Participant,
-  ValueOrSetter
+  Tag
 } from "../../../../../lib/model/admin/user/scheduleEditor/ScheduleEditorTypes";
-import {createWsSynchronizer, type WsSynchronizer} from "tinybase/synchronizers/synchronizer-ws-client";
-import ReconnectingWebSocket from "reconnecting-websocket";
-import {actions} from "astro:actions";
 import {useScheduleEditorConnection} from "./ScheduleEditorConnectionProvider.tsx";
+import {useMutation, useQueryClient} from "@tanstack/solid-query";
+import {orpc} from "../../../../../lib/orpc/client.ts";
 
 /**
  * Defines the structure for tracking the state of all actions in the hook.
@@ -162,6 +151,37 @@ const useScheduleEditorHook = (id: number, userId: number,
                                username: string) => {
 
   const {store, addListener} = useScheduleEditorConnection()
+  const queryClient = useQueryClient()
+  const schedules = orpc.private.schedules
+  const tags = orpc.private.tags
+
+  // Schedule mutations
+  const saveScheduleMutation = useMutation(() =>
+    schedules.save.mutationOptions({
+      onSuccess: async () => {
+        // Invalidate related queries if needed
+        await queryClient.invalidateQueries({queryKey: schedules.getSchedules.queryKey()});
+      },
+    })
+  );
+
+  const deleteScheduleMutation = useMutation(() =>
+    schedules.delete.mutationOptions({
+      onSuccess: async () => {
+        // Invalidate related queries
+        await queryClient.invalidateQueries({queryKey: schedules.getSchedules.queryKey()});
+      },
+    })
+  );
+
+  // Tag mutations
+  const searchTagsMutation = useMutation(() =>
+    tags.searchTags.mutationOptions()
+  );
+
+  const getPopularTagsMutation = useMutation(() =>
+    tags.getPopularTags.mutationOptions()
+  );
 
   const {
     actions: action,
@@ -1171,39 +1191,35 @@ const useScheduleEditorHook = (id: number, userId: number,
     startAction('fetchTags');
 
     try {
-      let data, error;
+      let data;
 
-      // If both stream and searchTag are provided, use getSuggestedTagsForStreamBySearchTerm
+      // If both stream and searchTag are provided, use searchTags as fallback
       if (request?.stream && request?.searchTag) {
-        ({data, error} = await actions.schedules.getSuggestedTagsForStreamBySearchTerm({
-          streamId: request.stream.streamId,
-          scheduleId: request.stream.scheduleId,
-          term: request.searchTag,
+        data = await searchTagsMutation.mutateAsync({
+          query: request.searchTag,
           limit: 5
-        }));
+        });
       }
-      // If only stream is provided, use getSuggestedTagsForStream
+      // If only stream is provided, use searchTags with empty query to get suggestions
       else if (request?.stream) {
-        ({data, error} = await actions.schedules.getSuggestedTagsForStream({
-          streamId: request.stream.streamId,
-          scheduleId: request.stream.scheduleId,
+        data = await searchTagsMutation.mutateAsync({
+          query: '',
           limit: 5
-        }));
+        });
       }
       // If neither stream nor searchTag is provided, use getPopularTags
       else {
-        ({data, error} = await actions.schedules.getPopularTags(5));
-      }
-
-      if (error) {
-        console.error("Error fetching tags:", error);
-        setLastError('fetchTags', error.message || "Error fetching tags");
-        stopAction('fetchTags');
-        return {tags: [], defaultTags: [], charityTags: []};
+        const result = await getPopularTagsMutation.mutateAsync({limit:5});
+        data = result.tags
       }
 
       stopAction('fetchTags');
-      return data;
+      // Transform the data to match expected format
+      return {
+        tags: data || [],
+        defaultTags: [],
+        charityTags: []
+      };
     } catch (error) {
       console.error("Error fetching tags:", error);
       const errorMsg = error instanceof Error ? error.message : 'An unknown error occurred';
@@ -1216,41 +1232,22 @@ const useScheduleEditorHook = (id: number, userId: number,
 
   // region Schedule API Operations
   const saveSchedule = async () => {
-    startAction('saveSchedule');
     try {
-      const result = await actions.schedules.save(local.id);
-      if (result.error) {
-        console.error("Failed to save schedule:", result.error);
-        setLastError('saveSchedule', result.error.message);
-      }
-      stopAction('saveSchedule');
-      return result;
+      const result = await saveScheduleMutation.mutateAsync(local.id);
+      return { data: result };
     } catch (error) {
       console.error("Error saving schedule:", error);
-      const errorMsg = error instanceof Error ? error.message : String(error);
-      setLastError('saveSchedule', errorMsg);
-      stopAction('saveSchedule');
       throw error;
     }
   };
 
   const deleteSchedule = async () => {
-    startAction('deleteSchedule');
     try {
-      const result = await actions.schedules.delete(local.id);
-      if (result.error) {
-        console.error("Failed to delete schedule:", result.error);
-        setLastError('deleteSchedule', result.error.message);
-      } else {
-        console.log("Schedule deleted successfully!");
-      }
-      stopAction('deleteSchedule');
-      return result;
+      const result = await deleteScheduleMutation.mutateAsync(local.id);
+      console.log("Schedule deleted successfully!");
+      return { data: result };
     } catch (error) {
       console.error("Error deleting schedule:", error);
-      const errorMsg = error instanceof Error ? error.message : String(error);
-      setLastError('deleteSchedule', errorMsg);
-      stopAction('deleteSchedule');
       throw error;
     }
   };
@@ -1276,10 +1273,15 @@ const useScheduleEditorHook = (id: number, userId: number,
     getAllDays,
     fetchTags,
     saveSchedule,
+    saveScheduleMutation,
     deleteSchedule,
+    deleteScheduleMutation,
     hideStreams,
     showStreams,
     deleteStreams,
+    // Tag mutations
+    searchTagsMutation,
+    getPopularTagsMutation,
     // Action state
     action: action
   }

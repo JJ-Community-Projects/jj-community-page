@@ -1,16 +1,15 @@
-import type {Component} from "solid-js";
-import {useTeamDetail} from "../../providers/TeamDetailsProvider.tsx";
+import {type Component, Show} from "solid-js";
 import {createModalSignal} from "../../../../../../lib/createModalSignal.ts";
 import {ConfirmationDialog} from "../../../../../common/dialogs/ConfirmationDialog.tsx";
 import {FaSolidChevronLeft} from "solid-icons/fa";
+import {useAdminTeamDetail} from "./AdminTeamDetailsProvider.tsx";
 
 export const AdminTeamDetailHeader: Component = () => {
   const {
-    local,
+    team,
     deleteTeam,
-    action,
-    user
-  } = useTeamDetail();
+    deleteTeamMutation
+  } = useAdminTeamDetail();
 
   const showDeleteDialog = createModalSignal();
 
@@ -35,16 +34,18 @@ export const AdminTeamDetailHeader: Component = () => {
               <FaSolidChevronLeft/><p>Back to Teams</p>
             </a>
             <h1 class="text-2xl font-bold">Team Details</h1>
-            <a class="text-primary" href={`/teams/${local.slug}`}>jj.ostof.dev/teams/${local.slug}</a>
+            <Show when={team.data}>
+              <a class="text-primary" href={`/teams/${team.data?.slug}`}>jj.ostof.dev/teams/${team.data?.slug}</a>
+            </Show>
           </div>
 
           <div class="flex gap-2">
             <button
               onClick={showDeleteDialog.open}
               class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-all"
-              disabled={action.deleteTeam?.actionInProgress}
+              disabled={deleteTeamMutation.isPending}
             >
-              {action.deleteTeam?.actionInProgress ? 'Deleting...' : 'Delete Team'}
+              {deleteTeamMutation.isPending ? 'Deleting...' : 'Delete Team'}
             </button>
           </div>
         </div>

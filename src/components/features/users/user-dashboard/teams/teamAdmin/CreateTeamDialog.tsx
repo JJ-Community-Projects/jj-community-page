@@ -1,78 +1,88 @@
-import {type Component, For, Show} from "solid-js";
-import {useUser} from "../../providers/UserProvider.tsx";
-import {createStore} from "solid-js/store";
+import {type Component, createSignal, For, Show} from "solid-js";
 import {debounce} from "@solid-primitives/scheduled";
 import {Dialog} from "@kobalte/core/dialog";
 import {TextField} from "@kobalte/core/text-field";
+import {useMutation} from "@tanstack/solid-query";
+import {orpc} from "../../../../../../lib/orpc/client.ts";
 
 export const CreateTeamDialog: Component<{ isOpen: () => boolean, setIsOpen: (open: boolean) => void }> = (props) => {
-  const {createTeam, isTeamSlugUnique, action} = useUser();
-  const [formState, setFormState] = createStore({
-    name: "",
-    slug: "",
-    isSlugValid: true,
-    suggestions: [] as string[]
-  });
+  // Form state signals
+  const [name, setName] = createSignal("");
+  const [slug, setSlug] = createSignal("");
+  const [isSlugValid, setIsSlugValid] = createSignal(true);
+  const [suggestions, setSuggestions] = createSignal<string[]>([]);
+  const [isCheckingSlug, setIsCheckingSlug] = createSignal(false);
 
-  // Create debounced function for slug validation
-  const checkSlugUnique = debounce(async (slug: string) => {
-    if (!slug) {
-      setFormState("isSlugValid", false);
-      setFormState("suggestions", []);
+  // oRPC mutations
+  const createTeamMutation = useMutation(() =>
+    orpc.private.teams.create.mutationOptions({
+      onSuccess: () => {
+        props.setIsOpen(false);
+        // Reset form
+        setName("");
+        setSlug("");
+        setIsSlugValid(true);
+        setSuggestions([]);
+      }
+    })
+  );
+
+  // Create debounced function for slug validation using oRPC
+  const checkSlugUnique = debounce(async (slugValue: string) => {
+    if (!slugValue) {
+      setIsSlugValid(false);
+      setSuggestions([]);
       return;
     }
 
-    try {
-      const {data, error} = await isTeamSlugUnique(slug, formState.name);
-      if (error) {
-        console.error("Error checking slug:", error);
-        setFormState("isSlugValid", false);
-        setFormState("suggestions", []);
-        return;
-      }
+    setIsCheckingSlug(true);
 
-      setFormState("isSlugValid", data.isValid);
-      setFormState("suggestions", data.suggestions || []);
+    try {
+      const result = await orpc.private.teams.validateSlug.mutate({
+        slug: slugValue,
+        tiltifyName: name()
+      });
+
+      setIsSlugValid(result.isValid);
+      setSuggestions(result.suggestions || []);
     } catch (error) {
       console.error("Error checking slug:", error);
-      setFormState("isSlugValid", false);
-      setFormState("suggestions", []);
+      setIsSlugValid(false);
+      setSuggestions([]);
+    } finally {
+      setIsCheckingSlug(false);
     }
   }, 500);
 
   const handleNameChange = (value: string) => {
-    setFormState("name", value);
+    setName(value);
     // Auto-generate slug from name if user hasn't manually edited the slug
     const generatedSlug = value.toLowerCase().replace(/[^a-z0-9]/g, "-");
-    setFormState("slug", generatedSlug);
+    setSlug(generatedSlug);
     checkSlugUnique(generatedSlug);
   };
 
   const handleSlugChange = (value: string) => {
     const sanitizedSlug = value.toLowerCase().replace(/[^a-z0-9-]/g, "-");
-    setFormState("slug", sanitizedSlug);
+    setSlug(sanitizedSlug);
     checkSlugUnique(sanitizedSlug);
   };
 
   const handleSubmit = async (e: Event) => {
     e.preventDefault();
 
-    if (!formState.name || !formState.slug || !formState.isSlugValid) {
+    if (!name() || !slug() || !isSlugValid()) {
       return;
     }
 
     try {
-      await createTeam(formState.name, formState.slug);
-      props.setIsOpen(false);
-      setFormState({
-        name: "",
-        slug: "",
-        isSlugValid: true,
-        suggestions: []
+      await createTeamMutation.mutateAsync({
+        name: name(),
+        slug: slug()
       });
     } catch (error) {
       console.error("Failed to create team:", error);
-      // Error is already handled by the action state
+      // Error is already handled by the mutation state
     }
   };
 
@@ -88,7 +98,7 @@ export const CreateTeamDialog: Component<{ isOpen: () => boolean, setIsOpen: (op
             </Dialog.Description>
 
             <form onSubmit={handleSubmit} class="flex flex-col gap-4">
-              <TextField value={formState.name} onChange={handleNameChange}>
+              <TextField value={name()} onChange={handleNameChange}>
                 <TextField.Label class="block text-sm font-medium text-gray-700 mb-1">
                   Team Name
                 </TextField.Label>
@@ -99,9 +109,9 @@ export const CreateTeamDialog: Component<{ isOpen: () => boolean, setIsOpen: (op
               </TextField>
 
               <TextField
-                value={formState.slug}
+                value={slug()}
                 onChange={handleSlugChange}
-                validationState={formState.isSlugValid ? "valid" : "invalid"}
+                validationState={isSlugValid() ? "valid" : "invalid"}
               >
                 <TextField.Label class="block text-sm font-medium text-gray-700 mb-1">
                   Team Slug
@@ -111,27 +121,27 @@ export const CreateTeamDialog: Component<{ isOpen: () => boolean, setIsOpen: (op
                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-accent"
                     placeholder="my-awesome-team"
                   />
-                  <Show when={action.isTeamSlugUnique.actionInProgress}>
+                  <Show when={isCheckingSlug()}>
                     <div class="absolute right-3 top-1/2 transform -translate-y-1/2">
                       <div class="animate-spin h-4 w-4 border-2 border-accent border-t-transparent rounded-full"></div>
                     </div>
                   </Show>
                 </div>
                 <TextField.ErrorMessage class="text-red-500 text-sm mt-1">
-                  {!formState.isSlugValid ? "This slug is not available. Try one of these suggestions:" : action.isTeamSlugUnique.lastErrorMessage}
+                  {!isSlugValid() ? "This slug is not available. Try one of these suggestions:" : undefined}
                 </TextField.ErrorMessage>
 
-                <Show when={formState.suggestions.length > 0}>
+                <Show when={suggestions().length > 0}>
                   <div class="mt-2">
                     <ul class="flex flex-wrap gap-2">
-                      <For each={formState.suggestions}>
+                      <For each={suggestions()}>
                         {(suggestion) => (
                           <li>
                             <button
                               type="button"
                               class="px-2 py-1 text-sm bg-accent/10 text-accent hover:bg-accent/20 rounded-md transition-colors"
                               onClick={() => {
-                                setFormState("slug", suggestion);
+                                setSlug(suggestion);
                                 checkSlugUnique(suggestion);
                               }}
                             >
@@ -145,13 +155,13 @@ export const CreateTeamDialog: Component<{ isOpen: () => boolean, setIsOpen: (op
                 </Show>
 
                 <p class="text-xs text-gray-500 mt-1">
-                  This will be used in URLs: jj.ostof.dev/teams/{formState.slug || "your-team-slug"}
+                  This will be used in URLs: jj.ostof.dev/teams/{slug() || "your-team-slug"}
                 </p>
               </TextField>
 
-              <Show when={action.createTeam.lastErrorMessage}>
+              <Show when={createTeamMutation.isError}>
                 <div class="text-red-500 text-sm mt-2">
-                  {action.createTeam.lastErrorMessage}
+                  {createTeamMutation.failureReason?.message}
                 </div>
               </Show>
 
@@ -166,9 +176,9 @@ export const CreateTeamDialog: Component<{ isOpen: () => boolean, setIsOpen: (op
                 <button
                   type="submit"
                   class="px-4 py-2 bg-accent text-white rounded-md hover:bg-accent-400 disabled:opacity-50 disabled:cursor-not-allowed"
-                  disabled={!formState.name || !formState.slug || !formState.isSlugValid || action.createTeam.actionInProgress}
+                  disabled={!name() || !slug() || !isSlugValid() || createTeamMutation.isPending}
                 >
-                  {action.createTeam.actionInProgress ? "Creating..." : "Create Team"}
+                  {createTeamMutation.isPending ? "Creating..." : "Create Team"}
                 </button>
               </div>
             </form>

@@ -1,5 +1,6 @@
 ---
-import { actions } from 'astro:actions';
+import { call, os } from '@orpc/server'
+import {publicTeamsRouter} from "../../../../lib/orpc/public/teams/impl";
 
 interface Props {
   tiltifyUsername: string;
@@ -7,10 +8,16 @@ interface Props {
 }
 
 const { tiltifyUsername, userId } = Astro.props;
+const getTeamsByUserId = publicTeamsRouter.getTeamsByUserId
+const result = await call(getTeamsByUserId, userId, {
+  context: {
+    locals: Astro.locals,
+    request: Astro.request,
+    env: Astro.locals.runtime.env
+  }
+})
 
-// Get user's teams using the new action
-const { data: teams, error } = await Astro.callAction(actions.teams.getTeamsByTiltifyUsername, tiltifyUsername);
-
+const teams = result.teams;
 
 ---
 

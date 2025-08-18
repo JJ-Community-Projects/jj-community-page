@@ -1,10 +1,9 @@
 import {type Component, createSignal, For} from "solid-js";
 import {UserProvider} from "../providers/UserProvider.tsx";
-import {TeamDetailsProvider, useTeamDetail} from "../providers/TeamDetailsProvider.tsx";
+import {TeamDetailsProvider, useTeamDetails} from "./TeamDetailsProvider.tsx";
 import type {User} from "../../../../../lib/auth/User.ts";
 import {Dialog} from "@kobalte/core/dialog";
 import {createModalSignal, type ModalSignal} from "../../../../../lib/createModalSignal.ts";
-import {actions} from "astro:actions";
 import {FaSolidChevronLeft} from "solid-icons/fa";
 
 interface TeamDetailProps {
@@ -15,7 +14,7 @@ interface TeamDetailProps {
 export const TeamDetail: Component<TeamDetailProps> = (props) => {
   return (
     <UserProvider user={props.user}>
-      <TeamDetailsProvider teamId={props.teamId} user={props.user}>
+      <TeamDetailsProvider teamId={props.teamId}>
         <TeamDetailContent teamId={props.teamId}/>
       </TeamDetailsProvider>
     </UserProvider>
@@ -23,20 +22,15 @@ export const TeamDetail: Component<TeamDetailProps> = (props) => {
 };
 
 const TeamDetailContent: Component<{ teamId: number }> = (props) => {
-  const {local, teamId, removeUser} = useTeamDetail();
+  const {team, members, leaveTeam, teamId} = useTeamDetails();
 
   const leaveDialog = createModalSignal();
 
-
   const handleLeaveTeam = async () => {
     try {
-      // Use the leaveTeam action for non-owner team members
-      const result = await actions.teams.leaveTeam(teamId);
-      if (result.error) {
-        throw new Error(result.error.message || 'Failed to leave team');
-      }
+      await leaveTeam(teamId);
       // Redirect to teams list page after leaving
-      window.location.href = `/admin/teams`;
+      window.location.href = `/dashboard/teams`;
     } catch (e) {
       console.error("Error leaving team:", e);
       // setError("Failed to leave team");
@@ -53,9 +47,9 @@ const TeamDetailContent: Component<{ teamId: number }> = (props) => {
               <a href={`/dashboard/teams`} class="text-primary hover:underline flex flex-row gap-1 items-center">
                 <FaSolidChevronLeft/><p>Back to Teams</p>
               </a>
-              <h2 class="text-xl font-bold">{local.name}</h2>
+              <h2 class="text-xl font-bold">{team.data?.name}</h2>
             </div>
-            <a class="text-primary" href={`/teams/${local.slug}`}>jj.ostof.dev/teams/${local.slug}</a>
+            <a class="text-primary" href={`/teams/${team.data?.slug}`}>jj.ostof.dev/teams/${team.data?.slug}</a>
           </div>
           <button
             class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-all"
@@ -71,11 +65,11 @@ const TeamDetailContent: Component<{ teamId: number }> = (props) => {
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <h4 class="font-medium text-gray-700">Team Name</h4>
-            <p>{local.name}</p>
+            <p>{team.data?.name}</p>
           </div>
           <div>
             <h4 class="font-medium text-gray-700">Team Slug</h4>
-            <p>{local.slug}</p>
+            <p>{team.data?.slug}</p>
           </div>
         </div>
       </div>
@@ -86,14 +80,14 @@ const TeamDetailContent: Component<{ teamId: number }> = (props) => {
         <div class="space-y-4">
           {/* Member list */}
           <ul class="divide-y divide-gray-200">
-            <For each={local.members}>
+            <For each={members.data?.invites}>
               {
                 ((member) => (
                   <li class="py-3 flex justify-between items-center">
                     <div>
                       <p class="font-medium">{member.username}</p>
                     </div>
-                    {member.userId === local.ownerId && (
+                    {member.userId === team.data?.ownerId && (
                       <span class="text-accent text-sm">Owner</span>
                     )}
                   </li>
@@ -108,7 +102,7 @@ const TeamDetailContent: Component<{ teamId: number }> = (props) => {
       <LeaveTeamDialog
         modalSignal={leaveDialog}
         onConfirm={handleLeaveTeam}
-        teamName={local.name}
+        teamName={team.data?.name || ""}
       />
     </div>
   );

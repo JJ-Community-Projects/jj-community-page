@@ -14,6 +14,7 @@ export const ScheduleEditorHeader: Component = () => {
     local,
     username,
     saveSchedule,
+    saveScheduleMutation,
     deleteSchedule,
     action
   } = useScheduleEditor();
