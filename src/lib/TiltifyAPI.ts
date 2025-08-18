@@ -208,7 +208,11 @@ export class TiltifyAPI {
   }
 
   async getTokenFromContext(ctx: AstroContext): Promise<string | null> {
-    const {session, user} = ctx.locals
+    return this.getTokenFromLocals(ctx.locals)
+  }
+
+  async getTokenFromLocals(locals: App.Locals): Promise<string | null> {
+    const {session, user} = locals
     if (!session || !user) {
       return null
     }

@@ -3,7 +3,6 @@ import {implement, ORPCError} from '@orpc/server';
 import {dbMiddleware} from '../../../middleware/dbMiddleware.ts';
 import {userDisplayView, usersSearchView} from '../../../../db/schema/views-schema.ts';
 import {eq, like, or} from 'drizzle-orm';
-import {userTags} from "../../../../db/schema/auth-schema.ts";
 
 const os = implement(discoveryContract)
   .use(dbMiddleware);
@@ -83,13 +82,14 @@ const searchByUsername = os.searchByUsername
     }
   });
 
+/* TODO
 const searchSimilarUsers = os.searchSimilarUsersDisplay
   .handler(async ({context, input}) => {
     const db = context.db
     const {limit, userId} = input
 
     const tagsResult = await db.select({
-      tag: userTags.tag
+      tag: userTags.tagId
     })
       .from(userTags)
       .where(
@@ -110,9 +110,10 @@ const searchSimilarUsers = os.searchSimilarUsersDisplay
 
     return []
   })
+*/
 
 export const discoverRouter = {
   byUsernameDisplay: searchByUsernameDisplay,
   byUsername: searchByUsername,
-  similarUsers: searchSimilarUsers
+  // similarUsers: searchSimilarUsers
 };

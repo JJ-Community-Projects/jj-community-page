@@ -1,16 +1,17 @@
 import {ORPCError} from '@orpc/server';
 import {accounts} from "../../../db/schema/auth-schema.ts";
-import {schedulesTable, streamsTable, streamParticipantsTable, streamTagsTable} from "../../../db/schema/jj-schema.ts";
+import {streamParticipantsTable, streamsTable} from "../../../db/schema/jj-schema.ts";
 import {userDisplayView} from "../../../db/schema/views-schema.ts";
 import {and, eq} from "drizzle-orm";
-import type {DrizzleD1Database} from 'drizzle-orm/d1';
-import {StreamSchema, ScheduleDaySchema, ScheduleWeekSchema} from "../schemas/schedule.ts";
+import {ScheduleDaySchema, ScheduleWeekSchema, StreamSchema} from "../schemas/schedule.ts";
 import {z} from "zod";
+import type {JJDrizzleDatabase} from "../../../db/db.ts";
+import {streamTagsTable, tags} from "../../../db/schema/tags-schema.ts";
 
 /**
  * Helper function to find a user by their Tiltify slug
  */
-export async function findUserBySlug(db: DrizzleD1Database, userSlug: string): Promise<{ userId: number }> {
+export async function findUserBySlug(db: JJDrizzleDatabase, userSlug: string): Promise<{ userId: number }> {
   const user = await db.select({ userId: accounts.userId })
     .from(accounts)
     .where(and(
@@ -28,7 +29,7 @@ export async function findUserBySlug(db: DrizzleD1Database, userSlug: string): P
 /**
  * Helper function to get streams for a schedule with their tags and participants
  */
-export async function getScheduleStreams(db: DrizzleD1Database, scheduleId: number) {
+export async function getScheduleStreams(db: JJDrizzleDatabase, scheduleId: number) {
   // Get all streams for the schedule
   const streams = await db.select({
     id: streamsTable.id,
@@ -53,10 +54,12 @@ export async function getScheduleStreams(db: DrizzleD1Database, scheduleId: numb
   // Get tags for all streams
   const streamTags = await db.select({
     streamId: streamTagsTable.streamId,
-    tag: streamTagsTable.tag,
-    label: streamTagsTable.label,
+    name: tags.name,
+    slug: tags.slug,
+    color: tags.color,
   })
     .from(streamTagsTable)
+    .innerJoin(tags, eq(streamTagsTable.tagId, tags.id))
     .where(eq(streamTagsTable.scheduleId, scheduleId))
     .all();
 
@@ -80,7 +83,7 @@ export async function getScheduleStreams(db: DrizzleD1Database, scheduleId: numb
     .all();
 
   // Group tags and participants by stream
-  const streamTagsMap = new Map<number, Array<{ tag: string; label: string }>>();
+  const streamTagsMap = new Map<number, Array<{ name: string; slug: string; color: string }>>();
   const streamParticipantsMap = new Map<number, Array<{
     userId: number;
     primaryLiveStream: string;
@@ -98,7 +101,7 @@ export async function getScheduleStreams(db: DrizzleD1Database, scheduleId: numb
     if (!streamTagsMap.has(tag.streamId)) {
       streamTagsMap.set(tag.streamId, []);
     }
-    streamTagsMap.get(tag.streamId)!.push({ tag: tag.tag, label: tag.label });
+    streamTagsMap.get(tag.streamId)!.push({ name: tag.name, slug: tag.slug, color: tag.color });
   }
 
   for (const participant of streamParticipants) {

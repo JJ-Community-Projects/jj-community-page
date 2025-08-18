@@ -17,13 +17,13 @@ function createOriginMiddleware(
           return next({ context });
         }
 
-        if (!context.ctx) {
+        if (!context.request) {
           throw new ORPCError('INTERNAL_SERVER_ERROR', {
             message: 'Missing Astro context'
           });
         }
 
-        const origin = context.ctx.request.headers.get('origin');
+        const origin = context.request.headers.get('origin');
 
         if (!origin) {
           throw new ORPCError('FORBIDDEN', {

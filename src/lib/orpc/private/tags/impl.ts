@@ -2,7 +2,7 @@ import {implement, ORPCError} from '@orpc/server'
 import {dbMiddleware} from "../../middleware/dbMiddleware.ts";
 import {authMiddleware} from "../../middleware/authMiddleware.ts";
 import {privateTagsContract} from "./contract.ts";
-import {streamTags, tagCategories, tags, userTags} from "../../../db/schema/tags-schema.ts";
+import {streamTagsTable, tagCategories, tags, userTagsTable} from "../../../db/schema/tags-schema.ts";
 import {users} from "../../../db/schema/auth-schema.ts";
 import {and, count, desc, eq, like, or, sql} from "drizzle-orm";
 
@@ -33,8 +33,8 @@ const addUserTag = os.addUserTag
 
       // Check if user already has this tag
       const existingUserTag = await db.select()
-        .from(userTags)
-        .where(and(eq(userTags.userId, userId), eq(userTags.tagId, input.tagId)))
+        .from(userTagsTable)
+        .where(and(eq(userTagsTable.userId, userId), eq(userTagsTable.tagId, input.tagId)))
         .get();
 
       if (existingUserTag) {
@@ -42,7 +42,7 @@ const addUserTag = os.addUserTag
       }
 
       // Insert new user tag
-      const newUserTag = await db.insert(userTags)
+      const newUserTag = await db.insert(userTagsTable)
         .values({
           userId: userId,
           tagId: input.tagId,
@@ -81,8 +81,8 @@ const removeUserTag = os.removeUserTag
     try {
       // Check if user has this tag
       const existingUserTag = await db.select()
-        .from(userTags)
-        .where(and(eq(userTags.userId, userId), eq(userTags.tagId, input.tagId)))
+        .from(userTagsTable)
+        .where(and(eq(userTagsTable.userId, userId), eq(userTagsTable.tagId, input.tagId)))
         .get();
 
       if (!existingUserTag) {
@@ -90,8 +90,8 @@ const removeUserTag = os.removeUserTag
       }
 
       // Delete user tag
-      await db.delete(userTags)
-        .where(and(eq(userTags.userId, userId), eq(userTags.tagId, input.tagId)));
+      await db.delete(userTagsTable)
+        .where(and(eq(userTagsTable.userId, userId), eq(userTagsTable.tagId, input.tagId)));
 
       return {success: true};
     } catch (error) {
@@ -112,9 +112,9 @@ const getUserTags = os.getUserTags
 
     try {
       const result = await db.select({
-        userId: userTags.userId,
-        tagId: userTags.tagId,
-        addedAt: userTags.addedAt,
+        userId: userTagsTable.userId,
+        tagId: userTagsTable.tagId,
+        addedAt: userTagsTable.addedAt,
         tag: {
           id: tags.id,
           name: tags.name,
@@ -124,10 +124,10 @@ const getUserTags = os.getUserTags
           color: tags.color,
         },
       })
-        .from(userTags)
-        .innerJoin(tags, and(eq(userTags.tagId, tags.id), eq(tags.visible, true)))
-        .where(eq(userTags.userId, userId))
-        .orderBy(desc(userTags.addedAt));
+        .from(userTagsTable)
+        .innerJoin(tags, and(eq(userTagsTable.tagId, tags.id), eq(tags.visible, true)))
+        .where(eq(userTagsTable.userId, userId))
+        .orderBy(desc(userTagsTable.addedAt));
 
       return result;
     } catch (error) {
@@ -163,27 +163,27 @@ const listAvailableTags = os.listAvailableTags
         categoryId: tags.categoryId,
         color: tags.color,
         userCount: sql<number>`COALESCE((SELECT COUNT(*) FROM
-        ${userTags}
+        ${userTagsTable}
         WHERE
-        ${userTags.tagId}
+        ${userTagsTable.tagId}
         =
         ${tags.id}
         ),
         0
         )`,
         streamCount: sql<number>`COALESCE((SELECT COUNT(*) FROM
-        ${streamTags}
+        ${streamTagsTable}
         WHERE
-        ${streamTags.tagId}
+        ${streamTagsTable.tagId}
         =
         ${tags.id}
         ),
         0
         )`,
         totalUsage: sql<number>`COALESCE((SELECT COUNT(*) FROM
-        ${userTags}
+        ${userTagsTable}
         WHERE
-        ${userTags.tagId}
+        ${userTagsTable.tagId}
         =
         ${tags.id}
         ),
@@ -199,9 +199,9 @@ const listAvailableTags = os.listAvailableTags
         *
         )
         FROM
-        ${streamTags}
+        ${streamTagsTable}
         WHERE
-        ${streamTags.tagId}
+        ${streamTagsTable.tagId}
         =
         ${tags.id}
         ),
@@ -255,11 +255,11 @@ const findUsersByTag = os.findUsersByTag
         tags: sql<any[]>`'[]'`, // This would need to be populated separately
         tagCount: sql<number>`1`, // This would need actual count
       })
-        .from(userTags)
-        .innerJoin(users, eq(userTags.userId, users.id))
-        .where(eq(userTags.tagId, input.tagId))
+        .from(userTagsTable)
+        .innerJoin(users, eq(userTagsTable.userId, users.id))
+        .where(eq(userTagsTable.tagId, input.tagId))
         .limit(input.limit)
-        .orderBy(desc(userTags.addedAt));
+        .orderBy(desc(userTagsTable.addedAt));
 
       return result;
     } catch (error) {
@@ -295,27 +295,27 @@ const getPopularTags = os.getPopularTags
         categoryId: tags.categoryId,
         color: tags.color,
         userCount: sql<number>`COALESCE((SELECT COUNT(*) FROM
-        ${userTags}
+        ${userTagsTable}
         WHERE
-        ${userTags.tagId}
+        ${userTagsTable.tagId}
         =
         ${tags.id}
         ),
         0
         )`,
         streamCount: sql<number>`COALESCE((SELECT COUNT(*) FROM
-        ${streamTags}
+        ${streamTagsTable}
         WHERE
-        ${streamTags.tagId}
+        ${streamTagsTable.tagId}
         =
         ${tags.id}
         ),
         0
         )`,
         totalUsage: sql<number>`COALESCE((SELECT COUNT(*) FROM
-        ${userTags}
+        ${userTagsTable}
         WHERE
-        ${userTags.tagId}
+        ${userTagsTable.tagId}
         =
         ${tags.id}
         ),
@@ -331,9 +331,9 @@ const getPopularTags = os.getPopularTags
         *
         )
         FROM
-        ${streamTags}
+        ${streamTagsTable}
         WHERE
-        ${streamTags.tagId}
+        ${streamTagsTable.tagId}
         =
         ${tags.id}
         ),
@@ -405,27 +405,27 @@ const searchTags = os.searchTags
         categoryId: tags.categoryId,
         color: tags.color,
         userCount: sql<number>`COALESCE((SELECT COUNT(*) FROM
-        ${userTags}
+        ${userTagsTable}
         WHERE
-        ${userTags.tagId}
+        ${userTagsTable.tagId}
         =
         ${tags.id}
         ),
         0
         )`,
         streamCount: sql<number>`COALESCE((SELECT COUNT(*) FROM
-        ${streamTags}
+        ${streamTagsTable}
         WHERE
-        ${streamTags.tagId}
+        ${streamTagsTable.tagId}
         =
         ${tags.id}
         ),
         0
         )`,
         totalUsage: sql<number>`COALESCE((SELECT COUNT(*) FROM
-        ${userTags}
+        ${userTagsTable}
         WHERE
-        ${userTags.tagId}
+        ${userTagsTable.tagId}
         =
         ${tags.id}
         ),
@@ -441,9 +441,9 @@ const searchTags = os.searchTags
         *
         )
         FROM
-        ${streamTags}
+        ${streamTagsTable}
         WHERE
-        ${streamTags.tagId}
+        ${streamTagsTable.tagId}
         =
         ${tags.id}
         ),
@@ -497,12 +497,12 @@ const getTagCategories = os.getTagCategories
         0
         )`,
         usageCount: sql<number>`COALESCE((SELECT COUNT(*) FROM
-        ${userTags}
+        ${userTagsTable}
         INNER
         JOIN
         ${tags}
         ON
-        ${userTags.tagId}
+        ${userTagsTable.tagId}
         =
         ${tags.id}
         WHERE
@@ -526,12 +526,12 @@ const getTagCategories = os.getTagCategories
         *
         )
         FROM
-        ${streamTags}
+        ${streamTagsTable}
         INNER
         JOIN
         ${tags}
         ON
-        ${streamTags.tagId}
+        ${streamTagsTable.tagId}
         =
         ${tags.id}
         WHERE

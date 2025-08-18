@@ -6,16 +6,18 @@ import {z} from "zod";
  */
 
 /**
- * Schema for user-defined tags that categorize content creators and their content.
- * Used for content discovery, filtering, and matching users with similar interests.
- * Tags help users find creators based on gaming preferences, content types, etc.
- * Used in: public user profiles, tag search results
+ * Schema for admin-managed tags that categorize streams and content.
+ * Used for content discovery, filtering, and stream categorization.
+ * Tags help users find streams based on gaming preferences, content types, etc.
+ * Used in: stream tags, schedule views, tag search results
  */
 export const TagSchema = z.object({
-  /** Unique tag identifier used internally for categorization and filtering */
-  tag: z.string(),
-  /** Human-readable display label shown to users in the interface */
-  label: z.string(),
+  /** Human-readable display name shown to users in the interface */
+  name: z.string(),
+  /** URL-friendly slug for routing and unique identification */
+  slug: z.string(),
+  /** Color hex code for UI theming and visual identification */
+  color: z.string(),
 });
 
 /**
@@ -24,10 +26,12 @@ export const TagSchema = z.object({
  * Used in: private tag management operations
  */
 export const UserTagSchema = z.object({
-  /** Unique tag identifier used internally for categorization and filtering */
-  tag: z.string(),
-  /** Human-readable display label shown to users in the interface */
-  label: z.string(),
+  /** Human-readable display name shown to users in the interface */
+  name: z.string(),
+  /** URL-friendly slug for routing and unique identification */
+  slug: z.string(),
+  /** Color hex code for UI theming and visual identification */
+  color: z.string(),
   /** Timestamp when the user added this tag to their profile */
   addedAt: z.date(),
 });
@@ -38,10 +42,12 @@ export const UserTagSchema = z.object({
  * Used in: popular tags, suggestions, and search operations
  */
 export const TagWithCountSchema = z.object({
-  /** The display label for the tag */
-  label: z.string(),
-  /** The actual tag value */
-  tag: z.string(),
+  /** Human-readable display name shown to users in the interface */
+  name: z.string(),
+  /** URL-friendly slug for routing and unique identification */
+  slug: z.string(),
+  /** Color hex code for UI theming and visual identification */
+  color: z.string(),
   /** The number of times this tag has been used */
   count: z.number()
 });
@@ -52,10 +58,12 @@ export const TagWithCountSchema = z.object({
  * Used in: tag search and recommendation operations
  */
 export const TagSearchResultSchema = z.object({
-  /** Unique tag identifier used internally for categorization and filtering */
-  tag: z.string(),
-  /** Human-readable display label shown to users in the interface */
-  label: z.string(),
+  /** Human-readable display name shown to users in the interface */
+  name: z.string(),
+  /** URL-friendly slug for routing and unique identification */
+  slug: z.string(),
+  /** Color hex code for UI theming and visual identification */
+  color: z.string(),
   /** Number of users who have added this tag (popularity metric) */
   count: z.number(),
 });

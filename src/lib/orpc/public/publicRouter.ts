@@ -1,8 +1,10 @@
 import {os} from "@orpc/server";
 import {usersRouter} from "./users/usersRouter.ts";
-import {teamsRouter} from "./teams/teamsRouter.ts";
+import {publicTeamsRouter} from "./teams/impl.ts";
+import {schedulesRouter} from "./schedules/impl.ts";
 
 export const publicRouter = os.router({
   users: usersRouter,
-  teams: teamsRouter,
+  teams: publicTeamsRouter,
+  schedules: schedulesRouter
 })

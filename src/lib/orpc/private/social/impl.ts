@@ -152,12 +152,12 @@ function formatSocialUrl(platform: string, value: string): string {
     const userId = context.userId;
 
     // Get Tiltify API instance
-    const tiltifyAPI = new TiltifyAPI(context.ctx.locals.runtime.env);
+    const tiltifyAPI = new TiltifyAPI(context.env);
 
     // Get user's Tiltify token
     let tiltifyToken: string | null;
     try {
-      tiltifyToken = await tiltifyAPI.getTokenFromContext(context.ctx);
+      tiltifyToken = await tiltifyAPI.getTokenFromLocals(context.locals);
       if (!tiltifyToken) {
         throw new ORPCError('UNAUTHORIZED', {
           message: 'No Tiltify token found for user'

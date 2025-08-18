@@ -1,7 +1,8 @@
 import {oc} from '@orpc/contract';
 import {z} from 'zod';
 import {TeamSchema} from "../schemas/teams.ts";
-import {UserDisplaySchema} from "../schemas/users.ts";
+import {UserIdSchema} from "../../schemas/common.ts";
+import {UserDisplaySchema} from "../../schemas/users.ts";
 
 /**
  * Public teams contracts for retrieving team information without authentication.
@@ -64,6 +65,18 @@ const getMembersContract = oc
     members: z.array(UserDisplaySchema)
   }));
 
+/**
+ * Get teams by user ID
+ * Input: userId (string) - The ID of the user to find teams for
+ * Output: object containing array of teams that the user is a member of
+ * This includes teams where the user is either a regular member or owner
+ */
+const getTeamsByUserIdContract = oc
+  .input(UserIdSchema)
+  .output(z.object({
+    teams: z.array(TeamSchema)
+  }));
+
 
 const getTeamSchedulesContract = oc
   .input(z.object({
@@ -72,8 +85,9 @@ const getTeamSchedulesContract = oc
   .output(z.array(z.object({})));
 
 export const publicTeamsContract = {
-  findVisible: findVisibleContract,
-  findAllVisibleWithMemberCount: findAllVisibleWithMemberCountContract,
-  getBySlug: getBySlugContract,
-  getMembers: getMembersContract
+  findVisibleContract,
+  findAllVisibleWithMemberCountContract,
+  getBySlugContract,
+  getMembersContract,
+  getTeamsByUserIdContract,
 };

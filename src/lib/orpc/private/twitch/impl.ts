@@ -12,7 +12,7 @@ const validateTwitchUrl = os.validateTwitchUrl
   .handler(async ({input: url, context}) => {
     const userId = context.userId.toString()
 
-    const DO = context.ctx.locals.runtime.env.TwitchAPIDO
+    const DO = context.env.TwitchAPIDO
     const DO_ID = DO.idFromName(userId)
     const stub = DO.get(DO_ID)
 

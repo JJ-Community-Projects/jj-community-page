@@ -9,6 +9,7 @@ import {streamTagsRouter} from "./tagsStream/impl.ts";
 import {twitchRouter} from "./twitch/twitchRouter.ts";
 import {privateSchedulesRouter} from "./schedules/impl.ts";
 import {socialRouter} from "./social/impl.ts";
+import {privateTeamsSSERouter} from "./teamsSSE/impl.ts";
 
 
 export const privateRouter = {
@@ -21,6 +22,7 @@ export const privateRouter = {
     adminTags: adminTagsRouter,
     streamTags: streamTagsRouter,
     teams: privateTeamsRouter,
+    teamsSSE: privateTeamsSSERouter,
     schedules: privateSchedulesRouter,
     twitch: twitchRouter,
   }

@@ -2,7 +2,7 @@ import {implement, ORPCError} from "@orpc/server";
 import {dbMiddleware} from "../../middleware/dbMiddleware.ts";
 import {adminAuthMiddleware} from "../../middleware/authAdminMiddleware.ts";
 import {adminTagsContract} from "./contract.ts";
-import {streamTags, tagAliases, tagCategories, tags, userTags} from "../../../db/schema/tags-schema.ts";
+import {streamTagsTable, tagAliases, tagCategories, tags, userTagsTable} from "../../../db/schema/tags-schema.ts";
 import {and, desc, eq, ne, sql} from "drizzle-orm";
 
 const os = implement(adminTagsContract)
@@ -165,27 +165,27 @@ const getAdminTags = os.getAdminTags
         createdAt: tags.createdAt,
         updatedAt: tags.updatedAt,
         userCount: sql<number>`COALESCE((SELECT COUNT(*) FROM
-        ${userTags}
+        ${userTagsTable}
         WHERE
-        ${userTags.tagId}
+        ${userTagsTable.tagId}
         =
         ${tags.id}
         ),
         0
         )`,
         streamCount: sql<number>`COALESCE((SELECT COUNT(*) FROM
-        ${streamTags}
+        ${streamTagsTable}
         WHERE
-        ${streamTags.tagId}
+        ${streamTagsTable.tagId}
         =
         ${tags.id}
         ),
         0
         )`,
         totalUsage: sql<number>`COALESCE((SELECT COUNT(*) FROM
-        ${userTags}
+        ${userTagsTable}
         WHERE
-        ${userTags.tagId}
+        ${userTagsTable.tagId}
         =
         ${tags.id}
         ),
@@ -201,9 +201,9 @@ const getAdminTags = os.getAdminTags
         *
         )
         FROM
-        ${streamTags}
+        ${streamTagsTable}
         WHERE
-        ${streamTags.tagId}
+        ${streamTagsTable.tagId}
         =
         ${tags.id}
         ),
@@ -397,8 +397,8 @@ const assignUserTag = os.assignUserTag
 
     // Check if user-tag relationship already exists
     const existingUserTag = await db.select()
-      .from(userTags)
-      .where(and(eq(userTags.userId, input.userId), eq(userTags.tagId, input.tagId)))
+      .from(userTagsTable)
+      .where(and(eq(userTagsTable.userId, input.userId), eq(userTagsTable.tagId, input.tagId)))
       .get();
 
     if (existingUserTag) {
@@ -407,7 +407,7 @@ const assignUserTag = os.assignUserTag
 
     try {
       // Insert new user tag
-      const newUserTag = await db.insert(userTags)
+      const newUserTag = await db.insert(userTagsTable)
         .values({
           userId: input.userId,
           tagId: input.tagId,
@@ -437,8 +437,8 @@ const removeUserTag = os.removeUserTag
 
     // Check if user-tag relationship exists
     const existingUserTag = await db.select()
-      .from(userTags)
-      .where(and(eq(userTags.userId, input.userId), eq(userTags.tagId, input.tagId)))
+      .from(userTagsTable)
+      .where(and(eq(userTagsTable.userId, input.userId), eq(userTagsTable.tagId, input.tagId)))
       .get();
 
     if (!existingUserTag) {
@@ -447,8 +447,8 @@ const removeUserTag = os.removeUserTag
 
     try {
       // Delete user tag
-      await db.delete(userTags)
-        .where(and(eq(userTags.userId, input.userId), eq(userTags.tagId, input.tagId)));
+      await db.delete(userTagsTable)
+        .where(and(eq(userTagsTable.userId, input.userId), eq(userTagsTable.tagId, input.tagId)));
 
       return {success: true};
     } catch (error) {
@@ -468,7 +468,7 @@ const getUserTagsAdmin = os.getUserTagsAdmin
 
     try {
       // Build where conditions
-      let whereConditions = [eq(userTags.userId, input.userId)];
+      let whereConditions = [eq(userTagsTable.userId, input.userId)];
 
       // Filter out hidden tags if not including them
       if (!input.includeHidden) {
@@ -476,9 +476,9 @@ const getUserTagsAdmin = os.getUserTagsAdmin
       }
 
       return db.select({
-        userId: userTags.userId,
-        tagId: userTags.tagId,
-        addedAt: userTags.addedAt,
+        userId: userTagsTable.userId,
+        tagId: userTagsTable.tagId,
+        addedAt: userTagsTable.addedAt,
         tag: {
           id: tags.id,
           name: tags.name,
@@ -492,10 +492,10 @@ const getUserTagsAdmin = os.getUserTagsAdmin
           updatedAt: tags.updatedAt,
         },
       })
-        .from(userTags)
-        .innerJoin(tags, eq(userTags.tagId, tags.id))
+        .from(userTagsTable)
+        .innerJoin(tags, eq(userTagsTable.tagId, tags.id))
         .where(whereConditions.length === 1 ? whereConditions[0] : and(...whereConditions))
-        .orderBy(userTags.addedAt);
+        .orderBy(userTagsTable.addedAt);
     } catch (error) {
       console.error('Error getting user tags:', error);
       throw new ORPCError('INTERNAL_SERVER_ERROR', {message: 'Failed to get user tags'});
@@ -527,10 +527,10 @@ const bulkAssignUserTags = os.bulkAssignUserTags
 
       // Check for existing user-tag relationships
       const existingUserTags = await db.select()
-        .from(userTags)
+        .from(userTagsTable)
         .where(and(
-          eq(userTags.userId, input.userId),
-          sql`${userTags.tagId}
+          eq(userTagsTable.userId, input.userId),
+          sql`${userTagsTable.tagId}
           IN (
           ${sql.join(input.tagIds.map(id => sql`${id}`), sql`, `)}
           )`
@@ -546,7 +546,7 @@ const bulkAssignUserTags = os.bulkAssignUserTags
       }
 
       // Insert new user tags
-      const newUserTags = await db.insert(userTags)
+      const newUserTags = await db.insert(userTagsTable)
         .values(newTagIds.map(tagId => ({
           userId: input.userId,
           tagId,
@@ -578,10 +578,10 @@ const bulkRemoveUserTags = os.bulkRemoveUserTags
 
     // Check if user-tag relationships exist
     const existingUserTags = await db.select()
-      .from(userTags)
+      .from(userTagsTable)
       .where(and(
-        eq(userTags.userId, input.userId),
-        sql`${userTags.tagId}
+        eq(userTagsTable.userId, input.userId),
+        sql`${userTagsTable.tagId}
         IN (
         ${sql.join(input.tagIds.map(id => sql`${id}`), sql`, `)}
         )`
@@ -595,10 +595,10 @@ const bulkRemoveUserTags = os.bulkRemoveUserTags
     try {
 
       // Delete user tags
-      await db.delete(userTags)
+      await db.delete(userTagsTable)
         .where(and(
-          eq(userTags.userId, input.userId),
-          sql`${userTags.tagId}
+          eq(userTagsTable.userId, input.userId),
+          sql`${userTagsTable.tagId}
           IN (
           ${sql.join(input.tagIds.map(id => sql`${id}`), sql`, `)}
           )`
@@ -635,11 +635,11 @@ const assignStreamTag = os.assignStreamTag
 
       // Check if stream-tag relationship already exists
       const existingStreamTag = await db.select()
-        .from(streamTags)
+        .from(streamTagsTable)
         .where(and(
-          eq(streamTags.scheduleId, input.scheduleId),
-          eq(streamTags.streamId, input.streamId),
-          eq(streamTags.tagId, input.tagId)
+          eq(streamTagsTable.scheduleId, input.scheduleId),
+          eq(streamTagsTable.streamId, input.streamId),
+          eq(streamTagsTable.tagId, input.tagId)
         ))
         .get();
 
@@ -648,7 +648,7 @@ const assignStreamTag = os.assignStreamTag
       }
 
       // Insert new stream tag
-      const newStreamTag = await db.insert(streamTags)
+      const newStreamTag = await db.insert(streamTagsTable)
         .values({
           scheduleId: input.scheduleId,
           streamId: input.streamId,
@@ -680,11 +680,11 @@ const removeStreamTag = os.removeStreamTag
     try {
       // Check if stream-tag relationship exists
       const existingStreamTag = await db.select()
-        .from(streamTags)
+        .from(streamTagsTable)
         .where(and(
-          eq(streamTags.scheduleId, input.scheduleId),
-          eq(streamTags.streamId, input.streamId),
-          eq(streamTags.tagId, input.tagId)
+          eq(streamTagsTable.scheduleId, input.scheduleId),
+          eq(streamTagsTable.streamId, input.streamId),
+          eq(streamTagsTable.tagId, input.tagId)
         ))
         .get();
 
@@ -693,11 +693,11 @@ const removeStreamTag = os.removeStreamTag
       }
 
       // Delete stream tag
-      await db.delete(streamTags)
+      await db.delete(streamTagsTable)
         .where(and(
-          eq(streamTags.scheduleId, input.scheduleId),
-          eq(streamTags.streamId, input.streamId),
-          eq(streamTags.tagId, input.tagId)
+          eq(streamTagsTable.scheduleId, input.scheduleId),
+          eq(streamTagsTable.streamId, input.streamId),
+          eq(streamTagsTable.tagId, input.tagId)
         ));
 
       return {success: true};
@@ -718,10 +718,10 @@ const getStreamTagsAdmin = os.getStreamTagsAdmin
 
     try {
       const result = await db.select({
-        scheduleId: streamTags.scheduleId,
-        streamId: streamTags.streamId,
-        tagId: streamTags.tagId,
-        addedAt: streamTags.addedAt,
+        scheduleId: streamTagsTable.scheduleId,
+        streamId: streamTagsTable.streamId,
+        tagId: streamTagsTable.tagId,
+        addedAt: streamTagsTable.addedAt,
         tag: {
           id: tags.id,
           name: tags.name,
@@ -735,13 +735,13 @@ const getStreamTagsAdmin = os.getStreamTagsAdmin
           updatedAt: tags.updatedAt,
         },
       })
-        .from(streamTags)
-        .innerJoin(tags, eq(streamTags.tagId, tags.id))
+        .from(streamTagsTable)
+        .innerJoin(tags, eq(streamTagsTable.tagId, tags.id))
         .where(and(
-          eq(streamTags.scheduleId, input.scheduleId),
-          eq(streamTags.streamId, input.streamId)
+          eq(streamTagsTable.scheduleId, input.scheduleId),
+          eq(streamTagsTable.streamId, input.streamId)
         ))
-        .orderBy(streamTags.addedAt);
+        .orderBy(streamTagsTable.addedAt);
 
       return result;
     } catch (error) {
@@ -775,11 +775,11 @@ const bulkAssignStreamTags = os.bulkAssignStreamTags
 
       // Check for existing stream-tag relationships
       const existingStreamTags = await db.select()
-        .from(streamTags)
+        .from(streamTagsTable)
         .where(and(
-          eq(streamTags.scheduleId, input.scheduleId),
-          eq(streamTags.streamId, input.streamId),
-          sql`${streamTags.tagId}
+          eq(streamTagsTable.scheduleId, input.scheduleId),
+          eq(streamTagsTable.streamId, input.streamId),
+          sql`${streamTagsTable.tagId}
           IN (
           ${sql.join(input.tagIds.map(id => sql`${id}`), sql`, `)}
           )`
@@ -795,7 +795,7 @@ const bulkAssignStreamTags = os.bulkAssignStreamTags
       }
 
       // Insert new stream tags
-      const newStreamTags = await db.insert(streamTags)
+      const newStreamTags = await db.insert(streamTagsTable)
         .values(newTagIds.map(tagId => ({
           scheduleId: input.scheduleId,
           streamId: input.streamId,
@@ -828,11 +828,11 @@ const bulkRemoveStreamTags = os.bulkRemoveStreamTags
 
     // Check if stream-tag relationships exist
     const existingStreamTags = await db.select()
-      .from(streamTags)
+      .from(streamTagsTable)
       .where(and(
-        eq(streamTags.scheduleId, input.scheduleId),
-        eq(streamTags.streamId, input.streamId),
-        sql`${streamTags.tagId}
+        eq(streamTagsTable.scheduleId, input.scheduleId),
+        eq(streamTagsTable.streamId, input.streamId),
+        sql`${streamTagsTable.tagId}
         IN (
         ${sql.join(input.tagIds.map(id => sql`${id}`), sql`, `)}
         )`
@@ -846,11 +846,11 @@ const bulkRemoveStreamTags = os.bulkRemoveStreamTags
     try {
 
       // Delete stream tags
-      await db.delete(streamTags)
+      await db.delete(streamTagsTable)
         .where(and(
-          eq(streamTags.scheduleId, input.scheduleId),
-          eq(streamTags.streamId, input.streamId),
-          sql`${streamTags.tagId}
+          eq(streamTagsTable.scheduleId, input.scheduleId),
+          eq(streamTagsTable.streamId, input.streamId),
+          sql`${streamTagsTable.tagId}
           IN (
           ${sql.join(input.tagIds.map(id => sql`${id}`), sql`, `)}
           )`
@@ -1028,12 +1028,12 @@ const getTagCategories = os.getTagCategories
         0
         )`,
         usageCount: sql<number>`COALESCE((SELECT COUNT(*) FROM
-        ${userTags}
+        ${userTagsTable}
         INNER
         JOIN
         ${tags}
         ON
-        ${userTags.tagId}
+        ${userTagsTable.tagId}
         =
         ${tags.id}
         WHERE
@@ -1053,12 +1053,12 @@ const getTagCategories = os.getTagCategories
         *
         )
         FROM
-        ${streamTags}
+        ${streamTagsTable}
         INNER
         JOIN
         ${tags}
         ON
-        ${streamTags.tagId}
+        ${streamTagsTable.tagId}
         =
         ${tags.id}
         WHERE

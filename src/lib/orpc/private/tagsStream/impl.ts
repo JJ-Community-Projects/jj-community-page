@@ -2,7 +2,7 @@ import {implement, ORPCError} from '@orpc/server'
 import {dbMiddleware} from "../../middleware/dbMiddleware.ts";
 import {authMiddleware} from "../../middleware/authMiddleware.ts";
 import {streamTagsContract} from "./contract.ts";
-import {streamTags, tags, userTags} from "../../../db/schema/tags-schema.ts";
+import {streamTagsTable, tags, userTagsTable} from "../../../db/schema/tags-schema.ts";
 import {and, count, desc, eq, like, or, sql} from "drizzle-orm";
 
 const os = implement(streamTagsContract)
@@ -31,11 +31,11 @@ const addStreamTag = os.addStreamTag
 
       // Check if stream-tag relationship already exists
       const existingStreamTag = await db.select()
-        .from(streamTags)
+        .from(streamTagsTable)
         .where(and(
-          eq(streamTags.scheduleId, input.scheduleId),
-          eq(streamTags.streamId, input.streamId),
-          eq(streamTags.tagId, input.tagId)
+          eq(streamTagsTable.scheduleId, input.scheduleId),
+          eq(streamTagsTable.streamId, input.streamId),
+          eq(streamTagsTable.tagId, input.tagId)
         ))
         .get();
 
@@ -44,7 +44,7 @@ const addStreamTag = os.addStreamTag
       }
 
       // Insert new stream tag
-      const newStreamTag = await db.insert(streamTags)
+      const newStreamTag = await db.insert(streamTagsTable)
         .values({
           scheduleId: input.scheduleId,
           streamId: input.streamId,
@@ -83,11 +83,11 @@ const removeStreamTag = os.removeStreamTag
     try {
       // Check if stream-tag relationship exists
       const existingStreamTag = await db.select()
-        .from(streamTags)
+        .from(streamTagsTable)
         .where(and(
-          eq(streamTags.scheduleId, input.scheduleId),
-          eq(streamTags.streamId, input.streamId),
-          eq(streamTags.tagId, input.tagId)
+          eq(streamTagsTable.scheduleId, input.scheduleId),
+          eq(streamTagsTable.streamId, input.streamId),
+          eq(streamTagsTable.tagId, input.tagId)
         ))
         .get();
 
@@ -96,11 +96,11 @@ const removeStreamTag = os.removeStreamTag
       }
 
       // Delete stream tag
-      await db.delete(streamTags)
+      await db.delete(streamTagsTable)
         .where(and(
-          eq(streamTags.scheduleId, input.scheduleId),
-          eq(streamTags.streamId, input.streamId),
-          eq(streamTags.tagId, input.tagId)
+          eq(streamTagsTable.scheduleId, input.scheduleId),
+          eq(streamTagsTable.streamId, input.streamId),
+          eq(streamTagsTable.tagId, input.tagId)
         ));
 
       return {success: true};
@@ -121,10 +121,10 @@ const getStreamTags = os.getStreamTags
 
     try {
       const result = await db.select({
-        scheduleId: streamTags.scheduleId,
-        streamId: streamTags.streamId,
-        tagId: streamTags.tagId,
-        addedAt: streamTags.addedAt,
+        scheduleId: streamTagsTable.scheduleId,
+        streamId: streamTagsTable.streamId,
+        tagId: streamTagsTable.tagId,
+        addedAt: streamTagsTable.addedAt,
         tag: {
           id: tags.id,
           name: tags.name,
@@ -134,13 +134,13 @@ const getStreamTags = os.getStreamTags
           color: tags.color,
         },
       })
-        .from(streamTags)
-        .innerJoin(tags, and(eq(streamTags.tagId, tags.id), eq(tags.visible, true)))
+        .from(streamTagsTable)
+        .innerJoin(tags, and(eq(streamTagsTable.tagId, tags.id), eq(tags.visible, true)))
         .where(and(
-          eq(streamTags.scheduleId, input.scheduleId),
-          eq(streamTags.streamId, input.streamId)
+          eq(streamTagsTable.scheduleId, input.scheduleId),
+          eq(streamTagsTable.streamId, input.streamId)
         ))
-        .orderBy(desc(streamTags.addedAt));
+        .orderBy(desc(streamTagsTable.addedAt));
 
       return result;
     } catch (error) {
@@ -163,7 +163,7 @@ const getPopularStreamTags = os.getPopularStreamTags
 
       // Filter by schedule if provided
       if (input.scheduleId) {
-        whereConditions.push(eq(streamTags.scheduleId, input.scheduleId));
+        whereConditions.push(eq(streamTagsTable.scheduleId, input.scheduleId));
       }
 
       // Get popular stream tags with usage statistics
@@ -174,11 +174,11 @@ const getPopularStreamTags = os.getPopularStreamTags
         description: tags.description,
         categoryId: tags.categoryId,
         color: tags.color,
-        streamCount: sql<number>`COUNT(DISTINCT ${streamTags.scheduleId} || '-' || ${streamTags.streamId})`,
-        totalUsage: sql<number>`COUNT(${streamTags.tagId})`,
+        streamCount: sql<number>`COUNT(DISTINCT ${streamTagsTable.scheduleId} || '-' || ${streamTagsTable.streamId})`,
+        totalUsage: sql<number>`COUNT(${streamTagsTable.tagId})`,
       })
         .from(tags)
-        .innerJoin(streamTags, eq(tags.id, streamTags.tagId))
+        .innerJoin(streamTagsTable, eq(tags.id, streamTagsTable.tagId))
         .where(whereConditions.length === 1 ? whereConditions[0] : and(...whereConditions))
         .groupBy(tags.id)
         .orderBy(desc(sql`totalUsage`), tags.name)
@@ -187,7 +187,7 @@ const getPopularStreamTags = os.getPopularStreamTags
       // Get total tags count
       const totalTagsResult = await db.select({count: count()})
         .from(tags)
-        .innerJoin(streamTags, eq(tags.id, streamTags.tagId))
+        .innerJoin(streamTagsTable, eq(tags.id, streamTagsTable.tagId))
         .where(whereConditions.length === 1 ? whereConditions[0] : and(...whereConditions))
         .get();
 
@@ -236,9 +236,9 @@ const searchStreamTags = os.searchStreamTags
         description: tags.description,
         categoryId: tags.categoryId,
         color: tags.color,
-        userCount: sql<number>`COALESCE((SELECT COUNT(*) FROM ${userTags} WHERE ${userTags.tagId} = ${tags.id}), 0)`,
-        streamCount: sql<number>`COALESCE((SELECT COUNT(DISTINCT ${streamTags.scheduleId} || '-' || ${streamTags.streamId}) FROM ${streamTags} WHERE ${streamTags.tagId} = ${tags.id}), 0)`,
-        totalUsage: sql<number>`COALESCE((SELECT COUNT(*) FROM ${userTags} WHERE ${userTags.tagId} = ${tags.id}), 0) + COALESCE((SELECT COUNT(*) FROM ${streamTags} WHERE ${streamTags.tagId} = ${tags.id}), 0)`,
+        userCount: sql<number>`COALESCE((SELECT COUNT(*) FROM ${userTagsTable} WHERE ${userTagsTable.tagId} = ${tags.id}), 0)`,
+        streamCount: sql<number>`COALESCE((SELECT COUNT(DISTINCT ${streamTagsTable.scheduleId} || '-' || ${streamTagsTable.streamId}) FROM ${streamTagsTable} WHERE ${streamTagsTable.tagId} = ${tags.id}), 0)`,
+        totalUsage: sql<number>`COALESCE((SELECT COUNT(*) FROM ${userTagsTable} WHERE ${userTagsTable.tagId} = ${tags.id}), 0) + COALESCE((SELECT COUNT(*) FROM ${streamTagsTable} WHERE ${streamTagsTable.tagId} = ${tags.id}), 0)`,
       })
         .from(tags)
         .where(and(...whereConditions));
@@ -252,15 +252,15 @@ const searchStreamTags = os.searchStreamTags
           description: tags.description,
           categoryId: tags.categoryId,
           color: tags.color,
-          userCount: sql<number>`COALESCE((SELECT COUNT(*) FROM ${userTags} WHERE ${userTags.tagId} = ${tags.id}), 0)`,
-          streamCount: sql<number>`COALESCE((SELECT COUNT(DISTINCT ${streamTags.scheduleId} || '-' || ${streamTags.streamId}) FROM ${streamTags} WHERE ${streamTags.tagId} = ${tags.id}), 0)`,
-          totalUsage: sql<number>`COALESCE((SELECT COUNT(*) FROM ${userTags} WHERE ${userTags.tagId} = ${tags.id}), 0) + COALESCE((SELECT COUNT(*) FROM ${streamTags} WHERE ${streamTags.tagId} = ${tags.id}), 0)`,
-          isAssignedToStream: sql<boolean>`CASE WHEN EXISTS(SELECT 1 FROM ${streamTags} WHERE ${streamTags.tagId} = ${tags.id} AND ${streamTags.scheduleId} = ${input.scheduleId} AND ${streamTags.streamId} = ${input.streamId}) THEN true ELSE false END`,
+          userCount: sql<number>`COALESCE((SELECT COUNT(*) FROM ${userTagsTable} WHERE ${userTagsTable.tagId} = ${tags.id}), 0)`,
+          streamCount: sql<number>`COALESCE((SELECT COUNT(DISTINCT ${streamTagsTable.scheduleId} || '-' || ${streamTagsTable.streamId}) FROM ${streamTagsTable} WHERE ${streamTagsTable.tagId} = ${tags.id}), 0)`,
+          totalUsage: sql<number>`COALESCE((SELECT COUNT(*) FROM ${userTagsTable} WHERE ${userTagsTable.tagId} = ${tags.id}), 0) + COALESCE((SELECT COUNT(*) FROM ${streamTagsTable} WHERE ${streamTagsTable.tagId} = ${tags.id}), 0)`,
+          isAssignedToStream: sql<boolean>`CASE WHEN EXISTS(SELECT 1 FROM ${streamTagsTable} WHERE ${streamTagsTable.tagId} = ${tags.id} AND ${streamTagsTable.scheduleId} = ${input.scheduleId} AND ${streamTagsTable.streamId} = ${input.streamId}) THEN true ELSE false END`,
         })
           .from(tags)
           .where(and(
             ...whereConditions,
-            sql`NOT EXISTS(SELECT 1 FROM ${streamTags} WHERE ${streamTags.tagId} = ${tags.id} AND ${streamTags.scheduleId} = ${input.scheduleId} AND ${streamTags.streamId} = ${input.streamId})`
+            sql`NOT EXISTS(SELECT 1 FROM ${streamTagsTable} WHERE ${streamTagsTable.tagId} = ${tags.id} AND ${streamTagsTable.scheduleId} = ${input.scheduleId} AND ${streamTagsTable.streamId} = ${input.streamId})`
           ))
           .limit(input.limit)
           .orderBy(desc(sql`totalUsage`), tags.name);
@@ -277,10 +277,10 @@ const searchStreamTags = os.searchStreamTags
           description: tags.description,
           categoryId: tags.categoryId,
           color: tags.color,
-          userCount: sql<number>`COALESCE((SELECT COUNT(*) FROM ${userTags} WHERE ${userTags.tagId} = ${tags.id}), 0)`,
-          streamCount: sql<number>`COALESCE((SELECT COUNT(DISTINCT ${streamTags.scheduleId} || '-' || ${streamTags.streamId}) FROM ${streamTags} WHERE ${streamTags.tagId} = ${tags.id}), 0)`,
-          totalUsage: sql<number>`COALESCE((SELECT COUNT(*) FROM ${userTags} WHERE ${userTags.tagId} = ${tags.id}), 0) + COALESCE((SELECT COUNT(*) FROM ${streamTags} WHERE ${streamTags.tagId} = ${tags.id}), 0)`,
-          isAssignedToStream: sql<boolean>`CASE WHEN EXISTS(SELECT 1 FROM ${streamTags} WHERE ${streamTags.tagId} = ${tags.id} AND ${streamTags.scheduleId} = ${input.scheduleId} AND ${streamTags.streamId} = ${input.streamId}) THEN true ELSE false END`,
+          userCount: sql<number>`COALESCE((SELECT COUNT(*) FROM ${userTagsTable} WHERE ${userTagsTable.tagId} = ${tags.id}), 0)`,
+          streamCount: sql<number>`COALESCE((SELECT COUNT(DISTINCT ${streamTagsTable.scheduleId} || '-' || ${streamTagsTable.streamId}) FROM ${streamTagsTable} WHERE ${streamTagsTable.tagId} = ${tags.id}), 0)`,
+          totalUsage: sql<number>`COALESCE((SELECT COUNT(*) FROM ${userTagsTable} WHERE ${userTagsTable.tagId} = ${tags.id}), 0) + COALESCE((SELECT COUNT(*) FROM ${streamTagsTable} WHERE ${streamTagsTable.tagId} = ${tags.id}), 0)`,
+          isAssignedToStream: sql<boolean>`CASE WHEN EXISTS(SELECT 1 FROM ${streamTagsTable} WHERE ${streamTagsTable.tagId} = ${tags.id} AND ${streamTagsTable.scheduleId} = ${input.scheduleId} AND ${streamTagsTable.streamId} = ${input.streamId}) THEN true ELSE false END`,
         })
           .from(tags)
           .where(and(...whereConditions))

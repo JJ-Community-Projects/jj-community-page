@@ -13,7 +13,9 @@ export const ALL: APIRoute = async (context) => {
   const {response} = await handler.handle(context.request, {
     prefix: '/api/orpc',
     context: {
-      ctx: context,
+      locals: context.locals,
+      request: context.request,
+      env: context.locals.runtime.env
     },
   })
   return response ?? new Response('Not found', {status: 404})

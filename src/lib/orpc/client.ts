@@ -1,5 +1,5 @@
-import type {RouterClient} from "@orpc/server";
-import type {router} from "./router.ts";
+import {type RouterClient} from "@orpc/server";
+import {router} from "./router.ts";
 import {RPCLink} from "@orpc/client/fetch";
 import {createORPCClient, onError} from '@orpc/client'
 import {createTanstackQueryUtils} from "@orpc/tanstack-query";

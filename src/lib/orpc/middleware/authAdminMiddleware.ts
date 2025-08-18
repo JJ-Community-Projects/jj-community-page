@@ -14,18 +14,22 @@ export const adminAuthMiddleware =
   dbMiddleware.concat(authMiddleware)
     .concat(async ({context, next}) => {
       // Ensure we have a valid Astro context
-      if (!context.ctx) {
-        throw new ORPCError('INTERNAL_SERVER_ERROR', {message: 'Missing Astro context'})
+      if (!context.locals) {
+        throw new ORPCError('INTERNAL_SERVER_ERROR', {message: 'Missing Astro Locals'})
       }
 
       // Ensure user is authenticated
-      if (!context.ctx.locals.user) {
+      if (!context.locals.user) {
         throw new ORPCError('UNAUTHORIZED', {message: 'Authentication required'})
       }
 
       const userId = context.userId
 
       const db = context.db
+
+      if (!db) {
+        throw new ORPCError('INTERNAL_SERVER_ERROR', {message: 'No DB found'})
+      }
 
       const result = await db
         .select({
@@ -45,11 +49,13 @@ export const adminAuthMiddleware =
 
       return next({
         context: {
-          ctx: context.ctx,
-          user: context.ctx.locals.user,
-          userId: context.ctx.locals.user.id as number,
-          tiltifyId: context.ctx.locals.user.tiltifyId as string,
-          tiltifyName: context.ctx.locals.user.tiltifyName as string,
+          locals: context.locals,
+          request: context.request,
+          env: context.locals.runtime.env,
+          user: context.locals.user,
+          userId: context.locals.user.id as number,
+          tiltifyId: context.locals.user.tiltifyId as string,
+          tiltifyName: context.locals.user.tiltifyName as string,
         }
       })
     })

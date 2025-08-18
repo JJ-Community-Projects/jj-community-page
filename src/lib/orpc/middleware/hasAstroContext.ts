@@ -1,19 +1,17 @@
-import type {AstroContext} from "../../AstroContext.ts";
 import {ORPCError, os} from "@orpc/server";
 
 
 export const hasAstroContext = os
-  .$context<{ ctx?: AstroContext }>()
+  .$context<{ locals?: App.Locals, request?: Request, env?: Env }>()
   .middleware(async ({context, next}) => {
-    if (!context.ctx) {
-      throw new ORPCError('INTERNAL_SERVER_ERROR', {
-        message: 'Missing Astro Context'
-      })
+    if (!context.locals || !context.request) {
+      throw new ORPCError('INTERNAL_SERVER_ERROR')
     }
     return next({
       context: {
-        ctx: context.ctx,
-        env: context.ctx.locals.runtime.env,
+        locals: context.locals,
+        request: context.request,
+        env: context.locals.runtime.env
       }
     })
   })

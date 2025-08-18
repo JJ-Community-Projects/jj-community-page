@@ -1,23 +1,26 @@
 import {ORPCError, os} from '@orpc/server'
-import type {AstroContext} from "../../AstroContext.ts";
-import type {DrizzleD1Database} from "drizzle-orm/d1";
 import {hasAstroContext} from "./hasAstroContext.ts";
 import {getDB, type JJDrizzleDatabase} from "../../db/db.ts";
 
 const db = os
   .$context<{
-    ctx?: AstroContext
+    locals?: App.Locals,
+    request?: Request,
+    env?: Env,
     db?: JJDrizzleDatabase
   }>()
   .middleware(({context, next}) => {
-    if (!context.ctx) {
+    if (!context.env || !context.locals || !context.request) {
       throw new ORPCError('INTERNAL_SERVER_ERROR')
     }
-    const db = context.db ?? getDB(context.ctx.locals.runtime.env)
+    const db = context.db ?? getDB(context.locals.runtime.env)
+
     return next({
       context: { // Pass additional context
-        ctx: context.ctx,
-        db: db
+        db: db,
+        env: context.locals.runtime.env,
+        request: context.request,
+        locals: context.locals,
       }
     })
   })

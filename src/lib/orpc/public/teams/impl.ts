@@ -5,6 +5,7 @@ import {teamMembersTable, teamsTable} from '../../../db/schema/jj-schema.ts';
 import {accounts, users} from '../../../db/schema/auth-schema.ts';
 import {userDisplayView} from '../../../db/schema/views-schema.ts';
 import {and, count, eq} from 'drizzle-orm';
+import {input} from "gel/dist/systemUtils";
 
 const os = implement(publicTeamsContract)
   .use(dbMiddleware);
@@ -13,7 +14,7 @@ const os = implement(publicTeamsContract)
  * Find all visible teams
  * Returns all teams where visible = true
  */
-const findVisible = os.findVisible
+const findVisible = os.findVisibleContract
   .handler(async ({ context }) => {
     const db = context.db;
 
@@ -36,7 +37,7 @@ const findVisible = os.findVisible
  * Find all visible teams with member count
  * Returns all visible teams with their member counts
  */
-const findAllVisibleWithMemberCount = os.findAllVisibleWithMemberCount
+const findAllVisibleWithMemberCount = os.findAllVisibleWithMemberCountContract
   .handler(async ({ context }) => {
     const db = context.db;
 
@@ -69,7 +70,7 @@ const findAllVisibleWithMemberCount = os.findAllVisibleWithMemberCount
  * Get team by slug with owner information
  * Returns team details with owner info for public viewing
  */
-const getBySlug = os.getBySlug
+const getBySlug = os.getBySlugContract
   .handler(async ({ context, input }) => {
     const db = context.db;
     const { slug } = input;
@@ -110,7 +111,7 @@ const getBySlug = os.getBySlug
  * Get team members by team ID in user display format
  * Returns team member details for public viewing (only for visible teams)
  */
-const getMembers = os.getMembers
+const getMembers = os.getMembersContract
   .handler(async ({ context, input }) => {
     const db = context.db;
     const { teamId } = input;
@@ -160,9 +161,44 @@ const getMembers = os.getMembers
     }
   });
 
+
+/**
+ * Get teams by user ID
+ * Returns all teams that the specified user is a member of
+ * This includes teams where the user is either a member or owner
+ */
+const getTeamsByUserId = os.getTeamsByUserIdContract
+  .handler(async ({context, input: userId}) => {
+    const db = context.db;
+
+    try {
+      // Query teams where the user is a member through teamMembersTable
+      // This will include teams where the user is both a regular member and owner
+      const teams = await db.select({
+        id: teamsTable.id,
+        name: teamsTable.name,
+        slug: teamsTable.slug,
+        description: teamsTable.description,
+        visible: teamsTable.visible,
+        ownerId: teamsTable.ownerId
+      })
+      .from(teamMembersTable)
+      .innerJoin(teamsTable, eq(teamMembersTable.teamId, teamsTable.id))
+      .where(eq(teamMembersTable.userId, userId))
+      .all();
+
+      return { teams };
+    } catch (error) {
+      console.error('Error getting teams by user ID:', error);
+      throw new ORPCError('INTERNAL_SERVER_ERROR', {
+        message: 'Failed to retrieve user teams'
+      });
+    }
+  });
 export const publicTeamsRouter = {
   findVisible,
   findAllVisibleWithMemberCount,
   getBySlug,
-  getMembers
+  getMembers,
+  getTeamsByUserId
 };

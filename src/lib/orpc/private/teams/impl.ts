@@ -7,7 +7,8 @@ import {teamInvitesTable, teamMembersTable, teamsTable} from '../../../db/schema
 import {users} from '../../../db/schema/auth-schema.ts';
 import {userDisplayView} from '../../../db/schema/views-schema.ts';
 import {and, count, eq, not} from 'drizzle-orm';
-import {createSlug, generateTeamSlugAlternatives} from '../../../../functions/slug.ts';
+import {createSlug, generateTeamSlugAlternativesLocals} from '../../../../functions/slug.ts';
+import {teamMemberEventPublisher} from "../teamsSSE/teamEventPublisher.ts";
 
 const os = implement(privateTeamsContract)
   .use(dbMiddleware);
@@ -64,6 +65,9 @@ const create = os.createContract
 
         return team.id;
       });
+
+      // Publish events for team creation (user becomes owner/member)
+      teamMemberEventPublisher.acceptInvite(teamId, userId);
 
       return { teamId };
     } catch (error) {
@@ -157,7 +161,7 @@ const validateSlug = os.validateSlugContract
     try {
       // Get alternatives using the generateTeamSlugAlternatives function
       // If it returns alternatives, the slug is not valid
-      const alternatives = await generateTeamSlugAlternatives(context.ctx, slug, 3);
+      const alternatives = await generateTeamSlugAlternativesLocals(context.locals, slug, 3);
 
       // If alternatives is empty, the slug is valid
       if (alternatives.length === 0) {
@@ -174,7 +178,7 @@ const validateSlug = os.validateSlugContract
         const tiltifySlug = createSlug(tiltifyName);
         // Check if this slug is valid using generateTeamSlugAlternatives
         // If it returns an empty array, the slug is valid
-        const tiltifyAlternatives = await generateTeamSlugAlternatives(context.ctx, tiltifySlug, 0);
+        const tiltifyAlternatives = await generateTeamSlugAlternativesLocals(context.locals, tiltifySlug, 0);
         if (tiltifyAlternatives.length === 0) {
           allAlternatives.push(tiltifySlug);
         }
@@ -182,7 +186,7 @@ const validateSlug = os.validateSlugContract
         const userTiltifySlug = createSlug(user.tiltifyName);
         // Check if this slug is valid using generateTeamSlugAlternatives
         // If it returns an empty array, the slug is valid
-        const userTiltifyAlternatives = await generateTeamSlugAlternatives(context.ctx, userTiltifySlug, 0);
+        const userTiltifyAlternatives = await generateTeamSlugAlternativesLocals(context.locals, userTiltifySlug, 0);
         if (userTiltifyAlternatives.length === 0) {
           allAlternatives.push(userTiltifySlug);
         }
@@ -213,34 +217,36 @@ const leaveTeam = os.leaveTeamContract
     const userId = context.userId;
     const { teamId } = input;
 
+    // Check if team exists
+    const team = await db.select()
+      .from(teamsTable)
+      .where(eq(teamsTable.id, teamId))
+      .get();
+
+    if (!team) {
+      throw new ORPCError('NOT_FOUND', { message: 'Team not found' });
+    }
+
+    // Prevent team owner from leaving their own team
+    if (team.ownerId === userId) {
+      throw new ORPCError('FORBIDDEN', { message: 'Team owner cannot leave their own team. Transfer ownership or delete the team instead.' });
+    }
+
+    // Check if user is actually a member
+    const membership = await db.select()
+      .from(teamMembersTable)
+      .where(and(
+        eq(teamMembersTable.teamId, teamId),
+        eq(teamMembersTable.userId, userId)
+      ))
+      .get();
+
+    if (!membership) {
+      throw new ORPCError('NOT_FOUND', { message: 'You are not a member of this team' });
+    }
+
     try {
-      // Check if team exists
-      const team = await db.select()
-        .from(teamsTable)
-        .where(eq(teamsTable.id, teamId))
-        .get();
 
-      if (!team) {
-        throw new ORPCError('NOT_FOUND', { message: 'Team not found' });
-      }
-
-      // Prevent team owner from leaving their own team
-      if (team.ownerId === userId) {
-        throw new ORPCError('FORBIDDEN', { message: 'Team owner cannot leave their own team. Transfer ownership or delete the team instead.' });
-      }
-
-      // Check if user is actually a member
-      const membership = await db.select()
-        .from(teamMembersTable)
-        .where(and(
-          eq(teamMembersTable.teamId, teamId),
-          eq(teamMembersTable.userId, userId)
-        ))
-        .get();
-
-      if (!membership) {
-        throw new ORPCError('NOT_FOUND', { message: 'You are not a member of this team' });
-      }
 
       // Remove user from team
       await db.delete(teamMembersTable)
@@ -248,6 +254,9 @@ const leaveTeam = os.leaveTeamContract
           eq(teamMembersTable.teamId, teamId),
           eq(teamMembersTable.userId, userId)
         ));
+
+      // Publish events for user leaving team
+      teamMemberEventPublisher.leaveTeam(teamId, userId);
 
       return { success: true };
     } catch (error) {
@@ -294,6 +303,9 @@ const removeMember = os.removeMemberContract
           eq(teamMembersTable.teamId, teamId),
           eq(teamMembersTable.userId, targetUserId)
         ));
+
+      // Publish events for member removal
+      teamMemberEventPublisher.removeUserFromTeam(teamId, targetUserId);
 
       return { success: true };
     } catch (error) {
@@ -350,6 +362,7 @@ const createInvite = os.createInviteContract
         })
         .onConflictDoNothing();
 
+      teamMemberEventPublisher.sendInvite(teamId, invitedUserId)
       return { success: true };
     } catch (error) {
       if (error instanceof ORPCError) throw error;
@@ -389,6 +402,9 @@ const deleteInvite = os.deleteInviteContract
           eq(teamInvitesTable.teamId, teamId),
           eq(teamInvitesTable.invitedUserId, invitedUserId)
         ));
+
+      // Publish events for invite deletion
+      teamMemberEventPublisher.deleteInvite(teamId, invitedUserId);
 
       return { success: true };
     } catch (error) {
@@ -448,6 +464,9 @@ const acceptInvite = os.acceptInviteContract
           });
       });
 
+      // Publish events for invite acceptance
+      teamMemberEventPublisher.acceptInvite(teamId, userId);
+
       return { success: true };
     } catch (error) {
       if (error instanceof ORPCError) throw error;
@@ -497,6 +516,9 @@ const rejectInvite = os.rejectInviteContract
           eq(teamInvitesTable.teamId, teamId),
           eq(teamInvitesTable.invitedUserId, userId)
         ));
+
+      // Publish events for invite rejection
+      teamMemberEventPublisher.rejectInvite(teamId, userId);
 
       return { success: true };
     } catch (error) {
@@ -827,6 +849,7 @@ const getTeamById = os.getTeamByIdContract
     }
   });
 
+
 export const privateTeamsRouter = {
   // Team CRUD Operations
   create,
@@ -854,5 +877,5 @@ export const privateTeamsRouter = {
   getTeamInviteCount,
   getTeamInvites,
   getUserInviteCount,
-  getUserInvites
+  getUserInvites,
 };

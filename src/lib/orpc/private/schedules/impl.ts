@@ -6,7 +6,7 @@ import {schedulesTable} from '../../../db/schema/jj-schema.ts';
 import {accounts, users} from '../../../db/schema/auth-schema.ts';
 import {and, eq} from 'drizzle-orm';
 import {DateTime} from 'luxon';
-import {createSlug, generateScheduleSlugAlternatives} from '../../../../functions/slug.ts';
+import {createSlug, generateScheduleSlugAlternativesLocals} from '../../../../functions/slug.ts';
 
 const os = implement(privateSchedulesContract)
   .use(dbMiddleware);
@@ -102,14 +102,13 @@ const save = os.save
         throw new ORPCError('FORBIDDEN', {message: 'You do not have permission to edit this schedule'});
       }
 
-      /*
-      // Save via ScheduleEditorDO
-      await useRpcScheduleEditorDO(ctx, scheduleId, async (rpc) => {
-        await rpc.saveToDB();
-      }, (error) => {
-        throw new ORPCError('INTERNAL_SERVER_ERROR', { message: error.message });
-      });
-       */
+      const DO = context.env.ScheduleEditorDO
+
+      const stubID = DO.idFromName(`${scheduleId}`)
+
+      const stub = DO.get(stubID)
+
+      await stub.saveToDB(`${scheduleId}`)
 
       return {message: "Schedule saved successfully"};
     } catch (error) {
@@ -260,12 +259,11 @@ const setPrimary = os.setPrimary
 const validateSlug = os.validateSlug
   .use(authMiddleware)
   .handler(async ({context, input}) => {
-    const ctx = context.ctx; // Astro context
     const {id, slug, title} = input;
 
     try {
       // Get alternatives using the generateScheduleSlugAlternatives function
-      const alternatives = await generateScheduleSlugAlternatives(ctx, slug, 3, id);
+      const alternatives = await generateScheduleSlugAlternativesLocals(context.locals, slug, 3, id);
 
       // If alternatives is empty, the slug is valid
       if (alternatives.length === 0) {
@@ -281,7 +279,7 @@ const validateSlug = os.validateSlug
       if (title && title.toLowerCase() !== slug.toLowerCase()) {
         const titleSlug = createSlug(title);
         // Check if this slug is valid
-        const titleAlternatives = await generateScheduleSlugAlternatives(ctx, titleSlug, 0, id);
+        const titleAlternatives = await generateScheduleSlugAlternativesLocals(context.locals, titleSlug, 0, id);
         if (titleAlternatives.length === 0) {
           allAlternatives.push(titleSlug);
         }
