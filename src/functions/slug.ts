@@ -2,7 +2,7 @@ import type {AstroContext} from "../lib/AstroContext";
 import {getDB} from "../lib/db/db";
 import {schedulesTable, teamsTable} from "../lib/db/schema/schema";
 import {and, eq, not} from "drizzle-orm";
-import {getBlockedNames} from "./blockedNames";
+import {getBlockedNamesLocals} from "./blockedNames";
 
 /**
  * Converts a name into a URL-friendly slug.
@@ -71,10 +71,15 @@ export function sanitizeTag(tag: string): string {
  * @returns An array of alternative slugs, or an empty array if the slug is not in use
  */
 export async function generateTeamSlugAlternatives(ctx: AstroContext, slug: string, n: number = 3): Promise<string[]> {
+  return generateTeamSlugAlternativesLocals(ctx.locals, slug, n);
+}
+
+
+export async function generateTeamSlugAlternativesLocals(locals: App.Locals, slug: string, n: number = 3): Promise<string[]> {
   if (!slug) return [];
 
   // Get blocked names first
-  const blockedNames = await getBlockedNames(ctx);
+  const blockedNames = await getBlockedNamesLocals(locals);
 
   // Generate alternatives
   const alternatives: string[] = [];
@@ -102,7 +107,7 @@ export async function generateTeamSlugAlternatives(ctx: AstroContext, slug: stri
     return nonBlockedAlternatives;
   }
 
-  const db = getDB(ctx);
+  const db = getDB(locals.runtime.env);
 
   // Check if the slug is already in use
   try {
@@ -152,10 +157,15 @@ export async function generateTeamSlugAlternatives(ctx: AstroContext, slug: stri
  * @returns An array of alternative slugs, or an empty array if the slug is not in use
  */
 export async function generateScheduleSlugAlternatives(ctx: AstroContext, slug: string, n: number = 3, currentId?: number): Promise<string[]> {
+  return generateScheduleSlugAlternativesLocals(ctx.locals, slug, n);
+}
+
+
+export async function generateScheduleSlugAlternativesLocals(locals: App.Locals, slug: string, n: number = 3, currentId?: number): Promise<string[]> {
   if (!slug) return [];
 
   // Get blocked names first
-  const blockedNames = await getBlockedNames(ctx);
+  const blockedNames = await getBlockedNamesLocals(locals);
 
   // Generate alternatives
   const alternatives: string[] = [];
@@ -183,7 +193,7 @@ export async function generateScheduleSlugAlternatives(ctx: AstroContext, slug: 
     return nonBlockedAlternatives;
   }
 
-  const db = getDB(ctx);
+  const db = getDB(locals.runtime.env);
 
   // Check if the slug is already in use (excluding the current schedule if ID is provided)
   try {
