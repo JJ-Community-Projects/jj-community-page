@@ -1,20 +1,22 @@
 import type {DrizzleD1Database} from 'drizzle-orm/d1';
 import {userDisplayView} from '../../../db/schema/views-schema.ts';
-import {friendsTable, userSocials, userTags} from '../../../db/schema/auth-schema.ts';
+import {friendsTable, userSocials} from '../../../db/schema/auth-schema.ts';
 import {
   schedulesTable,
   streamParticipantsTable,
   streamsTable,
-  streamTagsTable,
   teamMembersTable,
   teamsTable
 } from '../../../db/schema/jj-schema.ts';
 import {and, asc, desc, eq, gt, inArray, ne} from 'drizzle-orm';
 import {ORPCError} from '@orpc/server';
-import {Social, Tag, UserDisplaySchema} from '../schemas/users.ts';
 import {TeamSchema} from '../schemas/teams.ts';
-import {ScheduleInfoSchema, StreamSchema, StreamTagSchema} from '../schemas/schedule.ts';
 import {z} from 'zod';
+import type {JJDrizzleDatabase} from "../../../db/db.ts";
+import {type StreamTag, streamTagsTable, tags, type UserTag, userTagsTable} from "../../../db/schema/tags-schema.ts";
+import type {ScheduleInfoSchema} from "../../schemas/schedules.ts";
+import type {UserDisplaySchema} from "../../schemas/users.ts";
+import {SocialSchema} from "../../schemas/users.ts";
 
 /**
  * Helper functions for the getUserProfileBySlug procedure
@@ -26,13 +28,27 @@ type Database = DrizzleD1Database<Record<string, never>>;
 
 // Use Zod type inferences instead of custom interfaces
 export type UserDisplay = z.infer<typeof UserDisplaySchema>;
-export type UserTag = z.infer<typeof Tag>;
-export type UserSocial = z.infer<typeof Social>;
+export type UserTagType = UserTag;
+export type UserSocial = z.infer<typeof SocialSchema>;
 export type TeamInfo = z.infer<typeof TeamSchema>;
 export type ScheduleInfo = z.infer<typeof ScheduleInfoSchema>;
 export type StreamParticipant = z.infer<typeof UserDisplaySchema>;
-export type StreamTag = z.infer<typeof StreamTagSchema>;
-export type StreamInfo = z.infer<typeof StreamSchema>;
+export type StreamTagType = StreamTag;
+export type StreamInfo = {
+  id: number;
+  scheduleId: number;
+  createdBy: number;
+  title: string;
+  visible: boolean;
+  subtitle: string | null;
+  description: string | null;
+  youtubeVodUrl: string | null;
+  twitchVodUrl: string | null;
+  start: Date;
+  end: Date;
+  tags: Array<{ name: string; slug: string; color: string }>;
+  participants: StreamParticipant[];
+};
 
 /**
  * Fetches user by tiltify slug
@@ -41,7 +57,7 @@ export type StreamInfo = z.infer<typeof StreamSchema>;
  * @returns User display information
  * @throws ORPCError if user not found
  */
-export async function getUserBySlug(db: Database, slug: string): Promise<UserDisplay> {
+export async function getUserBySlug(db: JJDrizzleDatabase, slug: string): Promise<UserDisplay> {
   const user = await db.select({
     userId: userDisplayView.userId,
     primaryLiveStream: userDisplayView.primaryLiveStream,
@@ -69,15 +85,17 @@ export async function getUserBySlug(db: Database, slug: string): Promise<UserDis
  * Fetches all tags associated with a user
  * @param db Database connection
  * @param userId User ID to fetch tags for
- * @returns Array of user tags
+ * @returns Array of user tags with tag information
  */
-export async function getUserTags(db: Database, userId: number): Promise<UserTag[]> {
+export async function getUserTags(db: JJDrizzleDatabase, userId: number): Promise<Array<{ name: string; slug: string; color: string }>> {
   return db.select({
-    tag: userTags.tag,
-    label: userTags.label,
+    name: tags.name,
+    slug: tags.slug,
+    color: tags.color,
   })
-    .from(userTags)
-    .where(eq(userTags.userId, userId))
+    .from(userTagsTable)
+    .innerJoin(tags, eq(userTagsTable.tagId, tags.id))
+    .where(eq(userTagsTable.userId, userId))
     .all();
 }
 
@@ -87,7 +105,7 @@ export async function getUserTags(db: Database, userId: number): Promise<UserTag
  * @param userId User ID to fetch socials for
  * @returns Array of user social media links
  */
-export async function getUserSocials(db: Database, userId: number): Promise<UserSocial[]> {
+export async function getUserSocials(db: JJDrizzleDatabase, userId: number): Promise<UserSocial[]> {
   return db.select({
     provider: userSocials.provider,
     url: userSocials.url,
@@ -103,7 +121,7 @@ export async function getUserSocials(db: Database, userId: number): Promise<User
  * @param userId User ID to fetch friends for
  * @returns Array of friend user display information
  */
-export async function getUserFriends(db: Database, userId: number): Promise<UserDisplay[]> {
+export async function getUserFriends(db: JJDrizzleDatabase, userId: number): Promise<UserDisplay[]> {
   return db.select({
     userId: userDisplayView.userId,
     primaryLiveStream: userDisplayView.primaryLiveStream,
@@ -132,7 +150,7 @@ export async function getUserFriends(db: Database, userId: number): Promise<User
  * @param userId User ID to fetch teams for
  * @returns Array of team information
  */
-export async function getUserTeams(db: Database, userId: number): Promise<TeamInfo[]> {
+export async function getUserTeams(db: JJDrizzleDatabase, userId: number): Promise<TeamInfo[]> {
   return db.select({
     id: teamsTable.id,
     name: teamsTable.name,
@@ -156,7 +174,7 @@ export async function getUserTeams(db: Database, userId: number): Promise<TeamIn
  * @param userId User ID to fetch schedules for
  * @returns Object with schedules array and optional primary schedule
  */
-export async function getUserSchedules(db: Database, userId: number): Promise<{
+export async function getUserSchedules(db: JJDrizzleDatabase, userId: number): Promise<{
   schedules: ScheduleInfo[];
   primarySchedule: ScheduleInfo | undefined;
 }> {
@@ -191,27 +209,29 @@ export async function getUserSchedules(db: Database, userId: number): Promise<{
  * @param streamIds Array of stream IDs
  * @returns Map of stream ID to array of tags
  */
-export async function getStreamTagsMap(db: Database, streamIds: number[]): Promise<Map<number, StreamTag[]>> {
+export async function getStreamTagsMap(db: JJDrizzleDatabase, streamIds: number[]): Promise<Map<number, Array<{ name: string; slug: string; color: string }>>> {
   if (streamIds.length === 0) {
     return new Map();
   }
 
   const streamTags = await db.select({
     streamId: streamTagsTable.streamId,
-    tag: streamTagsTable.tag,
-    label: streamTagsTable.label,
+    name: tags.name,
+    slug: tags.slug,
+    color: tags.color,
   })
     .from(streamTagsTable)
+    .innerJoin(tags, eq(streamTagsTable.tagId, tags.id))
     .where(inArray(streamTagsTable.streamId, streamIds))
     .all();
 
   // Group tags by stream ID
-  const streamTagsMap = new Map<number, StreamTag[]>();
+  const streamTagsMap = new Map<number, Array<{ name: string; slug: string; color: string }>>();
   for (const tag of streamTags) {
     if (!streamTagsMap.has(tag.streamId)) {
       streamTagsMap.set(tag.streamId, []);
     }
-    streamTagsMap.get(tag.streamId)!.push({ tag: tag.tag, label: tag.label });
+    streamTagsMap.get(tag.streamId)!.push({ name: tag.name, slug: tag.slug, color: tag.color });
   }
 
   return streamTagsMap;
@@ -223,7 +243,7 @@ export async function getStreamTagsMap(db: Database, streamIds: number[]): Promi
  * @param streamIds Array of stream IDs
  * @returns Map of stream ID to array of participants
  */
-export async function getStreamParticipantsMap(db: Database, streamIds: number[]): Promise<Map<number, StreamParticipant[]>> {
+export async function getStreamParticipantsMap(db: JJDrizzleDatabase, streamIds: number[]): Promise<Map<number, StreamParticipant[]>> {
   if (streamIds.length === 0) {
     return new Map();
   }
@@ -291,7 +311,7 @@ export function enrichStreamsWithTagsAndParticipants(
     start: Date;
     end: Date;
   }>,
-  streamTagsMap: Map<number, StreamTag[]>,
+  streamTagsMap: Map<number, Array<{ name: string; slug: string; color: string }>>,
   streamParticipantsMap: Map<number, StreamParticipant[]>
 ): StreamInfo[] {
   return streams.map(stream => ({
@@ -307,7 +327,7 @@ export function enrichStreamsWithTagsAndParticipants(
  * @param userScheduleIds Array of schedule IDs owned by the user
  * @returns Array of enriched stream information (max 3)
  */
-export async function getUserOwnStreams(db: Database, userScheduleIds: number[]): Promise<StreamInfo[]> {
+export async function getUserOwnStreams(db: JJDrizzleDatabase, userScheduleIds: number[]): Promise<StreamInfo[]> {
   if (userScheduleIds.length === 0) {
     return [];
   }
@@ -361,7 +381,7 @@ export async function getUserOwnStreams(db: Database, userScheduleIds: number[])
  * @param userId User ID to find participation for
  * @returns Array of enriched stream information (max 3)
  */
-export async function getUserParticipatingStreams(db: Database, userId: number): Promise<StreamInfo[]> {
+export async function getUserParticipatingStreams(db: JJDrizzleDatabase, userId: number): Promise<StreamInfo[]> {
   const currentDate = new Date();
 
   const futureOtherStreams = await db.select({

@@ -1,6 +1,6 @@
 import {oc} from '@orpc/contract'
 import {z} from 'zod';
-import {UserDisplaySchema} from "../../schemas/users.ts";
+import {UserDisplaySchema} from "../../../schemas/users.ts";
 
 const UserIdSchema = z.number().int().positive();
 

@@ -1,12 +1,10 @@
-import {type Component, createEffect, For, Show} from "solid-js";
+import {type Component, createEffect, createSignal, For, Show} from "solid-js";
 import {useScheduleEditor} from "../../providers/ScheduleEditorProvider.tsx";
 import {debounce} from "@solid-primitives/scheduled";
 import {TextField} from "@kobalte/core/text-field";
 import {Checkbox} from "@kobalte/core/checkbox";
 import {FaRegularCircle, FaRegularCircleCheck, FaRegularCircleXmark} from "solid-icons/fa";
-import {actions} from "astro:actions";
-import {createStore} from "solid-js/store";
-import {useMutation} from "@tanstack/solid-query";
+import {useQuery} from "@tanstack/solid-query";
 import {orpc} from "../../../../../../lib/orpc/client.ts";
 
 const Correct = () => {
@@ -96,104 +94,64 @@ const ScheduleSlugField: Component = () => {
     updateScheduleSlug
   } = useScheduleEditor();
 
-  const [state, setState] = createStore<{
-    slug: string,
-    slugValid: boolean,
-    errorMessage?: string,
-    isCheckingSlug: boolean,
-    suggestions: string[]
-  }>({
-    slug: local.slug,
-    slugValid: true,
-    isCheckingSlug: false,
-    suggestions: []
-  });
+  const [slug, setSlug] = createSignal<string>('')
+
+  const validateSlug = useQuery(
+    () => orpc.private.schedules.validateSlug.queryOptions({
+      input: {
+        id: local.id,
+        slug: slug(),
+        title: local.title
+      },
+      enabled: () => slug() !== local.slug && slug().length > 0,
+    })
+  )
 
   createEffect(() => {
-    setState('slug', local.slug);
-    setState('suggestions', []);
-    setState('slugValid', true);
+    if (local) {
+      setSlug(local.slug);
+    }
   })
   // Function to get error message
   const slugErrorMessage = () => {
-    if (state.errorMessage) {
-      return state.errorMessage;
-    } else if (!state.slugValid) {
-      return 'This slug is not available. Try one of these suggestions:';
+    if (validateSlug.isError) {
+      return validateSlug.error?.message;
+    } else if (validateSlug.isSuccess) {
+      if (!validateSlug.data.isValid) {
+        return 'This slug is not available. Try one of these suggestions:';
+      }
     }
     return undefined;
   };
 
-  const x = useMutation(
-    orpc.private.schedules.validateSlug.mutationOptions
-  )
-
-
 
   // Create debounced function for slug validation
-  const checkSlugUnique = debounce(async (slug: string) => {
+  const setSlugDebounce = debounce(async (slug: string) => {
     // If slug hasn't changed, it's valid
     if (slug === local.slug) {
       return;
     }
-
-    if (!slug) {
-      setState('errorMessage', 'Slug is required');
-      setState('suggestions', []);
-      setState('slugValid', false);
-      return;
-    }
-
-    setState('isCheckingSlug', true);
-    setState('errorMessage', undefined);
-    setState('suggestions', []);
-
-    try {
-      const result = await actions.schedules.isSlugValid({
-        id: local.id,
-        slug: slug,
-        title: local.title
-      });
-
-      if (result.error) {
-        console.error(result.error);
-        setState('slugValid', false);
-        setState('errorMessage', 'Error checking slug availability');
-      } else {
-        setState('slugValid', result.data.isValid);
-        setState('suggestions', result.data.suggestions || []);
-        setState('errorMessage', result.data.isValid ? undefined : 'This slug is not available. Try one of these suggestions:');
-
-        // If valid, update the schedule slug
-        if (result.data.isValid) {
-          updateScheduleSlug(slug);
-        }
-      }
-    } catch (error) {
-      console.error("Error checking slug:", error);
-      setState('slugValid', false);
-      setState('errorMessage', 'Error checking slug availability');
-      setState('suggestions', []);
-    } finally {
-      setState('isCheckingSlug', false);
-    }
+    setSlug(slug)
   }, 500);
 
-  // Handler for slug change
-  const handleSlugChange = (value: string) => {
-    const sanitizedSlug = value.toLowerCase().replace(/[^a-z0-9-]/g, "-");
-    setState('slug', sanitizedSlug);
-    setState('isCheckingSlug', true);
-    checkSlugUnique(sanitizedSlug);
-  };
+  const validationState = () => {
+    if (validateSlug.data) {
+      if (validateSlug.data.isValid) {
+        return "valid"
+      } else {
+        return "invalid"
+      }
+    }
+    return "valid"
+  }
 
   return (
     <TextField
       name="slug"
       class="flex flex-col"
-      value={state.slug}
-      onChange={handleSlugChange}
-      validationState={state.slugValid ? "valid" : "invalid"}
+      value={slug()}
+      onChange={setSlugDebounce}
+      validationState={validationState()}
     >
       <TextField.Label class="text-sm font-medium mb-1">Slug: </TextField.Label>
       <div class="w-full flex flex-row items-center gap-4">
@@ -201,36 +159,35 @@ const ScheduleSlugField: Component = () => {
           class="w-full border border-gray-300 rounded-lg px-3 py-2"
         />
         <div>
-          <Show when={state.isCheckingSlug}>
+          <Show when={validateSlug.isPending}>
             <Loading/>
           </Show>
-          <Show when={!state.isCheckingSlug && state.slugValid && state.slug !== ''}>
+          <Show when={validateSlug.isSuccess && validateSlug.data?.isValid && slug() !== ''}>
             <Correct/>
           </Show>
-          <Show when={!state.isCheckingSlug && !state.slugValid && state.slug !== ''}>
+          <Show when={validateSlug.isSuccess && !validateSlug.data?.isValid && slug() !== ''}>
             <Wrong/>
           </Show>
         </div>
       </div>
       <TextField.Description class="text-xs text-gray-500 mt-1">
-        This will be used in the URL: /schedules/{state.slug}
+        This will be used in the URL: /schedules/{slug()}
       </TextField.Description>
       <TextField.ErrorMessage class="text-red-500 text-sm mt-1">
         {slugErrorMessage()}
       </TextField.ErrorMessage>
 
-      <Show when={state.suggestions.length > 0}>
+      <Show when={(validateSlug.data?.suggestions.length ?? 0) > 0}>
         <div class="mt-2">
           <ul class="flex flex-wrap gap-2">
-            <For each={state.suggestions}>
+            <For each={validateSlug.data?.suggestions}>
               {(suggestion) => (
                 <li>
                   <button
                     type="button"
                     class="px-2 py-1 text-sm bg-accent/10 text-accent hover:bg-accent/20 rounded-md transition-colors"
                     onClick={() => {
-                      setState('slug', suggestion);
-                      checkSlugUnique(suggestion);
+                      updateScheduleSlug(suggestion);
                     }}
                   >
                     {suggestion}
@@ -448,35 +405,35 @@ export const ScheduleEditorSettings: Component = () => {
       <h2 class="text-xl font-bold mb-4">Schedule Settings</h2>
 
       <Show when={action.updateScheduleTitle.lastErrorMessage ||
-                  action.updateScheduleYear.lastErrorMessage ||
-                  action.updateScheduleSlug.lastErrorMessage ||
-                  action.updateScheduleVisibility.lastErrorMessage ||
-                  action.updateAlwaysAddSelfToStream.lastErrorMessage ||
-                  action.updateDefaultStreamVisibility.lastErrorMessage ||
-                  action.updateDefaultStreamLength.lastErrorMessage}>
+        action.updateScheduleYear.lastErrorMessage ||
+        action.updateScheduleSlug.lastErrorMessage ||
+        action.updateScheduleVisibility.lastErrorMessage ||
+        action.updateAlwaysAddSelfToStream.lastErrorMessage ||
+        action.updateDefaultStreamVisibility.lastErrorMessage ||
+        action.updateDefaultStreamLength.lastErrorMessage}>
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-4">
           {action.updateScheduleTitle.lastErrorMessage ||
-           action.updateScheduleYear.lastErrorMessage ||
-           action.updateScheduleSlug.lastErrorMessage ||
-           action.updateScheduleVisibility.lastErrorMessage ||
-           action.updateAlwaysAddSelfToStream.lastErrorMessage ||
-           action.updateDefaultStreamVisibility.lastErrorMessage ||
-           action.updateDefaultStreamLength.lastErrorMessage}
+            action.updateScheduleYear.lastErrorMessage ||
+            action.updateScheduleSlug.lastErrorMessage ||
+            action.updateScheduleVisibility.lastErrorMessage ||
+            action.updateAlwaysAddSelfToStream.lastErrorMessage ||
+            action.updateDefaultStreamVisibility.lastErrorMessage ||
+            action.updateDefaultStreamLength.lastErrorMessage}
         </div>
       </Show>
 
       <div class="grid grid-cols-1 gap-4">
         <div class="flex gap-4">
-          <ScheduleTitleField />
-          <ScheduleYearField />
+          <ScheduleTitleField/>
+          <ScheduleYearField/>
         </div>
-        <ScheduleSlugField />
-        <ScheduleVisibilityCheckbox />
+        <ScheduleSlugField/>
+        <ScheduleVisibilityCheckbox/>
 
         <h3 class="text-lg font-semibold mt-4 mb-2">Stream Settings</h3>
-        <AlwaysAddSelfToStreamCheckbox />
-        <DefaultStreamVisibilityCheckbox />
-        <DefaultStreamLengthField />
+        <AlwaysAddSelfToStreamCheckbox/>
+        <DefaultStreamVisibilityCheckbox/>
+        <DefaultStreamLengthField/>
       </div>
     </div>
   );

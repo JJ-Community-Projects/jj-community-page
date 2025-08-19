@@ -2,16 +2,22 @@ import {type Component, createSignal, For, Show} from "solid-js";
 import {debounce} from "@solid-primitives/scheduled";
 import {Dialog} from "@kobalte/core/dialog";
 import {TextField} from "@kobalte/core/text-field";
-import {useMutation} from "@tanstack/solid-query";
+import {useMutation, useQuery} from "@tanstack/solid-query";
 import {orpc} from "../../../../../../lib/orpc/client.ts";
 
 export const CreateTeamDialog: Component<{ isOpen: () => boolean, setIsOpen: (open: boolean) => void }> = (props) => {
   // Form state signals
   const [name, setName] = createSignal("");
   const [slug, setSlug] = createSignal("");
-  const [isSlugValid, setIsSlugValid] = createSignal(true);
-  const [suggestions, setSuggestions] = createSignal<string[]>([]);
-  const [isCheckingSlug, setIsCheckingSlug] = createSignal(false);
+
+  // Slug validation query
+  const validateSlug = useQuery(() => orpc.private.teams.validateSlug.queryOptions({
+    input: {
+      slug: slug(),
+      tiltifyName: name()
+    },
+    enabled: () => slug().length > 0,
+  }));
 
   // oRPC mutations
   const createTeamMutation = useMutation(() =>
@@ -21,37 +27,37 @@ export const CreateTeamDialog: Component<{ isOpen: () => boolean, setIsOpen: (op
         // Reset form
         setName("");
         setSlug("");
-        setIsSlugValid(true);
-        setSuggestions([]);
       }
     })
   );
 
-  // Create debounced function for slug validation using oRPC
-  const checkSlugUnique = debounce(async (slugValue: string) => {
-    if (!slugValue) {
-      setIsSlugValid(false);
-      setSuggestions([]);
-      return;
+  // Validation helper functions
+  const isCheckingSlug = () => {
+    return validateSlug.isPending;
+  };
+
+  const slugValid = () => {
+    if (!validateSlug.data) {
+      return false;
     }
+    return validateSlug.data.isValid;
+  };
 
-    setIsCheckingSlug(true);
+  const slugErrorMessage = () => {
+    return validateSlug.error?.message;
+  };
 
-    try {
-      const result = await orpc.private.teams.validateSlug.mutate({
-        slug: slugValue,
-        tiltifyName: name()
-      });
-
-      setIsSlugValid(result.isValid);
-      setSuggestions(result.suggestions || []);
-    } catch (error) {
-      console.error("Error checking slug:", error);
-      setIsSlugValid(false);
-      setSuggestions([]);
-    } finally {
-      setIsCheckingSlug(false);
+  const suggestions = () => {
+    if (!validateSlug.data) {
+      return [];
     }
+    return validateSlug.data.suggestions;
+  };
+
+  // Create debounced function for slug setting
+  const setSlugDebounce = debounce((slugValue: string) => {
+    const sanitizedSlug = slugValue.toLowerCase().replace(/[^a-z0-9-]/g, "-");
+    setSlug(sanitizedSlug);
   }, 500);
 
   const handleNameChange = (value: string) => {
@@ -59,19 +65,16 @@ export const CreateTeamDialog: Component<{ isOpen: () => boolean, setIsOpen: (op
     // Auto-generate slug from name if user hasn't manually edited the slug
     const generatedSlug = value.toLowerCase().replace(/[^a-z0-9]/g, "-");
     setSlug(generatedSlug);
-    checkSlugUnique(generatedSlug);
   };
 
   const handleSlugChange = (value: string) => {
-    const sanitizedSlug = value.toLowerCase().replace(/[^a-z0-9-]/g, "-");
-    setSlug(sanitizedSlug);
-    checkSlugUnique(sanitizedSlug);
+    setSlugDebounce(value);
   };
 
   const handleSubmit = async (e: Event) => {
     e.preventDefault();
 
-    if (!name() || !slug() || !isSlugValid()) {
+    if (!name() || !slug() || !slugValid()) {
       return;
     }
 
@@ -111,7 +114,7 @@ export const CreateTeamDialog: Component<{ isOpen: () => boolean, setIsOpen: (op
               <TextField
                 value={slug()}
                 onChange={handleSlugChange}
-                validationState={isSlugValid() ? "valid" : "invalid"}
+                validationState={slugValid() ? "valid" : "invalid"}
               >
                 <TextField.Label class="block text-sm font-medium text-gray-700 mb-1">
                   Team Slug
@@ -128,7 +131,7 @@ export const CreateTeamDialog: Component<{ isOpen: () => boolean, setIsOpen: (op
                   </Show>
                 </div>
                 <TextField.ErrorMessage class="text-red-500 text-sm mt-1">
-                  {!isSlugValid() ? "This slug is not available. Try one of these suggestions:" : undefined}
+                  {slugErrorMessage() || (!slugValid() ? "This slug is not available. Try one of these suggestions:" : undefined)}
                 </TextField.ErrorMessage>
 
                 <Show when={suggestions().length > 0}>
@@ -142,7 +145,6 @@ export const CreateTeamDialog: Component<{ isOpen: () => boolean, setIsOpen: (op
                               class="px-2 py-1 text-sm bg-accent/10 text-accent hover:bg-accent/20 rounded-md transition-colors"
                               onClick={() => {
                                 setSlug(suggestion);
-                                checkSlugUnique(suggestion);
                               }}
                             >
                               {suggestion}
@@ -176,7 +178,7 @@ export const CreateTeamDialog: Component<{ isOpen: () => boolean, setIsOpen: (op
                 <button
                   type="submit"
                   class="px-4 py-2 bg-accent text-white rounded-md hover:bg-accent-400 disabled:opacity-50 disabled:cursor-not-allowed"
-                  disabled={!name() || !slug() || !isSlugValid() || createTeamMutation.isPending}
+                  disabled={!name() || !slug() || !slugValid() || createTeamMutation.isPending}
                 >
                   {createTeamMutation.isPending ? "Creating..." : "Create Team"}
                 </button>

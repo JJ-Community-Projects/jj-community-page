@@ -1,7 +1,7 @@
 import {oc} from '@orpc/contract'
 import {z} from 'zod';
-import {UserDisplaySchema} from "../schemas/users.ts";
 import {SuccessSchema, UserIdSchema} from "../../schemas/common.ts";
+import {UserDisplaySchema} from "../../schemas/users.ts";
 
 
 // Block user contract

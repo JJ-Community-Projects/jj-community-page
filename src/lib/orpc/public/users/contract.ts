@@ -1,12 +1,7 @@
 import {oc} from '@orpc/contract'
-import {
-  TwitchChannelSchema,
-  UserDisplaySchema,
-  UserIdSchema,
-  UserPaginationSchema,
-  UserProfileDataSchema,
-  UserSlugSchema
-} from "../schemas/users.ts";
+import {UserPaginationSchema, UserProfileDataSchema, UserSlugSchema} from "../schemas/users.ts";
+import {TwitchChannelSchema, UserDisplaySchema} from "../../schemas/users.ts";
+import {UserIdSchema} from "../../schemas/common.ts";
 
 
 export const getUserBySlugContract = oc.input(UserSlugSchema)

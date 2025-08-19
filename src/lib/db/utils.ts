@@ -1,12 +1,3 @@
-import type {APIContext} from "astro";
-import {type ActionAPIContext, ActionError} from "astro:actions";
-import {getAuth} from "../auth.ts";
-import {getDB} from "./db.ts";
-import {editorsTable, schedulesTable, streamsTable} from "./schema/schema.ts";
-import {and, eq} from "drizzle-orm";
-import type {DrizzleD1Database} from "drizzle-orm/d1";
-import type {ScheduleEditor} from "./dbModels.ts";
-
 /*
 export async function isAuthenticated(ctx: APIContext | ActionAPIContext) {
   const auth = getAuth(ctx)

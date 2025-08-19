@@ -7,6 +7,7 @@ import {useConfig} from "../../../lib/useConfig.ts";
 import {Countdown} from "../../common/ui/Countdown.tsx";
 import {MobileYogsScheduleComponent} from "./mobile/MobileYogsScheduleComponent.tsx";
 import {YogsScheduleDisclaimer} from "./YogsScheduleDisclaimer.tsx";
+import {PlaceholderSchedule} from "./placeholder/PlaceholderSchedule.tsx";
 
 
 interface CurrentScheduleLoaderProps {
