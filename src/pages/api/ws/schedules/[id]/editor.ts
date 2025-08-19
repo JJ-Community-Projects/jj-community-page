@@ -1,5 +1,4 @@
 import type {APIRoute} from "astro";
-import {getScheduleEditorDO} from "../../../../../actions/getDO.ts";
 
 
 export const GET: APIRoute = async (ctx) => {
@@ -9,8 +8,10 @@ export const GET: APIRoute = async (ctx) => {
   if (!id) {
     throw new Error("id is required");
   }
+  const DO = ctx.locals.runtime.env.ScheduleEditorDO
+  const stubID = DO.idFromName(id)
 
-  const stub = await getScheduleEditorDO(ctx, parseInt(id))
+  const stub = DO.get(stubID) //await getScheduleEditorDO(ctx, parseInt(id))
   await stub.loadFromDB(id)
   return stub.fetch(ctx.request)
 }
