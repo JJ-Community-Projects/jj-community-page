@@ -30,6 +30,14 @@
         "UserRateLimiter",
         "TwitchAPIDO"
       ]
+    },
+    {
+      "tag": "v2",
+      "deleted_classes": [
+        "UserDO",
+        "TeamDO",
+        "TwitchAPIDO"
+      ]
     }
   ],
   "durable_objects": {
@@ -44,20 +52,8 @@
         "class_name": "JingleJamData"
       },
       {
-        "name": "UserDO",
-        "class_name": "UserDO"
-      },
-      {
-        "name": "TeamDO",
-        "class_name": "TeamDO"
-      },
-      {
         "name": "UserRateLimiter",
         "class_name": "UserRateLimiter"
-      },
-      {
-        "name": "TwitchAPIDO",
-        "class_name": "TwitchAPIDO"
       }
     ]
   },
@@ -121,7 +117,8 @@
   },
   "triggers": {
     "crons": [
-      "*/2 * * * *" // every 2 minutes
+      "*/2 * * * *"
+      // every 2 minutes
     ]
   },
   "env": {
