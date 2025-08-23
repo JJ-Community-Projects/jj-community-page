@@ -1,4 +1,4 @@
-import { z } from "zod";
+import {z} from "zod/v4";
 
 /**
  * Schedule management schemas for private oRPC procedures.

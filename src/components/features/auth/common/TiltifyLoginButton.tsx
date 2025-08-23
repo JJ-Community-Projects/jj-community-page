@@ -5,9 +5,9 @@ export const TiltifyLoginButton: Component = () => {
   return (
     <a
       href={'/api/auth/tiltify'}
-      class="flex items-center justify-center gap-2 bg-tiltify hover:bg-tiltify/90 text-white font-medium py-3 px-6 rounded-lg transition-all transform hover:scale-105 shadow-md"
+      class="flex items-center justify-center gap-3 bg-tiltify hover:bg-tiltify/90 disabled:bg-tiltify/50 text-white font-semibold font-poppins py-4 px-8 rounded-xl transition-all transform hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl disabled:pointer-events-none w-full group"
     >
-      <TiltifyIcon class="size-5" />
+      <TiltifyIcon class={`size-5 group-hover:rotate-3 transition-transform`} />
       <span>Login with Tiltify</span>
     </a>
   );

@@ -11,12 +11,12 @@ import {
 import {and, asc, desc, eq, gt, inArray, ne} from 'drizzle-orm';
 import {ORPCError} from '@orpc/server';
 import {TeamSchema} from '../schemas/teams.ts';
-import {z} from 'zod';
+import {z} from "zod/v4";
 import type {JJDrizzleDatabase} from "../../../db/db.ts";
 import {type StreamTag, streamTagsTable, tags, type UserTag, userTagsTable} from "../../../db/schema/tags-schema.ts";
-import type {ScheduleInfoSchema} from "../../schemas/schedules.ts";
-import type {UserDisplaySchema} from "../../schemas/users.ts";
-import {SocialSchema} from "../../schemas/users.ts";
+import type {ScheduleInfoSchema} from "../schemas/schedules.ts";
+import type {SocialSchema} from "../schemas/social.ts";
+import type {UserDisplaySchema} from "../schemas/UserDisplaySchema.ts";
 
 /**
  * Helper functions for the getUserProfileBySlug procedure

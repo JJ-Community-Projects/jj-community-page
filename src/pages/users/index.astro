@@ -1,9 +1,14 @@
 ---
+import { serverClientPublic } from "../../lib/orpc/client";
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import {actions} from "astro:actions";
 import UsersPage from "../../components/features/users/public/UsersPage";
+
 // Get all users in UserPageUI format
-const {data, error} = await Astro.callAction(actions.ui.users.all, {});
+const { data, error } = await serverClientPublic.users.getAllUsers({}, {
+  locals: Astro.locals,
+  request: Astro.request,
+  env: Astro.locals.runtime.env
+})
 ---
 <BaseLayout title="Users - Jingle Jam Community">
 

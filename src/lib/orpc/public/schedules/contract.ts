@@ -1,98 +1,51 @@
 import {oc} from "@orpc/contract";
-import {FullScheduleSchema} from "../schemas/schedule.ts";
-import {ScheduleInfoSchema} from "../../schemas/schedules.ts";
-import z from "zod";
-import {UserSlugSchema} from "../schemas/users.ts";
+import {FullScheduleSchema, ScheduleSlugInputSchema, YearInputSchema, SchedulesListSchema} from "../schemas/schedules.ts";
+
 
 /**
- * Schema for input that includes both user slug and year.
- * Used for year-specific schedule queries.
+ * Get full schedule by slug
+ * @path /schedules/{slug}
+ * @description Retrieve complete schedule information including all streams, participants, and organized data for displaying individual schedule pages
+ * @Input ScheduleSlugInputSchema - contains slug (string) to identify the schedule
+ * @Output FullScheduleSchema object containing complete schedule information with all streams and participants
  */
-const UserSlugWithYearSchema = z.object({
-  userSlug: UserSlugSchema,
-  year: z.number().int().positive(),
-});
+const getFullScheduleBySlugContract = oc
+  .input(ScheduleSlugInputSchema)
+  .output(FullScheduleSchema)
+  .route({
+    path: '/schedules/{slug}',
+    method: 'GET',
+    operationId: 'getScheduleBySlug',
+    summary: 'Get schedule by slug',
+    description: 'Retrieve complete schedule information by slug',
+    tags: ['schedules'],
+    successDescription: 'Schedule retrieved successfully',
+    deprecated: false
+  });
 
 /**
- * Contract for getting the primary schedule information for a user by their slug.
- * Returns only the basic schedule metadata without streams or participants.
- * The primary schedule is the main/featured schedule for the user's current year.
+ * Get visible primary schedules by year
+ * @path /schedules/year/{year}
+ * @description Retrieve all visible primary schedules for a specific year for public display
+ * @Input YearInputSchema - contains year (number) to filter schedules by year
+ * @Output SchedulesListSchema array containing all visible primary schedules for the specified year
  */
-const getPrimaryScheduleInfoByUserSlugContract = oc
-  .input(UserSlugSchema)
-  .output(ScheduleInfoSchema);
-
-/**
- * Contract for getting the primary full schedule data for a user by their slug.
- * Returns complete schedule information including all streams, participants, and organized data.
- * The primary schedule is the main/featured schedule for the user's current year.
- */
-const getPrimaryFullScheduleByUserSlugContract = oc
-  .input(UserSlugSchema)
-  .output(FullScheduleSchema);
-
-/**
- * Contract for getting all schedule information entries for a user by their slug.
- * Returns an array of schedule metadata for all schedules owned by the user.
- * Does not include detailed stream data or participants.
- */
-const getScheduleInfoByUserSlugContract = oc
-  .input(UserSlugSchema)
-  .output(z.array(ScheduleInfoSchema));
-
-/**
- * Contract for getting all full schedule data for a user by their slug.
- * Returns an array of complete schedule information including streams and participants.
- * Includes all schedules owned by the user with their complete datasets.
- */
-const getFullScheduleByUserSlugContract = oc
-  .input(UserSlugSchema)
-  .output(z.array(FullScheduleSchema));
-
-/**
- * Contract for getting the primary schedule information for a user by their slug for a specific year.
- * Returns only the basic schedule metadata without streams or participants.
- * The primary schedule is the main/featured schedule for the user in the specified year.
- */
-const getPrimaryScheduleInfoByUserSlugAndYearContract = oc
-  .input(UserSlugWithYearSchema)
-  .output(ScheduleInfoSchema);
-
-/**
- * Contract for getting the primary full schedule data for a user by their slug for a specific year.
- * Returns complete schedule information including all streams, participants, and organized data.
- * The primary schedule is the main/featured schedule for the user in the specified year.
- */
-const getPrimaryFullScheduleByUserSlugAndYearContract = oc
-  .input(UserSlugWithYearSchema)
-  .output(FullScheduleSchema);
-
-/**
- * Contract for getting all schedule information entries for a user by their slug for a specific year.
- * Returns an array of schedule metadata for all schedules owned by the user in the specified year.
- * Does not include detailed stream data or participants.
- */
-const getScheduleInfoByUserSlugAndYearContract = oc
-  .input(UserSlugWithYearSchema)
-  .output(z.array(ScheduleInfoSchema));
-
-/**
- * Contract for getting all full schedule data for a user by their slug for a specific year.
- * Returns an array of complete schedule information including streams and participants.
- * Includes all schedules owned by the user in the specified year with their complete datasets.
- */
-const getFullScheduleByUserSlugAndYearContract = oc
-  .input(UserSlugWithYearSchema)
-  .output(z.array(FullScheduleSchema));
+const getVisiblePrimarySchedulesByYearContract = oc
+  .input(YearInputSchema)
+  .output(SchedulesListSchema)
+  .route({
+    path: '/schedules/year/{year}',
+    method: 'GET',
+    operationId: 'getVisiblePrimarySchedulesByYear',
+    summary: 'Get visible primary schedules by year',
+    description: 'Retrieve all visible primary schedules for a specific year',
+    tags: ['schedules'],
+    successDescription: 'Visible primary schedules retrieved successfully',
+    deprecated: false
+  });
 
 
 export const contracts = {
-  getPrimaryScheduleInfoByUserSlugContract,
-  getPrimaryFullScheduleByUserSlugContract,
-  getScheduleInfoByUserSlugContract,
-  getFullScheduleByUserSlugContract,
-  getPrimaryScheduleInfoByUserSlugAndYearContract,
-  getPrimaryFullScheduleByUserSlugAndYearContract,
-  getScheduleInfoByUserSlugAndYearContract,
-  getFullScheduleByUserSlugAndYearContract,
+  getFullScheduleBySlugContract,
+  getVisiblePrimarySchedulesByYearContract,
 }

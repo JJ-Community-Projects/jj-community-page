@@ -1,4 +1,7 @@
-import {z} from "zod";
+import {z} from "zod/v4"; /**
+ * Social media and platform integration schemas used across oRPC procedures.
+ * These schemas handle social media connections, platform validations, and import operations.
+ */
 
 /**
  * Social media and platform integration schemas used across oRPC procedures.

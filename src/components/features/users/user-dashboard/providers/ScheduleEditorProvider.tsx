@@ -35,7 +35,7 @@ import type {
 } from "../../../../../lib/model/admin/user/scheduleEditor/ScheduleEditorTypes";
 import {useScheduleEditorConnection} from "./ScheduleEditorConnectionProvider.tsx";
 import {useMutation, useQueryClient} from "@tanstack/solid-query";
-import {orpc} from "../../../../../lib/orpc/client.ts";
+import {orpcPrivate} from "../../../../../lib/orpc/client.ts";
 
 /**
  * Defines the structure for tracking the state of all actions in the hook.
@@ -152,8 +152,8 @@ const useScheduleEditorHook = (id: number, userId: number,
 
   const {store, addListener} = useScheduleEditorConnection()
   const queryClient = useQueryClient()
-  const schedules = orpc.private.schedules
-  const tags = orpc.private.tags
+  const schedules = orpcPrivate.schedules
+  const tags = orpcPrivate.tags
 
   // Schedule mutations
   const saveScheduleMutation = useMutation(() =>

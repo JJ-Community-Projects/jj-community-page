@@ -1,5 +1,5 @@
 ---
-import { actions } from 'astro:actions';
+import { serverClientPublic } from "../../../../lib/orpc/client";
 
 interface Props {
   tiltifyUsername: string;
@@ -7,8 +7,12 @@ interface Props {
 
 const { tiltifyUsername } = Astro.props;
 
-// Get user's schedules using the new action
-const { data: schedules, error } = await Astro.callAction(actions.schedules.getSchedulesByTiltifyUsername, tiltifyUsername);
+// Get user's schedules using serverClient
+const { data: schedules } = await serverClientPublic.schedules.getScheduleInfoByUserSlug(tiltifyUsername, {
+  locals: Astro.locals,
+  request: Astro.request,
+  env: Astro.locals.runtime.env
+})
 ---
 
 <div class="w-full bg-white rounded-lg p-6 mb-4 shadow-md">

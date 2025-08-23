@@ -1,7 +1,10 @@
 import {oc} from '@orpc/contract'
-import z from "zod";
-import {HexColorSchema, SuccessSchema} from "../../schemas/common.ts";
-import {StreamingPlatformSchema} from "../../schemas/users.ts";
+import z from "zod/v4";
+import {HexColorSchema, SuccessSchema} from "../schemas/common.ts";
+import {StreamingPlatformSchema} from "../schemas/users.ts"; /**
+ * Profile management contracts for user style and streaming preferences.
+ * These endpoints handle direct database operations for user profile customization.
+ */
 
 /**
  * Profile management contracts for user style and streaming preferences.

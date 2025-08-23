@@ -1,11 +1,11 @@
 import {createContext, type ParentComponent, useContext} from "solid-js";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/solid-query";
-import {orpc} from "../../../../../lib/orpc/client.ts";
+import {orpcPrivate} from "../../../../../lib/orpc/client.ts";
 
 const useTeamDetailsHook = (teamId: number) => {
   const queryClient = useQueryClient();
-  const teams = orpc.private.teams;
-  const teamsSSE = orpc.private.teamsSSE;
+  const teams = orpcPrivate.teams;
+  const teamsSSE = orpcPrivate.teamsSSE;
 
   // Team-specific data queries
   const teamQuery = useQuery(() =>

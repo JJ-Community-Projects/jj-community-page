@@ -1,6 +1,6 @@
 import {type Component, For, Show} from "solid-js";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/solid-query";
-import {orpc} from "../../../../../lib/orpc/client.ts";
+import {orpcPrivate} from "../../../../../lib/orpc/client.ts";
 import type {User} from "../../../../../lib/auth/User.ts";
 import {Dialog} from "@kobalte/core/dialog";
 import {createModalSignal} from "../../../../../lib/createModalSignal.ts";
@@ -27,7 +27,7 @@ export const SchedulesList: Component<SchedulesListProps> = (props) => {
 
 const SchedulesListContent: Component<{user: User}> = (props) => {
   const queryClient = useQueryClient();
-  const schedules = orpc.private.schedules;
+  const schedules = orpcPrivate.schedules;
 
   // Query for user schedules
   const schedulesQuery = useQuery(() =>
@@ -153,7 +153,7 @@ const SchedulePrimaryButton: Component<{
   }
 }> = (props) => {
   const queryClient = useQueryClient();
-  const schedules = orpc.private.schedules;
+  const schedules = orpcPrivate.schedules;
 
   const setPrimaryMutation = useMutation(() =>
     schedules.setPrimary.mutationOptions({
@@ -196,7 +196,7 @@ const ScheduleVisibilityButton: Component<{
   }
 }> = (props) => {
   const queryClient = useQueryClient();
-  const schedules = orpc.private.schedules;
+  const schedules = orpcPrivate.schedules;
 
   const toggleVisibilityMutation = useMutation(() =>
     schedules.toggleVisibility.mutationOptions({
@@ -240,7 +240,7 @@ const ScheduleDeleteButton: Component<{
   }
 }> = (props) => {
   const queryClient = useQueryClient();
-  const schedules = orpc.private.schedules;
+  const schedules = orpcPrivate.schedules;
   const modal = createModalSignal();
 
   const deleteScheduleMutation = useMutation(() =>

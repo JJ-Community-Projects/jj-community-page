@@ -1,12 +1,18 @@
 ---
-import {actions} from "astro:actions";
 import {DebugJSONView} from "../../components/common/DebugJSONView";
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import {serverClientPublic} from "../../lib/orpc/client";
 const {slug} = Astro.params
 if (!slug) {
   return Astro.redirect('/teams')
 }
-const {data, error} = await Astro.callAction(actions.ui.teams.getBySlug, slug)
+
+const {data, error} = await serverClientPublic.teams.getBySlug({slug}, {
+  locals: Astro.locals,
+  request: Astro.request,
+  env: Astro.locals.runtime.env
+})
+
 ---
 <BaseLayout>
   {

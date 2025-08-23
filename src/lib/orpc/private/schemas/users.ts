@@ -1,9 +1,53 @@
-import {z} from "zod";
+import {z} from "zod/v4";
 
 /**
  * User-related schemas used across public and private oRPC procedures.
  * These schemas handle user identification, display, and platform integrations.
  */
+
+/**
+ * Schema for validating user ID parameters in API requests.
+ * Ensures the ID is a positive integer matching the users table primary key.
+ * Used in: blocks, friends contracts for user identification, public user lookups
+ */
+export const UserIdSchema = z.number().int().positive();
+
+/**
+ * Input schema for operations that require a user ID parameter.
+ * Provides consistent validation for user identification across all procedures.
+ * Used in: user lookups, friend operations, blocking, and any endpoint that targets a specific user.
+ *
+ * @example
+ * // Used in public user profile lookup
+ * { userId: 123 }
+ *
+ * // Used in friend list retrieval
+ * { userId: 456 }
+ */
+export const UserIdInputSchema = z.object({
+  /** The unique identifier for a user from the users table */
+  userId: UserIdSchema,
+})
+
+/**
+ * Public user contracts for retrieving user information without authentication.
+ * These schemas handle read-only operations for user profiles, relationships, and associated data.
+ */
+
+
+/**
+ * Schema for validating user slug parameters in API requests.
+ * User slugs are derived from provider usernames (e.g., Tiltify login) and used for URL routing.
+ */
+export const UserSlugSchema = z.string().nonempty();
+
+
+export const UserSlugInputSchema = z.object({slug: z.string()});
+
+
+export const UserQueryInputSchema = z.union([
+  UserSlugInputSchema, UserIdInputSchema,
+])
 
 /**
  * Schema for primary streaming platform selection.

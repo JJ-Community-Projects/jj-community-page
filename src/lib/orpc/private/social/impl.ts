@@ -11,7 +11,7 @@ import {TiltifyAPI} from "../../../TiltifyAPI.ts";
 const os = implement(platformsContract)
   .use(dbMiddleware);
 
- const addSocial = os.addSocialContract
+const addSocial = os.addSocialContract
   .use(authMiddleware)
   .handler(async ({context, input}) => {
     const db = context.db;
@@ -49,7 +49,7 @@ const os = implement(platformsContract)
           offlineImageUrl: channel.offline_image_url,
         })
         .onConflictDoUpdate({
-          target: [twitchChannelSchema.userId],
+          target: [twitchChannelSchema.id],
           set: {
             id: channel.id,
             login: channel.login,
@@ -76,7 +76,7 @@ const os = implement(platformsContract)
     return result
   });
 
- const removeSocial = os.removeSocialContract
+const removeSocial = os.removeSocialContract
   .use(authMiddleware)
   .handler(async ({context, input}) => {
     const db = context.db;
@@ -104,7 +104,7 @@ const os = implement(platformsContract)
 /**
  * Get all social media links for the authenticated user
  */
- const getSocial = os
+const getSocial = os
   .getSocialContract
   .use(authMiddleware)
   .handler(async ({context}) => {
@@ -145,7 +145,7 @@ function formatSocialUrl(platform: string, value: string): string {
   }
 }
 
- const importFromTiltify = os.importFromTiltifyContract
+const importFromTiltify = os.importFromTiltifyContract
   .use(authMiddleware)
   .handler(async ({context}) => {
     const db = context.db;

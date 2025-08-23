@@ -1,6 +1,5 @@
 ---
-import { call, os } from '@orpc/server'
-import {publicTeamsRouter} from "../../../../lib/orpc/public/teams/impl";
+import { serverClientPublic } from "../../../../lib/orpc/client";
 
 interface Props {
   tiltifyUsername: string;
@@ -8,16 +7,14 @@ interface Props {
 }
 
 const { tiltifyUsername, userId } = Astro.props;
-const getTeamsByUserId = publicTeamsRouter.getTeamsByUserId
-const result = await call(getTeamsByUserId, userId, {
-  context: {
-    locals: Astro.locals,
-    request: Astro.request,
-    env: Astro.locals.runtime.env
-  }
+
+const { data: result } = await serverClientPublic.teams.getTeamsByUserId(userId, {
+  locals: Astro.locals,
+  request: Astro.request,
+  env: Astro.locals.runtime.env
 })
 
-const teams = result.teams;
+const teams = result?.teams;
 
 ---
 

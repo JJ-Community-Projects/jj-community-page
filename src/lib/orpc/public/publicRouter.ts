@@ -1,10 +1,15 @@
 import {os} from "@orpc/server";
-import {usersRouter} from "./users/usersRouter.ts";
+import {publicUsersRouter} from "./users/impl.ts";
 import {publicTeamsRouter} from "./teams/impl.ts";
-import {schedulesRouter} from "./schedules/impl.ts";
+import {publicSchedulesRouter} from "./schedules/impl.ts";
+import {hasAstroContext} from "../middleware/hasAstroContext.ts";
+import {dbMiddleware} from "../middleware/dbMiddleware.ts";
 
-export const publicRouter = os.router({
-  users: usersRouter,
-  teams: publicTeamsRouter,
-  schedules: schedulesRouter
-})
+export const publicRouter = os
+  .use(hasAstroContext)
+  .use(dbMiddleware)
+  .router({
+    users: publicUsersRouter,
+    teams: publicTeamsRouter,
+    schedules: publicSchedulesRouter
+  })

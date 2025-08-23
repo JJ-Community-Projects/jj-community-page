@@ -1,8 +1,8 @@
 import {oc} from '@orpc/contract'
-import {z} from 'zod';
-import {SocialImportResultSchema, SocialProviderSchema} from "../../schemas/social.ts";
+import {z} from "zod/v4";
+import {SocialImportResultSchema, SocialProviderSchema} from "../schemas/social.ts";
 import {socialUrlRegex} from "../../../../functions/socialUrlRegex.ts";
-import {SocialSchema} from "../../schemas/users.ts";
+import {SocialSchema} from "../schemas/users.ts";
 
 // Add social contract
  const addSocialContract = oc
@@ -27,13 +27,13 @@ import {SocialSchema} from "../../schemas/users.ts";
  * Uses authMiddleware to access user ID from context
  */
  const getSocialContract = oc
-  .output(SocialSchema.array())
+  .output(z.array(SocialSchema))
 
 
 // Import from Tiltify contract
  const importFromTiltifyContract = oc
   .input(z.void()) // No input required, uses authenticated user context
-  .output(SocialImportResultSchema.array());
+  .output(z.array(SocialImportResultSchema));
 
 
 // Platforms contract combining all platform operations

@@ -1,5 +1,5 @@
 import {oc} from '@orpc/contract';
-import {z} from 'zod';
+import {z} from "zod/v4";
 import {
   CreateScheduleResponseSchema,
   NextScheduleResponseSchema,
@@ -9,7 +9,7 @@ import {
   SuccessMessageSchema,
   TablesDataSchema
 } from "../schemas/schedules.ts";
-import {PopularTagsResponseSchema, SuggestedTagsResponseSchema} from "../../schemas/tags.ts";
+import {PopularTagsResponseSchema, SuggestedTagsResponseSchema} from "../schemas/tags.ts";
 
 /**
  * Private schedules contracts for authenticated schedule management operations.
@@ -170,7 +170,7 @@ const getNextScheduleByTiltifyUsernameContract = oc
  * Uses authMiddleware to access user ID from context
  */
 const getSchedulesContract = oc
-  .output(ScheduleSchema.array())
+  .output(z.array(ScheduleSchema))
 
 export const privateSchedulesContract = {
   // Schedule CRUD Operations

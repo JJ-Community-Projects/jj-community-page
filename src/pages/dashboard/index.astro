@@ -1,5 +1,5 @@
 ---
-import {actions} from 'astro:actions';
+import {serverClientPrivate} from "../../lib/orpc/client";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import {UserAdminDashboardPage} from "../../components/features/users/user-dashboard/UserAdminDashboardPage.tsx";
 
@@ -7,17 +7,20 @@ const {session, user} = Astro.locals
 if (session === null) {
   return Astro.redirect("/");
 }
+const getCurrentUser = serverClientPrivate.users.getCurrentUser
+const {data: userData, error} = await getCurrentUser({}, {
+  context: {
+    locals: Astro.locals,
+    request: Astro.request,
+  },
+})
 
-const {data, error} = await Astro.callAction(actions.users.getTiltifyAccount, user.tiltifyName)
-if (error) {
-  console.error(error)
+console.log('userData', userData);
+console.log('error', error);
+
+if (!userData) {
   return Astro.redirect("/");
 }
-
-if (!data) {
-  return Astro.redirect("/");
-}
-
 ---
 <BaseLayout>
     <UserAdminDashboardPage user={user} client:only="solid-js"/>

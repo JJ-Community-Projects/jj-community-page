@@ -2,12 +2,22 @@ import {implement, ORPCError} from '@orpc/server'
 import {dbMiddleware} from "../../middleware/dbMiddleware.ts";
 import {authMiddleware} from "../../middleware/authMiddleware.ts";
 import {privateTagsContract} from "./contract.ts";
-import {streamTagsTable, tagCategories, tags, userTagsTable} from "../../../db/schema/tags-schema.ts";
+import {tagCategories, tags, userTagsTable} from "../../../db/schema/tags-schema.ts";
 import {users} from "../../../db/schema/auth-schema.ts";
 import {and, count, desc, eq, like, or, sql} from "drizzle-orm";
+import {
+  buildTagWhereConditions,
+  getCategoryTagCountExpression,
+  getCategoryWithStatsFields,
+  getTagUsageFilterCondition,
+  getTagWithUsageFields,
+  getTotalUsageExpression,
+  getVisibleTagsCondition
+} from "./util.ts";
 
 const os = implement(privateTagsContract)
   .use(dbMiddleware);
+
 
 // === User Tag Management Procedures ===
 
@@ -147,71 +157,23 @@ const listAvailableTags = os.listAvailableTags
     const db = context.db;
 
     try {
-      // Build where conditions
-      let whereConditions = [eq(tags.visible, true)];
+      // Build WHERE conditions using helper function
+      // - Ensures only visible tags are returned
+      // - Optionally filters by category if specified in input
+      const whereConditions = buildTagWhereConditions(input.categoryId);
 
-      // Filter by category if provided
-      if (input.categoryId) {
-        whereConditions.push(eq(tags.categoryId, input.categoryId));
-      }
-
-      const result = await db.select({
-        id: tags.id,
-        name: tags.name,
-        slug: tags.slug,
-        description: tags.description,
-        categoryId: tags.categoryId,
-        color: tags.color,
-        userCount: sql<number>`COALESCE((SELECT COUNT(*) FROM
-        ${userTagsTable}
-        WHERE
-        ${userTagsTable.tagId}
-        =
-        ${tags.id}
-        ),
-        0
-        )`,
-        streamCount: sql<number>`COALESCE((SELECT COUNT(*) FROM
-        ${streamTagsTable}
-        WHERE
-        ${streamTagsTable.tagId}
-        =
-        ${tags.id}
-        ),
-        0
-        )`,
-        totalUsage: sql<number>`COALESCE((SELECT COUNT(*) FROM
-        ${userTagsTable}
-        WHERE
-        ${userTagsTable.tagId}
-        =
-        ${tags.id}
-        ),
-        0
-        )
-        +
-        COALESCE
-        (
-        (
-        SELECT
-        COUNT
-        (
-        *
-        )
-        FROM
-        ${streamTagsTable}
-        WHERE
-        ${streamTagsTable.tagId}
-        =
-        ${tags.id}
-        ),
-        0
-        )`,
-      })
-        .from(tags)
-        .where(whereConditions.length === 1 ? whereConditions[0] : and(...whereConditions))
-        .limit(input.limit)
-        .orderBy(desc(sql`totalUsage`), tags.name);
+      // Execute SELECT query with comprehensive tag information and usage statistics
+      const result = await db
+        .select(getTagWithUsageFields()) // SELECT: Use standardized fields with usage calculations
+        .from(tags) // FROM: Query the main tags table
+        .where(whereConditions.length === 1 ? whereConditions[0] : and(...whereConditions)) // WHERE: Apply visibility and category filters
+        .limit(input.limit) // LIMIT: Restrict number of results as requested
+        .orderBy(
+          // ORDER BY: Sort by total usage count (descending) then by name (ascending)
+          // Note: Using full expression instead of alias to avoid SQLite column reference errors
+          desc(getTotalUsageExpression()),
+          tags.name
+        );
 
       return result;
     } catch (error) {
@@ -278,81 +240,37 @@ const getPopularTags = os.getPopularTags
     const db = context.db;
 
     try {
-      // Build where conditions
-      let whereConditions = [eq(tags.visible, true)];
+      // Build WHERE conditions using helper functions
+      // - Ensures only visible tags are returned
+      // - Optionally filters by category if specified in input
+      const baseWhereConditions = buildTagWhereConditions(input.categoryId);
 
-      // Filter by category if provided
-      if (input.categoryId) {
-        whereConditions.push(eq(tags.categoryId, input.categoryId));
-      }
+      // Add usage filter to only return tags that are actually used
+      // - Filters out tags with zero user count AND zero stream count
+      const usageFilter = getTagUsageFilterCondition();
+      const allWhereConditions = [...baseWhereConditions, usageFilter];
 
-      // Get popular tags with usage statistics
-      const popularTags = await db.select({
-        id: tags.id,
-        name: tags.name,
-        slug: tags.slug,
-        description: tags.description,
-        categoryId: tags.categoryId,
-        color: tags.color,
-        userCount: sql<number>`COALESCE((SELECT COUNT(*) FROM
-        ${userTagsTable}
-        WHERE
-        ${userTagsTable.tagId}
-        =
-        ${tags.id}
-        ),
-        0
-        )`,
-        streamCount: sql<number>`COALESCE((SELECT COUNT(*) FROM
-        ${streamTagsTable}
-        WHERE
-        ${streamTagsTable.tagId}
-        =
-        ${tags.id}
-        ),
-        0
-        )`,
-        totalUsage: sql<number>`COALESCE((SELECT COUNT(*) FROM
-        ${userTagsTable}
-        WHERE
-        ${userTagsTable.tagId}
-        =
-        ${tags.id}
-        ),
-        0
-        )
-        +
-        COALESCE
-        (
-        (
-        SELECT
-        COUNT
-        (
-        *
-        )
-        FROM
-        ${streamTagsTable}
-        WHERE
-        ${streamTagsTable.tagId}
-        =
-        ${tags.id}
-        ),
-        0
-        )`,
-      })
-        .from(tags)
-        .where(whereConditions.length === 1 ? whereConditions[0] : and(...whereConditions))
-        .having(sql`totalUsage
-        > 0`)
-        .limit(input.limit)
-        .orderBy(desc(sql`totalUsage`), tags.name);
+      // Execute main SELECT query for popular tags with comprehensive statistics
+      const popularTags = await db
+        .select(getTagWithUsageFields()) // SELECT: Use standardized fields with usage calculations
+        .from(tags) // FROM: Query the main tags table
+        .where(and(...allWhereConditions)) // WHERE: Apply visibility, category, and usage filters
+        .limit(input.limit) // LIMIT: Restrict number of results as requested
+        .orderBy(
+          // ORDER BY: Sort by total usage count (descending) then by name (ascending)
+          // Note: Using full expression instead of alias to avoid SQLite column reference errors
+          desc(getTotalUsageExpression()),
+          tags.name
+        );
 
-      // Get total visible tags count
-      const totalTagsResult = await db.select({count: count()})
-        .from(tags)
-        .where(eq(tags.visible, true))
+      // Execute secondary COUNT query to get total visible tags statistics
+      const totalTagsResult = await db
+        .select({count: count()}) // SELECT: Count all matching rows
+        .from(tags) // FROM: Query the main tags table
+        .where(getVisibleTagsCondition()) // WHERE: Only count visible tags
         .get();
 
+      // Return comprehensive response with tags, metadata, and statistics
       return {
         tags: popularTags,
         totalTags: totalTagsResult?.count || 0,
@@ -374,86 +292,35 @@ const searchTags = os.searchTags
     const db = context.db;
 
     try {
-      // Build where conditions
-      let whereConditions = [eq(tags.visible, true)];
+      // Build base WHERE conditions using helper functions
+      // - Ensures only visible tags are returned
+      // - Optionally filters by category if specified in input
+      const baseWhereConditions = buildTagWhereConditions(input.categoryId);
 
-      // Filter by category if provided
-      if (input.categoryId) {
-        whereConditions.push(eq(tags.categoryId, input.categoryId));
-      }
-
-      // Search in tag names and descriptions
+      // Build search conditions for text matching
+      // - Performs case-insensitive search in tag names and descriptions
+      // - Uses LIKE operator with wildcard patterns for flexible matching
       const searchPattern = `%${input.query.toLowerCase()}%`;
       const searchConditions = or(
-        like(sql`lower(
-        ${tags.name}
-        )`, searchPattern),
-        like(sql`lower(
-        ${tags.description}
-        )`, searchPattern)
+        like(sql`lower(${tags.name})`, searchPattern), // Search in tag names (case-insensitive)
+        like(sql`lower(${tags.description})`, searchPattern) // Search in tag descriptions (case-insensitive)
       );
 
-      if (searchConditions) {
-        whereConditions.push(searchConditions);
-      }
+      // Combine all WHERE conditions
+      const allWhereConditions = [...baseWhereConditions, searchConditions];
 
-      const result = await db.select({
-        id: tags.id,
-        name: tags.name,
-        slug: tags.slug,
-        description: tags.description,
-        categoryId: tags.categoryId,
-        color: tags.color,
-        userCount: sql<number>`COALESCE((SELECT COUNT(*) FROM
-        ${userTagsTable}
-        WHERE
-        ${userTagsTable.tagId}
-        =
-        ${tags.id}
-        ),
-        0
-        )`,
-        streamCount: sql<number>`COALESCE((SELECT COUNT(*) FROM
-        ${streamTagsTable}
-        WHERE
-        ${streamTagsTable.tagId}
-        =
-        ${tags.id}
-        ),
-        0
-        )`,
-        totalUsage: sql<number>`COALESCE((SELECT COUNT(*) FROM
-        ${userTagsTable}
-        WHERE
-        ${userTagsTable.tagId}
-        =
-        ${tags.id}
-        ),
-        0
-        )
-        +
-        COALESCE
-        (
-        (
-        SELECT
-        COUNT
-        (
-        *
-        )
-        FROM
-        ${streamTagsTable}
-        WHERE
-        ${streamTagsTable.tagId}
-        =
-        ${tags.id}
-        ),
-        0
-        )`,
-      })
-        .from(tags)
-        .where(and(...whereConditions))
-        .limit(input.limit)
-        .orderBy(desc(sql`totalUsage`), tags.name);
+      // Execute SELECT query with comprehensive tag information and usage statistics
+      const result = await db
+        .select(getTagWithUsageFields()) // SELECT: Use standardized fields with usage calculations
+        .from(tags) // FROM: Query the main tags table
+        .where(and(...allWhereConditions)) // WHERE: Apply visibility, category, and search filters
+        .limit(input.limit) // LIMIT: Restrict number of results as requested
+        .orderBy(
+          // ORDER BY: Sort by total usage count (descending) then by name (ascending)
+          // Note: Using full expression instead of alias to avoid SQLite column reference errors
+          desc(getTotalUsageExpression()),
+          tags.name
+        );
 
       return result;
     } catch (error) {
@@ -471,91 +338,33 @@ const getTagCategories = os.getTagCategories
     const db = context.db;
 
     try {
-      // Build where conditions
+      // Build base WHERE conditions for category visibility
+      // - Ensures only visible categories are returned
       let whereConditions = [eq(tagCategories.visible, true)];
 
-      let query = db.select({
-        id: tagCategories.id,
-        slug: tagCategories.slug,
-        name: tagCategories.name,
-        description: tagCategories.description,
-        color: tagCategories.color,
-        icon: tagCategories.icon,
-        sortOrder: tagCategories.sortOrder,
-        visible: tagCategories.visible,
-        tagCount: sql<number>`COALESCE((SELECT COUNT(*) FROM
-        ${tags}
-        WHERE
-        ${tags.categoryId}
-        =
-        ${tagCategories.id}
-        AND
-        ${tags.visible}
-        =
-        true
-        ),
-        0
-        )`,
-        usageCount: sql<number>`COALESCE((SELECT COUNT(*) FROM
-        ${userTagsTable}
-        INNER
-        JOIN
-        ${tags}
-        ON
-        ${userTagsTable.tagId}
-        =
-        ${tags.id}
-        WHERE
-        ${tags.categoryId}
-        =
-        ${tagCategories.id}
-        AND
-        ${tags.visible}
-        =
-        true
-        ),
-        0
-        )
-        +
-        COALESCE
-        (
-        (
-        SELECT
-        COUNT
-        (
-        *
-        )
-        FROM
-        ${streamTagsTable}
-        INNER
-        JOIN
-        ${tags}
-        ON
-        ${streamTagsTable.tagId}
-        =
-        ${tags.id}
-        WHERE
-        ${tags.categoryId}
-        =
-        ${tagCategories.id}
-        AND
-        ${tags.visible}
-        =
-        true
-        ),
-        0
-        )`,
-      })
-        .from(tagCategories)
-        .where(whereConditions.length === 1 ? whereConditions[0] : and(...whereConditions));
-
-      // Filter out empty categories if requested
+      // Add filter for non-empty categories if requested
+      // - Filters out categories with no visible tags
+      // - Uses WHERE clause instead of HAVING to avoid SQLite aggregate query errors
       if (!input.includeEmpty) {
-        return query.orderBy(tagCategories.sortOrder, tagCategories.name).having(sql`tagCount
-        > 0`);
+        whereConditions.push(
+          sql`${getCategoryTagCountExpression()} > 0` // WHERE: Only categories with at least one visible tag
+        );
       }
 
-      return query.orderBy(tagCategories.sortOrder, tagCategories.name);
+      // Execute SELECT query with comprehensive category information and statistics
+      const result = await db
+        .select(getCategoryWithStatsFields()) // SELECT: Use standardized fields with category statistics
+        .from(tagCategories) // FROM: Query the tag categories table
+        .where(and(...whereConditions)) // WHERE: Apply visibility and empty category filters
+        .orderBy(
+          // ORDER BY: Sort by assigned sort order then by name
+          // - Primary sort: sortOrder (ascending) for admin-controlled ordering
+          // - Secondary sort: name (ascending) for consistent alphabetical fallback
+          tagCategories.sortOrder,
+          tagCategories.name
+        );
+
+      return result;
     } catch (error) {
       console.error('Error getting tag categories:', error);
       throw new ORPCError('INTERNAL_SERVER_ERROR', {message: 'Failed to get tag categories'});

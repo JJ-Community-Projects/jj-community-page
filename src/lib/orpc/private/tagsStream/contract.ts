@@ -1,6 +1,6 @@
 import {oc} from '@orpc/contract';
-import {z} from 'zod';
-import {PaginationLimitSchema, SuccessSchema} from "../../schemas/common.ts";
+import {z} from "zod/v4";
+import {PaginationLimitSchema, SuccessSchema} from "../schemas/common.ts";
 
 /**
  * Private stream tags contracts for authenticated stream tag management operations.

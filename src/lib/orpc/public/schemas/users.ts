@@ -1,21 +1,10 @@
-import {z} from "zod";
+import {z} from "zod/v4";
 import {TeamSchema} from "./teams.ts";
-import {StreamSchema} from "./schedule.ts";
-import {SocialSchema as Social, UserDisplaySchema} from "../../schemas/users.ts";
-import {TagSchema as Tag} from "../../schemas/tags.ts";
-import {ScheduleInfoSchema} from "../../schemas/schedules.ts";
-
-/**
- * Public user contracts for retrieving user information without authentication.
- * These schemas handle read-only operations for user profiles, relationships, and associated data.
- */
-
-
-/**
- * Schema for validating user slug parameters in API requests.
- * User slugs are derived from provider usernames (e.g., Tiltify login) and used for URL routing.
- */
-export const UserSlugSchema = z.string();
+import {ScheduleInfoSchema, StreamSchema} from "./schedules.ts";
+import {SocialSchema} from "./social.ts";
+import {SimplePublicTagSchema} from "./tags.ts";
+import {UserIdSchema} from "./common.ts";
+import {UserDisplaySchema} from "./UserDisplaySchema.ts";
 
 /**
  * Schema for pagination parameters used in user listing endpoints.
@@ -23,9 +12,53 @@ export const UserSlugSchema = z.string();
  */
 export const UserPaginationSchema = z.object({
   /** Number of users to return per page (1-100, default: 20) */
-  limit: z.number().int().min(1).max(100).default(20),
+  limit: z.number().int().min(1).default(20),
   /** Page number for pagination (1-based, default: 1) */
   page: z.number().int().min(1).default(1),
+});
+
+export const UserPaginationOutputSchema = z.object({
+  users: z.array(UserDisplaySchema),
+  total: z.number(),
+  totalNumberOfPages: z.number(),
+  limit: z.number().int(),
+  currentPage: z.number().int().min(1).default(1),
+  hasNextPage: z.boolean(),
+})
+
+/**
+ * Schema for user search input parameters.
+ * Used for searching users by username with configurable limits.
+ */
+export const UserSearchInputSchema = z.object({
+  /** Maximum number of results to return (1-10, default: 5) */
+  limit: z.number().min(1).max(10).default(5),
+  /** Search term for matching usernames */
+  searchTerm: z.string().min(1, 'Search term must not be empty')
+});
+
+/**
+ * Schema for basic user search results.
+ * Returns essential user identifiers without full display data.
+ */
+export const BasicUserSearchOutputSchema = z.object({
+  /** Internal user ID */
+  userId: z.number(),
+  /** Tiltify username if connected */
+  tiltifyUsername: z.string().nullable(),
+  /** Twitch username if connected */
+  twitchUsername: z.string().nullable()
+});
+
+/**
+ * Schema for similar users search input.
+ * Used for finding users with similar profiles or interests.
+ */
+export const SimilarUsersInputSchema = z.object({
+  /** ID of the user to find similar users for */
+  userId: UserIdSchema,
+  /** Maximum number of similar users to return (1-10, default: 5) */
+  limit: z.number().min(1).max(10).default(5),
 });
 
 
@@ -38,9 +71,9 @@ export const UserProfileDataSchema = z.object({
   /** User display information for the profile being viewed */
   user: UserDisplaySchema,
   /** Array of social media links and external profile connections */
-  socials: z.array(Social),
+  socials: z.array(SocialSchema),
   /** Array of user-defined tags for content categorization and discovery */
-  tags: z.array(Tag),
+  tags: z.array(SimplePublicTagSchema),
   /** Array of users who are friends with this user */
   friends: z.array(UserDisplaySchema),
   /** Array of teams this user belongs to */
@@ -53,4 +86,21 @@ export const UserProfileDataSchema = z.object({
   nextStreams: z.array(StreamSchema).max(3),
   /** The next 3 streams belonging to schedules from other users where this user is part of */
   nextStreamsOthers: z.array(StreamSchema).max(3),
+});
+
+export const TwitchChannelSchema = z.object({
+  /** User ID that owns this Twitch channel */
+  userId: z.number(),
+  /** Twitch channel ID (primary key from Twitch API) */
+  id: z.string(),
+  /** Twitch login username (lowercase) */
+  login: z.string(),
+  /** Twitch display name (formatted) */
+  displayName: z.string(),
+  /** Channel description/bio from Twitch profile */
+  description: z.string().nullable(),
+  /** Profile image URL from Twitch */
+  profileImageUrl: z.string().nullable(),
+  /** Offline image URL from Twitch */
+  offlineImageUrl: z.string().nullable(),
 });

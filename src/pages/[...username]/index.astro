@@ -1,5 +1,5 @@
 ---
-import {actions} from 'astro:actions';
+import { serverClientPublic } from "../../lib/orpc/client";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import UserHeader from "../../components/features/users/public/UserHeader.astro";
 import UserSchedule from "../../components/features/users/public/UserSchedule.astro";
@@ -11,7 +11,12 @@ const {username} = Astro.params;
 if (!username) {
   return Astro.redirect('/user-not-found')
 }
-const {data: user, error} = await Astro.callAction(actions.ui.users.bySlug, username)
+
+const { data: user, error } = await serverClientPublic.users.getUserProfileBySlug(username, {
+  locals: Astro.locals,
+  request: Astro.request,
+  env: Astro.locals.runtime.env
+})
 
 if (error) {
   return Astro.redirect(`/${username}/error`)

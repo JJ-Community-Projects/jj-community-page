@@ -1,4 +1,4 @@
-import { z } from "zod";
+import {z} from "zod/v4";
 
 /**
  * Common response and validation schemas used across oRPC domains.
@@ -14,12 +14,6 @@ export const SuccessSchema = z.object({
   success: z.boolean()
 });
 
-/**
- * Schema for validating user ID parameters in API requests.
- * Ensures the ID is a positive integer matching the users table primary key.
- * Used in: blocks, friends contracts for user identification, public user lookups
- */
-export const UserIdSchema = z.number().int().positive();
 
 /**
  * Schema for validating hex color codes in user styling preferences.

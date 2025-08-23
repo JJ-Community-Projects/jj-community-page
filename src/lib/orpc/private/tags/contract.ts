@@ -1,6 +1,6 @@
 import {oc} from '@orpc/contract'
-import z from "zod";
-import {PaginationLimitSchema, SuccessSchema} from "../../schemas/common.ts";
+import z from "zod/v4";
+import {PaginationLimitSchema, SuccessSchema} from "../schemas/common.ts";
 
 /**
  * Private tag contracts for authenticated users in the new admin-controlled tag system

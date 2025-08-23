@@ -1,20 +1,20 @@
 import {type Component, Show} from "solid-js";
 import {UserProvider} from "./providers/UserProvider.tsx";
 import type {User} from "../../../../lib/auth/User.ts";
-import {UserTagsSection} from "./UserTagsSection.tsx";
 import {UserSocialsSection} from "./UserSocialsSection.tsx";
 import {UserStylesSection} from "./UserStylesSection.tsx";
 import {DebugJSONView} from "../../../common/DebugJSONView.tsx";
 import "./UserAdminDashboardPage.css";
-import {orpc} from "../../../../lib/orpc/client.ts";
+import {orpcPrivate} from "../../../../lib/orpc/client.ts";
 import {QueryClientProvider, useQuery, useQueryClient} from "@tanstack/solid-query";
 import {QueryClient} from "@tanstack/query-core";
+import {UserTagsSection} from "./UserTagsSection.tsx";
 
 
 const ProfileCard: Component = () => {
   const queryClient = useQueryClient();
 
-  const user = useQuery(() => orpc.private.users.getCurrentUser.queryOptions({
+  const user = useQuery(() => orpcPrivate.users.getCurrentUser.queryOptions({
     staleTime: 60_000
   }))
 
@@ -92,7 +92,7 @@ const ScheduleCard: Component = () => {
 }
 
 const TeamCard: Component = () => {
-  const {data} = useQuery(orpc.private.teams.getUserInviteCount.queryOptions)
+  const {data} = useQuery(orpcPrivate.teams.getUserInviteCount.queryOptions)
 
   return (
     <a
@@ -117,7 +117,7 @@ const TeamCard: Component = () => {
 
 const Root: Component = () => {
 
-  const user = useQuery(() => orpc.private.users.getCurrentUser.queryOptions({
+  const user = useQuery(() => orpcPrivate.users.getCurrentUser.queryOptions({
     staleTime: 60_000
   }))
 

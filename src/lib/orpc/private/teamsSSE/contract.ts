@@ -1,5 +1,5 @@
-import {z} from "zod";
-import {UserDisplaySchema} from "../../schemas/users.ts";
+import {z} from "zod/v4";
+import {UserDisplaySchema} from "../schemas/users.ts";
 import {TeamSchema} from "../../public/schemas/teams.ts";
 import {eventIterator, oc} from "@orpc/contract";
 
@@ -13,7 +13,7 @@ const getTeamInvitesSSEContract = oc.input(z.object({
   teamId: z.number().positive("Team ID must be positive")
 }))
   .output(eventIterator(z.object({
-    invites: UserDisplaySchema.array(),
+    invites: z.array(UserDisplaySchema),
     event: z.string(),
   })))
 
@@ -28,7 +28,7 @@ const getTeamMembersSSEContract = oc
     teamId: z.number().positive("Team ID must be positive")
   }))
   .output(eventIterator(z.object({
-    invites: UserDisplaySchema.array(),
+    invites: z.array(UserDisplaySchema),
     event: z.string(),
   })))
 
@@ -55,7 +55,7 @@ const getUserInvitesSSEContract = oc
  */
 const getUserTeamsAdminSSEContract = oc
   .output(eventIterator(z.object({
-    teams: TeamSchema.array(), // Only owned teams
+    teams: z.array(TeamSchema), // Only owned teams
     event: z.string()
   })))
 
@@ -67,7 +67,7 @@ const getUserTeamsAdminSSEContract = oc
  */
 const getUserTeamsSSEContract = oc
   .output(eventIterator(z.object({
-    teams: TeamSchema.array(), // Only member teams
+    teams: z.array(TeamSchema), // Only member teams
     event: z.string()
   })))
 

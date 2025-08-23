@@ -6,7 +6,7 @@ import {debounce} from "@solid-primitives/scheduled";
 import {TextField} from "@kobalte/core/text-field";
 import {useAdminTeamDetail} from "./AdminTeamDetailsProvider.tsx";
 import {useQuery} from "@tanstack/solid-query";
-import {orpc} from "../../../../../../lib/orpc/client.ts";
+import {orpcPublic} from "../../../../../../lib/orpc/client.ts";
 
 export const AdminTeamInvitesSection: Component = () => {
   const {cancelInvite, cancelInviteMutation, invites} = useAdminTeamDetail()
@@ -82,7 +82,7 @@ export const AdminTeamInvitesSection: Component = () => {
 const UserSearchInvite: Component = () => {
   const [searchText, setSearchText] = createSignal("");
   const {inviteUser, inviteUserMutation} = useAdminTeamDetail()
-  const searchQuery = useQuery(() => orpc.public.users.searchByName.queryOptions({
+  const searchQuery = useQuery(() => orpcPublic.users.searchByName.queryOptions({
     input: {
       searchTerm: ''
     },

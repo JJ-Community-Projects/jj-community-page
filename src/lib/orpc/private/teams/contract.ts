@@ -1,9 +1,10 @@
 import {oc} from '@orpc/contract';
-import {z} from 'zod';
-import {SuccessSchema, UserIdSchema} from "../../schemas/common.ts";
+import {z} from "zod/v4";
+import {SuccessSchema} from "../schemas/common.ts";
+import {UserIdSchema} from "../schemas/users.ts";
 import {SlugValidationSchema, TeamIdSchema} from "../schemas/teams.ts";
 import {TeamSchema} from "../../public/schemas/teams.ts";
-import {UserDisplaySchema} from "../../schemas/users.ts";
+import {UserDisplaySchema} from "../schemas/users.ts";
 
 /**
  * Private teams contracts for authenticated team management operations.
@@ -145,21 +146,21 @@ const rejectInviteContract = oc
  * Uses authMiddleware to access user ID from context
  */
 const getUserTeamsContract = oc
-  .output(TeamSchema.array())
+  .output(z.array(TeamSchema))
 
 /**
  * Get all teams where the current user is the owner
  * Uses authMiddleware to access user ID from context
  */
 const getOwnedTeamsContract = oc
-  .output(TeamSchema.array())
+  .output(z.array(TeamSchema))
 
 /**
  * Get all teams where the current user is not the owner (member only)
  * Uses authMiddleware to access user ID from context
  */
 const getNonOwnedTeamsContract = oc
-  .output(TeamSchema.array())
+  .output(z.array(TeamSchema))
 
 /**
  * Get all team members as UserDisplaySchema (owner only)
@@ -170,7 +171,7 @@ const getTeamMembersContract = oc
   .input(z.object({
     teamId: z.number().positive("Team ID must be positive")
   }))
-  .output(UserDisplaySchema.array());
+  .output(z.array(UserDisplaySchema));
 
 /**
  * Get team member count (owner only)
@@ -231,7 +232,7 @@ const getTeamInvitesContract = oc
   .input(z.object({
     teamId: z.number().positive("Team ID must be positive")
   }))
-  .output(UserDisplaySchema.array());
+  .output(z.array(UserDisplaySchema));
 
 /**
  * Get a specific team by ID

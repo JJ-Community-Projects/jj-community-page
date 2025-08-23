@@ -4,7 +4,7 @@ import {Accordion} from "@kobalte/core/accordion";
 import {debounce} from "@solid-primitives/scheduled";
 import {FaRegularCircle} from "solid-icons/fa";
 import "./UserTagsSection.css";
-import {orpc} from "../../../../lib/orpc/client.ts";
+import {orpcPrivate} from "../../../../lib/orpc/client.ts";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/solid-query";
 
 // Type definitions for component props
@@ -269,7 +269,7 @@ const UserTagsList: Component<UserTagsListProps> = (props) => {
  */
 export const UserTagsSection: Component = () => {
   const queryClient = useQueryClient();
-  const t = orpc.private.tags;
+  const t = orpcPrivate.tags;
 
   // State for tag search
   const [searchInput, setSearchInput] = createSignal("");

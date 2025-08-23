@@ -5,7 +5,7 @@ import {TextField} from "@kobalte/core/text-field";
 import {Checkbox} from "@kobalte/core/checkbox";
 import {FaRegularCircle, FaRegularCircleCheck, FaRegularCircleXmark} from "solid-icons/fa";
 import {useQuery} from "@tanstack/solid-query";
-import {orpc} from "../../../../../../lib/orpc/client.ts";
+import {orpcPrivate} from "../../../../../../lib/orpc/client.ts";
 
 const Correct = () => {
   return (
@@ -97,7 +97,7 @@ const ScheduleSlugField: Component = () => {
   const [slug, setSlug] = createSignal<string>('')
 
   const validateSlug = useQuery(
-    () => orpc.private.schedules.validateSlug.queryOptions({
+    () => orpcPrivate.schedules.validateSlug.queryOptions({
       input: {
         id: local.id,
         slug: slug(),

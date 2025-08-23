@@ -14,15 +14,77 @@ import {
   getUserTags,
   getUserTeams
 } from './util.ts';
+import {users} from "../../../db/schema/auth-schema.ts";
+import {userSchedulesRouter} from "./schedules/impl.ts";
+import {userTeamsRouter} from "./teams/impl.ts";
 
 const os = implement(usersContracts)
   .use(dbMiddleware);
 
+const getAllUsers = os.getAllUsersContract
+  .handler(async ({context}) => {
+    const db = context.db
+    return db.select({
+      userId: userDisplayView.userId,
+      primaryLiveStream: userDisplayView.primaryLiveStream,
+      createdAt: userDisplayView.createdAt,
+      username: userDisplayView.username,
+      profileImage: userDisplayView.profileImage,
+      twitchLogin: userDisplayView.twitchLogin,
+      tiltifySlug: userDisplayView.tiltifySlug,
+      tiltifyUrl: userDisplayView.tiltifyUrl,
+      primaryColor: userDisplayView.primaryColor,
+      accentColor: userDisplayView.accentColor,
+    })
+      .from(userDisplayView)
+      .orderBy(asc(userDisplayView.username))
+      .all();
+  })
 
-export const getUserBySlug = os.getUserBySlugContract
-  .handler(async ({context, input: slug}) => {
+const getAllUsersPaged = os.getAllUsersPagedContract
+  .handler(async ({context, input}) => {
+    const db = context.db
+    const {limit, page} = input;
+    const offset = (page - 1) * limit;
+
+    const totalUserCount = await db.$count(users)
+
+    const totalNumberOfPages = totalUserCount % limit
+
+    // Query users with pagination, ordered alphabetically by username
+    const result = await db.select({
+      userId: userDisplayView.userId,
+      primaryLiveStream: userDisplayView.primaryLiveStream,
+      createdAt: userDisplayView.createdAt,
+      username: userDisplayView.username,
+      profileImage: userDisplayView.profileImage,
+      twitchLogin: userDisplayView.twitchLogin,
+      tiltifySlug: userDisplayView.tiltifySlug,
+      tiltifyUrl: userDisplayView.tiltifyUrl,
+      primaryColor: userDisplayView.primaryColor,
+      accentColor: userDisplayView.accentColor,
+    })
+      .from(userDisplayView)
+      .orderBy(asc(userDisplayView.username))
+      .limit(limit)
+      .offset(offset)
+      .all();
+
+    return {
+      users: result,
+      total: totalUserCount,
+      totalNumberOfPages: totalNumberOfPages,
+      limit: limit,
+      currentPage: page,
+      hasNextPage: page < totalNumberOfPages
+    }
+  })
+
+const getUserBySlug = os.getUserBySlugContract
+  .handler(async ({context, input}) => {
     const db = context.db
 
+    const slug = input.slug
     // Query user by tiltify slug
     const user = await db.select({
       userId: userDisplayView.userId,
@@ -50,13 +112,12 @@ export const getUserBySlug = os.getUserBySlugContract
     return user;
   })
 
-
-export const getUserProfileBySlug = os.getUserProfileBySlugContract
-  .handler(async ({context, input: slug}) => {
+const getUserFullProfileBySlug = os.getUserFullProfileBySlugContract
+  .handler(async ({context, input}) => {
     const db = context.db
 
     // Fetch user by slug (throws NOT_FOUND if user doesn't exist)
-    const user = await getUserBySlugUtil(db, slug);
+    const user = await getUserBySlugUtil(db, input.slug);
     const userId = user.userId;
 
     // Fetch all user-related data in parallel for optimal performance
@@ -97,87 +158,17 @@ export const getUserProfileBySlug = os.getUserProfileBySlugContract
     };
   })
 
-
-export const getAllUsersPaged = os.getAllUsersPagedContract
+const getTwitchChannelByUserSlug = os.getTwitchChannelByUserSlugContract
   .handler(async ({context, input}) => {
-    const db = context.db
-    const {limit, page} = input;
-    const offset = (page - 1) * limit;
-
-    // Query users with pagination, ordered alphabetically by username
-    return db.select({
-      userId: userDisplayView.userId,
-      primaryLiveStream: userDisplayView.primaryLiveStream,
-      createdAt: userDisplayView.createdAt,
-      username: userDisplayView.username,
-      profileImage: userDisplayView.profileImage,
-      twitchLogin: userDisplayView.twitchLogin,
-      tiltifySlug: userDisplayView.tiltifySlug,
-      tiltifyUrl: userDisplayView.tiltifyUrl,
-      primaryColor: userDisplayView.primaryColor,
-      accentColor: userDisplayView.accentColor,
-    })
-      .from(userDisplayView)
-      .orderBy(asc(userDisplayView.username))
-      .limit(limit)
-      .offset(offset)
-      .all();
-  })
-
-
-export const getAllUsers = os.getAllUsersContract
-  .handler(async ({context}) => {
-    const db = context.db
-    return db.select({
-      userId: userDisplayView.userId,
-      primaryLiveStream: userDisplayView.primaryLiveStream,
-      createdAt: userDisplayView.createdAt,
-      username: userDisplayView.username,
-      profileImage: userDisplayView.profileImage,
-      twitchLogin: userDisplayView.twitchLogin,
-      tiltifySlug: userDisplayView.tiltifySlug,
-      tiltifyUrl: userDisplayView.tiltifyUrl,
-      primaryColor: userDisplayView.primaryColor,
-      accentColor: userDisplayView.accentColor,
-    })
-      .from(userDisplayView)
-      .orderBy(asc(userDisplayView.username))
-      .all();
-  })
-
-
-export const getTwitchChannelByUserId = os.getTwitchChannelByUserIdContract
-  .handler(async ({context, input: userId}) => {
-    const db = context.db
-
-    // Query Twitch channel data by user ID
-    const twitchChannel = await db.select({
-      userId: twitchChannelSchema.userId,
-      id: twitchChannelSchema.id,
-      login: twitchChannelSchema.login,
-      displayName: twitchChannelSchema.displayName,
-      description: twitchChannelSchema.description,
-      profileImageUrl: twitchChannelSchema.profileImageUrl,
-      offlineImageUrl: twitchChannelSchema.offlineImageUrl,
-    })
-      .from(twitchChannelSchema)
-      .where(eq(twitchChannelSchema.userId, userId))
-      .get();
-
-    // Return null if no Twitch channel is found for the user
-    return twitchChannel || null;
-  })
-
-export const getTwitchChannelByUserSlug = os.getTwitchChannelByUserSlugContract
-  .handler(async ({context, input: slug}) => {
     const db = context.db
 
     // Fetch user by slug (throws NOT_FOUND if user doesn't exist)
-    const user = await getUserBySlugUtil(db, slug);
+    const user = await getUserBySlugUtil(db, input.slug);
     const userId = user.userId;
 
     // Query Twitch channel data by user ID
-    const twitchChannel = await db.select({
+    // Return null if no Twitch channel is found for the user
+    return db.select({
       userId: twitchChannelSchema.userId,
       id: twitchChannelSchema.id,
       login: twitchChannelSchema.login,
@@ -189,7 +180,15 @@ export const getTwitchChannelByUserSlug = os.getTwitchChannelByUserSlugContract
       .from(twitchChannelSchema)
       .where(eq(twitchChannelSchema.userId, userId))
       .get();
-
-    // Return null if no Twitch channel is found for the user
-    return twitchChannel || null;
   })
+
+
+export const publicUsersRouter = {
+  getAllUsers,
+  getAllUsersPaged,
+  getUserBySlug,
+  getUserFullProfileBySlug,
+  getTwitchChannelByUserSlug,
+  ...userSchedulesRouter,
+  ...userTeamsRouter,
+}

@@ -1,4 +1,7 @@
-import {z} from "zod";
+import {z} from "zod/v4"; /**
+ * Tag-related schemas used across oRPC procedures for categorization and content discovery.
+ * These schemas handle tag management, search, and recommendation operations.
+ */
 
 /**
  * Tag-related schemas used across oRPC procedures for categorization and content discovery.

@@ -1,10 +1,10 @@
 import {ORPCError} from '@orpc/server';
 import {accounts} from "../../../db/schema/auth-schema.ts";
-import {streamParticipantsTable, streamsTable} from "../../../db/schema/jj-schema.ts";
+import {schedulesTable, streamParticipantsTable, streamsTable} from "../../../db/schema/jj-schema.ts";
 import {userDisplayView} from "../../../db/schema/views-schema.ts";
 import {and, eq} from "drizzle-orm";
-import {ScheduleDaySchema, ScheduleWeekSchema, StreamSchema} from "../schemas/schedule.ts";
-import {z} from "zod";
+import {ScheduleDaySchema, ScheduleWeekSchema, StreamSchema} from "../schemas/schedules.ts";
+import {z} from "zod/v4";
 import type {JJDrizzleDatabase} from "../../../db/db.ts";
 import {streamTagsTable, tags} from "../../../db/schema/tags-schema.ts";
 
@@ -221,4 +221,15 @@ export function getNextStreams(streams: z.infer<typeof StreamSchema>[]): z.infer
     .filter(stream => stream.start > currentDate)
     .sort((a, b) => a.start.getTime() - b.start.getTime())
     .slice(0, 3);
+}
+
+
+export function getPrimaryScheduleByUserSlugAndYear(db: JJDrizzleDatabase, userId: number, year: number) {
+  return db.select().from(schedulesTable)
+    .where(and(
+      eq(schedulesTable.ownerId, userId),
+      eq(schedulesTable.year, year),
+      eq(schedulesTable.primary, true),
+      eq(schedulesTable.visible, true)
+    )).get()
 }

@@ -1,6 +1,6 @@
 import {oc} from '@orpc/contract'
-import {z} from 'zod'
-import {TwitchChannelSchema} from "../../schemas/users.ts";
+import {z} from "zod/v4"
+import {TwitchChannelSchema} from "../schemas/users.ts";
 
 export const twitchContract = {
   validateTwitchUrl: oc

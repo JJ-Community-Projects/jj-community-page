@@ -3,7 +3,7 @@ import {debounce} from "@solid-primitives/scheduled";
 import {Dialog} from "@kobalte/core/dialog";
 import {TextField} from "@kobalte/core/text-field";
 import {useMutation, useQuery} from "@tanstack/solid-query";
-import {orpc} from "../../../../../../lib/orpc/client.ts";
+import {orpcPrivate} from "../../../../../../lib/orpc/client.ts";
 
 export const CreateTeamDialog: Component<{ isOpen: () => boolean, setIsOpen: (open: boolean) => void }> = (props) => {
   // Form state signals
@@ -11,7 +11,7 @@ export const CreateTeamDialog: Component<{ isOpen: () => boolean, setIsOpen: (op
   const [slug, setSlug] = createSignal("");
 
   // Slug validation query
-  const validateSlug = useQuery(() => orpc.private.teams.validateSlug.queryOptions({
+  const validateSlug = useQuery(() => orpcPrivate.teams.validateSlug.queryOptions({
     input: {
       slug: slug(),
       tiltifyName: name()
@@ -21,7 +21,7 @@ export const CreateTeamDialog: Component<{ isOpen: () => boolean, setIsOpen: (op
 
   // oRPC mutations
   const createTeamMutation = useMutation(() =>
-    orpc.private.teams.create.mutationOptions({
+    orpcPrivate.teams.create.mutationOptions({
       onSuccess: () => {
         props.setIsOpen(false);
         // Reset form

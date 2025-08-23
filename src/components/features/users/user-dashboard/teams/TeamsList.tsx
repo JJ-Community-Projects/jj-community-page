@@ -5,7 +5,7 @@ import {ConfirmationDialog} from "../../../../common/dialogs/ConfirmationDialog.
 import {createModalSignal} from "../../../../../lib/createModalSignal.ts";
 import {CreateTeamDialog} from "./teamAdmin/CreateTeamDialog.tsx";
 import {FaSolidChevronLeft} from "solid-icons/fa";
-import {orpc} from "../../../../../lib/orpc/client.ts";
+import {orpcPrivate} from "../../../../../lib/orpc/client.ts";
 import {QueryComponent} from "../../../../common/QueryComponent.tsx";
 import {useMutation, useQueryClient} from "@tanstack/solid-query";
 
@@ -67,7 +67,7 @@ const OwnedTeamsList: Component = () => {
       <h3 class="text-lg font-bold mb-4">Teams You Own</h3>
 
       <QueryComponent
-        queryOptions={() => orpc.private.teamsSSE.getUserTeamsAdminSSE.experimental_liveOptions()}
+        queryOptions={() => orpcPrivate.teamsSSE.getUserTeamsAdminSSE.experimental_liveOptions()}
         loading={() => (
           <p class="text-gray-500 text-center py-4">Loading teams...</p>
         )}
@@ -113,7 +113,7 @@ const MemberTeamsList: Component = () => {
       <h3 class="text-lg font-bold mb-4">Teams You're In</h3>
 
       <QueryComponent
-        queryOptions={() => orpc.private.teamsSSE.getUserTeamsSSE.experimental_liveOptions()}
+        queryOptions={() => orpcPrivate.teamsSSE.getUserTeamsSSE.experimental_liveOptions()}
         loading={() => (
           <p class="text-gray-500 text-center py-4">Loading teams...</p>
         )}
@@ -159,17 +159,17 @@ const InvitesList: Component = () => {
   const confirmDialog = createModalSignal();
   const client = useQueryClient();
   // Create mutations for accept and reject operations
-  const acceptInviteMutation = useMutation(() => orpc.private.teams.acceptInvite.mutationOptions({
+  const acceptInviteMutation = useMutation(() => orpcPrivate.teams.acceptInvite.mutationOptions({
     onSuccess: async () => {
       await client.invalidateQueries({
-        queryKey: orpc.private.teams.getUserInvites.key()
+        queryKey: orpcPrivate.teams.getUserInvites.key()
       })
     }
   }))
-  const rejectInviteMutation = useMutation(() => orpc.private.teams.rejectInvite.mutationOptions({
+  const rejectInviteMutation = useMutation(() => orpcPrivate.teams.rejectInvite.mutationOptions({
     onSuccess: async () => {
       await client.invalidateQueries({
-        queryKey: orpc.private.teams.getUserInvites.key()
+        queryKey: orpcPrivate.teams.getUserInvites.key()
       })
     }
   }));
@@ -202,8 +202,8 @@ const InvitesList: Component = () => {
       <h3 class="text-lg font-bold mb-4">Team Invitations</h3>
 
       <QueryComponent
-        // queryOptions={() => orpc.private.teams.getUserInvites.queryOptions()}
-        queryOptions={() => orpc.private.teamsSSE.getUserInvitesSSE.experimental_liveOptions()}
+        // queryOptions={() => orpcPrivate.teams.getUserInvites.queryOptions()}
+        queryOptions={() => orpcPrivate.teamsSSE.getUserInvitesSSE.experimental_liveOptions()}
         loading={() => (
           <p class="text-gray-500 text-center py-4">Loading invitations...</p>
         )}

@@ -3,20 +3,20 @@ import {TextField} from "@kobalte/core/text-field";
 import {Dialog} from "@kobalte/core/dialog";
 import {createModalSignal} from "../../../../lib/createModalSignal.ts";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/solid-query";
-import {orpc} from "../../../../lib/orpc/client.ts";
+import {orpcPrivate} from "../../../../lib/orpc/client.ts";
 
 export const UserStylesSection: Component = () => {
 
   const queryClient = useQueryClient();
 
   const {data} = useQuery(() => {
-    return orpc.private.profile.getStyle.queryOptions({})
+    return orpcPrivate.profile.getStyle.queryOptions({})
   })
 
   const updateStyle = useMutation(() =>
-    orpc.private.profile.updateStyle.mutationOptions({
+    orpcPrivate.profile.updateStyle.mutationOptions({
       onSuccess: () => queryClient.invalidateQueries({
-        queryKey: orpc.private.profile.getStyle.key()
+        queryKey: orpcPrivate.profile.getStyle.key()
       })
     })
   )

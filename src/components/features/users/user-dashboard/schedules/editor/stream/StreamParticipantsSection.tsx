@@ -6,7 +6,7 @@ import {FaRegularCircle} from "solid-icons/fa";
 import {useScheduleEditor} from "../../../providers/ScheduleEditorProvider.tsx";
 import {useStreamEditor} from "./ScheduleEditorStreamEditDialogBodyProvider.tsx";
 import {useQuery} from "@tanstack/solid-query";
-import {orpc} from "../../../../../../../lib/orpc/client.ts";
+import {orpcPublic} from "../../../../../../../lib/orpc/client.ts";
 
 const useParticipants = () => {
   const {stream, addParticipant, removeParticipant} = useStreamEditor()
@@ -20,7 +20,7 @@ const useParticipants = () => {
   const [searchText, setSearchText] = createSignal("");
 
   // oRPC query for user search
-  const searchQuery = useQuery(() => orpc.public.users.searchByName.queryOptions({
+  const searchQuery = useQuery(() => orpcPublic.users.searchByName.queryOptions({
     input: {
       searchTerm: searchText()
     },
