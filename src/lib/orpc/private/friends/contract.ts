@@ -25,6 +25,13 @@ export const declineFriendRequestContract = oc
   }))
   .output(SuccessSchema);
 
+// Cancel friend request contract (for requests you sent)
+export const cancelFriendRequestContract = oc
+  .input(z.object({
+    toUserId: UserIdSchema
+  }))
+  .output(SuccessSchema);
+
 // Remove friend contract (unfriend)
 export const removeFriendContract = oc
   .input(z.object({
@@ -44,5 +51,6 @@ export const friendsContract = {
   sendFriendRequestContract,
   acceptFriendRequestContract,
   declineFriendRequestContract,
+  cancelFriendRequestContract,
   removeFriendContract,
 };

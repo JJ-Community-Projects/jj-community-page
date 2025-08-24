@@ -12,10 +12,11 @@ if (!username) {
   return Astro.redirect('/user-not-found')
 }
 
-const { data: user, error } = await serverClientPublic.users.getUserProfileBySlug(username, {
-  locals: Astro.locals,
-  request: Astro.request,
-  env: Astro.locals.runtime.env
+const { data: user, error } = await serverClientPublic.users.getUserFullProfileBySlug({slug: username}, {
+  context: {
+    locals: Astro.locals,
+    request: Astro.request,
+  },
 })
 
 if (error) {
@@ -31,18 +32,18 @@ if (user === undefined) {
 // Fetch the user's primary schedule for the ActiveSchedule component
 // const { data: primarySchedule, error: scheduleError } = await Astro.callAction(actions.ui.users.schedules.getCurrentPrimaryByTiltifyUsername, username);
 ---
-<BaseLayout title={`${user.name} | Jingle Jam Community`}>
+<BaseLayout title={`${user.user.username} | Jingle Jam Community`}>
     <div class="w-full max-w-4xl mx-auto">
-        <UserHeader user={user}/>
+        <UserHeader user={user.user}/>
 
       {/* Display ActiveSchedule if primary schedule is available */}
-      {user.schedule && (
+      {user.primarySchedule && (
               <div class="w-full bg-white rounded-lg p-6 mb-4 shadow-md">
-                  <ActiveSchedule client:load initSchedule={user.schedule}/>
+                  <ActiveSchedule client:load initSchedule={user.primarySchedule}/>
               </div>
       )}
 
         <UserSchedule tiltifyUsername={username}/>
-        <UserTeams tiltifyUsername={username} userId={user.id}/>
+        <UserTeams tiltifyUsername={username} userId={user.user.userId}/>
     </div>
 </BaseLayout>

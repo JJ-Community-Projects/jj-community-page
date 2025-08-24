@@ -2,39 +2,39 @@ import {type Component} from "solid-js";
 import {UserProvider} from "../providers/UserProvider.tsx";
 import type {User} from "../../../../../lib/auth/User.ts";
 import {FaSolidChevronLeft} from "solid-icons/fa";
-import {UserTagsSection} from "./UserTagsSection.tsx";
+import {UserFriendsSection} from "./UserFriendsSection.tsx";
 import {QueryClientProvider} from "@tanstack/solid-query";
 import {QueryClient} from "@tanstack/query-core";
-import {UserTagsProvider} from "./UserTagsProvider.tsx";
+import {UserFriendsProvider} from "./UserFriendsProvider.tsx";
 
-interface UserTagsPageProps {
+interface UserFriendsPageProps {
   user: User
 }
 
-export const UserTagsPage: Component<UserTagsPageProps> = (props) => {
+export const UserFriendsPage: Component<UserFriendsPageProps> = (props) => {
   return (
     <QueryClientProvider client={new QueryClient()}>
       <UserProvider user={props.user}>
-        <UserTagsProvider>
-          <UserTagsPageContent/>
-        </UserTagsProvider>
+        <UserFriendsProvider>
+          <UserFriendsPageContent/>
+        </UserFriendsProvider>
       </UserProvider>
     </QueryClientProvider>
   );
 };
 
-const UserTagsPageContent: Component = () => {
+const UserFriendsPageContent: Component = () => {
   return (
     <div class="max-w-6xl mx-auto px-4 py-8 flex flex-col gap-4">
-      <UserTagsHeader/>
+      <UserFriendsHeader/>
       <div class="bg-white rounded-2xl shadow-xl">
-        <UserTagsSection/>
+        <UserFriendsSection/>
       </div>
     </div>
   );
 };
 
-const UserTagsHeader: Component = () => {
+const UserFriendsHeader: Component = () => {
   return (
     <div class="bg-white rounded-2xl shadow-xl p-6 mb-6">
       <div class="flex flex-col gap-4">
@@ -44,7 +44,7 @@ const UserTagsHeader: Component = () => {
           </a>
         </div>
         <div class="flex justify-between items-center">
-          <h2 class="text-xl font-bold">Your Tags</h2>
+          <h2 class="text-xl font-bold">Your Friends</h2>
         </div>
       </div>
     </div>

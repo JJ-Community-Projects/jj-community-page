@@ -35,36 +35,33 @@ const create = os.createContract
     }
 
     try {
-      const teamId = await db.transaction(async (tx) => {
-        // Check if slug is available
-        const existingTeam = await tx.select()
-          .from(teamsTable)
-          .where(eq(teamsTable.slug, validSlug))
-          .get();
+      const existingTeam = await db.select()
+        .from(teamsTable)
+        .where(eq(teamsTable.slug, validSlug))
+        .get();
 
-        if (existingTeam) {
-          throw new ORPCError('CONFLICT', { message: 'Slug is already in use' });
-        }
+      if (existingTeam) {
+        throw new ORPCError('CONFLICT', { message: 'Slug is already in use' });
+      }
 
-        // Create team
-        const [team] = await tx.insert(teamsTable)
-          .values({
-            name: name,
-            slug: validSlug,
-            ownerId: userId,
-            visible: false
-          })
-          .returning();
+      // Create team
+      const [team] = await db.insert(teamsTable)
+        .values({
+          name: name,
+          slug: validSlug,
+          ownerId: userId,
+          visible: false
+        })
+        .returning();
 
-        // Add creator as member
-        await tx.insert(teamMembersTable)
-          .values({
-            teamId: team.id,
-            userId: userId
-          });
+      const teamId = team.id
 
-        return team.id;
-      });
+      // Add creator as member
+      await db.insert(teamMembersTable)
+        .values({
+          teamId: team.id,
+          userId: userId
+        });
 
       // Publish events for team creation (user becomes owner/member)
       teamMemberEventPublisher.acceptInvite(teamId, userId);

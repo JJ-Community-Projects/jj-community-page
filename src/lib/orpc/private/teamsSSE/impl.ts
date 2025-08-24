@@ -480,6 +480,57 @@ const getUserTeamsAdminSSE = os
   })
 
 /**
+ * Real-time stream of user team invites count (authenticated user)
+ * Streams live updates of the count of pending team invitations for the authenticated user
+ * No input required - uses authenticated user ID from context
+ * Requires authentication through authMiddleware
+ */
+const getUserTeamInvitesCountSSE = os
+  .getUserTeamInvitesCountSSEContract
+  .use(authMiddleware)
+  .handler(async function* ({context, signal}) {
+    const db = context.db
+    const userId = context.userId
+    try {
+      // Send initial count immediately
+      const invites = await getUserInvites(db, userId)
+      const count = invites.length
+
+      yield {
+        count,
+        event: 'init'
+      };
+
+      // Set up polling for updates - subscribes to user invite list changes
+      for await (const payload of teamMemberEventPublisher.subscribe('updateUserInviteList', {signal})) {
+        // Filter out events not relevant to this user
+        if (!isEventRelevantToUser(payload, userId)) {
+          continue;
+        }
+
+        // Use event-specific delay for optimal responsiveness
+        const delay = getEventDelay(payload.event);
+        await new Promise(resolve => setTimeout(resolve, delay));
+
+        // Smart data fetching based on event type (currently all events refetch, but prepared for optimization)
+        if (shouldRefetchAll(payload.event)) {
+          const currentInvites = await getUserInvites(db, userId);
+          const currentCount = currentInvites.length;
+          yield {
+            count: currentCount,
+            event: payload.event
+          };
+        }
+      }
+    } catch (error) {
+      console.error('Error in getUserTeamInvitesCountSSE:', error);
+      throw new ORPCError('INTERNAL_SERVER_ERROR', {message: 'Failed to stream team invites count'});
+    } finally {
+      console.log('getUserTeamInvitesCountSSE stream ended')
+    }
+  })
+
+/**
  * Export all SSE router procedures for team-related real-time functionality
  */
 export const privateTeamsSSERouter = {
@@ -487,5 +538,6 @@ export const privateTeamsSSERouter = {
   getTeamMembersSSE,
   getUserInvitesSSE,
   getUserTeamsSSE,
-  getUserTeamsAdminSSE
+  getUserTeamsAdminSSE,
+  getUserTeamInvitesCountSSE
 }

@@ -71,6 +71,18 @@ const getUserTeamsSSEContract = oc
     event: z.string()
   })))
 
+/**
+ * Real-time stream of user team invites count (authenticated user)
+ * Streams live updates of the count of pending team invitations for the authenticated user
+ * No input required - uses authenticated user ID from context
+ * Output: server-sent events with count of team invites
+ */
+const getUserTeamInvitesCountSSEContract = oc
+  .output(eventIterator(z.object({
+    count: z.number(),
+    event: z.string(),
+  })));
+
 
 export const privateTeamsSSEContract = {
   /// Team SSE Endpoints
@@ -78,5 +90,6 @@ export const privateTeamsSSEContract = {
   getTeamMembersSSEContract,
   getUserInvitesSSEContract,
   getUserTeamsSSEContract,
-  getUserTeamsAdminSSEContract
+  getUserTeamsAdminSSEContract,
+  getUserTeamInvitesCountSSEContract
 };

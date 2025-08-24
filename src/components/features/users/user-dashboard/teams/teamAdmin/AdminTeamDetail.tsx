@@ -6,6 +6,8 @@ import {AdminTeamSettingsSection} from "./AdminTeamSettingsSection.tsx";
 import {AdminTeamMembersSection} from "./AdminTeamMembersSection.tsx";
 import {AdminTeamInvitesSection} from "./AdminTeamInvitesSection.tsx";
 import {AdminTeamDetailsProvider} from "./AdminTeamDetailsProvider.tsx";
+import {QueryClient} from "@tanstack/query-core";
+import {QueryClientProvider} from "@tanstack/solid-query";
 
 interface AdminTeamDetailProps {
   user: User;
@@ -14,11 +16,13 @@ interface AdminTeamDetailProps {
 
 export const AdminTeamDetail: Component<AdminTeamDetailProps> = (props) => {
   return (
-    <UserProvider user={props.user}>
-      <AdminTeamDetailsProvider teamId={props.teamId}>
-        <AdminTeamDetailContent teamId={props.teamId}/>
-      </AdminTeamDetailsProvider>
-    </UserProvider>
+    <QueryClientProvider client={new QueryClient()}>
+      <UserProvider user={props.user}>
+        <AdminTeamDetailsProvider teamId={props.teamId}>
+          <AdminTeamDetailContent teamId={props.teamId}/>
+        </AdminTeamDetailsProvider>
+      </UserProvider>
+    </QueryClientProvider>
   );
 };
 

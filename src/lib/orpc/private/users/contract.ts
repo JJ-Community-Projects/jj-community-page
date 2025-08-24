@@ -19,7 +19,25 @@ const getCurrentUserContract = oc
 
 const isAdminContract = oc.output(z.boolean());
 
+/**
+ * Search users by name (authenticated user)
+ * @description Searches for users by Tiltify and Twitch usernames using case-insensitive matching
+ * @Input object with searchTerm (string) - the search query
+ * @Output array of objects with userId, tiltifyUsername, and twitchUsername
+ */
+const searchByNameContract = oc
+  .input(z.object({
+    searchTerm: z.string().min(1, "Search term must not be empty").max(100, "Search term too long"),
+    includeSelf: z.boolean().default(false)
+  }))
+  .output(z.array(z.object({
+    userId: z.number(),
+    tiltifyUsername: z.string().nullable(),
+    twitchUsername: z.string().nullable(),
+  })));
+
 export const privateUsersContract = {
   getCurrentUser: getCurrentUserContract,
   isAdminContract,
+  searchByName: searchByNameContract,
 };

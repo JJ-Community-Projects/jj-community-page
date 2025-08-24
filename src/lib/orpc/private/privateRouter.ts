@@ -10,6 +10,7 @@ import {twitchRouter} from "./twitch/twitchRouter.ts";
 import {privateSchedulesRouter} from "./schedules/impl.ts";
 import {socialRouter} from "./social/impl.ts";
 import {privateTeamsSSERouter} from "./teamsSSE/impl.ts";
+import {privateFriendsSSERouter} from "./friendsSSE/impl.ts";
 import {os} from "@orpc/server";
 import {hasAstroContext} from "../middleware/hasAstroContext.ts";
 
@@ -21,6 +22,7 @@ export const privateRouter = os
     profile: profileRouter,
     social: socialRouter,
     friends: friendsRouter,
+    friendsSSE: privateFriendsSSERouter,
     blocking: blockRouter,
     tags: tagsRouter,
     adminTags: adminTagsRouter,

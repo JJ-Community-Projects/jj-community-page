@@ -3,8 +3,9 @@ import {implement} from '@orpc/server';
 import {dbMiddleware} from '../../middleware/dbMiddleware.ts';
 import {authMiddleware} from '../../middleware/authMiddleware.ts';
 import {and, eq, or} from 'drizzle-orm';
-import {blockedUsers, friendRequests, friendsTable, users} from "../../../db/schema/auth-schema.ts";
+import {blockedUsers, friendRequests, friendsTable} from "../../../db/schema/auth-schema.ts";
 import {userDisplayView} from "../../../db/schema/views-schema.ts";
+import {friendsEventPublisher} from "../friendsSSE/friendEventPublisher.ts";
 
 const os = implement(friendsContract)
   .use(dbMiddleware);
@@ -75,6 +76,9 @@ const sendFriendRequest = os.sendFriendRequestContract
         toUserId: toUserId
       });
 
+    // Publish event for real-time updates
+    friendsEventPublisher.sendFriendRequest(userId, toUserId);
+
     return {success: true};
   });
 
@@ -117,6 +121,9 @@ const acceptFriendRequest = os.acceptFriendRequestContract
         })
     ]);
 
+    // Publish event for real-time updates
+    friendsEventPublisher.acceptFriendRequest(fromUserId, userId);
+
     return {success: true};
   });
 
@@ -152,6 +159,48 @@ const declineFriendRequest = os.declineFriendRequestContract
         )
       );
 
+    // Publish event for real-time updates
+    friendsEventPublisher.declineFriendRequest(fromUserId, userId);
+
+    return {success: true};
+  });
+
+// Cancel friend request implementation (for requests you sent)
+const cancelFriendRequest = os.cancelFriendRequestContract
+  .use(authMiddleware)
+  .handler(async ({context, input}) => {
+    const db = context.db;
+    const userId = context.userId;
+    const {toUserId} = input;
+
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    // Check if friend request exists (where current user is the sender)
+    const friendRequest = await db.select()
+      .from(friendRequests)
+      .where(
+        and(
+          eq(friendRequests.fromUserId, userId),
+          eq(friendRequests.toUserId, toUserId)
+        )
+      )
+      .get();
+
+    if (!friendRequest) {
+      throw new Error('Friend request not found');
+    }
+
+    // Remove the friend request
+    await db.delete(friendRequests)
+      .where(
+        and(
+          eq(friendRequests.fromUserId, userId),
+          eq(friendRequests.toUserId, toUserId)
+        )
+      );
+
+    // Publish event for real-time updates
+    friendsEventPublisher.cancelFriendRequest(userId, toUserId);
+
     return {success: true};
   });
 
@@ -186,6 +235,9 @@ const removeFriend = os.removeFriendContract
           and(eq(friendsTable.fromUserId, friendUserId), eq(friendsTable.toUserId, userId))
         )
       );
+
+    // Publish event for real-time updates
+    friendsEventPublisher.removeFriend(userId, friendUserId);
 
     return {success: true};
   });
@@ -231,6 +283,7 @@ export const friendsRouter = {
   sendFriendRequest,
   acceptFriendRequest,
   declineFriendRequest,
+  cancelFriendRequest,
   removeFriend,
   getFriends,
 };

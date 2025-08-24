@@ -5,6 +5,8 @@ import type {User} from "../../../../../lib/auth/User.ts";
 import {Dialog} from "@kobalte/core/dialog";
 import {createModalSignal, type ModalSignal} from "../../../../../lib/createModalSignal.ts";
 import {FaSolidChevronLeft} from "solid-icons/fa";
+import {QueryClient} from "@tanstack/query-core";
+import {QueryClientProvider} from "@tanstack/solid-query";
 
 interface TeamDetailProps {
   user: User;
@@ -13,11 +15,13 @@ interface TeamDetailProps {
 
 export const TeamDetail: Component<TeamDetailProps> = (props) => {
   return (
-    <UserProvider user={props.user}>
-      <TeamDetailsProvider teamId={props.teamId}>
-        <TeamDetailContent teamId={props.teamId}/>
-      </TeamDetailsProvider>
-    </UserProvider>
+    <QueryClientProvider client={new QueryClient()}>
+      <UserProvider user={props.user}>
+        <TeamDetailsProvider teamId={props.teamId}>
+          <TeamDetailContent teamId={props.teamId}/>
+        </TeamDetailsProvider>
+      </UserProvider>
+    </QueryClientProvider>
   );
 };
 

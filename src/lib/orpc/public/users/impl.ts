@@ -1,9 +1,9 @@
 import {usersContracts} from './contract.ts';
 import {implement, ORPCError} from '@orpc/server';
 import {dbMiddleware} from "../../middleware/dbMiddleware.ts";
-import {userDisplayView} from '../../../db/schema/views-schema.ts';
+import {userDisplayView, usersSearchView} from '../../../db/schema/views-schema.ts';
 import {twitchChannelSchema} from '../../../db/schema/twitch-channel-schema.ts';
-import {asc, eq} from 'drizzle-orm';
+import {asc, eq, like, or} from 'drizzle-orm';
 import {
   getUserBySlug as getUserBySlugUtil,
   getUserFriends,
@@ -182,6 +182,34 @@ const getTwitchChannelByUserSlug = os.getTwitchChannelByUserSlugContract
       .get();
   })
 
+const searchByName = os.searchByNameContract
+  .handler(async ({context, input}) => {
+    const db = context.db
+    const {searchTerm} = input;
+
+    // Convert search term to lowercase for case-insensitive matching
+    const searchPattern = `%${searchTerm.toLowerCase()}%`;
+
+    // Search in both Tiltify and Twitch usernames using the usersSearchView
+    // The view already stores lowercase versions of usernames for efficient searching
+    const results = await db.select({
+      userId: usersSearchView.userId,
+      tiltifyUsername: usersSearchView.tiltifyUsername,
+      twitchUsername: usersSearchView.twitchUsername,
+    })
+      .from(usersSearchView)
+      .where(
+        or(
+          like(usersSearchView.tiltifyUsername, searchPattern),
+          like(usersSearchView.twitchUsername, searchPattern)
+        )
+      )
+      .limit(20) // Limit results to prevent excessive data transfer
+      .all();
+
+    return results;
+  })
+
 
 export const publicUsersRouter = {
   getAllUsers,
@@ -189,6 +217,7 @@ export const publicUsersRouter = {
   getUserBySlug,
   getUserFullProfileBySlug,
   getTwitchChannelByUserSlug,
+  searchByName,
   ...userSchedulesRouter,
   ...userTeamsRouter,
 }

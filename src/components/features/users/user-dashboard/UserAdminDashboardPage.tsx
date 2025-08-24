@@ -91,7 +91,23 @@ const ScheduleCard: Component = () => {
 }
 
 const TeamCard: Component = () => {
-  const {data} = useQuery(orpcPrivate.teams.getUserInviteCount.queryOptions)
+
+  const inviteCountData = useQuery(() => orpcPrivate.teamsSSE.getUserTeamInvitesCountSSE.experimental_liveOptions({
+    staleTime: 30 * 1000,
+  }))
+
+  const counterText = () => {
+    const c = inviteCountData.data?.count ?? 0
+    if (c > 1) {
+      return `(${c} invites)`
+    }
+    return `(${c} invite)`
+  }
+
+  const hasInvites = () => {
+    return inviteCountData.data?.count ?? 0 > 0
+  }
+
 
   return (
     <a
@@ -103,10 +119,10 @@ const TeamCard: Component = () => {
         <p class="text-gray-600 mb-4">Manage your teams and team invitations</p>
         <div class="mt-auto flex justify-between items-center">
           <span class="text-accent font-medium">View Teams →</span>
-          <Show when={data?.count ?? 0 > 0}>
-                <span class="bg-primary text-white text-sm px-2 py-1 rounded-full">
-                  {data?.count} invite{data?.count !== 1 ? 's' : ''}
-                </span>
+          <Show when={hasInvites()}>
+            <span class="bg-primary text-white text-sm px-2 py-1 rounded-full">
+              {counterText()}
+            </span>
           </Show>
         </div>
       </div>
@@ -131,6 +147,44 @@ const TagsCard: Component = () => {
   )
 }
 
+const FriendsCard: Component = () => {
+  const friendsData = useQuery(() => orpcPrivate.friendsSSE.getUserFriendRequestsCountSSE.experimental_liveOptions({
+    staleTime: 30 * 1000,
+  }))
+
+  const counterText = () => {
+    const c = friendsData.data?.count ?? 0
+    if (c > 1) {
+      return `(${c} Requests)`
+    }
+    return `(${c} Request)`
+  }
+
+  const hasRequests = () => {
+    return friendsData.data?.count ?? 0 > 0
+  }
+
+  return (
+    <a
+      href={`/dashboard/friends`}
+      class="bg-white rounded-2xl shadow-xl p-6 hover:shadow-2xl transition-all"
+    >
+      <div class="flex flex-col h-full">
+        <h3 class="text-xl font-bold mb-2">Friends</h3>
+        <p class="text-gray-600 mb-4">Manage your friends and friend requests</p>
+        <div class="mt-auto flex justify-between items-center">
+          <span class="text-accent font-medium">Manage Friends →</span>
+          <Show when={hasRequests()}>
+            <span class="bg-primary text-white text-sm px-2 py-1 rounded-full">
+              {counterText()}
+            </span>
+          </Show>
+        </div>
+      </div>
+    </a>
+  )
+}
+
 const Root: Component = () => {
 
   const user = useQuery(() => orpcPrivate.users.getCurrentUser.queryOptions({
@@ -142,7 +196,7 @@ const Root: Component = () => {
       {/* Profile Card with Tiltify Links */}
       <ProfileCard/>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Schedules Card */}
         <ScheduleCard/>
 
@@ -151,6 +205,9 @@ const Root: Component = () => {
 
         {/* Tags Card */}
         <TagsCard/>
+
+        {/* Friends Card */}
+        <FriendsCard/>
       </div>
 
       {/* User Socials Section */}

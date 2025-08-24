@@ -35,7 +35,7 @@ export const AdminTeamDetailHeader: Component = () => {
             </a>
             <h1 class="text-2xl font-bold">Team Details</h1>
             <Show when={team.data}>
-              <a class="text-primary" href={`/teams/${team.data?.slug}`}>jj.ostof.dev/teams/${team.data?.slug}</a>
+              <a class="text-primary" href={`/teams/${team.data?.slug}`}>jj.ostof.dev/teams/{team.data?.slug}</a>
             </Show>
           </div>
 

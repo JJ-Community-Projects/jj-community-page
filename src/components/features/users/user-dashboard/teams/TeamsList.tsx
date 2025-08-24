@@ -7,7 +7,8 @@ import {CreateTeamDialog} from "./teamAdmin/CreateTeamDialog.tsx";
 import {FaSolidChevronLeft} from "solid-icons/fa";
 import {orpcPrivate} from "../../../../../lib/orpc/client.ts";
 import {QueryComponent} from "../../../../common/QueryComponent.tsx";
-import {useMutation, useQueryClient} from "@tanstack/solid-query";
+import {QueryClientProvider, useMutation, useQueryClient} from "@tanstack/solid-query";
+import {QueryClient} from "@tanstack/query-core";
 
 interface TeamsListProps {
   user: User
@@ -15,9 +16,11 @@ interface TeamsListProps {
 
 export const TeamsList: Component<TeamsListProps> = (props) => {
   return (
-    <UserProvider user={props.user}>
-      <TeamsListContent/>
-    </UserProvider>
+    <QueryClientProvider client={new QueryClient()}>
+      <UserProvider user={props.user}>
+        <TeamsListContent/>
+      </UserProvider>
+    </QueryClientProvider>
   );
 };
 

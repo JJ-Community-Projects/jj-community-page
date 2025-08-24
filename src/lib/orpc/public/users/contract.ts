@@ -106,6 +106,33 @@ export const getTwitchChannelByUserSlugContract = oc.input(UserSlugInputSchema)
     deprecated: false
   })
 
+/**
+ * Search users by name
+ * @path /users/search
+ * @description Searches for users by Tiltify and Twitch usernames using case-insensitive matching
+ * @Input object with searchTerm (string) - the search query
+ * @Output array of objects with userId, tiltifyUsername, and twitchUsername
+ */
+export const searchByNameContract = oc
+  .input(z.object({
+    searchTerm: z.string().min(1, "Search term must not be empty").max(100, "Search term too long")
+  }))
+  .output(z.array(z.object({
+    userId: z.number(),
+    tiltifyUsername: z.string().nullable(),
+    twitchUsername: z.string().nullable(),
+  })))
+  .route({
+    path: '/users/search',
+    method: 'GET',
+    operationId: 'searchUsersByName',
+    summary: 'Search users by name',
+    description: 'Search for users by their Tiltify and Twitch usernames (case-insensitive)',
+    tags: ['users'],
+    successDescription: 'User search completed successfully',
+    deprecated: false
+  })
+
 export const usersContracts = {
   // All users
   getAllUsersContract,
@@ -115,4 +142,7 @@ export const usersContracts = {
   getUserBySlugContract,
   getUserFullProfileBySlugContract,
   getTwitchChannelByUserSlugContract,
+
+  // search users
+  searchByNameContract,
 }

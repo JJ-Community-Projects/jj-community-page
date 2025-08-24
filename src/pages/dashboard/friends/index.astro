@@ -1,0 +1,12 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import {UserFriendsPage} from "../../../components/features/users/user-dashboard/friends/UserFriendsPage";
+
+const {session, user} = Astro.locals
+if (session === null) {
+  return Astro.redirect("/");
+}
+---
+<BaseLayout>
+    <UserFriendsPage client:only="solid-js" user={user} />
+</BaseLayout>
