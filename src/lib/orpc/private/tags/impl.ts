@@ -4,13 +4,14 @@ import {authMiddleware} from "../../middleware/authMiddleware.ts";
 import {privateTagsContract} from "./contract.ts";
 import {tagCategories, tags, userTagsTable} from "../../../db/schema/tags-schema.ts";
 import {users} from "../../../db/schema/auth-schema.ts";
-import {and, count, desc, eq, like, or, sql} from "drizzle-orm";
+import {and, count, desc, eq, inArray, like, or, sql} from "drizzle-orm";
 import {
   buildTagWhereConditions,
   getCategoryTagCountExpression,
   getCategoryWithStatsFields,
   getTagUsageFilterCondition,
   getTagWithUsageFields,
+  getTagWithUsageAndCategoryFields,
   getTotalUsageExpression,
   getVisibleTagsCondition
 } from "./util.ts";
@@ -330,6 +331,60 @@ const searchTags = os.searchTags
   });
 
 /**
+ * Enhanced search for admin-created tags including category names
+ * Searches in tag names, slugs, descriptions, AND category names
+ */
+const fullTagsSearch = os.fullTagsSearch
+  .use(authMiddleware)
+  .handler(async ({context, input}) => {
+    const db = context.db;
+
+    try {
+      // Build base WHERE conditions for tag visibility
+      let whereConditions = [eq(tags.visible, true)];
+
+      // Add category filtering if category IDs are provided
+      if (input.categoryIds.length > 0) {
+        whereConditions.push(inArray(tags.categoryId, input.categoryIds));
+      }
+
+      // Build comprehensive search conditions
+      // - Performs case-insensitive search in tag names, slugs, descriptions, AND category names
+      // - Uses LIKE operator with wildcard patterns for flexible matching
+      const searchPattern = `%${input.query.toLowerCase()}%`;
+      const searchConditions = or(
+        like(sql`lower(${tags.name})`, searchPattern), // Search in tag names (case-insensitive)
+        like(sql`lower(${tags.slug})`, searchPattern), // Search in tag slugs (case-insensitive)
+        like(sql`lower(${tags.description})`, searchPattern), // Search in tag descriptions (case-insensitive)
+        like(sql`lower(${tagCategories.name})`, searchPattern) // Search in category names (case-insensitive)
+      );
+
+      // Combine all WHERE conditions
+      const allWhereConditions = [...whereConditions, searchConditions];
+
+      // Execute SELECT query with comprehensive tag information and usage statistics
+      // Uses LEFT JOIN to include category information for searching and response
+      const result = await db
+        .select(getTagWithUsageAndCategoryFields()) // SELECT: Use extended fields with category information
+        .from(tags) // FROM: Query the main tags table
+        .leftJoin(tagCategories, eq(tags.categoryId, tagCategories.id)) // LEFT JOIN: Include category data for search and response
+        .where(and(...allWhereConditions)) // WHERE: Apply visibility, category, and search filters
+        .limit(input.limit) // LIMIT: Restrict number of results as requested
+        .orderBy(
+          // ORDER BY: Sort by total usage count (descending) then by name (ascending)
+          // Note: Using full expression instead of alias to avoid SQLite column reference errors
+          desc(getTotalUsageExpression()),
+          tags.name
+        );
+
+      return result;
+    } catch (error) {
+      console.error('Error in fullTagsSearch:', error);
+      throw new ORPCError('INTERNAL_SERVER_ERROR', {message: 'Failed to search tags with categories'});
+    }
+  });
+
+/**
  * Get available tag categories for browsing
  */
 const getTagCategories = os.getTagCategories
@@ -379,5 +434,6 @@ export const tagsRouter = {
   findUsersByTag,
   getPopularTags,
   searchTags,
+  fullTagsSearch,
   getTagCategories,
 }

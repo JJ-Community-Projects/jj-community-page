@@ -4,7 +4,7 @@ import {Accordion} from "@kobalte/core/accordion";
 import {debounce} from "@solid-primitives/scheduled";
 import {FaRegularCircle} from "solid-icons/fa";
 import "./UserTagsSection.css";
-import {orpcPrivate} from "../../../../lib/orpc/client.ts";
+import {orpcPrivate} from "../../../../../lib/orpc/client.ts";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/solid-query";
 
 // Type definitions for component props
@@ -36,6 +36,15 @@ interface UserTagsListProps {
   errorMessage?: string;
 }
 
+interface TagCategorySelectionProps {
+  categories: any[];
+  selectedCategoryIds: number[];
+  isLoading: boolean;
+  hasError: boolean;
+  onToggleCategory: (categoryId: number) => void;
+  errorMessage?: string;
+}
+
 /**
  * TagExplanationAccordion Component
  *
@@ -62,7 +71,8 @@ const TagExplanationAccordion: Component<TagExplanationAccordionProps> = (props)
         </Accordion.Header>
         <Accordion.Content class="px-4 pt-0 pb-2 text-sm text-gray-600">
           <div class="pt-2">
-            <p>Tags help others discover streamers with similar interests and causes. Choose from available tags to show off
+            <p>Tags help others discover streamers with similar interests and causes. Choose from available tags to show
+              off
               your favorite games, hobbies, or communities — and don't forget to add a charity tag to highlight the
               cause you're fundraising for.</p>
             <p class="mt-2">This makes it easier for viewers to connect with you and support the charity you care
@@ -73,6 +83,92 @@ const TagExplanationAccordion: Component<TagExplanationAccordionProps> = (props)
         </Accordion.Content>
       </Accordion.Item>
     </Accordion>
+  );
+};
+
+/**
+ * TagCategorySelection Component
+ *
+ * Displays available tag categories with selection functionality for filtering.
+ */
+const TagCategorySelection: Component<TagCategorySelectionProps> = (props) => {
+  const hasCategories = () => props.categories.length > 0;
+
+  return (
+    <div class="mb-4">
+      <div class="flex items-center gap-2 mb-2">
+        <p class="text-sm font-medium text-gray-700">Filter by Category:</p>
+
+        {/* State indicator for category fetch */}
+        <div class="flex items-center gap-1">
+          <Switch>
+            <Match when={props.isLoading}>
+              <span class="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">
+                <FaRegularCircle class="inline mr-1 text-blue-500 animate-ping" size={8}/>
+                Loading
+              </span>
+            </Match>
+            <Match when={props.hasError}>
+              <span class="text-xs bg-red-100 text-red-800 px-2 py-0.5 rounded-full">
+                Error
+              </span>
+            </Match>
+            <Match when={!props.isLoading && !props.hasError}>
+              <span class="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded-full">
+                Ready
+              </span>
+            </Match>
+          </Switch>
+        </div>
+      </div>
+
+      {/* Category selection display */}
+      <Switch fallback={
+        <div class="flex flex-wrap gap-2 min-h-[28px]">
+          <p class="text-xs text-gray-500">No categories available.</p>
+        </div>
+      }>
+        {/* Error state */}
+        <Match when={props.hasError}>
+          <div class="flex flex-wrap gap-2 min-h-[28px]">
+            <p class="text-xs text-red-500 mb-1">Error loading categories: {props.errorMessage || "Unknown error"}</p>
+          </div>
+        </Match>
+
+        {/* Loading state */}
+        <Match when={props.isLoading && !hasCategories()}>
+          <div class="flex flex-wrap gap-2 min-h-[28px]">
+            <p class="text-xs text-gray-500">Loading categories...</p>
+          </div>
+        </Match>
+
+        {/* Data state */}
+        <Match when={hasCategories()}>
+          <div class="flex flex-wrap gap-2 min-h-[28px]">
+            {/* Available categories */}
+            <For each={props.categories}>
+              {(category) => {
+                const isSelected = () => props.selectedCategoryIds.includes(category.id);
+                return (
+                  <button
+                    type="button"
+                    onClick={() => props.onToggleCategory(category.id)}
+                    class={`text-xs px-2 py-1 rounded-full transition-all border ${
+                      isSelected()
+                        ? 'text-white border-transparent'
+                        : 'text-gray-700 border-gray-300 bg-white hover:bg-gray-50'
+                    }`}
+                    style={isSelected() ? {'background-color': category.color} : {}}
+                  >
+                    {category.name} ({category.tagCount})
+                  </button>
+                );
+              }}
+            </For>
+          </div>
+        </Match>
+      </Switch>
+    </div>
   );
 };
 
@@ -173,8 +269,8 @@ const AvailableTagsList: Component<AvailableTagsListProps> = (props) => {
                     onClick={(e) => props.onSelectTag(e, tag.id)}
                     disabled={userHasTag}
                     class={`text-xs px-2 py-1 rounded-full transition-all ${
-                      userHasTag 
-                        ? 'bg-gray-200 text-gray-500 cursor-not-allowed' 
+                      userHasTag
+                        ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
                         : 'text-white bg-accent-200 hover:bg-accent-300'
                     }`}
                     style={!userHasTag ? {'background-color': tag.color} : {}}
@@ -275,6 +371,9 @@ export const UserTagsSection: Component = () => {
   const [searchInput, setSearchInput] = createSignal("");
   const [debouncedInput, setDebouncedInput] = createSignal("");
 
+  // State for category selection
+  const [selectedCategoryIds, setSelectedCategoryIds] = createSignal<number[]>([]);
+
   // Debounced input handler
   const debouncedSetSearchInput = debounce((value: string) => {
     setDebouncedInput(value);
@@ -292,10 +391,11 @@ export const UserTagsSection: Component = () => {
     })
   );
 
-  const searchQuery = useQuery(() => t.searchTags.queryOptions({
+  const searchQuery = useQuery(() => t.fullTagsSearch.queryOptions({
       input: {
         query: debouncedInput(),
-        limit: 15
+        limit: 15,
+        categoryIds: selectedCategoryIds()
       },
       enabled: () => debouncedInput().length > 0,
       staleTime: 30 * 1000,
@@ -305,6 +405,13 @@ export const UserTagsSection: Component = () => {
   const getUserTagsQuery = useQuery(() => t.getUserTags.queryOptions({
     input: {},
     staleTime: 2 * 60 * 1000, // 2 minutes
+  }));
+
+  const getTagCategoriesQuery = useQuery(() => t.getTagCategories.queryOptions({
+    input: {
+      includeEmpty: false, // Only show categories that have tags
+    },
+    staleTime: 10 * 60 * 1000, // 10 minutes - categories don't change often
   }));
 
   // TanStack Mutations
@@ -338,15 +445,21 @@ export const UserTagsSection: Component = () => {
 
   const userTags = () => getUserTagsQuery.data || [];
 
+  const categories = () => getTagCategoriesQuery.data || [];
+
   const isLoadingTags = () => popularTagsQuery.isLoading ||
     searchQuery.isLoading ||
     addTagMutation.isPending ||
     removeTagMutation.isPending;
 
+  const isLoadingCategories = () => getTagCategoriesQuery.isLoading;
+
   const hasTagsError = () => !!popularTagsQuery.error ||
     !!searchQuery.error ||
     !!addTagMutation.error ||
     !!removeTagMutation.error;
+
+  const hasCategoriesError = () => !!getTagCategoriesQuery.error;
 
   // Handle removing a tag
   const handleRemoveTag = async (tagId: number) => {
@@ -379,6 +492,17 @@ export const UserTagsSection: Component = () => {
     debouncedSetSearchInput(value);
   };
 
+  // Handle category selection toggle
+  const handleToggleCategory = (categoryId: number) => {
+    setSelectedCategoryIds(prev => {
+      if (prev.includes(categoryId)) {
+        return prev.filter(id => id !== categoryId);
+      } else {
+        return [...prev, categoryId];
+      }
+    });
+  };
+
   // Computed error messages
   const availableTagsError = () => {
     return popularTagsQuery.error?.message ||
@@ -392,10 +516,24 @@ export const UserTagsSection: Component = () => {
       removeTagMutation.error?.message;
   };
 
+  const categoriesError = () => {
+    return getTagCategoriesQuery.error?.message || "Unknown error";
+  };
+
   return (
     <div class="bg-white p-6">
       {/* Explanation text in accordion */}
-      <TagExplanationAccordion />
+      <TagExplanationAccordion/>
+
+      {/* Category Selection */}
+      <TagCategorySelection
+        categories={categories()}
+        selectedCategoryIds={selectedCategoryIds()}
+        isLoading={isLoadingCategories()}
+        hasError={hasCategoriesError()}
+        onToggleCategory={handleToggleCategory}
+        errorMessage={categoriesError()}
+      />
 
       {/* Tag Search Input */}
       <TagSearchInput

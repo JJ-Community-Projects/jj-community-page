@@ -1,3 +1,34 @@
 ---
+import {AdminDashboard} from "../../components/features/admin/AdminDashboard";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import {serverClientPrivate} from "../../lib/orpc/client";
+
+
+
+const {session, user} = Astro.locals
+if (session === null) {
+  return Astro.redirect("/");
+}
+const isAdmin = serverClientPrivate.users.isAdmin
+const {data, error} = await isAdmin({}, {
+  context: {
+    locals: Astro.locals,
+    request: Astro.request,
+  },
+})
+
+if (error) {
+  console.log(error)
+  return Astro.redirect("/");
+}
+
+if (!data) {
+  return Astro.redirect("/");
+}
+
 
 ---
+
+<BaseLayout>
+    <AdminDashboard client:only="solid-js"/>
+</BaseLayout>

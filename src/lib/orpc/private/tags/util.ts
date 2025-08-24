@@ -85,6 +85,30 @@ export const getTagWithUsageFields = () => ({
 });
 
 /**
+ * Extended tag selection fields with usage statistics and category information
+ * Used for queries that LEFT JOIN with tagCategories table
+ */
+export const getTagWithUsageAndCategoryFields = () => ({
+  // Basic tag information
+  id: tags.id,
+  name: tags.name,
+  slug: tags.slug,
+  description: tags.description,
+  categoryId: tags.categoryId,
+  color: tags.color,
+  // Usage statistics calculated via subqueries
+  userCount: getUserCountExpression(),
+  streamCount: getStreamCountExpression(),
+  totalUsage: getTotalUsageExpression(),
+  // Category information (nullable from LEFT JOIN)
+  category: {
+    id: tagCategories.id,
+    slug: tagCategories.slug,
+    name: tagCategories.name,
+  },
+});
+
+/**
  * Helper function to calculate tag count for a specific category
  * Returns a SQL expression that counts visible tags in the category
  */

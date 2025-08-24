@@ -1,6 +1,6 @@
 ---
 import BaseLayout from "../../../layouts/BaseLayout.astro";
-import {SchedulesList} from "../../../components/features/users/user-dashboard/schedules/SchedulesList";
+import {UserTagsPage} from "../../../components/features/users/user-dashboard/tags/UserTagsPage";
 
 const {session, user} = Astro.locals
 if (session === null) {
@@ -8,5 +8,5 @@ if (session === null) {
 }
 ---
 <BaseLayout>
-    <SchedulesList client:only="solid-js" user={user} />
+    <UserTagsPage client:only="solid-js" user={user} />
 </BaseLayout>

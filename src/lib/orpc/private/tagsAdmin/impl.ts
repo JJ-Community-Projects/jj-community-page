@@ -265,6 +265,118 @@ const getTagWithAliases = os.getTagWithAliases
     }
   });
 
+/**
+ * Get all tags with usage and aliases for a specific category (admin only)
+ */
+const getTagsWithUsageAndAliasesByCategory = os.getTagsWithUsageAndAliasesByCategory
+  .use(adminAuthMiddleware)
+  .handler(async ({context, input}) => {
+    const db = context.db;
+
+    try {
+      // Build where conditions - categoryId is required
+      let whereConditions = [eq(tags.categoryId, input.categoryId)];
+
+      // Filter by visibility if needed
+      if (!input.includeHidden) {
+        whereConditions.push(eq(tags.visible, true));
+      }
+
+      // Get tags with usage statistics
+      const tagsWithUsage = await db.select({
+        id: tags.id,
+        name: tags.name,
+        slug: tags.slug,
+        description: tags.description,
+        categoryId: tags.categoryId,
+        color: tags.color,
+        visible: tags.visible,
+        createdBy: tags.createdBy,
+        createdAt: tags.createdAt,
+        updatedAt: tags.updatedAt,
+        userCount: sql<number>`COALESCE((SELECT COUNT(*) FROM
+        ${userTagsTable}
+        WHERE
+        ${userTagsTable.tagId}
+        =
+        ${tags.id}
+        ),
+        0
+        )`,
+        streamCount: sql<number>`COALESCE((SELECT COUNT(*) FROM
+        ${streamTagsTable}
+        WHERE
+        ${streamTagsTable.tagId}
+        =
+        ${tags.id}
+        ),
+        0
+        )`,
+        totalUsage: sql<number>`COALESCE((SELECT COUNT(*) FROM
+        ${userTagsTable}
+        WHERE
+        ${userTagsTable.tagId}
+        =
+        ${tags.id}
+        ),
+        0
+        )
+        +
+        COALESCE
+        (
+        (
+        SELECT
+        COUNT
+        (
+        *
+        )
+        FROM
+        ${streamTagsTable}
+        WHERE
+        ${streamTagsTable.tagId}
+        =
+        ${tags.id}
+        ),
+        0
+        )`,
+      })
+        .from(tags)
+        .where(whereConditions.length === 1 ? whereConditions[0] : and(...whereConditions))
+        .limit(input.limit)
+        .orderBy(desc(tags.createdAt));
+
+      // If no tags found, return empty array
+      if (tagsWithUsage.length === 0) {
+        return [];
+      }
+
+      // Get aliases for all tags in one query
+      const tagIds = tagsWithUsage.map(tag => tag.id);
+      const aliases = await db.select()
+        .from(tagAliases)
+        .where(sql`${tagAliases.tagId} IN (${sql.join(tagIds.map(id => sql`${id}`), sql`, `)})`)
+        .orderBy(tagAliases.tagId, tagAliases.alias);
+
+      // Group aliases by tag ID
+      const aliasesByTagId = aliases.reduce((acc, alias) => {
+        if (!acc[alias.tagId]) {
+          acc[alias.tagId] = [];
+        }
+        acc[alias.tagId].push(alias);
+        return acc;
+      }, {} as Record<number, typeof aliases>);
+
+      // Combine tags with their aliases
+      return tagsWithUsage.map(tag => ({
+        ...tag,
+        aliases: aliasesByTagId[tag.id] || [],
+      }));
+    } catch (error) {
+      console.error('Error getting tags with usage and aliases by category:', error);
+      throw new ORPCError('INTERNAL_SERVER_ERROR', {message: 'Failed to get tags with usage and aliases'});
+    }
+  });
+
 // === Tag Alias Management Procedures ===
 
 /**
@@ -1089,6 +1201,103 @@ const getTagCategories = os.getTagCategories
   });
 
 /**
+ * Get all tag categories for admin management
+ */
+const getAllTagCategories = os.getAllTagCategories
+  .use(adminAuthMiddleware)
+  .handler(async ({context, input}) => {
+    const db = context.db;
+
+    try {
+      // Build where conditions
+      let whereConditions = [];
+
+      // Filter by visibility if needed
+      if (!input.includeHidden) {
+        whereConditions.push(eq(tagCategories.visible, true));
+      }
+
+      let query = db.select({
+        id: tagCategories.id,
+        slug: tagCategories.slug,
+        name: tagCategories.name,
+        description: tagCategories.description,
+        color: tagCategories.color,
+        icon: tagCategories.icon,
+        sortOrder: tagCategories.sortOrder,
+        visible: tagCategories.visible,
+        createdBy: tagCategories.createdBy,
+        createdAt: tagCategories.createdAt,
+        updatedAt: tagCategories.updatedAt,
+        tagCount: sql<number>`COALESCE((SELECT COUNT(*) FROM
+        ${tags}
+        WHERE
+        ${tags.categoryId}
+        =
+        ${tagCategories.id}
+        ),
+        0
+        )`,
+        usageCount: sql<number>`COALESCE((SELECT COUNT(*) FROM
+        ${userTagsTable}
+        INNER
+        JOIN
+        ${tags}
+        ON
+        ${userTagsTable.tagId}
+        =
+        ${tags.id}
+        WHERE
+        ${tags.categoryId}
+        =
+        ${tagCategories.id}
+        ),
+        0
+        )
+        +
+        COALESCE
+        (
+        (
+        SELECT
+        COUNT
+        (
+        *
+        )
+        FROM
+        ${streamTagsTable}
+        INNER
+        JOIN
+        ${tags}
+        ON
+        ${streamTagsTable.tagId}
+        =
+        ${tags.id}
+        WHERE
+        ${tags.categoryId}
+        =
+        ${tagCategories.id}
+        ),
+        0
+        )`,
+      })
+        .from(tagCategories);
+
+      // Apply where conditions if any exist
+      if (whereConditions.length > 0) {
+        return query
+          .orderBy(tagCategories.sortOrder, tagCategories.name)
+          .where(whereConditions.length === 1 ? whereConditions[0] : and(...whereConditions));
+      }
+
+      return query
+        .orderBy(tagCategories.sortOrder, tagCategories.name);
+    } catch (error) {
+      console.error('Error getting tag categories:', error);
+      throw new ORPCError('INTERNAL_SERVER_ERROR', {message: 'Failed to get tag categories'});
+    }
+  });
+
+/**
  * Get a single tag category by ID (admin only)
  */
 const getTagCategory = os.getTagCategory
@@ -1261,6 +1470,7 @@ export const adminTagsRouter = {
   deleteTag,
   getAdminTags,
   getTagWithAliases,
+  getTagsWithUsageAndAliasesByCategory,
   addTagAlias,
   removeTagAlias,
   getTagAliases,
@@ -1278,6 +1488,7 @@ export const adminTagsRouter = {
   updateTagCategory,
   deleteTagCategory,
   getTagCategories,
+  getAllTagCategories,
   getTagCategory,
   checkTagSlugAvailability,
   checkAliasAvailability,

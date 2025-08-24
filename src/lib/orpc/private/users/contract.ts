@@ -1,5 +1,6 @@
 import {oc} from '@orpc/contract';
 import {UserDisplaySchema} from "../schemas/users.ts";
+import z from 'zod/v4';
 
 /**
  * Private users contracts for authenticated user operations.
@@ -15,6 +16,10 @@ import {UserDisplaySchema} from "../schemas/users.ts";
 const getCurrentUserContract = oc
   .output(UserDisplaySchema);
 
+
+const isAdminContract = oc.output(z.boolean());
+
 export const privateUsersContract = {
-  getCurrentUser: getCurrentUserContract
+  getCurrentUser: getCurrentUserContract,
+  isAdminContract,
 };

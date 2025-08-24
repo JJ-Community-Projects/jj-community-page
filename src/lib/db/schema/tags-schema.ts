@@ -212,6 +212,9 @@ export type NewUserTag = typeof userTagsTable.$inferInsert;
 export type StreamTag = typeof streamTagsTable.$inferSelect;
 export type NewStreamTag = typeof streamTagsTable.$inferInsert;
 
+export type TagCategory = typeof tagCategories.$inferSelect;
+export type NewTagCategory = typeof tagCategories.$inferInsert;
+
 /**
  * Tag with aliases - for admin management operations
  */

@@ -8,7 +8,6 @@ import "./UserAdminDashboardPage.css";
 import {orpcPrivate} from "../../../../lib/orpc/client.ts";
 import {QueryClientProvider, useQuery, useQueryClient} from "@tanstack/solid-query";
 import {QueryClient} from "@tanstack/query-core";
-import {UserTagsSection} from "./UserTagsSection.tsx";
 
 
 const ProfileCard: Component = () => {
@@ -115,6 +114,23 @@ const TeamCard: Component = () => {
   )
 }
 
+const TagsCard: Component = () => {
+  return (
+    <a
+      href={`/dashboard/tags`}
+      class="bg-white rounded-2xl shadow-xl p-6 hover:shadow-2xl transition-all"
+    >
+      <div class="flex flex-col h-full">
+        <h3 class="text-xl font-bold mb-2">Tags</h3>
+        <p class="text-gray-600 mb-4">Manage your profile tags and interests</p>
+        <div class="mt-auto">
+          <span class="text-accent font-medium">Manage Tags →</span>
+        </div>
+      </div>
+    </a>
+  )
+}
+
 const Root: Component = () => {
 
   const user = useQuery(() => orpcPrivate.users.getCurrentUser.queryOptions({
@@ -126,19 +142,19 @@ const Root: Component = () => {
       {/* Profile Card with Tiltify Links */}
       <ProfileCard/>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Schedules Card */}
         <ScheduleCard/>
 
         {/* Teams Card */}
         <TeamCard/>
+
+        {/* Tags Card */}
+        <TagsCard/>
       </div>
 
-      {/* User Tags, Socials, and Styles Sections */}
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <UserTagsSection/>
-        <UserSocialsSection/>
-      </div>
+      {/* User Socials Section */}
+      <UserSocialsSection/>
 
       {/* User Styles Section */}
       <UserStylesSection/>

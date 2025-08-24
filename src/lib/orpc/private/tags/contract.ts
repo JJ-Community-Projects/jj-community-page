@@ -59,6 +59,14 @@ const TagWithUsageSchema = PublicTagSchema.extend({
   totalUsage: z.number(),
 });
 
+const TagWithUsageAndCategorySchema = TagWithUsageSchema.extend({
+  category: z.object({
+    id: z.number(),
+    slug: z.string(),
+    name: z.string(),
+  }).nullable(),
+});
+
 const PopularTagsResponseSchema = z.object({
   tags: z.array(TagWithUsageSchema),
   totalTags: z.number(),
@@ -166,6 +174,20 @@ const searchTagsContract = oc
   .output(z.array(TagWithUsageSchema));
 
 /**
+ * Enhanced search for admin-created tags including category names
+ * Searches in tag names, slugs, descriptions, AND category names
+ * Supports filtering by multiple category IDs
+ * Returns tags with category information when available
+ */
+const fullTagsSearchContract = oc
+  .input(z.object({
+    query: z.string().min(1).max(100),
+    limit: PaginationLimitSchema(1, 50, 10),
+    categoryIds: z.array(z.number().int().positive()).max(10).default([]),
+  }))
+  .output(z.array(TagWithUsageAndCategorySchema));
+
+/**
  * Get available tag categories for browsing
  * Returns category list with metadata for filtered tag discovery
  */
@@ -197,5 +219,6 @@ export const privateTagsContract = {
   findUsersByTag: findUsersByTagContract,
   getPopularTags: getPopularTagsContract,
   searchTags: searchTagsContract,
+  fullTagsSearch: fullTagsSearchContract,
   getTagCategories: getTagCategoriesContract,
 }

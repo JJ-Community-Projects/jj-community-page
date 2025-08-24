@@ -4,6 +4,7 @@ import { dbMiddleware } from '../../middleware/dbMiddleware.ts';
 import { authMiddleware } from '../../middleware/authMiddleware.ts';
 import { userDisplayView } from '../../../db/schema/views-schema.ts';
 import { eq } from 'drizzle-orm';
+import {users} from "../../../db/schema/auth-schema.ts";
 
 const os = implement(privateUsersContract)
   .use(dbMiddleware);
@@ -49,6 +50,26 @@ const getCurrentUser = os.getCurrentUser
     }
   });
 
+const isAdmin = os.isAdminContract
+  .use(authMiddleware)
+  .handler(async ({context})=>{
+    const db = context.db
+    const userId = context.userId
+
+    const user =await db.select({
+      role: users.role
+    }).from(users)
+      .where(eq(users.id, userId))
+      .get()
+
+    if (!user) {
+      throw new ORPCError('NOT_FOUND')
+    }
+
+    return user.role === 'admin'
+  })
+
 export const privateUsersRouter = {
-  getCurrentUser
+  getCurrentUser,
+  isAdmin,
 };

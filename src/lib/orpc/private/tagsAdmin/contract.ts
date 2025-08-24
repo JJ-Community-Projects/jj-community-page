@@ -131,6 +131,13 @@ const TagWithUsageOutputSchema = TagOutputSchema.extend({
   totalUsage: z.number(),
 });
 
+const TagWithUsageAndAliasesOutputSchema = TagOutputSchema.extend({
+  userCount: z.number(),
+  streamCount: z.number(),
+  totalUsage: z.number(),
+  aliases: z.array(TagAliasOutputSchema),
+});
+
 const UserTagOutputSchema = z.object({
   userId: z.number(),
   tagId: z.number(),
@@ -211,6 +218,18 @@ export const getAdminTagsContract = oc
 export const getTagWithAliasesContract = oc
   .input(z.object({ id: TagIdSchema }))
   .output(TagWithAliasesOutputSchema);
+
+/**
+ * Get all tags with usage and aliases for a specific category (admin only)
+ * Returns tags with usage statistics and all their aliases for the given category
+ */
+export const getTagsWithUsageAndAliasesByCategoryContract = oc
+  .input(z.object({
+    categoryId: z.number().int().positive(),
+    includeHidden: z.boolean().default(true),
+    limit: PaginationLimitSchema(1, 100, 50),
+  }))
+  .output(z.array(TagWithUsageAndAliasesOutputSchema));
 
 // === Tag Alias Management Contracts ===
 
@@ -367,6 +386,13 @@ export const getTagCategoriesContract = oc
   }))
   .output(z.array(TagCategoryWithUsageOutputSchema));
 
+export const getAllTagCategoriesContract = oc
+  .input(z.object({
+    includeHidden: z.boolean().default(true),
+    includeUsage: z.boolean().default(true),
+  }))
+  .output(z.array(TagCategoryWithUsageOutputSchema));
+
 /**
  * Get a single tag category by ID (admin only)
  */
@@ -417,6 +443,7 @@ export const adminTagsContract = {
   deleteTag: deleteTagContract,
   getAdminTags: getAdminTagsContract,
   getTagWithAliases: getTagWithAliasesContract,
+  getTagsWithUsageAndAliasesByCategory: getTagsWithUsageAndAliasesByCategoryContract,
 
   // Alias management
   addTagAlias: addTagAliasContract,
@@ -442,6 +469,7 @@ export const adminTagsContract = {
   updateTagCategory: updateTagCategoryContract,
   deleteTagCategory: deleteTagCategoryContract,
   getTagCategories: getTagCategoriesContract,
+  getAllTagCategories: getAllTagCategoriesContract,
   getTagCategory: getTagCategoryContract,
 
   // Tag validation
