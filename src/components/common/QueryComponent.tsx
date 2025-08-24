@@ -188,7 +188,7 @@ export function RawQueryComponent<TData, TError>(props: RawQueryComponentProps<T
 
           {/* Handle background refetching */}
           <Show
-            when={props.query.isRefetching && props.showRefetchingIndicator !== false}
+            when={props.query.isRefetching && props.showRefetchingIndicator}
             fallback={props.children(props.query.data!)}
           >
             {props.refetching?.(props.query.data!) ?? (
