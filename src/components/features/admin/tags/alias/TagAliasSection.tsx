@@ -1,6 +1,6 @@
-import {type Component, Show, For} from "solid-js";
+import {type Component, For, Show} from "solid-js";
 import {useQuery} from "@tanstack/solid-query";
-import {orpcPrivate} from "../../../../lib/orpc/client.ts";
+import {orpcPrivate} from "../../../../../lib/orpc/client.ts";
 import {AddTagAliasPanel} from "./AddTagAliasPanel.tsx";
 import {TagAliasListItem} from "./TagAliasListItem.tsx";
 

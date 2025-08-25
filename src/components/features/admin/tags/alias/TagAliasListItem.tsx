@@ -1,7 +1,7 @@
-import {type Component, Show, createSignal} from "solid-js";
+import {type Component, createSignal, Show} from "solid-js";
 import {useMutation, useQueryClient} from "@tanstack/solid-query";
-import {orpcPrivate} from "../../../../lib/orpc/client.ts";
-import type {TagAlias} from "../../../../lib/db/schema/tags-schema.ts";
+import {orpcPrivate} from "../../../../../lib/orpc/client.ts";
+import type {TagAlias} from "../../../../../lib/db/schema/tags-schema.ts";
 
 interface TagAliasListItemProps {
   alias: TagAlias

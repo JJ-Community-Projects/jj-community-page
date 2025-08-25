@@ -1,45 +1,45 @@
 import {type Component, Show} from "solid-js";
 import {useMutation, useQueryClient} from "@tanstack/solid-query";
-import {orpcPrivate} from "../../../../lib/orpc/client.ts";
+import {orpcPrivate} from "../../../../../lib/orpc/client.ts";
 import {createStore} from "solid-js/store";
 import {TextField} from "@kobalte/core/text-field";
 import {Checkbox} from "@kobalte/core/checkbox";
 
-export const AddTagCategoryPanel: Component = () => {
+interface AddTagPanelProps {
+  categoryId: number
+}
+
+export const AddTagPanel: Component<AddTagPanelProps> = (props) => {
   const client = useQueryClient()
-  const createTagCategory = useMutation(() =>
-    orpcPrivate.adminTags.createTagCategory.mutationOptions(({
+  const createTag = useMutation(() =>
+    orpcPrivate.adminTags.createTag.mutationOptions({
       onSuccess: async () => {
         await client.invalidateQueries({
-          queryKey: orpcPrivate.adminTags.getAllTagCategories.key()
+          queryKey: orpcPrivate.adminTags.getTagsWithUsageAndAliasesByCategory.key()
         })
         // Reset form after successful submission
-        setCategory({
-          slug: '',
+        setTag({
           name: '',
+          slug: '',
           description: '',
-          color: '#6B7280',
-          icon: '',
+          color: '#3584BF',
           visible: true,
         })
       }
-    }))
+    })
   )
 
-
-  const [category, setCategory] = createStore<{
-    slug: string
+  const [tag, setTag] = createStore<{
     name: string
+    slug: string
     description: string | null
     color: string
-    icon: string | null
     visible: boolean
   }>({
-    slug: '',
     name: '',
+    slug: '',
     description: '',
-    color: '#6B7280',
-    icon: '',
+    color: '#3584BF',
     visible: true,
   })
 
@@ -47,69 +47,69 @@ export const AddTagCategoryPanel: Component = () => {
     e.preventDefault()
 
     // Basic validation
-    if (!category.slug.trim() || !category.name.trim()) {
+    if (!tag.name.trim() || !tag.slug.trim()) {
       return
     }
 
-    createTagCategory.mutate({
-      slug: category.slug,
-      name: category.name,
-      description: category.description || undefined,
-      color: category.color,
-      icon: category.icon || undefined,
-      visible: category.visible,
+    createTag.mutate({
+      name: tag.name,
+      slug: tag.slug,
+      description: tag.description || undefined,
+      categoryId: props.categoryId,
+      color: tag.color,
+      visible: tag.visible,
     })
   }
 
   return (
-    <div class="bg-white rounded-lg border border-gray-200 p-4 mb-6">
-      <h3 class="text-lg font-medium text-gray-900 mb-4">Add New Tag Category</h3>
+    <div class="bg-gray-50 rounded-lg border border-gray-200 p-4 mb-4">
+      <h4 class="text-md font-medium text-gray-900 mb-3">Add New Tag</h4>
 
       <form onSubmit={handleSubmit} class="space-y-4">
-        <div class="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
-          {/* Slug */}
-          <div>
-            <TextField
-              name="slug"
-              value={category.slug}
-              onChange={(value) => setCategory('slug', value)}
-              required
-            >
-              <TextField.Label class="block text-sm font-medium text-gray-700 mb-1">
-                Slug
-              </TextField.Label>
-              <TextField.Input
-                placeholder="e.g., gaming"
-                pattern="^[a-z0-9-]+$"
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-              />
-            </TextField>
-          </div>
-
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
           {/* Name */}
           <div>
             <TextField
               name="name"
-              value={category.name}
-              onChange={(value) => setCategory('name', value)}
+              value={tag.name}
+              onChange={(value) => setTag('name', value)}
               required
             >
               <TextField.Label class="block text-sm font-medium text-gray-700 mb-1">
                 Name
               </TextField.Label>
               <TextField.Input
-                placeholder="e.g., Gaming"
+                placeholder="e.g., Minecraft"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+              />
+            </TextField>
+          </div>
+
+          {/* Slug */}
+          <div>
+            <TextField
+              name="slug"
+              value={tag.slug}
+              onChange={(value) => setTag('slug', value)}
+              required
+            >
+              <TextField.Label class="block text-sm font-medium text-gray-700 mb-1">
+                Slug
+              </TextField.Label>
+              <TextField.Input
+                placeholder="e.g., minecraft"
+                pattern="^[a-z0-9-]+$"
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
               />
             </TextField>
           </div>
 
           {/* Description */}
-          <div class="md:col-span-2">
+          <div>
             <TextField
               name="description"
-              value={category.description || ''}
-              onChange={(value) => setCategory('description', value || null)}
+              value={tag.description || ''}
+              onChange={(value) => setTag('description', value || null)}
             >
               <TextField.Label class="block text-sm font-medium text-gray-700 mb-1">
                 Description
@@ -129,8 +129,8 @@ export const AddTagCategoryPanel: Component = () => {
             <input
               id="color"
               type="color"
-              value={category.color}
-              onInput={(e) => setCategory('color', e.currentTarget.value)}
+              value={tag.color}
+              onInput={(e) => setTag('color', e.currentTarget.value)}
               class="w-full h-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
@@ -138,8 +138,8 @@ export const AddTagCategoryPanel: Component = () => {
           {/* Visibility and Submit */}
           <div class="flex items-center gap-3">
             <Checkbox
-              checked={category.visible}
-              onChange={(checked) => setCategory('visible', checked)}
+              checked={tag.visible}
+              onChange={(checked) => setTag('visible', checked)}
               class="flex items-center"
             >
               <Checkbox.Input class="sr-only" />
@@ -155,19 +155,19 @@ export const AddTagCategoryPanel: Component = () => {
 
             <button
               type="submit"
-              disabled={createTagCategory.isPending || !category.slug.trim() || !category.name.trim()}
-              class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={createTag.isPending || !tag.name.trim() || !tag.slug.trim()}
+              class="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <Show when={createTagCategory.isPending} fallback="Add Category">
+              <Show when={createTag.isPending} fallback="Add Tag">
                 Adding...
               </Show>
             </button>
           </div>
         </div>
 
-        <Show when={createTagCategory.error}>
+        <Show when={createTag.error}>
           <div class="text-red-600 text-sm">
-            Error: {createTagCategory.error?.message || 'Failed to create category'}
+            Error: {createTag.error?.message || 'Failed to create tag'}
           </div>
         </Show>
       </form>

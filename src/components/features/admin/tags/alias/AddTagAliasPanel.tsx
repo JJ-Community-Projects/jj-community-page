@@ -1,6 +1,6 @@
 import {type Component, Show} from "solid-js";
 import {useMutation, useQueryClient} from "@tanstack/solid-query";
-import {orpcPrivate} from "../../../../lib/orpc/client.ts";
+import {orpcPrivate} from "../../../../../lib/orpc/client.ts";
 import {createStore} from "solid-js/store";
 import {TextField} from "@kobalte/core/text-field";
 

@@ -1,11 +1,11 @@
 import {type Component, createSignal, Show} from "solid-js";
 import {useMutation, useQueryClient} from "@tanstack/solid-query";
-import {orpcPrivate} from "../../../../lib/orpc/client.ts";
+import {orpcPrivate} from "../../../../../lib/orpc/client.ts";
 import {createStore} from "solid-js/store";
 import {TextField} from "@kobalte/core/text-field";
 import {Checkbox} from "@kobalte/core/checkbox";
-import type {Tag, TagAlias} from "../../../../lib/db/schema/tags-schema.ts";
-import {TagAliasSection} from "./TagAliasSection.tsx";
+import type {Tag, TagAlias} from "../../../../../lib/db/schema/tags-schema.ts";
+import {TagAliasSection} from "../alias/TagAliasSection.tsx";
 
 interface TagListItemProps {
   tag: Tag & {

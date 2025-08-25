@@ -1,7 +1,7 @@
 import {type Component, For} from "solid-js";
-import {orpcPrivate} from "../../../../lib/orpc/client.ts";
+import {orpcPrivate} from "../../../../../lib/orpc/client.ts";
 import {AddTagCategoryPanel} from "./AddTagCategoryPanel.tsx";
-import {QueryComponent} from "../../../common/QueryComponent.tsx";
+import {QueryComponent} from "../../../../common/QueryComponent.tsx";
 import {TagCategoryListItem} from "./TagCategoryListItem.tsx";
 
 interface TagsCategoriesSectionProps {
