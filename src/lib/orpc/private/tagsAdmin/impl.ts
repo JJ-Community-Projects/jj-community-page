@@ -8,6 +8,85 @@ import {and, desc, eq, ne, sql} from "drizzle-orm";
 const os = implement(adminTagsContract)
   .use(dbMiddleware);
 
+// === Utility Functions for Tag Category Queries ===
+
+/**
+ * Create a SQL subquery to count tags in a category
+ */
+const createTagCountSubquery = () => sql<number>`COALESCE((SELECT COUNT(*) FROM
+${tags}
+WHERE
+${tags.categoryId}
+=
+${tagCategories.id}
+),
+0
+)`;
+
+/**
+ * Create a SQL subquery to count total usage (user tags + stream tags) for a category
+ */
+const createUsageCountSubquery = () => sql<number>`COALESCE((SELECT COUNT(*) FROM
+${userTagsTable}
+INNER
+JOIN
+${tags}
+ON
+${userTagsTable.tagId}
+=
+${tags.id}
+WHERE
+${tags.categoryId}
+=
+${tagCategories.id}
+),
+0
+)
++
+COALESCE
+(
+(
+SELECT
+COUNT
+(
+*
+)
+FROM
+${streamTagsTable}
+INNER
+JOIN
+${tags}
+ON
+${streamTagsTable.tagId}
+=
+${tags.id}
+WHERE
+${tags.categoryId}
+=
+${tagCategories.id}
+),
+0
+)`;
+
+/**
+ * Create a base select object for tag categories with computed fields
+ */
+const createTagCategorySelect = () => ({
+  id: tagCategories.id,
+  slug: tagCategories.slug,
+  name: tagCategories.name,
+  description: tagCategories.description,
+  color: tagCategories.color,
+  icon: tagCategories.icon,
+  sortOrder: tagCategories.sortOrder,
+  visible: tagCategories.visible,
+  createdBy: tagCategories.createdBy,
+  createdAt: tagCategories.createdAt,
+  updatedAt: tagCategories.updatedAt,
+  tagCount: createTagCountSubquery(),
+  usageCount: createUsageCountSubquery(),
+});
+
 // === Core Tag Management Procedures ===
 
 /**
@@ -1118,69 +1197,7 @@ const getTagCategories = os.getTagCategories
         whereConditions.push(eq(tagCategories.visible, true));
       }
 
-      let query = db.select({
-        id: tagCategories.id,
-        slug: tagCategories.slug,
-        name: tagCategories.name,
-        description: tagCategories.description,
-        color: tagCategories.color,
-        icon: tagCategories.icon,
-        sortOrder: tagCategories.sortOrder,
-        visible: tagCategories.visible,
-        createdBy: tagCategories.createdBy,
-        createdAt: tagCategories.createdAt,
-        updatedAt: tagCategories.updatedAt,
-        tagCount: sql<number>`COALESCE((SELECT COUNT(*) FROM
-        ${tags}
-        WHERE
-        ${tags.categoryId}
-        =
-        ${tagCategories.id}
-        ),
-        0
-        )`,
-        usageCount: sql<number>`COALESCE((SELECT COUNT(*) FROM
-        ${userTagsTable}
-        INNER
-        JOIN
-        ${tags}
-        ON
-        ${userTagsTable.tagId}
-        =
-        ${tags.id}
-        WHERE
-        ${tags.categoryId}
-        =
-        ${tagCategories.id}
-        ),
-        0
-        )
-        +
-        COALESCE
-        (
-        (
-        SELECT
-        COUNT
-        (
-        *
-        )
-        FROM
-        ${streamTagsTable}
-        INNER
-        JOIN
-        ${tags}
-        ON
-        ${streamTagsTable.tagId}
-        =
-        ${tags.id}
-        WHERE
-        ${tags.categoryId}
-        =
-        ${tagCategories.id}
-        ),
-        0
-        )`,
-      })
+      let query = db.select(createTagCategorySelect())
         .from(tagCategories);
 
       // Apply where conditions if any exist
@@ -1217,69 +1234,7 @@ const getAllTagCategories = os.getAllTagCategories
         whereConditions.push(eq(tagCategories.visible, true));
       }
 
-      let query = db.select({
-        id: tagCategories.id,
-        slug: tagCategories.slug,
-        name: tagCategories.name,
-        description: tagCategories.description,
-        color: tagCategories.color,
-        icon: tagCategories.icon,
-        sortOrder: tagCategories.sortOrder,
-        visible: tagCategories.visible,
-        createdBy: tagCategories.createdBy,
-        createdAt: tagCategories.createdAt,
-        updatedAt: tagCategories.updatedAt,
-        tagCount: sql<number>`COALESCE((SELECT COUNT(*) FROM
-        ${tags}
-        WHERE
-        ${tags.categoryId}
-        =
-        ${tagCategories.id}
-        ),
-        0
-        )`,
-        usageCount: sql<number>`COALESCE((SELECT COUNT(*) FROM
-        ${userTagsTable}
-        INNER
-        JOIN
-        ${tags}
-        ON
-        ${userTagsTable.tagId}
-        =
-        ${tags.id}
-        WHERE
-        ${tags.categoryId}
-        =
-        ${tagCategories.id}
-        ),
-        0
-        )
-        +
-        COALESCE
-        (
-        (
-        SELECT
-        COUNT
-        (
-        *
-        )
-        FROM
-        ${streamTagsTable}
-        INNER
-        JOIN
-        ${tags}
-        ON
-        ${streamTagsTable.tagId}
-        =
-        ${tags.id}
-        WHERE
-        ${tags.categoryId}
-        =
-        ${tagCategories.id}
-        ),
-        0
-        )`,
-      })
+      let query = db.select(createTagCategorySelect())
         .from(tagCategories);
 
       // Apply where conditions if any exist
