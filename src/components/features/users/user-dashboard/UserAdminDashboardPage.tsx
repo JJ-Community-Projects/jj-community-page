@@ -185,6 +185,44 @@ const FriendsCard: Component = () => {
   )
 }
 
+const BlockedCard: Component = () => {
+  const blockedUsersData = useQuery(() => orpcPrivate.blocking.listBlockedUsers.queryOptions({
+    staleTime: 30 * 1000,
+  }))
+
+  const counterText = () => {
+    const c = blockedUsersData.data?.length ?? 0
+    if (c === 1) {
+      return `(${c} user)`
+    }
+    return `(${c} users)`
+  }
+
+  const hasBlockedUsers = () => {
+    return blockedUsersData.data?.length ?? 0 > 0
+  }
+
+  return (
+    <a
+      href={`/dashboard/block`}
+      class="bg-white rounded-2xl shadow-xl p-6 hover:shadow-2xl transition-all"
+    >
+      <div class="flex flex-col h-full">
+        <h3 class="text-xl font-bold mb-2">Blocked Users</h3>
+        <p class="text-gray-600 mb-4">Manage your blocked users list</p>
+        <div class="mt-auto flex justify-between items-center">
+          <span class="text-accent font-medium">Manage Blocks →</span>
+          <Show when={hasBlockedUsers()}>
+            <span class="bg-red-500 text-white text-sm px-2 py-1 rounded-full">
+              {counterText()}
+            </span>
+          </Show>
+        </div>
+      </div>
+    </a>
+  )
+}
+
 const Root: Component = () => {
 
   const user = useQuery(() => orpcPrivate.users.getCurrentUser.queryOptions({
@@ -208,6 +246,9 @@ const Root: Component = () => {
 
         {/* Friends Card */}
         <FriendsCard/>
+
+        {/* Blocked Users Card */}
+        <BlockedCard/>
       </div>
 
       {/* User Socials Section */}

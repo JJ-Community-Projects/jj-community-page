@@ -4,7 +4,7 @@ import {dbMiddleware} from '../../middleware/dbMiddleware.ts';
 import {authMiddleware} from '../../middleware/authMiddleware.ts';
 import {userDisplayView, usersSearchView} from '../../../db/schema/views-schema.ts';
 import {eq, like, or} from 'drizzle-orm';
-import {users} from "../../../db/schema/auth-schema.ts";
+import {blockedUsers, users} from "../../../db/schema/auth-schema.ts";
 
 const os = implement(privateUsersContract)
   .use(dbMiddleware);
@@ -81,6 +81,15 @@ const searchByName = os.searchByName
     const {searchTerm, includeSelf} = input;
     const userId = context.userId
     try {
+      // Query 1: Get list of users who have blocked the current user
+      const blockedByUsers = await db.select({
+        userId: blockedUsers.userId
+      })
+        .from(blockedUsers)
+        .where(eq(blockedUsers.blockedUser, userId))
+        .all();
+      const blockedUserIds = new Set(blockedByUsers.map(u => u.userId));
+
       // Convert search term to lowercase for case-insensitive matching
       const searchPattern = `%${searchTerm.toLowerCase()}%`;
       // Search in both Tiltify and Twitch usernames using the usersSearchView
@@ -97,14 +106,14 @@ const searchByName = os.searchByName
             like(usersSearchView.twitchUsername, searchPattern)
           )
         )
-        .limit(10) // Limit results to prevent excessive data transfer
+        .limit(10 + blockedUserIds.size) // Limit results to prevent excessive data transfer
         .all();
 
-      if (!input.includeSelf) {
-        return results.filter((user) => user.userId !== userId)
-      }
-
-      return results;
+      // Filter out blocked users and apply includeSelf logic
+      return results.filter(user =>
+        !blockedUserIds.has(user.userId) &&
+        (includeSelf || user.userId !== userId)
+      );
     } catch (error) {
       console.error('Error searching users:', error);
       throw new ORPCError('INTERNAL_SERVER_ERROR', {message: 'Failed to search users'});

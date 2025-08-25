@@ -184,7 +184,7 @@ const getUserFriendRequestsSSE = os
 
         // Use event-specific delay for optimal responsiveness
         const delay = getEventDelay(payload.event);
-        await new Promise(resolve => setTimeout(resolve, delay));
+        // await new Promise(resolve => setTimeout(resolve, delay));
 
         // Smart data fetching based on event type (currently all events refetch, but prepared for optimization)
         if (shouldRefetchAll(payload.event)) {
@@ -233,7 +233,7 @@ const getSendUserFriendRequestsSSE = os
 
         // Use event-specific delay for optimal responsiveness
         const delay = getEventDelay(payload.event);
-        await new Promise(resolve => setTimeout(resolve, delay));
+        // await new Promise(resolve => setTimeout(resolve, delay));
 
         // Smart data fetching based on event type (currently all events refetch, but prepared for optimization)
         if (shouldRefetchAll(payload.event)) {
@@ -282,7 +282,7 @@ const getUserFriendsSSE = os
 
         // Use event-specific delay for optimal responsiveness
         const delay = getEventDelay(payload.event);
-        await new Promise(resolve => setTimeout(resolve, delay));
+        // await new Promise(resolve => setTimeout(resolve, delay));
 
         // Smart data fetching based on event type (currently all events refetch, but prepared for optimization)
         if (shouldRefetchAll(payload.event)) {
@@ -332,7 +332,7 @@ const getUserFriendRequestsCountSSE = os
 
         // Use event-specific delay for optimal responsiveness
         const delay = getEventDelay(payload.event);
-        await new Promise(resolve => setTimeout(resolve, delay));
+        // await new Promise(resolve => setTimeout(resolve, delay));
 
         // Smart data fetching based on event type (currently all events refetch, but prepared for optimization)
         if (shouldRefetchAll(payload.event)) {

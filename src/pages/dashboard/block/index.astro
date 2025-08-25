@@ -1,0 +1,12 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import {UserBlocksPage} from "../../../components/features/users/user-dashboard/blocks/UserBlocksPage";
+
+const {session, user} = Astro.locals
+if (session === null) {
+  return Astro.redirect("/");
+}
+---
+<BaseLayout>
+    <UserBlocksPage client:only="solid-js" user={user} />
+</BaseLayout>

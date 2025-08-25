@@ -173,7 +173,6 @@ const cancelFriendRequest = os.cancelFriendRequestContract
     const userId = context.userId;
     const {toUserId} = input;
 
-    await new Promise(resolve => setTimeout(resolve, 2000));
     // Check if friend request exists (where current user is the sender)
     const friendRequest = await db.select()
       .from(friendRequests)
