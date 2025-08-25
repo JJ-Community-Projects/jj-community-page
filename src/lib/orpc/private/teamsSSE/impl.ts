@@ -287,7 +287,8 @@ const getTeamInvitesSSE = os
  */
 const getTeamMembersSSE = os
   .getTeamMembersSSEContract
-  .use(teamsOwnerMiddleware)
+  // .use(teamsOwnerMiddleware)
+  .use(authMiddleware)
   .handler(async function* ({context, input, signal}) {
     const db = context.db
     const teamId = input.teamId
