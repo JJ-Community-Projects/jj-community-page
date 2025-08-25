@@ -1,7 +1,7 @@
 import {type Component} from "solid-js";
 import {QueryClientProvider} from "@tanstack/solid-query";
 import {QueryClient} from "@tanstack/query-core";
-import {TagsCategoriesSection} from "./tags/TagsCategoriesSection.tsx";
+import {TagsCategoriesSection} from "./tags/category/TagsCategoriesSection.tsx";
 
 interface AdminDashboardProps {
 }
