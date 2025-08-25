@@ -1,19 +1,20 @@
 import {type Component, For, Match, Show, Switch} from "solid-js";
 import {useBlocks} from "./UserBlockProvider.tsx";
 import {FaSolidCircleExclamation, FaSolidUserSlash, FaSolidXmark} from "solid-icons/fa";
+import {createModalSignal} from "../../../../../lib/createModalSignal.ts";
+import {ConfirmationDialog} from "../../../../common/dialogs/ConfirmationDialog.tsx";
 
 interface BlockedUser {
-  userId: number;
-  primaryLiveStream: string;
-  role: string;
-  createdAt: Date;
-  username: string;
-  profileImage: string;
-  twitchLogin: string | null;
-  tiltifySlug: string;
-  tiltifyUrl: string;
-  primaryColor: string | null;
-  accentColor: string | null;
+  userId: number
+  primaryLiveStream: string
+  createdAt: Date
+  username: string
+  profileImage: string
+  twitchLogin: string | null
+  tiltifySlug: string
+  tiltifyUrl: string
+  primaryColor: string | null
+  accentColor: string | null
 }
 
 interface BlockedUserItemProps {
@@ -21,15 +22,21 @@ interface BlockedUserItemProps {
 }
 
 const BlockedUserItem: Component<BlockedUserItemProps> = (props) => {
-
   const {
     handleUnblockUser,
     isUnblockingUser,
   } = useBlocks();
 
-  const handleUnblockLocal = async () => {
+  const unblockUserDialog = createModalSignal();
+
+  const handleUnblockClick = () => {
+    unblockUserDialog.open();
+  };
+
+  const handleConfirmUnblock = async () => {
     try {
       await handleUnblockUser(props.user.userId);
+      unblockUserDialog.close();
     } catch (error) {
       console.error('Failed to unblock user:', error);
     }
@@ -43,7 +50,8 @@ const BlockedUserItem: Component<BlockedUserItemProps> = (props) => {
         <Show
           when={props.user.profileImage && props.user.profileImage.trim() !== ''}
           fallback={
-            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-danger-500 to-danger-600 flex items-center justify-center shadow-sm flex-shrink-0">
+            <div
+              class="w-10 h-10 rounded-full bg-gradient-to-br from-danger-500 to-danger-600 flex items-center justify-center shadow-sm flex-shrink-0">
               <span class="text-white font-semibold text-sm">
                 {(props.user.username || 'U')[0].toUpperCase()}
               </span>
@@ -62,7 +70,8 @@ const BlockedUserItem: Component<BlockedUserItemProps> = (props) => {
               if (fallback) fallback.style.display = 'flex';
             }}
           />
-          <div class="w-10 h-10 rounded-full bg-gradient-to-br from-danger-500 to-danger-600 flex items-center justify-center shadow-sm flex-shrink-0 hidden">
+          <div
+            class="w-10 h-10 rounded-full bg-gradient-to-br from-danger-500 to-danger-600 flex items-center justify-center shadow-sm flex-shrink-0 hidden">
             <span class="text-white font-semibold text-sm">
               {(props.user.username || 'U')[0].toUpperCase()}
             </span>
@@ -84,7 +93,7 @@ const BlockedUserItem: Component<BlockedUserItemProps> = (props) => {
         {/* Unblock button */}
         <button
           type="button"
-          onClick={handleUnblockLocal}
+          onClick={handleUnblockClick}
           disabled={isUnblockingUser()}
           class="
           flex-shrink-0 px-3 py-2 rounded-lg transition-all duration-200
@@ -105,6 +114,14 @@ const BlockedUserItem: Component<BlockedUserItemProps> = (props) => {
       <div
         class="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-5 transition-opacity duration-300 pointer-events-none bg-danger-500"></div>
 
+      <ConfirmationDialog
+        isOpen={unblockUserDialog.isOpen()}
+        onOpenChange={unblockUserDialog.setOpen}
+        title="Unblock User"
+        text={`Are you sure you want to unblock ${props.user.username}? They will be able to interact with you again.`}
+        onConfirm={handleConfirmUnblock}
+        onCancel={unblockUserDialog.close}
+      />
     </div>
   );
 }

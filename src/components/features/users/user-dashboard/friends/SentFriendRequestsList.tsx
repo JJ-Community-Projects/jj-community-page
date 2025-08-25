@@ -1,6 +1,8 @@
 import {type Component, For, Match, Show, Switch} from "solid-js";
 import {useFriends} from "./UserFriendsProvider.tsx";
 import {FaSolidCircleExclamation, FaSolidPaperPlane, FaSolidXmark} from "solid-icons/fa";
+import {createModalSignal} from "../../../../../lib/createModalSignal.ts";
+import {ConfirmationDialog} from "../../../../common/dialogs/ConfirmationDialog.tsx";
 
 interface SentFriendRequest {
   userId: number
@@ -25,9 +27,16 @@ const SentFriendRequestItem: Component<SentFriendRequestItemProps> = (props) => 
     isCancellingFriendRequest
   } = useFriends();
 
-  const handleCancelRequest = async () => {
+  const cancelRequestDialog = createModalSignal();
+
+  const handleCancelClick = () => {
+    cancelRequestDialog.open();
+  };
+
+  const handleConfirmCancel = async () => {
     try {
       await handleCancelFriendRequest(props.request.userId);
+      cancelRequestDialog.close();
     } catch (error) {
       console.error('Failed to cancel friend request:', error);
     }
@@ -86,7 +95,7 @@ const SentFriendRequestItem: Component<SentFriendRequestItemProps> = (props) => 
         <div class="flex items-center gap-2">
           <button
             type="button"
-            onClick={handleCancelRequest}
+            onClick={handleCancelClick}
             disabled={isCancellingFriendRequest()}
             class="
             px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200
@@ -106,6 +115,15 @@ const SentFriendRequestItem: Component<SentFriendRequestItemProps> = (props) => 
       {/* Subtle hover effect */}
       <div
         class="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-5 transition-opacity duration-300 pointer-events-none bg-accent-500"></div>
+
+      <ConfirmationDialog
+        isOpen={cancelRequestDialog.isOpen()}
+        onOpenChange={cancelRequestDialog.setOpen}
+        title="Cancel Friend Request"
+        text={`Are you sure you want to cancel your friend request to ${props.request.username}? This action cannot be undone.`}
+        onConfirm={handleConfirmCancel}
+        onCancel={cancelRequestDialog.close}
+      />
     </div>
   );
 }

@@ -1,6 +1,8 @@
 import {type Component, For, Match, Show, Switch} from "solid-js";
 import {useFriends} from "./UserFriendsProvider.tsx";
 import {FaSolidCheck, FaSolidCircleExclamation, FaSolidUserPlus, FaSolidXmark} from "solid-icons/fa";
+import {createModalSignal} from "../../../../../lib/createModalSignal.ts";
+import {ConfirmationDialog} from "../../../../common/dialogs/ConfirmationDialog.tsx";
 
 interface FriendRequestsListItemProps {
   request:  {
@@ -18,7 +20,6 @@ interface FriendRequestsListItemProps {
 }
 
 export const FriendRequestsListItem: Component<FriendRequestsListItemProps> = (props) => {
-
   const request = props.request
 
   const {
@@ -28,6 +29,8 @@ export const FriendRequestsListItem: Component<FriendRequestsListItemProps> = (p
     handleDeclineFriendRequest,
   } = useFriends();
 
+  const declineRequestDialog = createModalSignal();
+
   const handleAcceptRequest = async (fromUserId: number) => {
     try {
       await handleAcceptFriendRequest(fromUserId);
@@ -36,9 +39,14 @@ export const FriendRequestsListItem: Component<FriendRequestsListItemProps> = (p
     }
   };
 
-  const handleDeclineRequest = async (fromUserId: number) => {
+  const handleDeclineClick = () => {
+    declineRequestDialog.open();
+  };
+
+  const handleConfirmDecline = async () => {
     try {
-      await handleDeclineFriendRequest(fromUserId);
+      await handleDeclineFriendRequest(props.request.userId);
+      declineRequestDialog.close();
     } catch (error) {
       console.error('Failed to decline friend request:', error);
     }
@@ -115,7 +123,7 @@ export const FriendRequestsListItem: Component<FriendRequestsListItemProps> = (p
           {/* Decline button */}
           <button
             type="button"
-            onClick={() => handleDeclineRequest(request.userId)}
+            onClick={handleDeclineClick}
             disabled={isAcceptingFriendRequest() || isDecliningFriendRequest()}
             class="
                           px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200
@@ -134,6 +142,15 @@ export const FriendRequestsListItem: Component<FriendRequestsListItemProps> = (p
 
       {/* Subtle hover effect */}
       <div class="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-5 transition-opacity duration-300 pointer-events-none bg-primary-500"></div>
+
+      <ConfirmationDialog
+        isOpen={declineRequestDialog.isOpen()}
+        onOpenChange={declineRequestDialog.setOpen}
+        title="Decline Friend Request"
+        text={`Are you sure you want to decline the friend request from ${request.username}? This action cannot be undone.`}
+        onConfirm={handleConfirmDecline}
+        onCancel={declineRequestDialog.close}
+      />
     </div>
   );
 }

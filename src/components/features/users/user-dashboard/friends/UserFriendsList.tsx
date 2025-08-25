@@ -1,6 +1,8 @@
 import {type Component, For, Match, Show, Switch} from "solid-js";
 import {useFriends} from "./UserFriendsProvider.tsx";
 import {FaSolidCircleExclamation, FaSolidUsers, FaSolidXmark} from "solid-icons/fa";
+import {createModalSignal} from "../../../../../lib/createModalSignal.ts";
+import {ConfirmationDialog} from "../../../../common/dialogs/ConfirmationDialog.tsx";
 
 interface Friend {
   userId: number;
@@ -14,15 +16,21 @@ interface FriendListItemProps {
 }
 
 const FriendListItem: Component<FriendListItemProps> = (props) => {
-
   const {
     handleRemoveFriend,
     isRemovingFriend,
   } = useFriends();
 
-  const handleRemoveFriendLocal = async () => {
+  const removeFriendDialog = createModalSignal();
+
+  const handleRemoveClick = () => {
+    removeFriendDialog.open();
+  };
+
+  const handleConfirmRemove = async () => {
     try {
       await handleRemoveFriend(props.friend.userId);
+      removeFriendDialog.close();
     } catch (error) {
       console.error('Failed to remove friend:', error);
     }
@@ -77,7 +85,7 @@ const FriendListItem: Component<FriendListItemProps> = (props) => {
         {/* Remove button */}
         <button
           type="button"
-          onClick={handleRemoveFriendLocal}
+          onClick={handleRemoveClick}
           disabled={isRemovingFriend()}
           class="
           flex-shrink-0 p-2 rounded-full transition-all duration-200
@@ -98,6 +106,14 @@ const FriendListItem: Component<FriendListItemProps> = (props) => {
       <div
         class="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-5 transition-opacity duration-300 pointer-events-none bg-primary-500"></div>
 
+      <ConfirmationDialog
+        isOpen={removeFriendDialog.isOpen()}
+        onOpenChange={removeFriendDialog.setOpen}
+        title="Remove Friend"
+        text={`Are you sure you want to remove ${props.friend.username} from your friends list? This action cannot be undone.`}
+        onConfirm={handleConfirmRemove}
+        onCancel={removeFriendDialog.close}
+      />
     </div>
   );
 }

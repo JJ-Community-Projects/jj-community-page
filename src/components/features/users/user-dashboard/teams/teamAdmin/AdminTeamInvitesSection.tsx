@@ -1,163 +1,194 @@
-// TeamInvitesSection Component
-import {type Component, createSignal, For, Show} from "solid-js";
+import {type Component, createSignal, For, Match, Show, Switch} from "solid-js";
 import {createModalSignal} from "../../../../../../lib/createModalSignal.ts";
 import {ConfirmationDialog} from "../../../../../common/dialogs/ConfirmationDialog.tsx";
-import {debounce} from "@solid-primitives/scheduled";
-import {TextField} from "@kobalte/core/text-field";
 import {useAdminTeamDetail} from "./AdminTeamDetailsProvider.tsx";
-import {useQuery} from "@tanstack/solid-query";
-import {orpcPublic} from "../../../../../../lib/orpc/client.ts";
+import {AdminTeamInviteSearchInput} from "./AdminTeamInviteSearchInput.tsx";
+import {FaSolidEnvelope, FaSolidCircleExclamation, FaSolidXmark, FaSolidClock} from "solid-icons/fa";
 
-export const AdminTeamInvitesSection: Component = () => {
-  const {cancelInvite, cancelInviteMutation, invites} = useAdminTeamDetail()
+interface Invite {
+  userId: number;
+  username: string;
+}
+
+interface InviteListItemProps {
+  invite: Invite;
+}
+
+const InviteListItem: Component<InviteListItemProps> = (props) => {
+  const {cancelInvite, cancelInviteMutation} = useAdminTeamDetail();
   const cancelInviteDialog = createModalSignal();
-  const [userToRemove, setUserToRemove] = createSignal<number | null>(null);
 
-  const handleCancelClick = (userId: number) => {
-    setUserToRemove(userId);
+  const handleCancelClick = () => {
     cancelInviteDialog.open();
   };
 
   const handleConfirmCancel = async () => {
-    if (userToRemove() !== null) {
-      await cancelInvite(userToRemove()!);
+    try {
+      await cancelInvite(props.invite.userId);
       cancelInviteDialog.close();
+    } catch (error) {
+      console.error('Failed to cancel invite:', error);
     }
   };
 
   return (
-    <div class="bg-white rounded-2xl shadow-xl p-6">
-      <h3 class="text-lg font-bold mb-4">Pending Invites</h3>
-      <Show when={cancelInviteMutation.isError}>
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-          <p>{cancelInviteMutation.failureReason?.message}</p>
-        </div>
-      </Show>
-      <div class="space-y-4">
-        {/* Invite list */}
-        <ul class="divide-y divide-gray-200">
-          <Show when={invites.data}>
-            <For each={invites.data?.invites}>
-              {(invite) => {
-                return (
-                  <li class="py-3 flex justify-between items-center">
-                    <div>
-                      <p class="font-medium">{invite.username}</p>
-                    </div>
-                    <button
-                      class="text-red-500 hover:text-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                      onClick={() => handleCancelClick(invite.userId)}
-                      disabled={cancelInviteMutation.isPending}
-                    >
-                      {cancelInviteMutation.isPending ? 'Canceling...' : 'Cancel Invite'}
-                    </button>
-                  </li>
-                )
-              }}
-            </For>
-          </Show>
-        </ul>
+    <>
+      <div class="group relative flex items-center bg-white rounded-xl p-4 shadow-md border-2 border-warning-100 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 hover:border-warning-200">
+        <div class="flex items-center gap-3 flex-1">
+          {/* Avatar placeholder */}
+          <div class="w-10 h-10 rounded-full bg-gradient-to-br from-warning-400 to-warning-500 flex items-center justify-center shadow-sm flex-shrink-0">
+            <span class="text-white font-semibold text-sm">
+              {(props.invite.username || 'U')[0].toUpperCase()}
+            </span>
+          </div>
 
-        {/* Invite user form */}
-        <div class="mt-4">
-          <h4 class="font-medium mb-2">Invite a User</h4>
-          <UserSearchInvite/>
+          {/* Invite info */}
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2">
+              <p class="font-semibold text-gray-800 text-sm block truncate">
+                {props.invite.username || 'Unknown User'}
+              </p>
+              <div class="flex items-center gap-1 bg-warning-100 text-warning-700 px-2 py-1 rounded-full">
+                <FaSolidClock class="w-3 h-3" />
+                <span class="text-xs font-medium">Pending</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Cancel button */}
+          <button
+            type="button"
+            onClick={handleCancelClick}
+            disabled={cancelInviteMutation.isPending}
+            class="
+              flex-shrink-0 p-2 rounded-full transition-all duration-200
+              hover:bg-danger-100 focus:bg-danger-100
+              group-hover:opacity-100 opacity-70
+              focus:ring-2 focus:ring-danger-500 focus:ring-offset-2 focus:ring-offset-white outline-none
+              hover:scale-110 active:scale-95
+              disabled:opacity-50 disabled:cursor-not-allowed
+            "
+            aria-label={`Cancel invitation for ${props.invite.username}`}
+            title="Cancel invitation"
+          >
+            <FaSolidXmark class="w-4 h-4 text-danger-500 hover:text-danger-600" />
+          </button>
         </div>
+
+        {/* Subtle hover effect */}
+        <div class="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-5 transition-opacity duration-300 pointer-events-none bg-warning-500"></div>
       </div>
 
       <ConfirmationDialog
         isOpen={cancelInviteDialog.isOpen()}
         onOpenChange={cancelInviteDialog.setOpen}
         title="Cancel Invitation"
-        text="Are you sure you want to cancel this invitation? The user will no longer be able to join the team."
+        text={`Are you sure you want to cancel the invitation for ${props.invite.username}? They will no longer be able to join the team using this invitation.`}
         onConfirm={handleConfirmCancel}
         onCancel={cancelInviteDialog.close}
       />
-    </div>
+    </>
   );
 };
 
+const EmptyState = () => (
+  <div class="flex flex-col items-center justify-center py-12 px-4">
+    <div class="w-16 h-16 bg-gradient-to-br from-accent-400 to-accent-500 rounded-full flex items-center justify-center mb-4 shadow-lg">
+      <FaSolidEnvelope class="w-8 h-8 text-white" />
+    </div>
+    <h4 class="text-xl font-semibold text-gray-800 mb-2">No pending invites</h4>
+    <p class="text-gray-600 text-center max-w-md mb-6 leading-relaxed">
+      You don't have any pending team invitations. Use the search above to find and invite users to join your team.
+    </p>
+  </div>
+);
 
-// User Search and Invite Component
-const UserSearchInvite: Component = () => {
-  const [searchText, setSearchText] = createSignal("");
-  const {inviteUser, inviteUserMutation} = useAdminTeamDetail()
-  const searchQuery = useQuery(() => orpcPublic.users.searchByName.queryOptions({
-    input: {
-      searchTerm: ''
-    },
-    enabled: () => searchText().length > 0,
-  }))
+const LoadingSkeleton = () => (
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div class="animate-pulse bg-gray-200 rounded-xl h-16 shadow-sm"></div>
+    <div class="animate-pulse bg-gray-200 rounded-xl h-16 shadow-sm"></div>
+    <div class="animate-pulse bg-gray-200 rounded-xl h-16 shadow-sm"></div>
+  </div>
+);
 
-  // Debounced search function
-  const debouncedSearch = debounce(async (query: string) => {
-    setSearchText(query)
-  }, 500);
+/**
+ * AdminTeamInvitesSection Component
+ *
+ * Manages team invitations with user search and invite management functionality.
+ * Enhanced with modern design, invite cards, and proper loading/empty states.
+ */
+export const AdminTeamInvitesSection: Component = () => {
+  const {invites, cancelInviteMutation} = useAdminTeamDetail();
 
-  // Handle invite
-  const handleInvite = async (userId: number) => {
-    try {
-      await inviteUser(userId);
-      setSearchText("");
-    } catch (err) {
-      console.error("Invite error:", err);
-      // Error is now handled by the action state
-    }
-  };
+  const invitesList = () => invites.data?.invites ?? [];
+  const hasInvites = () => invitesList().length > 0;
+  const isLoading = () => invites.isLoading;
+  const hasError = () => !!invites.error;
 
   return (
-    <div class="flex flex-col gap-2">
-      <Show when={inviteUserMutation.isError}>
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-          <p>{inviteUserMutation.failureReason?.message}</p>
-        </div>
-      </Show>
-      <TextField
-        value={searchText()}
-        onChange={debouncedSearch}
-      >
-        <TextField.Label class="sr-only">Search Users</TextField.Label>
-        <div class="relative">
-          <TextField.Input
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-accent"
-            placeholder="Search users by username..."
-          />
-          <Show when={searchQuery.isPending}>
-            <div class="absolute right-3 top-1/2 transform -translate-y-1/2">
-              <div class="animate-spin h-4 w-4 border-2 border-accent border-t-transparent rounded-full"></div>
-            </div>
-          </Show>
-        </div>
-        <Show when={searchQuery.isError}>
-          <TextField.ErrorMessage class="text-red-500 text-sm mt-1">
-            {searchQuery.error?.message}
-          </TextField.ErrorMessage>
-        </Show>
-      </TextField>
+    <div class="space-y-6">
+      {/* User Search and Invite Section */}
+      <AdminTeamInviteSearchInput />
 
-      <Show when={searchQuery.data}>
-        <div class="mt-2 border border-gray-200 rounded-md max-h-60 overflow-y-auto">
-          <ul class="divide-y divide-gray-200">
-            <For each={searchQuery.data!}>
-              {(result) => (
-                <li class="p-2 hover:bg-gray-50 flex justify-between items-center">
-                  <div>
-                    <p class="font-medium">{result.tiltifyUsername}</p>
-                    <p class="text-sm text-gray-500">{result.twitchUsername}</p>
-                  </div>
-                  <button
-                    class="text-accent hover:text-accent-400 disabled:opacity-50 disabled:cursor-not-allowed"
-                    onClick={() => handleInvite(result.userId)}
-                    disabled={inviteUserMutation.isPending}
-                  >
-                    {inviteUserMutation.isPending ? 'Inviting...' : 'Invite'}
-                  </button>
-                </li>
-              )}
-            </For>
-          </ul>
+      {/* Pending Invites Section */}
+      <div class="space-y-4">
+        {/* Section Header */}
+        <div class="flex items-center gap-3">
+          <h4 class="text-sm font-semibold text-gray-800 flex items-center gap-2">
+            <FaSolidEnvelope class="w-4 h-4 text-warning-600" />
+            Pending Invites
+          </h4>
+          {hasInvites() && (
+            <div class="bg-gradient-to-r from-warning-100 to-warning-200 px-3 py-1 rounded-full">
+              <span class="text-warning-700 text-xs font-medium">
+                {invitesList().length} pending
+              </span>
+            </div>
+          )}
         </div>
-      </Show>
+
+        {/* Error Message */}
+        <Show when={cancelInviteMutation.isError}>
+          <div class="bg-danger-50 rounded-xl p-4 border border-danger-200">
+            <div class="flex items-center gap-3 text-danger-600">
+              <FaSolidCircleExclamation class="w-4 h-4 flex-shrink-0" />
+              <p class="text-sm font-medium">{cancelInviteMutation.failureReason?.message || "Failed to cancel invitation"}</p>
+            </div>
+          </div>
+        </Show>
+
+        <Switch>
+          <Match when={isLoading()}>
+            <LoadingSkeleton />
+          </Match>
+
+          <Match when={hasError()}>
+            <div class="bg-danger-50 rounded-xl p-6 border border-danger-200">
+              <div class="flex items-center justify-center gap-3 text-danger-600">
+                <FaSolidCircleExclamation class="w-5 h-5 flex-shrink-0" />
+                <div>
+                  <p class="font-semibold text-sm">Error loading invites</p>
+                  <p class="text-xs opacity-90">{invites.error?.message || "Unknown error occurred"}</p>
+                </div>
+              </div>
+            </div>
+          </Match>
+
+          <Match when={!hasInvites()}>
+            <EmptyState />
+          </Match>
+
+          <Match when={hasInvites()}>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 ~gap-3/4">
+              <For each={invitesList()}>
+                {(invite) => (
+                  <InviteListItem invite={invite} />
+                )}
+              </For>
+            </div>
+          </Match>
+        </Switch>
+      </div>
     </div>
   );
 };
