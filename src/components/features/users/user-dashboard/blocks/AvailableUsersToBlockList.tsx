@@ -12,16 +12,16 @@ const StatusIndicator = () => {
       <Switch>
         <Match when={isLoadingSearch()}>
           <div
-            class="flex items-center gap-2 bg-gradient-to-r from-red-100 to-red-200 px-3 py-1.5 rounded-full shadow-sm">
-            <div class="w-2 h-2 bg-red-600 rounded-full animate-pulse"></div>
-            <span class="text-red-700 text-xs font-medium">Searching</span>
+            class="flex items-center gap-2 bg-gradient-to-r from-danger-100 to-danger-200 px-3 py-1.5 rounded-full shadow-sm">
+            <div class="w-2 h-2 bg-danger rounded-full animate-pulse"></div>
+            <span class="text-danger-700 text-xs font-medium">Searching</span>
           </div>
         </Match>
         <Match when={hasSearchError()}>
           <div
-            class="flex items-center gap-2 bg-gradient-to-r from-red-100 to-red-200 px-3 py-1.5 rounded-full shadow-sm">
-            <div class="w-2 h-2 bg-red-500 rounded-full"></div>
-            <span class="text-red-700 text-xs font-medium">Error</span>
+            class="flex items-center gap-2 bg-gradient-to-r from-danger-100 to-danger-200 px-3 py-1.5 rounded-full shadow-sm">
+            <div class="w-2 h-2 bg-danger-500 rounded-full"></div>
+            <span class="text-danger-700 text-xs font-medium">Error</span>
           </div>
         </Match>
       </Switch>
@@ -90,7 +90,7 @@ export const AvailableUsersToBlockList: Component = () => {
     <div class="mb-6">
       <div class="flex items-center gap-3 mb-4">
         <h3 class="text-sm font-semibold text-gray-800 flex items-center gap-2">
-          <FaSolidMagnifyingGlass class="w-4 h-4 text-red-600" />
+          <FaSolidMagnifyingGlass class="w-4 h-4 text-danger" />
           Search Results
         </h3>
         <StatusIndicator/>
@@ -137,13 +137,13 @@ export const AvailableUsersToBlockList: Component = () => {
 
                 return (
                   <div
-                    class="group relative overflow-hidden rounded-lg p-4 bg-white border border-gray-200 transition-all duration-300 hover:shadow-md hover:border-gray-300">
+                    class="group relative overflow-hidden rounded-xl p-4 bg-white shadow-md border-2 border-danger-200 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 hover:border-danger-300">
                     <div class="flex items-center justify-between">
                       {/* User info */}
                       <div class="flex items-center gap-3">
                         {/* Avatar placeholder */}
                         <div
-                          class="w-10 h-10 rounded-full bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center shadow-sm">
+                          class="w-10 h-10 rounded-full bg-gradient-to-br from-danger-500 to-danger-600 flex items-center justify-center shadow-sm">
                           <span class="text-white font-semibold text-sm">
                             {(user.tiltifyUsername || user.twitchUsername || 'U')[0].toUpperCase()}
                           </span>
@@ -169,10 +169,10 @@ export const AvailableUsersToBlockList: Component = () => {
                         disabled={!canBlockUser() || isBlockingUser()}
                         class={`
                           px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200
-                          focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-white outline-none
+                          focus:ring-2 focus:ring-danger focus:ring-offset-2 focus:ring-offset-white outline-none
                           flex items-center gap-2
                           ${canBlockUser() && !isBlockingUser()
-                          ? 'bg-red-500 text-white hover:bg-red-600 shadow-sm hover:shadow-md'
+                          ? 'bg-danger text-white hover:bg-danger-600 shadow-sm hover:shadow-md'
                           : 'bg-gray-100 text-gray-500 cursor-not-allowed'
                         }
                         `}
@@ -190,10 +190,13 @@ export const AvailableUsersToBlockList: Component = () => {
                     {/* Status indicators */}
                     <Show when={isAlreadyBlockedVal()}>
                       <div
-                        class="absolute top-2 right-2 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center">
+                        class="absolute top-2 right-2 w-4 h-4 bg-danger rounded-full flex items-center justify-center">
                         <FaSolidUserSlash class="w-2.5 h-2.5 text-white" />
                       </div>
                     </Show>
+
+                    {/* Subtle hover effect */}
+                    <div class="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-5 transition-opacity duration-300 pointer-events-none bg-danger-500"></div>
                   </div>
                 );
               }}

@@ -37,13 +37,13 @@ const BlockedUserItem: Component<BlockedUserItemProps> = (props) => {
 
   return (
     <div
-      class="group relative flex items-center bg-white rounded-xl p-4 shadow-md border-2 border-red-200 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 hover:border-red-300">
+      class="group relative flex items-center bg-white rounded-xl p-4 shadow-md border-2 border-danger-200 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 hover:border-danger-300">
       <div class="flex items-center gap-3 flex-1">
         {/* Avatar */}
         <Show
           when={props.user.profileImage && props.user.profileImage.trim() !== ''}
           fallback={
-            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center shadow-sm flex-shrink-0">
+            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-danger-500 to-danger-600 flex items-center justify-center shadow-sm flex-shrink-0">
               <span class="text-white font-semibold text-sm">
                 {(props.user.username || 'U')[0].toUpperCase()}
               </span>
@@ -62,7 +62,7 @@ const BlockedUserItem: Component<BlockedUserItemProps> = (props) => {
               if (fallback) fallback.style.display = 'flex';
             }}
           />
-          <div class="w-10 h-10 rounded-full bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center shadow-sm flex-shrink-0 hidden">
+          <div class="w-10 h-10 rounded-full bg-gradient-to-br from-danger-500 to-danger-600 flex items-center justify-center shadow-sm flex-shrink-0 hidden">
             <span class="text-white font-semibold text-sm">
               {(props.user.username || 'U')[0].toUpperCase()}
             </span>
@@ -103,7 +103,7 @@ const BlockedUserItem: Component<BlockedUserItemProps> = (props) => {
 
       {/* Subtle hover effect */}
       <div
-        class="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-5 transition-opacity duration-300 pointer-events-none bg-red-500"></div>
+        class="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-5 transition-opacity duration-300 pointer-events-none bg-danger-500"></div>
 
     </div>
   );
@@ -112,7 +112,7 @@ const BlockedUserItem: Component<BlockedUserItemProps> = (props) => {
 const EmptyState = () => (
   <div class="flex flex-col items-center justify-center py-12 px-4">
     <div
-      class="w-16 h-16 bg-gradient-to-br from-red-500 to-red-600 rounded-full flex items-center justify-center mb-4 shadow-lg">
+      class="w-16 h-16 bg-gradient-to-br from-danger-500 to-danger-600 rounded-full flex items-center justify-center mb-4 shadow-lg">
       <FaSolidUserSlash class="w-8 h-8 text-white"/>
     </div>
     <h3 class="text-xl font-semibold text-gray-800 mb-2">No blocked users</h3>
@@ -152,7 +152,7 @@ export const BlockedUsersList: Component = () => {
     <div class="mt-6">
       <div class="flex items-center gap-3 mb-4">
         <h3 class="text-sm font-semibold text-gray-800 flex items-center gap-2">
-          <FaSolidUserSlash class="w-4 h-4 text-red-600"/>
+          <FaSolidUserSlash class="w-4 h-4 text-danger"/>
           Blocked Users
         </h3>
       </div>

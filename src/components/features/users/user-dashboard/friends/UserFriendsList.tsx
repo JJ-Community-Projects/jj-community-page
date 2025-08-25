@@ -30,13 +30,13 @@ const FriendListItem: Component<FriendListItemProps> = (props) => {
 
   return (
     <div
-      class="group relative flex items-center bg-white rounded-xl p-4 shadow-md border-2 border-green-200 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 hover:border-green-300">
+      class="group relative flex items-center bg-white rounded-xl p-4 shadow-md border-2 border-primary-100 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 hover:border-primary-200">
       <div class="flex items-center gap-3 flex-1">
         {/* Avatar */}
         <Show
           when={props.friend.profileImage && props.friend.profileImage.trim() !== ''}
           fallback={
-            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-sm flex-shrink-0">
+            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-primary-400 to-primary-500 flex items-center justify-center shadow-sm flex-shrink-0">
               <span class="text-white font-semibold text-sm">
                 {(props.friend.username || 'U')[0].toUpperCase()}
               </span>
@@ -55,7 +55,7 @@ const FriendListItem: Component<FriendListItemProps> = (props) => {
               if (fallback) fallback.style.display = 'flex';
             }}
           />
-          <div class="w-10 h-10 rounded-full bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-sm flex-shrink-0 hidden">
+          <div class="w-10 h-10 rounded-full bg-gradient-to-br from-primary-400 to-primary-500 flex items-center justify-center shadow-sm flex-shrink-0 hidden">
             <span class="text-white font-semibold text-sm">
               {(props.friend.username || 'U')[0].toUpperCase()}
             </span>
@@ -96,7 +96,7 @@ const FriendListItem: Component<FriendListItemProps> = (props) => {
 
       {/* Subtle hover effect */}
       <div
-        class="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-5 transition-opacity duration-300 pointer-events-none bg-green-500"></div>
+        class="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-5 transition-opacity duration-300 pointer-events-none bg-primary-500"></div>
 
     </div>
   );
@@ -105,7 +105,7 @@ const FriendListItem: Component<FriendListItemProps> = (props) => {
 const EmptyState = () => (
   <div class="flex flex-col items-center justify-center py-12 px-4">
     <div
-      class="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center mb-4 shadow-lg">
+      class="w-16 h-16 bg-gradient-to-br from-primary-400 to-primary-500 rounded-full flex items-center justify-center mb-4 shadow-lg">
       <FaSolidUsers class="w-8 h-8 text-white"/>
     </div>
     <h3 class="text-xl font-semibold text-gray-800 mb-2">No friends yet</h3>
@@ -144,7 +144,7 @@ export const UserFriendsList: Component = () => {
     <div class="mt-6">
       <div class="flex items-center gap-3 mb-4">
         <h3 class="text-sm font-semibold text-gray-800 flex items-center gap-2">
-          <FaSolidUsers class="w-4 h-4 text-green-600"/>
+          <FaSolidUsers class="w-4 h-4 text-primary"/>
           Your Friends
         </h3>
       </div>

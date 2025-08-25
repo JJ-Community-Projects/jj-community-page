@@ -45,7 +45,7 @@ export const FriendRequestsListItem: Component<FriendRequestsListItemProps> = (p
   };
 
   return (
-    <div class="group relative flex items-center bg-white rounded-xl p-4 shadow-md border-2 border-blue-200 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 hover:border-blue-300">
+    <div class="group relative flex items-center bg-white rounded-xl p-4 shadow-md border-2 border-primary-200 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 hover:border-primary-300">
       <div class="flex items-center justify-between w-full">
         {/* User info */}
         <div class="flex items-center gap-3">
@@ -53,7 +53,7 @@ export const FriendRequestsListItem: Component<FriendRequestsListItemProps> = (p
           <Show
             when={request.profileImage && request.profileImage.trim() !== ''}
             fallback={
-              <div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-sm">
+              <div class="w-12 h-12 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center shadow-sm">
                 <span class="text-white font-semibold">
                   {(request.username || 'U')[0].toUpperCase()}
                 </span>
@@ -72,7 +72,7 @@ export const FriendRequestsListItem: Component<FriendRequestsListItemProps> = (p
                 if (fallback) fallback.style.display = 'flex';
               }}
             />
-            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-sm hidden">
+            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center shadow-sm hidden">
               <span class="text-white font-semibold">
                 {(request.username || 'U')[0].toUpperCase()}
               </span>
@@ -101,8 +101,8 @@ export const FriendRequestsListItem: Component<FriendRequestsListItemProps> = (p
             disabled={isAcceptingFriendRequest() || isDecliningFriendRequest()}
             class="
                           px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200
-                          bg-green-500 text-white hover:bg-green-600 shadow-sm hover:shadow-md
-                          focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-white outline-none
+                          bg-success text-white hover:bg-success-600 shadow-sm hover:shadow-md
+                          focus:ring-2 focus:ring-success focus:ring-offset-2 focus:ring-offset-white outline-none
                           disabled:opacity-50 disabled:cursor-not-allowed
                           flex items-center gap-1
                         "
@@ -133,14 +133,14 @@ export const FriendRequestsListItem: Component<FriendRequestsListItemProps> = (p
       </div>
 
       {/* Subtle hover effect */}
-      <div class="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-5 transition-opacity duration-300 pointer-events-none bg-blue-500"></div>
+      <div class="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-5 transition-opacity duration-300 pointer-events-none bg-primary-500"></div>
     </div>
   );
 }
 
 const EmptyState = () => (
   <div class="flex flex-col items-center justify-center py-12 px-4">
-    <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mb-4 shadow-lg">
+    <div class="w-16 h-16 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center mb-4 shadow-lg">
       <FaSolidUserPlus class="w-8 h-8 text-white" />
     </div>
     <h3 class="text-xl font-semibold text-gray-800 mb-2">No pending friend requests</h3>
@@ -182,7 +182,7 @@ export const FriendRequestsList: Component = () => {
     <div class="mt-6">
       <div class="flex items-center gap-3 mb-4">
         <h3 class="text-sm font-semibold text-gray-800 flex items-center gap-2">
-          <FaSolidUserPlus class="w-4 h-4 text-blue-600" />
+          <FaSolidUserPlus class="w-4 h-4 text-primary" />
           Friend Requests
         </h3>
       </div>

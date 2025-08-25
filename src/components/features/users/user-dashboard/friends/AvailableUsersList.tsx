@@ -151,7 +151,7 @@ export const AvailableUsersList: Component = () => {
                       <div class="flex items-center gap-3">
                         {/* Avatar placeholder */}
                         <div
-                          class="w-10 h-10 rounded-full bg-gradient-to-br from-accent to-accent-600 flex items-center justify-center shadow-sm">
+                          class="w-10 h-10 rounded-full bg-gradient-to-br from-accent-500 to-accent-600 flex items-center justify-center shadow-sm">
                           <span class="text-white font-semibold text-sm">
                             {(user.tiltifyUsername || user.twitchUsername || 'U')[0].toUpperCase()}
                           </span>
@@ -197,7 +197,7 @@ export const AvailableUsersList: Component = () => {
                     {/* Status indicators */}
                     <Show when={isAlreadyFriendVal()}>
                       <div
-                        class="absolute top-2 right-2 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
+                        class="absolute top-2 right-2 w-4 h-4 bg-success rounded-full flex items-center justify-center">
                         <FaSolidCheck class="w-2.5 h-2.5 text-white" />
                       </div>
                     </Show>

@@ -30,9 +30,9 @@ export const TagCategorySelection: Component = () => {
           </div>
         </Match>
         <Match when={hasCategoriesError()}>
-          <div class="flex items-center gap-2 bg-gradient-to-r from-red-100 to-red-200 px-3 py-1.5 rounded-full shadow-sm">
-            <div class="w-2 h-2 bg-red-500 rounded-full"></div>
-            <span class="text-red-700 text-xs font-medium">Error</span>
+          <div class="flex items-center gap-2 bg-gradient-to-r from-danger-100 to-danger-200 px-3 py-1.5 rounded-full shadow-sm">
+            <div class="w-2 h-2 bg-danger-500 rounded-full"></div>
+            <span class="text-danger-700 text-xs font-medium">Error</span>
           </div>
         </Match>
       </Switch>
@@ -43,7 +43,7 @@ export const TagCategorySelection: Component = () => {
     <div class="mb-6">
       <div class="flex items-center gap-3 mb-4">
         <h3 class="text-sm font-semibold text-gray-800 flex items-center gap-2">
-          <FaSolidTag class="w-4 h-4 text-accent" />
+          <FaSolidTag class="w-4 h-4 text-accent-600" />
           Filter by Category
         </h3>
         <StatusIndicator />
@@ -55,8 +55,8 @@ export const TagCategorySelection: Component = () => {
         </div>
       }>
         <Match when={hasCategoriesError()}>
-          <div class="bg-red-50 rounded-lg p-4 border border-red-200">
-            <p class="text-sm text-red-600 text-center flex items-center justify-center gap-2">
+          <div class="bg-danger-50 rounded-lg p-4 border border-danger-200">
+            <p class="text-sm text-danger-600 text-center flex items-center justify-center gap-2">
               <FaSolidCircleExclamation class="w-4 h-4" />
               Error loading categories: {categoriesError() || "Unknown error"}
             </p>
@@ -66,10 +66,10 @@ export const TagCategorySelection: Component = () => {
         <Match when={isLoadingCategories() && !hasCategories()}>
           <div class="flex flex-wrap gap-2">
             {/* Skeleton loading state */}
-            <div class="animate-pulse bg-gray-200 rounded-full h-8 w-24"></div>
-            <div class="animate-pulse bg-gray-200 rounded-full h-8 w-32"></div>
-            <div class="animate-pulse bg-gray-200 rounded-full h-8 w-20"></div>
-            <div class="animate-pulse bg-gray-200 rounded-full h-8 w-28"></div>
+            <div class="animate-pulse bg-neutral-200 rounded-full h-8 w-24"></div>
+            <div class="animate-pulse bg-neutral-200 rounded-full h-8 w-32"></div>
+            <div class="animate-pulse bg-neutral-200 rounded-full h-8 w-20"></div>
+            <div class="animate-pulse bg-neutral-200 rounded-full h-8 w-28"></div>
           </div>
         </Match>
 
@@ -87,8 +87,8 @@ export const TagCategorySelection: Component = () => {
                       transition-all duration-300 transform hover:scale-105 active:scale-95
                       focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-white outline-none
                       ${isSelected() 
-                        ? 'text-white shadow-lg hover:shadow-xl' 
-                        : 'text-gray-700 bg-white border-2 border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                        ? 'bg-accent text-white hover:bg-accent-600 shadow-sm hover:shadow-md focus:ring-accent' 
+                        : 'bg-white border-2 border-accent-200 hover:border-accent-300 text-gray-700 hover:bg-gray-50'
                       }
                     `}
                     style={isSelected() ? {

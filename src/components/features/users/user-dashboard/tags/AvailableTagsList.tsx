@@ -31,9 +31,9 @@ export const AvailableTagsList: Component = () => {
           </div>
         </Match>
         <Match when={hasTagsError()}>
-          <div class="flex items-center gap-2 bg-gradient-to-r from-red-100 to-red-200 px-3 py-1.5 rounded-full shadow-sm">
-            <div class="w-2 h-2 bg-red-500 rounded-full"></div>
-            <span class="text-red-700 text-xs font-medium">Error</span>
+          <div class="flex items-center gap-2 bg-gradient-to-r from-danger-100 to-danger-200 px-3 py-1.5 rounded-full shadow-sm">
+            <div class="w-2 h-2 bg-danger-500 rounded-full"></div>
+            <span class="text-danger-700 text-xs font-medium">Error</span>
           </div>
         </Match>
       </Switch>
@@ -41,12 +41,12 @@ export const AvailableTagsList: Component = () => {
   );
 
   const TagSkeleton = () => (
-    <div class="animate-pulse bg-gray-200 rounded-lg h-10 w-24 shadow-sm"></div>
+    <div class="animate-pulse bg-neutral-200 rounded-lg h-10 w-24 shadow-sm"></div>
   );
 
   const EmptyState = () => (
     <div class="flex flex-col items-center justify-center py-8 px-4">
-      <div class="w-12 h-12 bg-gradient-to-br from-gray-400 to-gray-500 rounded-full flex items-center justify-center mb-3">
+      <div class="w-12 h-12 bg-gradient-to-br from-accent-500 to-accent-600 rounded-full flex items-center justify-center mb-3">
         <FaSolidMagnifyingGlass class="w-6 h-6 text-white" />
       </div>
       <h4 class="text-sm font-semibold text-gray-700 mb-1">
@@ -65,7 +65,7 @@ export const AvailableTagsList: Component = () => {
     <div class="mb-6">
       <div class="flex items-center gap-3 mb-4">
         <h3 class="text-sm font-semibold text-gray-800 flex items-center gap-2">
-          <FaSolidTag class="w-4 h-4 text-accent" />
+          <FaSolidTag class="w-4 h-4 text-accent-600" />
           {debouncedInput().length > 0 ? 'Search Results' : 'Popular Tags'}
         </h3>
         <StatusIndicator />
@@ -73,8 +73,8 @@ export const AvailableTagsList: Component = () => {
 
       <Switch fallback={<EmptyState />}>
         <Match when={hasTagsError()}>
-          <div class="bg-red-50 rounded-xl p-6 border border-red-200">
-            <div class="flex items-center justify-center gap-3 text-red-600">
+          <div class="bg-danger-50 rounded-xl p-6 border border-danger-200">
+            <div class="flex items-center justify-center gap-3 text-danger-600">
               <FaSolidCircleExclamation class="w-5 h-5 flex-shrink-0" />
               <div>
                 <p class="font-semibold text-sm">Error loading tags</p>
@@ -108,12 +108,14 @@ export const AvailableTagsList: Component = () => {
                     onClick={(e) => handleSelectTag(e, tag.id)}
                     disabled={userHasTag()}
                     class={`
-                      group relative overflow-hidden rounded-lg px-4 py-3 text-sm font-medium
-                      transition-all duration-300 ease-out transform 
-                      focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-white outline-none
+                      group relative overflow-hidden rounded-xl px-4 py-3 text-sm font-medium
+                      shadow-md hover:shadow-lg hover:scale-[1.02] 
+                      transition-all duration-300 ease-out transform
+                      focus:ring-2 focus:ring-accent focus:ring-offset-2 
+                      active:scale-[0.98] outline-none
                       ${userHasTag() 
                         ? 'bg-gray-100 text-gray-500 cursor-not-allowed opacity-60' 
-                        : 'text-white shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]'
+                        : 'text-white'
                       }
                     `}
                     style={!userHasTag() ? {
@@ -141,7 +143,7 @@ export const AvailableTagsList: Component = () => {
 
                     {/* Added indicator */}
                     {userHasTag() && (
-                      <div class="absolute top-2 right-2 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
+                      <div class="absolute top-2 right-2 w-4 h-4 bg-success-500 rounded-full flex items-center justify-center">
                         <FaSolidCheck class="w-2.5 h-2.5 text-white" />
                       </div>
                     )}

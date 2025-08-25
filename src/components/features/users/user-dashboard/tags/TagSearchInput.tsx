@@ -27,7 +27,7 @@ export const TagSearchInput: Component = () => {
     <div class="mb-6">
       <div class="flex items-center gap-2 mb-3">
         <h3 class="text-sm font-semibold text-gray-800 flex items-center gap-2">
-          <FaSolidMagnifyingGlass class="w-4 h-4 text-accent" />
+          <FaSolidMagnifyingGlass class="w-4 h-4 text-accent-600" />
           Search Tags
         </h3>
       </div>

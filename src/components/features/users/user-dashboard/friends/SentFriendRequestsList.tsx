@@ -35,7 +35,7 @@ const SentFriendRequestItem: Component<SentFriendRequestItemProps> = (props) => 
 
   return (
     <div
-      class="group relative flex items-center bg-white rounded-xl p-4 shadow-md border-2 border-orange-200 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 hover:border-orange-300">
+      class="group relative flex items-center bg-white rounded-xl p-4 shadow-md border-2 border-accent-200 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 hover:border-accent-300">
       <div class="flex items-center justify-between w-full">
         {/* User info */}
         <div class="flex items-center gap-3">
@@ -43,7 +43,7 @@ const SentFriendRequestItem: Component<SentFriendRequestItemProps> = (props) => 
           <Show
             when={props.request.profileImage && props.request.profileImage.trim() !== ''}
             fallback={
-              <div class="w-12 h-12 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-sm">
+              <div class="w-12 h-12 rounded-full bg-gradient-to-br from-accent-500 to-accent-600 flex items-center justify-center shadow-sm">
                 <span class="text-white font-semibold">
                   {(props.request.username || 'U')[0].toUpperCase()}
                 </span>
@@ -62,7 +62,7 @@ const SentFriendRequestItem: Component<SentFriendRequestItemProps> = (props) => 
                 if (fallback) fallback.style.display = 'flex';
               }}
             />
-            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-sm hidden">
+            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-accent-500 to-accent-600 flex items-center justify-center shadow-sm hidden">
               <span class="text-white font-semibold">
                 {(props.request.username || 'U')[0].toUpperCase()}
               </span>
@@ -105,14 +105,14 @@ const SentFriendRequestItem: Component<SentFriendRequestItemProps> = (props) => 
 
       {/* Subtle hover effect */}
       <div
-        class="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-5 transition-opacity duration-300 pointer-events-none bg-orange-500"></div>
+        class="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-5 transition-opacity duration-300 pointer-events-none bg-accent-500"></div>
     </div>
   );
 }
 
 const EmptyState = () => (
   <div class="flex flex-col items-center justify-center py-12 px-4">
-    <div class="w-16 h-16 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full flex items-center justify-center mb-4 shadow-lg">
+    <div class="w-16 h-16 bg-gradient-to-br from-accent-500 to-accent-600 rounded-full flex items-center justify-center mb-4 shadow-lg">
       <FaSolidPaperPlane class="w-8 h-8 text-white" />
     </div>
     <h3 class="text-xl font-semibold text-gray-800 mb-2">No sent friend requests</h3>
@@ -152,7 +152,7 @@ export const SentFriendRequestsList: Component = () => {
     <div class="mt-6">
       <div class="flex items-center gap-3 mb-4">
         <h3 class="text-sm font-semibold text-gray-800 flex items-center gap-2">
-          <FaSolidPaperPlane class="w-4 h-4 text-orange-600" />
+          <FaSolidPaperPlane class="w-4 h-4 text-accent" />
           Sent Friend Requests
         </h3>
       </div>
