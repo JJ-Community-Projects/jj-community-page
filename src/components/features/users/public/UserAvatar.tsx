@@ -1,9 +1,8 @@
-import { type Component } from "solid-js";
-import type { UserPageUI } from "../../../../lib/db/models/user-ui";
-import { twMerge } from "tailwind-merge";
+import {type Component} from "solid-js";
+import type {UserProfileData} from "../../../../lib/orpc/public/schemas/users.ts";
 
 interface UserAvatarProps {
-  user: UserPageUI;
+  user: UserProfileData;
   size?: 'xs' | 'sm' | 'md' | 'lg';
 }
 

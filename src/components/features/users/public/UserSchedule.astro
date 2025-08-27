@@ -1,18 +1,12 @@
 ---
-import { serverClientPublic } from "../../../../lib/orpc/client";
+import {type ScheduleInfo} from "../../../../lib/orpc/public/schemas/schedules";
 
 interface Props {
-  tiltifyUsername: string;
+  schedules: ScheduleInfo[]
 }
 
-const { tiltifyUsername } = Astro.props;
+const { schedules } = Astro.props;
 
-// Get user's schedules using serverClient
-const { data: schedules } = await serverClientPublic.schedules.getScheduleInfoByUserSlug(tiltifyUsername, {
-  locals: Astro.locals,
-  request: Astro.request,
-  env: Astro.locals.runtime.env
-})
 ---
 
 <div class="w-full bg-white rounded-lg p-6 mb-4 shadow-md">

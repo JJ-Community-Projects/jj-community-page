@@ -6,17 +6,17 @@ import TikTok from "./social/TikTok.astro";
 import BlueSky from "./social/BlueSky.astro";
 import {GlobeIcon} from "../../../common/icons/JJIcons";
 import Tag from "../../../common/Tag.astro";
-import {type UserPageUI} from "../../../../lib/db/models/user-ui";
 import UserAvatar from "./UserAvatar";
 import {TwitchLive} from "./social/TwitchLive";
+import type {UserProfileData} from "../../../../lib/orpc/public/schemas/users";
 
 interface Props {
-  user: UserPageUI
+  user: UserProfileData
 }
 
 const {user} = Astro.props;
 
-const {name, tags, socials} = user
+const {user: {username}, tags, socials} = user
 
 
 ---
@@ -24,7 +24,7 @@ const {name, tags, socials} = user
 <div class="bg-white rounded-lg p-6 mb-4 shadow-md">
     <div class="flex flex-row items-center gap-4 mb-4 justify-center">
         <UserAvatar client:only="solid-js"  user={user} size="sm" />
-        <h1 class="text-3xl font-bold text-primary">{name}</h1>
+        <h1 class="text-3xl font-bold text-primary">{username}</h1>
     </div>
 
     <div class="mt-4">
@@ -32,8 +32,8 @@ const {name, tags, socials} = user
               <div class="flex flex-wrap gap-2 justify-center">
                 {tags.map((tag) => (
                   <Tag
-                    label={tag.label}
-                    tag={tag.tag}
+                    label={tag.name}
+                    tag={tag.slug}
                     variant="default"
                   />
                 ))}
