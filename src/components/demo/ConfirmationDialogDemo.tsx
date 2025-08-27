@@ -1,4 +1,4 @@
-import { type Component, createSignal } from "solid-js";
+import { type Component, createSignal, Show } from "solid-js";
 import { ConfirmationDialog } from "../common/dialogs/ConfirmationDialog";
 
 export const ConfirmationDialogDemo: Component = () => {
@@ -31,11 +31,11 @@ export const ConfirmationDialogDemo: Component = () => {
           Open Dialog
         </button>
 
-        {result() && (
+        <Show when={result()}>
           <div class="bg-gray-100 p-4 rounded-lg">
             <p>Result: <span class="font-semibold">{result()}</span></p>
           </div>
-        )}
+        </Show>
       </div>
 
       <ConfirmationDialog
