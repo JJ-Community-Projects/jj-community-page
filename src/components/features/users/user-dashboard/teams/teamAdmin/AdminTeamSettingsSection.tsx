@@ -6,6 +6,8 @@ import {TextField} from "@kobalte/core/text-field";
 import {Checkbox} from "@kobalte/core/checkbox";
 import {useQuery} from "@tanstack/solid-query";
 import {orpcPrivate} from "../../../../../../lib/orpc/client.ts";
+import {MutationDebugger} from "../../../../../common/MutationDebugger.tsx";
+import {QueryDebugger} from "../../../../../common/QueryDebugger.tsx";
 
 /**
  * AdminTeamSettingsSection Component
@@ -98,19 +100,20 @@ export const AdminTeamSettingsSection: Component = () => {
     // 3. No changes have been made (name, slug, or visibility)
     // 4. slug is empty
     // 5. Currently checking slug
-    const teamData = team.data;
-    if (!teamData) return true;
+    if (!team.data) return true;
 
-    return (!validateSlug.data || !validateSlug.data.isValid) ||
-      updateTeamMutation.isPending ||
-      (name() === teamData.name && slug() === teamData.slug && visible() === teamData.visible) ||
-      slug() === '' ||
-      validateSlug.isPending;
+    return (updateTeamMutation.isPending && slug() === team.data.slug)
+      || (name() === team.data.name && slug() === team.data.slug && visible() === team.data.visible)
+      || slug() === ''
   }
-
 
   return (
     <div class="space-y-6">
+
+      <MutationDebugger mutation={updateTeamMutation}/>
+
+      <QueryDebugger query={team}/>
+
       {/* Section Header */}
       <div class="flex items-center gap-3">
         <h4 class="text-sm font-semibold text-gray-800">Team Settings</h4>
@@ -120,8 +123,9 @@ export const AdminTeamSettingsSection: Component = () => {
       <Show when={updateTeamMutation.isError}>
         <div class="bg-danger-50 rounded-xl p-4 border border-danger-200">
           <div class="flex items-center gap-3 text-danger-600">
-            <FaRegularCircleXmark class="w-4 h-4 flex-shrink-0" />
-            <p class="text-sm font-medium">{updateTeamMutation.failureReason?.message || "Failed to save team settings"}</p>
+            <FaRegularCircleXmark class="w-4 h-4 flex-shrink-0"/>
+            <p
+              class="text-sm font-medium">{updateTeamMutation.failureReason?.message || "Failed to save team settings"}</p>
           </div>
         </div>
       </Show>
@@ -175,10 +179,10 @@ export const AdminTeamSettingsSection: Component = () => {
               <div class="w-5 h-5 border-2 border-accent border-t-transparent rounded-full animate-spin"></div>
             </Show>
             <Show when={slugChanged() && !isCheckingSlug() && slugValid() && slug() !== ''}>
-              <FaRegularCircleCheck class="w-5 h-5 text-success" />
+              <FaRegularCircleCheck class="w-5 h-5 text-success"/>
             </Show>
             <Show when={slugChanged() && !isCheckingSlug() && !slugValid() && slug() !== ''}>
-              <FaRegularCircleXmark class="w-5 h-5 text-danger" />
+              <FaRegularCircleXmark class="w-5 h-5 text-danger"/>
             </Show>
           </div>
         </div>
@@ -233,7 +237,7 @@ export const AdminTeamSettingsSection: Component = () => {
           transition-all duration-200 hover:border-gray-400
         ">
           <Checkbox.Indicator>
-            <FaRegularCircleCheck class="text-white w-3 h-3" />
+            <FaRegularCircleCheck class="text-white w-3 h-3"/>
           </Checkbox.Indicator>
         </Checkbox.Control>
         <div class="flex-1">
