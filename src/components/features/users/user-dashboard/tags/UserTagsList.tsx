@@ -1,6 +1,41 @@
 import {type Component, For, Match, Switch} from "solid-js";
 import {useTags} from "./UserTagsProvider.tsx";
-import {FaSolidTag, FaSolidUser, FaSolidCircleExclamation, FaSolidXmark, FaSolidCheck} from "solid-icons/fa";
+import {FaSolidCheck, FaSolidCircleExclamation, FaSolidTag, FaSolidUser, FaSolidXmark} from "solid-icons/fa";
+
+const RecommendationHint = () => (
+  <div class="bg-accent-50 rounded-lg p-4 mb-6 max-w-md mx-auto">
+    <p class="text-xs text-accent-700 text-center font-medium">
+      💡 <span class="font-semibold">Recommendation:</span> Add at least one charity tag and a few other tags to make your profile more discoverable!
+    </p>
+  </div>
+);
+
+const EmptyState = () => (
+  <div class="flex flex-col items-center justify-center py-12 px-4">
+    <div class="w-16 h-16 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center mb-4 shadow-lg">
+      <FaSolidTag class="w-8 h-8 text-white" />
+    </div>
+    <h3 class="text-xl font-semibold text-gray-800 mb-2">No tags added yet</h3>
+    <p class="text-gray-600 text-center max-w-md mb-4 leading-relaxed">
+      Start building your profile by selecting tags that represent your interests, games, or causes.
+      This helps viewers discover and connect with your content.
+    </p>
+    <div class="flex items-center gap-2 text-accent font-medium">
+      <span class="text-sm">Browse available tags above</span>
+      <svg class="w-4 h-4 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+      </svg>
+    </div>
+  </div>
+);
+
+const LoadingSkeleton = () => (
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div class="animate-pulse bg-neutral-200 rounded-xl h-16 shadow-sm"></div>
+    <div class="animate-pulse bg-neutral-200 rounded-xl h-16 shadow-sm"></div>
+    <div class="animate-pulse bg-neutral-200 rounded-xl h-16 shadow-sm"></div>
+  </div>
+);
 
 /**
  * UserTagsList Component
@@ -18,33 +53,8 @@ export const UserTagsList: Component = () => {
   } = useTags();
 
   const hasTags = () => userTags().length > 0;
+  const needsMoreTags = () => userTags().length < 4;
 
-  const EmptyState = () => (
-    <div class="flex flex-col items-center justify-center py-12 px-4">
-      <div class="w-16 h-16 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center mb-4 shadow-lg">
-        <FaSolidTag class="w-8 h-8 text-white" />
-      </div>
-      <h3 class="text-xl font-semibold text-gray-800 mb-2">No tags added yet</h3>
-      <p class="text-gray-600 text-center max-w-md mb-6 leading-relaxed">
-        Start building your profile by selecting tags that represent your interests, games, or causes.
-        This helps viewers discover and connect with your content.
-      </p>
-      <div class="flex items-center gap-2 text-accent font-medium">
-        <span class="text-sm">Browse available tags above</span>
-        <svg class="w-4 h-4 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
-        </svg>
-      </div>
-    </div>
-  );
-
-  const LoadingSkeleton = () => (
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-      <div class="animate-pulse bg-neutral-200 rounded-xl h-16 shadow-sm"></div>
-      <div class="animate-pulse bg-neutral-200 rounded-xl h-16 shadow-sm"></div>
-      <div class="animate-pulse bg-neutral-200 rounded-xl h-16 shadow-sm"></div>
-    </div>
-  );
 
   return (
     <div class="mt-6">
@@ -61,6 +71,11 @@ export const UserTagsList: Component = () => {
           </div>
         )}
       </div>
+
+      {/* Show recommendation hint for users with less than 4 tags */}
+      {needsMoreTags() && !isLoadingUserTags() && !hasUserTagsError() && (
+        <RecommendationHint />
+      )}
 
       <Switch>
         <Match when={isLoadingUserTags()}>
