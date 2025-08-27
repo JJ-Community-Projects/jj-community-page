@@ -48,8 +48,16 @@ export const orpcPrivate = createTanstackQueryUtils(privateClient)
 
 // Split server clients as well
 export const serverClientPublic = createSafeClient(
-  createRouterClient(publicRouter)
+  createRouterClient<typeof publicRouter, {
+    locals: App.Locals, request: Request,
+  }>(publicRouter, {
+    context: (clientContext: { locals: App.Locals, request: Request }) => ({
+      locals: clientContext.locals,
+      request: clientContext.request
+    })
+  })
 )
+
 export const serverClientPrivate = createSafeClient(
     createRouterClient<typeof privateRouter, {
       locals: App.Locals, request: Request,
