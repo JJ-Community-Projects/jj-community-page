@@ -3,7 +3,8 @@ import {dbMiddleware} from "../../middleware/dbMiddleware.ts";
 import {adminAuthMiddleware} from "../../middleware/authAdminMiddleware.ts";
 import {adminTagsContract} from "./contract.ts";
 import {streamTagsTable, tagAliases, tagCategories, tags, userTagsTable} from "../../../db/schema/tags-schema.ts";
-import {and, desc, eq, ne, sql} from "drizzle-orm";
+import {and, count, desc, eq, ne, sql} from "drizzle-orm";
+import type {JJDrizzleDatabase} from "../../../db/db.ts";
 
 const os = implement(adminTagsContract)
   .use(dbMiddleware);
@@ -13,20 +14,17 @@ const os = implement(adminTagsContract)
 /**
  * Create a SQL subquery to count tags in a category
  */
-const createTagCountSubquery = () => sql<number>`COALESCE((SELECT COUNT(*) FROM
-${tags}
-WHERE
-${tags.categoryId}
-=
-${tagCategories.id}
-),
-0
-)`;
+const createTagCountSubquery = (db: JJDrizzleDatabase) =>
+  sql<number>`COALESCE((${
+          db.select({ count: count() })
+                  .from(tags)
+                  .where(eq(tags.categoryId, tagCategories.id))
+  }), 0)`;
 
 /**
- * Create a SQL subquery to count total usage (user tags + stream tags) for a category
+ * Create a SQL subquery to count user tag usage for a category
  */
-const createUsageCountSubquery = () => sql<number>`COALESCE((SELECT COUNT(*) FROM
+const createUserUsageCountSubquery = () => sql<number>`COALESCE((SELECT COUNT(*) FROM
 ${userTagsTable}
 INNER
 JOIN
@@ -41,17 +39,12 @@ ${tags.categoryId}
 ${tagCategories.id}
 ),
 0
-)
-+
-COALESCE
-(
-(
-SELECT
-COUNT
-(
-*
-)
-FROM
+)`;
+
+/**
+ * Create a SQL subquery to count stream tag usage for a category
+ */
+const createStreamUsageCountSubquery = () => sql<number>`COALESCE((SELECT COUNT(*) FROM
 ${streamTagsTable}
 INNER
 JOIN
@@ -68,10 +61,43 @@ ${tagCategories.id}
 0
 )`;
 
+// === Utility Functions for Individual Tag Queries ===
+
+/**
+ * Create a SQL subquery to count user usage for an individual tag
+ */
+const createTagUserCountSubquery = () => sql<number>`COALESCE((SELECT COUNT(*) FROM
+${userTagsTable}
+WHERE
+${userTagsTable.tagId}
+=
+${tags.id}
+),
+0
+)`;
+
+/**
+ * Create a SQL subquery to count stream usage for an individual tag
+ */
+const createTagStreamCountSubquery = () => sql<number>`COALESCE((SELECT COUNT(*) FROM
+${streamTagsTable}
+WHERE
+${streamTagsTable.tagId}
+=
+${tags.id}
+),
+0
+)`;
+
+/**
+ * Create a SQL subquery to count total usage for an individual tag
+ */
+const createTagTotalUsageSubquery = () => sql<number>`${createTagUserCountSubquery()} + ${createTagStreamCountSubquery()}`;
+
 /**
  * Create a base select object for tag categories with computed fields
  */
-const createTagCategorySelect = () => ({
+const createTagCategorySelect = (db: JJDrizzleDatabase) => ({
   id: tagCategories.id,
   slug: tagCategories.slug,
   name: tagCategories.name,
@@ -83,8 +109,9 @@ const createTagCategorySelect = () => ({
   createdBy: tagCategories.createdBy,
   createdAt: tagCategories.createdAt,
   updatedAt: tagCategories.updatedAt,
-  tagCount: createTagCountSubquery(),
-  usageCount: createUsageCountSubquery(),
+  tagCount: createTagCountSubquery(db),
+  userUsage: createUserUsageCountSubquery(),
+  streamUsage: createStreamUsageCountSubquery(),
 });
 
 // === Core Tag Management Procedures ===
@@ -243,51 +270,9 @@ const getAdminTags = os.getAdminTags
         createdBy: tags.createdBy,
         createdAt: tags.createdAt,
         updatedAt: tags.updatedAt,
-        userCount: sql<number>`COALESCE((SELECT COUNT(*) FROM
-        ${userTagsTable}
-        WHERE
-        ${userTagsTable.tagId}
-        =
-        ${tags.id}
-        ),
-        0
-        )`,
-        streamCount: sql<number>`COALESCE((SELECT COUNT(*) FROM
-        ${streamTagsTable}
-        WHERE
-        ${streamTagsTable.tagId}
-        =
-        ${tags.id}
-        ),
-        0
-        )`,
-        totalUsage: sql<number>`COALESCE((SELECT COUNT(*) FROM
-        ${userTagsTable}
-        WHERE
-        ${userTagsTable.tagId}
-        =
-        ${tags.id}
-        ),
-        0
-        )
-        +
-        COALESCE
-        (
-        (
-        SELECT
-        COUNT
-        (
-        *
-        )
-        FROM
-        ${streamTagsTable}
-        WHERE
-        ${streamTagsTable.tagId}
-        =
-        ${tags.id}
-        ),
-        0
-        )`,
+        userCount: createTagUserCountSubquery(),
+        streamCount: createTagStreamCountSubquery(),
+        totalUsage: createTagTotalUsageSubquery(),
       })
         .from(tags);
 
@@ -373,51 +358,8 @@ const getTagsWithUsageAndAliasesByCategory = os.getTagsWithUsageAndAliasesByCate
         createdBy: tags.createdBy,
         createdAt: tags.createdAt,
         updatedAt: tags.updatedAt,
-        userCount: sql<number>`COALESCE((SELECT COUNT(*) FROM
-        ${userTagsTable}
-        WHERE
-        ${userTagsTable.tagId}
-        =
-        ${tags.id}
-        ),
-        0
-        )`,
-        streamCount: sql<number>`COALESCE((SELECT COUNT(*) FROM
-        ${streamTagsTable}
-        WHERE
-        ${streamTagsTable.tagId}
-        =
-        ${tags.id}
-        ),
-        0
-        )`,
-        totalUsage: sql<number>`COALESCE((SELECT COUNT(*) FROM
-        ${userTagsTable}
-        WHERE
-        ${userTagsTable.tagId}
-        =
-        ${tags.id}
-        ),
-        0
-        )
-        +
-        COALESCE
-        (
-        (
-        SELECT
-        COUNT
-        (
-        *
-        )
-        FROM
-        ${streamTagsTable}
-        WHERE
-        ${streamTagsTable.tagId}
-        =
-        ${tags.id}
-        ),
-        0
-        )`,
+        userCount: createTagUserCountSubquery(),
+        streamCount: createTagStreamCountSubquery(),
       })
         .from(tags)
         .where(whereConditions.length === 1 ? whereConditions[0] : and(...whereConditions))
@@ -1197,8 +1139,26 @@ const getTagCategories = os.getTagCategories
         whereConditions.push(eq(tagCategories.visible, true));
       }
 
-      let query = db.select(createTagCategorySelect())
-        .from(tagCategories);
+      let query =  db
+        .select({
+          id: tagCategories.id,
+          slug: tagCategories.slug,
+          name: tagCategories.name,
+          description: tagCategories.description,
+          color: tagCategories.color,
+          icon: tagCategories.icon,
+          sortOrder: tagCategories.sortOrder,
+          visible: tagCategories.visible,
+          createdBy: tagCategories.createdBy,
+          createdAt: tagCategories.createdAt,
+          updatedAt: tagCategories.updatedAt,
+          tagCount: count(tags.id),
+          userUsage: createUserUsageCountSubquery(),
+          streamUsage: createStreamUsageCountSubquery(),
+        })
+        .from(tagCategories)
+        .leftJoin(tags, eq(tags.categoryId, tagCategories.id))
+        .groupBy(tagCategories.id);
 
       // Apply where conditions if any exist
       if (whereConditions.length > 0) {
@@ -1234,8 +1194,26 @@ const getAllTagCategories = os.getAllTagCategories
         whereConditions.push(eq(tagCategories.visible, true));
       }
 
-      let query = db.select(createTagCategorySelect())
-        .from(tagCategories);
+      let query =  db
+        .select({
+          id: tagCategories.id,
+          slug: tagCategories.slug,
+          name: tagCategories.name,
+          description: tagCategories.description,
+          color: tagCategories.color,
+          icon: tagCategories.icon,
+          sortOrder: tagCategories.sortOrder,
+          visible: tagCategories.visible,
+          createdBy: tagCategories.createdBy,
+          createdAt: tagCategories.createdAt,
+          updatedAt: tagCategories.updatedAt,
+          tagCount: count(tags.id),
+          userUsage: createUserUsageCountSubquery(),
+          streamUsage: createStreamUsageCountSubquery(),
+        })
+        .from(tagCategories)
+        .leftJoin(tags, eq(tags.categoryId, tagCategories.id))
+        .groupBy(tagCategories.id);
 
       // Apply where conditions if any exist
       if (whereConditions.length > 0) {

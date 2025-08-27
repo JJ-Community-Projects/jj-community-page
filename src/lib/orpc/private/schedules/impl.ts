@@ -4,7 +4,7 @@ import {dbMiddleware} from '../../middleware/dbMiddleware.ts';
 import {authMiddleware} from '../../middleware/authMiddleware.ts';
 import {schedulesTable} from '../../../db/schema/jj-schema.ts';
 import {accounts, users} from '../../../db/schema/auth-schema.ts';
-import {and, eq} from 'drizzle-orm';
+import {and, eq, not} from 'drizzle-orm';
 import {DateTime} from 'luxon';
 import {createSlug, generateScheduleSlugAlternativesLocals} from '../../../../functions/slug.ts';
 
@@ -74,6 +74,67 @@ const create = os.create
     } catch (error) {
       if (error instanceof ORPCError) throw error;
       console.error('Error creating schedule:', error);
+      throw new ORPCError('INTERNAL_SERVER_ERROR', {message: 'Failed to create schedule'});
+    }
+  });
+
+/**
+ * Create a new schedule with custom details
+ */
+const createWithDetails = os.createWithDetails
+  .use(authMiddleware)
+  .handler(async ({context, input}) => {
+    const db = context.db;
+    const user = context.user;
+    const {name, slug, primary, year} = input;
+
+    try {
+      // Check if slug already exists for this user
+      const existingSchedule = await db.select().from(schedulesTable)
+        .where(and(
+          eq(schedulesTable.ownerId, user.id),
+          eq(schedulesTable.slug, slug)
+        ))
+        .get();
+
+      if (existingSchedule) {
+        throw new ORPCError('CONFLICT', {message: 'A schedule with this slug already exists'});
+      }
+
+      // If setting as primary, check if there's already a primary schedule for this year
+      if (primary) {
+        const existingPrimary = await db.select().from(schedulesTable)
+          .where(and(
+            eq(schedulesTable.ownerId, user.id),
+            eq(schedulesTable.year, year),
+            eq(schedulesTable.primary, true)
+          ))
+          .get();
+
+        if (existingPrimary) {
+          // Unset the existing primary schedule
+          await db.update(schedulesTable)
+            .set({primary: false})
+            .where(eq(schedulesTable.id, existingPrimary.id));
+        }
+      }
+
+      // Create schedule using provided parameters
+      const [schedule] = await db.insert(schedulesTable)
+        .values({
+          ownerId: user.id,
+          title: name,
+          year: year,
+          slug: slug,
+          visible: false, // Default to private
+          primary: primary
+        })
+        .returning();
+
+      return {schedule};
+    } catch (error) {
+      if (error instanceof ORPCError) throw error;
+      console.error('Error creating schedule with details:', error);
       throw new ORPCError('INTERNAL_SERVER_ERROR', {message: 'Failed to create schedule'});
     }
   });
@@ -191,14 +252,11 @@ const toggleVisibility = os.toggleVisibility
         throw new ORPCError('FORBIDDEN', {message: 'You do not have permission to modify this schedule'});
       }
 
-      /*
-      // Toggle visibility via UserDO
-      await useRpcUserDO(ctx, user.id, async (rpc) => {
-        await rpc.toggleScheduleVisibility(scheduleId);
-      }, (error) => {
-        throw new ORPCError('INTERNAL_SERVER_ERROR', { message: error.message });
-      });
-       */
+      await db.update(schedulesTable)
+        .set({
+          visible: !schedule.visible
+        })
+        .where(eq(schedulesTable.id, scheduleId))
 
       return {message: "Schedule visibility toggled successfully"};
     } catch (error) {
@@ -232,14 +290,21 @@ const setPrimary = os.setPrimary
         throw new ORPCError('FORBIDDEN', {message: 'You do not have permission to modify this schedule'});
       }
 
-      // Set as primary via UserDO
-      /*
-      await useRpcUserDO(ctx, user.id, async (rpc) => {
-        await rpc.setPrimarySchedule(scheduleId);
-      }, (error) => {
-        throw new ORPCError('INTERNAL_SERVER_ERROR', { message: error.message });
-      });
-       */
+      await db.update(schedulesTable)
+        .set({
+          primary: true
+        })
+        .where(eq(schedulesTable.id, scheduleId))
+
+      await db.update(schedulesTable)
+        .set({
+          primary: false
+        })
+        .where(and(
+          eq(schedulesTable.ownerId, user.id),
+          eq(schedulesTable.year, schedule.year),
+          not(eq(schedulesTable.id, scheduleId))
+        ))
 
       return {message: "Schedule set as primary successfully"};
     } catch (error) {
@@ -259,11 +324,17 @@ const setPrimary = os.setPrimary
 const validateSlug = os.validateSlug
   .use(authMiddleware)
   .handler(async ({context, input}) => {
-    const {id, slug, title} = input;
+    const {slug, tiltifyName} = input;
+    const user = context.user;
+
+    if (!slug) {
+      throw new ORPCError('BAD_REQUEST', {message: 'Slug is required'});
+    }
 
     try {
       // Get alternatives using the generateScheduleSlugAlternatives function
-      const alternatives = await generateScheduleSlugAlternativesLocals(context.locals, slug, 3, id);
+      // If it returns alternatives, the slug is not valid
+      const alternatives = await generateScheduleSlugAlternativesLocals(context.locals, slug, 3);
 
       // If alternatives is empty, the slug is valid
       if (alternatives.length === 0) {
@@ -273,15 +344,24 @@ const validateSlug = os.validateSlug
         };
       }
 
-      // Add title as a suggestion if provided and different from slug
+      // Add tiltifyName as a suggestion if provided and different from slug
       let allAlternatives = [...alternatives];
 
-      if (title && title.toLowerCase() !== slug.toLowerCase()) {
-        const titleSlug = createSlug(title);
-        // Check if this slug is valid
-        const titleAlternatives = await generateScheduleSlugAlternativesLocals(context.locals, titleSlug, 0, id);
-        if (titleAlternatives.length === 0) {
-          allAlternatives.push(titleSlug);
+      if (tiltifyName && tiltifyName.toLowerCase() !== slug.toLowerCase()) {
+        const tiltifySlug = createSlug(tiltifyName);
+        // Check if this slug is valid using generateScheduleSlugAlternatives
+        // If it returns an empty array, the slug is valid
+        const tiltifyAlternatives = await generateScheduleSlugAlternativesLocals(context.locals, tiltifySlug, 0);
+        if (tiltifyAlternatives.length === 0) {
+          allAlternatives.push(tiltifySlug);
+        }
+      } else if (user.tiltifyName && user.tiltifyName.toLowerCase() !== slug.toLowerCase()) {
+        const userTiltifySlug = createSlug(user.tiltifyName);
+        // Check if this slug is valid using generateScheduleSlugAlternatives
+        // If it returns an empty array, the slug is valid
+        const userTiltifyAlternatives = await generateScheduleSlugAlternativesLocals(context.locals, userTiltifySlug, 0);
+        if (userTiltifyAlternatives.length === 0) {
+          allAlternatives.push(userTiltifySlug);
         }
       }
 
@@ -357,7 +437,7 @@ const getNextScheduleByTiltifyUsername = os.getNextScheduleByTiltifyUsername
  */
 const getSchedules = os.getSchedules
   .use(authMiddleware)
-  .handler(async ({ context }) => {
+  .handler(async ({context}) => {
     const db = context.db;
     const userId = context.userId;
 
@@ -371,7 +451,7 @@ const getSchedules = os.getSchedules
       return schedules;
     } catch (error) {
       console.error('Error getting schedules for user:', error);
-      throw new ORPCError('INTERNAL_SERVER_ERROR', { message: 'Failed to get schedules' });
+      throw new ORPCError('INTERNAL_SERVER_ERROR', {message: 'Failed to get schedules'});
     }
   });
 
@@ -381,6 +461,7 @@ const getSchedules = os.getSchedules
 export const privateSchedulesRouter = {
   // Schedule CRUD Operations
   create,
+  createWithDetails,
   save,
   delete: deleteSchedule,
 

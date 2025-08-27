@@ -61,7 +61,6 @@ export const SimilarUsersInputSchema = z.object({
   limit: z.number().min(1).max(10).default(5),
 });
 
-
 /**
  * Schema for comprehensive user data including relationships and associations.
  * Used for detailed user profile pages that show friends, teams, and schedules.
@@ -104,3 +103,9 @@ export const TwitchChannelSchema = z.object({
   /** Offline image URL from Twitch */
   offlineImageUrl: z.string().nullable(),
 });
+
+
+export type UserProfileData = z.infer<typeof UserProfileDataSchema>
+export type UserPaginationOutput = z.infer<typeof UserPaginationOutputSchema>
+export type BasicUserSearchOutput = z.infer<typeof BasicUserSearchOutputSchema>
+export type TwitchChannel = z.infer<typeof TwitchChannelSchema>

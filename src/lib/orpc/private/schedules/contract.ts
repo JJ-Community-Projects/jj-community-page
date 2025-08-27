@@ -30,6 +30,20 @@ const createContract = oc
   .output(CreateScheduleResponseSchema);
 
 /**
+ * Create a new schedule with custom details
+ * Input: name, slug, primary flag, and year
+ * Output: schedule object
+ */
+const createWithDetailsContract = oc
+  .input(z.object({
+    name: z.string().min(1, "Schedule name is required"),
+    slug: z.string().min(1, "Slug is required"),
+    primary: z.boolean(),
+    year: z.number().int().min(2020).max(2030, "Year must be between 2020 and 2030")
+  }))
+  .output(CreateScheduleResponseSchema);
+
+/**
  * Save schedule data to database
  * Input: schedule ID
  * Output: success message
@@ -79,14 +93,13 @@ const setPrimaryContract = oc
 
 /**
  * Validate slug availability
- * Input: schedule ID, slug, and optional title for suggestions
+ * Input: slug and optional tiltify name for suggestions
  * Output: validation result with suggestions
  */
 const validateSlugContract = oc
   .input(z.object({
-    id: z.number().positive("Schedule ID must be positive"),
     slug: z.string().min(1, "Slug is required"),
-    title: z.string().optional()
+    tiltifyName: z.string().optional()
   }))
   .output(SlugValidationSchema);
 
@@ -175,6 +188,7 @@ const getSchedulesContract = oc
 export const privateSchedulesContract = {
   // Schedule CRUD Operations
   create: createContract,
+  createWithDetails: createWithDetailsContract,
   save: saveContract,
   delete: deleteContract,
 

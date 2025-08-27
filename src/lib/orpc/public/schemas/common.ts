@@ -60,3 +60,11 @@ export const IdentifierInputSchema = z.intersection(z.object({
 }), z.object({
   slug: z.string().nonempty()
 }))
+
+export type Success = z.infer<typeof SuccessSchema>
+export type HexColor = z.infer<typeof HexColorSchema>
+export type UserId = z.infer<typeof UserIdSchema>
+export type UserIdInput = z.infer<typeof UserIdInputSchema>
+export type UserSlug = z.infer<typeof UserSlugSchema>
+export type UserSlugInput = z.infer<typeof UserSlugInputSchema>
+export type IdentifierInput = z.infer<typeof IdentifierInputSchema>

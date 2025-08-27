@@ -391,3 +391,15 @@ export const TagCategoriesInputSchema = z.object({
   includeEmpty: z.boolean().default(false),
   sortBy: z.enum(['name', 'count', 'usage']).default('usage'),
 })
+
+export type PublicTag = z.infer<typeof PublicTagSchema>
+export type SimplePublicTag = z.infer<typeof SimplePublicTagSchema>
+export type TagWithUsage = z.infer<typeof TagWithUsageSchema>
+export type TagSearchResult = z.infer<typeof TagSearchResultSchema>
+export type TagCategory = z.infer<typeof TagCategorySchema>
+export type UserTag = z.infer<typeof UserTagSchema>
+export type UserWithTags = z.infer<typeof UserWithTagsSchema>
+export type TagRecommendation = z.infer<typeof TagRecommendationSchema>
+export type BulkUpdateResult = z.infer<typeof BulkUpdateResultSchema>
+export type PopularTagsResponse = z.infer<typeof PopularTagsResponseSchema>
+export type AdvancedSearchResponse = z.infer<typeof AdvancedSearchResponseSchema>

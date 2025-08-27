@@ -147,10 +147,10 @@ export function organizeStreamsByTime(streams: z.infer<typeof StreamSchema>[]): 
     dayGroups.get(dayKey)!.push(stream);
   }
 
-  const days = Array.from(dayGroups.entries()).map(([day, dayStreams]) => ({
-    day,
+  const days = Array.from(dayGroups.entries()).map(([dayKey, dayStreams]) => ({
+    day: new Date(dayKey + 'T00:00:00.000Z'),
     streams: dayStreams.sort((a, b) => a.start.getTime() - b.start.getTime()),
-  })).sort((a, b) => a.day.localeCompare(b.day));
+  })).sort((a, b) => a.day.getTime() - b.day.getTime());
 
   // Group days into weeks
   const weeks: Array<{
@@ -168,7 +168,7 @@ export function organizeStreamsByTime(streams: z.infer<typeof StreamSchema>[]): 
     let currentWeekStreams: typeof streams = [];
 
     for (const day of days) {
-      const dayDate = new Date(day.day);
+      const dayDate = day.day;
       const weekEnd = new Date(currentWeekStart);
       weekEnd.setDate(weekEnd.getDate() + 6);
 

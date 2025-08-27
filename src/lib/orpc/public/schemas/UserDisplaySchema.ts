@@ -28,3 +28,5 @@ export const UserDisplaySchema = z.object({
   /** Custom accent color from userStyles table */
   accentColor: z.string().nullable(),
 });
+
+export type UserDisplay = z.infer<typeof UserDisplaySchema>

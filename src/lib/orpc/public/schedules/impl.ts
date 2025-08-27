@@ -14,14 +14,15 @@ const getFullScheduleBySlug = os.getFullScheduleBySlugContract
 
     // Find the schedule by slug
     const schedule = await db.select().from(schedulesTable)
-      .where(and(
-        eq(schedulesTable.slug, input.slug),
-        eq(schedulesTable.visible, true)
-      ))
+      .where(eq(schedulesTable.slug, input.slug))
       .get()
 
     if (!schedule) {
       throw new ORPCError('NOT_FOUND', {message: 'Schedule not found'})
+    }
+
+    if (!schedule.visible) {
+      throw new ORPCError('FORBIDDEN', {message: 'The schedule is private'})
     }
 
     // Get all streams for this schedule

@@ -48,3 +48,7 @@ export const SocialSchema = z.object({
   /** Full URL to the user's profile on the social media platform */
   url: z.string().url(),
 });
+
+export type SocialProvider = z.infer<typeof SocialProviderSchema>
+export type SocialImportResult = z.infer<typeof SocialImportResultSchema>
+export type Social = z.infer<typeof SocialSchema>

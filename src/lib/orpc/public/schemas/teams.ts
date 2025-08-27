@@ -90,3 +90,11 @@ export const TeamSchedulesOutputSchema = z.array(z.object({}));
 export const TeamMembersOutputSchema = z.object({
   members: z.array(UserDisplaySchema),
 })
+
+export type Team = z.infer<typeof TeamSchema>
+export type TeamWithMemberCount = z.infer<typeof TeamWithMemberCountSchema>
+export type TeamWithOwner = z.infer<typeof TeamWithOwnerSchema>
+export type TeamWithOwnerOutput = z.infer<typeof TeamWithOwnerOutputSchema>
+export type UserTeamsResponse = z.infer<typeof UserTeamsResponseSchema>
+export type TeamMembersOutput = z.infer<typeof TeamMembersOutputSchema>
+export type TeamSchedulesOutput = z.infer<typeof TeamSchedulesOutputSchema>

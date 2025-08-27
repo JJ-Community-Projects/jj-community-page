@@ -134,7 +134,6 @@ const TagWithUsageOutputSchema = TagOutputSchema.extend({
 const TagWithUsageAndAliasesOutputSchema = TagOutputSchema.extend({
   userCount: z.number(),
   streamCount: z.number(),
-  totalUsage: z.number(),
   aliases: z.array(TagAliasOutputSchema),
 });
 
@@ -170,7 +169,8 @@ const TagCategoryOutputSchema = z.object({
 
 const TagCategoryWithUsageOutputSchema = TagCategoryOutputSchema.extend({
   tagCount: z.number(),
-  usageCount: z.number(),
+  userUsage: z.number(),
+  streamUsage: z.number(),
 });
 
 // === Core Tag Management Contracts ===

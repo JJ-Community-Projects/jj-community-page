@@ -148,8 +148,8 @@ export const StreamSchema = z.object({
  * Used in: schedule organization and daily view displays
  */
 export const ScheduleDaySchema = z.object({
-  /** ISO date string for the day (YYYY-MM-DD format) */
-  day: z.string(),
+  /** Date object for the day */
+  day: z.date(),
   /** Array of streams occurring on this day, sorted by start time */
   streams: z.array(StreamSchema),
 });
@@ -189,3 +189,15 @@ export const FullScheduleSchema = z.object({
   /** Array of all unique users participating in streams */
   participants: z.array(UserDisplaySchema),
 });
+
+export type ScheduleInfo = z.infer<typeof ScheduleInfoSchema>
+export type ScheduleId = z.infer<typeof ScheduleIdSchema>
+export type CreateScheduleResponse = z.infer<typeof CreateScheduleResponseSchema>
+export type SlugValidation = z.infer<typeof SlugValidationSchema>
+export type SchedulesList = z.infer<typeof SchedulesListSchema>
+export type NextScheduleResponse = z.infer<typeof NextScheduleResponseSchema>
+export type StreamTag = z.infer<typeof StreamTagSchema>
+export type Stream = z.infer<typeof StreamSchema>
+export type ScheduleDay = z.infer<typeof ScheduleDaySchema>
+export type ScheduleWeek = z.infer<typeof ScheduleWeekSchema>
+export type FullSchedule = z.infer<typeof FullScheduleSchema>
