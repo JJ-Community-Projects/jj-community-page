@@ -1,9 +1,9 @@
 import {type Component, For, Show} from "solid-js";
-import type {TagUI} from "../../../../lib/db/models/TagUI.ts";
+import type {StreamTag} from "../../../../lib/orpc/public/schemas/schedules.ts";
 import {TagPill} from "../../../common/TagPill.tsx";
 
 interface StreamTagsProps {
-  tags: TagUI[];
+  tags: StreamTag[];
 }
 
 /**
@@ -17,8 +17,8 @@ export const StreamTags: Component<StreamTagsProps> = (props) => {
         <For each={props.tags}>
           {(tag) => (
             <TagPill
-              label={tag.label}
-              tag={tag.tag}
+              label={tag.name}
+              tag={tag.slug}
               variant="default"
             />
           )}

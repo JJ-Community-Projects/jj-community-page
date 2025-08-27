@@ -4,10 +4,10 @@ import {ScheduleStreamCard} from "../common/StreamCard.tsx";
 import {Accordion} from "@kobalte/core";
 import {FaSolidChevronDown} from "solid-icons/fa";
 import {DateTime} from "luxon";
-import type {ScheduleDayUI} from "../../../../lib/db/models/schedule-ui.ts";
 import {getStreamColor} from "../../../../functions/jjDatesToColors.ts";
 import './UserSchedulePageBodyDesktop.css'
 import {getTextColor} from "../../../../lib/utils/textColors.ts";
+import type {ScheduleDay} from "../../../../lib/orpc/public/schemas/schedules.ts";
 
 export const UserSchedulePageBodyDesktop: Component = () => {
   return (
@@ -63,7 +63,7 @@ const DaysAccordion: Component = () => {
   )
 }
 
-const DayAccordionItem: Component<{ day: ScheduleDayUI, index: number, expandedDays: () => string[] }> = (props) => {
+const DayAccordionItem: Component<{ day: ScheduleDay, index: number, expandedDays: () => string[] }> = (props) => {
   const isOpen = () => {
     return props.expandedDays().includes(props.index.toString());
   };
@@ -72,7 +72,7 @@ const DayAccordionItem: Component<{ day: ScheduleDayUI, index: number, expandedD
   const getHighlightColor = () => {
     // Convert JS Date to DateTime for color calculation
     // For color calculation, we still use UTC to maintain consistent colors
-    const dayDate = DateTime.fromJSDate(props.day.date, { zone: 'utc' });
+    const dayDate = DateTime.fromJSDate(props.day.day, { zone: 'utc' });
     return getStreamColor(dayDate);
   };
 
@@ -112,7 +112,7 @@ const DayAccordionItem: Component<{ day: ScheduleDayUI, index: number, expandedD
           <div class="accordion__item-trigger-bg" />
 
           <span class="accordion__item-trigger-text">
-            {formatDate(props.day.date)}
+            {formatDate(props.day.day)}
           </span>
           <FaSolidChevronDown class="accordion__item-trigger-chevron" />
         </Accordion.Trigger>

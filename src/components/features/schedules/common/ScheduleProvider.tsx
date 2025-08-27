@@ -1,10 +1,10 @@
 import {createContext, createSignal, onCleanup, type ParentComponent, useContext} from "solid-js";
-import type {ScheduleUI} from "../../../../lib/db/models/schedule-ui.ts";
+import type {FullSchedule} from "../../../../lib/orpc/public/schemas/schedules.ts";
 import {createStore} from "solid-js/store";
 import {DateTime} from "luxon";
 
-const useScheduleHook = (initSchedule: ScheduleUI) => {
-  const [schedule, setSchedule] = createStore<ScheduleUI>(initSchedule)
+const useScheduleHook = (initSchedule: FullSchedule) => {
+  const [schedule, setSchedule] = createStore<FullSchedule>(initSchedule)
   const [date, setDate] = createSignal<Date>(new Date())
   const [updatedDate, setUpdatedDate] = createSignal<boolean>(false)
 
@@ -39,10 +39,8 @@ const useScheduleHook = (initSchedule: ScheduleUI) => {
 
     // Find the day that matches the current date
     return days.findIndex(day => {
-      // Convert day date from UTC to local timezone
-      const dayLocalDate = DateTime.fromJSDate(day.date, { zone: 'utc' }).toLocal()
-      // Get YYYY-MM-DD from the day's date in local timezone
-      const dayDateStr = dayLocalDate.toISODate();
+      // day.day is a Date object, convert it to YYYY-MM-DD format for comparison
+      const dayDateStr = DateTime.fromJSDate(day.day, { zone: 'utc' }).toLocal().toISODate();
       return dayDateStr === currentDateStr;
     })
   }
@@ -127,7 +125,7 @@ const useScheduleHook = (initSchedule: ScheduleUI) => {
 }
 
 interface ScheduleTestProps {
-  schedule: ScheduleUI
+  schedule: FullSchedule
 }
 
 const ScheduleTestContext = createContext<ReturnType<typeof useScheduleHook>>();

@@ -1,8 +1,8 @@
 import {type Component} from "solid-js";
-import type {ScheduleWeekUI} from "../../../../lib/db/models/schedule-ui.ts";
+import type {ScheduleWeek} from "../../../../lib/orpc/public/schemas/schedules.ts";
 
 interface ScheduleWeekCollapsibleDaysProps {
-  week: ScheduleWeekUI
+  week: ScheduleWeek
 }
 
 export const ScheduleWeekCollapsibleDays: Component<ScheduleWeekCollapsibleDaysProps> = (props) => {

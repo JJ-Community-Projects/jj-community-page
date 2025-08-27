@@ -1,9 +1,9 @@
 import {type Component, For, Show} from "solid-js";
-import type {ScheduleDayUI, ScheduleWeekUI} from "../../../../lib/db/models/schedule-ui.ts";
+import type {ScheduleDay, ScheduleWeek} from "../../../../lib/orpc/public/schemas/schedules.ts";
 import {ScheduleStreamCard} from "../common/StreamCard.tsx";
 
 interface WeekScheduleDesktopComponentProps {
-  week: ScheduleWeekUI
+  week: ScheduleWeek
 }
 
 export const WeekScheduleDesktopComponent: Component<WeekScheduleDesktopComponentProps> = (props) => {
@@ -11,20 +11,6 @@ export const WeekScheduleDesktopComponent: Component<WeekScheduleDesktopComponen
     <div>
       <p>Week</p>
       <div class={'flex flex-row w-full'}>
-        <Show when={props.week.times}>
-          <div class={'h-full w-12 gap-2'}>
-            <For each={props.week.times}>
-              {
-                (time) => (
-                  <div class={'bg-white flex-1 p-2 rounded-md shadow-sm flex flex-col justify-around'}>
-                    <p>{time.start.hours}:{time.start.minutes}</p>
-                    <p>{time.end.hours}:{time.end.minutes}</p>
-                  </div>
-                )
-              }
-            </For>
-          </div>
-        </Show>
         <For each={props.week.days} fallback={<p>No days</p>}>
           {
             (day) => (
@@ -39,7 +25,7 @@ export const WeekScheduleDesktopComponent: Component<WeekScheduleDesktopComponen
 
 
 interface DayProps {
-  day: ScheduleDayUI
+  day: ScheduleDay
 }
 
 const Day: Component<DayProps> = (props) => {

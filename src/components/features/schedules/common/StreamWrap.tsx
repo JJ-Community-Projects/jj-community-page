@@ -1,10 +1,10 @@
 import {type Component, For} from "solid-js";
-import type {DetailedStream} from "../../../../lib/db/models/schedule-ui.ts";
+import type {Stream} from "../../../../lib/orpc/public/schemas/schedules.ts";
 import {ScheduleStreamCard} from "./StreamCard.tsx";
 import {twMerge} from "tailwind-merge";
 
 interface StreamWrapCardProps {
-  streams: DetailedStream[]
+  streams: Stream[]
   class?: string
 }
 

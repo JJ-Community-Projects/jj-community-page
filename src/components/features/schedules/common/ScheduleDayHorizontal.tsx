@@ -1,11 +1,11 @@
 import {type Component, For} from "solid-js";
-import type {ScheduleDayUI} from "../../../../lib/db/models/schedule-ui.ts";
+import type {ScheduleDay} from "../../../../lib/orpc/public/schemas/schedules.ts";
 import {DateTime} from "luxon";
 import {rangeFromData} from "../../../../lib/utils/rangeFromData.ts";
 import {ScheduleStreamCard} from "./StreamCard.tsx";
 
 interface ScheduleDayProps {
-  day: ScheduleDayUI
+  day: ScheduleDay
 }
 
 export const ScheduleDayHorizontal: Component<ScheduleDayProps> = (props) => {
@@ -18,7 +18,7 @@ export const ScheduleDayHorizontal: Component<ScheduleDayProps> = (props) => {
 }
 
 interface ScheduleDayBodyProps {
-  day: ScheduleDayUI
+  day: ScheduleDay
 }
 
 const ScheduleDayBody: Component<ScheduleDayBodyProps> = props => {
@@ -40,7 +40,7 @@ const ScheduleDayBody: Component<ScheduleDayBodyProps> = props => {
 }
 
 interface ScheduleDayHeaderProps {
-  day: ScheduleDayUI
+  day: ScheduleDay
 }
 
 const ScheduleDayHeader: Component<ScheduleDayHeaderProps> = props => {
@@ -50,10 +50,8 @@ const ScheduleDayHeader: Component<ScheduleDayHeaderProps> = props => {
     if (range) {
       return DateTime.fromJSDate(range.start).toFormat("EEE',' MMM d")
     }
-    // Ensure day.date is a DateTime object
-    const dayDate = props.day.date instanceof DateTime
-      ? props.day.date
-      : DateTime.fromISO(props.day.date as unknown as string);
+    // Convert Date to DateTime object
+    const dayDate = DateTime.fromJSDate(props.day.day);
     return dayDate.toFormat("EEE',' MMM d")
   }
 

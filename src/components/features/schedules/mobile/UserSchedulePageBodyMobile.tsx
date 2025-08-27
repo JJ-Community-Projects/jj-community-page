@@ -1,8 +1,8 @@
 import {type Component, For, Show} from "solid-js";
 import {useScheduleTest} from "../common/ScheduleProvider.tsx";
 import {ScheduleStreamCard} from "../common/StreamCard.tsx";
-import {DateTime} from "luxon";
 import {FaSolidChevronLeft, FaSolidChevronRight} from "solid-icons/fa";
+import {DateTime} from "luxon";
 
 export const UserSchedulePageBodyMobile: Component = () => {
   const {days} = useScheduleTest();
@@ -38,12 +38,16 @@ const DaysPager: Component = () => {
   const {days, nextDay, prevDay, dayIndex} = useScheduleTest();
   const currentDay = () => days()[dayIndex()];
 
+  const formatedDate = () => {
+    return DateTime.fromJSDate(currentDay().day).toFormat("EEE, MMM d")
+  }
+
   return (
     <div class="w-full">
       <div class="flex items-center justify-between mb-2">
         <h2 class="text-xl font-bold text-white">Schedule</h2>
         <div class="text-white text-sm">
-          {(currentDay().date).toFormat("EEE, MMM d")}
+          {formatedDate()}
         </div>
       </div>
 

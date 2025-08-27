@@ -1,5 +1,5 @@
 import {type Component, Match, Show, Switch} from "solid-js";
-import type {DetailedStream} from "../../../../lib/db/models/schedule-ui.ts";
+import type {Stream} from "../../../../lib/orpc/public/schemas/schedules.ts";
 import {DateTime} from "luxon";
 import {useNow} from "../../../../lib/utils/useNow.ts";
 import {createModalSignal} from "../../../../lib/createModalSignal.ts";
@@ -12,7 +12,7 @@ import {twMerge} from "tailwind-merge";
  * Custom hook that manages state for schedule stream cards
  * Handles countdown timers, live status, and color calculations
  */
-const useScheduleStreamState = (stream: DetailedStream) => {
+const useScheduleStreamState = (stream: Stream) => {
   const modal = createModalSignal();
 
   const now = useNow();
@@ -90,7 +90,7 @@ const useScheduleStreamState = (stream: DetailedStream) => {
 
 
 interface Props {
-  stream: DetailedStream;
+  stream: Stream;
   type: 'filled' | 'top-bar' | 'bottom-bar' | 'left-bar'
   hover: boolean
 }
@@ -124,7 +124,7 @@ export const ScheduleStreamCard: Component<Props> = (props) => {
 }
 
 interface ScheduleStreamCardProps {
-  stream: DetailedStream;
+  stream: Stream;
 }
 
 /**
