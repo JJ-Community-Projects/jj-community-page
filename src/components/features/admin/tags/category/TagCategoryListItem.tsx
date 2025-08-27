@@ -1,5 +1,4 @@
 import {type Component, createSignal, Show} from "solid-js";
-import type {TagCategory} from "../../../../../lib/db/schema/tags-schema.ts";
 import {useMutation, useQueryClient} from "@tanstack/solid-query";
 import {orpcPrivate} from "../../../../../lib/orpc/client.ts";
 import {createStore} from "solid-js/store";
@@ -8,9 +7,21 @@ import {Checkbox} from "@kobalte/core/checkbox";
 import {TagSection} from "../tag/TagSection.tsx";
 
 interface TagCategoryListItemProps {
-  category: TagCategory & {
-    tagCount: number,
-    usageCount: number,
+  category: {
+    id: number
+    slug: string
+    name: string
+    description: string | null
+    color: string
+    icon: string | null
+    sortOrder: number
+    visible: boolean
+    createdBy: number
+    createdAt: Date
+    updatedAt: Date
+    tagCount: number
+    userUsage: number
+    streamUsage: number
   }
 }
 
@@ -115,7 +126,7 @@ export const TagCategoryListItem: Component<TagCategoryListItemProps> = (props) 
             </svg>
           </button>
           <h4 class="text-lg font-medium text-gray-900">
-            {category.name} ({category.tagCount} tags, {category.usageCount} uses)
+            {category.name} ({category.tagCount} tags, {category.userUsage + category.streamUsage} uses)
           </h4>
         </div>
         <div class="flex items-center gap-2">
