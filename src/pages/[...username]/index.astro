@@ -12,7 +12,9 @@ if (!username) {
   return Astro.redirect('/user-not-found')
 }
 
-const { data: user, error } = await serverClientPublic.users.getUserFullProfileBySlug({slug: username}, {
+const getUserFullProfileBySlug = serverClientPublic.users.getUserFullProfileBySlug
+
+const { data: user, error } = await getUserFullProfileBySlug({slug: username}, {
   context: {
     locals: Astro.locals,
     request: Astro.request,
@@ -20,6 +22,7 @@ const { data: user, error } = await serverClientPublic.users.getUserFullProfileB
 })
 
 if (error) {
+  console.error(error)
   return Astro.redirect(`/${username}/error`)
 }
 
@@ -34,7 +37,7 @@ if (user === undefined) {
 ---
 <BaseLayout title={`${user.user.username} | Jingle Jam Community`}>
     <div class="w-full max-w-4xl mx-auto">
-        <UserHeader user={user.user}/>
+        <UserHeader user={user}/>
 
       {/* Display ActiveSchedule if primary schedule is available */}
       {user.primarySchedule && (
@@ -43,7 +46,7 @@ if (user === undefined) {
               </div>
       )}
 
-        <UserSchedule tiltifyUsername={username}/>
-        <UserTeams tiltifyUsername={username} userId={user.user.userId}/>
+        <UserSchedule schedules={user.schedules} />
+        <UserTeams teams={user.teams} />
     </div>
 </BaseLayout>
