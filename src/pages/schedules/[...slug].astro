@@ -1,5 +1,5 @@
 ---
-import { serverClientPublic } from "../../lib/orpc/client";
+import {serverClientPublic} from "../../lib/orpc/client";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import {UserSchedulePage} from "../../components/features/schedules/UserSchedulePage";
 import {DebugJSONView} from "../../components/common/DebugJSONView";
@@ -10,14 +10,18 @@ if (!slug) {
   return Astro.redirect('/error')
 }
 
-const { data, error } = await serverClientPublic.schedules.getFullScheduleBySlug(slug, {
-  locals: Astro.locals,
-  request: Astro.request,
-  env: Astro.locals.runtime.env
+const {data: schedule, error} = await serverClientPublic.schedules.getFullScheduleBySlug({slug}, {
+  context: {
+    locals: Astro.locals,
+    request: Astro.request,
+  }
 })
-console.log('data', data)
+
+if (error) {
+  console.error(error)
+}
 ---
-<BaseLayout title={data?.schedule?.title || "Schedule"}>
+<BaseLayout title={schedule?.data.title || "Schedule"}>
   {
     error && (
                   <div class="container mx-auto px-4 py-8">
@@ -29,10 +33,10 @@ console.log('data', data)
     )
   }
   {
-    (!error && data) && (
+    (!error && schedule) && (
                   <div class="container mx-auto px-4 py-8">
-                      <UserSchedulePage client:only="solid-js" initSchedule={data}/>
-                      <DebugJSONView client:only="solid-js"  data={data} title="DEBUG Schedule Data" />
+                      <UserSchedulePage client:only="solid-js" initSchedule={schedule}/>
+                      <DebugJSONView client:only="solid-js" data={schedule} title="DEBUG Schedule Data"/>
                   </div>
     )
   }
