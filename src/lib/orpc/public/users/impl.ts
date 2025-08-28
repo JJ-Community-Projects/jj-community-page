@@ -9,6 +9,7 @@ import {
   getUserFriends,
   getUserOwnStreams,
   getUserParticipatingStreams,
+  getUserPrimaryStreams,
   getUserSchedules,
   getUserSocials,
   getUserTags,
@@ -140,13 +141,18 @@ const getUserFullProfileBySlug = os.getUserFullProfileBySlugContract
     const userScheduleIds = schedules.map(s => s.id);
 
     // Fetch streams data in parallel
-    const [nextStreams, nextStreamsOthers] = await Promise.all([
+    const [nextStreams, nextStreamsOthers, nextPrimaryStreams] = await Promise.all([
       getUserOwnStreams(db, userScheduleIds),
       getUserParticipatingStreams(db, userId),
+      getUserPrimaryStreams(db, primarySchedule?.id),
     ]);
 
     return {
       user,
+      style: {
+        primaryColor: user.primaryColor,
+        accentColor: user.accentColor,
+      },
       socials,
       tags,
       friends,
@@ -155,6 +161,7 @@ const getUserFullProfileBySlug = os.getUserFullProfileBySlugContract
       schedules,
       nextStreams,
       nextStreamsOthers,
+      nextPrimaryStreams,
     };
   })
 

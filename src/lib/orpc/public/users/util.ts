@@ -376,6 +376,60 @@ export async function getUserOwnStreams(db: JJDrizzleDatabase, userScheduleIds: 
 }
 
 /**
+ * Fetches next streams from the user's primary schedule only
+ * @param db Database connection
+ * @param primaryScheduleId Primary schedule ID (optional)
+ * @returns Array of enriched stream information (max 3)
+ */
+export async function getUserPrimaryStreams(db: JJDrizzleDatabase, primaryScheduleId?: number): Promise<StreamInfo[]> {
+  if (!primaryScheduleId) {
+    return [];
+  }
+
+  const currentDate = new Date();
+
+  // Fetch streams from the primary schedule only
+  const futurePrimaryStreams = await db.select({
+    id: streamsTable.id,
+    scheduleId: streamsTable.scheduleId,
+    createdBy: streamsTable.createdBy,
+    title: streamsTable.title,
+    visible: streamsTable.visible,
+    subtitle: streamsTable.subtitle,
+    description: streamsTable.description,
+    youtubeVodUrl: streamsTable.youtubeVodUrl,
+    twitchVodUrl: streamsTable.twitchVodUrl,
+    start: streamsTable.start,
+    end: streamsTable.end,
+  })
+    .from(streamsTable)
+    .where(and(
+      eq(streamsTable.visible, true),
+      eq(streamsTable.scheduleId, primaryScheduleId),
+      gt(streamsTable.start, currentDate)
+    ))
+    .orderBy(asc(streamsTable.start))
+    .limit(3);
+
+  if (futurePrimaryStreams.length === 0) {
+    return [];
+  }
+
+  // Get tags and participants for these streams
+  const streamIds = futurePrimaryStreams.map(s => s.id);
+  const [streamTagsMap, streamParticipantsMap] = await Promise.all([
+    getStreamTagsMap(db, streamIds),
+    getStreamParticipantsMap(db, streamIds)
+  ]);
+
+  return enrichStreamsWithTagsAndParticipants(
+    futurePrimaryStreams,
+    streamTagsMap,
+    streamParticipantsMap
+  );
+}
+
+/**
  * Fetches next streams from other users' schedules where this user is a participant
  * @param db Database connection
  * @param userId User ID to find participation for

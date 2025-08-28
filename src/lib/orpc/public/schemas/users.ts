@@ -77,6 +77,13 @@ export const UserProfileDataSchema = z.object({
   friends: z.array(UserDisplaySchema),
   /** Array of teams this user belongs to */
   teams: z.array(TeamSchema),
+  /** User style configuration with primary and accent colors */
+  style: z.object({
+    /** Primary brand color from userStyles table */
+    primaryColor: z.string().nullable(),
+    /** Accent color from userStyles table */
+    accentColor: z.string().nullable(),
+  }),
   /** Primary schedule for the user, if one exists and is visible */
   primarySchedule: ScheduleInfoSchema.optional(),
   /** Array of schedules this user has created or participates in */
@@ -85,6 +92,8 @@ export const UserProfileDataSchema = z.object({
   nextStreams: z.array(StreamSchema).max(3),
   /** The next 3 streams belonging to schedules from other users where this user is part of */
   nextStreamsOthers: z.array(StreamSchema).max(3),
+  /** The next 3 streams from the primary schedule of this user */
+  nextPrimaryStreams: z.array(StreamSchema).max(3),
 });
 
 export const TwitchChannelSchema = z.object({
