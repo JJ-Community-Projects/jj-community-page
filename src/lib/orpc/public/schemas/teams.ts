@@ -28,7 +28,7 @@ export const TeamsListInputSchema = z.object({
   includeMemberCount: z.boolean().optional()
 })
 
-export const TeamIdSchema =  z.number().int().positive();
+export const TeamIdSchema =  z.number().int().nonnegative();
 
 export const TeamIdInputSchema = z.object({
   teamId: TeamIdSchema

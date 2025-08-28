@@ -113,7 +113,7 @@ export const TagCategorySchema = z.object({
  * Schema for tag identifier validation.
  * Used for identifying tags in user-related operations.
  */
-export const TagIdSchema = z.number().int().positive();
+export const TagIdSchema = z.number().int().nonnegative();
 
 export const TagIdInputSchema = z.object({
   teamId: TagIdSchema
@@ -203,7 +203,7 @@ export const TagSearchInputSchema = z.object({
   /** Maximum number of results to return */
   limit: PaginationLimitSchema(1, 50, 10),
   /** Optional category filter */
-  categoryId: z.number().int().positive().optional(),
+  categoryId: z.number().int().nonnegative().optional(),
   /** Whether to include hidden tags in results */
   includeHidden: z.boolean().default(false),
 });
@@ -216,7 +216,7 @@ export const PopularTagsInputSchema = z.object({
   /** Maximum number of tags to return */
   limit: PaginationLimitSchema(1, 50, 10),
   /** Optional category filter */
-  categoryId: z.number().int().positive().optional(),
+  categoryId: z.number().int().nonnegative().optional(),
   /** Time range for popularity calculation */
   timeRange: z.enum(['7d', '30d', '90d', 'all']).default('30d'),
 });
@@ -227,7 +227,7 @@ export const PopularTagsInputSchema = z.object({
  */
 export const TagsByCategoryInputSchema = z.object({
   /** ID of the category to browse */
-  categoryId: z.number().int().positive(),
+  categoryId: z.number().int().nonnegative(),
   /** Maximum number of tags to return */
   limit: PaginationLimitSchema(1, 50, 20),
   /** How to sort the results */
@@ -253,7 +253,7 @@ export const SuggestedTagsInputSchema = z.object({
   /** Whether to exclude tags the user already has */
   excludeUserTags: z.boolean().default(true),
   /** Optional category filter for suggestions */
-  categoryId: z.number().int().positive().optional(),
+  categoryId: z.number().int().nonnegative().optional(),
 });
 
 /**
@@ -266,7 +266,7 @@ export const SearchTagsAdvancedInputSchema = z.object({
   /** Optional filters to narrow results */
   filters: z.object({
     /** Filter by specific category IDs */
-    categoryIds: z.array(z.number().int().positive()).optional(),
+    categoryIds: z.array(z.number().int().nonnegative()).optional(),
     /** Filter by specific colors */
     colors: z.array(z.string().regex(/^#[0-9A-Fa-f]{6}$/)).optional(),
     /** Minimum usage count threshold */

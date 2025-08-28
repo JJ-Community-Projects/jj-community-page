@@ -46,7 +46,7 @@ export const PaginationLimitSchema = (
  * Ensures the ID is a positive integer matching the users table primary key.
  * Used in: blocks, friends contracts for user identification, public user lookups
  */
-export const UserIdSchema = z.number().int().positive();
+export const UserIdSchema = z.number().int().nonnegative();
 export const UserIdInputSchema = z.object({
   userId: UserIdSchema
 })
@@ -56,7 +56,7 @@ export const UserSlugInputSchema = z.object({
 })
 
 export const IdentifierInputSchema = z.intersection(z.object({
-  id: z.number().int().positive()
+  id: z.number().int().nonnegative()
 }), z.object({
   slug: z.string().nonempty()
 }))

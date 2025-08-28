@@ -28,7 +28,7 @@ export const YearInputSchema = z.object({
  */
 export const ScheduleInfoSchema = z.object({
   /** Unique identifier for the schedule */
-  id: z.number().int().positive(),
+  id: z.number().int().nonnegative(),
   /** Display title of the schedule (e.g., "JingleJam 2024") */
   title: z.string(),
   /** URL-friendly slug for the schedule (e.g., "jinglejam-2024") */
@@ -40,7 +40,7 @@ export const ScheduleInfoSchema = z.object({
   /** Whether this is the primary/main schedule for the year */
   primary: z.boolean(),
   /** User ID of the schedule owner/creator */
-  ownerId: z.number().int().positive(),
+  ownerId: z.number().int().nonnegative(),
   /** Timestamp when the schedule was created */
   createdAt: z.date(),
   /** Timestamp when the schedule was last updated */
@@ -115,11 +115,11 @@ export const StreamTagSchema = z.object({
  */
 export const StreamSchema = z.object({
   /** Unique identifier for the stream */
-  id: z.number().int().positive(),
+  id: z.number().int().nonnegative(),
   /** ID of the schedule this stream belongs to */
-  scheduleId: z.number().int().positive(),
+  scheduleId: z.number().int().nonnegative(),
   /** ID of the user who created this stream */
-  createdBy: z.number().int().positive(),
+  createdBy: z.number().int().nonnegative(),
   /** Display title of the stream */
   title: z.string(),
   /** Whether this stream is publicly visible */
