@@ -1,28 +1,124 @@
 ---
-import {DebugJSONView} from "../../components/common/DebugJSONView";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import {serverClientPublic} from "../../lib/orpc/client";
-const {slug} = Astro.params
+import {TeamHeader} from "../../components/features/teams/public/TeamHeader";
+import {TeamMembersSection} from "../../components/features/teams/public/TeamMembersSection";
+import {TeamNextStreamsSection} from "../../components/features/teams/public/TeamNextStreamsSection";
+import {TeamNotFoundState} from "../../components/features/teams/public/TeamErrorState";
+import {ORPCError, ValidationError} from "@orpc/server";
+
+const {slug} = Astro.params;
+
 if (!slug) {
-  return Astro.redirect('/teams')
+  return Astro.redirect('/teams');
 }
 
-const {data, error} = await serverClientPublic.teams.getBySlug({slug}, {
-  locals: Astro.locals,
-  request: Astro.request,
-  env: Astro.locals.runtime.env
-})
+const slugLower = slug.toLowerCase();
 
+if (slug !== slugLower) {
+  return Astro.redirect(`/teams/${slugLower}`);
+}
+
+// Fetch team data
+const {data: team, error: teamError} = await serverClientPublic.teams.getBySlug({slug}, {
+  context: {
+    locals: Astro.locals,
+    request: Astro.request,
+  },
+});
+
+// Handle team not found
+if (teamError || !team) {
+  console.error('Team fetch error:', teamError);
+  // Return 404 component instead of redirect to avoid infinite loops
+}
+
+let members, nextStreams, membersError, streamsError;
+
+// Fetch additional data only if team exists
+if (team) {
+  // Fetch team members
+  const membersResult = await serverClientPublic.teams.getMembers({slug}, {
+    context: {
+      locals: Astro.locals,
+      request: Astro.request,
+    },
+  });
+  members = membersResult.data;
+  membersError = membersResult.error;
+
+  // Fetch next streams
+  const streamsResult = await serverClientPublic.teams.getTeamNextStreams({
+    slug,
+    limit: 6,
+    unique: true
+  }, {
+    context: {
+      locals: Astro.locals,
+      request: Astro.request,
+    },
+  });
+  nextStreams = streamsResult.data;
+  streamsError = streamsResult.error;
+}
+
+// Team colors - use design system defaults since teams don't have custom colors yet
+const teamColors = {
+  primaryColor: '#E30E50',
+  accentColor: '#3584BF'
+};
 ---
-<BaseLayout>
-  {
-    error && (
-                  <p>Error: {error.message}</p>
-    )
-  }
-  {data && (
-          <DebugJSONView client:only="solid-js" data={data} title="Debug Team"/>
 
-  )
+<BaseLayout title={team ? `${team.name} Team | Jingle Jam Community` : 'Team Not Found | Jingle Jam Community'}>
+  {
+    (teamError || !team) ? (
+      <TeamNotFoundState client:only="solid-js" />
+    ) : (
+      <div class="w-full mx-4 xl:mx-20 py-8 md:py-12 lg:py-16">
+        {/* Team Header */}
+        <TeamHeader
+          client:only="solid-js"
+          team={team}
+          memberCount={members?.members.length || 0}
+          teamColors={teamColors}
+        />
+
+        {/* Team Members Section */}
+        {!membersError && members && (
+          <TeamMembersSection
+            client:only="solid-js"
+            members={members.members}
+            teamColors={teamColors}
+          />
+        )}
+
+        {/* Team Next Streams Section */}
+        {!streamsError && nextStreams && nextStreams.length > 0 && (
+          <TeamNextStreamsSection
+            client:only="solid-js"
+            streams={nextStreams}
+            teamSlug={slug}
+            teamColors={teamColors}
+          />
+        )}
+
+        {/* Error states for partial failures */}
+        {membersError && (
+          <div class="bg-white rounded-xl shadow-md border-2 border-danger-200 p-6 mb-6">
+            <p class="text-danger-700 text-center font-poppins">
+              Unable to load team members. Please try refreshing the page.
+            </p>
+          </div>
+        )}
+
+        {streamsError && (
+          <div class="bg-white rounded-xl shadow-md border-2 border-danger-200 p-6 mb-6">
+            <p class="text-danger-700 text-center font-poppins">
+              Unable to load upcoming streams. Please try refreshing the page.
+            </p>
+          </div>
+        )}
+      </div>
+    )
   }
 </BaseLayout>
