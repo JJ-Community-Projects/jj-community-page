@@ -1,7 +1,15 @@
 import {oc} from '@orpc/contract';
 import {z} from "zod/v4";
-import {TeamMembersOutputSchema, TeamSchema, TeamsListInputSchema, TeamSlugInputSchema, TeamSlugWithYearInputSchema, TeamNextStreamsInputSchema} from "../schemas/teams.ts";
-import {SchedulesListSchema, StreamSchema, FullScheduleSchema} from "../schemas/schedules.ts";
+import {
+  TeamMembersOutputSchema,
+  TeamNextStreamsInputSchema,
+  TeamSchema,
+  TeamsListInputSchema,
+  TeamSlugInputSchema,
+  TeamSlugWithYearInputSchema,
+  TeamWithMemberCountSchema
+} from "../schemas/teams.ts";
+import {FullScheduleSchema, SchedulesListSchema, StreamSchema} from "../schemas/schedules.ts";
 
 /**
  * Public teams contracts for retrieving team information without authentication.
@@ -10,15 +18,15 @@ import {SchedulesListSchema, StreamSchema, FullScheduleSchema} from "../schemas/
 
 
 /**
- * Find all visible teams with optional member counts
+ * Find all visible teams with member counts
  * @path /teams
- * @description Retrieve all publicly visible teams. Use ?includeMemberCount=true to include member statistics.
+ * @description Retrieve all publicly visible teams with member count statistics included.
  * @Input TeamsListInputSchema - contains optional includeMemberCount parameter (boolean)
- * @Output array of TeamSchema objects containing visible teams (with member counts if requested)
+ * @Output array of TeamWithMemberCountSchema objects containing visible teams with member counts
  */
 const findVisibleTeamsContract = oc
   .input(TeamsListInputSchema)
-  .output(z.array(TeamSchema))
+  .output(z.array(TeamWithMemberCountSchema))
   .route({
     path: '/teams',
     method: 'GET',
@@ -39,7 +47,7 @@ const findVisibleTeamsContract = oc
  */
 const getBySlugContract = oc
   .input(TeamSlugInputSchema)
-  .output(TeamSchema)
+  .output(TeamWithMemberCountSchema)
   .route({
     path: '/teams/{slug}',
     method: 'GET',

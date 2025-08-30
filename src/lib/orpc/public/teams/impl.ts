@@ -9,23 +9,51 @@ import {
   teamsTable
 } from '../../../db/schema/jj-schema.ts';
 import {userDisplayView} from '../../../db/schema/views-schema.ts';
-import {and, eq, gte, inArray, sql} from 'drizzle-orm';
-import {getScheduleStreams, organizeStreamsByTime, getNextStreams} from '../schedules/util.ts';
+import {and, count, eq, gte, inArray, sql} from 'drizzle-orm';
+import {getNextStreams, getScheduleStreams, organizeStreamsByTime} from '../schedules/util.ts';
 
 const os = implement(publicTeamsContract)
   .use(dbMiddleware);
 
 /**
- * Find all visible teams
- * Returns all teams where visible = true
+ * Find all visible teams with member counts
+ * Returns all teams where visible = true, including member count for each team
  */
 const findVisible = os.findVisibleTeamsContract
   .handler(async ({context}) => {
     const db = context.db;
-    return db.select()
+
+    // Get all visible teams
+    const teams = await db.select({
+      id: teamsTable.id,
+      name: teamsTable.name,
+      slug: teamsTable.slug,
+      description: teamsTable.description,
+      visible: teamsTable.visible,
+      ownerId: teamsTable.ownerId,
+    })
       .from(teamsTable)
       .where(eq(teamsTable.visible, true))
       .all();
+
+    // Get member counts for each team
+    const teamsWithMemberCounts = await Promise.all(
+      teams.map(async (team) => {
+        const memberCountResult = await db.select({
+          count: count()
+        })
+          .from(teamMembersTable)
+          .where(eq(teamMembersTable.teamId, team.id))
+          .get();
+
+        return {
+          ...team,
+          memberCount: memberCountResult?.count ?? 0
+        };
+      })
+    );
+
+    return teamsWithMemberCounts;
   });
 
 
@@ -47,17 +75,28 @@ const getBySlug = os.getBySlugContract
       ownerId: teamsTable.ownerId,
     })
       .from(teamsTable)
-      .where(and(
+      .where(
         eq(teamsTable.slug, slug),
-        eq(teamsTable.visible, true)
-      ))
+      )
       .get();
 
     if (!team) {
       throw new ORPCError('NOT_FOUND')
     }
 
-    return team;
+    if (!team.visible) {
+      throw new ORPCError('FORBIDDEN', {message: 'Team is private'})
+    }
+
+    const teamMembers = await db.select({
+      count: count()
+    })
+      .from(teamMembersTable)
+      .where(eq(teamMembersTable.teamId, team.id))
+      .get();
+
+
+    return {...team, memberCount: teamMembers?.count ?? 0};
   });
 
 /**

@@ -8,7 +8,7 @@ import {
   teamMembersTable,
   teamsTable
 } from '../../../db/schema/jj-schema.ts';
-import {and, asc, desc, eq, gt, inArray, ne} from 'drizzle-orm';
+import {and, asc, desc, eq, gt, inArray, ne, or} from 'drizzle-orm';
 import {ORPCError} from '@orpc/server';
 import {TeamSchema} from '../schemas/teams.ts';
 import {z} from "zod/v4";
@@ -87,7 +87,11 @@ export async function getUserBySlug(db: JJDrizzleDatabase, slug: string): Promis
  * @param userId User ID to fetch tags for
  * @returns Array of user tags with tag information
  */
-export async function getUserTags(db: JJDrizzleDatabase, userId: number): Promise<Array<{ name: string; slug: string; color: string }>> {
+export async function getUserTags(db: JJDrizzleDatabase, userId: number): Promise<Array<{
+  name: string;
+  slug: string;
+  color: string
+}>> {
   return db.select({
     name: tags.name,
     slug: tags.slug,
@@ -136,7 +140,10 @@ export async function getUserFriends(db: JJDrizzleDatabase, userId: number): Pro
   })
     .from(friendsTable)
     .innerJoin(userDisplayView,
-      eq(userDisplayView.userId, friendsTable.toUserId),
+      or(
+        and(eq(friendsTable.fromUserId, userId), eq(userDisplayView.userId, friendsTable.toUserId)),
+        and(eq(friendsTable.toUserId, userId), eq(userDisplayView.userId, friendsTable.fromUserId))
+      )
     )
     .where(
       eq(friendsTable.fromUserId, userId),
@@ -194,13 +201,13 @@ export async function getUserSchedules(db: JJDrizzleDatabase, userId: number): P
       eq(schedulesTable.ownerId, userId),
       eq(schedulesTable.visible, true)
     ))
-    .orderBy(desc(schedulesTable.primary), desc(schedulesTable.createdAt))
+    .orderBy(desc(schedulesTable.primary), desc(schedulesTable.year), desc(schedulesTable.createdAt))
     .all();
 
   // Extract primary schedule from results
   const primarySchedule = schedules.find(s => s.primary) || undefined;
 
-  return { schedules, primarySchedule };
+  return {schedules, primarySchedule};
 }
 
 /**
@@ -209,7 +216,11 @@ export async function getUserSchedules(db: JJDrizzleDatabase, userId: number): P
  * @param streamIds Array of stream IDs
  * @returns Map of stream ID to array of tags
  */
-export async function getStreamTagsMap(db: JJDrizzleDatabase, streamIds: number[]): Promise<Map<number, Array<{ name: string; slug: string; color: string }>>> {
+export async function getStreamTagsMap(db: JJDrizzleDatabase, streamIds: number[]): Promise<Map<number, Array<{
+  name: string;
+  slug: string;
+  color: string
+}>>> {
   if (streamIds.length === 0) {
     return new Map();
   }
@@ -231,7 +242,7 @@ export async function getStreamTagsMap(db: JJDrizzleDatabase, streamIds: number[
     if (!streamTagsMap.has(tag.streamId)) {
       streamTagsMap.set(tag.streamId, []);
     }
-    streamTagsMap.get(tag.streamId)!.push({ name: tag.name, slug: tag.slug, color: tag.color });
+    streamTagsMap.get(tag.streamId)!.push({name: tag.name, slug: tag.slug, color: tag.color});
   }
 
   return streamTagsMap;

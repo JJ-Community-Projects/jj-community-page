@@ -222,3 +222,6 @@ export const privateTagsContract = {
   fullTagsSearch: fullTagsSearchContract,
   getTagCategories: getTagCategoriesContract,
 }
+
+
+export type TagWithUsageAndCategory = z.infer<typeof TagWithUsageAndCategorySchema>

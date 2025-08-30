@@ -147,10 +147,7 @@ function getUserFriends(db: JJDrizzleDatabase, userId: number) {
       and(eq(friendsTable.fromUserId, userId), eq(userDisplayView.userId, friendsTable.toUserId)),
       and(eq(friendsTable.toUserId, userId), eq(userDisplayView.userId, friendsTable.fromUserId))
     ))
-    .where(or(
-      eq(friendsTable.fromUserId, userId),
-      eq(friendsTable.toUserId, userId)
-    ))
+    .where(eq(friendsTable.fromUserId, userId))
     .all();
 }
 

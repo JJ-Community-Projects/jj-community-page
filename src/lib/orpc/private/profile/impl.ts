@@ -146,7 +146,7 @@ const getStyle = os.style.getStyleContract
         .from(userStyles)
         .where(eq(userStyles.userId, userId))
         .get();
-
+      console.log('getStyle', userStyle)
       return {
         primaryColor: userStyle?.primaryColor || null,
         accentColor: userStyle?.accentColor || null

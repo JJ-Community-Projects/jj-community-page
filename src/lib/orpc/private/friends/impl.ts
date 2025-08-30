@@ -118,6 +118,11 @@ const acceptFriendRequest = os.acceptFriendRequestContract
         .values({
           fromUserId: fromUserId,
           toUserId: userId
+        }),
+      db.insert(friendsTable)
+        .values({
+          fromUserId: userId,
+          toUserId: fromUserId
         })
     ]);
 
@@ -267,12 +272,11 @@ const getFriends = os.getFriendsContract
       .from(friendsTable)
       .innerJoin(userDisplayView, or(
         and(eq(friendsTable.fromUserId, userId), eq(userDisplayView.userId, friendsTable.toUserId)),
-        and(eq(friendsTable.toUserId, userId), eq(userDisplayView.userId, friendsTable.fromUserId))
+        // and(eq(friendsTable.toUserId, userId), eq(userDisplayView.userId, friendsTable.fromUserId))
       ))
-      .where(or(
-        eq(friendsTable.fromUserId, userId),
+      .where(
         eq(friendsTable.toUserId, userId)
-      ))
+      )
       .all();
 
     return friendships;
