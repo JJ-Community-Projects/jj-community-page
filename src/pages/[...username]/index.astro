@@ -1,10 +1,12 @@
 ---
-import { serverClientPublic } from "../../lib/orpc/client";
+import {serverClientPublic} from "../../lib/orpc/client";
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import UserHeader from "../../components/features/users/public/UserHeader.astro";
-import UserSchedule from "../../components/features/users/public/UserSchedule.astro";
-import UserTeams from "../../components/features/users/public/UserTeams.astro";
-import {ActiveSchedule} from "../../components/features/users/public/schedule/ActiveSchedule";
+import {UserHeader} from "../../components/features/users/public/UserHeader";
+import {NextStreamsSection} from "../../components/features/users/public/NextStreamsSection";
+import {FriendsSection} from "../../components/features/users/public/FriendsSection";
+import UserTeamsSection from "../../components/features/users/public/UserTeamsSection.astro";
+import OtherSchedulesSection from "../../components/features/users/public/OtherSchedulesSection.astro";
+import {ORPCError, ValidationError} from "@orpc/server";
 
 const {username} = Astro.params;
 
@@ -12,9 +14,15 @@ if (!username) {
   return Astro.redirect('/user-not-found')
 }
 
+const usernameLower = username.toLowerCase();
+
+if (username !== usernameLower) {
+  return Astro.redirect(`/${usernameLower}`)
+}
+
 const getUserFullProfileBySlug = serverClientPublic.users.getUserFullProfileBySlug
 
-const { data: user, error } = await getUserFullProfileBySlug({slug: username}, {
+const {data: user, error} = await getUserFullProfileBySlug({slug: username}, {
   context: {
     locals: Astro.locals,
     request: Astro.request,
@@ -23,30 +31,93 @@ const { data: user, error } = await getUserFullProfileBySlug({slug: username}, {
 
 if (error) {
   console.error(error)
-  return Astro.redirect(`/${username}/error`)
+  if (error instanceof ORPCError) {
+    console.error('ORPCError')
+    const cause = error.cause
+    console.error('Cause', cause)
+    if (cause instanceof ValidationError) {
+      console.error('ValidationError')
+      const issues = cause.issues
+      for (const issue of issues) {
+        console.error('Issue', issue)
+      }
+    }
+  } else if (error instanceof ValidationError) {
+    console.error('ValidationError')
+  }
 }
-
-if (user === undefined) {
-    throw Astro.redirect('/user-not-found')
+if (user !== undefined) {
+//   throw Astro.redirect('/user-not-found')
+  console.log(JSON.stringify(user, null, 2))
 }
-
 
 
 // Fetch the user's primary schedule for the ActiveSchedule component
 // const { data: primarySchedule, error: scheduleError } = await Astro.callAction(actions.ui.users.schedules.getCurrentPrimaryByTiltifyUsername, username);
 ---
-<BaseLayout title={`${user.user.username} | Jingle Jam Community`}>
-    <div class="w-full max-w-4xl mx-auto">
-        <UserHeader user={user}/>
+<BaseLayout title={`${user?.user.username} | Jingle Jam Community`}>
+    <div class="w-full mx-4 xl:mx-20 py-8 md:py-12 lg:py-16">
+      {
+        error && (
+                      <pre>ERROR: {JSON.stringify(error, null, 2)}</pre>
+        )
+      }
 
-      {/* Display ActiveSchedule if primary schedule is available */}
-      {user.primarySchedule && (
-              <div class="w-full bg-white rounded-lg p-6 mb-4 shadow-md">
-                  <ActiveSchedule client:load initSchedule={user.primarySchedule}/>
-              </div>
-      )}
+      {
+        !error && user && (
+                      <>
+                        {/* New redesigned component order */}
+                          <UserHeader
+                                  client:only="solid-js"
+                                  user={user}
+                          />
 
-        <UserSchedule schedules={user.schedules} />
-        <UserTeams teams={user.teams} />
+                        {/* StreamsPreview for next primary streams */}
+                        {user.primarySchedule &&  user.nextPrimaryStreams && user.nextPrimaryStreams.length > 0 && (
+                                <NextStreamsSection
+                                        client:only="solid-js"
+                                        streams={user.nextPrimaryStreams}
+                                        userColors={{
+                                          primaryColor: user.style.primaryColor,
+                                          accentColor: user.style.accentColor
+                                        }}
+                                        primarySchedule={user.primarySchedule}
+                                />
+                        )}
+
+                        {/* FriendsSection */}
+                        {
+                          (user.friends.length > 0) && (
+                                        <FriendsSection
+                                                client:only="solid-js"
+                                                friends={user.friends}
+                                                userColors={{
+                                                  primaryColor: user.style.primaryColor,
+                                                  accentColor: user.style.accentColor
+                                                }}
+                                        />)
+                        }
+
+                        {/* UserTeams with user color theming */}
+                        {(user.teams.length > 0) && (
+                                <UserTeamsSection
+                                        teams={user.teams}
+                                        userColors={{
+                                          primaryColor: user.style.primaryColor,
+                                          accentColor: user.style.accentColor
+                                        }}
+                                />
+                        )}
+                        {/* OtherSchedules */}
+                        {(user.schedules.length > 0) && (
+                                <OtherSchedulesSection
+                                        schedules={user.schedules}
+                                        userColors={{
+                                          primaryColor: user.style.primaryColor,
+                                          accentColor: user.style.accentColor
+                                        }}
+                                />)}
+                      </>)
+      }
     </div>
 </BaseLayout>
