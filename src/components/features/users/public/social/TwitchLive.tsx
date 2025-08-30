@@ -1,6 +1,5 @@
 import {type Component, Show} from "solid-js";
 import {TwitchIcon} from "../../../../common/icons/JJIcons.tsx";
-import {useUserLiveStatus} from "../../../../../lib/useUserLiveStatus.ts";
 
 interface TwitchLiveProps {
   url: string;
@@ -10,9 +9,9 @@ interface TwitchLiveProps {
 
 export const TwitchLive: Component<TwitchLiveProps> = (props) => {
   const {url, name = 'Twitch', userId} = props
-  const liveStatus = useUserLiveStatus(userId);
+//  const liveStatus = useUserLiveStatus(userId);
 
-  const isLive = () => liveStatus.isLive && liveStatus.channel.twitch !== undefined
+  const isLive = () => false; // liveStatus.isLive && liveStatus.channel.twitch !== undefined
 
   return (
     <a
