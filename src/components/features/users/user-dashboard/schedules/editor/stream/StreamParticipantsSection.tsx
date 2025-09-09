@@ -1,12 +1,10 @@
-import {type Component, createMemo, createSignal, For, Show} from "solid-js";
+import {type Component, createMemo, For, Show} from "solid-js";
 import type {Participant} from "../../../../../../../lib/model/admin/user/scheduleEditor/ScheduleEditorTypes";
 import {TextField} from "@kobalte/core/text-field";
-import {debounce} from "@solid-primitives/scheduled";
 import {FaRegularCircle} from "solid-icons/fa";
 import {useScheduleEditor} from "../../../providers/ScheduleEditorProvider.tsx";
 import {useStreamEditor} from "./ScheduleEditorStreamEditDialogBodyProvider.tsx";
-import {useQuery} from "@tanstack/solid-query";
-import {orpcPublic} from "../../../../../../../lib/orpc/client.ts";
+import {useUserSearch} from "../../../../../../../lib/useUserSearch";
 
 const useParticipants = () => {
   const {stream, addParticipant, removeParticipant} = useStreamEditor()
@@ -16,57 +14,43 @@ const useParticipants = () => {
     return stream?.participants || [];
   });
 
-  // State for search input
-  const [searchText, setSearchText] = createSignal("");
+  // Use shared user search hook (public router)
+  const userSearch = useUserSearch();
 
-  // oRPC query for user search
-  const searchQuery = useQuery(() => orpcPublic.users.searchByName.queryOptions({
-    input: {
-      searchTerm: searchText()
-    },
-    enabled: () => searchText().length > 0,
-  }));
-
-  // Computed search results with participant filtering
+  // Computed search results with participant filtering and mapping
   const searchResults = createMemo(() => {
-    if (!searchQuery.data) return [];
+    const data = userSearch.results();
+    if (!data) return [] as Participant[];
 
-    // Filter out users that are already participants and transform data
-    return searchQuery.data.filter(user =>
-      !participants().some(p => p.userId === user.userId)
-    ).map((user) => ({
-      userId: user.userId,
-      provider: user.twitchUsername ? 'twitch' : 'tiltify',
-      name: user.twitchUsername || user.tiltifyUsername || 'Unknown User',
-    })) as Participant[];
+    return data
+      .filter(user => !participants().some(p => p.userId === user.userId))
+      .map((user) => ({
+        userId: user.userId,
+        provider: user.twitchUsername ? 'twitch' : 'tiltify',
+        name: user.twitchUsername || user.tiltifyUsername || 'Unknown User',
+      })) as Participant[];
   });
 
-  // Debounced search function
-  const debouncedSearch = debounce(async (query: string) => {
-    setSearchText(query);
-  }, 500);
-
-  // Handle input change
+  // Handle input change (debounced internally by the hook)
   const handleSearchChange = (value: string) => {
-    debouncedSearch(value);
+    userSearch.handleSearchInput(value);
   };
 
-  // Handle adding a participant
+  // Handle adding/removing a participant
   const handleAddParticipant = (participant: Participant) => {
     addParticipant(participant);
-    setSearchText("");
+    userSearch.clear();
   };
 
-  // Handle removing a participant
   const handleRemoveParticipant = (userId: number) => {
     removeParticipant(userId);
   };
 
   return {
-    searchText,
+    searchText: userSearch.searchInput,
     handleSearchChange,
-    isSearching: () => searchQuery.isPending,
-    error: () => searchQuery.error?.message || "",
+    isSearching: () => userSearch.isLoading(),
+    error: () => userSearch.errorMessage(),
     searchResults,
     handleAddParticipant,
     participants,

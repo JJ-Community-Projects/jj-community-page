@@ -1,8 +1,7 @@
 import {oc} from '@orpc/contract'
 import {z} from "zod/v4";
 import {SuccessSchema} from "../schemas/common.ts";
-import {UserIdSchema} from "../schemas/users.ts";
-import {UserDisplaySchema} from "../schemas/users.ts";
+import {UserDisplaySchema, UserIdSchema} from "../schemas/users.ts";
 
 // Send friend request contract
 export const sendFriendRequestContract = oc

@@ -1,6 +1,8 @@
 ---
 import BaseLayout from "../../../../layouts/BaseLayout.astro";
-import {ScheduleEditorComponent} from '../../../../components/features/users/user-dashboard/schedules/editor/ScheduleEditorComponent'
+import {
+  ScheduleAdminComponent
+} from '../../../../components/features/users/user-dashboard/schedules/editor_v2/ScheduleAdminComponent'
 
 const {session, user} = Astro.locals;
 if (session === null) {
@@ -19,6 +21,6 @@ if (!id) {
 
 <BaseLayout>
   <div class="container mx-auto px-4 py-8">
-      <ScheduleEditorComponent client:only="solid-js" scheduleId={parseInt(id)} userId={user.id} username={user.tiltifyName} />
+      <ScheduleAdminComponent client:only="solid-js" scheduleId={parseInt(id)}/>
   </div>
 </BaseLayout>

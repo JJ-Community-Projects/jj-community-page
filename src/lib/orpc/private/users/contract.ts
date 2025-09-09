@@ -36,8 +36,22 @@ const searchByNameContract = oc
     twitchUsername: z.string().nullable(),
   })));
 
+
+/**
+ * Get relations (friends + team mates) for the authenticated user
+ * Output shape exactly:
+ * { friends: UserDisplaySchema[]; teamMates: UserDisplaySchema[] }
+ */
+const getRelationsContract = oc.output(
+  z.object({
+    friends: z.array(UserDisplaySchema),
+    teamMates: z.array(UserDisplaySchema),
+  })
+);
+
 export const privateUsersContract = {
-  getCurrentUser: getCurrentUserContract,
+  getCurrentUserContract,
   isAdminContract,
-  searchByName: searchByNameContract,
+  searchByNameContract,
+  getRelationsContract,
 };

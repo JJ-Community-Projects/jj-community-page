@@ -8,6 +8,7 @@ const auth = os
   }>()
   .middleware(({context, next}) => {
     if (!context.locals?.user) {
+      console.log('authMiddleware', context.request.url, 'UNAUTHORIZED')
       throw new ORPCError('UNAUTHORIZED')
     }
     return next({

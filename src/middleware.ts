@@ -20,6 +20,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
   const token = context.cookies.get("session")?.value ?? null;
   const upgradeHeader = context.request.headers.get("upgrade");
   if (upgradeHeader && upgradeHeader.toLowerCase() === "websocket") {
+
     if (token) {
       // Create a new request with the token in the header
       const newRequest = new Request(context.request.url, {
@@ -37,7 +38,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
       context.request = newRequest;
     }
     // Bypass middleware for WebSocket upgrade requests
-    // console.log('middleware', 'websocket')
+    console.log('middleware', 'websocket', context.request.url);
     return next()
   }
 
@@ -56,7 +57,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
           await stub.getMillisecondsToNextRequest();
         if (milliseconds_to_next_request > 0) {
           // Alternatively one could sleep for the necessary length of time
-          return new Response("Rate limit exceeded", { status: 429 });
+          return new Response("Rate limit exceeded", {status: 429});
         }
       } catch (error) {
         console.log(error);
@@ -71,6 +72,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
     if (token === null) {
       context.locals.session = null;
       context.locals.user = null;
+      console.log('authMiddleware', context.request.url, 'token === null');
       return next();
     }
     const {user, session} = await validateSessionToken(context, token);

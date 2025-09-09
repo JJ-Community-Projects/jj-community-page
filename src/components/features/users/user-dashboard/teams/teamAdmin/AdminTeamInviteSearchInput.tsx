@@ -1,9 +1,7 @@
-import {type Component, createSignal, For, Show} from "solid-js";
+import {type Component, For, Show} from "solid-js";
 import {useAdminTeamDetail} from "./AdminTeamDetailsProvider.tsx";
 import {FaSolidCircleInfo, FaSolidMagnifyingGlass, FaSolidUserPlus, FaSolidXmark} from "solid-icons/fa";
-import {debounce} from "@solid-primitives/scheduled";
-import {useQuery} from "@tanstack/solid-query";
-import {orpcPrivate} from "../../../../../../lib/orpc/client.ts";
+import {useUserSearch} from "../../../../../../lib/useUserSearch";
 
 /**
  * AdminTeamInviteSearchInput Component
@@ -17,38 +15,20 @@ export const AdminTeamInviteSearchInput: Component = () => {
     inviteUserMutation
   } = useAdminTeamDetail();
 
-  const [searchInput, setSearchInput] = createSignal("");
-  const [debouncedInput, setDebouncedInput] = createSignal("");
-
-  // Debounced search function
-  const debouncedSearch = debounce((query: string) => {
-    setDebouncedInput(query);
-  }, 500);
+  const userSearch = useUserSearch();
 
   const handleInput = (e: Event) => {
     const target = e.target as HTMLInputElement;
-    const value = target.value;
-    setSearchInput(value);
-    debouncedSearch(value);
+    userSearch.handleSearchInput(target.value);
   };
 
   const clearSearch = () => {
-    setSearchInput("");
-    setDebouncedInput("");
+    userSearch.clear();
   };
 
-  // User search query
-  const searchQuery = useQuery(() => orpcPrivate.users.searchByName.queryOptions({
-    input: {
-      searchTerm: debouncedInput()
-    },
-    enabled: () => debouncedInput().length > 0,
-    staleTime: 30 * 1000,
-  }));
-
-  const searchResults = () => searchQuery.data ?? [];
-  const isLoadingSearch = () => searchQuery.isLoading;
-  const hasSearchError = () => !!searchQuery.error;
+  const searchResults = () => userSearch.results();
+  const isLoadingSearch = () => userSearch.isLoading();
+  const hasSearchError = () => userSearch.hasError();
 
   // Handle invite
   const handleInvite = async (userId: number) => {
@@ -65,7 +45,7 @@ export const AdminTeamInviteSearchInput: Component = () => {
     <div class="space-y-4">
       <div class="flex items-center gap-2 mb-3">
         <h4 class="text-sm font-semibold text-gray-800 flex items-center gap-2">
-          <FaSolidUserPlus class="w-4 h-4 text-accent" />
+          <FaSolidUserPlus class="w-4 h-4 text-accent"/>
           Invite Users
         </h4>
       </div>
@@ -73,10 +53,10 @@ export const AdminTeamInviteSearchInput: Component = () => {
       <div class="relative">
         {/* Search icon / Loading spinner */}
         <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-          {(isLoadingSearch() || searchInput().length > 0) && searchInput().length > 0 ? (
+          {(isLoadingSearch() || userSearch.searchInput().length > 0) && userSearch.searchInput().length > 0 ? (
             <div class="w-5 h-5 border-2 border-accent border-t-transparent rounded-full animate-spin"></div>
           ) : (
-            <FaSolidMagnifyingGlass class="w-5 h-5 text-gray-400 transition-colors duration-200" />
+            <FaSolidMagnifyingGlass class="w-5 h-5 text-gray-400 transition-colors duration-200"/>
           )}
         </div>
 
@@ -92,13 +72,13 @@ export const AdminTeamInviteSearchInput: Component = () => {
             shadow-sm hover:shadow-md focus:shadow-lg
           "
           placeholder="Search for users to invite..."
-          value={searchInput()}
+          value={userSearch.searchInput()}
           onInput={handleInput}
           aria-label="Search for users to invite"
         />
 
         {/* Clear button */}
-        {searchInput().length > 0 && (
+        {userSearch.searchInput().length > 0 && (
           <button
             type="button"
             onClick={clearSearch}
@@ -110,7 +90,7 @@ export const AdminTeamInviteSearchInput: Component = () => {
             "
             aria-label="Clear search"
           >
-            <FaSolidXmark class="w-5 h-5" />
+            <FaSolidXmark class="w-5 h-5"/>
           </button>
         )}
       </div>
@@ -119,7 +99,7 @@ export const AdminTeamInviteSearchInput: Component = () => {
       <Show when={inviteUserMutation.isError}>
         <div class="bg-danger-50 rounded-xl p-4 border border-danger-200">
           <div class="flex items-center gap-3 text-danger-600">
-            <FaSolidXmark class="w-4 h-4 flex-shrink-0" />
+            <FaSolidXmark class="w-4 h-4 flex-shrink-0"/>
             <p class="text-sm font-medium">{inviteUserMutation.failureReason?.message || "Failed to invite user"}</p>
           </div>
         </div>
@@ -128,8 +108,8 @@ export const AdminTeamInviteSearchInput: Component = () => {
       <Show when={hasSearchError()}>
         <div class="bg-danger-50 rounded-xl p-4 border border-danger-200">
           <div class="flex items-center gap-3 text-danger-600">
-            <FaSolidXmark class="w-4 h-4 flex-shrink-0" />
-            <p class="text-sm font-medium">{searchQuery.error?.message || "Failed to search users"}</p>
+            <FaSolidXmark class="w-4 h-4 flex-shrink-0"/>
+            <p class="text-sm font-medium">{userSearch.errorMessage()}</p>
           </div>
         </div>
       </Show>
@@ -147,7 +127,8 @@ export const AdminTeamInviteSearchInput: Component = () => {
                   <div class="flex items-center justify-between">
                     <div class="flex items-center gap-3">
                       {/* Avatar placeholder */}
-                      <div class="w-8 h-8 rounded-full bg-gradient-to-br from-accent-400 to-accent-500 flex items-center justify-center shadow-sm flex-shrink-0">
+                      <div
+                        class="w-8 h-8 rounded-full bg-gradient-to-br from-accent-400 to-accent-500 flex items-center justify-center shadow-sm flex-shrink-0">
                         <span class="text-white font-semibold text-xs">
                           {(result.tiltifyUsername || 'U')[0].toUpperCase()}
                         </span>
@@ -182,12 +163,13 @@ export const AdminTeamInviteSearchInput: Component = () => {
                     >
                       {inviteUserMutation.isPending ? (
                         <>
-                          <div class="w-3 h-3 border-2 border-accent border-t-transparent rounded-full animate-spin"></div>
+                          <div
+                            class="w-3 h-3 border-2 border-accent border-t-transparent rounded-full animate-spin"></div>
                           <span>Inviting...</span>
                         </>
                       ) : (
                         <>
-                          <FaSolidUserPlus class="w-3 h-3" />
+                          <FaSolidUserPlus class="w-3 h-3"/>
                           <span>Invite</span>
                         </>
                       )}
@@ -202,12 +184,12 @@ export const AdminTeamInviteSearchInput: Component = () => {
 
       {/* Helper text */}
       <div class="flex items-start gap-2">
-        <FaSolidCircleInfo class="w-3 h-3 text-gray-400 mt-0.5 flex-shrink-0" />
+        <FaSolidCircleInfo class="w-3 h-3 text-gray-400 mt-0.5 flex-shrink-0"/>
         <div class="text-xs text-gray-500 space-y-1">
           <p>Search for users by their username to send team invitations.</p>
-          {searchInput().length > 0 && (
+          {userSearch.searchInput().length > 0 && (
             <p class="text-accent-600 font-medium">
-              {isLoadingSearch() ? `Searching for "${searchInput()}"...` : `Showing results for "${searchInput()}"`}
+              {isLoadingSearch() ? `Searching for "${userSearch.searchInput()}"...` : `Showing results for "${userSearch.searchInput()}"`}
             </p>
           )}
         </div>

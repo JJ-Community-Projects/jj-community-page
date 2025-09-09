@@ -5,8 +5,8 @@ import {privateFriendsSSEContract} from "./contract.ts";
 import {userDisplayView} from "../../../db/schema/views-schema.ts";
 import {friendRequests, friendsTable} from "../../../db/schema/auth-schema.ts";
 import {and, eq, or} from "drizzle-orm";
-import {friendsEventPublisher} from "./friendEventPublisher.ts";
 import type {JJDrizzleDatabase} from "../../../db/db.ts";
+import {friendsEventPublisher} from "./friendEventPublisher.ts";
 
 const os = implement(privateFriendsSSEContract)
   .use(dbMiddleware);

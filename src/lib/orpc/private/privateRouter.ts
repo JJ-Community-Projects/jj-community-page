@@ -11,8 +11,12 @@ import {privateSchedulesRouter} from "./schedules/impl.ts";
 import {socialRouter} from "./social/impl.ts";
 import {privateTeamsSSERouter} from "./teamsSSE/impl.ts";
 import {privateFriendsSSERouter} from "./friendsSSE/impl.ts";
+import {privateScheduleEditingRouter} from "./scheduleEditing";
 import {os} from "@orpc/server";
 import {hasAstroContext} from "../middleware/hasAstroContext.ts";
+import {privateFriendsWSRouter} from "./friendsWS/impl.ts";
+import {privateTeamsWSRouter} from "./teamsWS/impl.ts";
+import {privateScheduleEditingWSRouter} from "./scheduleEditingWS";
 
 
 export const privateRouter = os
@@ -23,12 +27,16 @@ export const privateRouter = os
     social: socialRouter,
     friends: friendsRouter,
     friendsSSE: privateFriendsSSERouter,
+    friendsWS: privateFriendsWSRouter,
     blocking: blockRouter,
     tags: tagsRouter,
     adminTags: adminTagsRouter,
     streamTags: streamTagsRouter,
     teams: privateTeamsRouter,
     teamsSSE: privateTeamsSSERouter,
+    teamsWS: privateTeamsWSRouter,
     schedules: privateSchedulesRouter,
+    scheduleEditing: privateScheduleEditingRouter,
+    scheduleEditingWS: privateScheduleEditingWSRouter,
     twitch: twitchRouter,
   })

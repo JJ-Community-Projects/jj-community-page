@@ -3,6 +3,7 @@ import {implement, ORPCError} from '@orpc/server';
 import {dbMiddleware} from '../../middleware/dbMiddleware.ts';
 import {authMiddleware} from '../../middleware/authMiddleware.ts';
 import {schedulesTable} from '../../../db/schema/jj-schema.ts';
+import {editSchedulesTable} from '../../../db/schema/edit-schedules-schema.ts';
 import {accounts, users} from '../../../db/schema/auth-schema.ts';
 import {and, eq, not} from 'drizzle-orm';
 import {DateTime} from 'luxon';
@@ -53,22 +54,16 @@ const create = os.create
           primary: shouldBePrimary
         })
         .returning();
-
-      /*
-      // Initialize the ScheduleEditorDO for this schedule
-      await useRpcScheduleEditorDO(ctx, schedule.id, async (rpc) => {
-        await rpc.loadFromDB();
-      }, (error) => {
-        throw new ORPCError('INTERNAL_SERVER_ERROR', { message: error.message });
-      });
-
-      // Add the schedule to the UserDO
-      await useRpcUserDO(ctx, user.id, async (rpc) => {
-        await rpc.addSchedule(schedule);
-      }, (error) => {
-        throw new ORPCError('INTERNAL_SERVER_ERROR', { message: error.message });
-      });
-      */
+      console.log('schedule', schedule)
+      // Seed edit_schedules with initial draft meta
+      await db.insert(editSchedulesTable).values({
+        scheduleId: schedule.id,
+        editorId: user.id,
+        title: schedule.title,
+        slug: schedule.slug,
+        year: schedule.year,
+        visible: schedule.visible,
+      }).onConflictDoNothing().run()
 
       return {schedule};
     } catch (error) {
@@ -130,6 +125,16 @@ const createWithDetails = os.createWithDetails
           primary: primary
         })
         .returning();
+
+      // Seed edit_schedules with initial draft meta
+      await db.insert(editSchedulesTable).values({
+        scheduleId: schedule.id,
+        editorId: user.id,
+        title: schedule.title,
+        slug: schedule.slug,
+        year: schedule.year,
+        visible: schedule.visible,
+      }).onConflictDoNothing().run()
 
       return {schedule};
     } catch (error) {

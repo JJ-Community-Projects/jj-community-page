@@ -3,8 +3,9 @@ import {implement, ORPCError} from '@orpc/server';
 import {dbMiddleware} from '../../middleware/dbMiddleware.ts';
 import {authMiddleware} from '../../middleware/authMiddleware.ts';
 import {userDisplayView, usersSearchView} from '../../../db/schema/views-schema.ts';
-import {eq, like, or} from 'drizzle-orm';
-import {blockedUsers, users} from "../../../db/schema/auth-schema.ts";
+import {and, eq, inArray, like, not, or} from 'drizzle-orm';
+import {blockedUsers, friendsTable, users} from "../../../db/schema/auth-schema.ts";
+import {teamMembersTable} from "../../../db/schema/jj-schema.ts";
 
 const os = implement(privateUsersContract)
   .use(dbMiddleware);
@@ -13,7 +14,7 @@ const os = implement(privateUsersContract)
  * Get current authenticated user information
  * Returns the current user as UserDisplaySchema with role information
  */
-const getCurrentUser = os.getCurrentUser
+const getCurrentUser = os.getCurrentUserContract
   .use(authMiddleware)
   .handler(async ({context}) => {
     const db = context.db;
@@ -74,7 +75,7 @@ const isAdmin = os.isAdminContract
  * Searches for users by Tiltify and Twitch usernames using case-insensitive matching
  * Requires authentication through authMiddleware
  */
-const searchByName = os.searchByName
+const searchByName = os.searchByNameContract
   .use(authMiddleware)
   .handler(async ({context, input}) => {
     const db = context.db;
@@ -120,8 +121,79 @@ const searchByName = os.searchByName
     }
   });
 
+
+/**
+ * Get relations for the authenticated user:
+ * - friends: direct friendships
+ * - teamMates: users sharing at least one team with the user (excluding self)
+ */
+const getRelations = os.getRelationsContract
+  .use(authMiddleware)
+  .handler(async ({context}) => {
+    const db = context.db;
+    const userId = context.userId;
+
+    // Projection matching UserDisplaySchema
+    const fields = {
+      userId: userDisplayView.userId,
+      primaryLiveStream: userDisplayView.primaryLiveStream,
+      role: userDisplayView.role,
+      createdAt: userDisplayView.createdAt,
+      username: userDisplayView.username,
+      profileImage: userDisplayView.profileImage,
+      twitchLogin: userDisplayView.twitchLogin,
+      tiltifySlug: userDisplayView.tiltifySlug,
+      tiltifyUrl: userDisplayView.tiltifyUrl,
+      primaryColor: userDisplayView.primaryColor,
+      accentColor: userDisplayView.accentColor,
+    };
+
+    // 1) Friends: pick one direction only to avoid duplicates
+    const friends = await db
+      .select(fields)
+      .from(friendsTable)
+      .innerJoin(
+        userDisplayView,
+        and(
+          eq(friendsTable.fromUserId, userId),
+          eq(userDisplayView.userId, friendsTable.toUserId)
+        )
+      )
+      .all();
+
+    // 2) Team mates: users sharing any team with current user (exclude self, dedupe)
+    const myTeams = await db
+      .select({teamId: teamMembersTable.teamId})
+      .from(teamMembersTable)
+      .where(eq(teamMembersTable.userId, userId))
+      .all();
+
+    let teamMates: typeof friends = [];
+    const teamIds = myTeams.map(t => t.teamId);
+    if (teamIds.length > 0) {
+      teamMates = await db
+        .select(fields)
+        .from(teamMembersTable)
+        .innerJoin(
+          userDisplayView,
+          eq(userDisplayView.userId, teamMembersTable.userId)
+        )
+        .where(
+          and(
+            inArray(teamMembersTable.teamId, teamIds),
+            not(eq(teamMembersTable.userId, userId))
+          )
+        )
+        .groupBy(userDisplayView.userId) // avoid duplicates when sharing multiple teams
+        .all();
+    }
+
+    return {friends, teamMates};
+  });
+
 export const privateUsersRouter = {
   getCurrentUser,
   isAdmin,
   searchByName,
+  getRelations,
 };

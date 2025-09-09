@@ -1,46 +1,13 @@
-import {createContext, createSignal, type ParentComponent, useContext} from "solid-js";
+import {createContext, type ParentComponent, useContext} from "solid-js";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/solid-query";
 import {orpcPrivate} from "../../../../../lib/orpc/client.ts";
-import {debounce} from "@solid-primitives/scheduled";
+import {useTagSearch} from "../../../../../lib/useTagSearch.ts";
 
 const useUserTagsHook = () => {
   const queryClient = useQueryClient();
   const t = orpcPrivate.tags;
+  const tagSearch = useTagSearch()
 
-  // State for tag search
-  const [searchInput, setSearchInput] = createSignal("");
-  const [debouncedInput, setDebouncedInput] = createSignal("");
-
-  // State for category selection
-  const [selectedCategoryIds, setSelectedCategoryIds] = createSignal<number[]>([]);
-
-  // Debounced input handler
-  const debouncedSetSearchInput = debounce((value: string) => {
-    setDebouncedInput(value);
-  }, 1000);
-
-  // TanStack Queries
-  const popularTagsQuery = useQuery(() =>
-    t.getPopularTags.queryOptions({
-      input: {
-        limit: 15,
-        timeRange: '30d' as const,
-      },
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      gcTime: 10 * 60 * 1000, // 10 minutes
-    })
-  );
-
-  const searchQuery = useQuery(() => t.fullTagsSearch.queryOptions({
-      input: {
-        query: debouncedInput(),
-        limit: 15,
-        categoryIds: selectedCategoryIds()
-      },
-      enabled: () => debouncedInput().length > 0,
-      staleTime: 30 * 1000,
-    })
-  );
 
   const getUserTagsQuery = useQuery(() => t.getUserTags.queryOptions({
     input: {},
@@ -76,19 +43,19 @@ const useUserTagsHook = () => {
 
   // Computed values
   const availableTags = () => {
-    const searchTerm = debouncedInput();
+    const searchTerm = tagSearch.debouncedInput();
     if (searchTerm.length > 0) {
-      return searchQuery.data || [];
+      return tagSearch.searchQuery.data || [];
     }
-    return popularTagsQuery.data?.tags || [];
+    return tagSearch.popularTagsQuery.data?.tags || [];
   };
 
   const userTags = () => getUserTagsQuery.data || [];
   const categories = () => getTagCategoriesQuery.data || [];
 
   // Loading states
-  const isLoadingTags = () => popularTagsQuery.isLoading ||
-    searchQuery.isLoading ||
+  const isLoadingTags = () => tagSearch.popularTagsQuery.isLoading ||
+    tagSearch.searchQuery.isLoading ||
     addTagMutation.isPending ||
     removeTagMutation.isPending;
 
@@ -96,8 +63,8 @@ const useUserTagsHook = () => {
   const isLoadingUserTags = () => getUserTagsQuery.isLoading || addTagMutation.isPending || removeTagMutation.isPending;
 
   // Error states
-  const hasTagsError = () => !!popularTagsQuery.error ||
-    !!searchQuery.error ||
+  const hasTagsError = () => !!tagSearch.popularTagsQuery.error ||
+    !!tagSearch.searchQuery.error ||
     !!addTagMutation.error ||
     !!removeTagMutation.error;
 
@@ -120,8 +87,7 @@ const useUserTagsHook = () => {
     if (!userTags().some(ut => ut.tagId === tagId)) {
       try {
         await addTagMutation.mutateAsync({tagId});
-        setSearchInput("");
-        setDebouncedInput("");
+        tagSearch.handleSearchInput('');
       } catch (error) {
         console.error("Error adding tag:", error);
       }
@@ -129,12 +95,11 @@ const useUserTagsHook = () => {
   };
 
   const handleSearchInput = (value: string) => {
-    setSearchInput(value);
-    debouncedSetSearchInput(value);
+    tagSearch.handleSearchInput(value);
   };
 
   const handleToggleCategory = (categoryId: number) => {
-    setSelectedCategoryIds(prev => {
+    tagSearch.setSelectedCategoryIds(prev => {
       if (prev.includes(categoryId)) {
         return prev.filter(id => id !== categoryId);
       } else {
@@ -145,8 +110,8 @@ const useUserTagsHook = () => {
 
   // Error messages
   const availableTagsError = () => {
-    return popularTagsQuery.error?.message ||
-      searchQuery.error?.message ||
+    return tagSearch.popularTagsQuery.error?.message ||
+      tagSearch.searchQuery.error?.message ||
       "Unknown error";
   };
 
@@ -162,10 +127,10 @@ const useUserTagsHook = () => {
 
   return {
     // State
-    searchInput,
-    setSearchInput,
-    debouncedInput,
-    selectedCategoryIds,
+    searchInput: tagSearch.searchInput,
+    // setSearchInput: handleSearchInput,
+    debouncedInput: tagSearch.debouncedInput,
+    selectedCategoryIds: tagSearch.selectedCategoryIds,
 
     // Computed data
     availableTags,

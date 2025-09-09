@@ -5,7 +5,11 @@ import {authMiddleware} from '../../middleware/authMiddleware.ts';
 import {and, eq, or} from 'drizzle-orm';
 import {blockedUsers, friendRequests, friendsTable} from "../../../db/schema/auth-schema.ts";
 import {userDisplayView} from "../../../db/schema/views-schema.ts";
-import {friendsEventPublisher} from "../friendsSSE/friendEventPublisher.ts";
+import {
+  publishFriendRequestIncomingUpdate,
+  publishFriendRequestSentUpdate,
+  publishFriendsListUpdate
+} from "../friendsWS/publisher.ts";
 
 const os = implement(friendsContract)
   .use(dbMiddleware);
@@ -76,8 +80,9 @@ const sendFriendRequest = os.sendFriendRequestContract
         toUserId: toUserId
       });
 
-    // Publish event for real-time updates
-    friendsEventPublisher.sendFriendRequest(userId, toUserId);
+    // Publish event for real-time updates via Durable Objects
+    await publishFriendRequestIncomingUpdate(context.env, toUserId);
+    await publishFriendRequestSentUpdate(context.env, userId);
 
     return {success: true};
   });
@@ -126,8 +131,11 @@ const acceptFriendRequest = os.acceptFriendRequestContract
         })
     ]);
 
-    // Publish event for real-time updates
-    friendsEventPublisher.acceptFriendRequest(fromUserId, userId);
+    // Publish event for real-time updates via Durable Objects
+    await publishFriendRequestIncomingUpdate(context.env, userId);
+    await publishFriendRequestSentUpdate(context.env, fromUserId);
+    await publishFriendsListUpdate(context.env, userId)
+    await publishFriendsListUpdate(context.env, fromUserId)
 
     return {success: true};
   });
@@ -164,8 +172,9 @@ const declineFriendRequest = os.declineFriendRequestContract
         )
       );
 
-    // Publish event for real-time updates
-    friendsEventPublisher.declineFriendRequest(fromUserId, userId);
+    // Publish event for real-time updates via Durable Objects
+    await publishFriendRequestIncomingUpdate(context.env, userId);
+    await publishFriendRequestSentUpdate(context.env, fromUserId);
 
     return {success: true};
   });
@@ -202,8 +211,9 @@ const cancelFriendRequest = os.cancelFriendRequestContract
         )
       );
 
-    // Publish event for real-time updates
-    friendsEventPublisher.cancelFriendRequest(userId, toUserId);
+    // Publish event for real-time updates via Durable Objects
+    await publishFriendRequestIncomingUpdate(context.env, toUserId);
+    await publishFriendRequestSentUpdate(context.env, userId);
 
     return {success: true};
   });
@@ -240,8 +250,9 @@ const removeFriend = os.removeFriendContract
         )
       );
 
-    // Publish event for real-time updates
-    friendsEventPublisher.removeFriend(userId, friendUserId);
+    // Publish event for real-time updates via Durable Objects
+    await publishFriendsListUpdate(context.env, userId);
+    await publishFriendsListUpdate(context.env, friendUserId);
 
     return {success: true};
   });

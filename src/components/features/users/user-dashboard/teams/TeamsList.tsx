@@ -1,10 +1,18 @@
-import {type Component, createSignal, For, Show, Match, Switch} from "solid-js";
-import {UserProvider} from "../providers/UserProvider.tsx";
+import {type Component, createSignal, For, Show} from "solid-js";
+import {UserProvider, useUser} from "../providers/UserProvider.tsx";
 import type {User} from "../../../../../lib/auth/User.ts";
 import {ConfirmationDialog} from "../../../../common/dialogs/ConfirmationDialog.tsx";
 import {createModalSignal} from "../../../../../lib/createModalSignal.ts";
 import {CreateTeamDialog} from "./teamAdmin/CreateTeamDialog.tsx";
-import {FaSolidChevronLeft, FaSolidPlus, FaSolidUsers, FaSolidCrown, FaSolidEnvelope, FaSolidUserGroup, FaSolidArrowUpRightFromSquare} from "solid-icons/fa";
+import {
+  FaSolidArrowUpRightFromSquare,
+  FaSolidChevronLeft,
+  FaSolidCrown,
+  FaSolidEnvelope,
+  FaSolidPlus,
+  FaSolidUserGroup,
+  FaSolidUsers
+} from "solid-icons/fa";
 import {orpcPrivate} from "../../../../../lib/orpc/client.ts";
 import {QueryComponent} from "../../../../common/QueryComponent.tsx";
 import {QueryClientProvider, useMutation, useQueryClient} from "@tanstack/solid-query";
@@ -74,6 +82,7 @@ const TeamsHeader: Component = () => {
 };
 
 const OwnedTeamsList: Component = () => {
+  const {user} = useUser()
   return (
     <div class="bg-white rounded-2xl shadow-xl border-2 border-gray-200 overflow-hidden">
       <div class="~p-4/8">
@@ -83,7 +92,7 @@ const OwnedTeamsList: Component = () => {
         </h3>
 
         <QueryComponent
-          queryOptions={() => orpcPrivate.teamsSSE.getUserTeamsAdminSSE.experimental_liveOptions()}
+          queryOptions={() => orpcPrivate.teamsWS.getUserTeamsWS.experimental_liveOptions()}
           loading={() => (
             <div class="space-y-3">
               <div class="animate-pulse bg-gray-200 rounded-xl h-20 shadow-sm"></div>
@@ -111,55 +120,58 @@ const OwnedTeamsList: Component = () => {
             </div>
           )}
         >
-          {(result) => (
-            <Show when={result.teams.length > 0} fallback={
-              <div class="flex flex-col items-center justify-center py-12 px-4">
-                <div class="w-16 h-16 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center mb-4 shadow-lg">
-                  <FaSolidCrown class="w-8 h-8 text-white" />
+          {(result) => {
+            const teams = result.teams.filter((t) => t.ownerId === user.id)
+            return (
+              <Show when={teams.length > 0} fallback={
+                <div class="flex flex-col items-center justify-center py-12 px-4">
+                  <div class="w-16 h-16 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center mb-4 shadow-lg">
+                    <FaSolidCrown class="w-8 h-8 text-white" />
+                  </div>
+                  <h4 class="text-xl font-semibold text-gray-800 mb-2">No teams owned</h4>
+                  <p class="text-gray-600 text-center max-w-md leading-relaxed">
+                    You don't own any teams yet. Create your first team to get started.
+                  </p>
                 </div>
-                <h4 class="text-xl font-semibold text-gray-800 mb-2">No teams owned</h4>
-                <p class="text-gray-600 text-center max-w-md leading-relaxed">
-                  You don't own any teams yet. Create your first team to get started.
-                </p>
-              </div>
-            }>
-              <div class="space-y-4">
-                <For each={result.teams}>
-                  {(team) => (
-                    <a
-                      href={`/dashboard/teams/${team.id}`}
-                      class="
+              }>
+                <div class="space-y-4">
+                  <For each={teams}>
+                    {(team) => (
+                      <a
+                        href={`/dashboard/teams/${team.id}`}
+                        class="
                         group block bg-white rounded-xl p-4 shadow-md border-2 border-primary-200
                         transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 hover:border-primary-300
                         focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-white outline-none
                       "
-                    >
-                      <div class="flex items-center justify-between">
-                        <div class="flex-1 min-w-0">
-                          <h4 class="font-semibold text-gray-900 text-sm mb-1 truncate group-hover:text-primary transition-colors">
-                            {team.name}
-                          </h4>
-                          <p class="text-xs text-gray-500 font-mono bg-gray-100 px-2 py-1 rounded inline-block">
-                            {team.slug}
-                          </p>
-                        </div>
-                        <div class="flex items-center gap-2 ml-3">
-                          <div class="flex items-center gap-1 bg-primary-100 text-primary-700 px-2 py-1 rounded-full">
-                            <FaSolidCrown class="w-3 h-3" />
-                            <span class="text-xs font-medium">Owner</span>
+                      >
+                        <div class="flex items-center justify-between">
+                          <div class="flex-1 min-w-0">
+                            <h4 class="font-semibold text-gray-900 text-sm mb-1 truncate group-hover:text-primary transition-colors">
+                              {team.name}
+                            </h4>
+                            <p class="text-xs text-gray-500 font-mono bg-gray-100 px-2 py-1 rounded inline-block">
+                              {team.slug}
+                            </p>
                           </div>
-                          <FaSolidArrowUpRightFromSquare class="w-4 h-4 text-gray-400 group-hover:text-primary transition-colors" />
+                          <div class="flex items-center gap-2 ml-3">
+                            <div class="flex items-center gap-1 bg-primary-100 text-primary-700 px-2 py-1 rounded-full">
+                              <FaSolidCrown class="w-3 h-3" />
+                              <span class="text-xs font-medium">Owner</span>
+                            </div>
+                            <FaSolidArrowUpRightFromSquare class="w-4 h-4 text-gray-400 group-hover:text-primary transition-colors" />
+                          </div>
                         </div>
-                      </div>
 
-                      {/* Subtle hover effect */}
-                      <div class="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-5 transition-opacity duration-300 pointer-events-none bg-primary-500"></div>
-                    </a>
-                  )}
-                </For>
-              </div>
-            </Show>
-          )}
+                        {/* Subtle hover effect */}
+                        <div class="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-5 transition-opacity duration-300 pointer-events-none bg-primary-500"></div>
+                      </a>
+                    )}
+                  </For>
+                </div>
+              </Show>
+            )
+          }}
         </QueryComponent>
       </div>
     </div>
@@ -167,6 +179,8 @@ const OwnedTeamsList: Component = () => {
 };
 
 const MemberTeamsList: Component = () => {
+  const {user} = useUser()
+
   return (
     <div class="bg-white rounded-2xl shadow-xl border-2 border-gray-200 overflow-hidden">
       <div class="~p-4/8">
@@ -176,7 +190,7 @@ const MemberTeamsList: Component = () => {
         </h3>
 
         <QueryComponent
-          queryOptions={() => orpcPrivate.teamsSSE.getUserTeamsSSE.experimental_liveOptions()}
+          queryOptions={() => orpcPrivate.teamsWS.getUserTeamsWS.experimental_liveOptions()}
           loading={() => (
             <div class="space-y-3">
               <div class="animate-pulse bg-gray-200 rounded-xl h-20 shadow-sm"></div>
@@ -204,55 +218,58 @@ const MemberTeamsList: Component = () => {
             </div>
           )}
         >
-          {(result) => (
-            <Show when={result.teams.length > 0} fallback={
-              <div class="flex flex-col items-center justify-center py-12 px-4">
-                <div class="w-16 h-16 bg-gradient-to-br from-accent-500 to-accent-600 rounded-full flex items-center justify-center mb-4 shadow-lg">
-                  <FaSolidUsers class="w-8 h-8 text-white" />
+          {(result) => {
+            const teams = result.teams.filter((t) => t.ownerId !== user.id)
+            return (
+              <Show when={teams.length > 0} fallback={
+                <div class="flex flex-col items-center justify-center py-12 px-4">
+                  <div class="w-16 h-16 bg-gradient-to-br from-accent-500 to-accent-600 rounded-full flex items-center justify-center mb-4 shadow-lg">
+                    <FaSolidUsers class="w-8 h-8 text-white" />
+                  </div>
+                  <h4 class="text-xl font-semibold text-gray-800 mb-2">No team memberships</h4>
+                  <p class="text-gray-600 text-center max-w-md leading-relaxed">
+                    You're not a member of any teams yet. Accept team invitations to join teams.
+                  </p>
                 </div>
-                <h4 class="text-xl font-semibold text-gray-800 mb-2">No team memberships</h4>
-                <p class="text-gray-600 text-center max-w-md leading-relaxed">
-                  You're not a member of any teams yet. Accept team invitations to join teams.
-                </p>
-              </div>
-            }>
-              <div class="space-y-4">
-                <For each={result.teams}>
-                  {(team) => (
-                    <a
-                      href={`/dashboard/teams/${team.id}`}
-                      class="
+              }>
+                <div class="space-y-4">
+                  <For each={teams}>
+                    {(team) => (
+                      <a
+                        href={`/dashboard/teams/${team.id}`}
+                        class="
                         group block bg-white rounded-xl p-4 shadow-md border-2 border-accent-100
                         transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 hover:border-accent-200
                         focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-white outline-none
                       "
-                    >
-                      <div class="flex items-center justify-between">
-                        <div class="flex-1 min-w-0">
-                          <h4 class="font-semibold text-gray-900 text-sm mb-1 truncate group-hover:text-accent transition-colors">
-                            {team.name}
-                          </h4>
-                          <p class="text-xs text-gray-500 font-mono bg-gray-100 px-2 py-1 rounded inline-block">
-                            {team.slug}
-                          </p>
-                        </div>
-                        <div class="flex items-center gap-2 ml-3">
-                          <div class="flex items-center gap-1 bg-accent-100 text-accent-700 px-2 py-1 rounded-full">
-                            <FaSolidUserGroup class="w-3 h-3" />
-                            <span class="text-xs font-medium">Member</span>
+                      >
+                        <div class="flex items-center justify-between">
+                          <div class="flex-1 min-w-0">
+                            <h4 class="font-semibold text-gray-900 text-sm mb-1 truncate group-hover:text-accent transition-colors">
+                              {team.name}
+                            </h4>
+                            <p class="text-xs text-gray-500 font-mono bg-gray-100 px-2 py-1 rounded inline-block">
+                              {team.slug}
+                            </p>
                           </div>
-                          <FaSolidArrowUpRightFromSquare class="w-4 h-4 text-gray-400 group-hover:text-accent transition-colors" />
+                          <div class="flex items-center gap-2 ml-3">
+                            <div class="flex items-center gap-1 bg-accent-100 text-accent-700 px-2 py-1 rounded-full">
+                              <FaSolidUserGroup class="w-3 h-3" />
+                              <span class="text-xs font-medium">Member</span>
+                            </div>
+                            <FaSolidArrowUpRightFromSquare class="w-4 h-4 text-gray-400 group-hover:text-accent transition-colors" />
+                          </div>
                         </div>
-                      </div>
 
-                      {/* Subtle hover effect */}
-                      <div class="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-5 transition-opacity duration-300 pointer-events-none bg-accent-500"></div>
-                    </a>
-                  )}
-                </For>
-              </div>
-            </Show>
-          )}
+                        {/* Subtle hover effect */}
+                        <div class="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-5 transition-opacity duration-300 pointer-events-none bg-accent-500"></div>
+                      </a>
+                    )}
+                  </For>
+                </div>
+              </Show>
+            )
+          }}
         </QueryComponent>
       </div>
     </div>
@@ -313,7 +330,7 @@ const InvitesList: Component = () => {
 
         <QueryComponent
           // queryOptions={() => orpcPrivate.teams.getUserInvites.queryOptions()}
-          queryOptions={() => orpcPrivate.teamsSSE.getUserInvitesSSE.experimental_liveOptions()}
+          queryOptions={() => orpcPrivate.teamsWS.getUserTeamInvitesWS.experimental_liveOptions()}
           loading={() => (
             <div class="space-y-3">
               <div class="animate-pulse bg-gray-200 rounded-xl h-20 shadow-sm"></div>

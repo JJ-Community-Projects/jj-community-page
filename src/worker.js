@@ -32,3 +32,13 @@ export default {
 export { ScheduleEditorDO } from "./do/ScheduleEditorDO.js";
 export { JingleJamData } from "./do/JingleJamData.js";
 export { UserRateLimiter } from "./do/rateLimiter/UserRateLimiter.js";
+
+export { FriendRequestIncomingObject } from "./lib/orpc/private/friendsWS/do/FriendRequestIncomingObject.ts";
+export { FriendRequestSentObject } from "./lib/orpc/private/friendsWS/do/FriendRequestSentObject.ts";
+export { FriendsListObject } from "./lib/orpc/private/friendsWS/do/FriendsListObject.ts";
+
+export { UserTeamInvitesObject } from "./lib/orpc/private/teamsWS/do/UserTeamInvitesObject.ts";
+export { UserTeamsObject } from "./lib/orpc/private/teamsWS/do/UserTeamsObject.ts";
+export { TeamAdminInvitesObject } from "./lib/orpc/private/teamsWS/do/TeamAdminInvitesObject.ts";
+export { TeamAdminMembersObject } from "./lib/orpc/private/teamsWS/do/TeamAdminMembersObject.ts";
+export { ScheduleEditingObject } from "./lib/orpc/private/scheduleEditingWS/do/ScheduleEditingObject.ts";

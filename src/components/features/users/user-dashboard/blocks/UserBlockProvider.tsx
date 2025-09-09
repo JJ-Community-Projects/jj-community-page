@@ -1,32 +1,14 @@
-import {createContext, createSignal, type ParentComponent, useContext} from "solid-js";
+import {createContext, type ParentComponent, useContext} from "solid-js";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/solid-query";
 import {orpcPrivate} from "../../../../../lib/orpc/client.ts";
-import {debounce} from "@solid-primitives/scheduled";
+import {useUserSearch} from "../../../../../lib/useUserSearch.ts";
 
 const useUserBlockHook = () => {
   const queryClient = useQueryClient();
   const blocking = orpcPrivate.blocking;
   const users = orpcPrivate.users;
 
-  // State for user search
-  const [searchInput, setSearchInput] = createSignal("");
-  const [debouncedInput, setDebouncedInput] = createSignal("");
-
-  // Debounced input handler
-  const debouncedSetSearchInput = debounce((value: string) => {
-    setDebouncedInput(value);
-  }, 500); // 500ms delay for user search
-
-  // TanStack Queries
-
-  // User search query for finding users to block
-  const userSearchQuery = useQuery(() => users.searchByName.queryOptions({
-    input: {
-      searchTerm: debouncedInput()
-    },
-    enabled: () => debouncedInput().length > 0,
-    staleTime: 30 * 1000, // 30 seconds
-  }));
+  const userSearch = useUserSearch();
 
   // List of blocked users query
   const blockedUsersQuery = useQuery(() => blocking.listBlockedUsers.queryOptions({
@@ -43,8 +25,7 @@ const useUserBlockHook = () => {
         await queryClient.invalidateQueries({queryKey: blocking.listBlockedUsers.key()});
         await queryClient.invalidateQueries({queryKey: users.searchByName.key()});
         // Clear search after successful block
-        setSearchInput("");
-        setDebouncedInput("");
+        userSearch.handleSearchInput('')
       },
       onError: (error) => {
         console.error('Failed to block user:', error);
@@ -66,11 +47,11 @@ const useUserBlockHook = () => {
   );
 
   // Computed values
-  const searchResults = () => userSearchQuery.data ?? [];
+  const searchResults = () => userSearch.results() ?? [];
   const blockedUsers = () => blockedUsersQuery.data ?? [];
 
   // Loading states
-  const isLoadingSearch = () => userSearchQuery.isLoading;
+  const isLoadingSearch = () => userSearch.isLoading();
   const isLoadingBlockedUsers = () => blockedUsersQuery.isLoading;
 
   // Mutation loading states
@@ -78,7 +59,7 @@ const useUserBlockHook = () => {
   const isUnblockingUser = () => unblockUserMutation.isPending;
 
   // Error states
-  const hasSearchError = () => !!userSearchQuery.error;
+  const hasSearchError = () => userSearch.hasError();
   const hasBlockedUsersError = () => !!blockedUsersQuery.error;
 
   // Mutation error states
@@ -108,12 +89,11 @@ const useUserBlockHook = () => {
   };
 
   const handleSearchInput = (value: string) => {
-    setSearchInput(value);
-    debouncedSetSearchInput(value);
+    userSearch.handleSearchInput(value);
   };
 
   // Error message helpers
-  const searchErrorMessage = () => userSearchQuery.error?.message || 'Failed to search users';
+  const searchErrorMessage = () => userSearch.errorMessage() // userSearchQuery.error?.message || 'Failed to search users';
   const blockedUsersErrorMessage = () => blockedUsersQuery.error?.message || 'Failed to load blocked users';
 
   // Mutation error message helpers
@@ -122,8 +102,8 @@ const useUserBlockHook = () => {
 
   return {
     // State
-    searchInput,
-    debouncedInput,
+    searchInput: userSearch.searchInput(),
+    debouncedInput: userSearch.debouncedInput,
 
     // Computed data
     searchResults,

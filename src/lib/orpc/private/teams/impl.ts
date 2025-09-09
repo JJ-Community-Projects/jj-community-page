@@ -8,7 +8,12 @@ import {users} from '../../../db/schema/auth-schema.ts';
 import {userDisplayView} from '../../../db/schema/views-schema.ts';
 import {and, count, eq, not} from 'drizzle-orm';
 import {createSlug, generateTeamSlugAlternativesLocals} from '../../../../functions/slug.ts';
-import {teamMemberEventPublisher} from "../teamsSSE/teamEventPublisher.ts";
+import {
+  publishTeamAdminInvitesUpdate,
+  publishTeamAdminMembersUpdate,
+  publishUserInvitesUpdate,
+  publishUserTeamsUpdate
+} from "../teamsWS/publisher.ts";
 
 const os = implement(privateTeamsContract)
   .use(dbMiddleware);
@@ -63,8 +68,11 @@ const create = os.createContract
           userId: userId
         });
 
-      // Publish events for team creation (user becomes owner/member)
-      teamMemberEventPublisher.acceptInvite(teamId, userId);
+      // Publish WS updates for team creation (user becomes owner/member)
+      await Promise.all([
+        publishUserTeamsUpdate(context.env, userId),
+        publishTeamAdminMembersUpdate(context.env, teamId),
+      ]);
 
       return {teamId};
     } catch (error) {
@@ -252,8 +260,11 @@ const leaveTeam = os.leaveTeamContract
           eq(teamMembersTable.userId, userId)
         ));
 
-      // Publish events for user leaving team
-      teamMemberEventPublisher.leaveTeam(teamId, userId);
+      // Publish WS updates for user leaving team
+      await Promise.all([
+        publishUserTeamsUpdate(context.env, userId),
+        publishTeamAdminMembersUpdate(context.env, teamId),
+      ]);
 
       return {success: true};
     } catch (error) {
@@ -301,8 +312,11 @@ const removeMember = os.removeMemberContract
           eq(teamMembersTable.userId, targetUserId)
         ));
 
-      // Publish events for member removal
-      teamMemberEventPublisher.removeUserFromTeam(teamId, targetUserId);
+      // Publish WS updates for member removal
+      await Promise.all([
+        publishUserTeamsUpdate(context.env, targetUserId),
+        publishTeamAdminMembersUpdate(context.env, teamId),
+      ]);
 
       return {success: true};
     } catch (error) {
@@ -359,7 +373,11 @@ const createInvite = os.createInviteContract
         })
         .onConflictDoNothing();
 
-      teamMemberEventPublisher.sendInvite(teamId, invitedUserId)
+      await Promise.all([
+        publishUserInvitesUpdate(context.env, invitedUserId),
+        publishTeamAdminInvitesUpdate(context.env, teamId),
+      ]);
+
       return {success: true};
     } catch (error) {
       if (error instanceof ORPCError) throw error;
@@ -400,8 +418,11 @@ const deleteInvite = os.deleteInviteContract
           eq(teamInvitesTable.invitedUserId, invitedUserId)
         ));
 
-      // Publish events for invite deletion
-      teamMemberEventPublisher.deleteInvite(teamId, invitedUserId);
+      // Publish WS updates for invite deletion
+      await Promise.all([
+        publishUserInvitesUpdate(context.env, invitedUserId),
+        publishTeamAdminInvitesUpdate(context.env, teamId),
+      ]);
 
       return {success: true};
     } catch (error) {
@@ -459,8 +480,13 @@ const acceptInvite = os.acceptInviteContract
           userId: userId
         });
 
-      // Publish events for invite acceptance
-      teamMemberEventPublisher.acceptInvite(teamId, userId);
+      // Publish WS updates for invite acceptance
+      await Promise.all([
+        publishUserInvitesUpdate(context.env, userId),
+        publishUserTeamsUpdate(context.env, userId),
+        publishTeamAdminInvitesUpdate(context.env, teamId),
+        publishTeamAdminMembersUpdate(context.env, teamId),
+      ]);
 
       return {success: true};
     } catch (error) {
@@ -512,8 +538,11 @@ const rejectInvite = os.rejectInviteContract
           eq(teamInvitesTable.invitedUserId, userId)
         ));
 
-      // Publish events for invite rejection
-      teamMemberEventPublisher.rejectInvite(teamId, userId);
+      // Publish WS updates for invite rejection
+      await Promise.all([
+        publishUserInvitesUpdate(context.env, userId),
+        publishTeamAdminInvitesUpdate(context.env, teamId),
+      ]);
 
       return {success: true};
     } catch (error) {

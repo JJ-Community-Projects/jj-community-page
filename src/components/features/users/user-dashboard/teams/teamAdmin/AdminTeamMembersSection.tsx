@@ -1,9 +1,8 @@
-
-import {type Component, createSignal, For, Match, Show, Switch} from "solid-js";
+import {type Component, For, Match, Show, Switch} from "solid-js";
 import {useAdminTeamDetail} from "./AdminTeamDetailsProvider.tsx";
 import {createModalSignal} from "../../../../../../lib/createModalSignal.ts";
 import {ConfirmationDialog} from "../../../../../common/dialogs/ConfirmationDialog.tsx";
-import {FaSolidUsers, FaSolidCircleExclamation, FaSolidXmark, FaSolidCrown} from "solid-icons/fa";
+import {FaSolidCircleExclamation, FaSolidCrown, FaSolidUsers, FaSolidXmark} from "solid-icons/fa";
 
 interface Member {
   userId: number;
@@ -125,7 +124,7 @@ const LoadingSkeleton = () => (
 export const AdminTeamMembersSection: Component = () => {
   const {team, members, removeUserMutation} = useAdminTeamDetail();
 
-  const membersList = () => members.data?.invites ?? [];
+  const membersList = () => members.data?.members ?? [];
   const hasMembers = () => membersList().length > 0;
   const isLoading = () => members.isLoading;
   const hasError = () => !!members.error;

@@ -5,7 +5,7 @@ import {orpcPrivate} from "../../../../../../lib/orpc/client.ts";
 const useAdminTeamDetailsHook = (teamId: number) => {
   const queryClient = useQueryClient();
   const teams = orpcPrivate.teams;
-  const teamsSSE = orpcPrivate.teamsSSE;
+  const teamsWS = orpcPrivate.teamsWS;
 
   // Team data queries
   const teamQuery = useQuery(() =>
@@ -16,13 +16,13 @@ const useAdminTeamDetailsHook = (teamId: number) => {
   );
 
   const membersQuery = useQuery(() =>
-    teamsSSE.getTeamMembersSSE.experimental_liveOptions({
+    teamsWS.getTeamAdminMembersWS.experimental_liveOptions({
       input: {teamId},
       staleTime: 30 * 1000,
     })
   );
 
-  const inviteQuery = useQuery(() => teamsSSE.getTeamInvitesSSE.experimental_liveOptions({
+  const inviteQuery = useQuery(() => teamsWS.getTeamAdminInvitesWS.experimental_liveOptions({
     input: {teamId},
     staleTime: 30 * 1000,
   }))

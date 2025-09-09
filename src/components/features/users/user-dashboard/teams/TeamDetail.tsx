@@ -1,10 +1,16 @@
-import {type Component, createSignal, For, Match, Show, Switch} from "solid-js";
+import {type Component, createSignal, For, Match, Switch} from "solid-js";
 import {UserProvider} from "../providers/UserProvider.tsx";
 import {TeamDetailsProvider, useTeamDetails} from "./TeamDetailsProvider.tsx";
 import type {User} from "../../../../../lib/auth/User.ts";
 import {Dialog} from "@kobalte/core/dialog";
 import {createModalSignal, type ModalSignal} from "../../../../../lib/createModalSignal.ts";
-import {FaSolidChevronLeft, FaSolidUsers, FaSolidCrown, FaSolidArrowUpRightFromSquare, FaSolidUserGroup} from "solid-icons/fa";
+import {
+  FaSolidArrowUpRightFromSquare,
+  FaSolidChevronLeft,
+  FaSolidCrown,
+  FaSolidUserGroup,
+  FaSolidUsers
+} from "solid-icons/fa";
 import {QueryClient} from "@tanstack/query-core";
 import {QueryClientProvider} from "@tanstack/solid-query";
 
@@ -41,7 +47,7 @@ const TeamDetailContent: Component<{ teamId: number }> = (props) => {
     }
   };
 
-  const membersList = () => members.data?.invites ?? [];
+  const membersList = () => members.data?.members ?? [];
   const hasMembers = () => membersList().length > 0;
   const isLoading = () => members.isLoading;
 

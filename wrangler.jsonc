@@ -38,11 +38,27 @@
         "TeamDO",
         "TwitchAPIDO"
       ]
+    },
+    {
+      "tag": "v3",
+      "new_sqlite_classes": [
+        "FriendRequestIncomingObject",
+        "FriendRequestSentObject",
+        "FriendsListObject"
+      ]
+    },
+    {
+      "tag": "v4",
+      "new_sqlite_classes": [
+        "UserTeamInvitesObject",
+        "UserTeamsObject",
+        "TeamAdminInvitesObject",
+        "TeamAdminMembersObject"
+      ]
     }
   ],
   "durable_objects": {
     "bindings": [
-      // TODO
       {
         "name": "ScheduleEditorDO",
         "class_name": "ScheduleEditorDO"
@@ -54,6 +70,38 @@
       {
         "name": "UserRateLimiter",
         "class_name": "UserRateLimiter"
+      },
+      {
+        "name": "FriendRequestIncomingObject",
+        "class_name": "FriendRequestIncomingObject"
+      },
+      {
+        "name": "FriendRequestSentObject",
+        "class_name": "FriendRequestSentObject"
+      },
+      {
+        "name": "FriendsListObject",
+        "class_name": "FriendsListObject"
+      },
+      {
+        "name": "UserTeamInvitesObject",
+        "class_name": "UserTeamInvitesObject"
+      },
+      {
+        "name": "UserTeamsObject",
+        "class_name": "UserTeamsObject"
+      },
+      {
+        "name": "TeamAdminInvitesObject",
+        "class_name": "TeamAdminInvitesObject"
+      },
+      {
+        "name": "TeamAdminMembersObject",
+        "class_name": "TeamAdminMembersObject"
+      },
+      {
+        "name": "ScheduleEditingObject",
+        "class_name": "ScheduleEditingObject"
       }
     ]
   },
@@ -113,7 +161,8 @@
     "TILTIFY_API": "<PLACEHOLDER>",
     "TILTIFY_REDIRECT_URI": "<PLACEHOLDER>",
     "JJ_DASHBOARD_URL": "<PLACEHOLDER>",
-    "YOUTUBE_API_KEY": "<PLACEHOLDER>"
+    "YOUTUBE_API_KEY": "<PLACEHOLDER>",
+    "ORPC_DEI_SIGNING_KEY": "<SET_SECRET>"
   },
   "triggers": {
     "crons": [

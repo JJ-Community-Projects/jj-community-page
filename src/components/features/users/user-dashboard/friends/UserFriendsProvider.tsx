@@ -1,54 +1,72 @@
-import {createContext, createSignal, type ParentComponent, useContext} from "solid-js";
+import {createContext, createEffect, on, type ParentComponent, useContext} from "solid-js";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/solid-query";
 import {orpcPrivate} from "../../../../../lib/orpc/client.ts";
-import {debounce} from "@solid-primitives/scheduled";
+import {useUserSearch} from "../../../../../lib/useUserSearch";
 
 const useUserFriendsHook = () => {
   const queryClient = useQueryClient();
   const friends = orpcPrivate.friends;
-  const friendsSSE = orpcPrivate.friendsSSE;
-  const users = orpcPrivate.users;
-
-  // State for user search
-  const [searchInput, setSearchInput] = createSignal("");
-  const [debouncedInput, setDebouncedInput] = createSignal("");
-
-  // Debounced input handler
-  const debouncedSetSearchInput = debounce((value: string) => {
-    setDebouncedInput(value);
-  }, 500); // Shorter delay for user search
+  // User search via shared hook
+  const userSearch = useUserSearch();
+  const searchInput = userSearch.searchInput;
+  const debouncedInput = userSearch.debouncedInput;
 
   // TanStack Queries
 
-  // User search query for finding users to send friend requests to
-  const userSearchQuery = useQuery(() => users.searchByName.queryOptions({
-    input: {
-      searchTerm: debouncedInput()
-    },
-    enabled: () => debouncedInput().length > 0,
-    staleTime: 30 * 1000, // 30 seconds
-  }));
-
-  // Real-time friend requests using SSE
+  const friendsWS = orpcPrivate.friendsWS;
+  // Real-time friend requests using WS
   const friendRequestsQuery = useQuery(() =>
-    friendsSSE.getUserFriendRequestsSSE.experimental_liveOptions({
+    friendsWS.getUserFriendRequestsWS.experimental_liveOptions({
       staleTime: 30 * 1000, // 30 seconds
     })
   );
 
-  // Real-time sent friend requests using SSE
+  // Real-time sent friend requests using WS
   const sentFriendRequestsQuery = useQuery(() =>
-    friendsSSE.getSendUserFriendRequestsSSE.experimental_liveOptions({
+    friendsWS.getSendUserFriendRequestsWS.experimental_liveOptions({
       staleTime: 30 * 1000, // 30 seconds
     })
   );
 
-  // Real-time friends list using SSE
+  createEffect(on(() => sentFriendRequestsQuery.data, (data)=> {
+    console.log('sentFriendRequestsQuery.data',data);
+  }))
+  createEffect(on(() => sentFriendRequestsQuery.error, (data)=> {
+    console.error('sentFriendRequestsQuery.error',data);
+  }))
+
+  // Real-time friends list using WS
   const friendsListQuery = useQuery(() =>
-    friendsSSE.getUserFriendsSSE.experimental_liveOptions({
+    friendsWS.getUserFriendsWS.experimental_liveOptions({
       staleTime: 30 * 1000, // 30 seconds
     })
   );
+
+
+  /*
+    const friendsSSE = orpcPrivate.friendsSSE;
+    // Real-time friend requests using SSE
+    const friendRequestsQuery = useQuery(() =>
+      friendsSSE.getUserFriendRequestsSSE.experimental_liveOptions({
+        staleTime: 30 * 1000, // 30 seconds
+      })
+    );
+
+    // Real-time sent friend requests using SSE
+    const sentFriendRequestsQuery = useQuery(() =>
+      friendsSSE.getSendUserFriendRequestsSSE.experimental_liveOptions({
+        staleTime: 30 * 1000, // 30 seconds
+      })
+    );
+
+    // Real-time friends list using SSE
+    const friendsListQuery = useQuery(() =>
+      friendsSSE.getUserFriendsSSE.experimental_liveOptions({
+        staleTime: 30 * 1000, // 30 seconds
+      })
+    );
+    */
+
 
   // TanStack Mutations
 
@@ -57,8 +75,7 @@ const useUserFriendsHook = () => {
     friends.sendFriendRequest.mutationOptions({
       onSuccess: () => {
         // Clear search after successful friend request
-        setSearchInput("");
-        setDebouncedInput("");
+        userSearch.clear();
         // SSE will automatically update the UI, no need to invalidate queries
       },
       onError: (error) => {
@@ -116,13 +133,13 @@ const useUserFriendsHook = () => {
   );
 
   // Computed values
-  const searchResults = () => userSearchQuery.data ?? [];
-  const friendRequests = () => friendRequestsQuery.data?.friendRequests || [];
-  const sentFriendRequests = () => sentFriendRequestsQuery.data?.sentFriendRequests || [];
+  const searchResults = () => userSearch.results();
+  const friendRequests = () => friendRequestsQuery.data?.users || [];
+  const sentFriendRequests = () => sentFriendRequestsQuery.data?.users || [];
   const friendsList = () => friendsListQuery.data?.friends || [];
 
   // Loading states
-  const isLoadingSearch = () => userSearchQuery.isLoading;
+  const isLoadingSearch = () => userSearch.isLoading();
   const isLoadingFriendRequests = () => friendRequestsQuery.isLoading;
   const isLoadingSentFriendRequests = () => sentFriendRequestsQuery.isLoading;
   const isLoadingFriends = () => friendsListQuery.isLoading;
@@ -135,7 +152,7 @@ const useUserFriendsHook = () => {
   const isRemovingFriend = () => removeFriendMutation.isPending;
 
   // Error states
-  const hasSearchError = () => !!userSearchQuery.error;
+  const hasSearchError = () => userSearch.hasError();
   const hasFriendRequestsError = () => !!friendRequestsQuery.error;
   const hasSentFriendRequestsError = () => !!sentFriendRequestsQuery.error;
   const hasFriendsError = () => !!friendsListQuery.error;
@@ -200,12 +217,11 @@ const useUserFriendsHook = () => {
   };
 
   const handleSearchInput = (value: string) => {
-    setSearchInput(value);
-    debouncedSetSearchInput(value);
+    userSearch.handleSearchInput(value);
   };
 
   // Error message helpers
-  const searchErrorMessage = () => userSearchQuery.error?.message || 'Failed to search users';
+  const searchErrorMessage = () => userSearch.errorMessage();
   const friendRequestsErrorMessage = () => friendRequestsQuery.error?.message || 'Failed to load friend requests';
   const sentFriendRequestsErrorMessage = () => sentFriendRequestsQuery.error?.message || 'Failed to load sent friend requests';
   const friendsErrorMessage = () => friendsListQuery.error?.message || 'Failed to load friends';

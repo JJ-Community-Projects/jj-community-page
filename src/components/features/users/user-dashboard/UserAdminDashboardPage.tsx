@@ -39,7 +39,8 @@ const ProfileCard: Component = () => {
             <div class="flex flex-col">
               <div class="flex flex-col">
                 <div class="flex flex-row gap-3 items-center">
-                  <div class="size-10 rounded-full border-2 border-primary-200 bg-gradient-to-r from-primary-100 to-primary-200 animate-pulse"></div>
+                  <div
+                    class="size-10 rounded-full border-2 border-primary-200 bg-gradient-to-r from-primary-100 to-primary-200 animate-pulse"></div>
                   <div class="h-6 bg-gradient-to-r from-primary-100 to-primary-200 rounded w-32 animate-pulse"></div>
                 </div>
                 <div class="h-4 bg-gradient-to-r from-primary-100 to-primary-200 rounded w-48 mt-2 animate-pulse"></div>
@@ -61,15 +62,17 @@ const ProfileCard: Component = () => {
       }
     >
 
-      <div class="bg-white rounded-xl p-6 md:p-8 shadow-md border-2 border-primary-200 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 hover:border-primary-300">
+      <div
+        class="bg-white rounded-xl p-6 md:p-8 shadow-md border-2 border-primary-200 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 hover:border-primary-300">
         <div class="flex justify-between items-center mb-6">
           <div class={'flex flex-col'}>
             <div class={'flex flex-col'}>
               <div class={'flex flex-row gap-3 items-center'}>
                 <div class="relative">
                   <img class={'size-10 rounded-full border-2 border-primary-200'} src={imgUrl()} alt={'avatar'}/>
-                  <div class="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full border-2 border-white">
-                    <FaSolidUser class="w-2 h-2 text-white m-0.5" />
+                  <div
+                    class="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full border-2 border-white">
+                    <FaSolidUser class="w-2 h-2 text-white m-0.5"/>
                   </div>
                 </div>
                 <h2 class="~text-xl/2xl font-poppins font-bold text-neutral-800">{user.data?.username}</h2>
@@ -102,7 +105,7 @@ const ProfileCard: Component = () => {
               target="_blank"
               rel="noopener noreferrer"
             >
-              <FaSolidArrowUpRightFromSquare class="w-4 h-4" />
+              <FaSolidArrowUpRightFromSquare class="w-4 h-4"/>
               Tiltify Hub
             </a>
             <a
@@ -111,7 +114,7 @@ const ProfileCard: Component = () => {
               target="_blank"
               rel="noopener noreferrer"
             >
-              <FaSolidArrowUpRightFromSquare class="w-4 h-4" />
+              <FaSolidArrowUpRightFromSquare class="w-4 h-4"/>
               Tiltify Profile
             </a>
           </div>
@@ -129,7 +132,7 @@ const ScheduleCard: Component = () => {
     >
       <div class="flex flex-col h-full">
         <div class="flex items-center gap-2 mb-2">
-          <FaSolidCalendarDays class="w-5 h-5 text-accent-600" />
+          <FaSolidCalendarDays class="w-5 h-5 text-accent-600"/>
           <h3 class="~text-lg/xl font-poppins font-bold text-neutral-800">Schedules</h3>
         </div>
         <p class="~text-sm/base font-poppins text-neutral-600 mb-4">Manage your streaming schedules for JingleJam</p>
@@ -167,7 +170,7 @@ const TeamCard: Component = () => {
     >
       <div class="flex flex-col h-full">
         <div class="flex items-center gap-2 mb-2">
-          <FaSolidUserGroup class="w-5 h-5 text-accent-600" />
+          <FaSolidUserGroup class="w-5 h-5 text-accent-600"/>
           <h3 class="~text-lg/xl font-poppins font-bold text-neutral-800">Teams</h3>
         </div>
         <p class="~text-sm/base font-poppins text-neutral-600 mb-4">Manage your teams and team invitations</p>
@@ -192,7 +195,7 @@ const TagsCard: Component = () => {
     >
       <div class="flex flex-col h-full">
         <div class="flex items-center gap-2 mb-2">
-          <FaSolidTag class="w-5 h-5 text-accent-600" />
+          <FaSolidTag class="w-5 h-5 text-accent-600"/>
           <h3 class="~text-lg/xl font-poppins font-bold text-neutral-800">Tags</h3>
         </div>
         <p class="~text-sm/base font-poppins text-neutral-600 mb-4">Manage your profile tags and interests</p>
@@ -228,7 +231,7 @@ const FriendsCard: Component = () => {
     >
       <div class="flex flex-col h-full">
         <div class="flex items-center gap-2 mb-2">
-          <FaSolidUser class="w-5 h-5 text-accent-600" />
+          <FaSolidUser class="w-5 h-5 text-accent-600"/>
           <h3 class="~text-lg/xl font-poppins font-bold text-neutral-800">Friends</h3>
         </div>
         <p class="~text-sm/base font-poppins text-neutral-600 mb-4">Manage your friends and friend requests</p>
@@ -269,7 +272,7 @@ const BlockedCard: Component = () => {
     >
       <div class="flex flex-col h-full">
         <div class="flex items-center gap-2 mb-2">
-          <FaSolidUserSlash class="w-5 h-5 text-danger-600" />
+          <FaSolidUserSlash class="w-5 h-5 text-danger-600"/>
           <h3 class="~text-lg/xl font-poppins font-bold mb-2 text-neutral-800">Blocked Users</h3>
         </div>
         <p class="~text-sm/base font-poppins text-neutral-600 mb-4">Manage your blocked users list</p>
