@@ -2,6 +2,7 @@ import {type Component} from "solid-js";
 import {formatTimeRange} from "./utils/dateUtils.ts";
 import {StreamEditorDialogProvider, useStreamEditorDialog} from "./dialog/edit/StreamEditorDialogContext.tsx";
 import StreamEditDialog from "./dialog/edit/StreamEditDialog.tsx";
+import {FaRegularEye, FaRegularEyeSlash} from "solid-icons/fa";
 
 export type DraftStream = {
   id: number;
@@ -25,7 +26,7 @@ const StreamCardBody: Component<{ stream: DraftStream; showDate?: boolean; white
         <div class="font-medium truncate">{s().title || "Untitled stream"}</div>
         <span
           class={`text-xs px-2 py-0.5 rounded-full ${s().visible ? 'bg-success-100 text-success-700' : 'bg-neutral-200 text-neutral-700'}`}>
-          {s().visible ? 'Visible' : 'Hidden'}
+          {s().visible ? <FaRegularEye/> : <FaRegularEyeSlash/>}
         </span>
       </div>
       <div class="text-xs text-gray-600 mt-1">{formatTimeRange(s().start, s().end)}</div>

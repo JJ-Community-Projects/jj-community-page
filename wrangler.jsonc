@@ -42,18 +42,19 @@
     {
       "tag": "v3",
       "new_sqlite_classes": [
+        // friends
         "FriendRequestIncomingObject",
         "FriendRequestSentObject",
-        "FriendsListObject"
-      ]
-    },
-    {
-      "tag": "v4",
-      "new_sqlite_classes": [
+        "FriendsListObject",
+
+        // team invites
         "UserTeamInvitesObject",
         "UserTeamsObject",
         "TeamAdminInvitesObject",
-        "TeamAdminMembersObject"
+        "TeamAdminMembersObject",
+
+        // schedule editing
+        "ScheduleEditingObject"
       ]
     }
   ],

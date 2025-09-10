@@ -7,9 +7,9 @@ import {
   publishDraftContract,
   startEditingSessionContract,
   upsertScheduleMetaContract
-} from '../../scheduleEditing/scheduleMeta/contract.ts'
-import {scheduleOwnerOrEditorMiddleware} from '../../scheduleEditing/middleware.ts'
-import {ensureDraftInitialized} from '../../scheduleEditing/utils.ts'
+} from './contract.ts'
+import {scheduleOwnerOrEditorMiddleware} from '../middleware.ts'
+import {ensureDraftInitialized} from '../utils.ts'
 import {and, eq, inArray, sql} from 'drizzle-orm'
 import {schedulesTable, streamParticipantsTable, streamsTable} from '../../../../db/schema/jj-schema.ts'
 import {editSchedulesTable} from '../../../../db/schema/edit-schedules-schema.ts'
@@ -40,7 +40,7 @@ const startEditingSession = os.startEditingSessionContract
     const editorId = context.userId
     const {scheduleId} = input
     const draftCreated = await ensureDraftInitialized(context.db, scheduleId, editorId)
-    return { scheduleId, editorId, draftCreated }
+    return {scheduleId, editorId, draftCreated}
   })
 
 const upsertScheduleMeta = os.upsertScheduleMetaContract
@@ -49,62 +49,78 @@ const upsertScheduleMeta = os.upsertScheduleMetaContract
   .handler(async ({context, input}) => {
     const db = context.db
     const editorId = context.userId
-    const { scheduleId, title, slug, year, visible } = input
+    const {scheduleId, title, slug, year, visible} = input
+
+    console.log('upsertScheduleMeta', 'input', input)
 
     await db.insert(editSchedulesTable)
-      .values({ scheduleId, editorId })
+      .values({scheduleId, editorId})
       .onConflictDoNothing()
       .run()
 
-    const patch: Record<string, any> = { editorId, updatedAt: sql`(unixepoch())` }
+    const patch: Record<string, any> = {}
     if (title !== undefined) patch.title = title
     if (slug !== undefined) patch.slug = slug
     if (year !== undefined) patch.year = year
     if (visible !== undefined) patch.visible = visible
+    const sqlPatch: Record<string, any> = {
+      editorId, updatedAt: sql`(unixepoch()
+                               )`, ...patch
+    }
+
+    console.log('upsertScheduleMeta', 'patch', patch)
 
     await db.update(editSchedulesTable)
-      .set(patch as any)
+      .set(sqlPatch)
       .where(eq(editSchedulesTable.scheduleId, scheduleId))
       .run()
 
     // WS publish schedule meta change
     const stub = getScheduleEditingStub(context.env as any, scheduleId)
-    await stub.publishScheduleUpdated(scheduleId, editorId, { patch })
+    await stub.publishScheduleUpdated(scheduleId, editorId, {patch})
 
-    const row = await db.select({ updatedAt: editSchedulesTable.updatedAt })
+    const row = await db.select({updatedAt: editSchedulesTable.updatedAt})
       .from(editSchedulesTable)
       .where(eq(editSchedulesTable.scheduleId, scheduleId))
       .get()
 
-    return { updatedAt: row?.updatedAt ?? new Date() }
+    return {updatedAt: row?.updatedAt ?? new Date()}
   })
 
 const publishDraft = os.publishDraftContract
   .use(authMiddleware)
   .use(scheduleOwnerOrEditorMiddleware)
   .handler(async ({context, input}) => {
+    // Establish DB handle and identity of the editor performing the publish
     const db = context.db
     const editorId = context.userId
-    const { scheduleId } = input
+    const {scheduleId} = input
 
+    // 1) Apply schedule-level metadata from the draft to the canonical schedule, if any fields were edited
     const draftMeta = await db.select().from(editSchedulesTable).where(eq(editSchedulesTable.scheduleId, scheduleId)).get()
     if (draftMeta) {
+      // Build a patch with only the non-null fields from the draft
       const metaPatch: Record<string, any> = {}
       if (draftMeta.title != null) metaPatch.title = draftMeta.title
       if (draftMeta.slug != null) metaPatch.slug = draftMeta.slug
       if (draftMeta.year != null) metaPatch.year = draftMeta.year
       if (draftMeta.visible != null) metaPatch.visible = draftMeta.visible
+      // Write patched fields to canonical schedules table if there is anything to update
       if (Object.keys(metaPatch).length > 0) {
         await db.update(schedulesTable).set(metaPatch as any).where(eq(schedulesTable.id, scheduleId)).run()
       }
     }
 
+    // 2) Compute the final set of streams by reconciling draft streams with canonical streams
     const draftStreams = await db.select().from(editStreamsTable).where(eq(editStreamsTable.scheduleId, scheduleId)).all()
     const canonStreams = await db.select().from(streamsTable).where(eq(streamsTable.scheduleId, scheduleId)).all()
 
+    // Keep fast lookup of existing canonical IDs and the current max ID to allocate IDs for new streams
     const canonIdSet = new Set(canonStreams.map(s => s.id))
     const maxCanonId = canonStreams.reduce((m, s) => Math.max(m, s.id), 0)
 
+    // Map draft stream IDs to their final canonical IDs
+    // Negative/zero IDs in draft indicate new streams → allocate new incremental IDs
     const idMap = new Map<number, number>()
     let nextId = maxCanonId + 1
     for (const ds of draftStreams) {
@@ -115,10 +131,13 @@ const publishDraft = os.publishDraftContract
       }
     }
 
+    // Set of IDs that will exist after publish; used to identify deletions
     const finalIds = new Set(Array.from(idMap.values()))
 
+    // Counters for summary
     let created = 0, updated = 0, deleted = 0
 
+    // 2a) Upsert all draft streams into canonical table (update if exists, insert if new)
     for (const ds of draftStreams) {
       const finalId = idMap.get(ds.id)!
       const exists = canonIdSet.has(finalId)
@@ -136,17 +155,21 @@ const publishDraft = os.publishDraftContract
         end: ds.end,
       }
       if (exists) {
+        // Update existing canonical stream row
         const res = await db.update(streamsTable)
           .set(values as any)
           .where(and(eq(streamsTable.scheduleId, scheduleId), eq(streamsTable.id, finalId)))
           .run()
         if ((res as any).rowsAffected > 0) updated++
       } else {
+        // Insert new canonical stream row
         await db.insert(streamsTable).values(values as any).run()
+        canonIdSet.add(finalId)
         created++
       }
     }
 
+    // 2b) Delete any canonical streams that are not present in the final draft
     const toDelete = canonStreams.filter(s => !finalIds.has(s.id)).map(s => s.id)
     if (toDelete.length > 0) {
       await db.delete(streamsTable)
@@ -155,6 +178,8 @@ const publishDraft = os.publishDraftContract
       deleted += toDelete.length
     }
 
+    // 3) Sync stream participants: replace canonical set with the draft set
+    // Count removals by inspecting current canonical rows, then delete them all
     const prevParticipants = await db.select({u: streamParticipantsTable.userId})
       .from(streamParticipantsTable)
       .where(eq(streamParticipantsTable.scheduleId, scheduleId))
@@ -163,6 +188,7 @@ const publishDraft = os.publishDraftContract
 
     await db.delete(streamParticipantsTable).where(eq(streamParticipantsTable.scheduleId, scheduleId)).run()
 
+    // Insert draft participants mapped to their final stream IDs
     const draftParts = await db.select().from(editStreamParticipantsTable).where(eq(editStreamParticipantsTable.scheduleId, scheduleId)).all()
     let addedParticipants = 0
     if (draftParts.length > 0) {
@@ -171,6 +197,7 @@ const publishDraft = os.publishDraftContract
         streamId: idMap.get(p.streamId)!,
         userId: p.userId,
       }))
+      // Single-batch insert (kept chunking structure for potential future batching)
       for (const chunk of [values]) {
         if (chunk.length > 0) {
           await db.insert(streamParticipantsTable).values(chunk as any).run()
@@ -179,6 +206,7 @@ const publishDraft = os.publishDraftContract
       }
     }
 
+    // 4) Sync stream tags similarly: replace canonical tags with draft tags
     const prevTags = await db.select({t: streamTagsTable.tagId})
       .from(streamTagsTable)
       .where(eq(streamTagsTable.scheduleId, scheduleId))
@@ -196,6 +224,7 @@ const publishDraft = os.publishDraftContract
         tagId: t.tagId,
         addedAt: t.addedAt,
       }))
+      // Single-batch insert (kept chunking structure for potential future batching)
       for (const chunk of [tagValues]) {
         if (chunk.length > 0) {
           await db.insert(streamTagsTable).values(chunk).run()
@@ -204,25 +233,35 @@ const publishDraft = os.publishDraftContract
       }
     }
 
-    await db.update(schedulesTable).set({ updatedAt: sql`(unixepoch())` } as any).where(eq(schedulesTable.id, scheduleId)).run()
+    // 5) Touch canonical schedule updatedAt to reflect content changes
+    await db.update(schedulesTable).set({
+      updatedAt: sql`(unixepoch()
+                     )`
+    } as any).where(eq(schedulesTable.id, scheduleId)).run()
 
-    await db.update(editSchedulesTable).set({ status: 'published', updatedAt: sql`(unixepoch())` } as any)
+    // 6) Mark draft schedule as published and remove draft working tables for this schedule
+    await db.update(editSchedulesTable).set({
+      status: 'published', updatedAt: sql`(unixepoch()
+                                          )`
+    } as any)
       .where(eq(editSchedulesTable.scheduleId, scheduleId)).run()
     await db.delete(editStreamParticipantsTable).where(eq(editStreamParticipantsTable.scheduleId, scheduleId)).run()
     await db.delete(editStreamTagsTable).where(eq(editStreamTagsTable.scheduleId, scheduleId)).run()
     await db.delete(editStreamsTable).where(eq(editStreamsTable.scheduleId, scheduleId)).run()
 
+    // 7) Emit WebSocket event notifying collaborators that the draft was published
     const publishedAt = new Date()
 
     const stub = getScheduleEditingStub(context.env as any, scheduleId)
     await stub.publishDraftPublished(scheduleId, editorId, {})
 
+    // 8) Return a publish summary including counts of created/updated/deleted items
     return {
       publishedAt,
       changes: {
-        streams: { created, updated, deleted },
-        participants: { added: addedParticipants, removed: removedParticipants },
-        tags: { added: addedTags, removed: removedTags },
+        streams: {created, updated, deleted},
+        participants: {added: addedParticipants, removed: removedParticipants},
+        tags: {added: addedTags, removed: removedTags},
       }
     }
   })
@@ -233,12 +272,15 @@ const discardDraft = os.discardDraftContract
   .handler(async ({context, input}) => {
     const db = context.db
     const editorId = context.userId
-    const { scheduleId } = input
+    const {scheduleId} = input
 
     await db.delete(editStreamParticipantsTable).where(eq(editStreamParticipantsTable.scheduleId, scheduleId)).run()
     await db.delete(editStreamTagsTable).where(eq(editStreamTagsTable.scheduleId, scheduleId)).run()
     await db.delete(editStreamsTable).where(eq(editStreamsTable.scheduleId, scheduleId)).run()
-    await db.update(editSchedulesTable).set({ status: 'discarded', updatedAt: sql`(unixepoch())` } as any)
+    await db.update(editSchedulesTable).set({
+      status: 'discarded', updatedAt: sql`(unixepoch()
+                                          )`
+    } as any)
       .where(eq(editSchedulesTable.scheduleId, scheduleId)).run()
 
     const stub = getScheduleEditingStub(context.env as any, scheduleId)

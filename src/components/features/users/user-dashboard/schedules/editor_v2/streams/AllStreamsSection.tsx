@@ -3,6 +3,7 @@ import {useScheduleEditor2} from "../ScheduleEditorProvider.tsx";
 import {sortByStart} from "./utils/streamFilters.ts";
 import {StreamCard} from "./StreamCard.tsx";
 import {useAddStreamDialog} from "./dialog/add/AddStreamDialogContext.tsx";
+import { latestByEnd, addHours, makeEmptyScheduleFallback } from "./utils/initialTimes.ts";
 
 export const AllStreamsSection: Component = () => {
   const { state } = useScheduleEditor2();
@@ -12,10 +13,11 @@ export const AllStreamsSection: Component = () => {
   const streams = () => sortByStart(state.streams);
 
   const addCustom = () => {
-    // Default to Dec 15th at 18:00–20:00 or today if schedule year is current
-    const base = new Date(year(), 11, 15);
-    const start = new Date(base.getFullYear(), base.getMonth(), base.getDate(), 18, 0, 0, 0);
-    const end = new Date(base.getFullYear(), base.getMonth(), base.getDate(), 20, 0, 0, 0);
+    // If there are any streams, continue from the end of the latest-by-end across schedule
+    const all = streams();
+    const last = latestByEnd(all);
+    const start = last ? new Date(last.end as any) : makeEmptyScheduleFallback(year());
+    const end = addHours(start, 3);
     dialog.addNew({ title: "", start, end, visible: false });
   };
 

@@ -1,10 +1,10 @@
 import {implement} from '@orpc/server'
 import {dbMiddleware} from '../../../middleware/dbMiddleware.ts'
 import {authMiddleware} from '../../../middleware/authMiddleware.ts'
-import {addTagToStreamContract, removeTagFromStreamContract} from '../../scheduleEditing/tags/contract.ts'
-import {scheduleOwnerOrEditorMiddleware} from '../../scheduleEditing/middleware.ts'
-import {ensureDraftInitialized, resolveTag} from '../../scheduleEditing/utils.ts'
-import {assertStreamLockAvailableOrOwned} from '../../scheduleEditing/streamEditingLock.ts'
+import {addTagToStreamContract, removeTagFromStreamContract} from './contract.ts'
+import {scheduleOwnerOrEditorMiddleware} from '../middleware.ts'
+import {ensureDraftInitialized, resolveTag} from '../utils.ts'
+import {assertStreamLockAvailableOrOwned} from '../streamEditingLock.ts'
 import {and, eq} from 'drizzle-orm'
 import {editStreamTagsTable} from '../../../../db/schema/edit-stream-tags-schema.ts'
 import {scheduleEditingChannels} from '../channels.ts'
@@ -26,12 +26,12 @@ export const addTagToStream = os.addTagToStreamContract
   .handler(async ({context, input}) => {
     const db = context.db
     const editorId = context.userId
-    const {scheduleId, streamId, tag, createIfMissing} = input
+    const {scheduleId, streamId, tag} = input
 
     await assertStreamLockAvailableOrOwned(context.env as any, scheduleId, streamId, editorId)
     await ensureDraftInitialized(db, scheduleId, editorId)
 
-    const t = await resolveTag(db, tag, editorId, !!createIfMissing)
+    const t = await resolveTag(db, tag)
 
     await db.insert(editStreamTagsTable)
       .values({scheduleId, streamId, tagId: t.id})

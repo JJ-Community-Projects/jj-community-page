@@ -1,7 +1,7 @@
 import {createContext, createSignal, type ParentComponent, useContext} from "solid-js";
 import {createStore} from "solid-js/store";
 import {useScheduleEditor2} from "../../../ScheduleEditorProvider.tsx";
-import type { LocalDraftStream, DraftTag, DraftParticipant } from "../types/uiDraftTypes.ts";
+import type {DraftParticipant, DraftTag, LocalDraftStream} from "../types/uiDraftTypes.ts";
 
 // Use the same local draft shape as the edit dialog
 export type LocalDialogDraft = {
@@ -64,8 +64,8 @@ const useAddStreamDialogHook = (start: Date, end: Date) => {
   const setEnd = (value: Date) => setDraft("stream", "end", value);
 
   // Local-only mutations for tags and participants
-  const addTagLocal = (tag: DraftTag) => setDraft("tags", (prev) => prev.some((t) => t.tagId === tag.tagId) ? prev : [...prev, { ...tag }]);
-  const removeTagLocal = (tagId: number) => setDraft("tags", (prev) => prev.filter((t) => t.tagId !== tagId));
+  const addTagLocal = (tag: DraftTag) => setDraft("tags", (prev) => prev.some((t) => t.id === tag.id) ? prev : [...prev, { ...tag }]);
+  const removeTagLocal = (tagId: number) => setDraft("tags", (prev) => prev.filter((t) => t.id !== tagId));
   const addParticipantLocal = (p: DraftParticipant) => setDraft("participants", (prev) => prev.some((x) => x.userId === p.userId) ? prev : [...prev, { ...p }]);
   const removeParticipantLocal = (userId: number) => setDraft("participants", (prev) => prev.filter((p) => p.userId !== userId));
 

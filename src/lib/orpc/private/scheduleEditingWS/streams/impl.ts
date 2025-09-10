@@ -9,15 +9,12 @@ import {
   unlockStreamContract,
   updateStreamContract,
   updateStreamsContract,
+  updateStreamsWithDetailsContract,
   updateStreamWithDetailsContract,
-} from '../../scheduleEditing/streams/contract.ts'
-import {scheduleOwnerOrEditorMiddleware} from '../../scheduleEditing/middleware.ts'
-import {ensureDraftInitialized} from '../../scheduleEditing/utils.ts'
-import {
-  assertStreamLockAvailableOrOwned,
-  lockStreamEditing,
-  unlockStreamEditing
-} from '../../scheduleEditing/streamEditingLock.ts'
+} from './contract.ts'
+import {scheduleOwnerOrEditorMiddleware} from '../middleware.ts'
+import {ensureDraftInitialized} from '../utils.ts'
+import {assertStreamLockAvailableOrOwned, lockStreamEditing, unlockStreamEditing} from '../streamEditingLock.ts'
 import {and, eq, inArray, sql} from 'drizzle-orm'
 import {editStreamsTable} from '../../../../db/schema/edit-streams-schema.ts'
 import {editStreamParticipantsTable} from '../../../../db/schema/edit-stream-participants-schema.ts'
@@ -25,7 +22,7 @@ import {editStreamTagsTable} from '../../../../db/schema/edit-stream-tags-schema
 import {tags as tagsTable} from '../../../../db/schema/tags-schema.ts'
 import {userDisplayView} from '../../../../db/schema/views-schema.ts'
 import type {BatchItem} from 'drizzle-orm/batch'
-import type {StreamUpdatedWithDetailPayload} from '../../scheduleEditing/scheduleEditingTypes.ts'
+import type {StreamUpdatedWithDetailPayload} from '../scheduleEditingTypes.ts'
 import {scheduleEditingChannels} from '../channels.ts'
 
 const os = implement({
@@ -37,6 +34,7 @@ const os = implement({
   lockStreamContract,
   unlockStreamContract,
   updateStreamWithDetailsContract,
+  updateStreamsWithDetailsContract,
 }).use(dbMiddleware)
 
 function getScheduleEditingStub(env: Env, scheduleId: number) {
@@ -226,7 +224,8 @@ export const unlockStream = os.unlockStreamContract
     return {ok: true as const}
   })
 
-export const updateStreamWithDetails = os.updateStreamWithDetailsContract
+export const updateStreamWithDetails = os
+  .updateStreamWithDetailsContract
   .use(authMiddleware)
   .use(scheduleOwnerOrEditorMiddleware)
   .handler(async ({context, input}) => {
@@ -351,6 +350,143 @@ export const updateStreamWithDetails = os.updateStreamWithDetailsContract
     await stub.publishStreamUpdatedWithDetails(scheduleId, editorId, payload)
   })
 
+export const updateStreamsWithDetails = os
+  .updateStreamsWithDetailsContract
+  .use(authMiddleware)
+  .use(scheduleOwnerOrEditorMiddleware)
+  .handler(async ({context, input}) => {
+    const db = context.db
+    const editorId = context.userId
+
+    const {scheduleId, streams} = input
+
+    const payloads = []
+
+    const batch: BatchItem<'sqlite'>[] = []
+
+    for (const stream of streams) {
+
+      const {id: streamId, patch, participants, tags} = stream
+
+      let allowedPatch: Record<string, unknown> | undefined
+      if (patch && Object.keys(patch).length > 0) {
+        const allowed: any = {}
+        const keys = ['title', 'visible', 'subtitle', 'description', 'youtubeVodUrl', 'twitchVodUrl', 'start', 'end'] as const
+        for (const k of keys) if (k in patch && (patch as any)[k] !== undefined) (allowed as any)[k] = (patch as any)[k]
+        if (Object.keys(allowed).length > 0) {
+          allowedPatch = {...allowed}
+          ;(allowed as any).updatedAt = sql`(unixepoch())`
+          batch.push(
+            db.update(editStreamsTable)
+              .set(allowed)
+              .where(and(eq(editStreamsTable.scheduleId, scheduleId), eq(editStreamsTable.id, streamId)))
+          )
+        }
+      }
+
+      if (participants !== undefined) {
+        const currentRows = await db.select({userId: editStreamParticipantsTable.userId})
+          .from(editStreamParticipantsTable)
+          .where(and(eq(editStreamParticipantsTable.scheduleId, scheduleId), eq(editStreamParticipantsTable.streamId, streamId)))
+          .all()
+        const current = new Set(currentRows.map(r => r.userId))
+        const desired = new Set(participants)
+        const toRemove = [...current].filter(u => !desired.has(u))
+        const toAdd = participants.filter(u => !current.has(u))
+        for (const userId of toRemove) {
+          batch.push(
+            db.delete(editStreamParticipantsTable)
+              .where(and(eq(editStreamParticipantsTable.scheduleId, scheduleId), eq(editStreamParticipantsTable.streamId, streamId), eq(editStreamParticipantsTable.userId, userId)))
+          )
+        }
+        for (const userId of toAdd) {
+          batch.push(
+            db.insert(editStreamParticipantsTable)
+              .values({scheduleId, streamId, userId})
+              .onConflictDoNothing()
+          )
+        }
+      }
+
+      if (tags !== undefined) {
+        const existing = await db.select({id: editStreamTagsTable.tagId})
+          .from(editStreamTagsTable)
+          .where(and(eq(editStreamTagsTable.scheduleId, scheduleId), eq(editStreamTagsTable.streamId, streamId)))
+          .all()
+        const currentids = new Set(existing.map(r => r.id))
+        const desiredids = new Set(tags)
+        const desiredIdsArr = Array.from(desiredids)
+        if (desiredIdsArr.length > 0) {
+          const rows = await db.select({id: tagsTable.id})
+            .from(tagsTable)
+            .where(inArray(tagsTable.id, desiredIdsArr))
+            .all()
+          const foundIds = new Set(rows.map(r => r.id))
+          const unknown = desiredIdsArr.filter(id_ => !foundIds.has(id_))
+          if (unknown.length > 0) throw new Error(`Unknown tag IDs: ${unknown.join(', ')}`)
+        }
+        const idsToRemove = [...currentids].filter(id_ => !desiredids.has(id_))
+        const idsToAdd = desiredIdsArr.filter(id_ => !currentids.has(id_))
+        for (const id of idsToRemove) {
+          batch.push(
+            db.delete(editStreamTagsTable)
+              .where(and(eq(editStreamTagsTable.scheduleId, scheduleId), eq(editStreamTagsTable.streamId, streamId), eq(editStreamTagsTable.tagId, id)))
+          )
+        }
+        for (const id of idsToAdd) {
+          batch.push(
+            db.insert(editStreamTagsTable)
+              .values({scheduleId, streamId, tagId: id})
+              .onConflictDoNothing()
+          )
+        }
+      }
+
+
+      const payload: StreamUpdatedWithDetailPayload = {id: streamId}
+      if (allowedPatch && Object.keys(allowedPatch).length > 0) payload.patch = allowedPatch
+
+      if (tags !== undefined) {
+        const finalTags = await db.select({ id: tagsTable.id, name: tagsTable.name, slug: tagsTable.slug })
+          .from(editStreamTagsTable)
+          .innerJoin(tagsTable, eq(editStreamTagsTable.tagId, tagsTable.id))
+          .where(and(eq(editStreamTagsTable.scheduleId, scheduleId), eq(editStreamTagsTable.streamId, streamId)))
+          .all()
+        payload.tags = finalTags.map((t) => ({id: t.id, name: t.name, slug: t.slug}))
+      }
+
+      if (participants !== undefined) {
+        payload.participants = await db.select({
+          userId: userDisplayView.userId,
+          primaryLiveStream: userDisplayView.primaryLiveStream,
+          createdAt: userDisplayView.createdAt,
+          username: userDisplayView.username,
+          profileImage: userDisplayView.profileImage,
+          twitchLogin: userDisplayView.twitchLogin,
+          tiltifySlug: userDisplayView.tiltifySlug,
+          tiltifyUrl: userDisplayView.tiltifyUrl,
+          primaryColor: userDisplayView.primaryColor,
+          accentColor: userDisplayView.accentColor,
+        })
+          .from(editStreamParticipantsTable)
+          .innerJoin(userDisplayView, eq(editStreamParticipantsTable.userId, userDisplayView.userId))
+          .where(and(eq(editStreamParticipantsTable.scheduleId, scheduleId), eq(editStreamParticipantsTable.streamId, streamId)))
+          .all()
+      }
+
+      payloads.push(payload)
+    }
+
+    if (batch.length > 0) {
+      try { await db.batch(batch as any) } catch (e) { console.error('updateStreamWithDetails', 'batch', e) }
+    }
+    const stub = getScheduleEditingStub(context.env, scheduleId)
+    for (const payload of payloads){
+      await stub.publishStreamUpdatedWithDetails(scheduleId, editorId, payload)
+    }
+
+  })
+
 export const streamsRouter = {
   addStream,
   updateStream,
@@ -360,4 +496,5 @@ export const streamsRouter = {
   lockStream,
   unlockStream,
   updateStreamWithDetails,
+  updateStreamsWithDetails,
 }

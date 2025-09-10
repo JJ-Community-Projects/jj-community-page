@@ -149,6 +149,7 @@ const publishDraft = os.publishDraftContract
         if ((res as any).rowsAffected > 0) updated++
       } else {
         await db.insert(streamsTable).values(values as any).run()
+        canonIdSet.add(finalId)
         created++
       }
     }

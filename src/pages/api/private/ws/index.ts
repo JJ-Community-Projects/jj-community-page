@@ -14,6 +14,8 @@ function resolveNamespaceByChannel(env: Env, chn: string): DurableObjectNamespac
   if (chn.startsWith('teams:user:teams:')) return env.UserTeamsObject
   if (chn.startsWith('teams:admin:invites:')) return env.TeamAdminInvitesObject
   if (chn.startsWith('teams:admin:members:')) return env.TeamAdminMembersObject
+  // Schedule Editing
+  if (chn.startsWith('schedule:edit:')) return env.ScheduleEditingObject
   return null
 }
 

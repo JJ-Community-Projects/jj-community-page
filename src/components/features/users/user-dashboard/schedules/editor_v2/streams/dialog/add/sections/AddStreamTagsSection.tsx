@@ -30,7 +30,7 @@ export const AddStreamTagsSection: Component = () => {
     // Prevent duplicates by slug or name (case-sensitive match to mirror provider logic)
     const exists = tags().some((t) => t.slug === trimmed || t.name === trimmed);
     if (exists) return;
-    const newTag: DraftTag = {tagId: nextTempTagId(), slug: trimmed, name: trimmed};
+    const newTag: DraftTag = {id: nextTempTagId(), slug: trimmed, name: trimmed};
     addTagLocal(newTag);
     tagSearch.handleSearchInput("");
   };
@@ -56,10 +56,10 @@ export const AddStreamTagsSection: Component = () => {
     const label = String(t.slug ?? t.name ?? t.label ?? "");
     if (!label) return;
     // Skip if already present (id or slug/name match)
-    const exists = tags().some((et) => (t.id != null && et.tagId === t.id) || (t.slug && et.slug === t.slug) || (t.name && et.name === t.name));
+    const exists = tags().some((et) => (t.id != null && et.id === t.id) || (t.slug && et.slug === t.slug) || (t.name && et.name === t.name));
     if (exists) return;
     const newTag: DraftTag = {
-      tagId: t.id ?? nextTempTagId(),
+      id: t.id ?? nextTempTagId(),
       slug: t.slug ?? label,
       name: t.name ?? label,
     };
@@ -88,7 +88,7 @@ export const AddStreamTagsSection: Component = () => {
         <div class="flex flex-wrap gap-2">
           <For each={tagSearch.availableTags!()}>{(t: TagSuggestion) => {
             const label: string = String(t.slug ?? t.name ?? t.label ?? "");
-            const isAlready = tags().some(et => (t.id != null && et.tagId === t.id) || (t.slug && et.slug === t.slug) || (t.name && et.name === t.name));
+            const isAlready = tags().some(et => (t.id != null && et.id === t.id) || (t.slug && et.slug === t.slug) || (t.name && et.name === t.name));
             return (
               <button
                 class={`inline-flex items-center gap-1 text-xs rounded-full px-2 py-1 border ${isAlready ? 'bg-neutral-100 text-neutral-400 border-neutral-200' : 'bg-neutral-50 hover:bg-neutral-100 text-neutral-800 border-neutral-300'}`}
@@ -111,7 +111,7 @@ export const AddStreamTagsSection: Component = () => {
               {t.slug || t.name}
               <button
                 class="ml-1 text-neutral-600 hover:text-neutral-800 disabled:opacity-50"
-                onClick={() => onRemove(t.tagId)}
+                onClick={() => onRemove(t.id)}
                 aria-label={`Remove tag ${t.slug || t.name}`}
               >
                 ×

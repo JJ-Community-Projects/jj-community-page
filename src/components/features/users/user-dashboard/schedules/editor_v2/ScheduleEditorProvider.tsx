@@ -47,9 +47,9 @@ const useScheduleEditor2Hook = (scheduleId: number) => {
     })
   }
 
-  const scheduleEditing = orpcPrivate.scheduleEditing
+  const scheduleEditing = orpcPrivate.scheduleEditingWS
   const users = orpcPrivate.users
-  const sse = useQuery(() => scheduleEditing.sse.streamDraft
+  const sse = useQuery(() => scheduleEditing.streamDraftWS
     .experimental_liveOptions({
       input: {scheduleId},
     })
@@ -389,6 +389,38 @@ const useScheduleEditor2Hook = (scheduleId: number) => {
     return updateStreamMutation.mutateAsync({scheduleId, ...input})
   }
 
+  const updateStreamsMutation = useMutation(
+    () => scheduleEditing.updateStreamsWithDetails.mutationOptions()
+  )
+
+  const updateStreams = (inputs: {
+    id: number;
+    patch?: Partial<{
+      title: string;
+      visible: boolean;
+      subtitle?: string | null;
+      description?: string | null;
+      youtubeVodUrl?: string | null;
+      twitchVodUrl?: string | null;
+      start: Date;
+      end: Date
+    }>;
+    participants?: number[];
+    tags?: number[];
+  }[]) => {
+    for (const input of inputs) {
+      const idx = state.streams.findIndex(s => s.id === input.id)
+      // local-only patch for temporary streams
+      if (input.patch) {
+        setState('streams', idx, (prev) => ({...(prev as DraftStream), ...(input.patch as any)}))
+      }
+      console.log('updateStream', input)
+    }
+    
+    return updateStreamsMutation.mutateAsync({scheduleId, streams: inputs})
+  }
+
+
   const deleteStreamMutation = useMutation(
     () => scheduleEditing.deleteStream.mutationOptions()
   )
@@ -459,6 +491,7 @@ const useScheduleEditor2Hook = (scheduleId: number) => {
     // addStreamWithDetails, addStreamWithDetailsMutation,
     createLocalStream, saveLocalStream,
     updateStream, updateStreamMutation,
+    updateStreams, updateStreamsMutation,
     deleteStream, deleteStreamMutation,
     // tags
     addTagToStream, addTagToStreamMutation,

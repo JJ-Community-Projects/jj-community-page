@@ -3,18 +3,56 @@ import {useScheduleEditor2} from "../ScheduleEditorProvider.tsx";
 import {byDay} from "./utils/streamFilters.ts";
 import {StreamCard} from "./StreamCard.tsx";
 import {useAddStreamDialog} from "./dialog/add/AddStreamDialogContext.tsx";
+import {addHours, latestByEndOnDay, makeDayFallback} from "./utils/initialTimes.ts";
+import {FaRegularEye, FaRegularEyeSlash, FaSolidPlus} from "solid-icons/fa";
+import {twMerge} from "tailwind-merge";
+import {DateTime} from "luxon";
+import {getDayBackgroundColor} from "./utils/colors.ts";
 
 export const DayColumn: Component<{ date: Date; dayIndex: number }> = (props) => {
-  const {state} = useScheduleEditor2();
+  const {state, updateStreams} = useScheduleEditor2();
   const dialog = useAddStreamDialog();
   const year = () => state.schedule?.year ?? props.date.getFullYear();
 
   const streamsToday = () => byDay(state.streams, props.date);
 
+  const shouldShowSetAllVisibleButton = () => {
+    return streamsToday().some((s) => !s.visible);
+  }
+  const shouldShowSetAllInvisibleButton = () => {
+    return streamsToday().some((s) => s.visible);
+  }
+
+  const setAllVisible = () => {
+    const updates = streamsToday()
+      .map((s) => ({
+        id: s.id,
+        patch: {
+          visible: true,
+        }
+      }))
+    updateStreams(updates);
+  }
+
+  const setAllInvisible = () => {
+    const updates = streamsToday()
+      .map((s) => ({
+        id: s.id,
+        patch: {
+          visible: false,
+        }
+      }))
+    updateStreams(updates);
+  }
+
   const addNew = () => {
-    const start = new Date(year(), 11, props.date.getDate(), 18, 0, 0, 0);
-    const end = new Date(year(), 11, props.date.getDate(), 20, 0, 0, 0);
-    dialog.addNew({ title: "", start, end, visible: false });
+    // Compute start as the end of the last stream on this day; fallback to 18:00
+    // End defaults to start + 3 hours
+    const todays = streamsToday();
+    const last = latestByEndOnDay(todays, props.date);
+    const start = last ? new Date(last.end as any) : makeDayFallback(year(), props.date);
+    const end = addHours(start, 3);
+    dialog.addNew({title: "", start, end, visible: false});
   };
 
   const header = () => {
@@ -22,12 +60,40 @@ export const DayColumn: Component<{ date: Date; dayIndex: number }> = (props) =>
     return d.toLocaleDateString(undefined, {weekday: "short", day: "numeric"});
   };
 
+  const getWeekDay = () => {
+    return DateTime.fromJSDate(props.date)
+      .weekday - 1
+  }
+
   return (
-    <div class="rounded-lg border p-3 flex flex-col gap-2">
+    <div class={twMerge("rounded-lg border p-3 flex flex-col gap-2", getDayBackgroundColor(getWeekDay()))}
+    >
       <div class="flex items-center justify-between">
         <div class="text-sm font-semibold">{header()}</div>
-        <button class="text-xs px-2 py-1 bg-accent text-white rounded hover:bg-accent-600" onClick={addNew}>
-          Add Stream
+        <Show when={shouldShowSetAllInvisibleButton()}>
+          <button
+            class="text-xs px-2 py-1 bg-accent text-white rounded hover:bg-accent-600"
+            onClick={setAllInvisible}
+            title='Set All Invisible'
+          >
+            <FaRegularEyeSlash/>
+          </button>
+        </Show>
+        <Show when={shouldShowSetAllVisibleButton()}>
+          <button
+            class="text-xs px-2 py-1 bg-accent text-white rounded hover:bg-accent-600"
+            onClick={setAllVisible}
+            title='Set All Visible'
+          >
+            <FaRegularEye/>
+          </button>
+        </Show>
+        <button
+          class="text-xs px-2 py-1 bg-accent text-white rounded hover:bg-accent-600"
+          onClick={addNew}
+          title='Add New Stream'
+        >
+          <FaSolidPlus/>
         </button>
       </div>
 

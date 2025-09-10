@@ -32,7 +32,7 @@ export const AddStreamTimeSection: Component = () => {
     if (isNaN(next.getTime())) return;
     const clamped = clampToRange(next, minDate(), maxDate());
     // Ensure start <= end
-    const currentEnd = new Date(dialog.draft.end);
+    const currentEnd = new Date(dialog.draft.stream.end);
     const nextEnd = clamped.getTime() > currentEnd.getTime() ? clamped : currentEnd;
     dialog.setStart(clamped);
     dialog.setEnd(nextEnd);
@@ -43,7 +43,7 @@ export const AddStreamTimeSection: Component = () => {
     if (isNaN(next.getTime())) return;
     const clamped = clampToRange(next, minDate(), maxDate());
     // Ensure start <= end
-    const currentStart = new Date(dialog.draft.start);
+    const currentStart = new Date(dialog.draft.stream.start);
     const nextStart = clamped.getTime() < currentStart.getTime() ? clamped : currentStart;
     dialog.setStart(nextStart);
     dialog.setEnd(clamped);
@@ -57,12 +57,12 @@ export const AddStreamTimeSection: Component = () => {
     <div class="space-y-3">
       <h3 class="text-sm font-semibold">Time</h3>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-        <TextField value={toLocalDateTimeInputValue(dialog.draft.start)} onChange={updateStart}>
+        <TextField value={toLocalDateTimeInputValue(dialog.draft.stream.start)} onChange={updateStart}>
           <TextField.Label class="text-xs font-medium mb-1">Start</TextField.Label>
           <TextField.Input type="datetime-local" min={minAttr()} max={maxAttr()}
                            class="w-full px-3 py-2 border rounded"/>
         </TextField>
-        <TextField value={toLocalDateTimeInputValue(dialog.draft.end)} onChange={updateEnd}>
+        <TextField value={toLocalDateTimeInputValue(dialog.draft.stream.end)} onChange={updateEnd}>
           <TextField.Label class="text-xs font-medium mb-1">End</TextField.Label>
           <TextField.Input type="datetime-local" min={minAttr()} max={maxAttr()}
                            class="w-full px-3 py-2 border rounded"/>

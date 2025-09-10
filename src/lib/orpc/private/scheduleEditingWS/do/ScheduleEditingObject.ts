@@ -15,7 +15,7 @@ import type {
   TagAddedPayload,
   TagRemovedPayload,
   UnlockPayload,
-} from '../../scheduleEditing/scheduleEditingTypes.ts'
+} from '../scheduleEditingTypes.ts'
 
 /**
  * Durable Object for Schedule Editing WebSocket stream.
