@@ -2,7 +2,7 @@ import {type Component, createSignal, For, Show} from "solid-js";
 import {useScheduleTest} from "../common/ScheduleProvider.tsx";
 import {ScheduleStreamCard} from "../common/StreamCard.tsx";
 import {Accordion} from "@kobalte/core";
-import {FaSolidChevronDown} from "solid-icons/fa";
+import {FaSolidCalendarDays, FaSolidChevronDown, FaSolidPlay} from "solid-icons/fa";
 import {DateTime} from "luxon";
 import {getStreamColor} from "../../../../functions/jjDatesToColors.ts";
 import './UserSchedulePageBodyDesktop.css'
@@ -24,7 +24,13 @@ const NextThreeStreams: Component = () => {
 
   return (
     <div class="w-full">
-      <h2 class="text-2xl font-bold text-white mb-4">Next Streams</h2>
+      <div
+        class="bg-white block w-fit px-4 py-2 rounded-lg shadow mx-auto mb-4 ">
+        <h2 class="text-2xl font-bold text-gray-900 text-center inline-flex items-center gap-2">
+          <FaSolidPlay class="w-5 h-5 text-gray-700"/>
+          <span>Next Streams</span>
+        </h2>
+      </div>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <For each={streams}>
           {(stream) => (
@@ -46,7 +52,13 @@ const DaysAccordion: Component = () => {
 
   return (
     <div class="w-full">
-      <h2 class="text-2xl font-bold text-white mb-4">Schedule</h2>
+      <div
+        class="bg-white block w-fit px-4 py-2 rounded-lg shadow mx-auto mb-4">
+        <h2 class="text-2xl font-bold text-gray-900 text-center flex items-center gap-2">
+          <FaSolidCalendarDays class="w-5 h-5 text-gray-700"/>
+          <span>Schedule</span>
+        </h2>
+      </div>
       <Accordion.Root
         class="flex flex-col gap-2 w-full"
         collapsible={true}
@@ -72,7 +84,7 @@ const DayAccordionItem: Component<{ day: ScheduleDay, index: number, expandedDay
   const getHighlightColor = () => {
     // Convert JS Date to DateTime for color calculation
     // For color calculation, we still use UTC to maintain consistent colors
-    const dayDate = DateTime.fromJSDate(props.day.day, { zone: 'utc' });
+    const dayDate = DateTime.fromJSDate(props.day.day, {zone: 'utc'});
     return getStreamColor(dayDate);
   };
 
@@ -82,7 +94,7 @@ const DayAccordionItem: Component<{ day: ScheduleDay, index: number, expandedDay
   // Format date for display
   const formatDate = (date: Date) => {
     // Create DateTime from JS Date, assuming it's in UTC, then convert to local time for display
-    return DateTime.fromJSDate(date, { zone: 'utc' }).toLocal().toLocaleString({
+    return DateTime.fromJSDate(date, {zone: 'utc'}).toLocal().toLocaleString({
       weekday: 'long',
       month: 'long',
       day: 'numeric'
@@ -109,12 +121,12 @@ const DayAccordionItem: Component<{ day: ScheduleDay, index: number, expandedDay
           />
 
           {/* Overlay that fills from left to right when accordion is open */}
-          <div class="accordion__item-trigger-bg" />
+          <div class="accordion__item-trigger-bg"/>
 
           <span class="accordion__item-trigger-text">
             {formatDate(props.day.day)}
           </span>
-          <FaSolidChevronDown class="accordion__item-trigger-chevron" />
+          <FaSolidChevronDown class="accordion__item-trigger-chevron"/>
         </Accordion.Trigger>
       </Accordion.Header>
       <Accordion.Content class="accordion__item-content p-4 pt-4">
