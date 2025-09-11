@@ -77,14 +77,10 @@ const getStyleContract = oc.output(
 
 
 export const profileContract = {
-  style: {
-    updatePrimaryColorContract,
-    updateAccentColorContract,
-    getStyleContract,
-    updateStyleContract
-  },
-  streaming: {
-    updatePrimaryLiveStreamContract,
-    getPrimaryLiveStreamContract,
-  }
+  updatePrimaryColorContract,
+  updateAccentColorContract,
+  getStyleContract,
+  updateStyleContract,
+  updatePrimaryLiveStreamContract,
+  getPrimaryLiveStreamContract,
 }
