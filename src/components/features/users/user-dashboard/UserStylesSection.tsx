@@ -1,17 +1,42 @@
-import {type Component, createEffect, createSignal, Show,} from "solid-js";
+import {type Component, createEffect, createSignal, on, Show,} from "solid-js";
 import {TextField} from "@kobalte/core/text-field";
 import {Dialog} from "@kobalte/core/dialog";
 import {createModalSignal} from "../../../../lib/createModalSignal.ts";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/solid-query";
 import {orpcPrivate} from "../../../../lib/orpc/client.ts";
 
+const DEFAULT_PRIMARY_COLOR = "#E30E50";
+const DEFAULT_ACCENT_COLOR = "#3584BF";
+
 export const UserStylesSection: Component = () => {
 
-  const queryClient = useQueryClient();
+  const query = useQuery(
+    () => orpcPrivate.profile.getStyle.queryOptions()
+  )
 
-  const {data} = useQuery(() => {
-    return orpcPrivate.profile.getStyle.queryOptions({})
-  })
+  createEffect(on(() => query.data, console.log))
+
+  return (
+      <Show when={query.isSuccess}>
+        <UserStyle
+          primaryColor={query.data?.primaryColor || DEFAULT_PRIMARY_COLOR}
+          accentColor={query.data?.accentColor || DEFAULT_ACCENT_COLOR}
+        />
+      </Show>
+  );
+};
+
+
+interface UserStyleProps {
+  primaryColor: string
+  accentColor: string
+}
+
+export const UserStyle: Component<UserStyleProps> = (props) => {
+  const [primaryColor, setPrimaryColor] = createSignal(props.primaryColor);
+  const [accentColor, setAccentColor] = createSignal(props.accentColor);
+  const modal = createModalSignal();
+  const queryClient = useQueryClient();
 
   const updateStyle = useMutation(() =>
     orpcPrivate.profile.updateStyle.mutationOptions({
@@ -20,21 +45,6 @@ export const UserStylesSection: Component = () => {
       })
     })
   )
-  // State for color inputs and dialog
-  const DEFAULT_PRIMARY_COLOR = "#E30E50";
-  const DEFAULT_ACCENT_COLOR = "#3584BF";
-  const [primaryColor, setPrimaryColor] = createSignal(DEFAULT_PRIMARY_COLOR);
-  const [accentColor, setAccentColor] = createSignal(DEFAULT_ACCENT_COLOR);
-  const modal = createModalSignal();
-
-  // Update local state when user style changes
-  createEffect(() => {
-    if (data) {
-      setPrimaryColor(data?.primaryColor ?? DEFAULT_PRIMARY_COLOR);
-      setAccentColor(data?.accentColor ?? DEFAULT_ACCENT_COLOR);
-    }
-  });
-
   // Handle saving user styles
   const handleSaveStyles = async () => {
     try {
@@ -53,6 +63,15 @@ export const UserStylesSection: Component = () => {
     setPrimaryColor(DEFAULT_PRIMARY_COLOR);
     setAccentColor(DEFAULT_ACCENT_COLOR);
   };
+
+  const onOpenChange = (v: boolean) => {
+    console.log('onOpenChange', v)
+    modal.setOpen(v);
+    if (!v) {
+      setPrimaryColor(props.primaryColor);
+      setAccentColor(props.accentColor);
+    }
+  }
 
   return (
     <div class="bg-white rounded-2xl shadow-xl p-6 mb-6">
@@ -99,7 +118,7 @@ export const UserStylesSection: Component = () => {
       </div>
 
       {/* Edit Colors Dialog */}
-      <Dialog open={modal.isOpen()} onOpenChange={modal.setOpen}>
+      <Dialog open={modal.isOpen()} onOpenChange={onOpenChange}>
         <Dialog.Portal>
           <Dialog.Overlay class="fixed inset-0 bg-black/50 z-40"/>
           <div class="fixed inset-0 flex items-center justify-center z-50">
@@ -186,4 +205,4 @@ export const UserStylesSection: Component = () => {
       </Dialog>
     </div>
   );
-};
+}
