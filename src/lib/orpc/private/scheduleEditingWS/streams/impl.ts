@@ -125,7 +125,7 @@ export const deleteStream = os.deleteStreamContract
     const editorId = context.userId
     const {scheduleId, id} = input
 
-    await assertStreamLockAvailableOrOwned(context.env as any, scheduleId, id, editorId)
+    await assertStreamLockAvailableOrOwned(context.env, scheduleId, id, editorId)
 
     const res = await db.delete(editStreamsTable)
       .where(and(eq(editStreamsTable.scheduleId, scheduleId), eq(editStreamsTable.id, id)))
