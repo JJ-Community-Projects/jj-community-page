@@ -12,7 +12,7 @@ const os = implement(profileContract)
  * Update user's primary color preference
  * Uses upsert pattern to insert or update the userStyles record
  */
-const updatePrimaryColor = os.style.updatePrimaryColorContract
+const updatePrimaryColor = os.updatePrimaryColorContract
   .use(authMiddleware)
   .handler(async ({context, input}) => {
     const db = context.db;
@@ -41,7 +41,7 @@ const updatePrimaryColor = os.style.updatePrimaryColorContract
   })
 
 
-const updateStyle = os.style.updateStyleContract
+const updateStyle = os.updateStyleContract
   .use(authMiddleware)
   .handler(async ({context, input}) => {
     const db = context.db;
@@ -77,7 +77,7 @@ const updateStyle = os.style.updateStyleContract
  * Update user's accent color preference
  * Uses upsert pattern to insert or update the userStyles record
  */
-const updateAccentColor = os.style.updateAccentColorContract
+const updateAccentColor = os.updateAccentColorContract
   .use(authMiddleware)
   .handler(async ({context, input}) => {
     const db = context.db;
@@ -109,7 +109,7 @@ const updateAccentColor = os.style.updateAccentColorContract
  * Update user's primary live streaming platform
  * Updates the primaryLiveStream field in the users table
  */
-const updatePrimaryLiveStream = os.streaming.updatePrimaryLiveStreamContract
+const updatePrimaryLiveStream = os.updatePrimaryLiveStreamContract
   .use(authMiddleware)
   .handler(async ({context, input}) => {
     const db = context.db;
@@ -135,35 +135,28 @@ const updatePrimaryLiveStream = os.streaming.updatePrimaryLiveStreamContract
  * Get user's style preferences (primary and accent colors)
  * Uses authMiddleware to access user ID from context
  */
-const getStyle = os.style.getStyleContract
+const getStyle = os.getStyleContract
   .use(authMiddleware)
   .handler(async ({context}) => {
     const db = context.db;
     const userId = context.userId;
 
-    try {
-      const userStyle = await db.select()
-        .from(userStyles)
-        .where(eq(userStyles.userId, userId))
-        .get();
-      console.log('getStyle', userStyle)
-      return {
-        primaryColor: userStyle?.primaryColor || null,
-        accentColor: userStyle?.accentColor || null
-      };
-    } catch (error) {
-      console.error('Error getting user style preferences:', error);
-      throw new ORPCError('INTERNAL_SERVER_ERROR', {
-        message: 'Failed to get style preferences'
-      });
-    }
+    const userStyle = await db.select()
+      .from(userStyles)
+      .where(eq(userStyles.userId, userId))
+      .get();
+    console.log('getStyle', userStyle)
+    return {
+      primaryColor: userStyle?.primaryColor || null,
+      accentColor: userStyle?.accentColor || null
+    };
   })
 
 /**
  * Get user's primary live streaming platform
  * Uses authMiddleware to access user ID from context
  */
-const getPrimaryLiveStream = os.streaming.getPrimaryLiveStreamContract
+const getPrimaryLiveStream = os.getPrimaryLiveStreamContract
   .use(authMiddleware)
   .handler(async ({context}) => {
     const db = context.db;
