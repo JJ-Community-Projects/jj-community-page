@@ -4,6 +4,7 @@ import {contracts} from "./contract.ts";
 import {schedulesTable} from "../../../db/schema/jj-schema.ts";
 import {and, eq} from "drizzle-orm";
 import {getNextStreams, getScheduleStreams, organizeStreamsByTime} from "./util.ts";
+import {userDisplayView} from "../../../db/schema/views-schema.ts";
 
 const os = implement(contracts)
   .use(dbMiddleware);
@@ -25,6 +26,28 @@ const getFullScheduleBySlug = os.getFullScheduleBySlugContract
       throw new ORPCError('FORBIDDEN', {message: 'The schedule is private'})
     }
 
+
+
+    const owner = await db.select({
+      userId: userDisplayView.userId,
+      primaryLiveStream: userDisplayView.primaryLiveStream,
+      createdAt: userDisplayView.createdAt,
+      username: userDisplayView.username,
+      profileImage: userDisplayView.profileImage,
+      twitchLogin: userDisplayView.twitchLogin,
+      tiltifySlug: userDisplayView.tiltifySlug,
+      tiltifyUrl: userDisplayView.tiltifyUrl,
+      primaryColor: userDisplayView.primaryColor,
+      accentColor: userDisplayView.accentColor,
+    })
+      .from(userDisplayView)
+      .where(eq(userDisplayView.userId, schedule.ownerId))
+      .get()
+
+    if (!owner) {
+      throw new ORPCError('NOT_FOUND', {message: 'Schedule owner not found'})
+    }
+
     // Get all streams for this schedule
     const streams = await getScheduleStreams(db, schedule.id)
 
@@ -41,9 +64,9 @@ const getFullScheduleBySlug = os.getFullScheduleBySlugContract
           .map(participant => [participant.userId, participant])
       ).values()
     )
-
     return {
       data: schedule,
+      owner: owner,
       streams,
       nextStreams,
       days,

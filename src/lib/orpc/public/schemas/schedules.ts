@@ -178,6 +178,12 @@ export const ScheduleWeekSchema = z.object({
 export const FullScheduleSchema = z.object({
   /** Basic schedule information and metadata */
   data: ScheduleInfoSchema,
+  /**
+   * Represents the owner of an entity or resource.
+   * The owner is defined using the UserDisplaySchema, which contains the details
+   * or attributes associated with the user.
+   */
+  owner: UserDisplaySchema,
   /** Array of all streams in this schedule */
   streams: z.array(StreamSchema),
   /** Array of next 3 upcoming streams from this schedule */
