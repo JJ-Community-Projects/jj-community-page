@@ -1,6 +1,6 @@
 import {type Component, For, Show} from "solid-js";
 import type {UserDisplay} from "../../../../lib/orpc/public/schemas/UserDisplaySchema";
-import {UserAvatar} from "../../../common/UserAvatar";
+import {UserPillAvatar} from "../../../common/UserAvatar";
 import {FaSolidUsers} from "solid-icons/fa";
 
 interface TeamMembersSectionProps {
@@ -62,7 +62,7 @@ export const TeamMembersSection: Component<TeamMembersSectionProps> = (props) =>
                 <div
                   class="transform hover:scale-[1.02] transition-all duration-200"
                 >
-                  <UserAvatar
+                  <UserPillAvatar
                     user={member}
                     primaryColor={member.primaryColor || primaryColor}
                     accentColor={member.accentColor || accentColor}
