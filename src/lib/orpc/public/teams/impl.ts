@@ -8,8 +8,9 @@ import {
   teamMembersTable,
   teamsTable
 } from '../../../db/schema/jj-schema.ts';
+import {streamTagsTable, tags as tagsTable} from '../../../db/schema/tags-schema.ts';
 import {userDisplayView} from '../../../db/schema/views-schema.ts';
-import {and, count, eq, gte, inArray, sql} from 'drizzle-orm';
+import {and, count, eq, gte, inArray, sql, or} from 'drizzle-orm';
 import {getNextStreams, getScheduleStreams, organizeStreamsByTime} from '../schedules/util.ts';
 
 const os = implement(publicTeamsContract)
@@ -232,7 +233,10 @@ const getTeamNextStreams = os.getTeamNextStreamsContract
     const db = context.db;
     const {slug, limit = 10, unique = false} = input;
 
-    const currentYear = new Date().getFullYear()
+    // Normalize limit per contract (default 10, max 50, min 1)
+    const normalizedLimit = Math.min(50, Math.max(1, limit ?? 10));
+
+    const currentYear = new Date().getUTCFullYear()
 
     try {
       // First check if team exists and is visible
@@ -264,7 +268,6 @@ const getTeamNextStreams = os.getTeamNextStreamsContract
 
       const memberUserIds = teamMembers.map(member => member.userId);
       const currentTime = new Date();
-
       // Get all upcoming streams from team member schedules
       const streams = await db.select({
         id: streamsTable.id,
@@ -278,8 +281,6 @@ const getTeamNextStreams = os.getTeamNextStreamsContract
         twitchVodUrl: streamsTable.twitchVodUrl,
         start: streamsTable.start,
         end: streamsTable.end,
-        tags: sql<any[]>`'[]'`,
-        participants: sql<any[]>`'[]'`
       })
         .from(streamsTable)
         .innerJoin(schedulesTable, eq(streamsTable.scheduleId, schedulesTable.id))
@@ -311,51 +312,80 @@ const getTeamNextStreams = os.getTeamNextStreamsContract
         });
       }
 
-      // Apply limit
-      const limitedStreams = filteredStreams.slice(0, limit);
+      // Apply limit (normalized)
+      const limitedStreams = filteredStreams.slice(0, normalizedLimit);
 
-      // Get stream participants for each stream
+      // Early return if none
+      if (limitedStreams.length === 0) return [];
+
+      // Get stream participants for each selected stream
       const participantsByStream = new Map<string, any[]>();
-
-      if (limitedStreams.length > 0) {
-        // Get participants for each stream individually to avoid complex composite key queries
-        for (const stream of limitedStreams) {
-          const participantsData = await db.select({
-            userId: userDisplayView.userId,
-            primaryLiveStream: userDisplayView.primaryLiveStream,
-            role: userDisplayView.role,
-            createdAt: userDisplayView.createdAt,
-            username: userDisplayView.username,
-            profileImage: userDisplayView.profileImage,
-            twitchLogin: userDisplayView.twitchLogin,
-            tiltifySlug: userDisplayView.tiltifySlug,
-            tiltifyUrl: userDisplayView.tiltifyUrl,
-            primaryColor: userDisplayView.primaryColor,
-            accentColor: userDisplayView.accentColor
-          })
-            .from(streamParticipantsTable)
-            .innerJoin(userDisplayView, eq(streamParticipantsTable.userId, userDisplayView.userId))
-            .where(and(
-              eq(streamParticipantsTable.scheduleId, stream.scheduleId),
-              eq(streamParticipantsTable.streamId, stream.id)
-            ))
-            .all();
-
-          const key = `${stream.scheduleId}-${stream.id}`;
-          participantsByStream.set(key, participantsData);
-        }
-
-        // Attach participants to streams
-        return limitedStreams.map(stream => ({
-          ...stream,
-          participants: participantsByStream.get(`${stream.scheduleId}-${stream.id}`) || []
-        }));
+      for (const stream of limitedStreams) {
+        const participantsData = await db.select({
+          userId: userDisplayView.userId,
+          primaryLiveStream: userDisplayView.primaryLiveStream,
+          createdAt: userDisplayView.createdAt,
+          username: userDisplayView.username,
+          profileImage: userDisplayView.profileImage,
+          twitchLogin: userDisplayView.twitchLogin,
+          tiltifySlug: userDisplayView.tiltifySlug,
+          tiltifyUrl: userDisplayView.tiltifyUrl,
+          primaryColor: userDisplayView.primaryColor,
+          accentColor: userDisplayView.accentColor
+        })
+          .from(streamParticipantsTable)
+          .innerJoin(userDisplayView, eq(streamParticipantsTable.userId, userDisplayView.userId))
+          .where(and(
+            eq(streamParticipantsTable.scheduleId, stream.scheduleId),
+            eq(streamParticipantsTable.streamId, stream.id)
+          ))
+          .all();
+        const key = `${stream.scheduleId}-${stream.id}`;
+        participantsByStream.set(key, participantsData);
       }
 
-      return limitedStreams;
+      // Fetch tags for selected streams (batch OR of composite keys)
+      const tagWhereClauses = limitedStreams.map(s => and(
+        eq(streamTagsTable.scheduleId, s.scheduleId),
+        eq(streamTagsTable.streamId, s.id)
+      ));
+      const tagsByStream = new Map<string, { name: string; slug: string; color: string }[]>();
+      if (tagWhereClauses.length > 0) {
+        const tagRows = await db.select({
+          scheduleId: streamTagsTable.scheduleId,
+          streamId: streamTagsTable.streamId,
+          name: tagsTable.name,
+          slug: tagsTable.slug,
+          color: tagsTable.color,
+        })
+          .from(streamTagsTable)
+          .innerJoin(tagsTable, and(eq(streamTagsTable.tagId, tagsTable.id), eq(tagsTable.visible, true)))
+          .where(tagWhereClauses.length === 1 ? tagWhereClauses[0] : or(...tagWhereClauses))
+          .all();
+        for (const row of tagRows) {
+          const key = `${row.scheduleId}-${row.streamId}`;
+          const list = tagsByStream.get(key) ?? [];
+          list.push({ name: row.name, slug: row.slug, color: row.color });
+          tagsByStream.set(key, list);
+        }
+      }
+
+      // Shape final output to comply with StreamSchema
+      return limitedStreams.map(s => {
+        const key = `${s.scheduleId}-${s.id}`;
+        const participants = participantsByStream.get(key) ?? [];
+        const tags = tagsByStream.get(key) ?? [];
+        return {
+          ...s,
+          start: s.start instanceof Date ? s.start : new Date(s.start as any),
+          end: s.end instanceof Date ? s.end : new Date(s.end as any),
+          tags,
+          participants,
+        };
+      });
     } catch (error) {
-      if (error instanceof ORPCError) throw error;
       console.error('Error getting team next streams:', error);
+      if (error instanceof ORPCError) throw error;
       throw new ORPCError('INTERNAL_SERVER_ERROR', {
         message: 'Failed to retrieve team next streams'
       });
