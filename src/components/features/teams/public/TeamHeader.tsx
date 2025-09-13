@@ -1,6 +1,6 @@
-import {type Component, Show} from "solid-js";
-import type {Team} from "../../../../lib/orpc/public/schemas/teams";
-import {FaSolidUsers} from "solid-icons/fa";
+import { type Component, Show } from 'solid-js'
+import type { Team } from '../../../../lib/orpc/public/schemas/teams'
+import { FaSolidUserGroup, FaSolidUsers } from 'solid-icons/fa'
 
 interface TeamHeaderProps {
   team: Team;
@@ -16,14 +16,14 @@ export const TeamHeader: Component<TeamHeaderProps> = (props) => {
 
   return (
     <div
-      class="bg-white rounded-xl shadow-md border-2 border-primary-200 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 mb-6"
+      class="bg-white rounded-xl shadow-md border-2 hover:shadow-lg transition-all duration-300"
     >
       <div class="p-4 md:p-6 lg:p-8">
         {/* Horizontal Layout - Team Icon next to Name */}
         <div class="flex flex-col items-center text-center">
           {/* Team Icon and Name Section - Horizontal */}
           <div class="flex items-center gap-3 mb-4">
-            <FaSolidUsers class="w-8 h-8 text-neutral-600" />
+            <FaSolidUserGroup class="w-8 h-8 text-neutral-600" />
             <h1 class="~text-2xl/4xl font-babas text-black">
               {team.name}
             </h1>

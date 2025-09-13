@@ -17,7 +17,7 @@ export const UserHeader: Component<UserHeaderProps> = (props) => {
 
   return (
     <div
-      class="w-full bg-white rounded-xl shadow-md border-2 border-primary-200 hover:shadow-lg transition-all duration-300"
+      class="w-full bg-white rounded-xl shadow-md border-2 hover:shadow-lg transition-all duration-300"
       style={{
         "--user-primary": primaryColor,
         "--user-accent": accentColor
@@ -81,6 +81,6 @@ export const UserHeader: Component<UserHeaderProps> = (props) => {
         </div>
     </div>
 
-    
+
   );
 };

@@ -107,13 +107,14 @@ const useAdminTeamDetailsHook = (teamId: number) => {
     }
   };
 
-  const updateTeam = async (name: string, slug: string, visible?: boolean) => {
+  const updateTeam = async (name: string, slug: string, visible?: boolean, description?: string | null) => {
     try {
       await updateTeamMutation.mutateAsync({
         teamId,
         name,
         slug,
         visible: visible !== undefined ? visible : teamQuery.data?.visible || false,
+        description: description !== undefined ? description : (teamQuery.data?.description ?? null),
       });
     } catch (error: any) {
       throw new Error(error?.message || 'Failed to update team');

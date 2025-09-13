@@ -1,7 +1,7 @@
-import {type Component, For, Show} from "solid-js";
-import type {Stream} from "../../../../lib/orpc/public/schemas/schedules";
-import {ScheduleStreamCard} from "../../schedules/common/StreamCard";
-import {FaSolidCalendarDays, FaSolidPlay} from "solid-icons/fa";
+import { type Component, For, Show } from 'solid-js'
+import type { Stream } from '../../../../lib/orpc/public/schemas/schedules'
+import { ScheduleStreamCard } from '../../schedules/common/StreamCard'
+import { FaSolidCalendarDays, FaSolidPlay } from 'solid-icons/fa'
 
 interface TeamNextStreamsSectionProps {
   streams: Stream[];
@@ -21,21 +21,18 @@ export const TeamNextStreamsSection: Component<TeamNextStreamsSectionProps> = (p
 
   return (
     <div
-      class="bg-white rounded-xl shadow-md border-2 border-primary-200 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 mb-6"
+      class="group/next-stream w-full bg-white rounded-xl shadow-md border-2 group-hover:border-accent-200 hover:shadow-lg transition-all duration-300 p-4 md:p-6 lg:p-8"
       style={{
-        "--team-primary": primaryColor,
-        "--team-accent": accentColor
+        "--user-primary": primaryColor,
+        "--user-accent": accentColor
       }}
     >
-      <div class="p-4 md:p-6 lg:p-8">
         {/* Section Header */}
-        <div class="flex flex-col items-center text-center mb-6">
-          <div class="flex items-center gap-3 mb-2">
-            <FaSolidPlay class="w-5 h-5 text-black" />
-            <h2 class="~text-xl/2xl font-babas text-black">
-              Upcoming Team Streams
-            </h2>
-          </div>
+        <div class="flex items-center gap-2 text-lg font-semibold mb-4">
+          <FaSolidPlay class="w-5 h-5 text-black group-hover/next-stream:text-accent transition-all duration-300" />
+          <h2 class="~text-xl/2xl font-babas text-black group-hover/next-stream:text-accent transition-all duration-300">
+            Upcoming Streams
+          </h2>
         </div>
 
         <Show
@@ -76,32 +73,6 @@ export const TeamNextStreamsSection: Component<TeamNextStreamsSectionProps> = (p
             </For>
           </div>
         </Show>
-
-        {/* Call to action for more streams */}
-        <Show when={streams && streams.length > 0}>
-          <div class="mt-6 pt-6 border-t border-gray-100 text-center">
-            <a
-              href={`/teams/${teamSlug}/schedules/2024`}
-              class="px-6 py-2 rounded-lg font-medium transition-all duration-200 transform hover:scale-105 active:scale-95 font-poppins"
-              style={{
-                "background-color": `${accentColor}15`,
-                "color": accentColor,
-                "border": `2px solid ${accentColor}30`
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = accentColor;
-                e.currentTarget.style.color = 'white';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = `${accentColor}15`;
-                e.currentTarget.style.color = accentColor;
-              }}
-            >
-              View All Team Schedules
-            </a>
-          </div>
-        </Show>
-      </div>
     </div>
   );
 };

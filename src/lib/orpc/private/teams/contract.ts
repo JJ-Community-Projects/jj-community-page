@@ -37,7 +37,8 @@ const updateContract = oc
     teamId: z.number().positive("Team ID must be positive"),
     name: z.string().min(1, "Team name is required").max(100, "Team name must be 100 characters or less"),
     slug: z.string().min(1, "Team slug is required").max(50, "Team slug must be 50 characters or less"),
-    visible: z.boolean().optional()
+    visible: z.boolean().optional(),
+    description: z.string().max(5000, "Description is too long").nullable().optional()
   }))
   .output(SuccessSchema);
 

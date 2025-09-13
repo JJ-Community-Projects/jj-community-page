@@ -1,13 +1,11 @@
-import {FaRegularCircleCheck, FaRegularCircleXmark} from "solid-icons/fa";
-import {type Component, createEffect, createSignal, For, Show} from "solid-js";
-import {useAdminTeamDetail} from "./AdminTeamDetailsProvider.tsx";
-import {debounce} from "@solid-primitives/scheduled";
-import {TextField} from "@kobalte/core/text-field";
-import {Checkbox} from "@kobalte/core/checkbox";
-import {useQuery} from "@tanstack/solid-query";
-import {orpcPrivate} from "../../../../../../lib/orpc/client.ts";
-import {MutationDebugger} from "../../../../../common/MutationDebugger.tsx";
-import {QueryDebugger} from "../../../../../common/QueryDebugger.tsx";
+import { FaRegularCircleCheck, FaRegularCircleXmark } from 'solid-icons/fa'
+import { type Component, createEffect, createSignal, For, Show } from 'solid-js'
+import { useAdminTeamDetail } from './AdminTeamDetailsProvider.tsx'
+import { debounce } from '@solid-primitives/scheduled'
+import { TextField } from '@kobalte/core/text-field'
+import { Checkbox } from '@kobalte/core/checkbox'
+import { useQuery } from '@tanstack/solid-query'
+import { orpcPrivate } from '../../../../../../lib/orpc/client.ts'
 
 /**
  * AdminTeamSettingsSection Component
@@ -24,6 +22,7 @@ export const AdminTeamSettingsSection: Component = () => {
   const [debounceSlug, setDebounceSlug] = createSignal<string>('')
 
   const [visible, setVisible] = createSignal(false);
+  const [description, setDescription] = createSignal('');
 
   const validateSlug = useQuery(() => orpcPrivate.teams.validateSlug.queryOptions({
     input: {
@@ -39,6 +38,7 @@ export const AdminTeamSettingsSection: Component = () => {
       setName(team.data.name);
       setSlug(team.data.slug);
       setVisible(team.data.visible);
+      setDescription(team.data.description || '');
     }
   });
 
@@ -59,7 +59,7 @@ export const AdminTeamSettingsSection: Component = () => {
 
 
   const save = async () => {
-    await updateTeam(name(), slug(), visible());
+    await updateTeam(name(), slug(), visible(), description().trim() === '' ? null : description());
   }
 
   const slugChanged = () => {
@@ -103,16 +103,12 @@ export const AdminTeamSettingsSection: Component = () => {
     if (!team.data) return true;
 
     return (updateTeamMutation.isPending && slug() === team.data.slug)
-      || (name() === team.data.name && slug() === team.data.slug && visible() === team.data.visible)
+      || (name() === team.data.name && slug() === team.data.slug && visible() === team.data.visible && (description() === (team.data.description || '')))
       || slug() === ''
   }
 
   return (
     <div class="space-y-6">
-
-      <MutationDebugger mutation={updateTeamMutation}/>
-
-      <QueryDebugger query={team}/>
 
       {/* Section Header */}
       <div class="flex items-center gap-3">
@@ -223,6 +219,19 @@ export const AdminTeamSettingsSection: Component = () => {
           </span>
         </p>
       </TextField>
+
+      {/* Team Description Field */}
+      <div class="space-y-2">
+        <label class="block text-sm font-medium text-gray-700">Team Description</label>
+        <textarea
+          class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-accent focus:ring-4 focus:ring-accent/20 transition-all duration-300 outline-none bg-white/50 backdrop-blur-sm hover:bg-white/70 text-gray-800 shadow-sm hover:shadow-md focus:shadow-lg"
+          rows={5}
+          placeholder="Describe your team..."
+          value={description()}
+          onInput={(e) => setDescription((e.target as HTMLTextAreaElement).value)}
+        />
+        <p class="text-xs text-gray-500">Optional. Provide a brief description of your team.</p>
+      </div>
 
       {/* Team Visibility Toggle */}
       <Checkbox

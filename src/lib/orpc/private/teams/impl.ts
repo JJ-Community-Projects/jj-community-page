@@ -92,7 +92,7 @@ const update = os.updateContract
   .handler(async ({context, input}) => {
     const db = context.db;
     const team = context.team; // From teamsOwnerMiddleware
-    const {name, slug, visible} = input;
+    const {name, slug, visible, description} = input;
 
     try {
       // Check slug uniqueness if changed
@@ -116,7 +116,8 @@ const update = os.updateContract
         .set({
           name: name,
           slug: createSlug(slug),
-          ...(visible !== undefined && {visible: visible})
+          ...(visible !== undefined && {visible: visible}),
+          ...(description !== undefined && {description: description ?? null})
         })
         .where(eq(teamsTable.id, input.teamId));
 

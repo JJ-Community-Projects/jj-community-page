@@ -1,43 +1,106 @@
 ---
-import {serverClientPublic} from "../../lib/orpc/serverClient";
-import BaseLayout from "../../layouts/BaseLayout.astro";
-import {UserSchedulePage} from "../../components/features/schedules/UserSchedulePage";
-import {DebugJSONView} from "../../components/common/DebugJSONView";
+import { serverClientPublic } from '../../lib/orpc/serverClient'
+import BaseLayout4xl from '../../layouts/BaseLayout4xl.astro'
+import {
+  NextStreamsIsland,
+  FullScheduleIsland,
+} from '../../components/features/schedules/UserSchedulePage'
+import { DebugJSONView } from '../../components/common/DebugJSONView'
+import { FaSolidPlay } from 'solid-icons/fa'
 
-const {slug} = Astro.params
+const { slug } = Astro.params
 
 if (!slug) {
   return Astro.redirect('/error')
 }
 
-const {data: schedule, error} = await serverClientPublic.schedules.getFullScheduleBySlug({slug}, {
-  context: {
-    locals: Astro.locals,
-    request: Astro.request,
-  }
-})
+const { data: schedule, error } =
+  await serverClientPublic.schedules.getFullScheduleBySlug(
+    { slug },
+    {
+      context: {
+        locals: Astro.locals,
+        request: Astro.request,
+      },
+    }
+  )
 
 if (error) {
   console.error(error)
 }
+
+const isDebug = Astro.url.searchParams.get('debug') === '1'
+const pageTitleBase = schedule?.data?.title ?? 'Schedule'
+const pageTitle = `${pageTitleBase} | Jingle Jam Community`
+
+const ownerName = schedule?.owner?.username ?? ''
+const ownerSlug = schedule?.owner?.tiltifySlug ?? ''
 ---
-<BaseLayout title={schedule?.data.title || "Schedule"}>
-  {
-    error && (
-                  <div class="container mx-auto px-4 py-8">
-                      <div class="bg-white p-6 rounded-lg shadow-lg">
-                          <h1 class="text-2xl font-bold text-red-600 mb-4">Error</h1>
-                          <p class="text-gray-800">{error.message}</p>
-                      </div>
-                  </div>
-    )
-  }
-  {
-    (!error && schedule) && (
-                  <div class="container mx-auto px-4 py-8">
-                      <UserSchedulePage client:only="solid-js" initSchedule={schedule}/>
-                      <DebugJSONView client:only="solid-js" data={schedule} title="DEBUG Schedule Data"/>
-                  </div>
-    )
-  }
-</BaseLayout>
+
+<BaseLayout4xl title={pageTitle}>
+  <div class="w-full flex flex-col justify-center items-stretch gap-4">
+    <!-- Hero / Header (centered H1) -->
+    <div
+      class="group w-full bg-white rounded-xl shadow-md border-2 group-hover:border-accent-200 hover:shadow-lg transition-all duration-300 p-4"
+    >
+      <h1 class="~text-xl/2xl font-babas text-black text-center">
+        {pageTitleBase}
+      </h1>
+      {
+        ownerName && (
+          <div class="mt-1 text-center">
+            <a href={`/${ownerSlug}`} class="text-accent hover:underline">
+              {ownerName}
+            </a>
+          </div>
+        )
+      }
+    </div>
+
+    <!-- Error state (single card) -->
+    {
+      error && (
+        <div class="group w-full bg-white rounded-xl shadow-md border-2 group-hover:border-accent-200 hover:shadow-lg transition-all duration-300 p-4">
+          <div class="flex items-center gap-2 text-lg font-semibold mb-4">
+            <h2 class="~text-xl/2xl font-babas text-black group-hover:text-accent transition-all duration-300">
+              Error
+            </h2>
+          </div>
+          <p class="text-gray-800">{error.message}</p>
+        </div>
+      )
+    }
+
+    <!-- Next Streams section -->
+    {
+      !error && schedule && (
+        <NextStreamsIsland client:only="solid-js" initSchedule={schedule} />
+      )
+    }
+
+    <!-- Full Schedule section -->
+    {
+      !error && schedule && (
+        <FullScheduleIsland client:only="solid-js" initSchedule={schedule} />
+      )
+    }
+
+    <!-- Debug view (conditional) -->
+    {
+      !error && schedule && isDebug && (
+        <div class="group w-full bg-white rounded-xl shadow-md border-2 group-hover:border-accent-200 hover:shadow-lg transition-all duration-300 p-4">
+          <div class="flex items-center gap-2 text-lg font-semibold mb-4">
+            <h2 class="~text-xl/2xl font-babas text-black group-hover:text-accent transition-all duration-300">
+              Debug Data
+            </h2>
+          </div>
+          <DebugJSONView
+            client:only="solid-js"
+            data={schedule}
+            title="DEBUG Schedule Data"
+          />
+        </div>
+      )
+    }
+  </div>
+</BaseLayout4xl>

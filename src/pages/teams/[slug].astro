@@ -1,124 +1,69 @@
 ---
-import BaseLayout from "../../layouts/BaseLayout.astro";
-import {serverClientPublic} from "../../lib/orpc/serverClient";
-import {TeamHeader} from "../../components/features/teams/public/TeamHeader";
-import {TeamMembersSection} from "../../components/features/teams/public/TeamMembersSection";
-import {TeamNextStreamsSection} from "../../components/features/teams/public/TeamNextStreamsSection";
-import {TeamNotFoundState} from "../../components/features/teams/public/TeamErrorState";
-import {ORPCError, ValidationError} from "@orpc/server";
+import BaseLayout4xl from "../../layouts/BaseLayout4xl.astro";
+import { serverClientPublic } from "../../lib/orpc/serverClient";
+import { TeamHeader } from "../../components/features/teams/public/TeamHeader";
+import { TeamMembersSection } from "../../components/features/teams/public/TeamMembersSection";
+import { TeamNextStreamsSection } from "../../components/features/teams/public/TeamNextStreamsSection";
+import { TeamNotFoundState } from "../../components/features/teams/public/TeamErrorState";
 
-const {slug} = Astro.params;
-
+const { slug } = Astro.params;
 if (!slug) {
   return Astro.redirect('/teams');
 }
-
 const slugLower = slug.toLowerCase();
-
 if (slug !== slugLower) {
   return Astro.redirect(`/teams/${slugLower}`);
 }
 
-// Fetch team data
-const {data: team, error: teamError} = await serverClientPublic.teams.getBySlug({slug}, {
-  context: {
-    locals: Astro.locals,
-    request: Astro.request,
-  },
-});
+const context = { context: { locals: Astro.locals, request: Astro.request } } as const;
 
-// Handle team not found
+const { data: team, error: teamError } = await serverClientPublic.teams.getBySlug({ slug }, context);
 if (teamError || !team) {
   console.error('Team fetch error:', teamError);
-  // Return 404 component instead of redirect to avoid infinite loops
 }
 
-let members, nextStreams, membersError, streamsError;
-
-// Fetch additional data only if team exists
+let members, membersError, nextStreams, streamsError;
 if (team) {
-  // Fetch team members
-  const membersResult = await serverClientPublic.teams.getMembers({slug}, {
-    context: {
-      locals: Astro.locals,
-      request: Astro.request,
-    },
-  });
-  members = membersResult.data;
-  membersError = membersResult.error;
-
-  // Fetch next streams
-  const streamsResult = await serverClientPublic.teams.getTeamNextStreams({
-    slug,
-    limit: 6,
-    unique: true
-  }, {
-    context: {
-      locals: Astro.locals,
-      request: Astro.request,
-    },
-  });
-  nextStreams = streamsResult.data;
-  streamsError = streamsResult.error;
+  const m = await serverClientPublic.teams.getMembers({ slug }, context);
+  members = m.data; membersError = m.error;
+  const s = await serverClientPublic.teams.getTeamNextStreams({ slug, limit: 6, unique: true }, context);
+  nextStreams = s.data; streamsError = s.error;
 }
 
-// Team colors - use design system defaults since teams don't have custom colors yet
+// Semantic DS tokens with safe fallbacks; keep island prop contract (strings)
 const teamColors = {
-  primaryColor: '#E30E50',
-  accentColor: '#3584BF'
+  primaryColor: 'var(--jj-color-primary-500, #E30E50)',
+  accentColor: 'var(--jj-color-accent-500, #3584BF)'
 };
 ---
 
-<BaseLayout title={team ? `${team.name} Team | Jingle Jam Community` : 'Team Not Found | Jingle Jam Community'}>
-  {
-    (teamError || !team) ? (
-      <TeamNotFoundState client:only="solid-js" />
-    ) : (
-      <div class="w-full mx-4 xl:mx-20 py-8 md:py-12 lg:py-16">
-        {/* Team Header */}
-        <TeamHeader
-          client:only="solid-js"
-          team={team}
-          memberCount={members?.members.length || 0}
-          teamColors={teamColors}
-        />
-
-        {/* Team Members Section */}
-        {!membersError && members && (
-          <TeamMembersSection
-            client:only="solid-js"
-            members={members.members}
-            teamColors={teamColors}
-          />
-        )}
-
-        {/* Team Next Streams Section */}
-        {!streamsError && nextStreams && nextStreams.length > 0 && (
-          <TeamNextStreamsSection
-            client:only="solid-js"
-            streams={nextStreams}
-            teamSlug={slug}
-            teamColors={teamColors}
-          />
-        )}
-
-        {/* Error states for partial failures */}
-        {membersError && (
-          <div class="bg-white rounded-xl shadow-md border-2 border-danger-200 p-6 mb-6">
-            <p class="text-danger-700 text-center font-poppins">
-              Unable to load team members. Please try refreshing the page.
-            </p>
-          </div>
-        )}
-
-        {streamsError && (
-          <div class="bg-white rounded-xl shadow-md border-2 border-danger-200 p-6 mb-6">
-            <p class="text-danger-700 text-center font-poppins">
-              Unable to load upcoming streams. Please try refreshing the page.
-            </p>
-          </div>
-        )}
+<BaseLayout4xl title={team ? `${team.name} | Jingle Jam Community` : 'Team | Jingle Jam Community'}>
+  <main class="w-full flex flex-col justify-center items-stretch gap-4">
+    {(!team || teamError) ? (
+      <div class="w-full">
+        <TeamNotFoundState client:only="solid-js" />
       </div>
-    )
-  }
-</BaseLayout>
+    ) : (
+      <>
+        {/* Hero/Header */}
+        <TeamHeader client:only="solid-js" team={team} memberCount={members?.members.length ?? 0} teamColors={teamColors} />
+
+        {(!membersError && members) ? (
+          <TeamMembersSection client:only="solid-js" members={members.members} teamColors={teamColors} />
+        ) : membersError ? (
+          <div class="bg-white rounded-xl p-4 shadow-md border-2 border-danger-200">
+            <p class="text-danger-700 text-center">Unable to load team members. Please try again.</p>
+          </div>
+        ) : null}
+
+        {(!streamsError && nextStreams && nextStreams.length > 0) ? (
+          <TeamNextStreamsSection client:only="solid-js" streams={nextStreams} teamSlug={slug} teamColors={teamColors} />
+        ) : streamsError ? (
+          <div class="bg-white rounded-xl p-4 shadow-md border-2 border-danger-200">
+            <p class="text-danger-700 text-center">Unable to load upcoming streams. Please try again.</p>
+          </div>
+        ) : null}
+      </>
+    )}
+  </main>
+</BaseLayout4xl>

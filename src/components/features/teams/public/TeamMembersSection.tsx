@@ -20,21 +20,18 @@ export const TeamMembersSection: Component<TeamMembersSectionProps> = (props) =>
 
   return (
     <div
-      class="bg-white rounded-xl shadow-md border-2 border-primary-200 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 mb-6"
+      class="group w-full bg-white rounded-xl shadow-md border-2 group-hover:border-accent-200 hover:shadow-lg transition-all duration-300 p-4 md:p-6 lg:p-8"
       style={{
-        "--team-primary": primaryColor,
-        "--team-accent": accentColor
+        "--user-primary": primaryColor,
+        "--user-accent": accentColor
       }}
     >
-      <div class="p-4 md:p-6 lg:p-8">
         {/* Section Header */}
-        <div class="flex flex-col items-center text-center mb-6">
-          <div class="flex items-center gap-3 mb-2">
-            <FaSolidUsers class="w-5 h-5 text-black" />
-            <h2 class="~text-xl/2xl font-babas text-black">
-              Team Members
-            </h2>
-          </div>
+        <div class="flex items-center gap-2 text-lg font-semibold mb-4">
+          <FaSolidUsers class="w-5 h-5 text-black group-hover:text-accent transition-all duration-300" />
+          <h2 class="~text-xl/2xl font-babas text-black group-hover:text-accent transition-all duration-300">
+            Members
+          </h2>
         </div>
 
         <Show
@@ -72,7 +69,6 @@ export const TeamMembersSection: Component<TeamMembersSectionProps> = (props) =>
             </For>
           </div>
         </Show>
-      </div>
     </div>
   );
 };
