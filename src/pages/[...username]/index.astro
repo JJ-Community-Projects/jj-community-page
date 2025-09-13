@@ -1,33 +1,37 @@
 ---
-import {serverClientPublic} from "../../lib/orpc/serverClient";
-import BaseLayout from "../../layouts/BaseLayout.astro";
-import {UserHeader} from "../../components/features/users/public/UserHeader";
-import {NextStreamsSection} from "../../components/features/users/public/NextStreamsSection";
-import {FriendsSection} from "../../components/features/users/public/FriendsSection";
-import UserTeamsSection from "../../components/features/users/public/UserTeamsSection.astro";
-import OtherSchedulesSection from "../../components/features/users/public/OtherSchedulesSection.astro";
-import {ORPCError, ValidationError} from "@orpc/server";
+import { serverClientPublic } from '../../lib/orpc/serverClient'
+import { UserHeader } from '../../components/features/users/public/UserHeader'
+import { NextStreamsSection } from '../../components/features/users/public/NextStreamsSection'
+import { FriendsSection } from '../../components/features/users/public/FriendsSection'
+import UserTeamsSection from '../../components/features/users/public/UserTeamsSection.astro'
+import OtherSchedulesSection from '../../components/features/users/public/OtherSchedulesSection.astro'
+import { ORPCError, ValidationError } from '@orpc/server'
+import BaseLayout4xl from '../../layouts/BaseLayout4xl.astro'
 
-const {username} = Astro.params;
+const { username } = Astro.params
 
 if (!username) {
   return Astro.redirect('/user-not-found')
 }
 
-const usernameLower = username.toLowerCase();
+const usernameLower = username.toLowerCase()
 
 if (username !== usernameLower) {
   return Astro.redirect(`/${usernameLower}`)
 }
 
-const getUserFullProfileBySlug = serverClientPublic.users.getUserFullProfileBySlug
+const getUserFullProfileBySlug =
+  serverClientPublic.users.getUserFullProfileBySlug
 
-const {data: user, error} = await getUserFullProfileBySlug({slug: username}, {
-  context: {
-    locals: Astro.locals,
-    request: Astro.request,
-  },
-})
+const { data: user, error } = await getUserFullProfileBySlug(
+  { slug: username },
+  {
+    context: {
+      locals: Astro.locals,
+      request: Astro.request,
+    },
+  }
+)
 
 if (error) {
   console.error(error)
@@ -47,77 +51,61 @@ if (error) {
   }
 }
 if (user !== undefined) {
-//   throw Astro.redirect('/user-not-found')
+  //   throw Astro.redirect('/user-not-found')
   console.log(JSON.stringify(user, null, 2))
 }
-
 
 // Fetch the user's primary schedule for the ActiveSchedule component
 // const { data: primarySchedule, error: scheduleError } = await Astro.callAction(actions.ui.users.schedules.getCurrentPrimaryByTiltifyUsername, username);
 ---
-<BaseLayout title={`${user?.user.username} | Jingle Jam Community`}>
-    <div class="w-full mx-4 xl:mx-20 py-8 md:py-12 lg:py-16">
-      {
-        error && (
-                      <pre>ERROR: {JSON.stringify(error, null, 2)}</pre>
-        )
-      }
 
-      {
-        !error && user && (
-                      <>
-                        {/* New redesigned component order */}
-                          <UserHeader
-                                  client:only="solid-js"
-                                  user={user}
-                          />
+<BaseLayout4xl title={`${user?.user.username} | Jingle Jam Community`}>
+  {error && <pre>ERROR: {JSON.stringify(error, null, 2)}</pre>}
 
-                        {/* StreamsPreview for next primary streams */}
-                        {user.primarySchedule &&  user.nextPrimaryStreams && user.nextPrimaryStreams.length > 0 && (
-                                <NextStreamsSection
-                                        client:only="solid-js"
-                                        streams={user.nextPrimaryStreams}
-                                        userColors={{
-                                          primaryColor: user.style.primaryColor,
-                                          accentColor: user.style.accentColor
-                                        }}
-                                        primarySchedule={user.primarySchedule}
-                                />
-                        )}
-
-                        {/* FriendsSection */}
-                        {
-                          (user.friends.length > 0) && (
-                                        <FriendsSection
-                                                client:only="solid-js"
-                                                friends={user.friends}
-                                                userColors={{
-                                                  primaryColor: user.style.primaryColor,
-                                                  accentColor: user.style.accentColor
-                                                }}
-                                        />)
-                        }
-
-                        {/* UserTeams with user color theming */}
-                        {(user.teams.length > 0) && (
-                                <UserTeamsSection
-                                        teams={user.teams}
-                                        userColors={{
-                                          primaryColor: user.style.primaryColor,
-                                          accentColor: user.style.accentColor
-                                        }}
-                                />
-                        )}
-                        {/* OtherSchedules */}
-                        {(user.schedules.length > 0) && (
-                                <OtherSchedulesSection
-                                        schedules={user.schedules}
-                                        userColors={{
-                                          primaryColor: user.style.primaryColor,
-                                          accentColor: user.style.accentColor
-                                        }}
-                                />)}
-                      </>)
-      }
-    </div>
-</BaseLayout>
+  {
+    !error && user && (
+      <div class="w-full flex flex-col justify-center items-stretch gap-4">
+        <UserHeader client:only="solid-js" user={user} />
+        {user.primarySchedule && user.nextPrimaryStreams.length > 0 && (
+          <NextStreamsSection
+            client:only="solid-js"
+            primarySchedule={user.primarySchedule}
+            streams={user.nextPrimaryStreams}
+            userColors={{
+              primaryColor: user.style.primaryColor,
+              accentColor: user.style.accentColor,
+            }}
+          />
+        )}
+        {user.friends.length > 0 && (
+          <FriendsSection
+            client:only="solid-js"
+            friends={user.friends}
+            userColors={{
+              primaryColor: user.style.primaryColor,
+              accentColor: user.style.accentColor,
+            }}
+          />
+        )}
+        {user.teams.length > 0 && (
+          <UserTeamsSection
+            teams={user.teams}
+            userColors={{
+              primaryColor: user.style.primaryColor,
+              accentColor: user.style.accentColor,
+            }}
+          />
+        )}
+        {user.schedules.length > 0 && (
+          <OtherSchedulesSection
+            schedules={user.schedules}
+            userColors={{
+              primaryColor: user.style.primaryColor,
+              accentColor: user.style.accentColor,
+            }}
+          />
+        )}
+      </div>
+    )
+  }
+</BaseLayout4xl>
