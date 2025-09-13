@@ -1,5 +1,6 @@
 ---
 import {type ScheduleInfo} from "../../../../lib/orpc/public/schemas/schedules";
+import { FaSolidCalendarDays } from 'solid-icons/fa'
 
 interface Props {
   schedules: ScheduleInfo[];
@@ -16,31 +17,29 @@ const primaryColor = userColors?.primaryColor || '#E30E50';
 const accentColor = userColors?.accentColor || '#3584BF';
 ---
 
-<div class="w-full bg-white rounded-xl shadow-md border-2 border-primary-200 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 mb-6 p-4 md:p-6 lg:p-8">
-  <div class="flex flex-col items-center text-center mb-6">
-    <div class="flex items-center gap-3 mb-2">
-      <svg class="w-5 h-5 text-black" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
-      </svg>
-      <h2 class="text-xl font-bold text-black font-babas">Schedules</h2>
+<div class="group w-full bg-white rounded-xl shadow-md border-2 group-hover:border-accent-200 hover:shadow-lg transition-all duration-300 mb-6 p-4 md:p-6 lg:p-8">
+    <div class="flex items-center gap-2 text-lg font-semibold mb-4">
+      <FaSolidCalendarDays class="w-5 h-5 group-hover:text-accent transition-all duration-300" />
+      <h2 class="text-xl font-bold text-black font-babas group-hover:text-accent transition-all duration-300">Schedules</h2>
     </div>
-  </div>
   {schedules && schedules.length > 0 ? (
     <div class="space-y-4">
       {schedules.map((schedule) => (
         <div class="border border-gray-200 rounded-md p-4">
-          <div class="flex justify-between items-center mb-2">
+          <div class="flex justify-between items-center">
+          <div class="flex gap-2 items-center">
             <h3 class="text-lg font-semibold">{schedule.title}</h3>
             <span class="text-sm bg-primary text-white px-2 py-1 rounded">
               {schedule.year}
             </span>
           </div>
-          <a
-            href={`/schedules/${schedule.slug}`}
-            class="text-accent hover:underline inline-block mt-2"
-          >
-            View Schedule
-          </a>
+            <a
+              href={`/schedules/${schedule.slug}`}
+              class="text-accent hover:underline inline-block mt-2"
+            >
+              View Schedule
+            </a>
+          </div>
         </div>
       ))}
     </div>

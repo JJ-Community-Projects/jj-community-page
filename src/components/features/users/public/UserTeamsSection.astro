@@ -1,5 +1,8 @@
 ---
 import {type Team} from "../../../../lib/orpc/public/schemas/teams";
+import {
+FaSolidUserGroup
+} from "solid-icons/fa";
 
 interface Props {
   teams: Team[];
@@ -16,15 +19,11 @@ const primaryColor = userColors?.primaryColor || '#E30E50';
 const accentColor = userColors?.accentColor || '#3584BF';
 ---
 
-<div class="w-full bg-white rounded-xl shadow-md border-2 border-primary-200 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 mb-6 p-4 md:p-6 lg:p-8">
-  <div class="flex flex-col items-center text-center mb-6">
-    <div class="flex items-center gap-3 mb-2">
-      <svg class="w-5 h-5 text-black" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M12 5.9c1.16 0 2.1.94 2.1 2.1s-.94 2.1-2.1 2.1S9.9 9.16 9.9 8s.94-2.1 2.1-2.1m0 9c2.97 0 6.1 1.46 6.1 2.1v1.1H5.9V17c0-.64 3.13-2.1 6.1-2.1M12 4C9.79 4 8 5.79 8 8s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm0 9c-2.67 0-8 1.34-8 4v3h16v-3c0-2.66-5.33-4-8-4z"/>
-      </svg>
-      <h2 class="text-xl font-bold text-black font-babas">Teams</h2>
+<div class="group w-full bg-white rounded-xl shadow-md border-2 group-hover:border-accent-200 hover:shadow-lg transition-all duration-300 p-4">
+    <div class="flex items-center gap-2 text-lg font-semibold mb-4">
+      <FaSolidUserGroup class="group-hover:text-accent transition-all duration-300"/>
+      <h2 class="text-xl font-bold text-black font-babas group-hover:text-accent transition-all duration-300">Teams</h2>
     </div>
-  </div>
   {teams && teams.length > 0 ? (
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             {teams.map((team) => (

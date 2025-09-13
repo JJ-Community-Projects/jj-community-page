@@ -1,7 +1,7 @@
-import {type Component, For, Show} from "solid-js";
-import type {UserDisplay} from "../../../../lib/orpc/public/schemas/UserDisplaySchema";
-import {FaSolidUserGroup} from "solid-icons/fa";
-import {UserPillAvatar} from "../../../common/UserAvatar.tsx";
+import { type Component, For, Show } from 'solid-js'
+import type { UserDisplay } from '../../../../lib/orpc/public/schemas/UserDisplaySchema'
+import { FaSolidUser } from 'solid-icons/fa'
+import { UserPillAvatar } from '../../../common/UserAvatar.tsx'
 
 interface FriendsSectionProps {
   friends: UserDisplay[];
@@ -19,33 +19,32 @@ export const FriendsSection: Component<FriendsSectionProps> = (props) => {
 
   return (
     <div
-      class="bg-white rounded-xl shadow-md border-2 border-primary-200 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 mb-6"
+      class="group w-full bg-white rounded-xl shadow-md border-2 group-hover:border-accent-200 hover:shadow-lg transition-all duration-300"
       style={{
         "--user-primary": primaryColor,
         "--user-accent": accentColor
       }}
     >
-      <div class="p-4 md:p-6 lg:p-8">
-        <div class="flex flex-col items-center text-center mb-6">
-          <div class="flex items-center gap-3 mb-2">
-            <FaSolidUserGroup class="w-5 h-5 text-black"/>
-            <h2 class="~text-xl/2xl font-babas text-black">
+      <div class="p-4">
+          <div class="flex items-center gap-2 text-lg font-semibold mb-4">
+            <FaSolidUser class="w-5 h-5 text-black group-hover:text-accent transition-all duration-300"/>
+            <h2 class="~text-xl/2xl font-babas text-black group-hover:text-accent transition-all duration-300">
               Friends
             </h2>
           </div>
-        </div>
-
         <Show
           when={props.friends && props.friends.length > 0}
         >
-          <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4 md:gap-6">
+          <div class="flex flex-wrap gap-4">
             <For each={props.friends}>
               {(friend) => (
-                <UserPillAvatar
-                  user={friend}
-                  primaryColor={primaryColor}
-                  accentColor={accentColor}
-                />
+                <div class="min-w-24">
+                  <UserPillAvatar
+                    user={friend}
+                    primaryColor={primaryColor}
+                    accentColor={accentColor}
+                  />
+                </div>
               )}
             </For>
           </div>
