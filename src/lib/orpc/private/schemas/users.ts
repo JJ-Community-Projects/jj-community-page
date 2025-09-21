@@ -1,4 +1,4 @@
-import {z} from "zod/v4";
+import { z } from 'zod/v4'
 
 /**
  * User-related schemas used across public and private oRPC procedures.
@@ -10,7 +10,7 @@ import {z} from "zod/v4";
  * Ensures the ID is a positive integer matching the users table primary key.
  * Used in: blocks, friends contracts for user identification, public user lookups
  */
-export const UserIdSchema = z.number().int().positive();
+export const UserIdSchema = z.number().int().positive()
 
 /**
  * Input schema for operations that require a user ID parameter.
@@ -34,19 +34,17 @@ export const UserIdInputSchema = z.object({
  * These schemas handle read-only operations for user profiles, relationships, and associated data.
  */
 
-
 /**
  * Schema for validating user slug parameters in API requests.
  * User slugs are derived from provider usernames (e.g., Tiltify login) and used for URL routing.
  */
-export const UserSlugSchema = z.string().nonempty();
+export const UserSlugSchema = z.string().nonempty()
 
-
-export const UserSlugInputSchema = z.object({slug: z.string()});
-
+export const UserSlugInputSchema = z.object({ slug: z.string() })
 
 export const UserQueryInputSchema = z.union([
-  UserSlugInputSchema, UserIdInputSchema,
+  UserSlugInputSchema,
+  UserIdInputSchema,
 ])
 
 /**
@@ -59,7 +57,7 @@ export const UserQueryInputSchema = z.union([
  * - youtube: YouTube Live streaming
  * - tiktok: TikTok Live streaming
  */
-export const StreamingPlatformSchema = z.enum(['twitch', 'youtube', 'tiktok']);
+export const StreamingPlatformSchema = z.enum(['twitch', 'youtube', 'tiktok'])
 
 /**
  * Schema for Twitch channel information associated with a user.
@@ -82,7 +80,7 @@ export const TwitchChannelSchema = z.object({
   profileImageUrl: z.string().nullable(),
   /** Offline image URL from Twitch */
   offlineImageUrl: z.string().nullable(),
-});
+})
 
 /**
  * Schema for social media links associated with a user profile.
@@ -95,7 +93,7 @@ export const SocialSchema = z.object({
   provider: z.string(),
   /** Full URL to the user's profile on the social media platform */
   url: z.string().url(),
-});
+})
 
 /**
  * Schema for user display information used in public API responses.
@@ -124,7 +122,7 @@ export const UserDisplaySchema = z.object({
   primaryColor: z.string().nullable(),
   /** Custom accent color from userStyles table */
   accentColor: z.string().nullable(),
-});
-
+})
 
 export type UserDisplay = z.infer<typeof UserDisplaySchema>
+export type StreamingPlatform = z.infer<typeof StreamingPlatformSchema>

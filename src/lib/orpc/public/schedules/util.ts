@@ -2,8 +2,8 @@ import {ORPCError} from '@orpc/server';
 import {accounts} from "../../../db/schema/auth-schema.ts";
 import {schedulesTable, streamParticipantsTable, streamsTable} from "../../../db/schema/jj-schema.ts";
 import {userDisplayView} from "../../../db/schema/views-schema.ts";
-import {and, eq} from "drizzle-orm";
-import {ScheduleDaySchema, ScheduleWeekSchema, StreamSchema} from "../schemas/schedules.ts";
+import {and, eq, asc, sql, or} from "drizzle-orm";
+import {ScheduleDaySchema, ScheduleWeekSchema, StreamSchema, type Stream} from "../schemas/schedules.ts";
 import {z} from "zod/v4";
 import type {JJDrizzleDatabase} from "../../../db/db.ts";
 import {streamTagsTable, tags} from "../../../db/schema/tags-schema.ts";
@@ -232,4 +232,186 @@ export function getPrimaryScheduleByUserSlugAndYear(db: JJDrizzleDatabase, userI
       eq(schedulesTable.primary, true),
       eq(schedulesTable.visible, true)
     )).get()
+}
+
+
+export async function getNextStreamsAcrossPublicPrimarySchedules(
+  db: JJDrizzleDatabase,
+  params: { year: number; limit: number; uniqueBySchedule: boolean; nowSec: number }
+): Promise<Stream[]> {
+  const { year, limit, uniqueBySchedule, nowSec } = params
+
+  // Step 1: Identify candidate streams in time window across public primary schedules
+  const baseSelect = db
+    .select({
+      scheduleId: schedulesTable.id,
+      streamId: streamsTable.id,
+      streamStart: streamsTable.start,
+    })
+    .from(schedulesTable)
+    .innerJoin(streamsTable, eq(streamsTable.scheduleId, schedulesTable.id))
+    .where(and(
+      eq(schedulesTable.year, year),
+      eq(schedulesTable.visible, true),
+      eq(schedulesTable.primary, true),
+      eq(streamsTable.visible, true),
+      // upcoming or currently live
+      sql`${streamsTable.start} >= ${nowSec} OR (${streamsTable.start} <= ${nowSec} AND ${streamsTable.end} > ${nowSec})`
+    ))
+    .orderBy(asc(streamsTable.start))
+
+  let selectedPairs: Array<{ scheduleId: number; streamId: number }>
+
+  if (!uniqueBySchedule) {
+    const rows = await baseSelect.limit(limit).all()
+    selectedPairs = rows.map(r => ({ scheduleId: r.scheduleId, streamId: r.streamId }))
+  } else {
+    // Unique by schedule: fetch a window and dedupe in application
+    const windowSize = Math.min(Math.max(limit * 5, 50), 300)
+    const rows = await baseSelect.limit(windowSize).all()
+    const seen = new Set<number>()
+    const unique: Array<{ scheduleId: number; streamId: number }> = []
+    for (const r of rows) {
+      if (!seen.has(r.scheduleId)) {
+        seen.add(r.scheduleId)
+        unique.push({ scheduleId: r.scheduleId, streamId: r.streamId })
+        if (unique.length >= limit) break
+      }
+    }
+    selectedPairs = unique
+  }
+
+  if (selectedPairs.length === 0) return []
+
+  // Helper to build OR of composite key (scheduleId, streamId)
+  const pairOrConditionStreams = or(
+    ...selectedPairs.map(p => and(
+      eq(streamsTable.scheduleId, p.scheduleId),
+      eq(streamsTable.id, p.streamId),
+    ))
+  )
+
+  // Step 2: Load full stream details
+  const streamDetails = await db.select({
+    id: streamsTable.id,
+    scheduleId: streamsTable.scheduleId,
+    createdBy: streamsTable.createdBy,
+    title: streamsTable.title,
+    visible: streamsTable.visible,
+    subtitle: streamsTable.subtitle,
+    description: streamsTable.description,
+    youtubeVodUrl: streamsTable.youtubeVodUrl,
+    twitchVodUrl: streamsTable.twitchVodUrl,
+    start: streamsTable.start,
+    end: streamsTable.end,
+  })
+    .from(streamsTable)
+    .where(pairOrConditionStreams)
+    .all()
+
+  const detailMap = new Map<string, Omit<Stream, 'tags' | 'participants'>>()
+  for (const s of streamDetails) {
+    const key = `${s.scheduleId}:${s.id}`
+    detailMap.set(key, s as Omit<Stream, 'tags' | 'participants'>)
+  }
+
+  // Step 3: Load tags for selected streams
+  const pairOrConditionTags = or(
+    ...selectedPairs.map(p => and(
+      eq(streamTagsTable.scheduleId, p.scheduleId),
+      eq(streamTagsTable.streamId, p.streamId),
+    ))
+  )
+  const tagRows = await db.select({
+    scheduleId: streamTagsTable.scheduleId,
+    streamId: streamTagsTable.streamId,
+    name: tags.name,
+    slug: tags.slug,
+    color: tags.color,
+  })
+    .from(streamTagsTable)
+    .innerJoin(tags, eq(streamTagsTable.tagId, tags.id))
+    .where(pairOrConditionTags)
+    .all()
+
+  const tagsMap = new Map<string, Array<{ name: string; slug: string; color: string }>>()
+  for (const t of tagRows) {
+    const key = `${t.scheduleId}:${t.streamId}`
+    const arr = tagsMap.get(key) ?? []
+    arr.push({ name: t.name, slug: t.slug, color: t.color })
+    tagsMap.set(key, arr)
+  }
+
+  // Step 4: Load participants for selected streams
+  const pairOrConditionParticipants = or(
+    ...selectedPairs.map(p => and(
+      eq(streamParticipantsTable.scheduleId, p.scheduleId),
+      eq(streamParticipantsTable.streamId, p.streamId),
+    ))
+  )
+  const participantRows = await db.select({
+    scheduleId: streamParticipantsTable.scheduleId,
+    streamId: streamParticipantsTable.streamId,
+    userId: userDisplayView.userId,
+    primaryLiveStream: userDisplayView.primaryLiveStream,
+    createdAt: userDisplayView.createdAt,
+    username: userDisplayView.username,
+    profileImage: userDisplayView.profileImage,
+    twitchLogin: userDisplayView.twitchLogin,
+    tiltifySlug: userDisplayView.tiltifySlug,
+    tiltifyUrl: userDisplayView.tiltifyUrl,
+    primaryColor: userDisplayView.primaryColor,
+    accentColor: userDisplayView.accentColor,
+  })
+    .from(streamParticipantsTable)
+    .innerJoin(userDisplayView, eq(streamParticipantsTable.userId, userDisplayView.userId))
+    .where(pairOrConditionParticipants)
+    .all()
+
+  const participantsMap = new Map<string, Array<{
+    userId: number;
+    primaryLiveStream: string;
+    createdAt: Date;
+    username: string;
+    profileImage: string;
+    twitchLogin: string | null;
+    tiltifySlug: string;
+    tiltifyUrl: string;
+    primaryColor: string | null;
+    accentColor: string | null;
+  }>>()
+  for (const p of participantRows) {
+    const key = `${p.scheduleId}:${p.streamId}`
+    const arr = participantsMap.get(key) ?? []
+    arr.push({
+      userId: p.userId,
+      primaryLiveStream: p.primaryLiveStream,
+      createdAt: p.createdAt,
+      username: p.username,
+      profileImage: p.profileImage,
+      twitchLogin: p.twitchLogin,
+      tiltifySlug: p.tiltifySlug,
+      tiltifyUrl: p.tiltifyUrl,
+      primaryColor: p.primaryColor,
+      accentColor: p.accentColor,
+    })
+    participantsMap.set(key, arr)
+  }
+
+  // Step 5: Compose final stream objects preserving chronological order
+  const result: Stream[] = []
+  for (const pair of selectedPairs) {
+    const key = `${pair.scheduleId}:${pair.streamId}`
+    const core = detailMap.get(key)
+    if (!core) continue
+    result.push({
+      ...(core as any),
+      tags: tagsMap.get(key) ?? [],
+      participants: participantsMap.get(key) ?? [],
+    })
+  }
+
+  // Ensure ascending order by start time (should already be from base selection)
+  result.sort((a, b) => a.start.getTime() - b.start.getTime())
+  return result
 }

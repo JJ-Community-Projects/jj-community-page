@@ -1,7 +1,7 @@
-import {oc} from '@orpc/contract'
-import z from "zod/v4";
-import {HexColorSchema, SuccessSchema} from "../schemas/common.ts";
-import {StreamingPlatformSchema} from "../schemas/users.ts"; /**
+import { oc } from '@orpc/contract'
+import z from 'zod/v4'
+import { HexColorSchema, SuccessSchema } from '../schemas/common.ts'
+import { StreamingPlatformSchema } from '../schemas/users.ts' /**
  * Profile management contracts for user style and streaming preferences.
  * These endpoints handle direct database operations for user profile customization.
  */
@@ -17,9 +17,11 @@ import {StreamingPlatformSchema} from "../schemas/users.ts"; /**
  * Output: success flag
  */
 const updatePrimaryColorContract = oc
-  .input(z.object({
-    primaryColor: HexColorSchema
-  }))
+  .input(
+    z.object({
+      primaryColor: HexColorSchema,
+    }),
+  )
   .output(SuccessSchema)
 
 /**
@@ -28,9 +30,11 @@ const updatePrimaryColorContract = oc
  * Output: success flag
  */
 const updateAccentColorContract = oc
-  .input(z.object({
-    accentColor: HexColorSchema
-  }))
+  .input(
+    z.object({
+      accentColor: HexColorSchema,
+    }),
+  )
   .output(SuccessSchema)
 /**
  * Update user's accent color preference
@@ -38,14 +42,18 @@ const updateAccentColorContract = oc
  * Output: success flag
  */
 const updateStyleContract = oc
-  .input(z.object({
-    primaryColor: HexColorSchema,
-    accentColor: HexColorSchema
-  }))
-  .output(z.object({
-    primaryColor: HexColorSchema,
-    accentColor: HexColorSchema
-  }))
+  .input(
+    z.object({
+      primaryColor: HexColorSchema,
+      accentColor: HexColorSchema,
+    }),
+  )
+  .output(
+    z.object({
+      primaryColor: HexColorSchema,
+      accentColor: HexColorSchema,
+    }),
+  )
 
 /**
  * Update user's primary live streaming platform
@@ -53,16 +61,22 @@ const updateStyleContract = oc
  * Output: success flag
  */
 const updatePrimaryLiveStreamContract = oc
-  .input(z.object({
-    platform: StreamingPlatformSchema
-  }))
-  .output(SuccessSchema)
+  .input(
+    z.object({
+      platform: StreamingPlatformSchema,
+    }),
+  )
+  .output(
+    z.object({
+      platform: StreamingPlatformSchema,
+    }),
+  )
 
 /**
  * Get user's primary live streaming platform
  * Output: platform string (twitch, youtube, tiktok, or null)
  */
-const getPrimaryLiveStreamContract = oc.output(z.string().nullable())
+const getPrimaryLiveStreamContract = oc.output(StreamingPlatformSchema)
 
 /**
  * Get user's style preferences (primary and accent colors)
@@ -71,10 +85,9 @@ const getPrimaryLiveStreamContract = oc.output(z.string().nullable())
 const getStyleContract = oc.output(
   z.object({
     primaryColor: HexColorSchema.nullable(),
-    accentColor: HexColorSchema.nullable()
-  })
+    accentColor: HexColorSchema.nullable(),
+  }),
 )
-
 
 export const profileContract = {
   updatePrimaryColorContract,

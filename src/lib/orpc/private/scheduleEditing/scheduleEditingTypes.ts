@@ -1,6 +1,6 @@
-import {z} from 'zod/v4'
-import {UserDisplaySchema} from "../schemas/users.ts";
-import {ScheduleSchema} from "../schemas/schedules.ts";
+import { z } from 'zod/v4'
+import { UserDisplaySchema } from '../schemas/users.ts'
+import { ScheduleSchema } from '../schemas/schedules.ts'
 
 /**
  * 1) Core stream schemas
@@ -37,7 +37,7 @@ export const InitScheduleMetaSchema = ScheduleSchema.pick({
   year: true,
   visible: true,
   updatedAt: true,
-});
+})
 
 export const TagSchema = z.object({
   id: z.number(),
@@ -77,7 +77,7 @@ export const StreamUpdatedWithDetailPayloadSchema = z.object({
   tags: z.array(TagSchema).optional(),
 })
 
-export const StreamDeletedPayloadSchema = z.object({id: z.number()})
+export const StreamDeletedPayloadSchema = z.object({ id: z.number() })
 
 export const TagAddedPayloadSchema = z.object({
   streamId: z.number(),
@@ -119,28 +119,57 @@ export const UnlockPayloadSchema = z.object({
  */
 export const EditChannelMessageSchema = z
   .union([
-    z.object({event: z.literal('init'), payload: InitPayloadSchema}),
-    z.object({event: z.literal('schedule_updated'), payload: ScheduleUpdatedPayloadSchema}),
-    z.object({event: z.literal('stream_added'), payload: StreamAddedPayloadSchema}),
-    z.object({event: z.literal('stream_updated'), payload: StreamUpdatedPayloadSchema}),
-    z.object({event: z.literal('stream_updated_with_details'), payload: StreamUpdatedWithDetailPayloadSchema}),
-    z.object({event: z.literal('stream_deleted'), payload: StreamDeletedPayloadSchema}),
-    z.object({event: z.literal('tag_added'), payload: TagAddedPayloadSchema}),
-    z.object({event: z.literal('tag_removed'), payload: TagRemovedPayloadSchema}),
-    z.object({event: z.literal('participant_added'), payload: ParticipantAddedPayloadSchema}),
-    z.object({event: z.literal('participant_removed'), payload: ParticipantRemovedPayloadSchema}),
-    z.object({event: z.literal('draft_published'), payload: DraftPublishedPayloadSchema}),
-    z.object({event: z.literal('draft_discarded'), payload: DraftDiscardedPayloadSchema}),
-    z.object({event: z.literal('lock'), payload: LockPayloadSchema}),
-    z.object({event: z.literal('unlock'), payload: UnlockPayloadSchema}),
+    z.object({ event: z.literal('init'), payload: InitPayloadSchema }),
+    z.object({
+      event: z.literal('schedule_updated'),
+      payload: ScheduleUpdatedPayloadSchema,
+    }),
+    z.object({
+      event: z.literal('stream_added'),
+      payload: StreamAddedPayloadSchema,
+    }),
+    z.object({
+      event: z.literal('stream_updated'),
+      payload: StreamUpdatedPayloadSchema,
+    }),
+    z.object({
+      event: z.literal('stream_updated_with_details'),
+      payload: StreamUpdatedWithDetailPayloadSchema,
+    }),
+    z.object({
+      event: z.literal('stream_deleted'),
+      payload: StreamDeletedPayloadSchema,
+    }),
+    z.object({ event: z.literal('tag_added'), payload: TagAddedPayloadSchema }),
+    z.object({
+      event: z.literal('tag_removed'),
+      payload: TagRemovedPayloadSchema,
+    }),
+    z.object({
+      event: z.literal('participant_added'),
+      payload: ParticipantAddedPayloadSchema,
+    }),
+    z.object({
+      event: z.literal('participant_removed'),
+      payload: ParticipantRemovedPayloadSchema,
+    }),
+    z.object({
+      event: z.literal('draft_published'),
+      payload: DraftPublishedPayloadSchema,
+    }),
+    z.object({
+      event: z.literal('draft_discarded'),
+      payload: DraftDiscardedPayloadSchema,
+    }),
+    z.object({ event: z.literal('lock'), payload: LockPayloadSchema }),
+    z.object({ event: z.literal('unlock'), payload: UnlockPayloadSchema }),
   ])
   .and(
     z.object({
       scheduleId: z.number().int().positive(),
       editorId: z.number().int().positive(),
-    })
+    }),
   )
-
 
 /**
  * 7) Type exports
@@ -149,20 +178,29 @@ export type InitScheduleMeta = z.infer<typeof InitScheduleMetaSchema>
 export type InitDraftStream = z.infer<typeof DraftStreamSchema>
 export type InitTag = z.infer<typeof TagSchema>
 export type InitPayload = z.infer<typeof InitPayloadSchema>
+export type InitParticipant = z.infer<typeof UserDisplaySchema>
 
-export type ScheduleUpdatedPayload = z.infer<typeof ScheduleUpdatedPayloadSchema>
+export type ScheduleUpdatedPayload = z.infer<
+  typeof ScheduleUpdatedPayloadSchema
+>
 export type StreamAddedPayload = z.infer<typeof StreamAddedPayloadSchema>
 export type StreamUpdatedPayload = z.infer<typeof StreamUpdatedPayloadSchema>
 export type StreamDeletedPayload = z.infer<typeof StreamDeletedPayloadSchema>
 export type TagAddedPayload = z.infer<typeof TagAddedPayloadSchema>
 export type TagRemovedPayload = z.infer<typeof TagRemovedPayloadSchema>
-export type ParticipantAddedPayload = z.infer<typeof ParticipantAddedPayloadSchema>
-export type ParticipantRemovedPayload = z.infer<typeof ParticipantRemovedPayloadSchema>
+export type ParticipantAddedPayload = z.infer<
+  typeof ParticipantAddedPayloadSchema
+>
+export type ParticipantRemovedPayload = z.infer<
+  typeof ParticipantRemovedPayloadSchema
+>
 export type DraftPublishedPayload = z.infer<typeof DraftPublishedPayloadSchema>
 export type DraftDiscardedPayload = z.infer<typeof DraftDiscardedPayloadSchema>
 export type LockPayload = z.infer<typeof LockPayloadSchema>
 export type UnlockPayload = z.infer<typeof UnlockPayloadSchema>
-export type StreamUpdatedWithDetailPayload = z.infer<typeof StreamUpdatedWithDetailPayloadSchema>
+export type StreamUpdatedWithDetailPayload = z.infer<
+  typeof StreamUpdatedWithDetailPayloadSchema
+>
 
 export type EditChannelMessage = z.infer<typeof EditChannelMessageSchema>
 
@@ -190,8 +228,8 @@ export function normalizeInitPayloadDates(p: InitPayload): InitPayload {
     participantsByStream: Object.fromEntries(
       Object.entries(p.participantsByStream).map(([k, arr]) => [
         k,
-        arr.map((u) => ({...u, createdAt: toDate(u.createdAt)!})),
-      ])
+        arr.map((u) => ({ ...u, createdAt: toDate(u.createdAt)! })),
+      ]),
     ),
   }
 }

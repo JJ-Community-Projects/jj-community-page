@@ -1,53 +1,48 @@
 ---
-import {serverClientPublic} from "../../lib/orpc/serverClient";
-import BaseLayout from "../../layouts/BaseLayout.astro";
-import {TeamsGrid} from "../../components/features/teams/public/TeamsGrid";
+import { serverClientPublic } from '../../lib/orpc/serverClient'
+import { TeamsGrid } from '../../components/features/teams/public/TeamsGrid'
+import BaseLayout4xl from '../../layouts/BaseLayout4xl.astro'
+import { FaSolidUserGroup } from 'solid-icons/fa'
 
-const {data, error} = await serverClientPublic.teams.findVisible({}, {
+const { data: teams, error } = await serverClientPublic.teams.findVisible(
+  {},
+  {
     context: {
       locals: Astro.locals,
       request: Astro.request,
-    }
-  }
-);
+    },
+  },
+)
 ---
 
-<BaseLayout title="Teams - Jingle Jam Community">
-    <div class="container-margins">
-        <div class="section-spacing">
-            <!-- Page Header -->
-            <header class="bg-white rounded-xl p-4 shadow-md border-2 border-neutral-100 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 text-center mb-12">
-                <h1 class="~text-3xl/5xl font-babas text-neutral-800 mb-4">
-                    Community Teams
-                </h1>
-            </header>
+<BaseLayout4xl title="Teams - Jingle Jam Community">
+  <!-- Error State -->
+  {
+    error && (
+      <div class="bg-red-500 bg-opacity-20 p-4 rounded-lg text-white mb-6">
+        <h2 class="text-xl font-semibold">Error Loading Teams</h2>
+        <p>
+          {error?.message || 'An unknown error occurred while loading teams.'}
+        </p>
+      </div>
+    )
+  }
 
-            <!-- Error State -->
-          {error && (
-                  <div class="bg-danger-50 border border-danger-200 rounded-xl p-6 mb-8">
-                      <div class="flex items-center gap-3 mb-2">
-                          <div class="w-6 h-6 bg-danger-500 rounded-full flex items-center justify-center">
-                              <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
-                                  <path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
-                              </svg>
-                          </div>
-                          <h2 class="~text-lg/xl font-semibold text-danger-700 font-poppins">
-                              Error Loading Teams
-                          </h2>
-                      </div>
-                      <p class="text-danger-600 ~text-sm/base font-poppins">
-                        {error.message || "An unexpected error occurred while loading teams. Please try refreshing the page."}
-                      </p>
-                  </div>
-          )}
-
-            <!-- Teams Grid -->
-          {!error && (
-                  <TeamsGrid
-                          teams={data || []}
-                          client:load
-                  />
-          )}
+  {
+    teams && teams.length > 0 && (
+      <div class="w-full flex flex-col justify-center items-stretch gap-4 ">
+        <div class="bg-white rounded-xl shadow-md border-2 hover:shadow-lg transition-all duration-300">
+          <div class="p-4 md:p-6 lg:p-8">
+            <div class="flex flex-col items-center text-center">
+              <div class="flex items-center gap-3 mb-4">
+                <FaSolidUserGroup class="w-8 h-8 text-neutral-600" />
+                <h1 class="~text-2xl/4xl font-babas text-black">Teams</h1>
+              </div>
+            </div>
+          </div>
         </div>
-    </div>
-</BaseLayout>
+        <TeamsGrid teams={teams} client:only="solid-js" />
+      </div>
+    )
+  }
+</BaseLayout4xl>

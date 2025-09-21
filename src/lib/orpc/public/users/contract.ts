@@ -1,13 +1,14 @@
-import {oc} from '@orpc/contract'
-import {z} from "zod/v4";
+import { oc } from '@orpc/contract'
+import { z } from 'zod/v4'
 import {
   TwitchChannelSchema,
+  UserDisplayWithTagsSchema,
   UserPaginationOutputSchema,
   UserPaginationSchema,
   UserProfileDataSchema,
-} from "../schemas/users.ts";
-import {UserDisplaySchema} from "../schemas/UserDisplaySchema.ts";
-import {UserSlugInputSchema} from "../schemas/common.ts";
+} from '../schemas/users.ts'
+import { UserDisplaySchema } from '../schemas/UserDisplaySchema.ts'
+import { UserSlugInputSchema } from '../schemas/common.ts'
 
 /**
  * Get all users
@@ -133,10 +134,25 @@ export const searchByNameContract = oc
     deprecated: false
   })
 
+
+export const getAllUsersWithTagsContract = oc
+  .output(z.array(UserDisplayWithTagsSchema))
+  .route({
+    path: '/users-all-with-tags',
+    method: 'GET',
+    operationId: 'getAllUsersWithTags',
+    summary: 'Get all users with tags',
+    description: 'Retrieve complete list of all registered users with tags (use with caution)',
+    tags: ['users'],
+    successDescription: 'Complete user list with tags retrieved successfully',
+    deprecated: false
+  })
+
 export const usersContracts = {
   // All users
   getAllUsersContract,
   getAllUsersPagedContract,
+  getAllUsersWithTagsContract,
 
   // user data by slug
   getUserBySlugContract,

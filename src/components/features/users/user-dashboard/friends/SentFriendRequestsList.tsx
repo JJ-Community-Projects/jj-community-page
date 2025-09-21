@@ -1,8 +1,13 @@
-import {type Component, For, Match, Show, Switch} from "solid-js";
-import {useFriends} from "./UserFriendsProvider.tsx";
-import {FaSolidCircleExclamation, FaSolidPaperPlane, FaSolidXmark} from "solid-icons/fa";
-import {createModalSignal} from "../../../../../lib/createModalSignal.ts";
-import {ConfirmationDialog} from "../../../../common/dialogs/ConfirmationDialog.tsx";
+import { type Component, For, Match, Show, Switch } from 'solid-js'
+import { useFriends } from './UserFriendsProvider.tsx'
+import {
+  FaSolidArrowUpRightFromSquare,
+  FaSolidCircleExclamation,
+  FaSolidPaperPlane,
+  FaSolidXmark,
+} from 'solid-icons/fa'
+import { createModalSignal } from '../../../../../lib/createModalSignal.ts'
+import { ConfirmationDialog } from '../../../../common/dialogs/ConfirmationDialog.tsx'
 
 interface SentFriendRequest {
   userId: number
@@ -18,42 +23,43 @@ interface SentFriendRequest {
 }
 
 interface SentFriendRequestItemProps {
-  request: SentFriendRequest;
+  request: SentFriendRequest
 }
 
-const SentFriendRequestItem: Component<SentFriendRequestItemProps> = (props) => {
-  const {
-    handleCancelFriendRequest,
-    isCancellingFriendRequest
-  } = useFriends();
+const SentFriendRequestItem: Component<SentFriendRequestItemProps> = (
+  props,
+) => {
+  const { handleCancelFriendRequest, isCancellingFriendRequest } = useFriends()
 
-  const cancelRequestDialog = createModalSignal();
+  const cancelRequestDialog = createModalSignal()
 
   const handleCancelClick = () => {
-    cancelRequestDialog.open();
-  };
+    cancelRequestDialog.open()
+  }
 
   const handleConfirmCancel = async () => {
     try {
-      await handleCancelFriendRequest(props.request.userId);
-      cancelRequestDialog.close();
+      await handleCancelFriendRequest(props.request.userId)
+      cancelRequestDialog.close()
     } catch (error) {
-      console.error('Failed to cancel friend request:', error);
+      console.error('Failed to cancel friend request:', error)
     }
-  };
+  }
 
   return (
-    <div
-      class="group relative flex items-center bg-white rounded-xl p-4 shadow-md border-2 border-accent-200 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 hover:border-accent-300">
-      <div class="flex items-center justify-between w-full">
+    <>
+      <div class="group flex items-center justify-between rounded-xl border-2 border-accent-200 bg-white p-4 shadow-md transition-all duration-300">
         {/* User info */}
         <div class="flex items-center gap-3">
           {/* Avatar */}
           <Show
-            when={props.request.profileImage && props.request.profileImage.trim() !== ''}
+            when={
+              props.request.profileImage &&
+              props.request.profileImage.trim() !== ''
+            }
             fallback={
-              <div class="w-12 h-12 rounded-full bg-gradient-to-br from-accent-500 to-accent-600 flex items-center justify-center shadow-sm">
-                <span class="text-white font-semibold">
+              <div class="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-accent-500 to-accent-600 shadow-sm">
+                <span class="font-semibold text-white">
                   {(props.request.username || 'U')[0].toUpperCase()}
                 </span>
               </div>
@@ -62,17 +68,17 @@ const SentFriendRequestItem: Component<SentFriendRequestItemProps> = (props) => 
             <img
               src={props.request.profileImage}
               alt={`${props.request.username}'s profile`}
-              class="w-12 h-12 rounded-full object-cover shadow-sm"
+              class="h-12 w-12 rounded-full object-cover shadow-sm"
               onError={(e) => {
                 // Fallback to gradient avatar if image fails to load
-                const target = e.target as HTMLImageElement;
-                target.style.display = 'none';
-                const fallback = target.nextElementSibling as HTMLElement;
-                if (fallback) fallback.style.display = 'flex';
+                const target = e.target as HTMLImageElement
+                target.style.display = 'none'
+                const fallback = target.nextElementSibling as HTMLElement
+                if (fallback) fallback.style.display = 'flex'
               }}
             />
-            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-accent-500 to-accent-600 flex items-center justify-center shadow-sm hidden">
-              <span class="text-white font-semibold">
+            <div class="flex hidden h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-accent-500 to-accent-600 shadow-sm">
+              <span class="font-semibold text-white">
                 {(props.request.username || 'U')[0].toUpperCase()}
               </span>
             </div>
@@ -80,9 +86,14 @@ const SentFriendRequestItem: Component<SentFriendRequestItemProps> = (props) => 
 
           {/* User details */}
           <div>
-            <p class="font-semibold text-gray-800">
-              {props.request.username || 'Unknown User'}
-            </p>
+            <a
+              target={`_blank`}
+              href={'/' + props.request.username}
+              class="flex items-center justify-start gap-2 truncate text-sm font-semibold text-gray-800 underline hover:text-accent-500"
+            >
+              {props.request.username || 'Unknown User'}{' '}
+              <FaSolidArrowUpRightFromSquare />
+            </a>
             <Show when={props.request.twitchLogin}>
               <p class="text-xs text-gray-600">
                 Twitch: {props.request.twitchLogin}
@@ -97,24 +108,14 @@ const SentFriendRequestItem: Component<SentFriendRequestItemProps> = (props) => 
             type="button"
             onClick={handleCancelClick}
             disabled={isCancellingFriendRequest()}
-            class="
-            px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200
-            bg-gray-200 text-gray-700 hover:bg-red-200 hover:text-red-700 shadow-sm hover:shadow-md
-            focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-white outline-none
-            disabled:opacity-50 disabled:cursor-not-allowed
-            flex items-center gap-1
-          "
+            class="flex items-center gap-1 rounded-lg bg-gray-200 px-4 py-2 text-sm font-medium text-gray-700 shadow-sm outline-none transition-all duration-200 hover:bg-red-200 hover:text-red-700 hover:shadow-md focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-white disabled:cursor-not-allowed disabled:opacity-50"
             aria-label={`Cancel friend request to ${props.request.username}`}
           >
-            <FaSolidXmark class="w-4 h-4"/>
+            <FaSolidXmark class="h-4 w-4" />
             {isCancellingFriendRequest() ? 'Cancelling...' : 'Cancel'}
           </button>
         </div>
       </div>
-
-      {/* Subtle hover effect */}
-      <div
-        class="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-5 transition-opacity duration-300 pointer-events-none bg-accent-500"></div>
 
       <ConfirmationDialog
         isOpen={cancelRequestDialog.isOpen()}
@@ -124,29 +125,32 @@ const SentFriendRequestItem: Component<SentFriendRequestItemProps> = (props) => 
         onConfirm={handleConfirmCancel}
         onCancel={cancelRequestDialog.close}
       />
-    </div>
-  );
+    </>
+  )
 }
 
 const EmptyState = () => (
-  <div class="flex flex-col items-center justify-center py-12 px-4">
-    <div class="w-16 h-16 bg-gradient-to-br from-accent-500 to-accent-600 rounded-full flex items-center justify-center mb-4 shadow-lg">
-      <FaSolidPaperPlane class="w-8 h-8 text-white" />
+  <div class="flex flex-col items-center justify-center px-4 py-12">
+    <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-accent-500 to-accent-600 shadow-lg">
+      <FaSolidPaperPlane class="h-8 w-8 text-white" />
     </div>
-    <h3 class="text-xl font-semibold text-gray-800 mb-2">No sent friend requests</h3>
-    <p class="text-gray-600 text-center max-w-md mb-6 leading-relaxed">
-      You haven't sent any friend requests yet. Search for users above and send friend requests to start connecting.
+    <h3 class="mb-2 text-xl font-semibold text-gray-800">
+      No sent friend requests
+    </h3>
+    <p class="mb-6 max-w-md text-center leading-relaxed text-gray-600">
+      You haven't sent any friend requests yet. Search for users above and send
+      friend requests to start connecting.
     </p>
   </div>
-);
+)
 
 const LoadingSkeleton = () => (
   <div class="space-y-4">
-    <div class="animate-pulse bg-gray-200 rounded-xl h-16 shadow-sm"></div>
-    <div class="animate-pulse bg-gray-200 rounded-xl h-16 shadow-sm"></div>
-    <div class="animate-pulse bg-gray-200 rounded-xl h-16 shadow-sm"></div>
+    <div class="h-16 animate-pulse rounded-xl bg-gray-200 shadow-sm"></div>
+    <div class="h-16 animate-pulse rounded-xl bg-gray-200 shadow-sm"></div>
+    <div class="h-16 animate-pulse rounded-xl bg-gray-200 shadow-sm"></div>
   </div>
-);
+)
 
 /**
  * SentFriendRequestsList Component
@@ -161,26 +165,29 @@ export const SentFriendRequestsList: Component = () => {
     hasSentFriendRequestsError,
     sentFriendRequestsErrorMessage,
     hasCancelFriendRequestError,
-    cancelFriendRequestErrorMessage
-  } = useFriends();
+    cancelFriendRequestErrorMessage,
+  } = useFriends()
 
-  const hasRequests = () => sentFriendRequests().length > 0;
+  const hasRequests = () => sentFriendRequests().length > 0
 
   return (
     <div class="mt-6">
-      <div class="flex items-center gap-3 mb-4">
-        <h3 class="text-sm font-semibold text-gray-800 flex items-center gap-2">
-          <FaSolidPaperPlane class="w-4 h-4 text-accent" />
+      <div class="mb-4 flex items-center gap-3">
+        <h3 class="flex items-center gap-2 text-sm font-semibold text-gray-800">
+          <FaSolidPaperPlane class="h-4 w-4 text-accent" />
           Sent Friend Requests
         </h3>
       </div>
 
       {/* Error messages */}
       <Show when={hasCancelFriendRequestError()}>
-        <div class="bg-red-50 rounded-xl p-4 border border-red-200 mb-4">
+        <div class="mb-4 rounded-xl border border-red-200 bg-red-50 p-4">
           <div class="flex items-center gap-3 text-red-600">
-            <FaSolidCircleExclamation class="w-4 h-4 flex-shrink-0" />
-            <p class="text-sm font-medium">{cancelFriendRequestErrorMessage() || "Failed to cancel friend request"}</p>
+            <FaSolidCircleExclamation class="h-4 w-4 flex-shrink-0" />
+            <p class="text-sm font-medium">
+              {cancelFriendRequestErrorMessage() ||
+                'Failed to cancel friend request'}
+            </p>
           </div>
         </div>
       </Show>
@@ -191,12 +198,16 @@ export const SentFriendRequestsList: Component = () => {
         </Match>
 
         <Match when={hasSentFriendRequestsError()}>
-          <div class="bg-red-50 rounded-xl p-6 border border-red-200">
+          <div class="rounded-xl border border-red-200 bg-red-50 p-6">
             <div class="flex items-center justify-center gap-3 text-red-600">
-              <FaSolidCircleExclamation class="w-5 h-5 flex-shrink-0" />
+              <FaSolidCircleExclamation class="h-5 w-5 flex-shrink-0" />
               <div>
-                <p class="font-semibold text-sm">Error loading sent friend requests</p>
-                <p class="text-xs opacity-90">{sentFriendRequestsErrorMessage() || "Unknown error occurred"}</p>
+                <p class="text-sm font-semibold">
+                  Error loading sent friend requests
+                </p>
+                <p class="text-xs opacity-90">
+                  {sentFriendRequestsErrorMessage() || 'Unknown error occurred'}
+                </p>
               </div>
             </div>
           </div>
@@ -209,15 +220,11 @@ export const SentFriendRequestsList: Component = () => {
         <Match when={hasRequests()}>
           <div class="space-y-3">
             <For each={sentFriendRequests()}>
-              {(request) => (
-                <SentFriendRequestItem
-                  request={request}
-                />
-              )}
+              {(request) => <SentFriendRequestItem request={request} />}
             </For>
           </div>
         </Match>
       </Switch>
     </div>
-  );
-};
+  )
+}

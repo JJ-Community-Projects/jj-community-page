@@ -1,10 +1,10 @@
-import {z} from "zod/v4";
-import {TeamSchema} from "./teams.ts";
-import {ScheduleInfoSchema, StreamSchema} from "./schedules.ts";
-import {SocialSchema} from "./social.ts";
-import {SimplePublicTagSchema} from "./tags.ts";
-import {UserIdSchema} from "./common.ts";
-import {UserDisplaySchema} from "./UserDisplaySchema.ts";
+import { z } from 'zod/v4'
+import { TeamSchema } from './teams.ts'
+import { ScheduleInfoSchema, StreamSchema } from './schedules.ts'
+import { SocialSchema } from './social.ts'
+import { SimplePublicTagSchema } from './tags.ts'
+import { UserIdSchema } from './common.ts'
+import { UserDisplaySchema } from './UserDisplaySchema.ts'
 
 /**
  * Schema for pagination parameters used in user listing endpoints.
@@ -15,7 +15,7 @@ export const UserPaginationSchema = z.object({
   limit: z.number().int().min(1).default(20),
   /** Page number for pagination (1-based, default: 1) */
   page: z.number().int().min(1).default(1),
-});
+})
 
 export const UserPaginationOutputSchema = z.object({
   users: z.array(UserDisplaySchema),
@@ -34,8 +34,8 @@ export const UserSearchInputSchema = z.object({
   /** Maximum number of results to return (1-10, default: 5) */
   limit: z.number().min(1).max(10).default(5),
   /** Search term for matching usernames */
-  searchTerm: z.string().min(1, 'Search term must not be empty')
-});
+  searchTerm: z.string().min(1, 'Search term must not be empty'),
+})
 
 /**
  * Schema for basic user search results.
@@ -47,8 +47,8 @@ export const BasicUserSearchOutputSchema = z.object({
   /** Tiltify username if connected */
   tiltifyUsername: z.string().nullable(),
   /** Twitch username if connected */
-  twitchUsername: z.string().nullable()
-});
+  twitchUsername: z.string().nullable(),
+})
 
 /**
  * Schema for similar users search input.
@@ -59,7 +59,7 @@ export const SimilarUsersInputSchema = z.object({
   userId: UserIdSchema,
   /** Maximum number of similar users to return (1-10, default: 5) */
   limit: z.number().min(1).max(10).default(5),
-});
+})
 
 /**
  * Schema for comprehensive user data including relationships and associations.
@@ -75,6 +75,8 @@ export const UserProfileDataSchema = z.object({
   tags: z.array(SimplePublicTagSchema),
   /** Array of users who are friends with this user */
   friends: z.array(UserDisplaySchema),
+  /** Array of users who are friends with this user */
+  related: z.array(UserDisplaySchema),
   /** Array of teams this user belongs to */
   teams: z.array(TeamSchema),
   /** User style configuration with primary and accent colors */
@@ -94,7 +96,7 @@ export const UserProfileDataSchema = z.object({
   nextStreamsOthers: z.array(StreamSchema).max(3),
   /** The next 3 streams from the primary schedule of this user */
   nextPrimaryStreams: z.array(StreamSchema).max(3),
-});
+})
 
 export const TwitchChannelSchema = z.object({
   /** User ID that owns this Twitch channel */
@@ -111,10 +113,14 @@ export const TwitchChannelSchema = z.object({
   profileImageUrl: z.string().nullable(),
   /** Offline image URL from Twitch */
   offlineImageUrl: z.string().nullable(),
-});
+})
 
+export const UserDisplayWithTagsSchema = UserDisplaySchema.extend({
+  tags: z.array(SimplePublicTagSchema),
+})
 
 export type UserProfileData = z.infer<typeof UserProfileDataSchema>
 export type UserPaginationOutput = z.infer<typeof UserPaginationOutputSchema>
 export type BasicUserSearchOutput = z.infer<typeof BasicUserSearchOutputSchema>
 export type TwitchChannel = z.infer<typeof TwitchChannelSchema>
+export type UserDisplayWithTags = z.infer<typeof UserDisplayWithTagsSchema>

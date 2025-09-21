@@ -2,6 +2,7 @@
 import jj_image from '../../../images/Jingle_Jam_Logo_White_Large.png';
 import {Image} from "astro:assets";
 import YogsScheduleNavigation from "./YogsScheduleNavigation.astro";
+import CommunityNavigation from "./CommunityNavigation.astro";
 import {MobileNav} from "./MobileNav";
 import {getCollection} from "astro:content";
 
@@ -26,7 +27,13 @@ const showDonationLink = now > jjStart && now < jjEnd;
     </div>
     <div class="hidden md:flex w-[50%] flex-row gap-4 text-white items-center justify-center">
         <a href="/">Home</a>
-        <a href="/community">Community</a>
+        <div class="group relative">
+            <button type="button"
+               class="flex w-full flex-row items-center rounded-lg bg-transparent focus:outline-none md:inline md:w-auto">
+                <span>Community</span>
+            </button>
+            <CommunityNavigation/>
+        </div>
         <div class="group relative">
             <a href="/yogs"
                class="flex w-full flex-row items-center rounded-lg bg-transparent focus:outline-none md:inline md:w-auto">

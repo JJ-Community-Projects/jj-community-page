@@ -17,8 +17,10 @@ const t = title || 'Jingle Jam Community'
 <html lang="en">
   <head>
     <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-P6MYGN62FW"
-    ></script>
+    <!-- prettier-ignore -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-P6MYGN62FW"/>
+
+    <!-- prettier-ignore -->
     <script is:inline>
       window.dataLayer = window.dataLayer || []
 
@@ -51,15 +53,14 @@ const t = title || 'Jingle Jam Community'
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
     <link rel="manifest" href="/site.webmanifest" />
-    <script is:inline src="/script.js"></script>
-    <script type="module">
-      import { QueryClient } from 'https://esm.sh/@tanstack/solid-query'
-    </script>
+    <script is:inline src="/script.js"/>
+
+    <!-- prettier-ignore -->
     {canonical && <link rel="canonical" href={canonical} />}
     <meta name="generator" content={Astro.generator} />
     <title>{t}</title>
-  </head>
-  <!--
+</head>
+<!--
 <body class="font-poppins from-primary-shade via-primary to-primary-shade bg-gradient-to-b h-screen overflow-hidden">
 <div class="flex flex-col justify-start items-center overflow-y-scroll h-[1000px]">
     <Image class="p-4" src={jj_image} alt="" height="100"/>
@@ -69,29 +70,27 @@ const t = title || 'Jingle Jam Community'
 <body class="h-screen overflow-hidden font-poppins from-primary-shade via-primary to-primary-shade bg-gradient-to-b">
 </body>-->
 
-  <body
-    class="h-screen overflow-hidden font-poppins bg-gradient-to-br from-primary-shade via-primary to-primary-shade"
-  >
-    <div class="h-full overflow-y-auto p-2">
-      <div class="flex flex-col justify-start min-h-screen">
-        <div class="flex flex-col gap-2 items-center mb-4">
-          <Navigation />
-          <AdminNavigation />
-        </div>
-        <FeedbackBanner />
-        <div class="flex flex-col justify-start items-center min-h-screen">
-          <div
-            class="w-full max-w-4xl mx-auto flex flex-col justify-start items-stretch [&>*]:w-full"
-          >
-            <slot />
-          </div>
+<body
+  class="h-screen overflow-hidden font-poppins bg-gradient-to-br from-primary-shade via-primary to-primary-shade"
+>
+  <div class="h-full overflow-y-auto p-2" style="overflow-anchor: none;">
+    <div class="flex flex-col justify-start min-h-screen">
+      <div class="flex flex-col gap-2 items-center mb-4">
+        <Navigation />
+        <AdminNavigation />
+      </div>
+      <FeedbackBanner />
+      <div class="flex flex-col justify-start items-center min-h-screen">
+        <div
+          class="w-full max-w-4xl mx-auto flex flex-col justify-start items-stretch [&>*]:w-full"
+        >
+          <slot />
         </div>
       </div>
-      <Footer />
     </div>
-  </body>
-</html>
-
+    <Footer />
+  </div>
+</body>
 <style is:global>
   @font-face {
     font-family: 'Bebas';
@@ -230,3 +229,5 @@ const t = title || 'Jingle Jam Community'
     font-family: 'Poppins', sans-serif;
   }
 </style>
+
+</html>

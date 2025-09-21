@@ -3,7 +3,7 @@ import {dbMiddleware} from "../../middleware/dbMiddleware.ts";
 import {contracts} from "./contract.ts";
 import {schedulesTable} from "../../../db/schema/jj-schema.ts";
 import {and, eq} from "drizzle-orm";
-import {getNextStreams, getScheduleStreams, organizeStreamsByTime} from "./util.ts";
+import {getNextStreams as getNextStreamsFromList, getScheduleStreams, organizeStreamsByTime, getNextStreamsAcrossPublicPrimarySchedules} from "./util.ts";
 import {userDisplayView} from "../../../db/schema/views-schema.ts";
 
 const os = implement(contracts)
@@ -52,7 +52,7 @@ const getFullScheduleBySlug = os.getFullScheduleBySlugContract
     const streams = await getScheduleStreams(db, schedule.id)
 
     // Get the next 3 future streams
-    const nextStreams = getNextStreams(streams)
+    const nextStreams = getNextStreamsFromList(streams)
 
     // Organize streams by time
     const {days, weeks} = organizeStreamsByTime(streams)
@@ -91,7 +91,22 @@ const getVisiblePrimarySchedulesByYear = os.getVisiblePrimarySchedulesByYearCont
     return schedules
   })
 
+const getNextStreamsAcrossSchedules = os.getNextStreamsContract
+  .handler(async ({context, input}) => {
+    const db = context.db
+    const nowSec = Math.floor(Date.now() / 1000)
+    const year = input.year ?? new Date().getUTCFullYear()
+    const limit = input.limit ?? 10
+    const uniqueBySchedule = input.uniqueBySchedule ?? false
+    try {
+      return await getNextStreamsAcrossPublicPrimarySchedules(db, {year, limit, uniqueBySchedule, nowSec})
+    } catch (_err) {
+      throw new ORPCError('INTERNAL_SERVER_ERROR', {message: 'Failed to load next streams'})
+    }
+  })
+
 export const publicSchedulesRouter = {
   getFullScheduleBySlug,
   getVisiblePrimarySchedulesByYear,
+  getNextStreams: getNextStreamsAcrossSchedules,
 }

@@ -1,5 +1,5 @@
-import {z} from "zod/v4";
-import {UserDisplaySchema} from "./UserDisplaySchema.ts";
+import { z } from 'zod/v4'
+import { UserDisplaySchema } from './UserDisplaySchema.ts'
 
 /**
  * Schedule-related schemas used across public and private oRPC procedures.
@@ -195,6 +195,15 @@ export const FullScheduleSchema = z.object({
   /** Array of all unique users participating in streams */
   participants: z.array(UserDisplaySchema),
 });
+
+// Input schema for next streams query
+// Defaults are applied in the handler, not here, to avoid dynamic defaults in Zod
+export const NextStreamsInputSchema = z.object({
+  year: z.number().int().min(2010).max(2100).optional(),
+  limit: z.number().int().min(1).max(100).optional(),
+  uniqueBySchedule: z.boolean().optional(),
+})
+
 
 export type ScheduleInfo = z.infer<typeof ScheduleInfoSchema>
 export type ScheduleId = z.infer<typeof ScheduleIdSchema>

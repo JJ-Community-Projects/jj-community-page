@@ -1,12 +1,15 @@
-import {profileContract} from './contract.ts';
-import {implement, ORPCError} from '@orpc/server'
-import {dbMiddleware} from "../../middleware/dbMiddleware.ts";
-import {authMiddleware} from "../../middleware/authMiddleware.ts";
-import {eq} from "drizzle-orm";
-import {users, userStyles} from "../../../db/schema/auth-schema.ts";
+import { profileContract } from './contract.ts'
+import { implement, ORPCError } from '@orpc/server'
+import { dbMiddleware } from '../../middleware/dbMiddleware.ts'
+import { authMiddleware } from '../../middleware/authMiddleware.ts'
+import { eq } from 'drizzle-orm'
+import { users, userStyles } from '../../../db/schema/auth-schema.ts'
+import {
+  type StreamingPlatform,
+  StreamingPlatformSchema,
+} from '../schemas/users.ts'
 
-const os = implement(profileContract)
-  .use(dbMiddleware)
+const os = implement(profileContract).use(dbMiddleware)
 
 /**
  * Update user's primary color preference
@@ -14,41 +17,42 @@ const os = implement(profileContract)
  */
 const updatePrimaryColor = os.updatePrimaryColorContract
   .use(authMiddleware)
-  .handler(async ({context, input}) => {
-    const db = context.db;
-    const userId = context.userId;
+  .handler(async ({ context, input }) => {
+    const db = context.db
+    const userId = context.userId
 
     try {
-      await db.insert(userStyles)
+      await db
+        .insert(userStyles)
         .values({
           userId: userId,
-          primaryColor: input.primaryColor
+          primaryColor: input.primaryColor,
         })
         .onConflictDoUpdate({
           target: userStyles.userId,
           set: {
-            primaryColor: input.primaryColor
-          }
-        });
+            primaryColor: input.primaryColor,
+          },
+        })
 
-      return {success: true};
+      return { success: true }
     } catch (error) {
-      console.error('Error updating primary color:', error);
+      console.error('Error updating primary color:', error)
       throw new ORPCError('INTERNAL_SERVER_ERROR', {
-        message: 'Failed to update primary color'
-      });
+        message: 'Failed to update primary color',
+      })
     }
   })
 
-
 const updateStyle = os.updateStyleContract
   .use(authMiddleware)
-  .handler(async ({context, input}) => {
-    const db = context.db;
-    const userId = context.userId;
+  .handler(async ({ context, input }) => {
+    const db = context.db
+    const userId = context.userId
 
     try {
-      const [result] = await db.insert(userStyles)
+      const [result] = await db
+        .insert(userStyles)
         .values({
           userId: userId,
           primaryColor: input.primaryColor,
@@ -59,17 +63,18 @@ const updateStyle = os.updateStyleContract
           set: {
             primaryColor: input.primaryColor,
             accentColor: input.accentColor,
-          }
-        }).returning();
+          },
+        })
+        .returning()
       return {
         primaryColor: result.primaryColor,
-        accentColor: result.accentColor
+        accentColor: result.accentColor,
       }
     } catch (error) {
-      console.error('Error updating primary color:', error);
+      console.error('Error updating primary color:', error)
       throw new ORPCError('INTERNAL_SERVER_ERROR', {
-        message: 'Failed to update primary color'
-      });
+        message: 'Failed to update primary color',
+      })
     }
   })
 
@@ -79,29 +84,30 @@ const updateStyle = os.updateStyleContract
  */
 const updateAccentColor = os.updateAccentColorContract
   .use(authMiddleware)
-  .handler(async ({context, input}) => {
-    const db = context.db;
-    const userId = context.userId;
+  .handler(async ({ context, input }) => {
+    const db = context.db
+    const userId = context.userId
 
     try {
-      await db.insert(userStyles)
+      await db
+        .insert(userStyles)
         .values({
           userId: userId,
-          accentColor: input.accentColor
+          accentColor: input.accentColor,
         })
         .onConflictDoUpdate({
           target: userStyles.userId,
           set: {
-            accentColor: input.accentColor
-          }
-        });
+            accentColor: input.accentColor,
+          },
+        })
 
-      return {success: true};
+      return { success: true }
     } catch (error) {
-      console.error('Error updating accent color:', error);
+      console.error('Error updating accent color:', error)
       throw new ORPCError('INTERNAL_SERVER_ERROR', {
-        message: 'Failed to update accent color'
-      });
+        message: 'Failed to update accent color',
+      })
     }
   })
 
@@ -111,23 +117,26 @@ const updateAccentColor = os.updateAccentColorContract
  */
 const updatePrimaryLiveStream = os.updatePrimaryLiveStreamContract
   .use(authMiddleware)
-  .handler(async ({context, input}) => {
-    const db = context.db;
-    const userId = context.userId;
-
+  .handler(async ({ context, input }) => {
+    const db = context.db
+    const userId = context.userId
+    console.log(input)
     try {
-      await db.update(users)
+      const [result] = await db
+        .update(users)
         .set({
-          primaryLiveStream: input.platform
+          primaryLiveStream: input.platform,
         })
-        .where(eq(users.id, userId));
-
-      return {success: true};
+        .where(eq(users.id, userId))
+        .returning()
+      return {
+        platform: StreamingPlatformSchema.parse(result.primaryLiveStream),
+      }
     } catch (error) {
-      console.error('Error updating primary live stream platform:', error);
+      console.error('Error updating primary live stream platform:', error)
       throw new ORPCError('INTERNAL_SERVER_ERROR', {
-        message: 'Failed to update primary live stream platform'
-      });
+        message: 'Failed to update primary live stream platform',
+      })
     }
   })
 
@@ -137,19 +146,20 @@ const updatePrimaryLiveStream = os.updatePrimaryLiveStreamContract
  */
 const getStyle = os.getStyleContract
   .use(authMiddleware)
-  .handler(async ({context}) => {
-    const db = context.db;
-    const userId = context.userId;
+  .handler(async ({ context }) => {
+    const db = context.db
+    const userId = context.userId
 
-    const userStyle = await db.select()
+    const userStyle = await db
+      .select()
       .from(userStyles)
       .where(eq(userStyles.userId, userId))
-      .get();
+      .get()
     console.log('getStyle', userStyle)
     return {
       primaryColor: userStyle?.primaryColor || null,
-      accentColor: userStyle?.accentColor || null
-    };
+      accentColor: userStyle?.accentColor || null,
+    }
   })
 
 /**
@@ -158,27 +168,26 @@ const getStyle = os.getStyleContract
  */
 const getPrimaryLiveStream = os.getPrimaryLiveStreamContract
   .use(authMiddleware)
-  .handler(async ({context}) => {
-    const db = context.db;
-    const userId = context.userId;
+  .handler(async ({ context }) => {
+    const db = context.db
+    const userId = context.userId
 
-    try {
-      const user = await db.select({
-        primaryLiveStream: users.primaryLiveStream
+    const user = await db
+      .select({
+        primaryLiveStream: users.primaryLiveStream,
       })
-        .from(users)
-        .where(eq(users.id, userId))
-        .get();
+      .from(users)
+      .where(eq(users.id, userId))
+      .get()
 
-      return user?.primaryLiveStream || null;
-    } catch (error) {
-      console.error('Error getting user primary live stream platform:', error);
-      throw new ORPCError('INTERNAL_SERVER_ERROR', {
-        message: 'Failed to get primary live stream platform'
-      });
+    const platform = user?.primaryLiveStream
+
+    if (!platform) {
+      throw new ORPCError('NOT_FOUND')
     }
-  })
 
+    return platform as unknown as StreamingPlatform
+  })
 
 export const profileRouter = {
   updatePrimaryColor,

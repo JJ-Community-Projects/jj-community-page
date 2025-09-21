@@ -3,6 +3,7 @@ import { serverClientPublic } from '../../lib/orpc/serverClient'
 import { UserHeader } from '../../components/features/users/public/UserHeader'
 import { NextStreamsSection } from '../../components/features/users/public/NextStreamsSection'
 import { FriendsSection } from '../../components/features/users/public/FriendsSection'
+import { RelatedSection } from '../../components/features/users/public/RelatedSection'
 import UserTeamsSection from '../../components/features/users/public/UserTeamsSection.astro'
 import OtherSchedulesSection from '../../components/features/users/public/OtherSchedulesSection.astro'
 import { ORPCError, ValidationError } from '@orpc/server'
@@ -30,7 +31,7 @@ const { data: user, error } = await getUserFullProfileBySlug(
       locals: Astro.locals,
       request: Astro.request,
     },
-  }
+  },
 )
 
 if (error) {
@@ -99,6 +100,16 @@ if (user !== undefined) {
         {user.schedules.length > 0 && (
           <OtherSchedulesSection
             schedules={user.schedules}
+            userColors={{
+              primaryColor: user.style.primaryColor,
+              accentColor: user.style.accentColor,
+            }}
+          />
+        )}
+        {user.related.length > 0 && (
+          <RelatedSection
+            client:only="solid-js"
+            related={user.related}
             userColors={{
               primaryColor: user.style.primaryColor,
               accentColor: user.style.accentColor,

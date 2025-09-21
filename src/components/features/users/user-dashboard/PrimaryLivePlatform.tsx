@@ -1,121 +1,187 @@
-import {type Component, createMemo, createSignal, Match, Show, Switch} from "solid-js";
-import {RadioGroup} from "@kobalte/core/radio-group";
-import {useMutation, useQueries, useQueryClient} from "@tanstack/solid-query";
-import {orpcPrivate} from "../../../../lib/orpc/client.ts";
+// src/components/features/users/user-dashboard/PrimaryLivePlatform.tsx
+import {
+  type Component,
+  createEffect,
+  createMemo,
+  createSignal,
+  Show,
+} from 'solid-js'
+import { RadioGroup } from '@kobalte/core/radio-group'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/solid-query'
+import { orpcPrivate } from '../../../../lib/orpc/client.ts'
+import type { StreamingPlatform } from '../../../../lib/orpc/private/schemas/users.ts'
 
-export const PrimaryLivePlatform: Component = () => {
+const usePrimaryLivePlatform = () => {
+  const client = useQueryClient()
+  const { getPrimaryLiveStream, updatePrimaryLiveStream } = orpcPrivate.profile
+  const { getSocial } = orpcPrivate.social
 
-  const client = useQueryClient();
+  // Queries
+  const primaryLiveStream = useQuery(() => getPrimaryLiveStream.queryOptions())
+  const socials = useQuery(() => getSocial.queryOptions())
 
+  // Single source of truth for the UI selection
+  const [selectedPlatform, setSelectedPlatform] =
+    createSignal<StreamingPlatform | null>(null)
+
+  // Mutation with optimistic update
   const mutation = useMutation(() =>
-    orpcPrivate.profile.updatePrimaryLiveStream.mutationOptions({
-      onSuccess: async () => {
-        await client.invalidateQueries({
-          queryKey: orpcPrivate.profile.getPrimaryLiveStream.key()
+    updatePrimaryLiveStream.mutationOptions({
+      onMutate: async (vars) => {
+        // Optimistically update cache and local state
+        setSelectedPlatform(vars.platform)
+        await client.cancelQueries({
+          queryKey: getPrimaryLiveStream.queryKey(),
         })
+        const prev = client.getQueryData<StreamingPlatform>(
+          getPrimaryLiveStream.queryKey(),
+        )
+        client.setQueryData(getPrimaryLiveStream.queryKey(), vars.platform)
+        return { prev }
+      },
+      onError: (_err, _vars, ctx) => {
+        // Roll back on error
+        if (ctx?.prev)
+          client.setQueryData(getPrimaryLiveStream.queryKey(), ctx.prev)
+      },
+      onSettled: async () => {
+        // Ensure server truth wins eventually
         await client.invalidateQueries({
-          queryKey: orpcPrivate.social.getSocial.key()
+          queryKey: getPrimaryLiveStream.queryKey(),
         })
-      }
-    })
+        await client.invalidateQueries({ queryKey: getSocial.queryKey() })
+      },
+    }),
   )
 
-  const [primaryLiveStream, socials] = useQueries(() => ({
-    queries: [orpcPrivate.profile.getPrimaryLiveStream.queryOptions(), orpcPrivate.social.getSocial.queryOptions()]
-  }))
-  // Both queries have data - render the main component
-  const [selectedPlatform, setSelectedPlatform] = createSignal(primaryLiveStream.data);
+  // Sync local state with server data when it arrives/changes
+  createEffect(() => {
+    const p = primaryLiveStream.data
+    if (!p) return
+    if (mutation.isPending) return // do not overwrite during mutate
+    if (p !== selectedPlatform()) setSelectedPlatform(p)
+  })
 
-  // Check if the user has the appropriate social for their selected platform
   const hasPlatformSocial = createMemo(() => {
-    const platform = selectedPlatform();
-    return socials.data?.some(social => social.provider === platform) || false;
-  });
+    const platform = selectedPlatform()
+    return platform
+      ? (socials.data?.some((s) => s.provider === platform) ?? false)
+      : false
+  })
 
-  const handlePlatformChange = async (platform: string) => {
-    try {
-      setSelectedPlatform(platform);
-      mutation.mutate(platform as any)
-    } catch (error) {
-      console.error("Failed to set primary live stream platform:", error);
-    }
-  };
+  const handlePlatformChange = (platform: StreamingPlatform) => {
+    setSelectedPlatform(platform)
+    mutation.mutate({ platform })
+  }
+
+  const retry = async () =>
+    Promise.all([primaryLiveStream.refetch(), socials.refetch()])
+
+  return {
+    selectedPlatform,
+    hasPlatformSocial,
+    handlePlatformChange,
+    primaryLiveStream,
+    socials,
+    mutation,
+    retry,
+  }
+}
+
+export const PrimaryLivePlatform: Component = () => {
+  const {
+    selectedPlatform,
+    hasPlatformSocial,
+    handlePlatformChange,
+    primaryLiveStream,
+    socials,
+    mutation,
+    retry,
+  } = usePrimaryLivePlatform()
 
   return (
-    <div class="mb-6">
-      <h3 class="text-lg font-medium mb-2">Primary Live Stream Platform</h3>
-      <p class="text-gray-600 mb-4">
-        Select your primary live streaming platform. This will be used as your default platform for live streams.
-        The Profile picture of your primary live stream platform will be used for your JJ profile.
+    <div class="">
+      <h3 class="mb-2 text-lg font-medium">Primary Live Stream Platform</h3>
+      <p class="mb-4 text-gray-600">
+        Select your primary live streaming platform. This will be used as your
+        default platform for live streams. The Profile picture of your primary
+        live stream platform will be used for your JJ profile.
       </p>
 
-      <Switch>
-        <Match when={primaryLiveStream.isPending || socials.isPending}>
-          <div class="text-gray-500 text-center py-4">Loading platform settings...</div>
-        </Match>
+      <Show when={primaryLiveStream.isPending || socials.isPending}>
+        <div class="py-4 text-center text-gray-500">
+          Loading platform settings...
+        </div>
+      </Show>
 
-        <Match when={primaryLiveStream.error || socials.error}>
-          <div class="text-center py-4">
-            <p class="text-red-500 mb-2">Failed to load platform settings</p>
-            <button
-              onClick={() => {
-                primaryLiveStream.refetch();
-                socials.refetch();
-              }}
-              class="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
-            >
-              Retry
-            </button>
-          </div>
-        </Match>
-
-        <Match when={primaryLiveStream.data != null && socials.data != null}>
-          <>
-            <RadioGroup
-              value={selectedPlatform()!}
-              onChange={handlePlatformChange}
-              class="space-y-2 flex flex-row"
-              disabled={mutation.isPending}
-            >
-              <RadioGroup.Item value="twitch" class="flex items-center space-x-2 p-2 rounded-md hover:bg-gray-50">
-                <RadioGroup.ItemInput/>
-                <RadioGroup.ItemControl class="w-4 h-4 border border-gray-300 rounded-full">
-                  <RadioGroup.ItemIndicator class="w-2 h-2 bg-purple-600 rounded-full"/>
-                </RadioGroup.ItemControl>
-                <RadioGroup.ItemLabel class="text-purple-600 font-medium">Twitch</RadioGroup.ItemLabel>
-              </RadioGroup.Item>
-
-              <RadioGroup.Item value="youtube"
-                               class="flex items-center space-x-2 p-2 rounded-md hover:bg-gray-50">
-                <RadioGroup.ItemInput/>
-                <RadioGroup.ItemControl class="w-4 h-4 border border-gray-300 rounded-full">
-                  <RadioGroup.ItemIndicator class="w-2 h-2 bg-red-600 rounded-full"/>
-                </RadioGroup.ItemControl>
-                <RadioGroup.ItemLabel class="text-red-600 font-medium">YouTube</RadioGroup.ItemLabel>
-              </RadioGroup.Item>
-
-              <RadioGroup.Item value="tiktok" class="flex items-center space-x-2 p-2 rounded-md hover:bg-gray-50">
-                <RadioGroup.ItemInput/>
-                <RadioGroup.ItemControl class="w-4 h-4 border border-gray-300 rounded-full">
-                  <RadioGroup.ItemIndicator class="w-2 h-2 bg-black rounded-full"/>
-                </RadioGroup.ItemControl>
-                <RadioGroup.ItemLabel class="text-black font-medium">TikTok</RadioGroup.ItemLabel>
-              </RadioGroup.Item>
-            </RadioGroup>
-
-            {/* Warning message if the user doesn't have the appropriate social */}
-            <Show when={!hasPlatformSocial()}>
-              <div class="mt-4 p-3 bg-yellow-50 border border-yellow-300 rounded-md text-yellow-800">
-                <p class="text-sm font-medium">
-                  Warning: You have selected {selectedPlatform()} as your primary live stream platform, but you
-                  don't have a {selectedPlatform()} account linked.
-                  Please add your {selectedPlatform()} account below.
-                </p>
-              </div>
-            </Show>
-          </>
-        </Match>
-      </Switch>
+      <Show when={primaryLiveStream.error || socials.error}>
+        <div class="py-4 text-center">
+          <p class="mb-2 text-red-500">Failed to load platform settings</p>
+          <button
+            onClick={retry}
+            class="rounded bg-blue-500 px-3 py-1 text-white hover:bg-blue-600"
+          >
+            Retry
+          </button>
+        </div>
+      </Show>
+      <RadioGroup
+        value={selectedPlatform() ?? undefined}
+        onChange={(s) => handlePlatformChange(s as StreamingPlatform)}
+        class="flex flex-row gap-4"
+        disabled={mutation.isPending}
+      >
+        <RadioGroup.Item
+          value="twitch"
+          class="flex items-center space-x-2 rounded-md p-2 hover:bg-gray-50"
+        >
+          <RadioGroup.ItemInput />
+          <RadioGroup.ItemControl class="h-4 w-4 rounded-full border border-gray-300">
+            <RadioGroup.ItemIndicator class="h-2 w-2 rounded-full bg-purple-600" />
+          </RadioGroup.ItemControl>
+          <RadioGroup.ItemLabel class="font-medium text-purple-600">
+            Twitch
+          </RadioGroup.ItemLabel>
+        </RadioGroup.Item>
+        <RadioGroup.Item
+          value="youtube"
+          class="flex items-center space-x-2 rounded-md p-2 hover:bg-gray-50"
+        >
+          <RadioGroup.ItemInput />
+          <RadioGroup.ItemControl class="h-4 w-4 rounded-full border border-gray-300">
+            <RadioGroup.ItemIndicator class="h-2 w-2 rounded-full bg-red-600" />
+          </RadioGroup.ItemControl>
+          <RadioGroup.ItemLabel class="font-medium text-red-600">
+            YouTube
+          </RadioGroup.ItemLabel>
+        </RadioGroup.Item>
+        <RadioGroup.Item
+          value="tiktok"
+          class="flex items-center space-x-2 rounded-md p-2 hover:bg-gray-50"
+        >
+          <RadioGroup.ItemInput />
+          <RadioGroup.ItemControl class="h-4 w-4 rounded-full border border-gray-300">
+            <RadioGroup.ItemIndicator class="h-2 w-2 rounded-full bg-black" />
+          </RadioGroup.ItemControl>
+          <RadioGroup.ItemLabel class="font-medium text-black">
+            TikTok
+          </RadioGroup.ItemLabel>
+        </RadioGroup.Item>
+      </RadioGroup>
     </div>
-  );
-};
+  )
+}
+
+/*
+
+          <Show when={!hasPlatformSocial()}>
+            <div class="mt-4 rounded-md border border-yellow-300 bg-yellow-50 p-3 text-yellow-800">
+              <p class="text-sm font-medium">
+                Warning: You have selected {selectedPlatform()} as your primary
+                live stream platform, but you don't have a {selectedPlatform()}{' '}
+                account linked. Please add your {selectedPlatform()} account
+                below.
+              </p>
+            </div>
+          </Show>
+ */

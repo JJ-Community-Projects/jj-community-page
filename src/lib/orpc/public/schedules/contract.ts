@@ -1,6 +1,13 @@
-import {oc} from "@orpc/contract";
-import {FullScheduleSchema, ScheduleSlugInputSchema, YearInputSchema, SchedulesListSchema} from "../schemas/schedules.ts";
-
+import { oc } from '@orpc/contract'
+import { z } from 'zod/v4'
+import {
+  FullScheduleSchema,
+  NextStreamsInputSchema,
+  SchedulesListSchema,
+  ScheduleSlugInputSchema,
+  StreamSchema,
+  YearInputSchema
+} from '../schemas/schedules.ts'
 
 /**
  * Get full schedule by slug
@@ -44,8 +51,27 @@ const getVisiblePrimarySchedulesByYearContract = oc
     deprecated: false
   });
 
+/**
+ * Get next N upcoming streams across public primary schedules for a given year.
+ * @path /schedules/next-streams
+ * @description Returns up to N upcoming or currently-live visible streams across all visible primary schedules for a year.
+ * @Input NextStreamsInputSchema - optional year, limit, and uniqueness mode
+ * @Output array of StreamSchema objects including tags and participants
+ */
+const getNextStreamsContract = oc
+  .input(NextStreamsInputSchema)
+  .output(z.array(StreamSchema))
+  .route({
+    path: '/schedules/next-streams',
+    method: 'GET',
+    operationId: 'getNextStreams',
+    summary: 'Get next N streams across public primary schedules',
+    description: 'Return the next N upcoming or live streams across visible primary schedules for a given year',
+    tags: ['schedules'],
+  });
 
 export const contracts = {
   getFullScheduleBySlugContract,
   getVisiblePrimarySchedulesByYearContract,
+  getNextStreamsContract,
 }

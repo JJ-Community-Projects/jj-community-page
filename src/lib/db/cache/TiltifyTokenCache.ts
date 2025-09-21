@@ -1,19 +1,21 @@
-import type {TiltifyToken} from "../../TiltifyAPI.ts";
-import {Cache} from './Cache.ts'
-import type {InferSelectModel} from "drizzle-orm";
-import {tokens} from "../schema/auth-schema.ts";
+import type { TiltifyToken } from '../../TiltifyAPI.ts'
+import { Cache } from './Cache.ts'
+import type { InferSelectModel } from 'drizzle-orm'
+import { tokens } from '../schema/auth-schema.ts'
 
 export class TiltifyTokenCache extends Cache<string> {
-
-  storeTokenFromDB(userSessionId: string, token: InferSelectModel<typeof tokens>) {
+  storeTokenFromDB(
+    userSessionId: string,
+    token: InferSelectModel<typeof tokens>,
+  ) {
     return this.putStr(`tiltify:${userSessionId}`, token.accessToken, {
-      expiration: token.expiresAt.getTime(),
+      expiration: token.expiresAt.getTime() / 1000,
     })
   }
 
   storeToken(userSessionId: string, token: TiltifyToken) {
     return this.putStr(`tiltify:${userSessionId}`, token.accessToken, {
-      expirationTtl: token.expiresIn
+      expirationTtl: token.expiresIn,
     })
   }
 
@@ -24,5 +26,4 @@ export class TiltifyTokenCache extends Cache<string> {
   deleteToken(userSessionId: string) {
     return this.delete(`tiltify:${userSessionId}`)
   }
-
 }

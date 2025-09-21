@@ -1,0 +1,29 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro'
+import { CommunityPage } from '../../components/features/community/CommunityPage.tsx'
+import { FaSolidHeart } from 'solid-icons/fa'
+import BaseLayout4xl from '../../layouts/BaseLayout4xl.astro'
+---
+
+<BaseLayout4xl
+  title="The Jingle Jam Community"
+  description="A central place to showcase the streams of the Jingle Jam!"
+  canonical="https://jinglejam.ostof.dev/community"
+>
+  <div class="w-full flex flex-col justify-center items-stretch gap-4">
+    <div
+      class="bg-white rounded-xl shadow-md border-2 hover:shadow-lg transition-all duration-300"
+    >
+      <div class="p-4 md:p-6 lg:p-8">
+        <div class="flex flex-col items-center text-center">
+          <div class="flex items-center gap-3 mb-4">
+            <FaSolidHeart class="w-8 h-8 text-neutral-600" />
+            <h1 class="~text-2xl/4xl font-babas text-black">Fundraisers</h1>
+          </div>
+          <p>This Page will be updated soon...</p>
+        </div>
+      </div>
+    </div>
+    <CommunityPage client:only="solid-js" />
+  </div>
+</BaseLayout4xl>
