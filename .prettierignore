@@ -1,0 +1,19 @@
+# .prettierignore
+# Ignore artifacts:
+.astro
+.bash
+.idea
+.junie
+.tmp
+.wrangler
+dist
+docs
+drizzle
+http
+node_modules
+/public
+**/*.html
+**/*.json
+**/*.yaml
+**/*.md
+**/*.mdx

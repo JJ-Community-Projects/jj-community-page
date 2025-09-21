@@ -1,0 +1,11 @@
+{
+  "trailingComma": "all",
+  "tabWidth": 2,
+  "semi": false,
+  "singleQuote": true,
+  "overrides": [],
+  "plugins": [
+    "prettier-plugin-tailwindcss",
+    "prettier-plugin-astro"
+  ]
+}
