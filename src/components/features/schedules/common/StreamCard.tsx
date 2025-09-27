@@ -1,71 +1,75 @@
-import {type Component, Match, Show, Switch} from "solid-js";
-import type {Stream} from "../../../../lib/orpc/public/schemas/schedules.ts";
-import {DateTime} from "luxon";
-import {useNow} from "../../../../lib/utils/useNow.ts";
-import {createModalSignal} from "../../../../lib/createModalSignal.ts";
-import {getStreamColor, getStreamColors} from "../../../../functions/jjDatesToColors.ts";
-import {getTextColor} from "../../../../lib/utils/textColors.ts";
-import {ScheduleStreamDetailDialog} from "./ScheduleStreamDetailDialog.tsx";
-import {twMerge} from "tailwind-merge";
+import { type Component, Match, Show, Switch } from 'solid-js'
+import type { Stream } from '../../../../lib/orpc/public/schemas/schedules.ts'
+import { DateTime } from 'luxon'
+import { useNow } from '../../../../lib/utils/useNow.ts'
+import { createModalSignal } from '../../../../lib/createModalSignal.ts'
+import {
+  getStreamColor,
+  getStreamColors,
+} from '../../../../functions/jjDatesToColors.ts'
+import { getTextColor } from '../../../../lib/utils/textColors.ts'
+import { ScheduleStreamDetailDialog } from './ScheduleStreamDetailDialog.tsx'
+import { twMerge } from 'tailwind-merge'
+import { FaBrandsTwitch, FaBrandsYoutube, FaSolidUsers } from 'solid-icons/fa'
 
 /**
  * Custom hook that manages state for schedule stream cards
  * Handles countdown timers, live status, and color calculations
  */
 const useScheduleStreamState = (stream: Stream) => {
-  const modal = createModalSignal();
+  const modal = createModalSignal()
 
-  const now = useNow();
+  const now = useNow()
 
   // Convert UTC dates from backend to DateTime objects
   const getStreamStartDateTime = () => {
     // Create DateTime from JS Date, assuming it's in UTC, then convert to local time
-    return DateTime.fromJSDate(stream.start, { zone: 'utc' }).toLocal();
-  };
+    return DateTime.fromJSDate(stream.start, { zone: 'utc' }).toLocal()
+  }
 
   const getStreamEndDateTime = () => {
     // Create DateTime from JS Date, assuming it's in UTC, then convert to local time
-    return DateTime.fromJSDate(stream.end, { zone: 'utc' }).toLocal();
-  };
+    return DateTime.fromJSDate(stream.end, { zone: 'utc' }).toLocal()
+  }
 
   // Calculate the highlight color using getStreamColor
   const getHighlightColor = () => {
     // For color calculation, we still use UTC to maintain consistent colors
-    const startDate = DateTime.fromJSDate(stream.start, { zone: 'utc' });
-    return getStreamColor(startDate);
-  };
+    const startDate = DateTime.fromJSDate(stream.start, { zone: 'utc' })
+    return getStreamColor(startDate)
+  }
 
   // Calculate the highlight color using getStreamColor
   const getHighlightColors = () => {
     // For color calculation, we still use UTC to maintain consistent colors
-    const startDate = DateTime.fromJSDate(stream.start, { zone: 'utc' });
-    return getStreamColors(startDate);
-  };
+    const startDate = DateTime.fromJSDate(stream.start, { zone: 'utc' })
+    return getStreamColors(startDate)
+  }
 
   const showCountdown = () => {
-    return getStreamStartDateTime() > now();
-  };
+    return getStreamStartDateTime() > now()
+  }
 
   const isLive = () => {
-    const start = getStreamStartDateTime();
-    const end = getStreamEndDateTime();
-    return start < now() && end > now();
-  };
+    const start = getStreamStartDateTime()
+    const end = getStreamEndDateTime()
+    return start < now() && end > now()
+  }
 
   const diff = () => {
-    return getStreamStartDateTime().diff(now());
-  };
+    return getStreamStartDateTime().diff(now())
+  }
 
   const countdown = () => {
-    const d = diff();
+    const d = diff()
     if (d.as('hour') < 1) {
-      return d.toFormat("mm'm' ss's'");
+      return d.toFormat("mm'm' ss's'")
     }
     if (d.as('day') < 1) {
-      return d.toFormat("h'h' mm'm' ss's'");
+      return d.toFormat("h'h' mm'm' ss's'")
     }
-    return d.toFormat("d'd' hh'h' mm'm' ss's'");
-  };
+    return d.toFormat("d'd' hh'h' mm'm' ss's'")
+  }
 
   const formatDate = () => {
     // Display date in user's local timezone
@@ -74,23 +78,30 @@ const useScheduleStreamState = (stream: Stream) => {
       month: 'short',
       day: 'numeric',
       hour: 'numeric',
-      minute: 'numeric'
-    });
-  };
+      minute: 'numeric',
+    })
+  }
 
-  const highlightColor = getHighlightColor();
-  const textColor = getTextColor(highlightColor);
+  const highlightColor = getHighlightColor()
+  const textColor = getTextColor(highlightColor)
   const pallet = getHighlightColors()
 
   return {
-    modal, now, showCountdown, isLive, diff, countdown, formatDate, highlightColor, textColor, pallet
+    modal,
+    now,
+    showCountdown,
+    isLive,
+    diff,
+    countdown,
+    formatDate,
+    highlightColor,
+    textColor,
+    pallet,
   }
-
 }
 
-
 interface Props {
-  stream: Stream;
+  stream: Stream
   type: 'filled' | 'top-bar' | 'bottom-bar' | 'left-bar'
   hover: boolean
 }
@@ -99,63 +110,78 @@ export const ScheduleStreamCard: Component<Props> = (props) => {
   return (
     <Switch>
       <Match when={props.type === 'filled'}>
-        <ScheduleStreamCardColored stream={props.stream}/>
+        <ScheduleStreamCardColored stream={props.stream} />
       </Match>
       <Match when={props.type === 'top-bar' && !props.hover}>
-        <ScheduleStreamCardTopBar stream={props.stream}/>
+        <ScheduleStreamCardTopBar stream={props.stream} />
       </Match>
       <Match when={props.type === 'top-bar' && props.hover}>
-        <ScheduleStreamCardTopBarHover stream={props.stream}/>
+        <ScheduleStreamCardTopBarHover stream={props.stream} />
       </Match>
       <Match when={props.type === 'bottom-bar' && !props.hover}>
-        <ScheduleStreamCardBottomBar stream={props.stream}/>
+        <ScheduleStreamCardBottomBar stream={props.stream} />
       </Match>
       <Match when={props.type === 'bottom-bar' && props.hover}>
-        <ScheduleStreamCardBottomBarHover stream={props.stream}/>
+        <ScheduleStreamCardBottomBarHover stream={props.stream} />
       </Match>
       <Match when={props.type === 'left-bar' && !props.hover}>
-        <ScheduleStreamCardSidebar stream={props.stream}/>
+        <ScheduleStreamCardSidebar stream={props.stream} />
       </Match>
       <Match when={props.type === 'left-bar' && props.hover}>
-        <ScheduleStreamCardSidebarHover stream={props.stream}/>
+        <ScheduleStreamCardSidebarHover stream={props.stream} />
       </Match>
     </Switch>
-  );
+  )
 }
 
 interface ScheduleStreamCardProps {
-  stream: Stream;
+  stream: Stream
 }
 
 /**
  * Main schedule stream card component
  * Displays stream information with colored background and countdown timer
  */
-const ScheduleStreamCardColored: Component<ScheduleStreamCardProps> = (props) => {
-
+const ScheduleStreamCardColored: Component<ScheduleStreamCardProps> = (
+  props,
+) => {
   const {
-    modal, now, showCountdown, isLive, diff, countdown, formatDate, highlightColor, textColor
+    modal,
+    now,
+    showCountdown,
+    isLive,
+    diff,
+    countdown,
+    formatDate,
+    highlightColor,
+    textColor,
   } = useScheduleStreamState(props.stream)
 
   return (
     <div class="h-full">
       <LiveStreamPulseWrapper isLive={isLive()}>
         <button
-          class="w-full h-full rounded-2xl p-3 flex flex-col text-center items-center justify-center transition-all hover:scale-105 hover:brightness-105"
+          class="flex h-full w-full flex-col items-center justify-center rounded-2xl p-3 text-center transition-all hover:scale-105 hover:brightness-105"
           style={{
             'background-color': highlightColor,
-            'color': textColor
+            color: textColor,
           }}
           onClick={() => modal.open()}
         >
-          <div class="flex flex-col items-center justify-center w-full">
-            <p class="text-lg font-bold tracking-widest uppercase text-pretty line-clamp-2">{props.stream.title}</p>
+          <div class="flex w-full flex-col items-center justify-center">
+            <p class="line-clamp-2 text-pretty text-lg font-bold uppercase tracking-widest">
+              {props.stream.title}
+            </p>
             <Show when={props.stream.subtitle}>
-              <p class="text-sm tracking-widest uppercase text-pretty line-clamp-1">{props.stream.subtitle}</p>
+              <p class="line-clamp-1 text-pretty text-sm uppercase tracking-widest">
+                {props.stream.subtitle}
+              </p>
             </Show>
             <p class="text-sm">{formatDate()}</p>
             <Show when={showCountdown()}>
-              <p class="font-mono text-xs font-bold lowercase tracking-wide line-clamp-1">{countdown()}</p>
+              <p class="line-clamp-1 font-mono text-xs font-bold lowercase tracking-wide">
+                {countdown()}
+              </p>
             </Show>
             <Show when={!showCountdown() && isLive()}>
               <p class="text-md font-bold tracking-wide text-white">LIVE</p>
@@ -163,45 +189,59 @@ const ScheduleStreamCardColored: Component<ScheduleStreamCardProps> = (props) =>
           </div>
         </button>
       </LiveStreamPulseWrapper>
-      <ScheduleStreamDetailDialog
-        stream={props.stream}
-        modalSignal={modal}
-      />
+      <ScheduleStreamDetailDialog stream={props.stream} modalSignal={modal} />
     </div>
-  );
+  )
 }
-
 
 /**
  * Alternative stream card with a colored sidebar on the left
  * Uses a white background with a colored stripe for visual distinction
  */
-const ScheduleStreamCardSidebar: Component<ScheduleStreamCardProps> = (props) => {
+const ScheduleStreamCardSidebar: Component<ScheduleStreamCardProps> = (
+  props,
+) => {
   const {
-    modal, now, showCountdown, isLive, diff, countdown, formatDate, highlightColor, textColor, pallet
+    modal,
+    now,
+    showCountdown,
+    isLive,
+    diff,
+    countdown,
+    formatDate,
+    highlightColor,
+    textColor,
+    pallet,
   } = useScheduleStreamState(props.stream)
   return (
     <>
       {/* white card with content */}
       <button
         // class="w-full h-auto rounded-2xl flex flex-row bg-white"
-        class="relative overflow-hidden group w-full rounded-2xl flex flex-row bg-white shadow-md hover:shadow-lg transition-shadow duration-300"
+        class="group relative flex w-full flex-row overflow-hidden rounded-2xl bg-white shadow-md transition-shadow duration-300 hover:shadow-lg"
         onClick={() => modal.open()}
       >
         {/* colored stripe */}
         <div
-          class={twMerge("w-4 rounded-l-2xl", isLive() && 'animate-pulse')}
-          style={{'background-color': highlightColor}}/>
+          class={twMerge('w-4 rounded-l-2xl', isLive() && 'animate-pulse')}
+          style={{ 'background-color': highlightColor }}
+        />
 
-        <div class="flex-1 flex flex-col text-left py-4 pl-2 pr-8">
-          <div class="flex flex-col items-start w-full transition-transform origin-left group-hover:scale-105">
-            <p class="text-lg font-bold tracking-widest uppercase text-pretty line-clamp-2">{props.stream.title}</p>
+        <div class="flex flex-1 flex-col py-4 pl-2 pr-8 text-left">
+          <div class="flex w-full origin-left flex-col items-start transition-transform group-hover:scale-105">
+            <p class="line-clamp-2 text-pretty text-lg font-bold uppercase tracking-widest">
+              {props.stream.title}
+            </p>
             <Show when={props.stream.subtitle}>
-              <p class="text-sm tracking-widest uppercase text-pretty line-clamp-1">{props.stream.subtitle}</p>
+              <p class="line-clamp-1 text-pretty text-sm uppercase tracking-widest">
+                {props.stream.subtitle}
+              </p>
             </Show>
             <p class="text-sm">{formatDate()}</p>
             <Show when={showCountdown()}>
-              <p class="font-mono text-xs font-bold lowercase tracking-wide line-clamp-1">{countdown()}</p>
+              <p class="line-clamp-1 font-mono text-xs font-bold lowercase tracking-wide">
+                {countdown()}
+              </p>
             </Show>
             <Show when={!showCountdown() && isLive()}>
               <p class="text-md font-bold tracking-wide text-accent">LIVE</p>
@@ -209,66 +249,76 @@ const ScheduleStreamCardSidebar: Component<ScheduleStreamCardProps> = (props) =>
           </div>
         </div>
       </button>
-      <ScheduleStreamDetailDialog
-        stream={props.stream}
-        modalSignal={modal}
-      />
+      <ScheduleStreamDetailDialog stream={props.stream} modalSignal={modal} />
     </>
   )
 }
-
 
 /**
  * Alternative stream card with a colored sidebar and hover effect
  * Features a color fill animation that expands from left to right on hover
  */
-const ScheduleStreamCardSidebarHover: Component<ScheduleStreamCardProps> = (props) => {
+const ScheduleStreamCardSidebarHover: Component<ScheduleStreamCardProps> = (
+  props,
+) => {
   const {
-    modal, now, showCountdown, isLive, diff, countdown, formatDate, highlightColor, textColor, pallet
+    modal,
+    now,
+    showCountdown,
+    isLive,
+    diff,
+    countdown,
+    formatDate,
+    highlightColor,
+    textColor,
+    pallet,
   } = useScheduleStreamState(props.stream)
   return (
     <>
       {/* white card with content */}
       <button
         // class="w-full h-auto rounded-2xl flex flex-row bg-white"
-        class="relative overflow-hidden group w-full rounded-2xl flex flex-row bg-white shadow-md hover:shadow-lg transition-shadow duration-300"
+        class="group relative flex w-full flex-row overflow-hidden rounded-2xl bg-white shadow-md transition-shadow duration-300 hover:shadow-lg"
         onClick={() => modal.open()}
         style={{
           '--highlight-color': highlightColor,
-          '--text-color': textColor
+          '--text-color': textColor,
         }}
       >
         {/* colored stripe */}
         <div
-          class={twMerge("w-4 rounded-l-2xl", isLive() && 'animate-pulse')}
-          style={{'background-color': highlightColor}}/>
-
-        {/* Overlay that animates from left to right on hover */}
-        <div
-          class="absolute inset-0 z-0 bg-gradient-to-r from-[var(--highlight-color)] to-[var(--highlight-color)] opacity-0 group-hover:opacity-100 rounded-2xl origin-left transform scale-x-0 group-hover:scale-x-100 transition-all ease-in-out duration-500"
+          class={twMerge('w-4 rounded-l-2xl', isLive() && 'animate-pulse')}
+          style={{ 'background-color': highlightColor }}
         />
 
-        <div
-          class="flex-grow flex flex-col text-left py-4 px-1 relative z-2 group-hover:text-[var(--text-color)] transition-colors duration-300">
-          <div class="flex flex-col items-start w-full">
-            <p class="text-lg font-bold tracking-widest uppercase text-pretty line-clamp-2">{props.stream.title}</p>
+        {/* Overlay that animates from left to right on hover */}
+        <div class="absolute inset-0 z-0 origin-left scale-x-0 transform rounded-2xl bg-gradient-to-r from-[var(--highlight-color)] to-[var(--highlight-color)] opacity-0 transition-all duration-500 ease-in-out group-hover:scale-x-100 group-hover:opacity-100" />
+
+        <div class="z-2 relative flex flex-grow flex-col px-1 py-4 text-left transition-colors duration-300 group-hover:text-[var(--text-color)]">
+          <div class="flex w-full flex-col items-start">
+            <p class="line-clamp-2 text-pretty text-lg font-bold uppercase tracking-widest">
+              {props.stream.title}
+            </p>
             <Show when={props.stream.subtitle}>
-              <p class="text-sm tracking-widest uppercase text-pretty line-clamp-1">{props.stream.subtitle}</p>
+              <p class="line-clamp-1 text-pretty text-sm uppercase tracking-widest">
+                {props.stream.subtitle}
+              </p>
             </Show>
             <p class="text-sm">{formatDate()}</p>
             <Show when={showCountdown()}>
-              <p class="font-mono text-xs font-bold lowercase tracking-wide line-clamp-1">{countdown()}</p>
+              <p class="line-clamp-1 font-mono text-xs font-bold lowercase tracking-wide">
+                {countdown()}
+              </p>
             </Show>
             <Show when={!showCountdown() && isLive()}>
-              <p class="text-md font-bold tracking-wide text-accent group-hover:text-[var(--text-color)]">LIVE</p>
+              <p class="text-md font-bold tracking-wide text-accent group-hover:text-[var(--text-color)]">
+                LIVE
+              </p>
             </Show>
           </div>
         </div>
       </button>
-      <ScheduleStreamDetailDialog
-        stream={props.stream}
-        modalSignal={modal}
-      />
+      <ScheduleStreamDetailDialog stream={props.stream} modalSignal={modal} />
     </>
   )
 }
@@ -277,26 +327,43 @@ const ScheduleStreamCardSidebarHover: Component<ScheduleStreamCardProps> = (prop
  * Alternative stream card with a colored bar at the bottom
  * Uses a white background with a colored stripe for visual distinction
  */
-const ScheduleStreamCardBottomBar: Component<ScheduleStreamCardProps> = (props) => {
+const ScheduleStreamCardBottomBar: Component<ScheduleStreamCardProps> = (
+  props,
+) => {
   const {
-    modal, now, showCountdown, isLive, diff, countdown, formatDate, highlightColor, textColor, pallet
+    modal,
+    now,
+    showCountdown,
+    isLive,
+    diff,
+    countdown,
+    formatDate,
+    highlightColor,
+    textColor,
+    pallet,
   } = useScheduleStreamState(props.stream)
   return (
     <>
       {/* white card with content */}
       <button
-        class="relative overflow-hidden group w-full rounded-2xl flex flex-col bg-white shadow-md hover:shadow-lg transition-shadow duration-300"
+        class="group relative flex w-full flex-col overflow-hidden rounded-2xl bg-white shadow-md transition-shadow duration-300 hover:shadow-lg"
         onClick={() => modal.open()}
       >
-        <div class="flex-grow flex flex-col text-center py-4 px-5">
-          <div class="flex flex-col items-center justify-center w-full transition-transform origin-center group-hover:scale-105">
-            <p class="text-lg font-bold tracking-widest uppercase text-pretty line-clamp-2">{props.stream.title}</p>
+        <div class="flex flex-grow flex-col px-5 py-4 text-center">
+          <div class="flex w-full origin-center flex-col items-center justify-center transition-transform group-hover:scale-105">
+            <p class="line-clamp-2 text-pretty text-lg font-bold uppercase tracking-widest">
+              {props.stream.title}
+            </p>
             <Show when={props.stream.subtitle}>
-              <p class="text-sm tracking-widest uppercase text-pretty line-clamp-1">{props.stream.subtitle}</p>
+              <p class="line-clamp-1 text-pretty text-sm uppercase tracking-widest">
+                {props.stream.subtitle}
+              </p>
             </Show>
             <p class="text-sm">{formatDate()}</p>
             <Show when={showCountdown()}>
-              <p class="font-mono text-xs font-bold lowercase tracking-wide line-clamp-1">{countdown()}</p>
+              <p class="line-clamp-1 font-mono text-xs font-bold lowercase tracking-wide">
+                {countdown()}
+              </p>
             </Show>
             <Show when={!showCountdown() && isLive()}>
               <p class="text-md font-bold tracking-wide text-accent">LIVE</p>
@@ -306,13 +373,14 @@ const ScheduleStreamCardBottomBar: Component<ScheduleStreamCardProps> = (props) 
 
         {/* colored stripe at bottom */}
         <div
-          class={twMerge("h-4 w-full rounded-b-2xl", isLive() && 'animate-pulse')}
-          style={{'background-color': highlightColor}}/>
+          class={twMerge(
+            'h-4 w-full rounded-b-2xl',
+            isLive() && 'animate-pulse',
+          )}
+          style={{ 'background-color': highlightColor }}
+        />
       </button>
-      <ScheduleStreamDetailDialog
-        stream={props.stream}
-        modalSignal={modal}
-      />
+      <ScheduleStreamDetailDialog stream={props.stream} modalSignal={modal} />
     </>
   )
 }
@@ -321,51 +389,69 @@ const ScheduleStreamCardBottomBar: Component<ScheduleStreamCardProps> = (props) 
  * Alternative stream card with a colored bar at the bottom and hover effect
  * Features a color fill animation that expands from bottom to top on hover
  */
-const ScheduleStreamCardBottomBarHover: Component<ScheduleStreamCardProps> = (props) => {
+const ScheduleStreamCardBottomBarHover: Component<ScheduleStreamCardProps> = (
+  props,
+) => {
   const {
-    modal, now, showCountdown, isLive, diff, countdown, formatDate, highlightColor, textColor, pallet
+    modal,
+    now,
+    showCountdown,
+    isLive,
+    diff,
+    countdown,
+    formatDate,
+    highlightColor,
+    textColor,
+    pallet,
   } = useScheduleStreamState(props.stream)
   return (
     <>
       {/* white card with content */}
       <button
-        class="relative overflow-hidden group w-full rounded-2xl flex flex-col bg-white shadow-md hover:shadow-lg transition-shadow duration-300"
-        onClick={() => modal.open()}
+        class="group relative flex w-full flex-col overflow-hidden rounded-2xl bg-white shadow-md transition-shadow duration-300 hover:shadow-lg"
+        onClick={modal.open}
         style={{
           '--highlight-color': highlightColor,
-          '--text-color': textColor
+          '--text-color': textColor,
         }}
       >
         {/* Overlay that animates from bottom to top on hover */}
-        <div
-          class="absolute inset-0 z-0 bg-gradient-to-t from-[var(--highlight-color)] to-[var(--highlight-color)] opacity-0 group-hover:opacity-100 rounded-2xl origin-bottom transform scale-y-0 group-hover:scale-y-100 transition-all ease-in-out duration-500"
-        />
+        <div class="absolute inset-0 z-0 origin-bottom scale-y-0 transform rounded-2xl bg-gradient-to-t from-[var(--highlight-color)] to-[var(--highlight-color)] opacity-0 transition-all duration-500 ease-in-out group-hover:scale-y-100 group-hover:opacity-100" />
 
-        <div class="flex-grow flex flex-col text-center py-4 px-5 relative z-2 group-hover:text-[var(--text-color)] transition-colors duration-300">
-          <div class="flex flex-col items-center justify-center w-full">
-            <p class="text-lg font-bold tracking-widest uppercase text-pretty line-clamp-2">{props.stream.title}</p>
+        <div class="z-2 relative flex flex-grow flex-col px-5 py-4 text-center transition-colors duration-300 group-hover:text-[var(--text-color)]">
+          <div class="flex w-full flex-col items-center justify-center">
+            <p class="line-clamp-2 text-pretty text-lg font-bold uppercase tracking-widest">
+              {props.stream.title}
+            </p>
             <Show when={props.stream.subtitle}>
-              <p class="text-sm tracking-widest uppercase text-pretty line-clamp-1">{props.stream.subtitle}</p>
+              <p class="line-clamp-1 text-pretty text-sm uppercase tracking-widest">
+                {props.stream.subtitle}
+              </p>
             </Show>
             <p class="text-sm">{formatDate()}</p>
             <Show when={showCountdown()}>
-              <p class="font-mono text-xs font-bold lowercase tracking-wide line-clamp-1">{countdown()}</p>
+              <p class="line-clamp-1 font-mono text-xs font-bold lowercase tracking-wide">
+                {countdown()}
+              </p>
             </Show>
             <Show when={!showCountdown() && isLive()}>
-              <p class="text-md font-bold tracking-wide text-accent group-hover:text-[var(--text-color)]">LIVE</p>
+              <p class="text-md font-bold tracking-wide text-accent group-hover:text-[var(--text-color)]">
+                LIVE
+              </p>
             </Show>
           </div>
         </div>
 
         {/* colored stripe at bottom */}
         <div
-          class={twMerge("h-4 w-full rounded-b-2xl", isLive() && 'animate-pulse')}
-          style={{'background-color': highlightColor}}/>
+          class={twMerge(
+            'h-4 w-full rounded-b-2xl',
+            isLive() && 'animate-pulse',
+          )}
+          style={{ 'background-color': highlightColor }}
+        />
       </button>
-      <ScheduleStreamDetailDialog
-        stream={props.stream}
-        modalSignal={modal}
-      />
+      <ScheduleStreamDetailDialog stream={props.stream} modalSignal={modal} />
     </>
   )
 }
@@ -374,31 +460,66 @@ const ScheduleStreamCardBottomBarHover: Component<ScheduleStreamCardProps> = (pr
  * Alternative stream card with a colored bar at the top
  * Uses a white background with a colored stripe for visual distinction
  */
-const ScheduleStreamCardTopBar: Component<ScheduleStreamCardProps> = (props) => {
+const ScheduleStreamCardTopBar: Component<ScheduleStreamCardProps> = (
+  props,
+) => {
   const {
-    modal, now, showCountdown, isLive, diff, countdown, formatDate, highlightColor, textColor, pallet
+    modal,
+    now,
+    showCountdown,
+    isLive,
+    diff,
+    countdown,
+    formatDate,
+    highlightColor,
+    textColor,
+    pallet,
   } = useScheduleStreamState(props.stream)
   return (
     <>
       {/* white card with content */}
       <button
-        class="relative overflow-hidden group w-full rounded-2xl flex flex-col bg-white shadow-md hover:shadow-lg transition-shadow duration-300"
+        class="group relative flex w-full flex-col overflow-hidden rounded-2xl bg-white shadow-md transition-shadow duration-300 hover:shadow-lg"
         onClick={() => modal.open()}
       >
         {/* colored stripe at top */}
         <div
-          class={twMerge("h-4 w-full rounded-t-2xl", isLive() && 'animate-pulse')}
-          style={{'background-color': highlightColor}}/>
+          class={twMerge(
+            'h-4 w-full rounded-t-2xl',
+            isLive() && 'animate-pulse',
+          )}
+          style={{ 'background-color': highlightColor }}
+        >
+          <div class="h-full w-full">
+            <div class="flex flex-1 flex-row items-center gap-2">
+              <Show when={props.stream.twitchVodUrl}>
+                <FaBrandsTwitch />
+              </Show>
+              <Show when={props.stream.youtubeVodUrl}>
+                <FaBrandsYoutube />
+              </Show>
+            </div>
+            <Show when={props.stream.participants.length > 0}>
+              <FaSolidUsers />
+            </Show>
+          </div>
+        </div>
 
-        <div class="flex-grow flex flex-col text-center py-4 px-5">
-          <div class="flex flex-col items-center justify-center w-full transition-transform origin-center group-hover:scale-105">
-            <p class="text-lg font-bold tracking-widest uppercase text-pretty line-clamp-2">{props.stream.title}</p>
+        <div class="flex flex-grow flex-col px-5 py-4 text-center">
+          <div class="flex w-full origin-center flex-col items-center justify-center transition-transform group-hover:scale-105">
+            <p class="line-clamp-2 text-pretty text-lg font-bold uppercase tracking-widest">
+              {props.stream.title}
+            </p>
             <Show when={props.stream.subtitle}>
-              <p class="text-sm tracking-widest uppercase text-pretty line-clamp-1">{props.stream.subtitle}</p>
+              <p class="line-clamp-1 text-pretty text-sm uppercase tracking-widest">
+                {props.stream.subtitle}
+              </p>
             </Show>
             <p class="text-sm">{formatDate()}</p>
             <Show when={showCountdown()}>
-              <p class="font-mono text-xs font-bold lowercase tracking-wide line-clamp-1">{countdown()}</p>
+              <p class="line-clamp-1 font-mono text-xs font-bold lowercase tracking-wide">
+                {countdown()}
+              </p>
             </Show>
             <Show when={!showCountdown() && isLive()}>
               <p class="text-md font-bold tracking-wide text-accent">LIVE</p>
@@ -406,10 +527,7 @@ const ScheduleStreamCardTopBar: Component<ScheduleStreamCardProps> = (props) => 
           </div>
         </div>
       </button>
-      <ScheduleStreamDetailDialog
-        stream={props.stream}
-        modalSignal={modal}
-      />
+      <ScheduleStreamDetailDialog stream={props.stream} modalSignal={modal} />
     </>
   )
 }
@@ -418,55 +536,100 @@ const ScheduleStreamCardTopBar: Component<ScheduleStreamCardProps> = (props) => 
  * Alternative stream card with a colored bar at the top and hover effect
  * Features a color fill animation that expands from top to bottom on hover
  */
-const ScheduleStreamCardTopBarHover: Component<ScheduleStreamCardProps> = (props) => {
+const ScheduleStreamCardTopBarHover: Component<ScheduleStreamCardProps> = (
+  props,
+) => {
   const {
-    modal, now, showCountdown, isLive, diff, countdown, formatDate, highlightColor, textColor, pallet
+    modal,
+    now,
+    showCountdown,
+    isLive,
+    diff,
+    countdown,
+    formatDate,
+    highlightColor,
+    textColor,
+    pallet,
   } = useScheduleStreamState(props.stream)
   return (
     <>
       {/* white card with content */}
       <button
-        class="relative overflow-hidden group w-full rounded-2xl flex flex-col bg-white shadow-md hover:shadow-lg transition-shadow duration-300"
+        class="group relative flex w-full flex-col overflow-hidden rounded-2xl bg-white shadow-md transition-shadow duration-300 hover:shadow-lg"
         onClick={() => modal.open()}
         style={{
           '--highlight-color': highlightColor,
-          '--text-color': textColor
+          '--text-color': textColor,
         }}
       >
+        {/* Overlay that animates from top to bottom on hover */}
+        <div class="absolute inset-0 z-0 origin-top scale-y-0 transform rounded-2xl bg-gradient-to-b from-[var(--highlight-color)] to-[var(--highlight-color)] opacity-0 transition-all duration-500 ease-in-out group-hover:scale-y-100 group-hover:opacity-100" />
+
         {/* colored stripe at top */}
         <div
-          class={twMerge("h-4 w-full rounded-t-2xl", isLive() && 'animate-pulse')}
-          style={{'background-color': highlightColor}}/>
+          class={twMerge(
+            'z-10 h-6 w-full rounded-t-2xl px-4 py-2',
+            isLive() && 'animate-pulse',
+          )}
+          style={{ 'background-color': highlightColor }}
+        >
+          <div class="flex h-full w-full flex-row items-center gap-2 text-[var(--text-color)]">
+            <div class="flex flex-1 flex-row items-center gap-2">
+              <Show when={props.stream.twitchVodUrl}>
+                <FaBrandsTwitch />
+              </Show>
+              <Show when={props.stream.youtubeVodUrl}>
+                <FaBrandsYoutube />
+              </Show>
+            </div>
+            <Show when={props.stream.participants.length > 0}>
+              <FaSolidUsers />
+            </Show>
+            <Show when={isLive()}>
+              <div class="flex flex-row items-center gap-1">
+                <p class="text-xs">LIVE</p>
+                <div class={'h-2 w-2'}>
+                  <span class="relative flex h-2 w-2">
+                    <span
+                      class={
+                        'relative inline-flex h-full w-full rounded-full bg-red-500'
+                      }
+                    />
+                    <span
+                      class={
+                        'absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75 duration-700'
+                      }
+                    />
+                  </span>
+                </div>
+              </div>
+            </Show>
+          </div>
+        </div>
 
-        {/* Overlay that animates from top to bottom on hover */}
-        <div
-          class="absolute inset-0 z-0 bg-gradient-to-b from-[var(--highlight-color)] to-[var(--highlight-color)] opacity-0 group-hover:opacity-100 rounded-2xl origin-top transform scale-y-0 group-hover:scale-y-100 transition-all ease-in-out duration-500"
-        />
-
-        <div class="flex-grow flex flex-col text-center py-4 px-5 relative z-2 group-hover:text-[var(--text-color)] transition-colors duration-300">
-          <div class="flex flex-col items-center justify-center w-full">
-            <p class="text-lg font-bold tracking-widest uppercase text-pretty line-clamp-2">{props.stream.title}</p>
+        <div class="relative z-10 flex flex-grow flex-col px-5 py-4 text-center transition-colors duration-300 group-hover:text-[var(--text-color)]">
+          <div class="flex w-full flex-col items-center justify-center">
+            <p class="line-clamp-2 text-pretty text-lg font-bold uppercase tracking-widest">
+              {props.stream.title}
+            </p>
             <Show when={props.stream.subtitle}>
-              <p class="text-sm tracking-widest uppercase text-pretty line-clamp-1">{props.stream.subtitle}</p>
+              <p class="line-clamp-1 text-pretty text-sm uppercase tracking-widest">
+                {props.stream.subtitle}
+              </p>
             </Show>
             <p class="text-sm">{formatDate()}</p>
             <Show when={showCountdown()}>
-              <p class="font-mono text-xs font-bold lowercase tracking-wide line-clamp-1">{countdown()}</p>
-            </Show>
-            <Show when={!showCountdown() && isLive()}>
-              <p class="text-md font-bold tracking-wide text-accent group-hover:text-[var(--text-color)]">LIVE</p>
+              <p class="line-clamp-1 font-mono text-xs font-bold lowercase tracking-wide">
+                {countdown()}
+              </p>
             </Show>
           </div>
         </div>
       </button>
-      <ScheduleStreamDetailDialog
-        stream={props.stream}
-        modalSignal={modal}
-      />
+      <ScheduleStreamDetailDialog stream={props.stream} modalSignal={modal} />
     </>
   )
 }
-
 
 /**
  * Component that displays a "LIVE" indicator with a pulsing red dot
@@ -478,9 +641,13 @@ const LiveStreamIndicator: Component = () => {
       <p class={'text-xs font-bold tracking-wide'}>LIVE</p>
       <div class={'h-2 w-2'}>
         <span class="relative flex h-2 w-2">
-          <span class={'relative inline-flex h-full w-full rounded-full bg-red-500'}/>
           <span
-            class={'absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75 duration-700'}
+            class={'relative inline-flex h-full w-full rounded-full bg-red-500'}
+          />
+          <span
+            class={
+              'absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75 duration-700'
+            }
           />
         </span>
       </div>
@@ -489,31 +656,28 @@ const LiveStreamIndicator: Component = () => {
 }
 
 interface LiveStreamPulseWrapperProps {
-  isLive: boolean;
-  children: any;
+  isLive: boolean
+  children: any
 }
 
 /**
  * Wrapper component that adds a pulsing animation effect when a stream is live
  * Provides consistent padding when not live
  */
-const LiveStreamPulseWrapper: Component<LiveStreamPulseWrapperProps> = (props) => {
+const LiveStreamPulseWrapper: Component<LiveStreamPulseWrapperProps> = (
+  props,
+) => {
   return (
     <Switch>
       <Match when={props.isLive}>
-        <div class="relative w-full h-full">
-          <div class="absolute w-full h-full bg-accent-300 rounded-2xl animate-pulse duration-300">
-          </div>
-          <div class="absolute p-1 w-full h-full">
-            {props.children}
-          </div>
+        <div class="relative h-full w-full">
+          <div class="absolute h-full w-full animate-pulse rounded-2xl bg-accent-300 duration-300"></div>
+          <div class="absolute h-full w-full p-1">{props.children}</div>
         </div>
       </Match>
       <Match when={!props.isLive}>
-        <div class="p-1 w-full h-full">
-          {props.children}
-        </div>
+        <div class="h-full w-full p-1">{props.children}</div>
       </Match>
     </Switch>
-  );
+  )
 }

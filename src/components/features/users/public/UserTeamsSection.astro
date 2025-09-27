@@ -1,49 +1,55 @@
 ---
-import {type Team} from "../../../../lib/orpc/public/schemas/teams";
-import {
-FaSolidUserGroup
-} from "solid-icons/fa";
+import { type Team } from '../../../../lib/orpc/public/schemas/teams'
+import { FaSolidUsers } from 'solid-icons/fa'
 
 interface Props {
-  teams: Team[];
+  teams: Team[]
   userColors?: {
-    primaryColor: string | null;
-    accentColor: string | null;
-  };
+    primaryColor: string | null
+    accentColor: string | null
+  }
 }
 
-const {teams, userColors} = Astro.props;
+const { teams, userColors } = Astro.props
 
 // Get user colors with fallbacks to design system colors (optional for backward compatibility)
-const primaryColor = userColors?.primaryColor || '#E30E50';
-const accentColor = userColors?.accentColor || '#3584BF';
+const primaryColor = userColors?.primaryColor || '#E30E50'
+const accentColor = userColors?.accentColor || '#3584BF'
 ---
 
-<div class="group w-full bg-white rounded-xl shadow-md border-2 group-hover:border-accent-200 hover:shadow-lg transition-all duration-300 p-4">
-    <div class="flex items-center gap-2 text-lg font-semibold mb-4">
-      <FaSolidUserGroup class="group-hover:text-accent transition-all duration-300"/>
-      <h2 class="text-xl font-bold text-black font-babas group-hover:text-accent transition-all duration-300">Teams</h2>
-    </div>
-  {teams && teams.length > 0 ? (
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {teams.map((team) => (
-                    <div class="border border-gray-200 rounded-md p-4">
-                        <div class="flex justify-between items-center mb-2">
-                            <h3 class="text-lg font-semibold">{team.name}</h3>
-                        </div>
-                      {team.description && (
-                              <p class="text-gray-600 text-sm mb-2">{team.description}</p>
-                      )}
-                        <a
-                                href={`/teams/${team.slug}`}
-                                class="text-accent hover:underline inline-block mt-2"
-                        >
-                            View Team
-                        </a>
-                    </div>
-            ))}
+<div
+  class="group w-full bg-white rounded-xl shadow-md border-2 group-hover:border-accent-200 hover:shadow-lg transition-all duration-300 p-4"
+>
+  <div class="flex items-center gap-2 text-lg font-semibold mb-4">
+    <FaSolidUsers class="group-hover:text-accent transition-all duration-300" />
+    <h2
+      class="text-xl font-bold text-black font-babas group-hover:text-accent transition-all duration-300"
+    >
+      Teams
+    </h2>
+  </div>
+  {
+    teams && teams.length > 0 ? (
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {teams.map((team) => (
+          <div class="border border-gray-200 rounded-md p-4">
+            <div class="flex justify-between items-center mb-2">
+              <h3 class="text-lg font-semibold">{team.name}</h3>
+            </div>
+            {team.description && (
+              <p class="text-gray-600 text-sm mb-2">{team.description}</p>
+            )}
+            <a
+              href={`/teams/${team.slug}`}
+              class="text-accent hover:underline inline-block mt-2"
+            >
+              View Team
+            </a>
           </div>
-  ) : (
-          <p class="text-gray-500">Not a member of any public teams</p>
-  )}
+        ))}
+      </div>
+    ) : (
+      <p class="text-gray-500">Not a member of any public teams</p>
+    )
+  }
 </div>

@@ -8,8 +8,8 @@ import {
 } from 'solid-js'
 import { RadioGroup } from '@kobalte/core/radio-group'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/solid-query'
-import { orpcPrivate } from '../../../../lib/orpc/client.ts'
-import type { StreamingPlatform } from '../../../../lib/orpc/private/schemas/users.ts'
+import { orpcPrivate } from '../../../../../lib/orpc/client.ts'
+import type { StreamingPlatform } from '../../../../../lib/orpc/private/schemas/users.ts'
 
 const usePrimaryLivePlatform = () => {
   const client = useQueryClient()

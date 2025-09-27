@@ -1,22 +1,25 @@
-import {type Component, createSignal, For, Match, Switch} from "solid-js";
-import {UserProvider} from "../providers/UserProvider.tsx";
-import {TeamDetailsProvider, useTeamDetails} from "./TeamDetailsProvider.tsx";
-import type {User} from "../../../../../lib/auth/User.ts";
-import {Dialog} from "@kobalte/core/dialog";
-import {createModalSignal, type ModalSignal} from "../../../../../lib/createModalSignal.ts";
+import { type Component, createSignal, For, Match, Switch } from 'solid-js'
+import { UserProvider } from '../providers/UserProvider.tsx'
+import { TeamDetailsProvider, useTeamDetails } from './TeamDetailsProvider.tsx'
+import type { User } from '../../../../../lib/auth/User.ts'
+import { Dialog } from '@kobalte/core/dialog'
+import {
+  createModalSignal,
+  type ModalSignal,
+} from '../../../../../lib/createModalSignal.ts'
 import {
   FaSolidArrowUpRightFromSquare,
   FaSolidChevronLeft,
   FaSolidCrown,
   FaSolidUserGroup,
-  FaSolidUsers
-} from "solid-icons/fa";
-import {QueryClient} from "@tanstack/query-core";
-import {QueryClientProvider} from "@tanstack/solid-query";
+  FaSolidUsers,
+} from 'solid-icons/fa'
+import { QueryClient } from '@tanstack/query-core'
+import { QueryClientProvider } from '@tanstack/solid-query'
 
 interface TeamDetailProps {
-  user: User;
-  teamId: number;
+  user: User
+  teamId: number
 }
 
 export const TeamDetail: Component<TeamDetailProps> = (props) => {
@@ -24,70 +27,69 @@ export const TeamDetail: Component<TeamDetailProps> = (props) => {
     <QueryClientProvider client={new QueryClient()}>
       <UserProvider user={props.user}>
         <TeamDetailsProvider teamId={props.teamId}>
-          <TeamDetailContent teamId={props.teamId}/>
+          <TeamDetailContent teamId={props.teamId} />
         </TeamDetailsProvider>
       </UserProvider>
     </QueryClientProvider>
-  );
-};
+  )
+}
 
 const TeamDetailContent: Component<{ teamId: number }> = (props) => {
-  const {team, members, leaveTeam, teamId} = useTeamDetails();
+  const { team, members, leaveTeam, teamId } = useTeamDetails()
 
-  const leaveDialog = createModalSignal();
+  const leaveDialog = createModalSignal()
 
   const handleLeaveTeam = async () => {
     try {
-      await leaveTeam(teamId);
+      await leaveTeam(teamId)
       // Redirect to teams list page after leaving
-      window.location.href = `/dashboard/teams`;
+      window.location.href = `/dashboard/teams`
     } catch (e) {
-      console.error("Error leaving team:", e);
+      console.error('Error leaving team:', e)
       // setError("Failed to leave team");
     }
-  };
+  }
 
-  const membersList = () => members.data?.members ?? [];
-  const hasMembers = () => membersList().length > 0;
-  const isLoading = () => members.isLoading;
+  const membersList = () => members.data?.members ?? []
+  const hasMembers = () => membersList().length > 0
+  const isLoading = () => members.isLoading
 
   return (
-    <div class="max-w-6xl mx-auto px-4 py-8 flex flex-col gap-4">
+    <div class="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-8">
       {/* Team Header */}
-      <div class="bg-white/95 backdrop-blur-lg rounded-2xl shadow-xl border border-white/20 overflow-hidden">
+      <div class="overflow-hidden rounded-2xl border border-white/20 bg-white/95 shadow-xl backdrop-blur-lg">
         <div class="~p-4/8">
           <div class="flex flex-col gap-4">
             <div>
-              <a href={`/dashboard/teams`} class="text-primary hover:underline flex flex-row gap-1 items-center transition-colors duration-200">
-                <FaSolidChevronLeft class="w-4 h-4" />
+              <a
+                href={`/dashboard/teams`}
+                class="flex flex-row items-center gap-1 text-primary transition-colors duration-200 hover:underline"
+              >
+                <FaSolidChevronLeft class="h-4 w-4" />
                 <span class="text-sm font-medium">Back to Teams</span>
               </a>
             </div>
 
-            <div class="flex justify-between items-start">
+            <div class="flex items-start justify-between">
               <div class="flex-1 space-y-3">
                 <div>
-                  <h1 class="text-2xl font-bold text-neutral-800 mb-2">{team.data?.name}</h1>
+                  <h1 class="mb-2 text-2xl font-bold text-neutral-800">
+                    {team.data?.name}
+                  </h1>
                   <a
-                    class="text-primary hover:underline text-sm font-medium inline-flex items-center gap-1 transition-colors duration-200"
+                    class="inline-flex items-center gap-1 text-sm font-medium text-primary transition-colors duration-200 hover:underline"
                     href={`/teams/${team.data?.slug}`}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
                     jj.ostof.dev/teams/{team.data?.slug}
-                    <FaSolidArrowUpRightFromSquare class="w-3 h-3" />
+                    <FaSolidArrowUpRightFromSquare class="h-3 w-3" />
                   </a>
                 </div>
               </div>
 
               <button
-                class="
-                  flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200
-                  bg-danger-50 hover:bg-danger-100 text-danger-700 hover:text-danger-800
-                  border border-danger-200 hover:border-danger-300
-                  focus:ring-2 focus:ring-danger-500 focus:ring-offset-2 focus:ring-offset-white
-                  outline-none hover:shadow-md active:scale-95
-                "
+                class="flex items-center gap-2 rounded-lg bg-danger px-4 py-2 font-medium text-white shadow-sm outline-none transition-all duration-200 hover:bg-danger-600 hover:shadow-md focus:ring-2 focus:ring-danger focus:ring-offset-2 focus:ring-offset-white active:scale-95"
                 onClick={leaveDialog.open}
               >
                 <span class="text-sm font-medium">Leave Team</span>
@@ -97,22 +99,22 @@ const TeamDetailContent: Component<{ teamId: number }> = (props) => {
         </div>
       </div>
 
-      <div class="bg-white/95 backdrop-blur-lg rounded-2xl shadow-xl border border-white/20 overflow-hidden">
-        <div class="~p-4/8 space-y-6">
+      <div class="overflow-hidden rounded-2xl border border-white/20 bg-white/95 shadow-xl backdrop-blur-lg">
+        <div class="space-y-6 ~p-4/8">
           {/* Team Information */}
           <div class="border-b border-neutral-200 pb-6">
-            <h3 class="text-lg font-semibold text-neutral-700 mb-4 flex items-center gap-2">
-              <FaSolidUserGroup class="w-5 h-5 text-neutral-600" />
+            <h3 class="mb-4 flex items-center gap-2 text-lg font-semibold text-neutral-700">
+              <FaSolidUserGroup class="h-5 w-5 text-neutral-600" />
               Team Information
             </h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
               <div class="space-y-2">
                 <h4 class="text-sm font-medium text-neutral-600">Team Name</h4>
-                <p class="text-neutral-800 font-medium">{team.data?.name}</p>
+                <p class="font-medium text-neutral-800">{team.data?.name}</p>
               </div>
               <div class="space-y-2">
                 <h4 class="text-sm font-medium text-neutral-600">Team Slug</h4>
-                <p class="text-neutral-800 font-mono text-sm bg-neutral-100 px-3 py-1 rounded-lg inline-block">
+                <p class="inline-block rounded-lg bg-neutral-100 px-3 py-1 font-mono text-sm text-neutral-800">
                   {team.data?.slug}
                 </p>
               </div>
@@ -122,14 +124,15 @@ const TeamDetailContent: Component<{ teamId: number }> = (props) => {
           {/* Team Members Section */}
           <div class="space-y-4">
             <div class="flex items-center gap-3">
-              <h4 class="text-sm font-semibold text-neutral-700 flex items-center gap-2">
-                <FaSolidUsers class="w-4 h-4 text-primary" />
+              <h4 class="flex items-center gap-2 text-sm font-semibold text-neutral-700">
+                <FaSolidUsers class="h-4 w-4 text-primary" />
                 Team Members
               </h4>
               {hasMembers() && (
-                <div class="bg-gradient-to-r from-primary-100 to-primary-200 px-3 py-1 rounded-full">
-                  <span class="text-primary-700 text-xs font-medium">
-                    {membersList().length} member{membersList().length !== 1 ? 's' : ''}
+                <div class="rounded-full bg-gradient-to-r from-primary-100 to-primary-200 px-3 py-1">
+                  <span class="text-xs font-medium text-primary-700">
+                    {membersList().length} member
+                    {membersList().length !== 1 ? 's' : ''}
                   </span>
                 </div>
               )}
@@ -137,47 +140,49 @@ const TeamDetailContent: Component<{ teamId: number }> = (props) => {
 
             <Switch>
               <Match when={isLoading()}>
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  <div class="animate-pulse bg-neutral-200 rounded-xl h-16 shadow-sm"></div>
-                  <div class="animate-pulse bg-neutral-200 rounded-xl h-16 shadow-sm"></div>
-                  <div class="animate-pulse bg-neutral-200 rounded-xl h-16 shadow-sm"></div>
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  <div class="h-16 animate-pulse rounded-xl bg-neutral-200 shadow-sm"></div>
+                  <div class="h-16 animate-pulse rounded-xl bg-neutral-200 shadow-sm"></div>
+                  <div class="h-16 animate-pulse rounded-xl bg-neutral-200 shadow-sm"></div>
                 </div>
               </Match>
 
               <Match when={!hasMembers()}>
-                <div class="flex flex-col items-center justify-center py-12 px-4">
-                  <div class="w-16 h-16 bg-gradient-to-br from-primary-400 to-primary-500 rounded-full flex items-center justify-center mb-4 shadow-lg">
-                    <FaSolidUsers class="w-8 h-8 text-white" />
+                <div class="flex flex-col items-center justify-center px-4 py-12">
+                  <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-primary-400 to-primary-500 shadow-lg">
+                    <FaSolidUsers class="h-8 w-8 text-white" />
                   </div>
-                  <h4 class="text-xl font-semibold text-neutral-700 mb-2">No members yet</h4>
-                  <p class="text-neutral-600 text-center max-w-md leading-relaxed">
+                  <h4 class="mb-2 text-xl font-semibold text-neutral-700">
+                    No members yet
+                  </h4>
+                  <p class="max-w-md text-center leading-relaxed text-neutral-600">
                     This team doesn't have any members currently.
                   </p>
                 </div>
               </Match>
 
               <Match when={hasMembers()}>
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 ~gap-3/4">
+                <div class="grid grid-cols-1 ~gap-3/4 sm:grid-cols-2 lg:grid-cols-3">
                   <For each={membersList()}>
                     {(member) => (
-                      <div class="group relative flex items-center bg-white rounded-xl p-4 shadow-md border-2 border-primary-100 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 hover:border-primary-200">
-                        <div class="flex items-center gap-3 flex-1">
+                      <div class="group relative flex items-center rounded-xl border-2 border-primary-100 bg-white p-4 shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:border-primary-200 hover:shadow-lg">
+                        <div class="flex flex-1 items-center gap-3">
                           {/* Avatar placeholder */}
-                          <div class="w-10 h-10 rounded-full bg-gradient-to-br from-primary-400 to-primary-500 flex items-center justify-center shadow-sm flex-shrink-0">
-                            <span class="text-white font-semibold text-sm">
+                          <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary-400 to-primary-500 shadow-sm">
+                            <span class="text-sm font-semibold text-white">
                               {(member.username || 'U')[0].toUpperCase()}
                             </span>
                           </div>
 
                           {/* Member info */}
-                          <div class="flex-1 min-w-0">
+                          <div class="min-w-0 flex-1">
                             <div class="flex items-center gap-2">
-                              <p class="font-semibold text-neutral-700 text-sm block truncate">
+                              <p class="block truncate text-sm font-semibold text-neutral-700">
                                 {member.username || 'Unknown User'}
                               </p>
                               {member.userId === team.data?.ownerId && (
-                                <div class="flex items-center gap-1 bg-warning-100 text-warning-700 px-2 py-1 rounded-full">
-                                  <FaSolidCrown class="w-3 h-3" />
+                                <div class="flex items-center gap-1 rounded-full bg-warning-100 px-2 py-1 text-warning-700">
+                                  <FaSolidCrown class="h-3 w-3" />
                                   <span class="text-xs font-medium">Owner</span>
                                 </div>
                               )}
@@ -186,7 +191,7 @@ const TeamDetailContent: Component<{ teamId: number }> = (props) => {
                         </div>
 
                         {/* Subtle hover effect */}
-                        <div class="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-5 transition-opacity duration-300 pointer-events-none bg-primary-500"></div>
+                        <div class="pointer-events-none absolute inset-0 rounded-xl bg-primary-500 opacity-0 transition-opacity duration-300 group-hover:opacity-5"></div>
                       </div>
                     )}
                   </For>
@@ -201,47 +206,53 @@ const TeamDetailContent: Component<{ teamId: number }> = (props) => {
       <LeaveTeamDialog
         modalSignal={leaveDialog}
         onConfirm={handleLeaveTeam}
-        teamName={team.data?.name || ""}
+        teamName={team.data?.name || ''}
       />
     </div>
-  );
-};
+  )
+}
 
 // Leave Team Dialog Component
 const LeaveTeamDialog: Component<{
-  modalSignal: ModalSignal;
-  onConfirm: () => Promise<void>;
-  teamName: string;
+  modalSignal: ModalSignal
+  onConfirm: () => Promise<void>
+  teamName: string
 }> = (props) => {
-  const [isLeaving, setIsLeaving] = createSignal(false);
+  const [isLeaving, setIsLeaving] = createSignal(false)
 
   const handleConfirm = async () => {
-    setIsLeaving(true);
+    setIsLeaving(true)
     try {
-      await props.onConfirm();
-      props.modalSignal.close();
+      await props.onConfirm()
+      props.modalSignal.close()
     } catch (e) {
-      console.error("Error in leave confirmation:", e);
+      console.error('Error in leave confirmation:', e)
     } finally {
-      setIsLeaving(false);
+      setIsLeaving(false)
     }
-  };
+  }
 
   return (
-    <Dialog open={props.modalSignal.isOpen()} onOpenChange={props.modalSignal.setOpen}>
+    <Dialog
+      open={props.modalSignal.isOpen()}
+      onOpenChange={props.modalSignal.setOpen}
+    >
       <Dialog.Portal>
-        <Dialog.Overlay class="fixed inset-0 bg-black/50 z-40"/>
-        <div class="fixed inset-0 flex items-center justify-center z-50">
-          <Dialog.Content class="bg-white rounded-xl shadow-xl p-6 w-full max-w-md">
-            <Dialog.Title class="text-xl font-bold mb-4">Leave Team</Dialog.Title>
-            <Dialog.Description class="text-neutral-600 mb-4">
-              Are you sure you want to leave the team "{props.teamName}"? You will lose access to all team resources.
+        <Dialog.Overlay class="fixed inset-0 z-40 bg-black/50" />
+        <div class="fixed inset-0 z-50 flex items-center justify-center">
+          <Dialog.Content class="w-full max-w-md rounded-xl bg-white p-6 shadow-xl">
+            <Dialog.Title class="mb-4 text-xl font-bold">
+              Leave Team
+            </Dialog.Title>
+            <Dialog.Description class="mb-4 text-neutral-600">
+              Are you sure you want to leave the team "{props.teamName}"? You
+              will lose access to all team resources.
             </Dialog.Description>
 
-            <div class="flex justify-end gap-2 mt-4">
+            <div class="mt-4 flex justify-end gap-2">
               <button
                 type="button"
-                class="px-4 py-2 border border-neutral-300 rounded-md hover:bg-neutral-50"
+                class="rounded-md border border-neutral-300 px-4 py-2 hover:bg-neutral-50"
                 onClick={props.modalSignal.close}
                 disabled={isLeaving()}
               >
@@ -249,16 +260,16 @@ const LeaveTeamDialog: Component<{
               </button>
               <button
                 type="button"
-                class="px-4 py-2 bg-danger text-white rounded-md hover:bg-danger-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                class="rounded-md bg-danger px-4 py-2 text-white hover:bg-danger-600 disabled:cursor-not-allowed disabled:opacity-50"
                 onClick={handleConfirm}
                 disabled={isLeaving()}
               >
-                {isLeaving() ? "Leaving..." : "Leave Team"}
+                {isLeaving() ? 'Leaving...' : 'Leave Team'}
               </button>
             </div>
           </Dialog.Content>
         </div>
       </Dialog.Portal>
     </Dialog>
-  );
-};
+  )
+}

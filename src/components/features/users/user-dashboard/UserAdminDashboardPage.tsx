@@ -1,15 +1,9 @@
 import { type Component, Show } from 'solid-js'
 import { UserProvider } from './providers/UserProvider.tsx'
 import type { User } from '../../../../lib/auth/User.ts'
-import { UserSocialsSection } from './UserSocialsSection.tsx'
-import { UserStylesSection } from './UserStylesSection.tsx'
 import './UserAdminDashboardPage.css'
 import { orpcPrivate } from '../../../../lib/orpc/client.ts'
-import {
-  QueryClientProvider,
-  useQuery,
-  useQueryClient,
-} from '@tanstack/solid-query'
+import { QueryClientProvider, useQuery, useQueryClient, } from '@tanstack/solid-query'
 import { QueryClient } from '@tanstack/query-core'
 import { FaSolidArrowUpRightFromSquare, FaSolidUser } from 'solid-icons/fa'
 import { UserDashboardCards } from './UserDashboardCards.tsx'
@@ -57,7 +51,7 @@ const ProfileCard: Component = () => {
         </div>
       }
     >
-      <div class="rounded-xl border-2 border-primary-200 bg-white p-6 shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:border-primary-300 hover:shadow-lg md:p-8">
+      <div class="rounded-xl border-2 border-primary-200 bg-white p-6 shadow-md transition-all duration-300 md:p-8">
         <div class="mb-6 flex items-center justify-between">
           <div class={'flex flex-col'}>
             <div class={'flex flex-col'}>
@@ -130,16 +124,8 @@ const ProfileCard: Component = () => {
 const Root: Component = () => {
   return (
     <div class="mx-auto flex flex-col gap-6 px-4 py-8 md:gap-8 md:py-12 xl:px-20">
-      {/* Profile Card with Tiltify Links */}
       <ProfileCard />
-
       <UserDashboardCards />
-
-      {/* User Socials Section */}
-      <UserSocialsSection />
-
-      {/* User Styles Section */}
-      <UserStylesSection />
     </div>
   )
 }

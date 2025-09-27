@@ -1,7 +1,7 @@
-import {createContext, type ParentComponent, useContext} from "solid-js";
-import {useMutation, useQuery, useQueryClient} from "@tanstack/solid-query";
-import {orpcPrivate} from "../../../../../lib/orpc/client.ts";
-import {useUserSearch} from "../../../../../lib/useUserSearch.ts";
+import { createContext, type ParentComponent, useContext } from 'solid-js'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/solid-query'
+import { orpcPrivate } from '../../../../../lib/orpc/client.ts'
+import { useUserSearch } from '../../../../../lib/useUserSearch.ts'
 
 const useUserBlockHook = () => {
   const queryClient = useQueryClient();
@@ -102,7 +102,7 @@ const useUserBlockHook = () => {
 
   return {
     // State
-    searchInput: userSearch.searchInput(),
+    searchInput: userSearch.searchInput,
     debouncedInput: userSearch.debouncedInput,
 
     // Computed data

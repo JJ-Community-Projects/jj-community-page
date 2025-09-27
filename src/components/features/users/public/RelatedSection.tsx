@@ -1,7 +1,7 @@
 import { type Component, For, Show } from 'solid-js'
 import type { UserDisplay } from '../../../../lib/orpc/public/schemas/UserDisplaySchema'
-import { FaSolidUser } from 'solid-icons/fa'
 import { UserPillAvatar } from '../../../common/UserAvatar.tsx'
+import { FaSolidUserTag } from 'solid-icons/fa'
 
 interface RelatedSectionProps {
   related: UserDisplay[]
@@ -26,7 +26,7 @@ export const RelatedSection: Component<RelatedSectionProps> = (props) => {
     >
       <div class="p-4">
         <div class="mb-4 flex items-center gap-2 text-lg font-semibold">
-          <FaSolidUser class="h-5 w-5 text-black transition-all duration-300 group-hover:text-accent" />
+          <FaSolidUserTag class="h-5 w-5 text-black transition-all duration-300 group-hover:text-accent" />
           <h2 class="font-babas text-black transition-all duration-300 ~text-xl/2xl group-hover:text-accent">
             Related
           </h2>

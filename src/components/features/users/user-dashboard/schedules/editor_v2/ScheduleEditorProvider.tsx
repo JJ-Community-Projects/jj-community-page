@@ -1,15 +1,22 @@
-import {createContext, createEffect, createSignal, on, type ParentComponent, useContext} from "solid-js";
-import {useMutation, useQuery} from "@tanstack/solid-query";
-import {orpcPrivate} from "../../../../../../lib/orpc/client.ts";
-import {createStore} from "solid-js/store";
+import {
+  createContext,
+  createEffect,
+  createSignal,
+  on,
+  type ParentComponent,
+  useContext,
+} from 'solid-js'
+import { useMutation, useQuery } from '@tanstack/solid-query'
+import { orpcPrivate } from '../../../../../../lib/orpc/client.ts'
+import { createStore } from 'solid-js/store'
 import type {
   EditChannelMessage,
   InitDraftStream,
-  InitTag
-} from "../../../../../../lib/orpc/private/scheduleEditing/scheduleEditingTypes.ts";
-import {normalizeInitPayloadDates} from "../../../../../../lib/orpc/private/scheduleEditing/scheduleEditingTypes.ts";
-import type {EditScheduleMetaPatch} from "../../../../../../lib/orpc/private/scheduleEditing/scheduleMeta/contract.ts";
-import type {UserDisplay} from "../../../../../../lib/orpc/private/schemas/users.ts";
+  InitTag,
+} from '../../../../../../lib/orpc/private/scheduleEditing/scheduleEditingTypes.ts'
+import { normalizeInitPayloadDates } from '../../../../../../lib/orpc/private/scheduleEditing/scheduleEditingTypes.ts'
+import type { EditScheduleMetaPatch } from '../../../../../../lib/orpc/private/scheduleEditing/scheduleMeta/contract.ts'
+import type { UserDisplay } from '../../../../../../lib/orpc/private/schemas/users.ts'
 
 // Shared schedule-editing types; UI-only tempId extension
 type DraftStream = InitDraftStream // & { tempId?: string }
@@ -22,7 +29,7 @@ export type ScheduleDraftState = {
     slug: string
     year: number
     visible: boolean
-    updatedAt: Date | string
+    updatedAt: Date
   } | null
   streams: DraftStream[]
   tagsByStream: Record<number, DraftTag[]>
@@ -49,14 +56,14 @@ const useScheduleEditor2Hook = (scheduleId: number) => {
 
   const scheduleEditing = orpcPrivate.scheduleEditingWS
   const users = orpcPrivate.users
-  const sse = useQuery(() => scheduleEditing.streamDraftWS
-    .experimental_liveOptions({
-      input: {scheduleId},
-    })
+  const sse = useQuery(() =>
+    scheduleEditing.streamDraftWS.experimental_liveOptions({
+      input: { scheduleId },
+    }),
   )
 
-  const ensureArray = <T, >(v: T[] | undefined) => v ?? []
-  const ensureMap = <T, >(m: Record<string, T[]> | undefined) => m ?? {}
+  const ensureArray = <T,>(v: T[] | undefined) => v ?? []
+  const ensureMap = <T,>(m: Record<string, T[]> | undefined) => m ?? {}
 
   const handleEvents = (msg: EditChannelMessage) => {
     addEvent(msg)
@@ -66,7 +73,10 @@ const useScheduleEditor2Hook = (scheduleId: number) => {
         setState((prev) => ({
           ...prev,
           schedule: snap.schedule ?? null,
-          streams: ensureArray(snap.streams).map((s) => ({...s, tempId: (s as any).tempId})),
+          streams: ensureArray(snap.streams).map((s) => ({
+            ...s,
+            tempId: (s as any).tempId,
+          })),
           tagsByStream: ensureMap(snap.tagsByStream),
           participantsByStream: ensureMap(snap.participantsByStream),
           isReady: true,
@@ -74,10 +84,12 @@ const useScheduleEditor2Hook = (scheduleId: number) => {
         break
       }
       case 'schedule_updated': {
-        const patch = msg.payload.patch as Partial<ScheduleDraftState['schedule']>
+        const patch = msg.payload.patch as Partial<
+          ScheduleDraftState['schedule']
+        >
         if (patch) {
           setState('schedule', (prev) => {
-            return prev ? ({...prev, ...patch}) : prev
+            return prev ? { ...prev, ...patch } : prev
           })
         }
         break
@@ -85,25 +97,30 @@ const useScheduleEditor2Hook = (scheduleId: number) => {
       case 'stream_added': {
         const stream = msg.payload as DraftStream
         if (stream && typeof (stream as any).id === 'number') {
-          setState('streams', (prev) => prev.some(s => s.id === stream.id) ? prev : [...prev, stream])
+          setState('streams', (prev) =>
+            prev.some((s) => s.id === stream.id) ? prev : [...prev, stream],
+          )
         }
         break
       }
       case 'stream_updated': {
-        const {id, patch} = msg.payload
+        const { id, patch } = msg.payload
         if (id != null && patch) {
-          const idx = state.streams.findIndex(s => s.id === id)
+          const idx = state.streams.findIndex((s) => s.id === id)
           if (idx >= 0) {
-            setState('streams', idx, (prev) => ({...(prev as DraftStream), ...(patch as Partial<DraftStream>)}))
+            setState('streams', idx, (prev) => ({
+              ...(prev as DraftStream),
+              ...(patch as Partial<DraftStream>),
+            }))
           }
         }
         break
       }
       case 'stream_updated_with_details': {
-        const {id, patch, tags, participants} = msg.payload
-        const idx = state.streams.findIndex(s => s.id === id)
+        const { id, patch, tags, participants } = msg.payload
+        const idx = state.streams.findIndex((s) => s.id === id)
         if (idx >= 0 && patch) {
-          setState('streams', idx, (prev) => ({...prev, ...patch}))
+          setState('streams', idx, (prev) => ({ ...prev, ...patch }))
         }
         if (tags) {
           setState('tagsByStream', id, tags)
@@ -114,17 +131,17 @@ const useScheduleEditor2Hook = (scheduleId: number) => {
         break
       }
       case 'stream_deleted': {
-        const {id} = msg.payload
+        const { id } = msg.payload
         if (id != null) {
-          setState('streams', (prev) => prev.filter(s => s.id !== id))
+          setState('streams', (prev) => prev.filter((s) => s.id !== id))
           // cleanup maps
           setState('tagsByStream', (prev) => {
-            const nm = {...prev}
+            const nm = { ...prev }
             delete nm[id]
             return nm
           })
           setState('participantsByStream', (prev) => {
-            const nm = {...prev}
+            const nm = { ...prev }
             delete nm[id]
             return nm
           })
@@ -132,33 +149,38 @@ const useScheduleEditor2Hook = (scheduleId: number) => {
         break
       }
       case 'tag_added': {
-        const {streamId, id, slug, name} = msg.payload
+        const { streamId, id, slug, name } = msg.payload
         setState('tagsByStream', streamId, (prev) => {
-          return [...prev, {
-            name, slug, id,
-          }]
+          return [
+            ...prev,
+            {
+              name,
+              slug,
+              id,
+            },
+          ]
         })
         break
       }
       case 'tag_removed': {
-        const {streamId, id} = msg.payload
+        const { streamId, id } = msg.payload
         const key = String(streamId)
         setState('tagsByStream', streamId, (prev) => {
-          return prev.filter(s => s.id !== id)
+          return prev.filter((s) => s.id !== id)
         })
         break
       }
       case 'participant_added': {
-        const {streamId, user} = msg.payload
+        const { streamId, user } = msg.payload
         setState('participantsByStream', streamId, (prev) => {
           return [...prev, user]
         })
         break
       }
       case 'participant_removed': {
-        const {streamId, userId} = msg.payload
+        const { streamId, userId } = msg.payload
         setState('participantsByStream', streamId, (prev) => {
-          return prev.filter(s => s.userId !== userId)
+          return prev.filter((s) => s.userId !== userId)
         })
         break
       }
@@ -209,8 +231,8 @@ const useScheduleEditor2Hook = (scheduleId: number) => {
         break
       }
       case 'lock': {
-        const {streamId, userId} = msg.payload
-        const idx = state.streams.findIndex(s => s.id === streamId)
+        const { streamId, userId } = msg.payload
+        const idx = state.streams.findIndex((s) => s.id === streamId)
         if (idx >= 0) {
           // setState('streams', idx, (prev) => ({...(prev as DraftStream), lockedBy: userId}))
           setState('streams', idx, 'lockedBy', userId)
@@ -218,8 +240,8 @@ const useScheduleEditor2Hook = (scheduleId: number) => {
         break
       }
       case 'unlock': {
-        const {streamId} = msg.payload
-        const idx = state.streams.findIndex(s => s.id === streamId)
+        const { streamId } = msg.payload
+        const idx = state.streams.findIndex((s) => s.id === streamId)
         if (idx >= 0) {
           // setState('streams', idx, (prev) => ({...(prev as DraftStream), lockedBy: null}))
           setState('streams', idx, 'lockedBy', null)
@@ -229,68 +251,72 @@ const useScheduleEditor2Hook = (scheduleId: number) => {
       default:
         break
     }
-
   }
 
   // Apply incoming SSE events to the local store
-  createEffect(on(() => sse.data, (event) => {
-    if (event !== undefined) {
-      const payload = event.payload
-      if (payload) {
-        handleEvents(event)
-      }
-    }
-  }))
+  createEffect(
+    on(
+      () => sse.data,
+      (event) => {
+        if (event !== undefined) {
+          const payload = event.payload
+          if (payload) {
+            handleEvents(event)
+          }
+        }
+      },
+    ),
+  )
 
   // Mutations
-  const deleteMutation = useMutation(
-    () => orpcPrivate.schedules.delete.mutationOptions()
+  const deleteMutation = useMutation(() =>
+    orpcPrivate.schedules.delete.mutationOptions(),
   )
 
   const deleteSchedule = () => deleteMutation.mutateAsync(scheduleId)
 
-
   // Schedule meta
-  const updateMetaMutation = useMutation(
-    () => scheduleEditing.upsertScheduleMeta.mutationOptions()
+  const updateMetaMutation = useMutation(() =>
+    scheduleEditing.upsertScheduleMeta.mutationOptions(),
   )
   // @ts-ignore
-  const updateMeta = (input: EditScheduleMetaPatch) => updateMetaMutation.mutateAsync(input)
+  const updateMeta = (input: EditScheduleMetaPatch) =>
+    updateMetaMutation.mutateAsync(input)
 
-  const startEditingSessionMutation = useMutation(
-    () => scheduleEditing.startEditingSession.mutationOptions()
+  const startEditingSessionMutation = useMutation(() =>
+    scheduleEditing.startEditingSession.mutationOptions(),
   )
   // @ts-ignore
-  const startEditingSession = () => startEditingSessionMutation.mutateAsync({scheduleId})
+  const startEditingSession = () =>
+    startEditingSessionMutation.mutateAsync({ scheduleId })
 
-  const publishDraftMutation = useMutation(
-    () => scheduleEditing.publishDraft.mutationOptions()
+  const publishDraftMutation = useMutation(() =>
+    scheduleEditing.publishDraft.mutationOptions(),
   )
   // @ts-ignore
-  const publishDraft = () => publishDraftMutation.mutateAsync({scheduleId})
+  const publishDraft = () => publishDraftMutation.mutateAsync({ scheduleId })
 
-  const discardDraftMutation = useMutation(
-    () => scheduleEditing.discardDraft.mutationOptions()
+  const discardDraftMutation = useMutation(() =>
+    scheduleEditing.discardDraft.mutationOptions(),
   )
   // @ts-ignore
-  const discardDraft = () => discardDraftMutation.mutateAsync({scheduleId})
+  const discardDraft = () => discardDraftMutation.mutateAsync({ scheduleId })
 
   // Streams
   let tempIdCounter = -1
-  const addStreamMutation = useMutation(
-    () => scheduleEditing.addStream.mutationOptions(),
+  const addStreamMutation = useMutation(() =>
+    scheduleEditing.addStream.mutationOptions(),
   )
   const addStream = (input: {
-    title: string;
-    start: Date;
-    end: Date;
-    visible?: boolean;
-    subtitle?: string;
-    description?: string;
-    youtubeVodUrl?: string;
-    twitchVodUrl?: string;
-  }) =>
-    addStreamMutation.mutateAsync({scheduleId, ...input})
+    title: string
+    start: Date
+    end: Date
+    visible?: boolean
+    subtitle?: string
+    description?: string
+    youtubeVodUrl?: string
+    twitchVodUrl?: string
+  }) => addStreamMutation.mutateAsync({ scheduleId, ...input })
 
   /*
   const addStreamWithDetailsMutation = useMutation(
@@ -313,14 +339,14 @@ const useScheduleEditor2Hook = (scheduleId: number) => {
     addStreamWithDetailsMutation.mutateAsync({scheduleId, ...input})*/
 
   const createLocalStream = (input: {
-    title: string;
-    start: Date;
-    end: Date;
-    visible?: boolean;
-    subtitle?: string | null;
-    description?: string | null;
-    youtubeVodUrl?: string | null;
-    twitchVodUrl?: string | null;
+    title: string
+    start: Date
+    end: Date
+    visible?: boolean
+    subtitle?: string | null
+    description?: string | null
+    youtubeVodUrl?: string | null
+    twitchVodUrl?: string | null
   }) => {
     const id = tempIdCounter--
     const placeholder: DraftStream = {
@@ -343,7 +369,7 @@ const useScheduleEditor2Hook = (scheduleId: number) => {
   }
 
   const saveLocalStream = async (id: number) => {
-    const idx = state.streams.findIndex(s => s.id === id)
+    const idx = state.streams.findIndex((s) => s.id === id)
     if (idx < 0) return null
     const s = state.streams[idx]
     const res = await addStream({
@@ -357,151 +383,181 @@ const useScheduleEditor2Hook = (scheduleId: number) => {
       twitchVodUrl: s.twitchVodUrl ?? undefined,
     })
     // replace temp with real id
-    setState('streams', idx, (prev) => ({...(prev as DraftStream), id: res.id, tempId: undefined}))
+    setState('streams', idx, (prev) => ({
+      ...(prev as DraftStream),
+      id: res.id,
+      tempId: undefined,
+    }))
     return res.id
   }
 
-  const updateStreamMutation = useMutation(
-    () => scheduleEditing.updateStreamWithDetails.mutationOptions()
+  const updateStreamMutation = useMutation(() =>
+    scheduleEditing.updateStreamWithDetails.mutationOptions(),
   )
   const updateStream = (input: {
-    id: number;
+    id: number
     patch?: Partial<{
-      title: string;
-      visible: boolean;
-      subtitle?: string | null;
-      description?: string | null;
-      youtubeVodUrl?: string | null;
-      twitchVodUrl?: string | null;
-      start: Date;
+      title: string
+      visible: boolean
+      subtitle?: string | null
+      description?: string | null
+      youtubeVodUrl?: string | null
+      twitchVodUrl?: string | null
+      start: Date
       end: Date
-    }>;
-    participants?: number[];
-    tags?: number[];
+    }>
+    participants?: number[]
+    tags?: number[]
   }) => {
-    const idx = state.streams.findIndex(s => s.id === input.id)
+    const idx = state.streams.findIndex((s) => s.id === input.id)
     // local-only patch for temporary streams
     if (input.patch) {
-      setState('streams', idx, (prev) => ({...(prev as DraftStream), ...(input.patch as any)}))
+      setState('streams', idx, (prev) => ({
+        ...(prev as DraftStream),
+        ...(input.patch as any),
+      }))
     }
     console.log('updateStream', input)
     // @ts-ignore
-    return updateStreamMutation.mutateAsync({scheduleId, ...input})
+    return updateStreamMutation.mutateAsync({ scheduleId, ...input })
   }
 
-  const updateStreamsMutation = useMutation(
-    () => scheduleEditing.updateStreamsWithDetails.mutationOptions()
+  const updateStreamsMutation = useMutation(() =>
+    scheduleEditing.updateStreamsWithDetails.mutationOptions(),
   )
 
-  const updateStreams = (inputs: {
-    id: number;
-    patch?: Partial<{
-      title: string;
-      visible: boolean;
-      subtitle?: string | null;
-      description?: string | null;
-      youtubeVodUrl?: string | null;
-      twitchVodUrl?: string | null;
-      start: Date;
-      end: Date
-    }>;
-    participants?: number[];
-    tags?: number[];
-  }[]) => {
+  const updateStreams = (
+    inputs: {
+      id: number
+      patch?: Partial<{
+        title: string
+        visible: boolean
+        subtitle?: string | null
+        description?: string | null
+        youtubeVodUrl?: string | null
+        twitchVodUrl?: string | null
+        start: Date
+        end: Date
+      }>
+      participants?: number[]
+      tags?: number[]
+    }[],
+  ) => {
     for (const input of inputs) {
-      const idx = state.streams.findIndex(s => s.id === input.id)
+      const idx = state.streams.findIndex((s) => s.id === input.id)
       // local-only patch for temporary streams
       if (input.patch) {
-        setState('streams', idx, (prev) => ({...(prev as DraftStream), ...(input.patch as any)}))
+        setState('streams', idx, (prev) => ({
+          ...(prev as DraftStream),
+          ...(input.patch as any),
+        }))
       }
       console.log('updateStream', input)
     }
-    
-    return updateStreamsMutation.mutateAsync({scheduleId, streams: inputs})
+
+    return updateStreamsMutation.mutateAsync({ scheduleId, streams: inputs })
   }
 
-
-  const deleteStreamMutation = useMutation(
-    () => scheduleEditing.deleteStream.mutationOptions()
+  const deleteStreamMutation = useMutation(() =>
+    scheduleEditing.deleteStream.mutationOptions(),
   )
   const deleteStream = (id: number) => {
     // remove locally
-    setState('streams', (prev) => prev.filter(s => s.id !== id))
+    setState('streams', (prev) => prev.filter((s) => s.id !== id))
     // @ts-ignore
-    return deleteStreamMutation.mutateAsync({scheduleId, id})
+    return deleteStreamMutation.mutateAsync({ scheduleId, id })
   }
 
   // Tags
-  const addTagToStreamMutation = useMutation(
-    () => scheduleEditing.addTagToStream.mutationOptions()
+  const addTagToStreamMutation = useMutation(() =>
+    scheduleEditing.addTagToStream.mutationOptions(),
   )
-  const addTagToStream = (input: { streamId: number, tag: string }) =>
-    addTagToStreamMutation.mutateAsync({scheduleId, ...input})
+  const addTagToStream = (input: { streamId: number; tag: string }) =>
+    addTagToStreamMutation.mutateAsync({ scheduleId, ...input })
 
-  const removeTagFromStreamMutation = useMutation(
-    () => scheduleEditing.removeTagFromStream.mutationOptions()
+  const removeTagFromStreamMutation = useMutation(() =>
+    scheduleEditing.removeTagFromStream.mutationOptions(),
   )
   const removeTagFromStream = (input: { streamId: number; tagId: number }) =>
-    removeTagFromStreamMutation.mutateAsync({scheduleId, streamId: input.streamId, id: input.tagId})
+    removeTagFromStreamMutation.mutateAsync({
+      scheduleId,
+      streamId: input.streamId,
+      id: input.tagId,
+    })
 
   // Participants
-  const addParticipantMutation = useMutation(
-    () => scheduleEditing.addParticipant.mutationOptions()
+  const addParticipantMutation = useMutation(() =>
+    scheduleEditing.addParticipant.mutationOptions(),
   )
   const addParticipant = (input: { streamId: number; userId: number }) =>
-    addParticipantMutation.mutateAsync({scheduleId, ...input})
+    addParticipantMutation.mutateAsync({ scheduleId, ...input })
 
-  const removeParticipantMutation = useMutation(
-    () => scheduleEditing.removeParticipant.mutationOptions()
+  const removeParticipantMutation = useMutation(() =>
+    scheduleEditing.removeParticipant.mutationOptions(),
   )
   const removeParticipant = (input: { streamId: number; userId: number }) =>
-    removeParticipantMutation.mutateAsync({scheduleId, ...input})
+    removeParticipantMutation.mutateAsync({ scheduleId, ...input })
 
   // Stream editing lock
-  const lockStreamMutation = useMutation(
-    () => scheduleEditing.lockStream.mutationOptions()
+  const lockStreamMutation = useMutation(() =>
+    scheduleEditing.lockStream.mutationOptions(),
   )
-  const unlockStreamMutation = useMutation(
-    () => scheduleEditing.unlockStream.mutationOptions()
+  const unlockStreamMutation = useMutation(() =>
+    scheduleEditing.unlockStream.mutationOptions(),
   )
   // @ts-ignore
-  const lockStream = (streamId: number) => lockStreamMutation.mutateAsync({scheduleId, streamId})
+  const lockStream = (streamId: number) =>
+    lockStreamMutation.mutateAsync({ scheduleId, streamId })
   // @ts-ignore
-  const unlockStream = (streamId: number) => unlockStreamMutation.mutateAsync({scheduleId, streamId})
+  const unlockStream = (streamId: number) =>
+    unlockStreamMutation.mutateAsync({ scheduleId, streamId })
 
   createEffect(() => {
     void startEditingSession()
   })
 
-
-  const relations = useQuery(
-    () => users.getRelations.queryOptions()
-  )
+  const relations = useQuery(() => users.getRelations.queryOptions())
 
   return {
     state,
-    deleteSchedule, deleteMutation,
+    deleteSchedule,
+    deleteMutation,
     // meta
-    updateMeta, updateMetaMutation,
-    startEditingSession, startEditingSessionMutation,
-    publishDraft, publishDraftMutation,
-    discardDraft, discardDraftMutation,
+    updateMeta,
+    updateMetaMutation,
+    startEditingSession,
+    startEditingSessionMutation,
+    publishDraft,
+    publishDraftMutation,
+    discardDraft,
+    discardDraftMutation,
     // streams
-    addStream, addStreamMutation,
+    addStream,
+    addStreamMutation,
     // addStreamWithDetails, addStreamWithDetailsMutation,
-    createLocalStream, saveLocalStream,
-    updateStream, updateStreamMutation,
-    updateStreams, updateStreamsMutation,
-    deleteStream, deleteStreamMutation,
+    createLocalStream,
+    saveLocalStream,
+    updateStream,
+    updateStreamMutation,
+    updateStreams,
+    updateStreamsMutation,
+    deleteStream,
+    deleteStreamMutation,
     // tags
-    addTagToStream, addTagToStreamMutation,
-    removeTagFromStream, removeTagFromStreamMutation,
+    addTagToStream,
+    addTagToStreamMutation,
+    removeTagFromStream,
+    removeTagFromStreamMutation,
     // participants
-    addParticipant, addParticipantMutation,
-    removeParticipant, removeParticipantMutation,
+    addParticipant,
+    addParticipantMutation,
+    removeParticipant,
+    removeParticipantMutation,
     // locks
-    lockStream, lockStreamMutation,
-    unlockStream, unlockStreamMutation,
+    lockStream,
+    lockStreamMutation,
+    unlockStream,
+    unlockStreamMutation,
     events,
 
     // relations
@@ -513,15 +569,18 @@ interface ScheduleEditorProps {
   scheduleId: number
 }
 
-const ScheduleEditorContext = createContext<ReturnType<typeof useScheduleEditor2Hook>>();
+const ScheduleEditorContext =
+  createContext<ReturnType<typeof useScheduleEditor2Hook>>()
 
-export const ScheduleEditorProvider: ParentComponent<ScheduleEditorProps> = (props) => {
+export const ScheduleEditorProvider: ParentComponent<ScheduleEditorProps> = (
+  props,
+) => {
   const hook = useScheduleEditor2Hook(props.scheduleId)
   return (
     <ScheduleEditorContext.Provider value={hook}>
       {props.children}
     </ScheduleEditorContext.Provider>
-  );
+  )
 }
 
 // @ts-ignore

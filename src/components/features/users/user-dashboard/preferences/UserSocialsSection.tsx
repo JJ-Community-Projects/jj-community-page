@@ -1,10 +1,10 @@
 import { type Component, createMemo, createSignal, Show } from 'solid-js'
 import { TextField } from '@kobalte/core/text-field'
-import { socialUrlRegex } from '../../../../functions/socialUrlRegex.ts'
+import { socialUrlRegex } from '../../../../../functions/socialUrlRegex.ts'
 import { FaSolidArrowsRotate, FaSolidTrash } from 'solid-icons/fa'
 import { PrimaryLivePlatform } from './PrimaryLivePlatform.tsx'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/solid-query'
-import { orpcPrivate } from '../../../../lib/orpc/client.ts'
+import { orpcPrivate } from '../../../../../lib/orpc/client.ts'
 
 const useHook = () => {
   const queryClient = useQueryClient()
@@ -172,7 +172,7 @@ const TwitchSocial: Component = () => {
               <button
                 type="button"
                 onClick={handleAdd}
-                class="rounded-md bg-purple-600 px-4 py-2 text-white hover:bg-purple-700"
+                class="rounded-md bg-purple-600 px-4 py-2 text-white hover:bg-purple-700 disabled:cursor-not-allowed disabled:bg-neutral"
                 disabled={addMutation.isPending || !url()}
               >
                 Add
@@ -255,7 +255,7 @@ const YouTubeSocial: Component = () => {
             <button
               type="button"
               onClick={() => removeMutation.mutate({ provider: 'youtube' })}
-              class="text-red-500 hover:text-red-700"
+              class="text-red-500 hover:text-red-700 disabled:cursor-not-allowed disabled:bg-neutral"
               disabled={removeMutation.isPending}
             >
               <FaSolidTrash />
@@ -283,7 +283,7 @@ const YouTubeSocial: Component = () => {
               <button
                 type="button"
                 onClick={handleAdd}
-                class="rounded-md bg-red-600 px-4 py-2 text-white hover:bg-red-700"
+                class="rounded-md bg-red-600 px-4 py-2 text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:bg-neutral"
                 disabled={addMutation.isPending || !url()}
               >
                 Add
@@ -353,7 +353,7 @@ const BlueSkySocial: Component = () => {
             <button
               type="button"
               onClick={() => removeMutation.mutate({ provider: 'bsky' })}
-              class="text-red-500 hover:text-red-700"
+              class="text-red-500 hover:text-red-700 disabled:cursor-not-allowed disabled:bg-neutral"
               disabled={removeMutation.isPending}
             >
               <FaSolidTrash />
@@ -381,7 +381,7 @@ const BlueSkySocial: Component = () => {
               <button
                 type="button"
                 onClick={handleAdd}
-                class="rounded-md bg-sky-500 px-4 py-2 text-white hover:bg-sky-600"
+                class="rounded-md bg-sky-500 px-4 py-2 text-white hover:bg-sky-600 disabled:cursor-not-allowed disabled:bg-neutral"
                 disabled={addMutation.isPending || !url()}
               >
                 Add
@@ -451,7 +451,7 @@ const TwitterSocial: Component = () => {
             <button
               type="button"
               onClick={() => removeMutation.mutate({ provider: 'twitter' })}
-              class="text-red-500 hover:text-red-700"
+              class="text-red-500 hover:text-red-700 disabled:cursor-not-allowed disabled:bg-neutral"
               disabled={removeMutation.isPending}
             >
               <FaSolidTrash />
@@ -479,7 +479,7 @@ const TwitterSocial: Component = () => {
               <button
                 type="button"
                 onClick={handleAdd}
-                class="rounded-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+                class="rounded-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 disabled:cursor-not-allowed disabled:bg-neutral"
                 disabled={addMutation.isPending || !url()}
               >
                 Add
@@ -549,7 +549,7 @@ const TikTokSocial: Component = () => {
             <button
               type="button"
               onClick={() => removeMutation.mutate({ provider: 'tiktok' })}
-              class="text-red-500 hover:text-red-700"
+              class="text-red-500 hover:text-red-700 disabled:cursor-not-allowed disabled:bg-neutral"
               disabled={removeMutation.isPending}
             >
               <FaSolidTrash />
@@ -577,7 +577,7 @@ const TikTokSocial: Component = () => {
               <button
                 type="button"
                 onClick={handleAdd}
-                class="rounded-md bg-black px-4 py-2 text-white hover:bg-gray-800"
+                class="rounded-md bg-black px-4 py-2 text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-neutral"
                 disabled={addMutation.isPending || !url()}
               >
                 Add
@@ -647,7 +647,7 @@ const InstagramSocial: Component = () => {
             <button
               type="button"
               onClick={() => removeMutation.mutate({ provider: 'instagram' })}
-              class="text-red-500 hover:text-red-700"
+              class="text-red-500 hover:text-red-700 disabled:cursor-not-allowed disabled:bg-neutral"
               disabled={removeMutation.isPending}
             >
               <FaSolidTrash />
@@ -675,7 +675,7 @@ const InstagramSocial: Component = () => {
               <button
                 type="button"
                 onClick={handleAdd}
-                class="rounded-md bg-pink-600 px-4 py-2 text-white hover:bg-pink-700"
+                class="rounded-md bg-pink-600 px-4 py-2 text-white hover:bg-pink-700 disabled:cursor-not-allowed disabled:bg-neutral"
                 disabled={addMutation.isPending || !url()}
               >
                 Add
@@ -701,7 +701,7 @@ export const UserSocialsSection: Component = () => {
         <button
           type="button"
           onClick={() => importFromTiltify.mutate()}
-          class="flex items-center gap-2 rounded-md bg-accent px-4 py-2 text-white transition-colors hover:bg-accent-400"
+          class="flex items-center gap-2 rounded-md bg-accent px-4 py-2 text-white transition-colors hover:bg-accent-400 disabled:cursor-not-allowed disabled:bg-neutral"
           disabled={importFromTiltify.isPending}
           title="Import social links from Tiltify"
         >

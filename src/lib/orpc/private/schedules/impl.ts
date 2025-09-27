@@ -1,16 +1,18 @@
-import {privateSchedulesContract} from './contract.ts';
-import {implement, ORPCError} from '@orpc/server';
-import {dbMiddleware} from '../../middleware/dbMiddleware.ts';
-import {authMiddleware} from '../../middleware/authMiddleware.ts';
-import {schedulesTable} from '../../../db/schema/jj-schema.ts';
-import {editSchedulesTable} from '../../../db/schema/edit-schedules-schema.ts';
-import {accounts, users} from '../../../db/schema/auth-schema.ts';
-import {and, eq, not} from 'drizzle-orm';
-import {DateTime} from 'luxon';
-import {createSlug, generateScheduleSlugAlternativesLocals} from '../../../../functions/slug.ts';
+import { privateSchedulesContract } from './contract.ts'
+import { implement, ORPCError } from '@orpc/server'
+import { dbMiddleware } from '../../middleware/dbMiddleware.ts'
+import { authMiddleware } from '../../middleware/authMiddleware.ts'
+import { schedulesTable } from '../../../db/schema/jj-schema.ts'
+import { editSchedulesTable } from '../../../db/schema/edit-schedules-schema.ts'
+import { accounts, users } from '../../../db/schema/auth-schema.ts'
+import { and, eq, not } from 'drizzle-orm'
+import { DateTime } from 'luxon'
+import {
+  createSlug,
+  generateScheduleSlugAlternativesLocals,
+} from '../../../../functions/slug.ts'
 
-const os = implement(privateSchedulesContract)
-  .use(dbMiddleware);
+const os = implement(privateSchedulesContract).use(dbMiddleware)
 
 /**
  * Schedule CRUD Operations
@@ -20,197 +22,233 @@ const os = implement(privateSchedulesContract)
  * Create a new schedule for the authenticated user
  * Creates a schedule for the current year with auto-generated title/slug
  */
-const create = os.create
-  .use(authMiddleware)
-  .handler(async ({context}) => {
-    const db = context.db;
-    const user = context.user;
-    const currentYear = DateTime.now().year;
+const create = os.create.use(authMiddleware).handler(async ({ context }) => {
+  const db = context.db
+  const user = context.user
+  const currentYear = DateTime.now().year
 
-    try {
-      // Check existing schedules for title generation
-      const existingSchedules = await db.select().from(schedulesTable)
-        .where(eq(schedulesTable.ownerId, user.id))
-        .all();
-      const allSchedulesWithCurrentYear = existingSchedules.filter(schedule => schedule.year === currentYear);
-      const existingSchedule = existingSchedules.find(schedule => schedule.year === currentYear);
-      const shouldBePrimary = allSchedulesWithCurrentYear.length === 0;
+  try {
+    // Check existing schedules for title generation
+    const existingSchedules = await db
+      .select()
+      .from(schedulesTable)
+      .where(eq(schedulesTable.ownerId, user.id))
+      .all()
+    const allSchedulesWithCurrentYear = existingSchedules.filter(
+      (schedule) => schedule.year === currentYear,
+    )
+    const existingSchedule = existingSchedules.find(
+      (schedule) => schedule.year === currentYear,
+    )
+    const shouldBePrimary = allSchedulesWithCurrentYear.length === 0
 
-      // Generate title and slug
-      let title = `${context.tiltifyName}'s Schedule ${currentYear}`;
-      if (existingSchedule) {
-        title += ` ${existingSchedules.length}`;
-      }
-      const slug = createSlug(title);
+    // Generate title and slug
+    let title = `${context.tiltifyName}'s Schedule ${currentYear}`
+    if (existingSchedule) {
+      title += ` ${existingSchedules.length}`
+    }
+    const slug = createSlug(title)
 
-      // Create schedule using direct database query
-      const [schedule] = await db.insert(schedulesTable)
-        .values({
-          ownerId: user.id,
-          title: title,
-          year: currentYear,
-          slug: slug,
-          visible: false,
-          primary: shouldBePrimary
-        })
-        .returning();
-      console.log('schedule', schedule)
-      // Seed edit_schedules with initial draft meta
-      await db.insert(editSchedulesTable).values({
+    // Create schedule using direct database query
+    const [schedule] = await db
+      .insert(schedulesTable)
+      .values({
+        ownerId: user.id,
+        title: title,
+        year: currentYear,
+        slug: slug,
+        visible: false,
+        primary: shouldBePrimary,
+      })
+      .returning()
+    console.log('schedule', schedule)
+    // Seed edit_schedules with initial draft meta
+    await db
+      .insert(editSchedulesTable)
+      .values({
         scheduleId: schedule.id,
         editorId: user.id,
         title: schedule.title,
         slug: schedule.slug,
         year: schedule.year,
         visible: schedule.visible,
-      }).onConflictDoNothing().run()
+      })
+      .onConflictDoNothing()
+      .run()
 
-      return {schedule};
-    } catch (error) {
-      if (error instanceof ORPCError) throw error;
-      console.error('Error creating schedule:', error);
-      throw new ORPCError('INTERNAL_SERVER_ERROR', {message: 'Failed to create schedule'});
-    }
-  });
+    return { schedule }
+  } catch (error) {
+    if (error instanceof ORPCError) throw error
+    console.error('Error creating schedule:', error)
+    throw new ORPCError('INTERNAL_SERVER_ERROR', {
+      message: 'Failed to create schedule',
+    })
+  }
+})
 
 /**
  * Create a new schedule with custom details
  */
 const createWithDetails = os.createWithDetails
   .use(authMiddleware)
-  .handler(async ({context, input}) => {
-    const db = context.db;
-    const user = context.user;
-    const {name, slug, primary, year} = input;
+  .handler(async ({ context, input }) => {
+    const db = context.db
+    const user = context.user
+    const { name, slug, primary, year } = input
 
     try {
       // Check if slug already exists for this user
-      const existingSchedule = await db.select().from(schedulesTable)
-        .where(and(
-          eq(schedulesTable.ownerId, user.id),
-          eq(schedulesTable.slug, slug)
-        ))
-        .get();
+      const existingSchedule = await db
+        .select()
+        .from(schedulesTable)
+        .where(
+          and(
+            eq(schedulesTable.ownerId, user.id),
+            eq(schedulesTable.slug, slug),
+          ),
+        )
+        .get()
 
       if (existingSchedule) {
-        throw new ORPCError('CONFLICT', {message: 'A schedule with this slug already exists'});
+        throw new ORPCError('CONFLICT', {
+          message: 'A schedule with this slug already exists',
+        })
       }
 
       // If setting as primary, check if there's already a primary schedule for this year
       if (primary) {
-        const existingPrimary = await db.select().from(schedulesTable)
-          .where(and(
-            eq(schedulesTable.ownerId, user.id),
-            eq(schedulesTable.year, year),
-            eq(schedulesTable.primary, true)
-          ))
-          .get();
+        const existingPrimary = await db
+          .select()
+          .from(schedulesTable)
+          .where(
+            and(
+              eq(schedulesTable.ownerId, user.id),
+              eq(schedulesTable.year, year),
+              eq(schedulesTable.primary, true),
+            ),
+          )
+          .get()
 
         if (existingPrimary) {
           // Unset the existing primary schedule
-          await db.update(schedulesTable)
-            .set({primary: false})
-            .where(eq(schedulesTable.id, existingPrimary.id));
+          await db
+            .update(schedulesTable)
+            .set({ primary: false })
+            .where(eq(schedulesTable.id, existingPrimary.id))
         }
       }
 
       // Create schedule using provided parameters
-      const [schedule] = await db.insert(schedulesTable)
+      const [schedule] = await db
+        .insert(schedulesTable)
         .values({
           ownerId: user.id,
           title: name,
           year: year,
           slug: slug,
           visible: false, // Default to private
-          primary: primary
+          primary: primary,
         })
-        .returning();
+        .returning()
 
       // Seed edit_schedules with initial draft meta
-      await db.insert(editSchedulesTable).values({
-        scheduleId: schedule.id,
-        editorId: user.id,
-        title: schedule.title,
-        slug: schedule.slug,
-        year: schedule.year,
-        visible: schedule.visible,
-      }).onConflictDoNothing().run()
+      await db
+        .insert(editSchedulesTable)
+        .values({
+          scheduleId: schedule.id,
+          editorId: user.id,
+          title: schedule.title,
+          slug: schedule.slug,
+          year: schedule.year,
+          visible: schedule.visible,
+        })
+        .onConflictDoNothing()
+        .run()
 
-      return {schedule};
+      return { schedule }
     } catch (error) {
-      if (error instanceof ORPCError) throw error;
-      console.error('Error creating schedule with details:', error);
-      throw new ORPCError('INTERNAL_SERVER_ERROR', {message: 'Failed to create schedule'});
+      if (error instanceof ORPCError) throw error
+      console.error('Error creating schedule with details:', error)
+      throw new ORPCError('INTERNAL_SERVER_ERROR', {
+        message: 'Failed to create schedule',
+      })
     }
-  });
+  })
 
 /**
  * Save schedule data to database via ScheduleEditorDO
  */
-const save = os.save
-  .use(authMiddleware)
-  .handler(async ({context, input}) => {
-    const db = context.db;
-    const user = context.user;
-    const scheduleId = input;
+const save = os.save.use(authMiddleware).handler(async ({ context, input }) => {
+  const db = context.db
+  const user = context.user
+  const scheduleId = input
 
-    try {
-      // Verify ownership
-      const schedule = await db.select().from(schedulesTable)
-        .where(eq(schedulesTable.id, scheduleId))
-        .get();
+  try {
+    // Verify ownership
+    const schedule = await db
+      .select()
+      .from(schedulesTable)
+      .where(eq(schedulesTable.id, scheduleId))
+      .get()
 
-      if (!schedule) {
-        throw new ORPCError('NOT_FOUND', {message: 'Schedule not found'});
-      }
-
-      if (schedule.ownerId !== user.id) {
-        throw new ORPCError('FORBIDDEN', {message: 'You do not have permission to edit this schedule'});
-      }
-
-      const DO = context.env.ScheduleEditorDO
-
-      const stubID = DO.idFromName(`${scheduleId}`)
-
-      const stub = DO.get(stubID)
-
-      await stub.saveToDB(`${scheduleId}`)
-
-      return {message: "Schedule saved successfully"};
-    } catch (error) {
-      if (error instanceof ORPCError) throw error;
-      console.error('Error saving schedule:', error);
-      throw new ORPCError('INTERNAL_SERVER_ERROR', {message: 'Failed to save schedule'});
+    if (!schedule) {
+      throw new ORPCError('NOT_FOUND', { message: 'Schedule not found' })
     }
-  });
+
+    if (schedule.ownerId !== user.id) {
+      throw new ORPCError('FORBIDDEN', {
+        message: 'You do not have permission to edit this schedule',
+      })
+    }
+
+    const DO = context.env.ScheduleEditorDO
+
+    const stubID = DO.idFromName(`${scheduleId}`)
+
+    const stub = DO.get(stubID)
+
+    await stub.saveToDB(`${scheduleId}`)
+
+    return { message: 'Schedule saved successfully' }
+  } catch (error) {
+    if (error instanceof ORPCError) throw error
+    console.error('Error saving schedule:', error)
+    throw new ORPCError('INTERNAL_SERVER_ERROR', {
+      message: 'Failed to save schedule',
+    })
+  }
+})
 
 /**
  * Delete a schedule owned by the authenticated user
  */
 const deleteSchedule = os.delete
   .use(authMiddleware)
-  .handler(async ({context, input}) => {
-    const db = context.db;
-    const user = context.user;
-    const scheduleId = input;
+  .handler(async ({ context, input }) => {
+    const db = context.db
+    const user = context.user
+    const scheduleId = input
 
     try {
       // Verify ownership
-      const schedule = await db.select().from(schedulesTable)
+      const schedule = await db
+        .select()
+        .from(schedulesTable)
         .where(eq(schedulesTable.id, scheduleId))
-        .get();
+        .get()
 
       if (!schedule) {
-        throw new ORPCError('NOT_FOUND', {message: 'Schedule not found'});
+        throw new ORPCError('NOT_FOUND', { message: 'Schedule not found' })
       }
 
       if (schedule.ownerId !== user.id) {
-        throw new ORPCError('FORBIDDEN', {message: 'You do not have permission to edit this schedule'});
+        throw new ORPCError('FORBIDDEN', {
+          message: 'You do not have permission to edit this schedule',
+        })
       }
 
       // Delete from database
-      await db.delete(schedulesTable)
-        .where(eq(schedulesTable.id, scheduleId));
+      await db.delete(schedulesTable).where(eq(schedulesTable.id, scheduleId))
 
       /*
       // Remove from UserDO
@@ -221,13 +259,15 @@ const deleteSchedule = os.delete
       });
        */
 
-      return {message: "Schedule successfully deleted"};
+      return { message: 'Schedule successfully deleted' }
     } catch (error) {
-      if (error instanceof ORPCError) throw error;
-      console.error('Error deleting schedule:', error);
-      throw new ORPCError('INTERNAL_SERVER_ERROR', {message: 'Failed to delete schedule'});
+      if (error instanceof ORPCError) throw error
+      console.error('Error deleting schedule:', error)
+      throw new ORPCError('INTERNAL_SERVER_ERROR', {
+        message: 'Failed to delete schedule',
+      })
     }
-  });
+  })
 
 /**
  * Schedule Management Operations
@@ -238,86 +278,144 @@ const deleteSchedule = os.delete
  */
 const toggleVisibility = os.toggleVisibility
   .use(authMiddleware)
-  .handler(async ({context, input}) => {
-    const db = context.db;
-    const user = context.user;
-    const {scheduleId} = input;
+  .handler(async ({ context, input }) => {
+    const db = context.db
+    const user = context.user
+    const { scheduleId } = input
 
     try {
       // Verify ownership
-      const schedule = await db.select().from(schedulesTable)
+      const schedule = await db
+        .select()
+        .from(schedulesTable)
         .where(eq(schedulesTable.id, scheduleId))
-        .get();
+        .get()
 
       if (!schedule) {
-        throw new ORPCError('NOT_FOUND', {message: 'Schedule not found'});
+        throw new ORPCError('NOT_FOUND', { message: 'Schedule not found' })
       }
 
       if (schedule.ownerId !== user.id) {
-        throw new ORPCError('FORBIDDEN', {message: 'You do not have permission to modify this schedule'});
+        throw new ORPCError('FORBIDDEN', {
+          message: 'You do not have permission to modify this schedule',
+        })
       }
 
-      await db.update(schedulesTable)
+      await db
+        .update(schedulesTable)
         .set({
-          visible: !schedule.visible
+          visible: !schedule.visible,
         })
         .where(eq(schedulesTable.id, scheduleId))
 
-      return {message: "Schedule visibility toggled successfully"};
+      return { message: 'Schedule visibility toggled successfully' }
     } catch (error) {
-      if (error instanceof ORPCError) throw error;
-      console.error('Error toggling schedule visibility:', error);
-      throw new ORPCError('INTERNAL_SERVER_ERROR', {message: 'Failed to toggle schedule visibility'});
+      if (error instanceof ORPCError) throw error
+      console.error('Error toggling schedule visibility:', error)
+      throw new ORPCError('INTERNAL_SERVER_ERROR', {
+        message: 'Failed to toggle schedule visibility',
+      })
     }
-  });
+  })
 
 /**
  * Set a schedule as primary
  */
 const setPrimary = os.setPrimary
   .use(authMiddleware)
-  .handler(async ({context, input}) => {
-    const db = context.db;
-    const user = context.user;
-    const {scheduleId} = input;
+  .handler(async ({ context, input }) => {
+    const db = context.db
+    const user = context.user
+    const { scheduleId } = input
 
     try {
       // Verify ownership
-      const schedule = await db.select().from(schedulesTable)
+      const schedule = await db
+        .select()
+        .from(schedulesTable)
         .where(eq(schedulesTable.id, scheduleId))
-        .get();
+        .get()
 
       if (!schedule) {
-        throw new ORPCError('NOT_FOUND', {message: 'Schedule not found'});
+        throw new ORPCError('NOT_FOUND', { message: 'Schedule not found' })
       }
 
       if (schedule.ownerId !== user.id) {
-        throw new ORPCError('FORBIDDEN', {message: 'You do not have permission to modify this schedule'});
+        throw new ORPCError('FORBIDDEN', {
+          message: 'You do not have permission to modify this schedule',
+        })
       }
 
-      await db.update(schedulesTable)
+      await db
+        .update(schedulesTable)
         .set({
-          primary: true
+          primary: true,
         })
         .where(eq(schedulesTable.id, scheduleId))
 
-      await db.update(schedulesTable)
+      await db
+        .update(schedulesTable)
         .set({
-          primary: false
+          primary: false,
         })
-        .where(and(
-          eq(schedulesTable.ownerId, user.id),
-          eq(schedulesTable.year, schedule.year),
-          not(eq(schedulesTable.id, scheduleId))
-        ))
+        .where(
+          and(
+            eq(schedulesTable.ownerId, user.id),
+            eq(schedulesTable.year, schedule.year),
+            not(eq(schedulesTable.id, scheduleId)),
+          ),
+        )
 
-      return {message: "Schedule set as primary successfully"};
+      return { message: 'Schedule set as primary successfully' }
     } catch (error) {
-      if (error instanceof ORPCError) throw error;
-      console.error('Error setting schedule as primary:', error);
-      throw new ORPCError('INTERNAL_SERVER_ERROR', {message: 'Failed to set schedule as primary'});
+      if (error instanceof ORPCError) throw error
+      console.error('Error setting schedule as primary:', error)
+      throw new ORPCError('INTERNAL_SERVER_ERROR', {
+        message: 'Failed to set schedule as primary',
+      })
     }
-  });
+  })
+
+const removePrimary = os.removePrimary
+  .use(authMiddleware)
+  .handler(async ({ context, input }) => {
+    const db = context.db
+    const user = context.user
+    const { scheduleId } = input
+    try {
+      // Verify ownership
+      const schedule = await db
+        .select()
+        .from(schedulesTable)
+        .where(eq(schedulesTable.id, scheduleId))
+        .get()
+
+      if (!schedule) {
+        throw new ORPCError('NOT_FOUND', { message: 'Schedule not found' })
+      }
+
+      if (schedule.ownerId !== user.id) {
+        throw new ORPCError('FORBIDDEN', {
+          message: 'You do not have permission to modify this schedule',
+        })
+      }
+
+      await db
+        .update(schedulesTable)
+        .set({
+          primary: false,
+        })
+        .where(eq(schedulesTable.id, scheduleId))
+
+      return { message: 'Schedule set not as primary successfully' }
+    } catch (error) {
+      if (error instanceof ORPCError) throw error
+      console.error('Error setting schedule as primary:', error)
+      throw new ORPCError('INTERNAL_SERVER_ERROR', {
+        message: 'Failed to set schedule as primary',
+      })
+    }
+  })
 
 /**
  * Schedule Validation Operations
@@ -328,57 +426,76 @@ const setPrimary = os.setPrimary
  */
 const validateSlug = os.validateSlug
   .use(authMiddleware)
-  .handler(async ({context, input}) => {
-    const {slug, tiltifyName} = input;
-    const user = context.user;
+  .handler(async ({ context, input }) => {
+    const { slug, tiltifyName } = input
+    const user = context.user
 
     if (!slug) {
-      throw new ORPCError('BAD_REQUEST', {message: 'Slug is required'});
+      throw new ORPCError('BAD_REQUEST', { message: 'Slug is required' })
     }
 
     try {
       // Get alternatives using the generateScheduleSlugAlternatives function
       // If it returns alternatives, the slug is not valid
-      const alternatives = await generateScheduleSlugAlternativesLocals(context.locals, slug, 3);
+      const alternatives = await generateScheduleSlugAlternativesLocals(
+        context.locals,
+        slug,
+        3,
+      )
 
       // If alternatives is empty, the slug is valid
       if (alternatives.length === 0) {
         return {
           isValid: true,
-          suggestions: []
-        };
+          suggestions: [],
+        }
       }
 
       // Add tiltifyName as a suggestion if provided and different from slug
-      let allAlternatives = [...alternatives];
+      let allAlternatives = [...alternatives]
 
       if (tiltifyName && tiltifyName.toLowerCase() !== slug.toLowerCase()) {
-        const tiltifySlug = createSlug(tiltifyName);
+        const tiltifySlug = createSlug(tiltifyName)
         // Check if this slug is valid using generateScheduleSlugAlternatives
         // If it returns an empty array, the slug is valid
-        const tiltifyAlternatives = await generateScheduleSlugAlternativesLocals(context.locals, tiltifySlug, 0);
+        const tiltifyAlternatives =
+          await generateScheduleSlugAlternativesLocals(
+            context.locals,
+            tiltifySlug,
+            0,
+          )
         if (tiltifyAlternatives.length === 0) {
-          allAlternatives.push(tiltifySlug);
+          allAlternatives.push(tiltifySlug)
         }
-      } else if (user.tiltifyName && user.tiltifyName.toLowerCase() !== slug.toLowerCase()) {
-        const userTiltifySlug = createSlug(user.tiltifyName);
+      } else if (
+        user.tiltifyName &&
+        user.tiltifyName.toLowerCase() !== slug.toLowerCase()
+      ) {
+        const userTiltifySlug = createSlug(user.tiltifyName)
         // Check if this slug is valid using generateScheduleSlugAlternatives
         // If it returns an empty array, the slug is valid
-        const userTiltifyAlternatives = await generateScheduleSlugAlternativesLocals(context.locals, userTiltifySlug, 0);
+        const userTiltifyAlternatives =
+          await generateScheduleSlugAlternativesLocals(
+            context.locals,
+            userTiltifySlug,
+            0,
+          )
         if (userTiltifyAlternatives.length === 0) {
-          allAlternatives.push(userTiltifySlug);
+          allAlternatives.push(userTiltifySlug)
         }
       }
 
       return {
         isValid: false,
-        suggestions: allAlternatives
-      };
+        suggestions: allAlternatives,
+      }
     } catch (error) {
-      console.error('Error validating schedule slug:', error);
-      throw new ORPCError('INTERNAL_SERVER_ERROR', {message: 'Failed to validate slug'});
+      console.error('Error validating schedule slug:', error)
+      throw new ORPCError('INTERNAL_SERVER_ERROR', {
+        message: 'Failed to validate slug',
+      })
     }
-  });
+  })
 
 /**
  * Schedule Query Operations
@@ -387,78 +504,90 @@ const validateSlug = os.validateSlug
 /**
  * Get all schedules by Tiltify username
  */
-const getSchedulesByTiltifyUsername = os.getSchedulesByTiltifyUsername
-  .handler(async ({context, input}) => {
-    const db = context.db;
-    const account = await db.select().from(accounts)
-      .where(and(
-        eq(accounts.provider, 'tiltify'),
-        eq(accounts.providerUsername, input)
-      ))
+const getSchedulesByTiltifyUsername = os.getSchedulesByTiltifyUsername.handler(
+  async ({ context, input }) => {
+    const db = context.db
+    const account = await db
+      .select()
+      .from(accounts)
+      .where(
+        and(
+          eq(accounts.provider, 'tiltify'),
+          eq(accounts.providerUsername, input),
+        ),
+      )
       .get()
     if (!account) {
-      throw new ORPCError('NOT_FOUND', {message: 'User not found'})
+      throw new ORPCError('NOT_FOUND', { message: 'User not found' })
     }
     try {
-      const schedules = await db.select({
-        schedule: schedulesTable
-      })
+      const schedules = await db
+        .select({
+          schedule: schedulesTable,
+        })
         .from(schedulesTable)
         .innerJoin(users, eq(schedulesTable.ownerId, users.id))
-        .where(and(
-          eq(users.id, account.userId),
-          eq(schedulesTable.visible, true)
-        ))
-        .all();
+        .where(
+          and(eq(users.id, account.userId), eq(schedulesTable.visible, true)),
+        )
+        .all()
 
-      return schedules.map(row => row.schedule);
+      return schedules.map((row) => row.schedule)
     } catch (error) {
-      console.error('Error getting schedules by tiltify username:', error);
-      throw new ORPCError('INTERNAL_SERVER_ERROR', {message: 'Failed to get schedules by tiltify username'});
+      console.error('Error getting schedules by tiltify username:', error)
+      throw new ORPCError('INTERNAL_SERVER_ERROR', {
+        message: 'Failed to get schedules by tiltify username',
+      })
     }
-  });
+  },
+)
 
 /**
  * Get next schedule by Tiltify username
  */
-const getNextScheduleByTiltifyUsername = os.getNextScheduleByTiltifyUsername
-  .handler(async ({context, input}) => {
-    const db = context.db;
-    const tiltifyUsername = input;
+const getNextScheduleByTiltifyUsername =
+  os.getNextScheduleByTiltifyUsername.handler(async ({ context, input }) => {
+    const db = context.db
+    const tiltifyUsername = input
 
     try {
       // This is a complex query that would need the streams table and time logic
       // For now, return null as this functionality might need to be implemented differently
-      const nextSchedule = null;
-      return {nextSchedule};
+      const nextSchedule = null
+      return { nextSchedule }
     } catch (error) {
-      console.error('Error getting next schedule by tiltify username:', error);
-      throw new ORPCError('INTERNAL_SERVER_ERROR', {message: 'Failed to get next schedule by tiltify username'});
+      console.error('Error getting next schedule by tiltify username:', error)
+      throw new ORPCError('INTERNAL_SERVER_ERROR', {
+        message: 'Failed to get next schedule by tiltify username',
+      })
     }
-  });
+  })
 
 /**
  * Get all schedules for the authenticated user
  */
 const getSchedules = os.getSchedules
   .use(authMiddleware)
-  .handler(async ({context}) => {
-    const db = context.db;
-    const userId = context.userId;
+  .handler(async ({ context }) => {
+    const db = context.db
+    const userId = context.userId
 
     try {
       // Get all schedules for the authenticated user
-      const schedules = await db.select()
+      const schedules = await db
+        .select()
         .from(schedulesTable)
         .where(eq(schedulesTable.ownerId, userId))
-        .all();
+        .all()
 
-      return schedules;
+      return schedules
     } catch (error) {
-      console.error('Error getting schedules for user:', error);
-      throw new ORPCError('INTERNAL_SERVER_ERROR', {message: 'Failed to get schedules'});
+      console.error('Error getting schedules for user:', error)
+      throw new ORPCError('INTERNAL_SERVER_ERROR', {
+        message: 'Failed to get schedules',
+      })
     }
-  });
+  })
 
 /**
  * Private schedules router with all implemented procedures
@@ -473,6 +602,7 @@ export const privateSchedulesRouter = {
   // Schedule Management Operations
   toggleVisibility,
   setPrimary,
+  removePrimary,
 
   // Schedule Validation Operations
   validateSlug,
@@ -484,9 +614,8 @@ export const privateSchedulesRouter = {
   getSuggestedTagsForStreamBySearchTerm,
   */
 
-
   // Schedule Query Operations
   getSchedulesByTiltifyUsername,
   getNextScheduleByTiltifyUsername,
-  getSchedules
-};
+  getSchedules,
+}

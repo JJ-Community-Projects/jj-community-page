@@ -1,0 +1,13 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro'
+import { UserPreferencesPage } from '../../../components/features/users/user-dashboard/preferences/UserPreferencesPage.tsx'
+
+const { session, user } = Astro.locals
+if (session === null) {
+  return Astro.redirect('/')
+}
+---
+
+<BaseLayout>
+  <UserPreferencesPage client:only="solid-js" />
+</BaseLayout>

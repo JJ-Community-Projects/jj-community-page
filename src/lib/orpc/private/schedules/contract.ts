@@ -1,5 +1,5 @@
-import {oc} from '@orpc/contract';
-import {z} from "zod/v4";
+import { oc } from '@orpc/contract'
+import { z } from 'zod/v4'
 import {
   CreateScheduleResponseSchema,
   NextScheduleResponseSchema,
@@ -7,9 +7,12 @@ import {
   SchedulesListSchema,
   SlugValidationSchema,
   SuccessMessageSchema,
-  TablesDataSchema
-} from "../schemas/schedules.ts";
-import {PopularTagsResponseSchema, SuggestedTagsResponseSchema} from "../schemas/tags.ts";
+  TablesDataSchema,
+} from '../schemas/schedules.ts'
+import {
+  PopularTagsResponseSchema,
+  SuggestedTagsResponseSchema,
+} from '../schemas/tags.ts'
 
 /**
  * Private schedules contracts for authenticated schedule management operations.
@@ -25,9 +28,7 @@ import {PopularTagsResponseSchema, SuggestedTagsResponseSchema} from "../schemas
  * Input: none (creates for current year automatically)
  * Output: schedule object
  */
-const createContract = oc
-  .input(z.void())
-  .output(CreateScheduleResponseSchema);
+const createContract = oc.input(z.void()).output(CreateScheduleResponseSchema)
 
 /**
  * Create a new schedule with custom details
@@ -35,13 +36,19 @@ const createContract = oc
  * Output: schedule object
  */
 const createWithDetailsContract = oc
-  .input(z.object({
-    name: z.string().min(1, "Schedule name is required"),
-    slug: z.string().min(1, "Slug is required"),
-    primary: z.boolean(),
-    year: z.number().int().min(2020).max(2030, "Year must be between 2020 and 2030")
-  }))
-  .output(CreateScheduleResponseSchema);
+  .input(
+    z.object({
+      name: z.string().min(1, 'Schedule name is required'),
+      slug: z.string().min(1, 'Slug is required'),
+      primary: z.boolean(),
+      year: z
+        .number()
+        .int()
+        .min(2020)
+        .max(2030, 'Year must be between 2020 and 2030'),
+    }),
+  )
+  .output(CreateScheduleResponseSchema)
 
 /**
  * Save schedule data to database
@@ -49,8 +56,8 @@ const createWithDetailsContract = oc
  * Output: success message
  */
 const saveContract = oc
-  .input(z.number().positive("Schedule ID must be positive"))
-  .output(SuccessMessageSchema);
+  .input(z.number().positive('Schedule ID must be positive'))
+  .output(SuccessMessageSchema)
 
 /**
  * Delete a schedule
@@ -58,8 +65,8 @@ const saveContract = oc
  * Output: success message
  */
 const deleteContract = oc
-  .input(z.number().positive("Schedule ID must be positive"))
-  .output(SuccessMessageSchema);
+  .input(z.number().positive('Schedule ID must be positive'))
+  .output(SuccessMessageSchema)
 
 /**
  * Schedule Management Operations
@@ -71,10 +78,12 @@ const deleteContract = oc
  * Output: success message
  */
 const toggleVisibilityContract = oc
-  .input(z.object({
-    scheduleId: z.number().positive("Schedule ID must be positive")
-  }))
-  .output(SuccessMessageSchema);
+  .input(
+    z.object({
+      scheduleId: z.number().positive('Schedule ID must be positive'),
+    }),
+  )
+  .output(SuccessMessageSchema)
 
 /**
  * Set schedule as primary
@@ -82,10 +91,20 @@ const toggleVisibilityContract = oc
  * Output: success message
  */
 const setPrimaryContract = oc
-  .input(z.object({
-    scheduleId: z.number().positive("Schedule ID must be positive")
-  }))
-  .output(SuccessMessageSchema);
+  .input(
+    z.object({
+      scheduleId: z.number().positive('Schedule ID must be positive'),
+    }),
+  )
+  .output(SuccessMessageSchema)
+
+const removePrimaryContract = oc
+  .input(
+    z.object({
+      scheduleId: z.number().positive('Schedule ID must be positive'),
+    }),
+  )
+  .output(SuccessMessageSchema)
 
 /**
  * Schedule Validation Operations
@@ -97,11 +116,13 @@ const setPrimaryContract = oc
  * Output: validation result with suggestions
  */
 const validateSlugContract = oc
-  .input(z.object({
-    slug: z.string().min(1, "Slug is required"),
-    tiltifyName: z.string().optional()
-  }))
-  .output(SlugValidationSchema);
+  .input(
+    z.object({
+      slug: z.string().min(1, 'Slug is required'),
+      tiltifyName: z.string().optional(),
+    }),
+  )
+  .output(SlugValidationSchema)
 
 /**
  * Schedule Tag Operations
@@ -113,8 +134,8 @@ const validateSlugContract = oc
  * Output: popular tags with default and charity tag options
  */
 const getPopularTagsContract = oc
-  .input(z.number().positive("Limit must be positive").default(5))
-  .output(PopularTagsResponseSchema);
+  .input(z.number().positive('Limit must be positive').default(5))
+  .output(PopularTagsResponseSchema)
 
 /**
  * Get suggested tags for a specific stream
@@ -122,12 +143,14 @@ const getPopularTagsContract = oc
  * Output: suggested tags not already used in the stream
  */
 const getSuggestedTagsForStreamContract = oc
-  .input(z.object({
-    streamId: z.number().positive("Stream ID must be positive"),
-    scheduleId: z.number().positive("Schedule ID must be positive"),
-    limit: z.number().positive("Limit must be positive").default(5)
-  }))
-  .output(SuggestedTagsResponseSchema);
+  .input(
+    z.object({
+      streamId: z.number().positive('Stream ID must be positive'),
+      scheduleId: z.number().positive('Schedule ID must be positive'),
+      limit: z.number().positive('Limit must be positive').default(5),
+    }),
+  )
+  .output(SuggestedTagsResponseSchema)
 
 /**
  * Get suggested tags for a stream matching search term
@@ -135,13 +158,15 @@ const getSuggestedTagsForStreamContract = oc
  * Output: suggested tags matching search term not already used in the stream
  */
 const getSuggestedTagsForStreamBySearchTermContract = oc
-  .input(z.object({
-    streamId: z.number().positive("Stream ID must be positive"),
-    scheduleId: z.number().positive("Schedule ID must be positive"),
-    term: z.string().min(1, "Search term is required"),
-    limit: z.number().positive("Limit must be positive").default(5)
-  }))
-  .output(SuggestedTagsResponseSchema);
+  .input(
+    z.object({
+      streamId: z.number().positive('Stream ID must be positive'),
+      scheduleId: z.number().positive('Schedule ID must be positive'),
+      term: z.string().min(1, 'Search term is required'),
+      limit: z.number().positive('Limit must be positive').default(5),
+    }),
+  )
+  .output(SuggestedTagsResponseSchema)
 
 /**
  * Schedule Data Operations
@@ -153,8 +178,8 @@ const getSuggestedTagsForStreamBySearchTermContract = oc
  * Output: tables data from TinyBase
  */
 const getTablesContract = oc
-  .input(z.number().positive("Schedule ID must be positive"))
-  .output(TablesDataSchema);
+  .input(z.number().positive('Schedule ID must be positive'))
+  .output(TablesDataSchema)
 
 /**
  * Schedule Query Operations
@@ -166,8 +191,8 @@ const getTablesContract = oc
  * Output: array of schedules owned by the user
  */
 const getSchedulesByTiltifyUsernameContract = oc
-  .input(z.string().min(1, "Tiltify username is required"))
-  .output(SchedulesListSchema);
+  .input(z.string().min(1, 'Tiltify username is required'))
+  .output(SchedulesListSchema)
 
 /**
  * Get next schedule by Tiltify username
@@ -175,15 +200,14 @@ const getSchedulesByTiltifyUsernameContract = oc
  * Output: next upcoming schedule for the user
  */
 const getNextScheduleByTiltifyUsernameContract = oc
-  .input(z.string().min(1, "Tiltify username is required"))
-  .output(NextScheduleResponseSchema);
+  .input(z.string().min(1, 'Tiltify username is required'))
+  .output(NextScheduleResponseSchema)
 
 /**
  * Get all schedules for the authenticated user
  * Uses authMiddleware to access user ID from context
  */
-const getSchedulesContract = oc
-  .output(z.array(ScheduleSchema))
+const getSchedulesContract = oc.output(z.array(ScheduleSchema))
 
 export const privateSchedulesContract = {
   // Schedule CRUD Operations
@@ -195,6 +219,7 @@ export const privateSchedulesContract = {
   // Schedule Management Operations
   toggleVisibility: toggleVisibilityContract,
   setPrimary: setPrimaryContract,
+  removePrimary: removePrimaryContract,
 
   // Schedule Validation Operations
   validateSlug: validateSlugContract,
@@ -202,10 +227,11 @@ export const privateSchedulesContract = {
   // Schedule Tag Operations
   getPopularTags: getPopularTagsContract,
   getSuggestedTagsForStream: getSuggestedTagsForStreamContract,
-  getSuggestedTagsForStreamBySearchTerm: getSuggestedTagsForStreamBySearchTermContract,
+  getSuggestedTagsForStreamBySearchTerm:
+    getSuggestedTagsForStreamBySearchTermContract,
 
   // Schedule Query Operations
   getSchedulesByTiltifyUsername: getSchedulesByTiltifyUsernameContract,
   getNextScheduleByTiltifyUsername: getNextScheduleByTiltifyUsernameContract,
-  getSchedules: getSchedulesContract
-};
+  getSchedules: getSchedulesContract,
+}

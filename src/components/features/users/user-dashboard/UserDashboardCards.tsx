@@ -3,6 +3,7 @@ import './UserAdminDashboardPage.css'
 import { orpcPrivate } from '../../../../lib/orpc/client.ts'
 import { useQuery } from '@tanstack/solid-query'
 import {
+  FaRegularPenToSquare,
   FaSolidCalendarDays,
   FaSolidTag,
   FaSolidUser,
@@ -14,7 +15,7 @@ const ScheduleCard: Component = () => {
   return (
     <a
       href={`/dashboard/schedules`}
-      class="group relative transform overflow-hidden rounded-xl border-2 border-accent-100 bg-white px-4 py-3 shadow-md transition-all duration-300 ease-out hover:scale-[1.02] hover:border-accent-200 hover:shadow-lg focus:ring-2 focus:ring-accent focus:ring-offset-2 active:scale-[0.98]"
+      class="group relative transform overflow-hidden rounded-xl border-2 border-accent-100 bg-white px-4 py-3 shadow-md transition-all duration-300 ease-out hover:border-accent-200 hover:shadow-lg focus:ring-2 focus:ring-accent focus:ring-offset-2 active:scale-[0.98]"
     >
       <div class="flex h-full flex-col">
         <div class="mb-2 flex items-center gap-2">
@@ -58,7 +59,7 @@ const TeamCard: Component = () => {
   return (
     <a
       href={`/dashboard/teams`}
-      class="group relative transform overflow-hidden rounded-xl border-2 border-accent-100 bg-white px-4 py-3 shadow-md transition-all duration-300 ease-out hover:scale-[1.02] hover:border-accent-200 hover:shadow-lg focus:ring-2 focus:ring-accent focus:ring-offset-2 active:scale-[0.98]"
+      class="group relative transform overflow-hidden rounded-xl border-2 border-accent-100 bg-white px-4 py-3 shadow-md transition-all duration-300 ease-out hover:border-accent-200 hover:shadow-lg focus:ring-2 focus:ring-accent focus:ring-offset-2 active:scale-[0.98]"
     >
       <div class="flex h-full flex-col">
         <div class="mb-2 flex items-center justify-between gap-2">
@@ -94,7 +95,7 @@ const TagsCard: Component = () => {
   return (
     <a
       href={`/dashboard/tags`}
-      class="group relative transform overflow-hidden rounded-xl border-2 border-accent-100 bg-white px-4 py-3 shadow-md transition-all duration-300 ease-out hover:scale-[1.02] hover:border-accent-200 hover:shadow-lg focus:ring-2 focus:ring-accent focus:ring-offset-2 active:scale-[0.98]"
+      class="group relative transform overflow-hidden rounded-xl border-2 border-accent-100 bg-white px-4 py-3 shadow-md transition-all duration-300 ease-out hover:border-accent-200 hover:shadow-lg focus:ring-2 focus:ring-accent focus:ring-offset-2 active:scale-[0.98]"
     >
       <div class="flex h-full flex-col">
         <div class="mb-2 flex items-center gap-2">
@@ -109,6 +110,32 @@ const TagsCard: Component = () => {
         <div class="mt-auto">
           <span class="font-poppins font-medium text-accent-600">
             Manage Tags →
+          </span>
+        </div>
+      </div>
+    </a>
+  )
+}
+
+const PrefsCard: Component = () => {
+  return (
+    <a
+      href={`/dashboard/preferences`}
+      class="group relative transform overflow-hidden rounded-xl border-2 border-accent-100 bg-white px-4 py-3 shadow-md transition-all duration-300 ease-out hover:border-accent-200 hover:shadow-lg focus:ring-2 focus:ring-accent focus:ring-offset-2 active:scale-[0.98]"
+    >
+      <div class="flex h-full flex-col">
+        <div class="mb-2 flex items-center gap-2">
+          <FaRegularPenToSquare class="h-5 w-5 text-accent-600" />
+          <h3 class="font-poppins font-bold text-neutral-800 ~text-lg/xl">
+            Preferences
+          </h3>
+        </div>
+        <p class="mb-4 font-poppins text-neutral-600 ~text-sm/base">
+          Manage your Socials and Style
+        </p>
+        <div class="mt-auto">
+          <span class="font-poppins font-medium text-accent-600">
+            Manage Preferences →
           </span>
         </div>
       </div>
@@ -138,7 +165,7 @@ const FriendsCard: Component = () => {
   return (
     <a
       href={`/dashboard/friends`}
-      class="group relative transform overflow-hidden rounded-xl border-2 border-accent-100 bg-white px-4 py-3 shadow-md transition-all duration-300 ease-out hover:scale-[1.02] hover:border-accent-200 hover:shadow-lg focus:ring-2 focus:ring-accent focus:ring-offset-2 active:scale-[0.98]"
+      class="group relative transform overflow-hidden rounded-xl border-2 border-accent-100 bg-white px-4 py-3 shadow-md transition-all duration-300 ease-out hover:border-accent-200 hover:shadow-lg focus:ring-2 focus:ring-accent focus:ring-offset-2 active:scale-[0.98]"
     >
       <div class="flex h-full flex-col">
         <div class="mb-2 flex items-center justify-between gap-2">
@@ -192,7 +219,7 @@ const BlockedCard: Component = () => {
   return (
     <a
       href={`/dashboard/block`}
-      class="rounded-xl border-2 border-danger-200 bg-white p-4 shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:border-danger-300 hover:shadow-lg focus:ring-2 focus:ring-danger focus:ring-offset-2"
+      class="rounded-xl border-2 border-danger-200 bg-white p-4 shadow-md transition-all duration-300 focus:ring-2 focus:ring-danger focus:ring-offset-2"
     >
       <div class="flex h-full flex-col">
         <div class="mb-2 flex items-center gap-2">
@@ -222,19 +249,16 @@ const BlockedCard: Component = () => {
 export const UserDashboardCards: Component = () => {
   return (
     <div class="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 lg:grid-cols-3 xl:grid-cols-4">
-      {/* Schedules Card */}
-      <ScheduleCard />
+      <PrefsCard />
 
-      {/* Teams Card */}
-      <TeamCard />
-
-      {/* Tags Card */}
       <TagsCard />
 
-      {/* Friends Card */}
+      <ScheduleCard />
+
+      <TeamCard />
+
       <FriendsCard />
 
-      {/* Blocked Users Card */}
       <BlockedCard />
     </div>
   )
