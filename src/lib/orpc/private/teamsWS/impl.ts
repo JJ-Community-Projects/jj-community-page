@@ -1,9 +1,8 @@
 import {implement, ORPCError,} from "@orpc/server";
 import {dbMiddleware} from "../../middleware/dbMiddleware.ts";
 import {authMiddleware} from "../../middleware/authMiddleware.ts";
-import {DurableEventIterator} from '@orpc/experimental-durable-event-iterator'
+import { DurableIterator } from '@orpc/experimental-durable-iterator'
 import {teamChannels} from "./channels.ts";
-import {getTeamInvites, getTeamMembers, getUserInvites, getUserTeams} from "./util.ts";
 import type {UserTeamInvitesObject} from "./do/UserTeamInvitesObject.ts";
 import type {UserTeamsObject} from "./do/UserTeamsObject.ts";
 import type {TeamAdminInvitesObject} from "./do/TeamAdminInvitesObject.ts";
@@ -22,11 +21,11 @@ const getUserTeamInvitesWS = os
     const userId = context.userId
     try {
       const channelId = teamChannels.userInvites(userId);
-      const invites = await getUserInvites(context.db, userId);
-      const DO = context.env.UserTeamInvitesObject;
-      const stub = DO.get(DO.idFromName(channelId));
-      await stub.publishChange(invites);
-      return new DurableEventIterator<UserTeamInvitesObject>(channelId, {signingKey: context.env!.ORPC_DEI_SIGNING_KEY});
+      return new DurableIterator<UserTeamInvitesObject>(channelId, {
+        signingKey: context.env!.ORPC_DEI_SIGNING_KEY,
+        tokenTTLSeconds: 300,
+        att: { userId },
+      });
     } catch (error) {
       console.error('Error in getUserTeamInvitesWS:', error);
       throw new ORPCError('INTERNAL_SERVER_ERROR', {message: 'Failed to stream user team invites'});
@@ -41,12 +40,11 @@ const getUserTeamsWS = os
     const userId = context.userId
     try {
       const channelId = teamChannels.userTeams(userId);
-      const teams = await getUserTeams(context.db, userId);
-      const DO = context.env.UserTeamsObject;
-      const stub = DO.get(DO.idFromName(channelId));
-      console.log('getUserTeamsWS', teams)
-      await stub.publishChange(teams);
-      return new DurableEventIterator<UserTeamsObject>(channelId, {signingKey: context.env!.ORPC_DEI_SIGNING_KEY});
+      return new DurableIterator<UserTeamsObject>(channelId, {
+        signingKey: context.env!.ORPC_DEI_SIGNING_KEY,
+        tokenTTLSeconds: 300,
+        att: { userId },
+      });
     } catch (error) {
       console.error('Error in getUserTeamsWS:', error);
       throw new ORPCError('INTERNAL_SERVER_ERROR', {message: 'Failed to stream user teams'});
@@ -61,11 +59,11 @@ const getTeamAdminInvitesWS = os
     const teamId = input.teamId
     try {
       const channelId = teamChannels.teamAdminInvites(teamId);
-      const invites = await getTeamInvites(context.db, teamId);
-      const DO = context.env.TeamAdminInvitesObject;
-      const stub = DO.get(DO.idFromName(channelId));
-      await stub.publishChange(invites);
-      return new DurableEventIterator<TeamAdminInvitesObject>(channelId, {signingKey: context.env!.ORPC_DEI_SIGNING_KEY});
+      return new DurableIterator<TeamAdminInvitesObject>(channelId, {
+        signingKey: context.env!.ORPC_DEI_SIGNING_KEY,
+        tokenTTLSeconds: 300,
+        att: { teamId },
+      });
     } catch (error) {
       console.error('Error in getTeamAdminInvitesWS:', error);
       throw new ORPCError('INTERNAL_SERVER_ERROR', {message: 'Failed to stream team admin invites'});
@@ -80,11 +78,11 @@ const getTeamAdminMembersWS = os
     const teamId = input.teamId
     try {
       const channelId = teamChannels.teamAdminMembers(teamId);
-      const members = await getTeamMembers(context.db, teamId);
-      const DO = context.env.TeamAdminMembersObject;
-      const stub = DO.get(DO.idFromName(channelId));
-      await stub.publishChange(members);
-      return new DurableEventIterator<TeamAdminMembersObject>(channelId, {signingKey: context.env!.ORPC_DEI_SIGNING_KEY});
+      return new DurableIterator<TeamAdminMembersObject>(channelId, {
+        signingKey: context.env!.ORPC_DEI_SIGNING_KEY,
+        tokenTTLSeconds: 300,
+        att: { teamId },
+      });
     } catch (error) {
       console.error('Error in getTeamAdminMembersWS:', error);
       throw new ORPCError('INTERNAL_SERVER_ERROR', {message: 'Failed to stream team admin members'});

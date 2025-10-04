@@ -1,10 +1,16 @@
-import {RPCLink} from "@orpc/client/fetch";
-import {createORPCClient, onError} from '@orpc/client'
-import {createTanstackQueryUtils} from "@orpc/tanstack-query";
-import {DurableEventIteratorLinkPlugin} from "@orpc/experimental-durable-event-iterator/client";
-import type {PrivateRouter} from "./privateRouter";
-import type {RouterClient} from "@orpc/server";
+import { RPCLink } from '@orpc/client/fetch'
+import { createORPCClient, onError } from '@orpc/client'
+import { createTanstackQueryUtils } from '@orpc/tanstack-query'
+import type { PrivateRouter } from './privateRouter'
+import type { PublicRouter } from './publicRouter'
+import type { RouterClient } from '@orpc/server'
+import { DurableIteratorLinkPlugin } from '@orpc/experimental-durable-iterator/client'
 
+declare module '@orpc/experimental-durable-iterator/client' {
+  interface ClientDurableIteratorRpcContext {
+    // Custom client context
+  }
+}
 const linkPublic = new RPCLink({
   url: () => {
     if (typeof window === 'undefined') {
@@ -16,7 +22,7 @@ const linkPublic = new RPCLink({
   interceptors: [
     onError((error) => {
       console.error(error)
-    })
+    }),
   ],
 })
 
@@ -33,12 +39,13 @@ const linkPrivate = new RPCLink({
   interceptors: [
     onError((error) => {
       console.error('linkPrivate', error)
-    })
+    }),
   ],
   plugins: [
-    new DurableEventIteratorLinkPlugin({
+    new DurableIteratorLinkPlugin({
       url: () => {
-        if (typeof window === 'undefined') throw new Error('RPCLink is not allowed on the server side.')
+        if (typeof window === 'undefined')
+          throw new Error('RPCLink is not allowed on the server side.')
         const url = `${window.location.origin}/api/private/ws` // single WS entry
         console.log('linkPrivateWS', 'url', url)
         return url
@@ -50,7 +57,7 @@ const linkPrivate = new RPCLink({
 // Create separate clients for public and private routers
 // const publicClient = createORPCClient<RouterClient<PublicRouter>>(linkPublic)
 const privateClient = createORPCClient<RouterClient<PrivateRouter>>(linkPrivate)
-const publicClient = createORPCClient<any>(linkPublic)
+const publicClient = createORPCClient<RouterClient<PublicRouter>>(linkPublic)
 // const privateClient = createORPCClient<any>(linkPrivate)
 
 export const orpcPublic = createTanstackQueryUtils(publicClient)

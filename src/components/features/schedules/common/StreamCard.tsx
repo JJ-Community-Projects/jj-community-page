@@ -556,7 +556,7 @@ const ScheduleStreamCardTopBarHover: Component<ScheduleStreamCardProps> = (
       {/* white card with content */}
       <button
         class="group relative flex w-full flex-col overflow-hidden rounded-2xl bg-white shadow-md transition-shadow duration-300 hover:shadow-lg"
-        onClick={() => modal.open()}
+        onClick={modal.open}
         style={{
           '--highlight-color': highlightColor,
           '--text-color': textColor,
@@ -607,7 +607,7 @@ const ScheduleStreamCardTopBarHover: Component<ScheduleStreamCardProps> = (
           </div>
         </div>
 
-        <div class="relative z-10 flex flex-grow flex-col px-5 py-4 text-center transition-colors duration-300 group-hover:text-[var(--text-color)]">
+        <div class="relative z-10 flex flex-grow flex-col px-5 py-4 text-center transition-colors delay-100 duration-300 group-hover:text-[var(--text-color)]">
           <div class="flex w-full flex-col items-center justify-center">
             <p class="line-clamp-2 text-pretty text-lg font-bold uppercase tracking-widest">
               {props.stream.title}
