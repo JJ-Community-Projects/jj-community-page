@@ -1,10 +1,9 @@
-import { getDB } from '../lib/db/db.ts'
-
 export async function scheduledYogsJJAP(
   controller: ScheduledController,
   env: Env,
   ctx: ExecutionContext,
 ) {
-  const db = getDB(env)
   const DO = env.JingleJamData
+  const stub = DO.get(DO.idFromName('JJ_API_CACHE'))
+  await stub.refresh()
 }

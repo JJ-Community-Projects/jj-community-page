@@ -52,3 +52,6 @@ export const jjCauses = sqliteTable(
   },
   (table) => [primaryKey({ name: 'pk', columns: [table.id, table.year] })],
 )
+
+export type JJCampaign = typeof jjCampaign.$inferSelect
+export type JJCauses = typeof jjCauses.$inferSelect

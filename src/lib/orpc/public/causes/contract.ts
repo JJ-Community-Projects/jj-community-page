@@ -57,6 +57,7 @@ export type JJCauseType = z.infer<typeof JJCauseSchema>
 export type JJCampaignType = z.infer<typeof JJCampaignSchema>
 export type JJCampaignsType = z.infer<typeof JJCampaignsSchema>
 
+// List endpoints (existing)
 const campaignsContract = oc.output(JJCampaignsSchema).route({
   path: '/jjData/campaigns',
   method: 'GET',
@@ -79,7 +80,45 @@ const causesContract = oc.output(z.array(JJCauseSchema)).route({
   deprecated: false,
 })
 
+// New: Get single cause by path parameter
+const causeByIdContract = oc
+  .input(z.object({ id: z.coerce.number().int().nonnegative() }))
+  .output(JJCauseSchema.nullable())
+  .route({
+    path: '/jjData/causes/{id}',
+    method: 'GET',
+    operationId: 'getJJDataCauseById',
+    summary: 'Get a single cause by id',
+    description: 'Retrieve a single cause from the current JJ data cache by id',
+    tags: ['jj-data'],
+    successDescription: 'Cause retrieved successfully',
+  })
+
+// New: Get single campaign via query params
+const campaignLookupInput = z.object({
+  year: z.coerce.number().int().optional(),
+  userId: z.coerce.number().int().optional(),
+  userSlug: z.string().optional(),
+  campaignId: z.string().optional(), // treated as slug identifier
+})
+
+const campaignLookupContract = oc
+  .input(campaignLookupInput)
+  .output(JJCampaignSchema.nullable())
+  .route({
+    path: '/jjData/campaign',
+    method: 'GET',
+    operationId: 'getJJDataCampaign',
+    summary: 'Get a single campaign by userId, userSlug, or campaignId (slug)',
+    description:
+      'Lookup a single campaign. If year is omitted, current-year data is served from the JingleJamData Durable Object; if year is provided, the database is queried.',
+    tags: ['jj-data'],
+    successDescription: 'Campaign retrieved successfully',
+  })
+
 export const contracts = {
   campaignsContract,
   causesContract,
+  causeByIdContract,
+  campaignLookupContract,
 }
