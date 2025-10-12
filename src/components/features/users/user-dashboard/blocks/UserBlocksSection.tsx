@@ -26,6 +26,16 @@ export const UserBlocksSection: Component = () => {
   return (
     <div class="bg-white/95 backdrop-blur-lg rounded-2xl shadow-xl border border-white/20 overflow-hidden">
       <div class="~p-4/8 space-y-6">
+        {/* Explain Section */}
+        <div class="relative space-y-4 px-6 pb-6 leading-relaxed text-gray-700 ~text-sm/base">
+          <div class="rounded-xl border border-accent/20 bg-gradient-to-br from-white to-accent/5 p-5 shadow-sm ring-1 ring-black/5">
+            <ul class="list-disc space-y-1 pl-6 marker:text-accent-600">
+              <li>Blocked users cannot send you friend requests.</li>
+              <li>Blocked users will not appear in your <strong>Related</strong> section.</li>
+              <li>You will not appear in the <strong>Related</strong> section of users you have blocked.</li>
+            </ul>
+          </div>
+        </div>
 
         {/* Block Search Section */}
         <BlockSearchInput />

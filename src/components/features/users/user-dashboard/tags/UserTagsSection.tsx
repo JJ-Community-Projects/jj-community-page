@@ -1,38 +1,45 @@
-import {type Component} from "solid-js";
-import {TagExplanationAccordion} from "./TagExplanationAccordion.tsx";
-import {TagCategorySelection} from "./TagCategorySelection.tsx";
-import {TagSearchInput} from "./TagSearchInput.tsx";
-import {AvailableTagsList} from "./AvailableTagsList.tsx";
-import {UserTagsList} from "./UserTagsList.tsx";
+import { type Component } from 'solid-js'
+import { TagCategorySelection } from './TagCategorySelection.tsx'
+import { TagSearchInput } from './TagSearchInput.tsx'
+import { AvailableTagsList } from './AvailableTagsList.tsx'
+import { UserTagsList } from './UserTagsList.tsx'
 
-/**
- * UserTagsSection Component
- *
- * Allows normal users to manage their tag associations by selecting from admin-created tags.
- * Enhanced with modern design, glass-morphism effects, and improved user experience.
- *
- * Features:
- * - Browse popular admin-created tags with enhanced visual design
- * - Search for specific tags by name with modern search interface
- * - Add tags to user profile with interactive animations
- * - Remove tags from user profile with better UX
- * - Visual feedback showing which tags are already selected
- * - Responsive design with fluid typography
- * - Comprehensive accessibility support
- *
- * Uses UserTagsProvider context for data management to avoid prop drilling.
- * All child components access data directly from the UserTagsProvider context.
- *
- * Note: Custom tag creation is no longer allowed for normal users.
- * Only administrators can create new tags through the admin interface.
- */
 export const UserTagsSection: Component = () => {
-
   return (
-    <div class="bg-white/95 backdrop-blur-lg rounded-2xl shadow-xl border border-white/20 overflow-hidden">
-      <div class="~p-4/8 space-y-6">
-        {/* Explanation accordion with enhanced design */}
-        <TagExplanationAccordion defaultExpanded={false} />
+    <div class="overflow-hidden rounded-2xl border border-white/20 bg-white/95 shadow-xl backdrop-blur-lg">
+      <div class="space-y-6 ~p-4/8">
+        <div class="relative space-y-4 px-6 pb-6 leading-relaxed text-gray-700 ~text-sm/base">
+          <div class="rounded-xl border border-accent/20 bg-gradient-to-br from-white to-accent/5 p-5 shadow-sm ring-1 ring-black/5">
+            <ul class="list-disc space-y-1 pl-6 marker:text-accent-600">
+              <li>
+                Choose from available tags to show off your self and your
+                streams.
+              </li>
+              <li>
+                Tags can help others to discover streamers with similar
+                interests and causes.
+              </li>
+              <li>
+                People with similar tags as you will be shown on your profile
+                page in the <strong>Related</strong> section.
+              </li>
+              <li>Blocked users will not be shown on your profile page.</li>
+              <li>
+                I recommend to add a tag for the cause you are fundraising for.
+              </li>
+              <li>You can have a maximum of 10 tags.</li>
+            </ul>
+
+            <div class="mt-4 flex items-start gap-3 rounded-lg border-l-4 border-accent/30 bg-gradient-to-r from-accent/10 to-accent/5 p-4">
+              <p class="font-medium text-accent-700">
+                <span>
+                  <strong>You can not find the right tags?</strong> Message
+                  Ostof on Discord to suggest a tag.
+                </span>
+              </p>
+            </div>
+          </div>
+        </div>
 
         {/* Category Selection with modern pills */}
         <TagCategorySelection />
@@ -47,5 +54,5 @@ export const UserTagsSection: Component = () => {
         <UserTagsList />
       </div>
     </div>
-  );
-};
+  )
+}

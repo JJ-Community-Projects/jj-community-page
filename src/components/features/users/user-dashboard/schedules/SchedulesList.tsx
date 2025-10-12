@@ -1,10 +1,5 @@
 import { type Component, createSignal, For, Show } from 'solid-js'
-import {
-  QueryClientProvider,
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from '@tanstack/solid-query'
+import { QueryClientProvider, useMutation, useQuery, useQueryClient, } from '@tanstack/solid-query'
 import { orpcPrivate } from '../../../../../lib/orpc/client.ts'
 import type { User } from '../../../../../lib/auth/User.ts'
 import { Dialog } from '@kobalte/core/dialog'
@@ -80,12 +75,10 @@ const SchedulesListContent: Component<{ user: User }> = (props) => {
                 </div>
                 <div class="space-y-2">
                   <h3 class="font-bold text-gray-800 ~text-lg/xl">
-                    No Schedules Yet
+                    No Schedules found
                   </h3>
                   <p class="mx-auto max-w-md leading-relaxed text-gray-600">
-                    Create your first schedule to start organizing your streams
-                    and events. You can have multiple schedules, but only one
-                    primary schedule per year.
+                    Create your first schedule.
                   </p>
                 </div>
                 <button

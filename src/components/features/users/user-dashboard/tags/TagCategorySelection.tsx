@@ -83,30 +83,22 @@ export const TagCategorySelection: Component = () => {
                     type="button"
                     onClick={() => handleToggleCategory(category.id)}
                     class={`
-                      group relative overflow-hidden rounded-full px-4 py-2 text-sm font-medium
-                      transition-all duration-300 transform hover:scale-105 active:scale-95
-                      focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-white outline-none
-                      ${isSelected() 
-                        ? 'bg-accent text-white hover:bg-accent-600 shadow-sm hover:shadow-md focus:ring-accent' 
-                        : 'bg-white border-2 border-accent-200 hover:border-accent-300 text-gray-700 hover:bg-gray-50'
+                      rounded-md px-3 py-1.5 text-sm font-medium
+                      border transition-colors focus:outline-none focus:ring-2 focus:ring-accent
+                      ${isSelected()
+                        ? 'bg-accent text-white border-accent-600'
+                        : 'bg-white text-gray-800 border-gray-200 hover:bg-gray-50'
                       }
                     `}
-                    style={isSelected() ? {
-                      'background': `linear-gradient(135deg, ${category.color}, ${category.color}dd)`,
-                      'box-shadow': `0 4px 15px ${category.color}30`
-                    } : {}}
                     aria-pressed={isSelected()}
                     aria-label={`${isSelected() ? 'Remove' : 'Add'} ${category.name} filter`}
                   >
-                    <span class="relative z-10 flex items-center gap-2">
+                    <span class="flex items-center gap-2">
                       {category.name}
                       <span class={`text-xs ${isSelected() ? 'opacity-90' : 'opacity-70'}`}>
                         ({category.tagCount})
                       </span>
                     </span>
-                    {isSelected() && (
-                      <div class="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 transform -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
-                    )}
                   </button>
                 );
               }}

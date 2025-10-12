@@ -1,5 +1,5 @@
-import {type Component} from "solid-js";
-import {FaSolidChevronLeft} from "solid-icons/fa";
+import { type Component } from 'solid-js'
+import { FaSolidChevronLeft } from 'solid-icons/fa'
 
 /**
  * ScheduleHeader Component
@@ -25,7 +25,7 @@ interface ScheduleHeaderProps {
 
 export const ScheduleHeader: Component<ScheduleHeaderProps> = (props) => {
   return (
-    <div class="bg-white rounded-xl p-6 shadow-md border-2 border-primary-200 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 hover:border-primary-300">
+    <div class="bg-white rounded-xl p-6 shadow-md border-2 duration-300">
       <div class="flex flex-col gap-4">
         {/* Navigation - User ownership semantic (primary colors) */}
         <a
@@ -55,10 +55,9 @@ export const ScheduleHeader: Component<ScheduleHeaderProps> = (props) => {
         </div>
 
         <p class="~text-sm/base text-gray-600 leading-relaxed">
-          You can create as many schedules as you want, but only one can be set as your primary schedule for each
-          year. In most cases, you'll only need one per year. Your primary schedule will be highlighted on your page,
-          while any other schedules—whether from the same year or different years—will still be available to view from
-          your page.
+          You can create up to 3 schedules per year. Only one can be set as your primary schedule for that year. In
+          most cases, you'll only need one per year. Your primary schedule will be highlighted on your page, while any
+          other schedules—whether from the same year or different years—will still be available to view from your page.
         </p>
       </div>
     </div>

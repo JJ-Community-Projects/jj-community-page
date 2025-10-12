@@ -6,6 +6,7 @@ import {Checkbox} from "@kobalte/core/checkbox";
 import {useMutation, useQuery} from "@tanstack/solid-query";
 import {orpcPrivate} from "../../../../../lib/orpc/client.ts";
 import {DateTime} from "luxon";
+import { FaSolidCheck } from 'solid-icons/fa'
 
 export const CreateScheduleDialog: Component<{
   isOpen: () => boolean,
@@ -151,14 +152,19 @@ export const CreateScheduleDialog: Component<{
                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-accent"
                     placeholder="my-awesome-schedule-2024"
                   />
-                  <Show when={isCheckingSlug()}>
+                  <Show when={isCheckingSlug() && slug().length>0}>
                     <div class="absolute right-3 top-1/2 transform -translate-y-1/2">
                       <div class="animate-spin h-4 w-4 border-2 border-accent border-t-transparent rounded-full"></div>
                     </div>
                   </Show>
+                  <Show when={!isCheckingSlug() && slug().length > 0 && slugValid()}>
+                    <div class="absolute right-3 top-1/2 transform -translate-y-1/2">
+                        <FaSolidCheck class={'text-success'} size={16}/>
+                    </div>
+                  </Show>
                 </div>
                 <TextField.ErrorMessage class="text-red-500 text-sm mt-1">
-                  {slugErrorMessage() || (!slugValid() ? "This slug is not available. Try one of these suggestions:" : undefined)}
+                  {slugErrorMessage() || (!slugValid() && slug().length > 0 ? "This slug is not available. Try one of these suggestions:" : undefined)}
                 </TextField.ErrorMessage>
 
                 <Show when={suggestions().length > 0}>
@@ -172,6 +178,7 @@ export const CreateScheduleDialog: Component<{
                               class="px-2 py-1 text-sm bg-accent/10 text-accent hover:bg-accent/20 rounded-md transition-colors"
                               onClick={() => {
                                 setSlug(suggestion);
+                                setDebounceSlug(suggestion);
                               }}
                             >
                               {suggestion}

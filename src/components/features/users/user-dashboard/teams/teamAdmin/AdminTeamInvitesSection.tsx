@@ -1,55 +1,62 @@
-import {type Component, createSignal, For, Match, Show, Switch} from "solid-js";
-import {createModalSignal} from "../../../../../../lib/createModalSignal.ts";
-import {ConfirmationDialog} from "../../../../../common/dialogs/ConfirmationDialog.tsx";
-import {useAdminTeamDetail} from "./AdminTeamDetailsProvider.tsx";
-import {AdminTeamInviteSearchInput} from "./AdminTeamInviteSearchInput.tsx";
-import {FaSolidEnvelope, FaSolidCircleExclamation, FaSolidXmark, FaSolidClock} from "solid-icons/fa";
+import { type Component, For, Match, Show, Switch } from 'solid-js'
+import { createModalSignal } from '../../../../../../lib/createModalSignal.ts'
+import { ConfirmationDialog } from '../../../../../common/dialogs/ConfirmationDialog.tsx'
+import { useAdminTeamDetail } from './AdminTeamDetailsProvider.tsx'
+import { AdminTeamInviteSearchInput } from './AdminTeamInviteSearchInput.tsx'
+import {
+  FaSolidArrowUpRightFromSquare,
+  FaSolidCircleExclamation,
+  FaSolidClock,
+  FaSolidEnvelope,
+  FaSolidXmark,
+} from 'solid-icons/fa'
 
 interface Invite {
-  userId: number;
-  username: string;
+  userId: number
+  username: string
+  tiltifySlug: string
 }
 
 interface InviteListItemProps {
-  invite: Invite;
+  invite: Invite
 }
 
 const InviteListItem: Component<InviteListItemProps> = (props) => {
-  const {cancelInvite, cancelInviteMutation} = useAdminTeamDetail();
-  const cancelInviteDialog = createModalSignal();
+  const { cancelInvite, cancelInviteMutation } = useAdminTeamDetail()
+  const cancelInviteDialog = createModalSignal()
 
   const handleCancelClick = () => {
-    cancelInviteDialog.open();
-  };
+    cancelInviteDialog.open()
+  }
 
   const handleConfirmCancel = async () => {
     try {
-      await cancelInvite(props.invite.userId);
-      cancelInviteDialog.close();
+      await cancelInvite(props.invite.userId)
+      cancelInviteDialog.close()
     } catch (error) {
-      console.error('Failed to cancel invite:', error);
+      console.error('Failed to cancel invite:', error)
     }
-  };
+  }
 
   return (
     <>
-      <div class="group relative flex items-center bg-white rounded-xl p-4 shadow-md border-2 border-warning-100 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 hover:border-warning-200">
-        <div class="flex items-center gap-3 flex-1">
+      <div class="group flex flex-col gap-4 rounded-xl border-2 bg-white p-2 shadow-md transition-all duration-300 hover:border-warning-100">
+        <div class="flex flex-1 items-center gap-3">
           {/* Avatar placeholder */}
-          <div class="w-10 h-10 rounded-full bg-gradient-to-br from-warning-400 to-warning-500 flex items-center justify-center shadow-sm flex-shrink-0">
-            <span class="text-white font-semibold text-sm">
+          <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-warning-400 to-warning-500 shadow-sm">
+            <span class="text-sm font-semibold text-white">
               {(props.invite.username || 'U')[0].toUpperCase()}
             </span>
           </div>
 
           {/* Invite info */}
-          <div class="flex-1 min-w-0">
+          <div class="min-w-0 flex-1">
             <div class="flex items-center gap-2">
-              <p class="font-semibold text-gray-800 text-sm block truncate">
+              <p class="block truncate text-sm font-semibold text-gray-800">
                 {props.invite.username || 'Unknown User'}
               </p>
-              <div class="flex items-center gap-1 bg-warning-100 text-warning-700 px-2 py-1 rounded-full">
-                <FaSolidClock class="w-3 h-3" />
+              <div class="flex items-center gap-1 rounded-full bg-warning-100 px-2 py-1 text-warning-700">
+                <FaSolidClock class="h-3 w-3" />
                 <span class="text-xs font-medium">Pending</span>
               </div>
             </div>
@@ -60,23 +67,20 @@ const InviteListItem: Component<InviteListItemProps> = (props) => {
             type="button"
             onClick={handleCancelClick}
             disabled={cancelInviteMutation.isPending}
-            class="
-              flex-shrink-0 p-2 rounded-full transition-all duration-200
-              hover:bg-danger-100 focus:bg-danger-100
-              group-hover:opacity-100 opacity-70
-              focus:ring-2 focus:ring-danger-500 focus:ring-offset-2 focus:ring-offset-white outline-none
-              hover:scale-110 active:scale-95
-              disabled:opacity-50 disabled:cursor-not-allowed
-            "
+            class="flex-shrink-0 rounded-full p-2 opacity-70 outline-none transition-all duration-200 group-hover:opacity-100 hover:scale-110 hover:bg-danger-100 focus:bg-danger-100 focus:ring-2 focus:ring-danger-500 focus:ring-offset-2 focus:ring-offset-white active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
             aria-label={`Cancel invitation for ${props.invite.username}`}
             title="Cancel invitation"
           >
-            <FaSolidXmark class="w-4 h-4 text-danger-500 hover:text-danger-600" />
+            <FaSolidXmark class="h-4 w-4 text-danger-500 hover:text-danger-600" />
           </button>
         </div>
-
-        {/* Subtle hover effect */}
-        <div class="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-5 transition-opacity duration-300 pointer-events-none bg-warning-500"></div>
+        <a
+          class="inline-flex items-center gap-1 text-sm font-medium text-primary transition-colors duration-200 hover:underline"
+          href={`/${props.invite.tiltifySlug}`}
+        >
+          {props.invite.tiltifySlug}{' '}
+          <FaSolidArrowUpRightFromSquare class="h-3 w-3" />
+        </a>
       </div>
 
       <ConfirmationDialog
@@ -88,28 +92,29 @@ const InviteListItem: Component<InviteListItemProps> = (props) => {
         onCancel={cancelInviteDialog.close}
       />
     </>
-  );
-};
+  )
+}
 
 const EmptyState = () => (
-  <div class="flex flex-col items-center justify-center py-12 px-4">
-    <div class="w-16 h-16 bg-gradient-to-br from-accent-400 to-accent-500 rounded-full flex items-center justify-center mb-4 shadow-lg">
-      <FaSolidEnvelope class="w-8 h-8 text-white" />
+  <div class="flex flex-col items-center justify-center px-4 py-12">
+    <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-accent-400 to-accent-500 shadow-lg">
+      <FaSolidEnvelope class="h-8 w-8 text-white" />
     </div>
-    <h4 class="text-xl font-semibold text-gray-800 mb-2">No pending invites</h4>
-    <p class="text-gray-600 text-center max-w-md mb-6 leading-relaxed">
-      You don't have any pending team invitations. Use the search above to find and invite users to join your team.
+    <h4 class="mb-2 text-xl font-semibold text-gray-800">No pending invites</h4>
+    <p class="mb-6 max-w-md text-center leading-relaxed text-gray-600">
+      You don't have any pending team invitations. Use the search above to find
+      and invite users to join your team.
     </p>
   </div>
-);
+)
 
 const LoadingSkeleton = () => (
-  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-    <div class="animate-pulse bg-gray-200 rounded-xl h-16 shadow-sm"></div>
-    <div class="animate-pulse bg-gray-200 rounded-xl h-16 shadow-sm"></div>
-    <div class="animate-pulse bg-gray-200 rounded-xl h-16 shadow-sm"></div>
+  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+    <div class="h-16 animate-pulse rounded-xl bg-gray-200 shadow-sm"></div>
+    <div class="h-16 animate-pulse rounded-xl bg-gray-200 shadow-sm"></div>
+    <div class="h-16 animate-pulse rounded-xl bg-gray-200 shadow-sm"></div>
   </div>
-);
+)
 
 /**
  * AdminTeamInvitesSection Component
@@ -118,12 +123,12 @@ const LoadingSkeleton = () => (
  * Enhanced with modern design, invite cards, and proper loading/empty states.
  */
 export const AdminTeamInvitesSection: Component = () => {
-  const {invites, cancelInviteMutation} = useAdminTeamDetail();
+  const { invites, cancelInviteMutation } = useAdminTeamDetail()
 
-  const invitesList = () => invites.data?.invites ?? [];
-  const hasInvites = () => invitesList().length > 0;
-  const isLoading = () => invites.isLoading;
-  const hasError = () => !!invites.error;
+  const invitesList = () => invites.data?.invites ?? []
+  const hasInvites = () => invitesList().length > 0
+  const isLoading = () => invites.isLoading
+  const hasError = () => !!invites.error
 
   return (
     <div class="space-y-6">
@@ -134,25 +139,21 @@ export const AdminTeamInvitesSection: Component = () => {
       <div class="space-y-4">
         {/* Section Header */}
         <div class="flex items-center gap-3">
-          <h4 class="text-sm font-semibold text-gray-800 flex items-center gap-2">
-            <FaSolidEnvelope class="w-4 h-4 text-warning-600" />
+          <h4 class="flex items-center gap-2 text-sm font-semibold text-gray-800">
+            <FaSolidEnvelope class="h-4 w-4 text-warning-600" />
             Pending Invites
           </h4>
-          {hasInvites() && (
-            <div class="bg-gradient-to-r from-warning-100 to-warning-200 px-3 py-1 rounded-full">
-              <span class="text-warning-700 text-xs font-medium">
-                {invitesList().length} pending
-              </span>
-            </div>
-          )}
         </div>
 
         {/* Error Message */}
         <Show when={cancelInviteMutation.isError}>
-          <div class="bg-danger-50 rounded-xl p-4 border border-danger-200">
+          <div class="rounded-xl border border-danger-200 bg-danger-50 p-4">
             <div class="flex items-center gap-3 text-danger-600">
-              <FaSolidCircleExclamation class="w-4 h-4 flex-shrink-0" />
-              <p class="text-sm font-medium">{cancelInviteMutation.failureReason?.message || "Failed to cancel invitation"}</p>
+              <FaSolidCircleExclamation class="h-4 w-4 flex-shrink-0" />
+              <p class="text-sm font-medium">
+                {cancelInviteMutation.failureReason?.message ||
+                  'Failed to cancel invitation'}
+              </p>
             </div>
           </div>
         </Show>
@@ -163,12 +164,14 @@ export const AdminTeamInvitesSection: Component = () => {
           </Match>
 
           <Match when={hasError()}>
-            <div class="bg-danger-50 rounded-xl p-6 border border-danger-200">
+            <div class="rounded-xl border border-danger-200 bg-danger-50 p-6">
               <div class="flex items-center justify-center gap-3 text-danger-600">
-                <FaSolidCircleExclamation class="w-5 h-5 flex-shrink-0" />
+                <FaSolidCircleExclamation class="h-5 w-5 flex-shrink-0" />
                 <div>
-                  <p class="font-semibold text-sm">Error loading invites</p>
-                  <p class="text-xs opacity-90">{invites.error?.message || "Unknown error occurred"}</p>
+                  <p class="text-sm font-semibold">Error loading invites</p>
+                  <p class="text-xs opacity-90">
+                    {invites.error?.message || 'Unknown error occurred'}
+                  </p>
                 </div>
               </div>
             </div>
@@ -179,16 +182,14 @@ export const AdminTeamInvitesSection: Component = () => {
           </Match>
 
           <Match when={hasInvites()}>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 ~gap-3/4">
+            <div class="grid grid-cols-1 ~gap-3/4 sm:grid-cols-2 lg:grid-cols-3">
               <For each={invitesList()}>
-                {(invite) => (
-                  <InviteListItem invite={invite} />
-                )}
+                {(invite) => <InviteListItem invite={invite} />}
               </For>
             </div>
           </Match>
         </Switch>
       </div>
     </div>
-  );
-};
+  )
+}

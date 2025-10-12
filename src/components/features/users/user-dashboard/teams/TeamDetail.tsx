@@ -1,12 +1,9 @@
-import { type Component, createSignal, For, Match, Switch } from 'solid-js'
+import { type Component, createSignal, For, Match, Show, Switch, } from 'solid-js'
 import { UserProvider } from '../providers/UserProvider.tsx'
 import { TeamDetailsProvider, useTeamDetails } from './TeamDetailsProvider.tsx'
 import type { User } from '../../../../../lib/auth/User.ts'
 import { Dialog } from '@kobalte/core/dialog'
-import {
-  createModalSignal,
-  type ModalSignal,
-} from '../../../../../lib/createModalSignal.ts'
+import { createModalSignal, type ModalSignal, } from '../../../../../lib/createModalSignal.ts'
 import {
   FaSolidArrowUpRightFromSquare,
   FaSolidChevronLeft,
@@ -128,14 +125,6 @@ const TeamDetailContent: Component<{ teamId: number }> = (props) => {
                 <FaSolidUsers class="h-4 w-4 text-primary" />
                 Team Members
               </h4>
-              {hasMembers() && (
-                <div class="rounded-full bg-gradient-to-r from-primary-100 to-primary-200 px-3 py-1">
-                  <span class="text-xs font-medium text-primary-700">
-                    {membersList().length} member
-                    {membersList().length !== 1 ? 's' : ''}
-                  </span>
-                </div>
-              )}
             </div>
 
             <Switch>
@@ -165,7 +154,7 @@ const TeamDetailContent: Component<{ teamId: number }> = (props) => {
                 <div class="grid grid-cols-1 ~gap-3/4 sm:grid-cols-2 lg:grid-cols-3">
                   <For each={membersList()}>
                     {(member) => (
-                      <div class="group relative flex items-center rounded-xl border-2 border-primary-100 bg-white p-4 shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:border-primary-200 hover:shadow-lg">
+                      <div class="group flex flex-col gap-4 rounded-xl border-2 hover:border-primary-100 bg-white p-2 shadow-md transition-all duration-300">
                         <div class="flex flex-1 items-center gap-3">
                           {/* Avatar placeholder */}
                           <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary-400 to-primary-500 shadow-sm">
@@ -180,18 +169,22 @@ const TeamDetailContent: Component<{ teamId: number }> = (props) => {
                               <p class="block truncate text-sm font-semibold text-neutral-700">
                                 {member.username || 'Unknown User'}
                               </p>
-                              {member.userId === team.data?.ownerId && (
+                              <Show when={member.userId === team.data?.ownerId}>
                                 <div class="flex items-center gap-1 rounded-full bg-warning-100 px-2 py-1 text-warning-700">
                                   <FaSolidCrown class="h-3 w-3" />
                                   <span class="text-xs font-medium">Owner</span>
                                 </div>
-                              )}
+                              </Show>
                             </div>
                           </div>
                         </div>
-
-                        {/* Subtle hover effect */}
-                        <div class="pointer-events-none absolute inset-0 rounded-xl bg-primary-500 opacity-0 transition-opacity duration-300 group-hover:opacity-5"></div>
+                        <a
+                          class="inline-flex items-center gap-1 text-sm font-medium text-primary transition-colors duration-200 hover:underline"
+                          href={`/${member.tiltifySlug}`}
+                        >
+                          {member.tiltifySlug}{' '}
+                          <FaSolidArrowUpRightFromSquare class="h-3 w-3" />
+                        </a>
                       </div>
                     )}
                   </For>

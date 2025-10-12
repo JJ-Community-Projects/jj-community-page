@@ -2,13 +2,14 @@ import {type Component, createSignal, For, Show} from "solid-js";
 import {debounce} from "@solid-primitives/scheduled";
 import {Dialog} from "@kobalte/core/dialog";
 import {TextField} from "@kobalte/core/text-field";
-import {useMutation, useQuery} from "@tanstack/solid-query";
+import { useMutation, useQuery, useQueryClient } from '@tanstack/solid-query'
 import {orpcPrivate} from "../../../../../../lib/orpc/client.ts";
 
 export const CreateTeamDialog: Component<{ isOpen: () => boolean, setIsOpen: (open: boolean) => void }> = (props) => {
   // Form state signals
   const [name, setName] = createSignal("");
   const [slug, setSlug] = createSignal("");
+  const client = useQueryClient()
 
   // Slug validation query
   const validateSlug = useQuery(() => orpcPrivate.teams.validateSlug.queryOptions({
@@ -22,11 +23,17 @@ export const CreateTeamDialog: Component<{ isOpen: () => boolean, setIsOpen: (op
   // oRPC mutations
   const createTeamMutation = useMutation(() =>
     orpcPrivate.teams.create.mutationOptions({
-      onSuccess: () => {
+      onSuccess: async () => {
         props.setIsOpen(false);
         // Reset form
         setName("");
         setSlug("");
+        await client.invalidateQueries({
+          queryKey:orpcPrivate.teams.canCreateTeam.queryKey(),
+        })
+        await client.invalidateQueries({
+          queryKey:orpcPrivate.teams.canInviteCurrentUser.queryKey(),
+        })
       }
     })
   );
