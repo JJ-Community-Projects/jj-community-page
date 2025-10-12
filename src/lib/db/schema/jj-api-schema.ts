@@ -1,10 +1,4 @@
-import {
-  integer,
-  primaryKey,
-  real,
-  sqliteTable,
-  text,
-} from 'drizzle-orm/sqlite-core'
+import { integer, primaryKey, real, sqliteTable, text, } from 'drizzle-orm/sqlite-core'
 
 export const jjCampaign = sqliteTable(
   'jj_campaign',
@@ -38,7 +32,7 @@ export const jjCauses = sqliteTable(
   'jj_causes',
   {
     year: integer('year').notNull(),
-    id: integer('id').primaryKey(), // 1227
+    id: integer('id'), // 1227
     name: text('name').notNull(),
     logo: text('logo'),
     description: text('description'),
