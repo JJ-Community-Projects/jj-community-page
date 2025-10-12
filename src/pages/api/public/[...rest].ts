@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro'
-import { CORSPlugin } from '@orpc/server/plugins'
+import { CORSPlugin, ResponseHeadersPlugin } from '@orpc/server/plugins'
 import { OpenAPIHandler } from '@orpc/openapi/fetch'
 import { OpenAPIReferencePlugin } from '@orpc/openapi/plugins'
 import { experimental_SmartCoercionPlugin as SmartCoercionPlugin } from '@orpc/json-schema'
@@ -40,6 +40,7 @@ const handler = new OpenAPIHandler(publicRouter, {
   ],
   plugins: [
     new CORSPlugin(),
+    new ResponseHeadersPlugin(),
     new SmartCoercionPlugin({
       schemaConverters: [new ZodToJsonSchemaConverter()],
     }),
