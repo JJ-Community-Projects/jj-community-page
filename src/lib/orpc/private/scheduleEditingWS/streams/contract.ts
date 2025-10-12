@@ -104,3 +104,11 @@ export const updateStreamsWithDetailsContract = oc
     }))
   }))
   .output(z.void())
+
+// Limit-check: per-date streams cap (see util/limits)
+export const canAddStreamContract = oc
+  .input(z.object({
+    scheduleId: z.number().int().positive(),
+    date: z.date(),
+  }))
+  .output(z.object({ canAdd: z.boolean(), streams: z.number(), date: z.date(), maxStreams: z.number() }))

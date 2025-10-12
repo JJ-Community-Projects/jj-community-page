@@ -1,22 +1,29 @@
-import {privateTeamsContract} from './contract.ts';
-import {teamsOwnerMiddleware} from './middleware.ts';
-import {implement, ORPCError} from '@orpc/server';
-import {dbMiddleware} from '../../middleware/dbMiddleware.ts';
-import {authMiddleware} from '../../middleware/authMiddleware.ts';
-import {teamInvitesTable, teamMembersTable, teamsTable} from '../../../db/schema/jj-schema.ts';
-import {users} from '../../../db/schema/auth-schema.ts';
-import {userDisplayView} from '../../../db/schema/views-schema.ts';
-import {and, count, eq, not} from 'drizzle-orm';
-import {createSlug, generateTeamSlugAlternativesLocals} from '../../../../functions/slug.ts';
+import { privateTeamsContract } from './contract.ts'
+import { teamsOwnerMiddleware } from './middleware.ts'
+import { implement, ORPCError } from '@orpc/server'
+import { dbMiddleware } from '../../middleware/dbMiddleware.ts'
+import { authMiddleware } from '../../middleware/authMiddleware.ts'
+import {
+  teamInvitesTable,
+  teamMembersTable,
+  teamsTable,
+} from '../../../db/schema/jj-schema.ts'
+import { users } from '../../../db/schema/auth-schema.ts'
+import { userDisplayView } from '../../../db/schema/views-schema.ts'
+import { and, count, eq, not } from 'drizzle-orm'
+import {
+  createSlug,
+  generateTeamSlugAlternativesLocals,
+} from '../../../../functions/slug.ts'
 import {
   publishTeamAdminInvitesUpdate,
   publishTeamAdminMembersUpdate,
   publishUserInvitesUpdate,
-  publishUserTeamsUpdate
-} from "../teamsWS/publisher.ts";
+  publishUserTeamsUpdate,
+} from '../teamsWS/publisher.ts'
+import { checkCanCreateTeam, checkCanInviteUser } from '../util/limits.ts'
 
-const os = implement(privateTeamsContract)
-  .use(dbMiddleware);
+const os = implement(privateTeamsContract).use(dbMiddleware)
 
 /**
  * Team CRUD Operations
@@ -28,59 +35,71 @@ const os = implement(privateTeamsContract)
  */
 const create = os.createContract
   .use(authMiddleware)
-  .handler(async ({context, input}) => {
-    const db = context.db;
-    const userId = context.userId;
-    const {name, slug} = input;
+  .handler(async ({ context, input }) => {
+    const db = context.db
+    const userId = context.userId
+    const { name, slug } = input
+
+    const teamLimit = await checkCanCreateTeam(db, userId)
+
+    if (!teamLimit.canCreate) {
+      throw new ORPCError('FORBIDDEN', {
+        message: 'Team owner limit reached',
+        ...teamLimit,
+      })
+    }
 
     // Create a proper slug using the createSlug function
-    const validSlug = createSlug(slug);
+    const validSlug = createSlug(slug)
     if (!validSlug) {
-      throw new ORPCError('BAD_REQUEST', {message: 'Invalid slug format'});
+      throw new ORPCError('BAD_REQUEST', { message: 'Invalid slug format' })
     }
 
     try {
-      const existingTeam = await db.select()
+      const existingTeam = await db
+        .select()
         .from(teamsTable)
         .where(eq(teamsTable.slug, validSlug))
-        .get();
+        .get()
 
       if (existingTeam) {
-        throw new ORPCError('CONFLICT', {message: 'Slug is already in use'});
+        throw new ORPCError('CONFLICT', { message: 'Slug is already in use' })
       }
 
       // Create team
-      const [team] = await db.insert(teamsTable)
+      const [team] = await db
+        .insert(teamsTable)
         .values({
           name: name,
           slug: validSlug,
           ownerId: userId,
-          visible: false
+          visible: false,
         })
-        .returning();
+        .returning()
 
       const teamId = team.id
 
       // Add creator as member
-      await db.insert(teamMembersTable)
-        .values({
-          teamId: team.id,
-          userId: userId
-        });
+      await db.insert(teamMembersTable).values({
+        teamId: team.id,
+        userId: userId,
+      })
 
       // Publish WS updates for team creation (user becomes owner/member)
       await Promise.all([
         publishUserTeamsUpdate(context.env, userId),
         publishTeamAdminMembersUpdate(context.env, teamId),
-      ]);
+      ])
 
-      return {teamId};
+      return { teamId }
     } catch (error) {
-      if (error instanceof ORPCError) throw error;
-      console.error('Error creating team:', error);
-      throw new ORPCError('INTERNAL_SERVER_ERROR', {message: 'Failed to create team'});
+      if (error instanceof ORPCError) throw error
+      console.error('Error creating team:', error)
+      throw new ORPCError('INTERNAL_SERVER_ERROR', {
+        message: 'Failed to create team',
+      })
     }
-  });
+  })
 
 /**
  * Update team information (owner only)
@@ -89,45 +108,51 @@ const create = os.createContract
 const update = os.updateContract
   .use(authMiddleware)
   .use(teamsOwnerMiddleware)
-  .handler(async ({context, input}) => {
-    const db = context.db;
-    const team = context.team; // From teamsOwnerMiddleware
-    const {name, slug, visible, description} = input;
+  .handler(async ({ context, input }) => {
+    const db = context.db
+    const team = context.team // From teamsOwnerMiddleware
+    const { name, slug, visible, description } = input
 
     try {
       // Check slug uniqueness if changed
       if (slug !== team.slug) {
-        const validSlug = createSlug(slug);
+        const validSlug = createSlug(slug)
         if (!validSlug) {
-          throw new ORPCError('BAD_REQUEST', {message: 'Invalid slug format'});
+          throw new ORPCError('BAD_REQUEST', { message: 'Invalid slug format' })
         }
 
-        const existingTeam = await db.select()
+        const existingTeam = await db
+          .select()
           .from(teamsTable)
           .where(eq(teamsTable.slug, validSlug))
-          .get();
+          .get()
 
         if (existingTeam) {
-          throw new ORPCError('CONFLICT', {message: 'Slug is already in use'});
+          throw new ORPCError('CONFLICT', { message: 'Slug is already in use' })
         }
       }
 
-      await db.update(teamsTable)
+      await db
+        .update(teamsTable)
         .set({
           name: name,
           slug: createSlug(slug),
-          ...(visible !== undefined && {visible: visible}),
-          ...(description !== undefined && {description: description ?? null})
+          ...(visible !== undefined && { visible: visible }),
+          ...(description !== undefined && {
+            description: description ?? null,
+          }),
         })
-        .where(eq(teamsTable.id, input.teamId));
+        .where(eq(teamsTable.id, input.teamId))
 
-      return {success: true};
+      return { success: true }
     } catch (error) {
-      if (error instanceof ORPCError) throw error;
-      console.error('Error updating team:', error);
-      throw new ORPCError('INTERNAL_SERVER_ERROR', {message: 'Failed to update team'});
+      if (error instanceof ORPCError) throw error
+      console.error('Error updating team:', error)
+      throw new ORPCError('INTERNAL_SERVER_ERROR', {
+        message: 'Failed to update team',
+      })
     }
-  });
+  })
 
 /**
  * Delete a team (owner only)
@@ -136,19 +161,20 @@ const update = os.updateContract
 const deleteTeam = os.deleteContract
   .use(authMiddleware)
   .use(teamsOwnerMiddleware)
-  .handler(async ({context, input}) => {
-    const db = context.db;
+  .handler(async ({ context, input }) => {
+    const db = context.db
 
     try {
-      await db.delete(teamsTable)
-        .where(eq(teamsTable.id, input.teamId));
+      await db.delete(teamsTable).where(eq(teamsTable.id, input.teamId))
 
-      return {success: true};
+      return { success: true }
     } catch (error) {
-      console.error('Error deleting team:', error);
-      throw new ORPCError('INTERNAL_SERVER_ERROR', {message: 'Failed to delete team'});
+      console.error('Error deleting team:', error)
+      throw new ORPCError('INTERNAL_SERVER_ERROR', {
+        message: 'Failed to delete team',
+      })
     }
-  });
+  })
 
 /**
  * Validate slug availability and generate suggestions
@@ -156,57 +182,75 @@ const deleteTeam = os.deleteContract
  */
 const validateSlug = os.validateSlugContract
   .use(authMiddleware)
-  .handler(async ({context, input}) => {
-    const {slug, tiltifyName} = input;
-    const user = context.user;
+  .handler(async ({ context, input }) => {
+    const { slug, tiltifyName } = input
+    const user = context.user
 
     if (!slug) {
-      throw new ORPCError('BAD_REQUEST', {message: 'Slug is required'});
+      throw new ORPCError('BAD_REQUEST', { message: 'Slug is required' })
     }
 
     try {
       // Get alternatives using the generateTeamSlugAlternatives function
       // If it returns alternatives, the slug is not valid
-      const alternatives = await generateTeamSlugAlternativesLocals(context.locals, slug, 3);
+      const alternatives = await generateTeamSlugAlternativesLocals(
+        context.locals,
+        slug,
+        3,
+      )
 
       // If alternatives is empty, the slug is valid
       if (alternatives.length === 0) {
         return {
           isValid: true,
-          suggestions: []
-        };
+          suggestions: [],
+        }
       }
 
       // Add tiltifyName as a suggestion if provided and different from slug
-      let allAlternatives = [...alternatives];
+      let allAlternatives = [...alternatives]
 
       if (tiltifyName && tiltifyName.toLowerCase() !== slug.toLowerCase()) {
-        const tiltifySlug = createSlug(tiltifyName);
+        const tiltifySlug = createSlug(tiltifyName)
         // Check if this slug is valid using generateTeamSlugAlternatives
         // If it returns an empty array, the slug is valid
-        const tiltifyAlternatives = await generateTeamSlugAlternativesLocals(context.locals, tiltifySlug, 0);
+        const tiltifyAlternatives = await generateTeamSlugAlternativesLocals(
+          context.locals,
+          tiltifySlug,
+          0,
+        )
         if (tiltifyAlternatives.length === 0) {
-          allAlternatives.push(tiltifySlug);
+          allAlternatives.push(tiltifySlug)
         }
-      } else if (user.tiltifyName && user.tiltifyName.toLowerCase() !== slug.toLowerCase()) {
-        const userTiltifySlug = createSlug(user.tiltifyName);
+      } else if (
+        user.tiltifyName &&
+        user.tiltifyName.toLowerCase() !== slug.toLowerCase()
+      ) {
+        const userTiltifySlug = createSlug(user.tiltifyName)
         // Check if this slug is valid using generateTeamSlugAlternatives
         // If it returns an empty array, the slug is valid
-        const userTiltifyAlternatives = await generateTeamSlugAlternativesLocals(context.locals, userTiltifySlug, 0);
+        const userTiltifyAlternatives =
+          await generateTeamSlugAlternativesLocals(
+            context.locals,
+            userTiltifySlug,
+            0,
+          )
         if (userTiltifyAlternatives.length === 0) {
-          allAlternatives.push(userTiltifySlug);
+          allAlternatives.push(userTiltifySlug)
         }
       }
 
       return {
         isValid: false,
-        suggestions: allAlternatives
-      };
+        suggestions: allAlternatives,
+      }
     } catch (error) {
-      console.error('Error validating slug:', error);
-      throw new ORPCError('INTERNAL_SERVER_ERROR', {message: 'Failed to validate slug'});
+      console.error('Error validating slug:', error)
+      throw new ORPCError('INTERNAL_SERVER_ERROR', {
+        message: 'Failed to validate slug',
+      })
     }
-  });
+  })
 
 /**
  * Team Member Operations
@@ -218,62 +262,74 @@ const validateSlug = os.validateSlugContract
  */
 const leaveTeam = os.leaveTeamContract
   .use(authMiddleware)
-  .handler(async ({context, input}) => {
-    const db = context.db;
-    const userId = context.userId;
-    const {teamId} = input;
+  .handler(async ({ context, input }) => {
+    const db = context.db
+    const userId = context.userId
+    const { teamId } = input
 
     // Check if team exists
-    const team = await db.select()
+    const team = await db
+      .select()
       .from(teamsTable)
       .where(eq(teamsTable.id, teamId))
-      .get();
+      .get()
 
     if (!team) {
-      throw new ORPCError('NOT_FOUND', {message: 'Team not found'});
+      throw new ORPCError('NOT_FOUND', { message: 'Team not found' })
     }
 
     // Prevent team owner from leaving their own team
     if (team.ownerId === userId) {
-      throw new ORPCError('FORBIDDEN', {message: 'Team owner cannot leave their own team. Transfer ownership or delete the team instead.'});
+      throw new ORPCError('FORBIDDEN', {
+        message:
+          'Team owner cannot leave their own team. Transfer ownership or delete the team instead.',
+      })
     }
 
     // Check if user is actually a member
-    const membership = await db.select()
+    const membership = await db
+      .select()
       .from(teamMembersTable)
-      .where(and(
-        eq(teamMembersTable.teamId, teamId),
-        eq(teamMembersTable.userId, userId)
-      ))
-      .get();
+      .where(
+        and(
+          eq(teamMembersTable.teamId, teamId),
+          eq(teamMembersTable.userId, userId),
+        ),
+      )
+      .get()
 
     if (!membership) {
-      throw new ORPCError('NOT_FOUND', {message: 'You are not a member of this team'});
+      throw new ORPCError('NOT_FOUND', {
+        message: 'You are not a member of this team',
+      })
     }
 
     try {
-
-
       // Remove user from team
-      await db.delete(teamMembersTable)
-        .where(and(
-          eq(teamMembersTable.teamId, teamId),
-          eq(teamMembersTable.userId, userId)
-        ));
+      await db
+        .delete(teamMembersTable)
+        .where(
+          and(
+            eq(teamMembersTable.teamId, teamId),
+            eq(teamMembersTable.userId, userId),
+          ),
+        )
 
       // Publish WS updates for user leaving team
       await Promise.all([
         publishUserTeamsUpdate(context.env, userId),
         publishTeamAdminMembersUpdate(context.env, teamId),
-      ]);
+      ])
 
-      return {success: true};
+      return { success: true }
     } catch (error) {
-      if (error instanceof ORPCError) throw error;
-      console.error('Error leaving team:', error);
-      throw new ORPCError('INTERNAL_SERVER_ERROR', {message: 'Failed to leave team'});
+      if (error instanceof ORPCError) throw error
+      console.error('Error leaving team:', error)
+      throw new ORPCError('INTERNAL_SERVER_ERROR', {
+        message: 'Failed to leave team',
+      })
     }
-  });
+  })
 
 /**
  * Remove a member from team (owner only)
@@ -282,50 +338,62 @@ const leaveTeam = os.leaveTeamContract
 const removeMember = os.removeMemberContract
   .use(authMiddleware)
   .use(teamsOwnerMiddleware)
-  .handler(async ({context, input}) => {
-    const db = context.db;
-    const userId = context.userId;
-    const {userId: targetUserId, teamId} = input;
+  .handler(async ({ context, input }) => {
+    const db = context.db
+    const userId = context.userId
+    const { userId: targetUserId, teamId } = input
 
     // Prevent team owner from removing themselves
     if (targetUserId === userId) {
-      throw new ORPCError('FORBIDDEN', {message: 'Team owner cannot remove themselves from the team'});
+      throw new ORPCError('FORBIDDEN', {
+        message: 'Team owner cannot remove themselves from the team',
+      })
     }
 
     try {
       // Check if target user is actually a member
-      const membership = await db.select()
+      const membership = await db
+        .select()
         .from(teamMembersTable)
-        .where(and(
-          eq(teamMembersTable.teamId, teamId),
-          eq(teamMembersTable.userId, targetUserId)
-        ))
-        .get();
+        .where(
+          and(
+            eq(teamMembersTable.teamId, teamId),
+            eq(teamMembersTable.userId, targetUserId),
+          ),
+        )
+        .get()
 
       if (!membership) {
-        throw new ORPCError('NOT_FOUND', {message: 'User is not a member of this team'});
+        throw new ORPCError('NOT_FOUND', {
+          message: 'User is not a member of this team',
+        })
       }
 
       // Remove user from team
-      await db.delete(teamMembersTable)
-        .where(and(
-          eq(teamMembersTable.teamId, teamId),
-          eq(teamMembersTable.userId, targetUserId)
-        ));
+      await db
+        .delete(teamMembersTable)
+        .where(
+          and(
+            eq(teamMembersTable.teamId, teamId),
+            eq(teamMembersTable.userId, targetUserId),
+          ),
+        )
 
       // Publish WS updates for member removal
       await Promise.all([
         publishUserTeamsUpdate(context.env, targetUserId),
         publishTeamAdminMembersUpdate(context.env, teamId),
-      ]);
+      ])
 
-      return {success: true};
+      return { success: true }
     } catch (error) {
-      if (error instanceof ORPCError) throw error;
-      console.error('Error removing team member:', error);
-      throw new ORPCError('INTERNAL_SERVER_ERROR', {message: 'Failed to remove team member'});
+      if (error instanceof ORPCError) throw error
+      console.error('Error removing team member:', error)
+      throw new ORPCError('INTERNAL_SERVER_ERROR', {
+        message: 'Failed to remove team member',
+      })
     }
-  });
+  })
 
 /**
  * Team Invite Operations
@@ -338,54 +406,72 @@ const removeMember = os.removeMemberContract
 const createInvite = os.createInviteContract
   .use(authMiddleware)
   .use(teamsOwnerMiddleware)
-  .handler(async ({context, input}) => {
-    const db = context.db;
-    const {invitedUserId, teamId} = input;
+  .handler(async ({ context, input }) => {
+    const db = context.db
+    const { invitedUserId, teamId } = input
 
     try {
       // Check if invited user exists
-      const invitedUser = await db.select()
+      const invitedUser = await db
+        .select()
         .from(users)
         .where(eq(users.id, invitedUserId))
-        .get();
+        .get()
 
       if (!invitedUser) {
-        throw new ORPCError('NOT_FOUND', {message: 'User not found'});
+        throw new ORPCError('NOT_FOUND', { message: 'User not found' })
       }
 
       // Check if user is already a team member
-      const existingMember = await db.select()
+      const existingMember = await db
+        .select()
         .from(teamMembersTable)
-        .where(and(
-          eq(teamMembersTable.teamId, teamId),
-          eq(teamMembersTable.userId, invitedUserId)
-        ))
-        .get();
+        .where(
+          and(
+            eq(teamMembersTable.teamId, teamId),
+            eq(teamMembersTable.userId, invitedUserId),
+          ),
+        )
+        .get()
 
       if (existingMember) {
-        throw new ORPCError('CONFLICT', {message: 'User is already a member of this team'});
+        throw new ORPCError('CONFLICT', {
+          message: 'User is already a member of this team',
+        })
+      }
+
+      // Enforce membership limit before inviting
+      const membershipLimit = await checkCanInviteUser(db, invitedUserId)
+      if (!membershipLimit.canInvite) {
+        throw new ORPCError('FORBIDDEN', {
+          message: 'User is at team membership limit',
+          ...membershipLimit,
+        })
       }
 
       // Create invite (using onConflictDoNothing to handle duplicate invites gracefully)
-      await db.insert(teamInvitesTable)
+      await db
+        .insert(teamInvitesTable)
         .values({
           teamId: teamId,
-          invitedUserId: invitedUserId
+          invitedUserId: invitedUserId,
         })
-        .onConflictDoNothing();
+        .onConflictDoNothing()
 
       await Promise.all([
         publishUserInvitesUpdate(context.env, invitedUserId),
         publishTeamAdminInvitesUpdate(context.env, teamId),
-      ]);
+      ])
 
-      return {success: true};
+      return { success: true }
     } catch (error) {
-      if (error instanceof ORPCError) throw error;
-      console.error('Error creating team invite:', error);
-      throw new ORPCError('INTERNAL_SERVER_ERROR', {message: 'Failed to create team invite'});
+      if (error instanceof ORPCError) throw error
+      console.error('Error creating team invite:', error)
+      throw new ORPCError('INTERNAL_SERVER_ERROR', {
+        message: 'Failed to create team invite',
+      })
     }
-  });
+  })
 
 /**
  * Delete an invite (owner only)
@@ -394,44 +480,52 @@ const createInvite = os.createInviteContract
 const deleteInvite = os.deleteInviteContract
   .use(authMiddleware)
   .use(teamsOwnerMiddleware)
-  .handler(async ({context, input}) => {
-    const db = context.db;
-    const {invitedUserId, teamId} = input;
+  .handler(async ({ context, input }) => {
+    const db = context.db
+    const { invitedUserId, teamId } = input
 
     try {
       // Check if invite exists
-      const invite = await db.select()
+      const invite = await db
+        .select()
         .from(teamInvitesTable)
-        .where(and(
-          eq(teamInvitesTable.teamId, teamId),
-          eq(teamInvitesTable.invitedUserId, invitedUserId)
-        ))
-        .get();
+        .where(
+          and(
+            eq(teamInvitesTable.teamId, teamId),
+            eq(teamInvitesTable.invitedUserId, invitedUserId),
+          ),
+        )
+        .get()
 
       if (!invite) {
-        throw new ORPCError('NOT_FOUND', {message: 'Invite not found'});
+        throw new ORPCError('NOT_FOUND', { message: 'Invite not found' })
       }
 
       // Delete invite
-      await db.delete(teamInvitesTable)
-        .where(and(
-          eq(teamInvitesTable.teamId, teamId),
-          eq(teamInvitesTable.invitedUserId, invitedUserId)
-        ));
+      await db
+        .delete(teamInvitesTable)
+        .where(
+          and(
+            eq(teamInvitesTable.teamId, teamId),
+            eq(teamInvitesTable.invitedUserId, invitedUserId),
+          ),
+        )
 
       // Publish WS updates for invite deletion
       await Promise.all([
         publishUserInvitesUpdate(context.env, invitedUserId),
         publishTeamAdminInvitesUpdate(context.env, teamId),
-      ]);
+      ])
 
-      return {success: true};
+      return { success: true }
     } catch (error) {
-      if (error instanceof ORPCError) throw error;
-      console.error('Error deleting team invite:', error);
-      throw new ORPCError('INTERNAL_SERVER_ERROR', {message: 'Failed to delete team invite'});
+      if (error instanceof ORPCError) throw error
+      console.error('Error deleting team invite:', error)
+      throw new ORPCError('INTERNAL_SERVER_ERROR', {
+        message: 'Failed to delete team invite',
+      })
     }
-  });
+  })
 
 /**
  * Accept an invite to join team
@@ -439,47 +533,62 @@ const deleteInvite = os.deleteInviteContract
  */
 const acceptInvite = os.acceptInviteContract
   .use(authMiddleware)
-  .handler(async ({context, input}) => {
-    const db = context.db;
-    const userId = context.userId;
-    const {teamId} = input;
+  .handler(async ({ context, input }) => {
+    const db = context.db
+    const userId = context.userId
+    const { teamId } = input
 
     try {
       // Check if team exists
-      const team = await db.select()
+      const team = await db
+        .select()
         .from(teamsTable)
         .where(eq(teamsTable.id, teamId))
-        .get();
+        .get()
 
       if (!team) {
-        throw new ORPCError('NOT_FOUND', {message: 'Team not found'});
+        throw new ORPCError('NOT_FOUND', { message: 'Team not found' })
       }
 
       // Check if user has an invite
-      const invite = await db.select()
+      const invite = await db
+        .select()
         .from(teamInvitesTable)
-        .where(and(
-          eq(teamInvitesTable.teamId, teamId),
-          eq(teamInvitesTable.invitedUserId, userId)
-        ))
-        .get();
+        .where(
+          and(
+            eq(teamInvitesTable.teamId, teamId),
+            eq(teamInvitesTable.invitedUserId, userId),
+          ),
+        )
+        .get()
 
       if (!invite) {
-        throw new ORPCError('NOT_FOUND', {message: 'Invite not found'});
+        throw new ORPCError('NOT_FOUND', { message: 'Invite not found' })
+      }
+
+      // Enforce membership limit before accepting
+      const membershipLimit = await checkCanInviteUser(db, userId)
+      if (!membershipLimit.canInvite) {
+        throw new ORPCError('FORBIDDEN', {
+          message: 'Team membership limit reached',
+          ...membershipLimit,
+        })
       }
 
       // Accept invite: remove invite and add as member
-      await db.delete(teamInvitesTable)
-        .where(and(
-          eq(teamInvitesTable.teamId, teamId),
-          eq(teamInvitesTable.invitedUserId, userId)
-        ));
+      await db
+        .delete(teamInvitesTable)
+        .where(
+          and(
+            eq(teamInvitesTable.teamId, teamId),
+            eq(teamInvitesTable.invitedUserId, userId),
+          ),
+        )
 
-      await db.insert(teamMembersTable)
-        .values({
-          teamId: teamId,
-          userId: userId
-        });
+      await db.insert(teamMembersTable).values({
+        teamId: teamId,
+        userId: userId,
+      })
 
       // Publish WS updates for invite acceptance
       await Promise.all([
@@ -487,15 +596,17 @@ const acceptInvite = os.acceptInviteContract
         publishUserTeamsUpdate(context.env, userId),
         publishTeamAdminInvitesUpdate(context.env, teamId),
         publishTeamAdminMembersUpdate(context.env, teamId),
-      ]);
+      ])
 
-      return {success: true};
+      return { success: true }
     } catch (error) {
-      if (error instanceof ORPCError) throw error;
-      console.error('Error accepting team invite:', error);
-      throw new ORPCError('INTERNAL_SERVER_ERROR', {message: 'Failed to accept team invite'});
+      if (error instanceof ORPCError) throw error
+      console.error('Error accepting team invite:', error)
+      throw new ORPCError('INTERNAL_SERVER_ERROR', {
+        message: 'Failed to accept team invite',
+      })
     }
-  });
+  })
 
 /**
  * Reject an invite to join team
@@ -503,160 +614,178 @@ const acceptInvite = os.acceptInviteContract
  */
 const rejectInvite = os.rejectInviteContract
   .use(authMiddleware)
-  .handler(async ({context, input}) => {
-    const db = context.db;
-    const userId = context.userId;
-    const {teamId} = input;
+  .handler(async ({ context, input }) => {
+    const db = context.db
+    const userId = context.userId
+    const { teamId } = input
 
     try {
       // Check if team exists
-      const team = await db.select()
+      const team = await db
+        .select()
         .from(teamsTable)
         .where(eq(teamsTable.id, teamId))
-        .get();
+        .get()
 
       if (!team) {
-        throw new ORPCError('NOT_FOUND', {message: 'Team not found'});
+        throw new ORPCError('NOT_FOUND', { message: 'Team not found' })
       }
 
       // Check if user has an invite
-      const invite = await db.select()
+      const invite = await db
+        .select()
         .from(teamInvitesTable)
-        .where(and(
-          eq(teamInvitesTable.teamId, teamId),
-          eq(teamInvitesTable.invitedUserId, userId)
-        ))
-        .get();
+        .where(
+          and(
+            eq(teamInvitesTable.teamId, teamId),
+            eq(teamInvitesTable.invitedUserId, userId),
+          ),
+        )
+        .get()
 
       if (!invite) {
-        throw new ORPCError('NOT_FOUND', {message: 'Invite not found'});
+        throw new ORPCError('NOT_FOUND', { message: 'Invite not found' })
       }
 
       // Delete invite
-      await db.delete(teamInvitesTable)
-        .where(and(
-          eq(teamInvitesTable.teamId, teamId),
-          eq(teamInvitesTable.invitedUserId, userId)
-        ));
+      await db
+        .delete(teamInvitesTable)
+        .where(
+          and(
+            eq(teamInvitesTable.teamId, teamId),
+            eq(teamInvitesTable.invitedUserId, userId),
+          ),
+        )
 
       // Publish WS updates for invite rejection
       await Promise.all([
         publishUserInvitesUpdate(context.env, userId),
         publishTeamAdminInvitesUpdate(context.env, teamId),
-      ]);
+      ])
 
-      return {success: true};
+      return { success: true }
     } catch (error) {
-      if (error instanceof ORPCError) throw error;
-      console.error('Error rejecting team invite:', error);
-      throw new ORPCError('INTERNAL_SERVER_ERROR', {message: 'Failed to reject team invite'});
+      if (error instanceof ORPCError) throw error
+      console.error('Error rejecting team invite:', error)
+      throw new ORPCError('INTERNAL_SERVER_ERROR', {
+        message: 'Failed to reject team invite',
+      })
     }
-  });
+  })
 
 /**
  * Get all teams for the authenticated user (owned or member)
  */
 const getUserTeams = os.getTeamContract
   .use(authMiddleware)
-  .handler(async ({context}) => {
-    const db = context.db;
-    const userId = context.userId;
+  .handler(async ({ context }) => {
+    const db = context.db
+    const userId = context.userId
 
     try {
       // Get teams where user is owner
-      const ownedTeams = await db.select()
+      const ownedTeams = await db
+        .select()
         .from(teamsTable)
         .where(eq(teamsTable.ownerId, userId))
-        .all();
+        .all()
 
       // Get teams where user is member
-      const memberTeams = await db.select({
-        id: teamsTable.id,
-        name: teamsTable.name,
-        description: teamsTable.description,
-        slug: teamsTable.slug,
-        ownerId: teamsTable.ownerId,
-        visible: teamsTable.visible
-      })
+      const memberTeams = await db
+        .select({
+          id: teamsTable.id,
+          name: teamsTable.name,
+          description: teamsTable.description,
+          slug: teamsTable.slug,
+          ownerId: teamsTable.ownerId,
+          visible: teamsTable.visible,
+        })
         .from(teamMembersTable)
         .innerJoin(teamsTable, eq(teamMembersTable.teamId, teamsTable.id))
         .where(eq(teamMembersTable.userId, userId))
-        .all();
+        .all()
 
       // Combine and deduplicate teams
-      const allTeams = [...ownedTeams];
+      const allTeams = [...ownedTeams]
       for (const memberTeam of memberTeams) {
-        if (!allTeams.find(team => team.id === memberTeam.id)) {
-          allTeams.push(memberTeam);
+        if (!allTeams.find((team) => team.id === memberTeam.id)) {
+          allTeams.push(memberTeam)
         }
       }
 
-      return allTeams;
+      return allTeams
     } catch (error) {
-      console.error('Error getting teams for user:', error);
-      throw new ORPCError('INTERNAL_SERVER_ERROR', {message: 'Failed to get teams'});
+      console.error('Error getting teams for user:', error)
+      throw new ORPCError('INTERNAL_SERVER_ERROR', {
+        message: 'Failed to get teams',
+      })
     }
-  });
+  })
 
 /**
  * Get all teams where the current user is the owner
  */
 const getOwnedTeams = os.getOwnedTeamsContract
   .use(authMiddleware)
-  .handler(async ({context}) => {
-    const db = context.db;
-    const userId = context.userId;
+  .handler(async ({ context }) => {
+    const db = context.db
+    const userId = context.userId
 
     try {
       // Get teams where user is owner
-      const ownedTeams = await db.select()
+      const ownedTeams = await db
+        .select()
         .from(teamsTable)
         .where(eq(teamsTable.ownerId, userId))
-        .all();
+        .all()
 
-      return ownedTeams;
+      return ownedTeams
     } catch (error) {
-      console.error('Error getting owned teams for user:', error);
-      throw new ORPCError('INTERNAL_SERVER_ERROR', {message: 'Failed to get owned teams'});
+      console.error('Error getting owned teams for user:', error)
+      throw new ORPCError('INTERNAL_SERVER_ERROR', {
+        message: 'Failed to get owned teams',
+      })
     }
-  });
+  })
 
 /**
  * Get all teams where the current user is not the owner (member only)
  */
 const getNonOwnedTeams = os.getNonOwnedTeamsContract
   .use(authMiddleware)
-  .handler(async ({context}) => {
-    const db = context.db;
-    const userId = context.userId;
+  .handler(async ({ context }) => {
+    const db = context.db
+    const userId = context.userId
 
     try {
       // Get teams where user is member but not owner
-      const memberTeams = await db.select({
-        id: teamsTable.id,
-        name: teamsTable.name,
-        description: teamsTable.description,
-        slug: teamsTable.slug,
-        ownerId: teamsTable.ownerId,
-        visible: teamsTable.visible
-      })
+      const memberTeams = await db
+        .select({
+          id: teamsTable.id,
+          name: teamsTable.name,
+          description: teamsTable.description,
+          slug: teamsTable.slug,
+          ownerId: teamsTable.ownerId,
+          visible: teamsTable.visible,
+        })
         .from(teamMembersTable)
         .innerJoin(teamsTable, eq(teamMembersTable.teamId, teamsTable.id))
         .where(
           and(
             eq(teamMembersTable.userId, userId),
-            not(eq(teamsTable.ownerId, userId)
-            )
-          )
+            not(eq(teamsTable.ownerId, userId)),
+          ),
         )
-        .all();
+        .all()
 
-      return memberTeams;
+      return memberTeams
     } catch (error) {
-      console.error('Error getting non-owned teams for user:', error);
-      throw new ORPCError('INTERNAL_SERVER_ERROR', {message: 'Failed to get non-owned teams'});
+      console.error('Error getting non-owned teams for user:', error)
+      throw new ORPCError('INTERNAL_SERVER_ERROR', {
+        message: 'Failed to get non-owned teams',
+      })
     }
-  });
+  })
 
 /**
  * Get all team members as UserDisplaySchema (owner only)
@@ -664,36 +793,42 @@ const getNonOwnedTeams = os.getNonOwnedTeamsContract
 const getTeamMembers = os.getTeamMembersContract
   .use(authMiddleware)
   .use(teamsOwnerMiddleware)
-  .handler(async ({context, input}) => {
-    const db = context.db;
-    const {teamId} = input;
+  .handler(async ({ context, input }) => {
+    const db = context.db
+    const { teamId } = input
 
     try {
       // Join team members with user display view to get UserDisplaySchema
-      const members = await db.select({
-        userId: userDisplayView.userId,
-        primaryLiveStream: userDisplayView.primaryLiveStream,
-        role: userDisplayView.role,
-        createdAt: userDisplayView.createdAt,
-        username: userDisplayView.username,
-        profileImage: userDisplayView.profileImage,
-        twitchLogin: userDisplayView.twitchLogin,
-        tiltifySlug: userDisplayView.tiltifySlug,
-        tiltifyUrl: userDisplayView.tiltifyUrl,
-        primaryColor: userDisplayView.primaryColor,
-        accentColor: userDisplayView.accentColor,
-      })
+      const members = await db
+        .select({
+          userId: userDisplayView.userId,
+          primaryLiveStream: userDisplayView.primaryLiveStream,
+          role: userDisplayView.role,
+          createdAt: userDisplayView.createdAt,
+          username: userDisplayView.username,
+          profileImage: userDisplayView.profileImage,
+          twitchLogin: userDisplayView.twitchLogin,
+          tiltifySlug: userDisplayView.tiltifySlug,
+          tiltifyUrl: userDisplayView.tiltifyUrl,
+          primaryColor: userDisplayView.primaryColor,
+          accentColor: userDisplayView.accentColor,
+        })
         .from(teamMembersTable)
-        .innerJoin(userDisplayView, eq(teamMembersTable.userId, userDisplayView.userId))
+        .innerJoin(
+          userDisplayView,
+          eq(teamMembersTable.userId, userDisplayView.userId),
+        )
         .where(eq(teamMembersTable.teamId, teamId))
-        .all();
+        .all()
 
-      return members;
+      return members
     } catch (error) {
-      console.error('Error getting team members:', error);
-      throw new ORPCError('INTERNAL_SERVER_ERROR', {message: 'Failed to get team members'});
+      console.error('Error getting team members:', error)
+      throw new ORPCError('INTERNAL_SERVER_ERROR', {
+        message: 'Failed to get team members',
+      })
     }
-  });
+  })
 
 /**
  * Get team member count (owner only)
@@ -701,22 +836,25 @@ const getTeamMembers = os.getTeamMembersContract
 const getTeamMemberCount = os.getTeamMemberCountContract
   .use(authMiddleware)
   .use(teamsOwnerMiddleware)
-  .handler(async ({context, input}) => {
-    const db = context.db;
-    const {teamId} = input;
+  .handler(async ({ context, input }) => {
+    const db = context.db
+    const { teamId } = input
 
     try {
-      const result = await db.select({count: count()})
+      const result = await db
+        .select({ count: count() })
         .from(teamMembersTable)
         .where(eq(teamMembersTable.teamId, teamId))
-        .get();
+        .get()
 
-      return {count: result?.count || 0};
+      return { count: result?.count || 0 }
     } catch (error) {
-      console.error('Error getting team member count:', error);
-      throw new ORPCError('INTERNAL_SERVER_ERROR', {message: 'Failed to get team member count'});
+      console.error('Error getting team member count:', error)
+      throw new ORPCError('INTERNAL_SERVER_ERROR', {
+        message: 'Failed to get team member count',
+      })
     }
-  });
+  })
 
 /**
  * Get team invite count (owner only)
@@ -724,70 +862,79 @@ const getTeamMemberCount = os.getTeamMemberCountContract
 const getTeamInviteCount = os.getTeamInviteCountContract
   .use(authMiddleware)
   .use(teamsOwnerMiddleware)
-  .handler(async ({context, input}) => {
-    const db = context.db;
-    const {teamId} = input;
+  .handler(async ({ context, input }) => {
+    const db = context.db
+    const { teamId } = input
 
     try {
-      const result = await db.select({count: count()})
+      const result = await db
+        .select({ count: count() })
         .from(teamInvitesTable)
         .where(eq(teamInvitesTable.teamId, teamId))
-        .get();
+        .get()
 
-      return {count: result?.count || 0};
+      return { count: result?.count || 0 }
     } catch (error) {
-      console.error('Error getting team invite count:', error);
-      throw new ORPCError('INTERNAL_SERVER_ERROR', {message: 'Failed to get team invite count'});
+      console.error('Error getting team invite count:', error)
+      throw new ORPCError('INTERNAL_SERVER_ERROR', {
+        message: 'Failed to get team invite count',
+      })
     }
-  });
+  })
 
 /**
  * Get user invite count (authenticated user)
  */
 const getUserInviteCount = os.getUserInviteCountContract
   .use(authMiddleware)
-  .handler(async ({context}) => {
-    const db = context.db;
-    const userId = context.userId;
+  .handler(async ({ context }) => {
+    const db = context.db
+    const userId = context.userId
 
     try {
-      const result = await db.select({count: count()})
+      const result = await db
+        .select({ count: count() })
         .from(teamInvitesTable)
         .where(eq(teamInvitesTable.invitedUserId, userId))
-        .get();
+        .get()
 
-      return {count: result?.count || 0};
+      return { count: result?.count || 0 }
     } catch (error) {
-      console.error('Error getting user invite count:', error);
-      throw new ORPCError('INTERNAL_SERVER_ERROR', {message: 'Failed to get user invite count'});
+      console.error('Error getting user invite count:', error)
+      throw new ORPCError('INTERNAL_SERVER_ERROR', {
+        message: 'Failed to get user invite count',
+      })
     }
-  });
+  })
 
 /**
  * Get user invites (authenticated user)
  */
 const getUserInvites = os.getUserInvitesContract
   .use(authMiddleware)
-  .handler(async ({context}) => {
-    const db = context.db;
-    const userId = context.userId;
+  .handler(async ({ context }) => {
+    const db = context.db
+    const userId = context.userId
 
     try {
-      const invites = await db.select({
-        teamId: teamInvitesTable.teamId,
-        name: teamsTable.name
-      })
+      const invites = await db
+        .select({
+          teamId: teamInvitesTable.teamId,
+          name: teamsTable.name,
+        })
         .from(teamInvitesTable)
         .innerJoin(teamsTable, eq(teamInvitesTable.teamId, teamsTable.id))
         .where(eq(teamInvitesTable.invitedUserId, userId))
-        .all();
+        .all()
 
-      return invites;
+      return invites
     } catch (error) {
-      console.error('Error getting user invites:', error);
-      throw new ORPCError('INTERNAL_SERVER_ERROR', {message: 'Failed to get user invites'});
+      console.error('Error getting user invites:', error)
+      throw new ORPCError('INTERNAL_SERVER_ERROR', {
+        message: 'Failed to get user invites',
+      })
     }
-  });
+  })
 
 /**
  * Get all invites for a specific team (owner only)
@@ -795,36 +942,42 @@ const getUserInvites = os.getUserInvitesContract
 const getTeamInvites = os.getTeamInvitesContract
   .use(authMiddleware)
   .use(teamsOwnerMiddleware)
-  .handler(async ({context, input}) => {
-    const db = context.db;
-    const {teamId} = input;
+  .handler(async ({ context, input }) => {
+    const db = context.db
+    const { teamId } = input
 
     try {
       // Join team invites with user display view to get UserDisplaySchema
-      const invites = await db.select({
-        userId: userDisplayView.userId,
-        primaryLiveStream: userDisplayView.primaryLiveStream,
-        role: userDisplayView.role,
-        createdAt: userDisplayView.createdAt,
-        username: userDisplayView.username,
-        profileImage: userDisplayView.profileImage,
-        twitchLogin: userDisplayView.twitchLogin,
-        tiltifySlug: userDisplayView.tiltifySlug,
-        tiltifyUrl: userDisplayView.tiltifyUrl,
-        primaryColor: userDisplayView.primaryColor,
-        accentColor: userDisplayView.accentColor,
-      })
+      const invites = await db
+        .select({
+          userId: userDisplayView.userId,
+          primaryLiveStream: userDisplayView.primaryLiveStream,
+          role: userDisplayView.role,
+          createdAt: userDisplayView.createdAt,
+          username: userDisplayView.username,
+          profileImage: userDisplayView.profileImage,
+          twitchLogin: userDisplayView.twitchLogin,
+          tiltifySlug: userDisplayView.tiltifySlug,
+          tiltifyUrl: userDisplayView.tiltifyUrl,
+          primaryColor: userDisplayView.primaryColor,
+          accentColor: userDisplayView.accentColor,
+        })
         .from(teamInvitesTable)
-        .innerJoin(userDisplayView, eq(teamInvitesTable.invitedUserId, userDisplayView.userId))
+        .innerJoin(
+          userDisplayView,
+          eq(teamInvitesTable.invitedUserId, userDisplayView.userId),
+        )
         .where(eq(teamInvitesTable.teamId, teamId))
-        .all();
+        .all()
 
-      return invites;
+      return invites
     } catch (error) {
-      console.error('Error getting team invites:', error);
-      throw new ORPCError('INTERNAL_SERVER_ERROR', {message: 'Failed to get team invites'});
+      console.error('Error getting team invites:', error)
+      throw new ORPCError('INTERNAL_SERVER_ERROR', {
+        message: 'Failed to get team invites',
+      })
     }
-  });
+  })
 
 /**
  * Get a specific team by ID
@@ -832,48 +985,77 @@ const getTeamInvites = os.getTeamInvitesContract
  */
 const getTeamById = os.getTeamByIdContract
   .use(authMiddleware)
-  .handler(async ({context, input}) => {
-    const db = context.db;
-    const userId = context.userId;
-    const {teamId} = input;
+  .handler(async ({ context, input }) => {
+    const db = context.db
+    const userId = context.userId
+    const { teamId } = input
 
     try {
       // Get the team
-      const team = await db.select()
+      const team = await db
+        .select()
         .from(teamsTable)
         .where(eq(teamsTable.id, teamId))
-        .get();
+        .get()
 
       if (!team) {
-        throw new ORPCError('NOT_FOUND', {message: 'Team not found'});
+        throw new ORPCError('NOT_FOUND', { message: 'Team not found' })
       }
 
       // Check if user has access to this team (either as owner or member)
-      const isOwner = team.ownerId === userId;
+      const isOwner = team.ownerId === userId
 
       if (!isOwner) {
         // Check if user is a member
-        const membership = await db.select()
+        const membership = await db
+          .select()
           .from(teamMembersTable)
-          .where(and(
-            eq(teamMembersTable.teamId, teamId),
-            eq(teamMembersTable.userId, userId)
-          ))
-          .get();
+          .where(
+            and(
+              eq(teamMembersTable.teamId, teamId),
+              eq(teamMembersTable.userId, userId),
+            ),
+          )
+          .get()
 
         if (!membership) {
-          throw new ORPCError('FORBIDDEN', {message: 'You do not have access to this team'});
+          throw new ORPCError('FORBIDDEN', {
+            message: 'You do not have access to this team',
+          })
         }
       }
 
-      return team;
+      return team
     } catch (error) {
-      if (error instanceof ORPCError) throw error;
-      console.error('Error getting team by ID:', error);
-      throw new ORPCError('INTERNAL_SERVER_ERROR', {message: 'Failed to get team'});
+      if (error instanceof ORPCError) throw error
+      console.error('Error getting team by ID:', error)
+      throw new ORPCError('INTERNAL_SERVER_ERROR', {
+        message: 'Failed to get team',
+      })
     }
-  });
+  })
 
+// Limit-checks
+const canCreateTeam = os.canCreateTeamContract
+  .use(authMiddleware)
+  .handler(async ({ context }) => {
+    const { db, userId } = context
+    return checkCanCreateTeam(db, userId)
+  })
+
+const canInviteUser = os.canInviteUserContract
+  .use(authMiddleware)
+  .handler(async ({ context, input }) => {
+    const { db } = context
+    return checkCanInviteUser(db, input.userId)
+  })
+
+const canInviteCurrentUser = os.canInviteCurrentUserContract
+  .use(authMiddleware)
+  .handler(async ({ context }) => {
+    const { db, userId } = context
+    return checkCanInviteUser(db, userId)
+  })
 
 export const privateTeamsRouter = {
   // Team CRUD Operations
@@ -903,4 +1085,9 @@ export const privateTeamsRouter = {
   getTeamInvites,
   getUserInviteCount,
   getUserInvites,
-};
+
+  // Limit-checks
+  canCreateTeam,
+  canInviteUser,
+  canInviteCurrentUser,
+}

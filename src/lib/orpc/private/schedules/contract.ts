@@ -209,6 +209,11 @@ const getNextScheduleByTiltifyUsernameContract = oc
  */
 const getSchedulesContract = oc.output(z.array(ScheduleSchema))
 
+// Limit-check contract
+const canCreateScheduleContract = oc
+  .input(z.object({ year: z.number().int().min(2000).max(2100) }))
+  .output(z.object({ canCreate: z.boolean(), schedules: z.number(), year: z.number(), maxSchedules: z.number() }));
+
 export const privateSchedulesContract = {
   // Schedule CRUD Operations
   create: createContract,
@@ -234,4 +239,7 @@ export const privateSchedulesContract = {
   getSchedulesByTiltifyUsername: getSchedulesByTiltifyUsernameContract,
   getNextScheduleByTiltifyUsername: getNextScheduleByTiltifyUsernameContract,
   getSchedules: getSchedulesContract,
+
+  // Limit-checks
+  canCreateSchedule: canCreateScheduleContract,
 }

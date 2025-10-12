@@ -1,9 +1,15 @@
-import {ORPCError, os} from "@orpc/server";
+import { ORPCError, os } from '@orpc/server'
+import type { ResponseHeadersPluginContext } from '@orpc/server/plugins'
 
+interface ORPCContext extends ResponseHeadersPluginContext {
+  locals?: App.Locals
+  request?: Request
+  env?: Env
+}
 
 export const hasAstroContext = os
-  .$context<{ locals?: App.Locals, request?: Request, env?: Env }>()
-  .middleware(async ({context, next}) => {
+  .$context<ORPCContext>()
+  .middleware(async ({ context, next }) => {
     if (!context.locals || !context.request) {
       console.error('No context')
       throw new ORPCError('INTERNAL_SERVER_ERROR')
@@ -12,7 +18,8 @@ export const hasAstroContext = os
       context: {
         locals: context.locals,
         request: context.request,
-        env: context.locals.runtime.env
-      }
+        env: context.locals.runtime.env,
+        resHeaders: context.resHeaders,
+      },
     })
   })

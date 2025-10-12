@@ -11,6 +11,7 @@ import {
   createSlug,
   generateScheduleSlugAlternativesLocals,
 } from '../../../../functions/slug.ts'
+import { checkCanCreateSchedule } from '../util/limits.ts'
 
 const os = implement(privateSchedulesContract).use(dbMiddleware)
 
@@ -28,6 +29,15 @@ const create = os.create.use(authMiddleware).handler(async ({ context }) => {
   const currentYear = DateTime.now().year
 
   try {
+    // Enforce per-year schedule limit
+    const createLimit = await checkCanCreateSchedule(db, user.id, currentYear)
+    if (!createLimit.canCreate) {
+      throw new ORPCError('FORBIDDEN', {
+        message: 'Yearly schedule limit reached',
+        ...createLimit,
+      })
+    }
+
     // Check existing schedules for title generation
     const existingSchedules = await db
       .select()
@@ -136,6 +146,15 @@ const createWithDetails = os.createWithDetails
             .set({ primary: false })
             .where(eq(schedulesTable.id, existingPrimary.id))
         }
+      }
+
+      // Enforce per-year schedule limit
+      const createLimit = await checkCanCreateSchedule(db, user.id, year)
+      if (!createLimit.canCreate) {
+        throw new ORPCError('FORBIDDEN', {
+          message: 'Yearly schedule limit reached',
+          ...createLimit,
+        })
       }
 
       // Create schedule using provided parameters
@@ -592,6 +611,15 @@ const getSchedules = os.getSchedules
 /**
  * Private schedules router with all implemented procedures
  */
+// Limit-checks
+const canCreateSchedule = os.canCreateSchedule
+  .use(authMiddleware)
+  .handler(async ({ context, input }) => {
+    const { db, userId } = context
+    const { year } = input
+    return checkCanCreateSchedule(db, userId, year)
+  })
+
 export const privateSchedulesRouter = {
   // Schedule CRUD Operations
   create,
@@ -618,4 +646,7 @@ export const privateSchedulesRouter = {
   getSchedulesByTiltifyUsername,
   getNextScheduleByTiltifyUsername,
   getSchedules,
+
+  // Limit-checks
+  canCreateSchedule,
 }

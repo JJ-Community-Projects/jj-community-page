@@ -4,10 +4,10 @@ import { publicTeamsRouter } from './teams/impl.ts'
 import { publicSchedulesRouter } from './schedules/impl.ts'
 import { hasAstroContext } from '../middleware/hasAstroContext.ts'
 import { dbMiddleware } from '../middleware/dbMiddleware.ts'
-import { jjData } from './causes/impl.ts'
+import { jjRouter } from './jjData/impl.ts'
 
 export const publicRouter = os.use(hasAstroContext).use(dbMiddleware).router({
-  jjData: jjData,
+  jj: jjRouter,
   users: publicUsersRouter,
   teams: publicTeamsRouter,
   schedules: publicSchedulesRouter,

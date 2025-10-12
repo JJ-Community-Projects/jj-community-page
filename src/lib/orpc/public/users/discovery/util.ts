@@ -2,6 +2,18 @@ import type { JJDrizzleDatabase } from '../../../../db/db.ts'
 import { and, eq, inArray, ne, sql } from 'drizzle-orm'
 import { userTagsTable } from '../../../../db/schema/tags-schema.ts'
 import { userDisplayView } from '../../../../db/schema/views-schema.ts'
+import { blockedUsers } from '../../../../db/schema/auth-schema.ts'
+import { UserDisplaySchema } from '../../../private/schemas/users.ts'
+import { z } from 'zod/v4'
+
+const UserSchema = UserDisplaySchema.extend({
+  sharedTags: z.number(),
+  jaccard: z.number(),
+})
+
+const UserArraySchema = z.array(UserSchema)
+
+type User = z.infer<typeof UserSchema>
 
 // Helper: cache user tag IDs
 async function getTagsForUser(db: JJDrizzleDatabase, env: Env, userId: number) {
@@ -9,10 +21,19 @@ async function getTagsForUser(db: JJDrizzleDatabase, env: Env, userId: number) {
 
   const cachedTagsForUser = await KV.get<{ tagIds: number[] }>(
     `tagsForUser:${userId}`,
+    {
+      type: 'json',
+    }
   )
 
   if (cachedTagsForUser) {
-    return cachedTagsForUser.tagIds ?? []
+    const result = cachedTagsForUser.tagIds ?? []
+    console.log('getTagsForUser returning (cache hit):', {
+      userId,
+      tagIds: result,
+      cachedTagsForUser,
+    })
+    return result
   }
 
   const tagsForUser = await db
@@ -20,7 +41,13 @@ async function getTagsForUser(db: JJDrizzleDatabase, env: Env, userId: number) {
     .from(userTagsTable)
     .where(eq(userTagsTable.userId, userId))
 
-  if (tagsForUser.length === 0) return []
+  if (tagsForUser.length === 0) {
+    console.log('getTagsForUser returning (no tags in DB):', {
+      userId,
+      tagIds: [],
+    })
+    return []
+  }
 
   const tagIds = tagsForUser.map((t) => t.tagId)
 
@@ -28,6 +55,7 @@ async function getTagsForUser(db: JJDrizzleDatabase, env: Env, userId: number) {
     expirationTtl: 300,
   })
 
+  console.log('getTagsForUser returning (fresh):', { userId, tagIds })
   return tagIds
 }
 
@@ -65,7 +93,7 @@ async function setUserDisplay(
 // Helper: cache final related users list (short TTL)
 async function getCachedRelatedUsers(env: Env, userId: number, limit: number) {
   const KV = env.KV
-  return KV.get<any>(`relatedUsers:${userId}:limit=${limit}`)
+  return KV.get<string>(`relatedUsers:${userId}:limit=${limit}`)
 }
 
 async function setCachedRelatedUsers(
@@ -76,7 +104,7 @@ async function setCachedRelatedUsers(
 ) {
   const KV = env.KV
   await KV.put(`relatedUsers:${userId}:limit=${limit}`, JSON.stringify(data), {
-    expirationTtl: 90,
+    expirationTtl: 60,
   })
 }
 
@@ -85,14 +113,32 @@ export async function findRelatedUsersWithJaccard(
   env: Env,
   userId: number,
   limit = 10,
-) {
+): Promise<User[]> {
   // Try short-lived full-response cache first
   const cached = await getCachedRelatedUsers(env, userId, limit)
-  if (cached) return cached
+  if (cached) {
+    const arr: any[] = JSON.parse(cached)
+    const arr2 = arr.map((e: any) => {
+      return {
+        ...e,
+        createdAt: new Date(e.createdAt),
+      }
+    })
+    const x = UserArraySchema.parse(arr2)
+    console.log('Found cached related users:', x)
+    return x
+  }
 
   const tagIds = await getTagsForUser(db, env, userId)
 
-  if (tagIds.length === 0) return []
+  if (tagIds.length === 0) {
+    console.log('findRelatedUsersWithJaccard returning (no tags):', {
+      userId,
+      limit,
+      result: [],
+    })
+    return []
+  }
 
   const others = await db
     .select({
@@ -112,10 +158,39 @@ export async function findRelatedUsersWithJaccard(
     counts[row.userId] = (counts[row.userId] || 0) + 1
   }
 
+  // fetch blocked relationships (both directions) and filter out blocked users
+  const [blockedByUser, blockedByOthers] = await Promise.all([
+    db
+      .select({ blockedUserId: blockedUsers.blockedUser })
+      .from(blockedUsers)
+      .where(eq(blockedUsers.userId, userId)),
+    db
+      .select({ userId: blockedUsers.userId })
+      .from(blockedUsers)
+      .where(eq(blockedUsers.blockedUser, userId)),
+  ])
+
+  const blockedSet = new Set<number>([
+    ...blockedByUser.map((r) => r.blockedUserId),
+    ...blockedByOthers.map((r) => r.userId),
+  ])
+
+  // remove blocked users from candidate counts
+  for (const blockedId of blockedSet) {
+    if (blockedId in counts) delete counts[blockedId]
+  }
+
   // get tag counts for each candidate
   const candidateIds = Object.keys(counts).map(Number)
 
-  if (candidateIds.length === 0) return []
+  if (candidateIds.length === 0) {
+    console.log('findRelatedUsersWithJaccard returning (no candidates):', {
+      userId,
+      limit,
+      result: [],
+    })
+    return []
+  }
 
   const candidateTagCounts = await db
     .select({
@@ -185,6 +260,8 @@ export async function findRelatedUsersWithJaccard(
       ...user,
     }
   })
+
+  console.log('finalPayload', finalPayload)
 
   // Store final short-lived cache
   await setCachedRelatedUsers(env, userId, limit, finalPayload)

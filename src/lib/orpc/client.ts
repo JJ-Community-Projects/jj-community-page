@@ -24,6 +24,7 @@ const linkPublic = new RPCLink({
       console.error(error)
     }),
   ],
+  method: 'GET'
 })
 
 const linkPrivate = new RPCLink({

@@ -19,16 +19,14 @@ export class UserTeamsObject extends DurableIteratorObject<{
         if (!userId) return
         const db = getDB(env)
         const teams = await getUserTeams(db, userId)
-        this.publishEvent(
-          { teams, event: 'update' },
-          { targets: [websocket] },
-        )
+        this.publishEvent({ teams, event: 'update' }, { targets: [websocket] })
       },
     })
   }
 
   async publishChange(teams: Team[]): Promise<Response> {
     try {
+      await this.ctx['~orpc'].original.storage.put('teams', teams.length)
       this.publishEvent({
         teams,
         event: 'update',

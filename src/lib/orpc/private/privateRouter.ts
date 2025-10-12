@@ -18,9 +18,11 @@ import { privateFriendsWSRouter } from './friendsWS/impl.ts'
 import { privateTeamsWSRouter } from './teamsWS/impl.ts'
 import { privateScheduleEditingWSRouter } from './scheduleEditingWS'
 import { adminRouter } from './admin/impl.ts'
+import { jjRouter } from './jjData/impl.ts'
 
 export const privateRouter = os.use(hasAstroContext).router({
   admin: adminRouter,
+  jj: jjRouter,
   users: privateUsersRouter,
   profile: profileRouter,
   social: socialRouter,

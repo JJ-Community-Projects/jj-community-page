@@ -1,8 +1,8 @@
-import {ORPCError} from "@orpc/server";
-import {dbMiddleware} from "./dbMiddleware.ts";
-import {authMiddleware} from "./authMiddleware.ts";
-import {users} from "../../db/schema/auth-schema.ts";
-import {eq} from "drizzle-orm";
+import { ORPCError } from '@orpc/server'
+import { dbMiddleware } from './dbMiddleware.ts'
+import { authMiddleware } from './authMiddleware.ts'
+import { users } from '../../db/schema/auth-schema.ts'
+import { eq } from 'drizzle-orm'
 
 /**
  * Admin authentication middleware for oRPC procedures
@@ -10,52 +10,57 @@ import {eq} from "drizzle-orm";
  * Used for tag management and other admin-only operations
  */
 
-export const adminAuthMiddleware =
-  dbMiddleware.concat(authMiddleware)
-    .concat(async ({context, next}) => {
-      // Ensure we have a valid Astro context
-      if (!context.locals) {
-        throw new ORPCError('INTERNAL_SERVER_ERROR', {message: 'Missing Astro Locals'})
-      }
-
-      // Ensure user is authenticated
-      if (!context.locals.user) {
-        throw new ORPCError('UNAUTHORIZED', {message: 'Authentication required'})
-      }
-
-      const userId = context.userId
-
-      const db = context.db
-
-      if (!db) {
-        throw new ORPCError('INTERNAL_SERVER_ERROR', {message: 'No DB found'})
-      }
-
-      const result = await db
-        .select({
-          role: users.role
-        })
-        .from(users)
-        .where(eq(users.id, userId))
-        .get()
-
-      if (!result) {
-        throw new ORPCError('UNAUTHORIZED')
-      }
-
-      if (result.role !== 'admin') {
-        throw new ORPCError('UNAUTHORIZED', {message: 'User is not admin'})
-      }
-
-      return next({
-        context: {
-          locals: context.locals,
-          request: context.request,
-          env: context.locals.runtime.env,
-          user: context.locals.user,
-          userId: context.locals.user.id as number,
-          tiltifyId: context.locals.user.tiltifyId as string,
-          tiltifyName: context.locals.user.tiltifyName as string,
-        }
+export const adminAuthMiddleware = dbMiddleware
+  .concat(authMiddleware)
+  .concat(async ({ context, next }) => {
+    // Ensure we have a valid Astro context
+    if (!context.locals) {
+      throw new ORPCError('INTERNAL_SERVER_ERROR', {
+        message: 'Missing Astro Locals',
       })
+    }
+
+    // Ensure user is authenticated
+    if (!context.locals.user) {
+      throw new ORPCError('UNAUTHORIZED', {
+        message: 'Authentication required',
+      })
+    }
+
+    const userId = context.userId
+
+    const db = context.db
+
+    if (!db) {
+      throw new ORPCError('INTERNAL_SERVER_ERROR', { message: 'No DB found' })
+    }
+
+    const result = await db
+      .select({
+        role: users.role,
+      })
+      .from(users)
+      .where(eq(users.id, userId))
+      .get()
+
+    if (!result) {
+      throw new ORPCError('UNAUTHORIZED')
+    }
+
+    if (result.role !== 'admin') {
+      throw new ORPCError('UNAUTHORIZED', { message: 'User is not admin' })
+    }
+
+    return next({
+      context: {
+        locals: context.locals,
+        request: context.request,
+        env: context.locals.runtime.env,
+        user: context.locals.user,
+        userId: context.locals.user.id as number,
+        tiltifyId: context.locals.user.tiltifyId as string,
+        tiltifyName: context.locals.user.tiltifyName as string,
+        resHeaders: context.resHeaders,
+      },
     })
+  })

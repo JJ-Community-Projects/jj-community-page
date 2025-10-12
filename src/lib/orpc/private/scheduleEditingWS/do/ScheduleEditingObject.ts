@@ -44,6 +44,7 @@ export class ScheduleEditingObject extends DurableIteratorObject<EditChannelMess
             lockedBy: s.lockedBy ?? null,
           })),
         } as any)
+        console.log('ScheduleEditingObject', 'onSubscribed', initPayload)
         this.publishEvent(
           { scheduleId, editorId: userId, event: 'init', payload: initPayload },
           {

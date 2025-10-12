@@ -16,3 +16,11 @@ export const removeTagFromStreamContract = oc
     id: z.number().int().positive(),
   }))
   .output(z.object({ok: z.literal(true)}))
+
+// Limit-check: tags per stream (see util/limits)
+export const canAddTagToStreamContract = oc
+  .input(z.object({
+    scheduleId: z.number().int().positive(),
+    streamId: z.number(),
+  }))
+  .output(z.object({ canAdd: z.boolean(), tags: z.number(), maxTags: z.number() }))

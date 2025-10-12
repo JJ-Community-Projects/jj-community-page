@@ -23,14 +23,14 @@ export type LoadDraftSnapshotResult = {
 
 export async function getScheduleMeta(db: JJDrizzleDatabase, scheduleId: number) {
   const schedule = await db.select({
-    id: schedulesTable.id,
-    title: schedulesTable.title,
-    slug: schedulesTable.slug,
-    year: schedulesTable.year,
-    visible: schedulesTable.visible,
-    updatedAt: schedulesTable.updatedAt,
-  }).from(schedulesTable)
-    .where(eq(schedulesTable.id, scheduleId))
+    id: editSchedulesTable.scheduleId,
+    title: editSchedulesTable.title,
+    slug: editSchedulesTable.slug,
+    year: editSchedulesTable.year,
+    visible: editSchedulesTable.visible,
+    updatedAt: editSchedulesTable.updatedAt,
+  }).from(editSchedulesTable)
+    .where(eq(editSchedulesTable.scheduleId, scheduleId))
     .get()
   if (!schedule) throw new ORPCError('NOT_FOUND', {message: 'Schedule not found'})
   return schedule
