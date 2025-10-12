@@ -365,6 +365,37 @@ CREATE TABLE `edit_stream_participants` (
 --> statement-breakpoint
 CREATE INDEX `edit_stream_participants_user_idx` ON `edit_stream_participants` (`user_id`);--> statement-breakpoint
 CREATE INDEX `edit_stream_participants_stream_idx` ON `edit_stream_participants` (`schedule_id`,`stream_id`);--> statement-breakpoint
+CREATE TABLE `jj_campaign` (
+	`year` integer NOT NULL,
+	`cause_id` integer,
+	`name` text NOT NULL,
+	`description` text,
+	`slug` text NOT NULL,
+	`url` text,
+	`start_time` text NOT NULL,
+	`raised` real NOT NULL,
+	`goal` real NOT NULL,
+	`livestream` text,
+	`user_id` integer,
+	`user_name` text,
+	`user_slug` text,
+	`user_avatar` text,
+	`user_url` text,
+	PRIMARY KEY(`user_slug`, `year`)
+);
+--> statement-breakpoint
+CREATE TABLE `jj_causes` (
+	`year` integer NOT NULL,
+	`id` integer,
+	`name` text NOT NULL,
+	`logo` text,
+	`description` text,
+	`url` text,
+	`donate_url` text,
+	`raised` text,
+	PRIMARY KEY(`id`, `year`)
+);
+--> statement-breakpoint
 CREATE VIEW `full_users` AS select "users"."id", "users"."created_at", "users"."role", "users"."primaryLiveStream", "id", "username", "avatar_src", "description", "slug", "twitch_channels"."user_id", "twitch_channels"."id", "twitch_channels"."login", "twitch_channels"."display_name", "twitch_channels"."description", "twitch_channels"."profile_image_url", "twitch_channels"."offline_image_url" from "users" inner join "tiltify_metadata_view" on "users"."id" = "tiltify_metadata_view"."user_id" left join "twitch_channels" on "users"."id" = "twitch_channels"."user_id";--> statement-breakpoint
 CREATE VIEW `social_names_view` AS select "user_id", "social", "url", substr(url, length(url) - instr(reverse(url), '/') + 2) as "name" from "user_socials";--> statement-breakpoint
 CREATE VIEW `stream_participants_display_view` AS select "stream_participants"."stream_id", "stream_participants"."schedule_id", "stream_participants"."user_id", "username", "profile_image" from "stream_participants" inner join "user_display_view" on "stream_participants"."user_id" = "user_display_view"."id";--> statement-breakpoint
