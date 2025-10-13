@@ -1,6 +1,12 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro'
 import {OverlayOverviewV2} from '../../components/features/overlay-v2/overview/OverlayOverviewV2'
+
+const user = Astro.locals.user
+if (!user) {
+  return Astro.redirect('/login')
+}
+
 ---
 <BaseLayout
   title="Jingle Jam Community OBS Overlays (V2)"
@@ -15,5 +21,5 @@ import {OverlayOverviewV2} from '../../components/features/overlay-v2/overview/O
     </p>
     <p class="text-xl font-bold">Feedback is appreciated!</p>
   </div>
-  <OverlayOverviewV2 client:only="solid-js" />
+  <OverlayOverviewV2 client:only="solid-js" user={user} />
 </BaseLayout>

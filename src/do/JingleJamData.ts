@@ -94,20 +94,29 @@ export class JingleJamData extends DurableObject<Env> {
     } catch (e) {
       console.error('put event:year', e)
     }
+
     try {
       await this.storage.put('raised', data.raised)
     } catch (e) {
       console.error('put raised', e)
     }
+
     try {
       await this.storage.put('collections', data.collections)
     } catch (e) {
       console.error('put collections', e)
     }
+
     try {
       await this.storage.put('donations', data.donations)
     } catch (e) {
       console.error('put donations', e)
+    }
+
+    try {
+      await this.storage.put('avgConversionRate', data.avgConversionRate)
+    } catch (e) {
+      console.error('put avgConversionRate', e)
     }
 
     try {

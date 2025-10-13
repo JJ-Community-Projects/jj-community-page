@@ -1,4 +1,5 @@
 import { type Component } from 'solid-js'
+import { twMerge } from 'tailwind-merge'
 
 // Small helper to build URLs safely
 export function buildUrl(
@@ -52,14 +53,14 @@ export const LinkPreview: Component<{ url: string }> = (p) => {
 }
 
 // Lightweight live preview frame for an overlay URL
-export const PreviewFrame: Component<{ url: string; visible?: boolean }> = (p) => (
+export const PreviewFrame: Component<{ url: string; visible?: boolean; class?: string }> = (p) => (
   <div class="mt-3 rounded border border-accent-500/50 bg-black/50">
     <iframe
       src={p.visible ? p.url : 'about:blank'}
       title="Overlay preview"
       loading="lazy"
       sandbox="allow-scripts allow-same-origin"
-      class="h-[320px] w-full rounded"
+      class={twMerge("h-[320px] w-full rounded", p.class)}
     />
   </div>
 )

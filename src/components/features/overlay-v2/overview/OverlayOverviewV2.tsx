@@ -9,6 +9,8 @@ import ScheduleSimpleSection from './ScheduleSimpleSection'
 import FundraisersSection from './FundraisersSection'
 import CharitiesSection from './CharitiesSection'
 import Charities2Section from './Charities2Section'
+import { UserProvider } from '../../users/user-dashboard/providers/UserProvider.tsx'
+import type { User } from '../../../../lib/auth/User.ts'
 
 const Body: Component = () => {
   const [expanded, setExpanded] = createSignal<string[]>([])
@@ -147,10 +149,12 @@ const Body: Component = () => {
   )
 }
 
-export const OverlayOverviewV2: Component = () => {
+export const OverlayOverviewV2: Component<{ user: User }> = (props) => {
   return (
-    <QueryClientProvider client={new QueryClient()}>
-      <Body />
-    </QueryClientProvider>
+    <UserProvider user={props.user}>
+      <QueryClientProvider client={new QueryClient()}>
+        <Body />
+      </QueryClientProvider>
+    </UserProvider>
   )
 }

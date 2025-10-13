@@ -21,10 +21,10 @@ function bg(theme: string) {
 }
 
 const HeaderCard: Component<{ theme: string; children: any }> = (p) => (
-  <div class="p-2">
+  <div class="p-2 w-full">
     <div
       class={twMerge(
-        'flex h-11 w-[220px] shrink-0 flex-row items-center justify-center rounded-2xl p-2 text-4xl font-bold shadow-xl transition-all',
+        'flex h-11 w-full flex-row items-center justify-center rounded-2xl p-2 text-4xl font-bold shadow-xl transition-all',
         bg(p.theme),
       )}
     >
@@ -35,7 +35,7 @@ const HeaderCard: Component<{ theme: string; children: any }> = (p) => (
 
 const Title: Component<{ theme: string }> = (p) => (
   <HeaderCard theme={p.theme}>
-    <div class="text-center text-2xl">
+    <div class="text-center text-2xl w-full">
       <p class={p.theme === 'default' ? 'text-primary-500' : 'text-white'}>
         Charities
       </p>
@@ -45,7 +45,7 @@ const Title: Component<{ theme: string }> = (p) => (
 
 const DonationChatCommand: Component<{ theme: string }> = (p) => (
   <HeaderCard theme={p.theme}>
-    <p class="text-center text-xl">
+    <p class="text-center text-xl w-full">
       <span class={p.theme === 'default' ? 'text-accent-500' : 'text-white'}>
         !Donate
       </span>{' '}
@@ -58,26 +58,9 @@ const DonationChatCommand: Component<{ theme: string }> = (p) => (
 
 const JJLink: Component<{ theme: string }> = (p) => (
   <HeaderCard theme={p.theme}>
-    <p class="text-center text-base">
+    <p class="text-center text-base w-full">
       <span class={p.theme === 'default' ? 'text-primary' : 'text-white'}>
         jinglejam.tiltify.com
-      </span>
-    </p>
-  </HeaderCard>
-)
-
-const ExtensionAd: Component<{ theme: string }> = (p) => (
-  <HeaderCard theme={p.theme}>
-    <p
-      class={`text-center text-xs ${p.theme === 'default' ? 'text-accent-500' : 'text-white'}`}
-    >
-      See the{' '}
-      <span class={p.theme === 'default' ? 'text-primary-500' : 'text-white'}>
-        full schedule
-      </span>{' '}
-      using the{' '}
-      <span class={p.theme === 'default' ? 'text-accent-500' : 'text-white'}>
-        extension below
       </span>
     </p>
   </HeaderCard>
@@ -94,8 +77,6 @@ const OverlayHeader: Component<{
     if (names().includes('title')) arr.push(<Title theme={props.headerTheme} />)
     if (names().includes('donate') || names().includes('donation'))
       arr.push(<DonationChatCommand theme={props.headerTheme} />)
-    if (names().includes('extension'))
-      arr.push(<ExtensionAd theme={props.headerTheme} />)
     if (names().includes('jj') || names().includes('jjlink'))
       arr.push(<JJLink theme={props.headerTheme} />)
     return arr
@@ -154,6 +135,10 @@ export type Props = {
   includeTotals?: boolean // maps to showRaised
   theme?: 'default' | 'red' | 'blue' | 'carousel'
   headerTheme?: 'default' | 'red' | 'blue'
+  showDesc?: boolean
+  showQRCode?: boolean
+  showUrl?: boolean
+  causes?: number[]
 }
 
 function clamp(n: number, min: number, max: number) {
@@ -174,22 +159,33 @@ const Charities2OverlayBody: Component<Props> = (props) => {
   const theme = () => props.theme ?? 'default'
   const headerTheme = () => props.headerTheme ?? 'default'
   const showRaised = () => Boolean(props.includeTotals)
+  const showDesc = () => Boolean(props.showDesc)
+  const showQRCode = () => Boolean(props.showQRCode)
+  const showUrl = () => (props.showUrl === undefined ? true : Boolean(props.showUrl))
+  const causes = () => props.causes ?? []
 
   const q = useQuery(() =>
     orpcPrivate.overlay.charities.queryOptions({
       input: { includeTotals: showRaised() },
-      staleTime: 60_000,
+      staleTime: 5_000,
+      refetchInterval: 5_000,
       refetchOnWindowFocus: false,
+      refetchIntervalInBackground: true,
     }),
   )
   const charities = () => q.data ?? []
+  const filteredCharities = () =>
+    causes().length === 0
+      ? charities()
+      : charities().filter((c) => causes().includes(Number(c.id)))
 
   const [idx, setIdx] = createSignal(0)
   let timer: any
 
   onMount(() => {
     timer = setInterval(() => {
-      if (charities().length > 0) setIdx((i) => (i + 1) % charities().length)
+      if (filteredCharities().length > 0)
+        setIdx((i) => (i + 1) % filteredCharities().length)
     }, speed() * 1000)
   })
 
@@ -205,20 +201,18 @@ const Charities2OverlayBody: Component<Props> = (props) => {
       : theme()
 
   const current = (): CharityItemT | undefined => {
-    const list = charities()
+    const list = filteredCharities()
     if (list.length === 0) return undefined
     return list[idx() % list.length]
   }
 
   return (
     <div class="flex h-full w-full flex-col">
-      <div>
         <OverlayHeader
           header={header()}
           headerTheme={headerTheme()}
           speed={speed()}
         />
-      </div>
       <div class="flex-1">
         <Show when={current()}>
           {(c) => (
@@ -254,9 +248,9 @@ const Charities2OverlayBody: Component<Props> = (props) => {
               <CharityItem
                 charity={c() as CharityItemT}
                 theme={currentTheme(idx())}
-                showDesc={false}
-                showQRCode={false}
-                showUrl={true}
+                showDesc={showDesc()}
+                showQRCode={showQRCode()}
+                showUrl={showUrl()}
                 showRaised={showRaised()}
               />
             </Transition>

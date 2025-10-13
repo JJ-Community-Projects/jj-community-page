@@ -48,7 +48,8 @@ export const useHeaderTheme = () => {
   return useParam('headertheme') ?? 'default'
 }
 export const useShowRaised = () => {
-  return (useParam('showraised') ?? 'true') === 'true'
+  const v = useParam('showraised') ?? 'true'
+  return v === 'true' || v === '1'
 }
 export const useShowCharityDesc = () => {
   return (useParam('showcharitydesc') ?? 'true') === 'true'
@@ -58,6 +59,20 @@ export const useShowCharityQRCode = () => {
 }
 export const useShowCharityUrl = () => {
   return (useParam('showcharityurl') ?? 'true') === 'true'
+}
+
+export const useShowTitle = () => {
+  const v = useParam('showtitle') ?? 'true'
+  return v === 'true' || v === '1'
+}
+
+export const useShowJJLink = () => {
+  const v = useParam('showjjlink') ?? 'true'
+  return v === 'true' || v === '1'
+}
+
+export const useUsername = () => {
+  return useParam('user') ?? ''
 }
 
 export const useSimpleScheduleData = () => {

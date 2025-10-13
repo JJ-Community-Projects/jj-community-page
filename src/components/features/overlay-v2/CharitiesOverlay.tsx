@@ -1,6 +1,6 @@
 import { type Component, createEffect, on, For, Match, Show, Switch } from 'solid-js'
 import { createI18n, I18nProvider, Numeric } from 'solid-i18n'
-import { useShowRaised, useSpeed, useTheme, useTiltifyUrl, useTitleLogo } from '../overlay/overlay_signals'
+import { useShowRaised, useSpeed, useTheme, useTiltifyUrl, useTitleLogo, useShowJJLink, useShowTitle, useUsername } from '../overlay/overlay_signals'
 import '../overlay/marquee.css'
 import { JJLink } from '../overlay/JJLinkCard'
 import { JJTitleCard } from '../overlay/JJTitleCard'
@@ -19,6 +19,9 @@ export const CharitiesOverlay: Component = () => {
         showRaised={useShowRaised()}
         url={useTiltifyUrl()}
         titleLogo={useTitleLogo()}
+        showTitle={useShowTitle()}
+        showJJLink={useShowJJLink()}
+        username={useUsername()}
       />
     </QueryClientProvider>
   )
@@ -30,6 +33,9 @@ export const CharitiesOverlayComponent: Component<{
   showRaised: boolean
   url: string
   titleLogo: string
+  showTitle: boolean
+  showJJLink: boolean
+  username: string
 }> = (props) => {
   const i18n = createI18n({ language: useLocale().locale() })
   return (
@@ -40,6 +46,9 @@ export const CharitiesOverlayComponent: Component<{
         showRaised={props.showRaised}
         url={props.url}
         titleLogo={props.titleLogo}
+        showTitle={props.showTitle}
+        showJJLink={props.showJJLink}
+        username={props.username}
       />
     </I18nProvider>
   )
@@ -51,6 +60,9 @@ export const Body: Component<{
   showRaised: boolean
   url: string
   titleLogo: string
+  showTitle: boolean
+  showJJLink: boolean
+  username: string
 }> = (props) => {
   const desc = () => 3
 
@@ -61,10 +73,13 @@ export const Body: Component<{
       refetchInterval: 5_000,
       refetchOnWindowFocus: false,
       refetchIntervalInBackground: true,
+      placeholderData: (prev) => prev
     }),
   )
 
   createEffect(on(() => q.data, (data) => console.log('Charities data', new Date(), data)))
+
+  const urlWithUser = () => (props.username && props.username.length > 0 ? `${props.url}/${props.username}` : props.url)
 
   const items = () => {
     const lst = q.data ?? []
@@ -74,9 +89,9 @@ export const Body: Component<{
       const d = lst[i]
       if (i % desc() == 0) {
         if (i % (desc() * 2) == 0) {
-          result.push(<Title theme={props.theme} titleLogo={props.titleLogo} />)
+          if (props.showTitle) result.push(<Title theme={props.theme} titleLogo={props.titleLogo} />)
         } else {
-          result.push(<JJLink theme={props.theme} url={props.url} />)
+          if (props.showJJLink) result.push(<JJLink theme={props.theme} url={urlWithUser()} />)
         }
       }
       result.push(
@@ -88,7 +103,7 @@ export const Body: Component<{
 
   return (
     <Switch>
-      <Match when={q.data} keyed={true}>
+      <Match when={q.data}>
         <p>{}</p>
         <div class="relative flex overflow-x-hidden">
           <div

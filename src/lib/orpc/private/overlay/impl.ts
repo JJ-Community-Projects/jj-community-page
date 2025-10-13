@@ -25,13 +25,15 @@ const charities = os.charitiesContract.handler(async ({ input, context }) => {
 
   if (!causes?.length) return []
 
+  const r = new Date().getUTCSeconds()
+
   const items = causes.map((cause: any) => ({
     id: Number(cause.id),
     name: String(cause.name ?? ''),
     logoUrl: cause.logo || undefined,
     websiteUrl: cause.url || undefined,
     amountRaised: includeTotals
-      ? Number((cause?.raised?.fundraisers ?? 0) + (cause?.raised?.yogscast ?? 0))
+      ? Number((cause?.raised?.fundraisers ?? 0) + (cause?.raised?.yogscast ?? 0))+r
       : undefined,
     currency: includeTotals ? 'GBP' : undefined,
     description: cause.description,
