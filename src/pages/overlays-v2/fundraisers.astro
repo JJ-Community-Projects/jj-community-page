@@ -1,0 +1,17 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro'
+import { FundraisersOverlay } from '../../components/features/overlay-v2/FundraisersOverlay'
+
+const orderByParam = Astro.url.searchParams.get('orderBy')
+const pageSizeParam = Astro.url.searchParams.get('pageSize')
+
+const orderBy =
+  orderByParam === 'top' || orderByParam === 'alphabetical'
+    ? orderByParam
+    : 'recent'
+const pageSize = pageSizeParam ? Number(pageSizeParam) : undefined
+---
+
+<div class="min-h-screen bg-transparent text-white">
+  <FundraisersOverlay client:only="solid-js" orderBy={orderBy} pageSize={pageSize} />
+</div>

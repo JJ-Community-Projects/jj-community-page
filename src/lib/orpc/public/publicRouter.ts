@@ -5,10 +5,14 @@ import { publicSchedulesRouter } from './schedules/impl.ts'
 import { hasAstroContext } from '../middleware/hasAstroContext.ts'
 import { dbMiddleware } from '../middleware/dbMiddleware.ts'
 import { jjRouter } from './jjData/impl.ts'
+import { overlaysScheduleRouter } from './overlays/schedule/impl.ts'
 
 export const publicRouter = os.use(hasAstroContext).use(dbMiddleware).router({
   jj: jjRouter,
   users: publicUsersRouter,
   teams: publicTeamsRouter,
   schedules: publicSchedulesRouter,
+  overlays: {
+    schedule: overlaysScheduleRouter,
+  },
 })

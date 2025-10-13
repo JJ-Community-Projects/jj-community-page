@@ -10,6 +10,7 @@ const {session, user} = Astro.locals
       <div class="hidden md:flex w-[50%] flex-row gap-4 text-white items-center justify-center">
           <a href="/dashboard">My Dashboard</a>
           <a href="/overlays">Stream Overlays</a>
+          <a href="/overlays-v2">Stream Overlays V2</a>
           <a href="/twitch-extension">Twitch Extension</a>
       </div>
       <AdminMobileNav client:only="solid-js" user={user}/>

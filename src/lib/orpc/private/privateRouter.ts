@@ -19,6 +19,7 @@ import { privateTeamsWSRouter } from './teamsWS/impl.ts'
 import { privateScheduleEditingWSRouter } from './scheduleEditingWS'
 import { adminRouter } from './admin/impl.ts'
 import { jjRouter } from './jjData/impl.ts'
+import { privateOverlayRouter } from './overlay/impl.ts'
 
 export const privateRouter = os.use(hasAstroContext).router({
   admin: adminRouter,
@@ -39,5 +40,6 @@ export const privateRouter = os.use(hasAstroContext).router({
   schedules: privateSchedulesRouter,
   scheduleEditing: privateScheduleEditingRouter,
   scheduleEditingWS: privateScheduleEditingWSRouter,
+  overlay: privateOverlayRouter,
   twitch: twitchRouter,
 })

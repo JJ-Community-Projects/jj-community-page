@@ -1,0 +1,18 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro'
+import {Charities2Overlay} from '../../components/features/overlay-v2/Charities2Overlay'
+
+const headers = Astro.url.searchParams.getAll('header')
+const speedParam = Astro.url.searchParams.get('speed')
+const includeTotalsParam = Astro.url.searchParams.get('includeTotals')
+const themeParam = Astro.url.searchParams.get('theme')
+const headerThemeParam = Astro.url.searchParams.get('headerTheme')
+
+const includeTotals = includeTotalsParam === 'true' || includeTotalsParam === '1'
+const speed = speedParam ? Number(speedParam) : undefined
+const theme = themeParam ?? undefined
+const headerTheme = headerThemeParam ?? undefined
+---
+  <div class="min-h-screen bg-transparent text-white">
+    <Charities2Overlay client:only="solid-js" headers={headers} speed={speed} includeTotals={includeTotals} theme={theme} headerTheme={headerTheme} />
+  </div>

@@ -146,10 +146,132 @@ const campaignPastLookup = os.campaignPastLookupContract.handler(
   },
 ) as any
 
+// New: get campaign by user slug
+const campaignByUserSlug = os.campaignByUserSlugContract.handler(
+  async ({ input, context }) => {
+    const { slug } = input
+    const DO = context.env.JingleJamData
+    const stubID = DO.idFromName('JJ_API_CACHE')
+    const stub = DO.get(stubID)
+
+    // Try DO campaigns first (current year)
+    const campaigns = await stub.getCampaigns()
+    const found = campaigns?.find((c: any) => c.user.slug === slug) || null
+    if (found) return found
+
+    // Fallback: query DB for latest by year
+    const db = context.db
+    const rows = await db.select().from(jjCampaign).where(eq(jjCampaign.userSlug, slug))
+    if (!rows?.length) return null
+    const latest = rows.reduce((a: any, b: any) => (a.year > b.year ? a : b))
+    return {
+      causeId: latest.causeId ?? null,
+      name: latest.name ?? '',
+      description: latest.description ?? '',
+      slug: latest.slug ?? '',
+      url: latest.url ?? '',
+      startTime: latest.startTime,
+      raised: Number(latest.raised ?? 0),
+      goal: Number(latest.goal ?? 0),
+      livestream: latest.livestream ?? { channel: null, type: '' },
+      user: {
+        id: latest.userId ?? 0,
+        name: latest.userName ?? '',
+        slug: latest.userSlug ?? '',
+        avatar: latest.userAvatar ?? '',
+        url: latest.userUrl ?? '',
+      },
+    }
+  },
+)
+
+// New: get campaign by user id
+const campaignByUserId = os.campaignByUserIdContract.handler(
+  async ({ input, context }) => {
+    const { userId } = input
+    const DO = context.env.JingleJamData
+    const stubID = DO.idFromName('JJ_API_CACHE')
+    const stub = DO.get(stubID)
+
+    const current = await stub.getCampaign(userId)
+    if (current) return current
+
+    // Fallback to DB latest by year
+    const db = context.db
+    const rows = await db.select().from(jjCampaign).where(eq(jjCampaign.userId, userId))
+    if (!rows?.length) return null
+    const latest = rows.reduce((a: any, b: any) => (a.year > b.year ? a : b))
+    return {
+      causeId: latest.causeId ?? null,
+      name: latest.name ?? '',
+      description: latest.description ?? '',
+      slug: latest.slug ?? '',
+      url: latest.url ?? '',
+      startTime: latest.startTime,
+      raised: Number(latest.raised ?? 0),
+      goal: Number(latest.goal ?? 0),
+      livestream: latest.livestream ?? { channel: null, type: '' },
+      user: {
+        id: latest.userId ?? 0,
+        name: latest.userName ?? '',
+        slug: latest.userSlug ?? '',
+        avatar: latest.userAvatar ?? '',
+        url: latest.userUrl ?? '',
+      },
+    }
+  },
+)
+
+// New: get campaign by Twitch id
+import { twitchChannelSchema } from '../../../db/schema/twitch-channel-schema.ts'
+const campaignByTwitchId = os.campaignByTwitchIdContract.handler(
+  async ({ input, context }) => {
+    const { twitchId } = input
+    const db = context.db
+    const rows = await db
+      .select({ userId: twitchChannelSchema.userId })
+      .from(twitchChannelSchema)
+      .where(eq(twitchChannelSchema.id, twitchId))
+    const userId = rows?.[0]?.userId
+    if (!userId) return null
+
+    const DO = context.env.JingleJamData
+    const stubID = DO.idFromName('JJ_API_CACHE')
+    const stub = DO.get(stubID)
+    const current = await stub.getCampaign(userId)
+    if (current) return current
+
+    const past = await db.select().from(jjCampaign).where(eq(jjCampaign.userId, userId))
+    if (!past?.length) return null
+    const latest = past.reduce((a: any, b: any) => (a.year > b.year ? a : b))
+    return {
+      causeId: latest.causeId ?? null,
+      name: latest.name ?? '',
+      description: latest.description ?? '',
+      slug: latest.slug ?? '',
+      url: latest.url ?? '',
+      startTime: latest.startTime,
+      raised: Number(latest.raised ?? 0),
+      goal: Number(latest.goal ?? 0),
+      livestream: latest.livestream ?? { channel: null, type: '' },
+      user: {
+        id: latest.userId ?? 0,
+        name: latest.userName ?? '',
+        slug: latest.userSlug ?? '',
+        avatar: latest.userAvatar ?? '',
+        url: latest.userUrl ?? '',
+      },
+    }
+  },
+)
+
 export const jjRouter = {
   campaigns,
   causes,
   causeById,
   campaignLookup,
   campaignPastLookup,
+  campaignByUserSlug,
+  campaignByUserId,
+  campaignByTwitchId,
 }

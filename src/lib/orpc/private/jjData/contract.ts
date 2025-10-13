@@ -96,10 +96,26 @@ const campaignPastLookupContract = oc
   .input(campaignPastLookupInput)
   .output(z.array(JJCampaignSchema))
 
+// New specific lookups (private)
+const campaignByUserSlugContract = oc
+  .input(z.object({ slug: z.string() }))
+  .output(JJCampaignSchema.nullable())
+
+const campaignByUserIdContract = oc
+  .input(z.object({ userId: z.coerce.number().int() }))
+  .output(JJCampaignSchema.nullable())
+
+const campaignByTwitchIdContract = oc
+  .input(z.object({ twitchId: z.string() }))
+  .output(JJCampaignSchema.nullable())
+
 export const contracts = {
   campaignsContract,
   causesContract,
   causeByIdContract,
   campaignLookupContract,
   campaignPastLookupContract,
+  campaignByUserSlugContract,
+  campaignByUserIdContract,
+  campaignByTwitchIdContract,
 }

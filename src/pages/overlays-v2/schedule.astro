@@ -1,0 +1,17 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro'
+import { ScheduleOverlay } from '../../components/features/overlay-v2/ScheduleOverlay'
+
+const scheduleIdParam = Astro.url.searchParams.get('scheduleId')
+const scheduleSlugParam = Astro.url.searchParams.get('scheduleSlug')
+const scheduleId = scheduleIdParam ? Number(scheduleIdParam) : undefined
+const scheduleSlug = scheduleSlugParam ?? undefined
+---
+
+<div class="min-h-screen bg-transparent text-white">
+  <ScheduleOverlay
+    client:only="solid-js"
+    scheduleId={scheduleId}
+    scheduleSlug={scheduleSlug}
+  />
+</div>

@@ -1,0 +1,13 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro'
+import {CharitiesOverlay} from '../../components/features/overlay-v2/CharitiesOverlay'
+
+const includeTotalsParam = Astro.url.searchParams.get('includeTotals')
+const pageSizeParam = Astro.url.searchParams.get('pageSize')
+
+const includeTotals = includeTotalsParam === 'true' || includeTotalsParam === '1'
+const pageSize = pageSizeParam ? Number(pageSizeParam) : undefined
+---
+  <div class="min-h-screen bg-transparent text-white">
+    <CharitiesOverlay client:only="solid-js" includeTotals={includeTotals} pageSize={pageSize} />
+  </div>

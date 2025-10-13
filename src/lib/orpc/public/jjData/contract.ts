@@ -145,10 +145,56 @@ const campaignPastLookupContract = oc
     successDescription: 'Past campaigns retrieved successfully',
   })
 
+// New specific lookups
+const campaignByUserSlugContract = oc
+  .input(z.object({ slug: z.string() }))
+  .output(JJCampaignSchema.nullable())
+  .route({
+    path: '/jj/campaign/by-slug',
+    method: 'GET',
+    operationId: 'getJJDataCampaignByUserSlug',
+    summary: 'Get current-year campaign by user slug',
+    description:
+      'Lookup a single current-year campaign by user slug via Durable Object cache; may fall back to DB in implementation.',
+    tags: ['jj-data'],
+    successDescription: 'Campaign retrieved successfully',
+  })
+
+const campaignByUserIdContract = oc
+  .input(z.object({ userId: z.coerce.number().int() }))
+  .output(JJCampaignSchema.nullable())
+  .route({
+    path: '/jj/campaign/by-user-id',
+    method: 'GET',
+    operationId: 'getJJDataCampaignByUserId',
+    summary: 'Get current-year campaign by numeric user id',
+    description:
+      'Lookup a single current-year campaign by numeric user id via Durable Object cache; may fall back to DB in implementation.',
+    tags: ['jj-data'],
+    successDescription: 'Campaign retrieved successfully',
+  })
+
+const campaignByTwitchIdContract = oc
+  .input(z.object({ twitchId: z.string() }))
+  .output(JJCampaignSchema.nullable())
+  .route({
+    path: '/jj/campaign/by-twitch-id',
+    method: 'GET',
+    operationId: 'getJJDataCampaignByTwitchId',
+    summary: 'Get current-year campaign by Twitch user id',
+    description:
+      'Resolve Twitch id to platform user and return their current-year campaign from Durable Object cache; may fall back to DB in implementation.',
+    tags: ['jj-data'],
+    successDescription: 'Campaign retrieved successfully',
+  })
+
 export const contracts = {
   campaignsContract,
   causesContract,
   causeByIdContract,
   campaignLookupContract,
   campaignPastLookupContract,
+  campaignByUserSlugContract,
+  campaignByUserIdContract,
+  campaignByTwitchIdContract,
 }

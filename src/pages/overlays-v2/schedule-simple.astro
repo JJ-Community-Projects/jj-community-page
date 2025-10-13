@@ -1,0 +1,24 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro'
+import { ScheduleSimpleOverlay } from '../../components/features/overlay-v2/ScheduleSimpleOverlay'
+
+const scheduleIdParam = Astro.url.searchParams.get('scheduleId')
+const scheduleSlugParam = Astro.url.searchParams.get('scheduleSlug')
+const includePastParam = Astro.url.searchParams.get('includePast')
+const windowSizeParam = Astro.url.searchParams.get('windowSize')
+
+const scheduleId = scheduleIdParam ? Number(scheduleIdParam) : undefined
+const scheduleSlug = scheduleSlugParam ?? undefined
+const includePast = includePastParam === 'true' || includePastParam === '1'
+const windowSize = windowSizeParam ? Number(windowSizeParam) : undefined
+---
+
+<div class="min-h-screen bg-transparent text-white">
+  <ScheduleSimpleOverlay
+    client:only="solid-js"
+    scheduleId={scheduleId}
+    scheduleSlug={scheduleSlug}
+    includePast={includePast}
+    windowSize={windowSize}
+  />
+</div>
