@@ -91,6 +91,17 @@ const fundraisersContract = oc
     tags: ['overlay', 'v2'],
   })
 
+// Team fundraisers: campaigns by users who are members of a given team (by slug)
+const teamFundraisersContract = oc
+  .input(z.object({ teamSlug: z.string().min(1) }))
+  .output(z.array(FundraiserItem))
+  .route({
+    path: '/overlay/team-fundraisers',
+    method: 'GET',
+    summary: 'Overlay V2 team fundraisers (UI-ready)',
+    tags: ['overlay', 'v2', 'teams'],
+  })
+
 const scheduleSimpleContract = oc
   .input(scheduleSimpleInput)
   .output(SimpleScheduleView)
@@ -101,8 +112,33 @@ const scheduleSimpleContract = oc
     tags: ['overlay', 'v2', 'schedule'],
   })
 
+// Cause fundraisers: campaigns with a given JJ cause ID
+const causeFundraisersContract = oc
+  .input(z.object({ causeId: z.number().int().nonnegative() }))
+  .output(z.array(FundraiserItem))
+  .route({
+    path: '/overlay/cause-fundraisers',
+    method: 'GET',
+    summary: 'Overlay V2 cause fundraisers (UI-ready)',
+    tags: ['overlay', 'v2', 'causes'],
+  })
+
+// Single cause by ID
+const causeByIdContract = oc
+  .input(z.object({ causeId: z.number().int().nonnegative(), includeTotals: z.boolean().optional() }))
+  .output(CharityItem.nullable())
+  .route({
+    path: '/overlay/cause',
+    method: 'GET',
+    summary: 'Overlay V2 single cause by ID (UI-ready)',
+    tags: ['overlay', 'v2', 'causes'],
+  })
+
 export const contracts = {
   charitiesContract,
   fundraisersContract,
+  teamFundraisersContract,
   scheduleSimpleContract,
+  causeFundraisersContract,
+  causeByIdContract,
 }

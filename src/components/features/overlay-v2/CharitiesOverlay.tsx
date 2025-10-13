@@ -149,7 +149,7 @@ interface ChildProps {
 const Child: Component<ChildProps> = (props) => {
   const useBackground = () => {
     switch (props.theme) {
-      case 'pink':
+
       case 'red':
         return 'bg-primary'
       case 'blue':
@@ -160,7 +160,7 @@ const Child: Component<ChildProps> = (props) => {
   }
   const useNameTextColor = () => {
     switch (props.theme) {
-      case 'pink':
+
       case 'red':
       case 'blue':
         return 'text-white'
@@ -170,7 +170,7 @@ const Child: Component<ChildProps> = (props) => {
   }
   const useRaisedTextColor = () => {
     switch (props.theme) {
-      case 'pink':
+
       case 'red':
       case 'blue':
         return 'text-white'
@@ -206,7 +206,7 @@ interface TitleProps {
 const Title: Component<TitleProps> = (props) => {
   const community = () => {
     switch (props.theme) {
-      case 'pink':
+
       case 'red':
       case 'blue':
         return 'text-white'
@@ -216,7 +216,7 @@ const Title: Component<TitleProps> = (props) => {
   }
   const fundraisers = () => {
     switch (props.theme) {
-      case 'pink':
+
       case 'red':
       case 'blue':
         return 'text-white'

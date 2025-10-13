@@ -1,0 +1,18 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro'
+import { TeamFundraiserOverlay } from '../../components/features/overlay-v2/TeamFundraiserOverlay'
+
+const teamParam = Astro.url.searchParams.get('team')
+const themeParam = Astro.url.searchParams.get('theme')
+const speedParam = Astro.url.searchParams.get('speed')
+const showRaisedParam = Astro.url.searchParams.get('showraised')
+
+const team = teamParam ?? undefined
+const theme = (themeParam as any) ?? undefined
+const speed = speedParam ? Number(speedParam) : undefined
+const showRaised = showRaisedParam === '1' || showRaisedParam === 'true' || showRaisedParam === null ? true : false
+---
+
+<div class="min-h-screen bg-transparent text-white">
+  <TeamFundraiserOverlay client:only="solid-js" teamSlug={team} theme={theme} speed={speed} showRaised={showRaised} />
+</div>

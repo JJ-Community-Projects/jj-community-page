@@ -50,7 +50,6 @@ export const CharitiesSection: Component<{ visible?: boolean }> = (p) => {
           class="w-40 rounded bg-black/40 px-2 py-1"
         >
           <option value="default">Default</option>
-          <option value="pink">Pink</option>
           <option value="red">Red</option>
           <option value="blue">Blue</option>
         </select>

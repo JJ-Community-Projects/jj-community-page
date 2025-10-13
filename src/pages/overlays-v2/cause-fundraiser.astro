@@ -1,0 +1,18 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro'
+import { CauseFundraiserOverlay } from '../../components/features/overlay-v2/CauseFundraiserOverlay'
+
+const causeParam = Astro.url.searchParams.get('cause')
+const themeParam = Astro.url.searchParams.get('theme')
+const speedParam = Astro.url.searchParams.get('speed')
+const showRaisedParam = Astro.url.searchParams.get('showraised')
+
+const causeId = causeParam ? Number(causeParam) : undefined
+const theme = (themeParam as any) ?? undefined
+const speed = speedParam ? Number(speedParam) : undefined
+const showRaised = showRaisedParam === '1' || showRaisedParam === 'true' || showRaisedParam === null ? true : false
+---
+
+<div class="min-h-screen bg-transparent text-white">
+  <CauseFundraiserOverlay client:only="solid-js" causeId={causeId} theme={theme} speed={speed} showRaised={showRaised} />
+</div>
