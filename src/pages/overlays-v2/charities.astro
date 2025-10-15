@@ -1,13 +1,7 @@
 ---
-import BaseLayout from '../../layouts/BaseLayout.astro'
 import {CharitiesTickerOverlay} from '../../components/features/overlay-v2/ticker/charities/CharitiesTickerOverlay.tsx'
 
-const includeTotalsParam = Astro.url.searchParams.get('includeTotals')
-const pageSizeParam = Astro.url.searchParams.get('pageSize')
-
-const includeTotals = includeTotalsParam === 'true' || includeTotalsParam === '1'
-const pageSize = pageSizeParam ? Number(pageSizeParam) : undefined
 ---
   <div class="min-h-screen bg-transparent text-white">
-    <CharitiesOverlay client:only="solid-js" includeTotals={includeTotals} pageSize={pageSize} />
+    <CharitiesTickerOverlay client:only="solid-js"/>
   </div>
