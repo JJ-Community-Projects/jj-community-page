@@ -1,12 +1,18 @@
-import { type Component, createSignal, onCleanup, onMount, Show, } from 'solid-js'
+import {
+  type Component,
+  createSignal,
+  onCleanup,
+  onMount,
+  Show,
+} from 'solid-js'
 import { Transition } from 'solid-transition-group'
 import { twMerge } from 'tailwind-merge'
 import { QRCodeSVG } from 'solid-qr-code'
-import '../overlay/marquee.css'
-import { orpcPrivate } from '../../../lib/orpc/client'
+import '../../overlay/marquee.css'
+import { orpcPrivate } from '../../../../lib/orpc/client.ts'
 import { QueryClientProvider, useQuery } from '@tanstack/solid-query'
 import { QueryClient } from '@tanstack/query-core'
-import type { CharityItemT } from '../../../lib/orpc/private/overlay/contract'
+import type { CharityItemT } from '../../../../lib/orpc/private/overlay/contract.ts'
 
 // Header cards (mirrors V1 CharityOverlay2)
 function bg(theme: string) {
@@ -21,7 +27,7 @@ function bg(theme: string) {
 }
 
 const HeaderCard: Component<{ theme: string; children: any }> = (p) => (
-  <div class="p-2 w-full">
+  <div class="w-full p-2">
     <div
       class={twMerge(
         'flex h-11 w-full flex-row items-center justify-center rounded-2xl p-2 text-4xl font-bold shadow-xl transition-all',
@@ -35,7 +41,7 @@ const HeaderCard: Component<{ theme: string; children: any }> = (p) => (
 
 const Title: Component<{ theme: string }> = (p) => (
   <HeaderCard theme={p.theme}>
-    <div class="text-center text-2xl w-full">
+    <div class="w-full text-center text-2xl">
       <p class={p.theme === 'default' ? 'text-primary-500' : 'text-white'}>
         Charities
       </p>
@@ -45,7 +51,7 @@ const Title: Component<{ theme: string }> = (p) => (
 
 const DonationChatCommand: Component<{ theme: string }> = (p) => (
   <HeaderCard theme={p.theme}>
-    <p class="text-center text-xl w-full">
+    <p class="w-full text-center text-xl">
       <span class={p.theme === 'default' ? 'text-accent-500' : 'text-white'}>
         !Donate
       </span>{' '}
@@ -58,7 +64,7 @@ const DonationChatCommand: Component<{ theme: string }> = (p) => (
 
 const JJLink: Component<{ theme: string }> = (p) => (
   <HeaderCard theme={p.theme}>
-    <p class="text-center text-base w-full">
+    <p class="w-full text-center text-base">
       <span class={p.theme === 'default' ? 'text-primary' : 'text-white'}>
         jinglejam.tiltify.com
       </span>
@@ -145,7 +151,7 @@ function clamp(n: number, min: number, max: number) {
   return Math.max(min, Math.min(max, n))
 }
 
-export const Charities2Overlay: Component<Props> = (props) => {
+export const CharitiesOverlay: Component<Props> = (props) => {
   return (
     <QueryClientProvider client={new QueryClient()}>
       <Charities2OverlayBody {...props} />
@@ -161,7 +167,8 @@ const Charities2OverlayBody: Component<Props> = (props) => {
   const showRaised = () => Boolean(props.includeTotals)
   const showDesc = () => Boolean(props.showDesc)
   const showQRCode = () => Boolean(props.showQRCode)
-  const showUrl = () => (props.showUrl === undefined ? true : Boolean(props.showUrl))
+  const showUrl = () =>
+    props.showUrl === undefined ? true : Boolean(props.showUrl)
   const causes = () => props.causes ?? []
 
   const q = useQuery(() =>
@@ -208,11 +215,11 @@ const Charities2OverlayBody: Component<Props> = (props) => {
 
   return (
     <div class="flex h-full w-full flex-col">
-        <OverlayHeader
-          header={header()}
-          headerTheme={headerTheme()}
-          speed={speed()}
-        />
+      <OverlayHeader
+        header={header()}
+        headerTheme={headerTheme()}
+        speed={speed()}
+      />
       <div class="flex-1">
         <Show when={current()}>
           {(c) => (

@@ -1,13 +1,11 @@
 import { type Component, createMemo, For, Show } from 'solid-js'
-import { orpcPrivate } from '../../../lib/orpc/client'
+import { orpcPublic } from '../../../../lib/orpc/client.ts'
 import { QueryClientProvider, useQuery } from '@tanstack/solid-query'
 import { QueryClient } from '@tanstack/query-core'
 
 type Props = {
   scheduleId?: number
   scheduleSlug?: string
-  includePast?: boolean
-  windowSize?: number
 }
 
 const Body: Component<Props> = (props) => {
@@ -19,12 +17,8 @@ const Body: Component<Props> = (props) => {
     Boolean(input().scheduleId) || Boolean(input().scheduleSlug)
 
   const q = useQuery(() =>
-    orpcPrivate.overlay.scheduleSimple.queryOptions({
-      input: {
-        ...input(),
-        includePast: props.includePast,
-        windowSize: props.windowSize,
-      },
+    orpcPublic.overlays.schedule.view.queryOptions({
+      input: input(),
       enabled: hasParam(),
       staleTime: 30_000,
       refetchOnWindowFocus: false,
@@ -35,7 +29,7 @@ const Body: Component<Props> = (props) => {
     <div class="p-2">
       <Show when={hasParam()} fallback={<MissingParamHint />}>
         <Show when={q.isLoading}>
-          <p class="opacity-80">Loading…</p>
+          <p class="opacity-80">Loading schedule…</p>
         </Show>
         <Show when={q.error}>
           <p class="text-red-400">
@@ -46,7 +40,8 @@ const Body: Component<Props> = (props) => {
           {(data) => (
             <div class="flex flex-col gap-2">
               <header class="text-center">
-                <h1 class="text-xl font-semibold">{data().schedule.name}</h1>
+                <h1 class="text-2xl font-bold">{data().schedule.name}</h1>
+                <p class="text-sm opacity-70">Slug: {data().schedule.slug}</p>
               </header>
               <ul class="flex flex-col gap-1">
                 <For each={data().blocks}>
@@ -54,19 +49,19 @@ const Body: Component<Props> = (props) => {
                     <li class="rounded bg-black/30 px-3 py-2">
                       <div class="flex justify-between text-sm">
                         <span>
-                          {new Date(b.start).toLocaleTimeString()} →{' '}
+                          {new Date(b.start).toLocaleString()} →{' '}
                           {new Date(b.end).toLocaleTimeString()}
                         </span>
                         <span class="font-semibold">{b.title}</span>
                       </div>
+                      <Show when={b.participants && b.participants.length}>
+                        <div class="mt-1 text-xs opacity-80">
+                          {b.participants?.join(', ')}
+                        </div>
+                      </Show>
                     </li>
                   )}
                 </For>
-                <Show when={!data() || data().blocks.length === 0}>
-                  <p class="text-center text-sm opacity-70">
-                    No upcoming items.
-                  </p>
-                </Show>
               </ul>
             </div>
           )}
@@ -85,7 +80,7 @@ const MissingParamHint: Component = () => (
   </div>
 )
 
-export const ScheduleSimpleOverlay: Component<Props> = (props) => {
+export const UserScheduleOverlay: Component<Props> = (props) =>{
   return (
     <QueryClientProvider client={new QueryClient()}>
       <Body {...props} />

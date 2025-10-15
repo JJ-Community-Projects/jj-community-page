@@ -1,14 +1,16 @@
 import { type Component, createSignal, For, Show } from 'solid-js'
-import { orpcPublic } from '../../../lib/orpc/client'
+import { orpcPublic } from '../../../../lib/orpc/client.ts'
 import { useQuery } from '@tanstack/solid-query'
 
-export const ScheduleSelector: Component = () => {
+export const UserScheduleSelector: Component = () => {
   const year = new Date().getUTCFullYear()
 
-  const q = useQuery(() => orpcPublic.schedules.getVisiblePrimarySchedulesByYear.queryOptions({
-    input: { year },
-    staleTime: 60_000,
-  }))
+  const q = useQuery(() =>
+    orpcPublic.schedules.getVisiblePrimarySchedulesByYear.queryOptions({
+      input: { year },
+      staleTime: 60_000,
+    }),
+  )
 
   const [value, setValue] = createSignal<string>('')
 
@@ -55,4 +57,4 @@ export const ScheduleSelector: Component = () => {
   )
 }
 
-export default ScheduleSelector
+export default UserScheduleSelector

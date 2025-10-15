@@ -25,6 +25,12 @@ export const FundraiserItem = z.object({
   currency: z.string().optional(),
   imageUrl: z.string().url().optional(),
   urlSlug: z.string().optional(),
+  livestream: z
+    .object({
+      channel: z.string().nullable(),
+      type: z.string(),
+    })
+    .optional(),
 })
 export type FundraiserItemT = z.infer<typeof FundraiserItem>
 

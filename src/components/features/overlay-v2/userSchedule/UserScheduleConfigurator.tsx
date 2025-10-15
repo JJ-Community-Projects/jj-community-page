@@ -1,8 +1,15 @@
 import { type Component, createMemo, createSignal } from 'solid-js'
-import ScheduleSelector from '../ScheduleSelector'
-import { FieldRow, LinkPreview, PreviewFrame, buildUrl } from './Common'
+import UserScheduleSelector from './UserScheduleSelector.tsx'
+import {
+  buildUrl,
+  FieldRow,
+  LinkPreview,
+  PreviewFrame,
+} from '../overview/Common.tsx'
 
-export const ScheduleSection: Component<{ visible?: boolean }> = (p) => {
+export const UserScheduleConfigurator: Component<{ visible?: boolean }> = (
+  p,
+) => {
   const [scheduleId, setScheduleId] = createSignal<string>('')
   const [scheduleSlug, setScheduleSlug] = createSignal<string>('')
 
@@ -32,14 +39,14 @@ export const ScheduleSection: Component<{ visible?: boolean }> = (p) => {
           placeholder="e.g. jinglejam-2024"
         />
       </FieldRow>
-      <p class="text-xs opacity-80">Provide exactly one: scheduleId or scheduleSlug</p>
+      <p class="text-xs opacity-80">
+        Provide exactly one: scheduleId or scheduleSlug
+      </p>
       <div class="mt-2">
-        <ScheduleSelector />
+        <UserScheduleSelector />
       </div>
       <LinkPreview url={scheduleUrl()} />
       <PreviewFrame url={scheduleUrl()} visible={p.visible} />
     </div>
   )
 }
-
-export default ScheduleSection

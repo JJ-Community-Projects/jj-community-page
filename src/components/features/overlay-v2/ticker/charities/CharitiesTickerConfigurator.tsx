@@ -1,8 +1,15 @@
 import { type Component, createMemo, createSignal } from 'solid-js'
-import { buildUrl, FieldRow, LinkPreview, PreviewFrame } from './Common'
-import { useUser } from '../../users/user-dashboard/providers/UserProvider.tsx'
+import {
+  buildUrl,
+  FieldRow,
+  LinkPreview,
+  PreviewFrame,
+} from '../../overview/Common.tsx'
+import { useUser } from '../../../users/user-dashboard/providers/UserProvider.tsx'
 
-export const CharitiesSection: Component<{ visible?: boolean }> = (p) => {
+export const CharitiesTickerConfigurator: Component<{ visible?: boolean }> = (
+  p,
+) => {
   const [showRaised, setShowRaised] = createSignal<boolean>(true)
   const [showTitle, setShowTitle] = createSignal<boolean>(true)
   const [showJJLink, setShowJJLink] = createSignal<boolean>(true)
@@ -59,5 +66,3 @@ export const CharitiesSection: Component<{ visible?: boolean }> = (p) => {
     </div>
   )
 }
-
-export default CharitiesSection

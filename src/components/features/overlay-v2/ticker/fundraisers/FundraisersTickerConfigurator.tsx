@@ -1,9 +1,16 @@
 import { type Component, createMemo, createSignal } from 'solid-js'
-import { FieldRow, LinkPreview, PreviewFrame, buildUrl } from './Common'
+import {
+  buildUrl,
+  FieldRow,
+  LinkPreview,
+  PreviewFrame,
+} from '../../overview/Common.tsx'
 
 type OrderBy = 'recent' | 'top' | 'alphabetical'
 
-export const FundraisersSection: Component<{ visible?: boolean }> = (p) => {
+export const FundraisersTickerConfigurator: Component<{
+  visible?: boolean
+}> = (p) => {
   const [orderBy, setOrderBy] = createSignal<OrderBy>('recent')
   const [pageSizeF, setPageSizeF] = createSignal<number>(25)
 
@@ -42,5 +49,3 @@ export const FundraisersSection: Component<{ visible?: boolean }> = (p) => {
     </div>
   )
 }
-
-export default FundraisersSection

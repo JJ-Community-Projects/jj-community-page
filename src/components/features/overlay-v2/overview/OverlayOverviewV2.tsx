@@ -4,12 +4,12 @@ import { twMerge } from 'tailwind-merge'
 import { FaSolidChevronDown } from 'solid-icons/fa'
 import { QueryClientProvider } from '@tanstack/solid-query'
 import { QueryClient } from '@tanstack/query-core'
-import ScheduleSection from './ScheduleSection'
-import FundraisersSection from './FundraisersSection'
-import CharitiesSection from './CharitiesSection'
-import Charities2Section from './Charities2Section'
-import TeamFundraiserSection from './TeamFundraiserSection'
-import CauseFundraiserSection from './CauseFundraiserSection'
+import { UserScheduleConfigurator } from '../userSchedule/UserScheduleConfigurator.tsx'
+import { FundraisersTickerConfigurator } from '../ticker/fundraisers/FundraisersTickerConfigurator.tsx'
+import { CharitiesTickerConfigurator } from '../ticker/charities/CharitiesTickerConfigurator.tsx'
+import { CharitiesConfigurator } from '../charities/CharitiesConfigurator.tsx'
+import { FundraisersByTeamConfigurator } from '../ticker/fundraisers/FundraisersByTeamConfigurator.tsx'
+import { FundraisersByCauseConfigurator } from '../ticker/fundraisers/FundraisersByCauseConfigurator.tsx'
 import { UserProvider } from '../../users/user-dashboard/providers/UserProvider.tsx'
 import type { User } from '../../../../lib/auth/User.ts'
 
@@ -42,7 +42,7 @@ const Body: Component = () => {
             </Accordion.Trigger>
           </Accordion.Header>
           <Accordion.Content class="max-w-[90vw] p-2">
-            <CharitiesSection visible={isOpen('charities')} />
+            <CharitiesTickerConfigurator visible={isOpen('charities')} />
           </Accordion.Content>
         </Accordion.Item>
 
@@ -67,7 +67,7 @@ const Body: Component = () => {
             </Accordion.Trigger>
           </Accordion.Header>
           <Accordion.Content class="max-w-[90vw] p-2">
-            <Charities2Section visible={isOpen('charities2')} />
+            <CharitiesConfigurator visible={isOpen('charities2')} />
           </Accordion.Content>
         </Accordion.Item>
         {/* Schedule (Full) */}
@@ -91,7 +91,7 @@ const Body: Component = () => {
             </Accordion.Trigger>
           </Accordion.Header>
           <Accordion.Content class="max-w-[90vw] p-2">
-            <ScheduleSection visible={isOpen('schedule')} />
+            <UserScheduleConfigurator visible={isOpen('schedule')} />
           </Accordion.Content>
         </Accordion.Item>
 
@@ -116,7 +116,7 @@ const Body: Component = () => {
             </Accordion.Trigger>
           </Accordion.Header>
           <Accordion.Content class="max-w-[90vw] p-2">
-            <FundraisersSection visible={isOpen('fundraisers')} />
+            <FundraisersTickerConfigurator visible={isOpen('fundraisers')} />
           </Accordion.Content>
         </Accordion.Item>
 
@@ -141,7 +141,9 @@ const Body: Component = () => {
             </Accordion.Trigger>
           </Accordion.Header>
           <Accordion.Content class="max-w-[90vw] p-2">
-            <TeamFundraiserSection visible={isOpen('team-fundraiser')} />
+            <FundraisersByTeamConfigurator
+              visible={isOpen('team-fundraiser')}
+            />
           </Accordion.Content>
         </Accordion.Item>
 
@@ -166,10 +168,11 @@ const Body: Component = () => {
             </Accordion.Trigger>
           </Accordion.Header>
           <Accordion.Content class="max-w-[90vw] p-2">
-            <CauseFundraiserSection visible={isOpen('cause-fundraiser')} />
+            <FundraisersByCauseConfigurator
+              visible={isOpen('cause-fundraiser')}
+            />
           </Accordion.Content>
         </Accordion.Item>
-
       </Accordion.Root>
     </div>
   )

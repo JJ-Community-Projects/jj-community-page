@@ -240,6 +240,7 @@ const causeFundraisers = os.causeFundraisersContract.handler(async ({ input, con
       userName: jjCampaign.userName,
       userAvatar: jjCampaign.userAvatar,
       causeId: jjCampaign.causeId,
+      livestream: jjCampaign.livestream,
     })
     .from(jjCampaign)
     .where(eq(jjCampaign.causeId, causeId))
@@ -255,6 +256,10 @@ const causeFundraisers = os.causeFundraisersContract.handler(async ({ input, con
     goal: typeof c.goal === 'number' ? c.goal : undefined,
     imageUrl: c.userAvatar || undefined,
     urlSlug: String(c.slug ?? ''),
+    livestream:
+      c?.livestream && (c.livestream.channel != null || c.livestream.type)
+        ? { channel: c.livestream.channel ?? null, type: c.livestream.type ?? '' }
+        : undefined,
   }))
 
   // Order by raised desc by default

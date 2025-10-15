@@ -1,8 +1,8 @@
 import { type Component, For, Show } from 'solid-js'
 import { QueryClientProvider, useQuery } from '@tanstack/solid-query'
 import { QueryClient } from '@tanstack/query-core'
-import { orpcPrivate } from '../../../lib/orpc/client'
-import '../overlay/marquee.css'
+import { orpcPrivate } from '../../../../../lib/orpc/client.ts'
+import '../../../overlay/marquee.css'
 
 // Props for the Team Fundraiser overlay
 // - teamSlug: optional selected team to scope/label the list (future backend filtering)
@@ -160,7 +160,7 @@ const Body: Component<TeamFundraiserProps> = (props) => {
   )
 }
 
-export const TeamFundraiserOverlay: Component<TeamFundraiserProps> = (props) => (
+export const FundraisersByTeamOverlay: Component<TeamFundraiserProps> = (props) => (
   <QueryClientProvider client={new QueryClient()}>
     <Body {...props} />
   </QueryClientProvider>

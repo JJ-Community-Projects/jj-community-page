@@ -1,8 +1,8 @@
 import { type Component, For, Match, Show, Switch } from 'solid-js'
 import { QueryClientProvider, useQuery } from '@tanstack/solid-query'
 import { QueryClient } from '@tanstack/query-core'
-import { orpcPrivate } from '../../../lib/orpc/client'
-import '../overlay/marquee.css'
+import { orpcPrivate } from '../../../../../lib/orpc/client.ts'
+import '../../../overlay/marquee.css'
 
 export type CauseFundraiserProps = {
   causeId?: number
@@ -285,7 +285,7 @@ const Body: Component<CauseFundraiserProps> = (props) => {
   )
 }
 
-export const CauseFundraiserOverlay: Component<CauseFundraiserProps> = (
+export const FundraisersByCauseOverlay: Component<CauseFundraiserProps> = (
   props,
 ) => (
   <QueryClientProvider client={new QueryClient()}>

@@ -1,24 +1,32 @@
 import { type Component, createMemo, createSignal, For, Show } from 'solid-js'
-import { buildUrl, FieldRow, LinkPreview, PreviewFrame } from './Common'
+import {
+  buildUrl,
+  FieldRow,
+  LinkPreview,
+  PreviewFrame,
+} from '../overview/Common.tsx'
 import { useQuery } from '@tanstack/solid-query'
-import { orpcPrivate } from '../../../../lib/orpc/client'
-import type { CharityItemT } from '../../../../lib/orpc/private/overlay/contract'
+import { orpcPrivate } from '../../../../lib/orpc/client.ts'
+import type { CharityItemT } from '../../../../lib/orpc/private/overlay/contract.ts'
 
 type Theme2 = 'default' | 'red' | 'blue' | 'carousel'
- type HeaderTheme2 = 'default' | 'red' | 'blue'
+type HeaderTheme2 = 'default' | 'red' | 'blue'
 
- export const Charities2Section: Component<{ visible?: boolean }> = (p) => {
-   // Header selection via checkboxes (mirrors V1 behavior but easier UX)
-   const headerOptions = ['Title', 'Donate', 'JJLink'] as const
-   const [selectedHeaders, setSelectedHeaders] = createSignal<string[]>(['Title', 'JJLink'])
-   const [speed, setSpeed] = createSignal<number>(5)
-   const [includeTotals2, setIncludeTotals2] = createSignal<boolean>(false)
-   const [theme2, setTheme2] = createSignal<Theme2>('default')
-   const [headerTheme2, setHeaderTheme2] = createSignal<HeaderTheme2>('default')
-   const [showDesc, setShowDesc] = createSignal<boolean>(false)
-   const [showQRCode, setShowQRCode] = createSignal<boolean>(false)
-   const [showUrl, setShowUrl] = createSignal<boolean>(true)
-   const [selectedIds, setSelectedIds] = createSignal<number[]>([])
+export const CharitiesConfigurator: Component<{ visible?: boolean }> = (p) => {
+  // Header selection via checkboxes (mirrors V1 behavior but easier UX)
+  const headerOptions = ['Title', 'Donate', 'JJLink'] as const
+  const [selectedHeaders, setSelectedHeaders] = createSignal<string[]>([
+    'Title',
+    'JJLink',
+  ])
+  const [speed, setSpeed] = createSignal<number>(5)
+  const [includeTotals2, setIncludeTotals2] = createSignal<boolean>(false)
+  const [theme2, setTheme2] = createSignal<Theme2>('default')
+  const [headerTheme2, setHeaderTheme2] = createSignal<HeaderTheme2>('default')
+  const [showDesc, setShowDesc] = createSignal<boolean>(false)
+  const [showQRCode, setShowQRCode] = createSignal<boolean>(false)
+  const [showUrl, setShowUrl] = createSignal<boolean>(true)
+  const [selectedIds, setSelectedIds] = createSignal<number[]>([])
 
   // Fetch charities list via oRPC for checkbox selection
   const q = useQuery(() =>
@@ -27,7 +35,8 @@ type Theme2 = 'default' | 'red' | 'blue' | 'carousel'
     }),
   )
   const charities = () => (q.data ?? []) as CharityItemT[]
-  const allSelected = () => selectedIds().length > 0 && selectedIds().length === charities().length
+  const allSelected = () =>
+    selectedIds().length > 0 && selectedIds().length === charities().length
   const toggleAll = (checked: boolean) =>
     setSelectedIds(checked ? charities().map((c) => Number(c.id)) : [])
   const toggleOne = (id: number, checked: boolean) => {
@@ -77,7 +86,9 @@ type Theme2 = 'default' | 'red' | 'blue' | 'carousel'
               </label>
             )}
           </For>
-          <p class="text-xs opacity-70">Tip: Uncheck all to hide the header bar.</p>
+          <p class="text-xs opacity-70">
+            Tip: Uncheck all to hide the header bar.
+          </p>
         </div>
       </FieldRow>
       <FieldRow label="Speed (0.25–3.0)">
@@ -147,14 +158,19 @@ type Theme2 = 'default' | 'red' | 'blue' | 'carousel'
       <FieldRow label="Select Charities">
         <div class="flex w-[30rem] flex-col gap-2">
           <div class="max-h-60 w-full overflow-y-auto rounded border border-accent-500/40 bg-black/20 p-2">
-            <Show when={!q.isLoading} fallback={<p class="opacity-70">Loading charities…</p>}>
+            <Show
+              when={!q.isLoading}
+              fallback={<p class="opacity-70">Loading charities…</p>}
+            >
               <For each={charities()}>
                 {(c) => (
                   <label class="flex cursor-pointer items-center gap-2 py-1 text-sm">
                     <input
                       type="checkbox"
                       checked={selectedIds().includes(Number(c.id))}
-                      onChange={(e) => toggleOne(Number(c.id), e.currentTarget.checked)}
+                      onChange={(e) =>
+                        toggleOne(Number(c.id), e.currentTarget.checked)
+                      }
                     />
                     <span class="line-clamp-1">{c.name}</span>
                   </label>
@@ -168,9 +184,11 @@ type Theme2 = 'default' | 'red' | 'blue' | 'carousel'
         </div>
       </FieldRow>
       <LinkPreview url={charities2Url()} />
-      <PreviewFrame url={charities2Url()} visible={p.visible} class={'w-[300px] h-[450px]'} />
+      <PreviewFrame
+        url={charities2Url()}
+        visible={p.visible}
+        class={'h-[450px] w-[300px]'}
+      />
     </div>
   )
 }
-
-export default Charities2Section

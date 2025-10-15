@@ -1,5 +1,5 @@
 import { type Component, For, Show } from 'solid-js'
-import { orpcPrivate } from '../../../lib/orpc/client'
+import { orpcPrivate } from '../../../../../lib/orpc/client.ts'
 import { QueryClientProvider, useQuery } from '@tanstack/solid-query'
 import { QueryClient } from '@tanstack/query-core'
 
@@ -88,7 +88,7 @@ function clamp(n: number, min: number, max: number) {
   return Math.max(min, Math.min(max, n))
 }
 
-export const FundraisersOverlay: Component<Props> = (props) => {
+export const FundraisersTickerOverlay: Component<Props> = (props) => {
   return (
     <QueryClientProvider client={new QueryClient()}>
       <Body {...props} />

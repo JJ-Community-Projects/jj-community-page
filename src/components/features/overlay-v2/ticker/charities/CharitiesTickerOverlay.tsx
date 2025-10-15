@@ -1,16 +1,16 @@
 import { type Component, createEffect, on, For, Match, Show, Switch } from 'solid-js'
 import { createI18n, I18nProvider, Numeric } from 'solid-i18n'
-import { useShowRaised, useSpeed, useTheme, useTiltifyUrl, useTitleLogo, useShowJJLink, useShowTitle, useUsername } from '../overlay/overlay_signals'
-import '../overlay/marquee.css'
-import { JJLink } from '../overlay/JJLinkCard'
-import { JJTitleCard } from '../overlay/JJTitleCard'
+import { useShowRaised, useSpeed, useTheme, useTiltifyUrl, useTitleLogo, useShowJJLink, useShowTitle, useUsername } from '../../../overlay/overlay_signals.ts'
+import '../../../overlay/marquee.css'
+import { JJLink } from '../../../overlay/JJLinkCard.tsx'
+import { JJTitleCard } from '../../../overlay/JJTitleCard.tsx'
 import { useLocale } from '@kobalte/core'
-import { orpcPrivate } from '../../../lib/orpc/client'
+import { orpcPrivate } from '../../../../../lib/orpc/client.ts'
 import { useQuery, QueryClientProvider } from '@tanstack/solid-query'
 import { QueryClient } from '@tanstack/query-core'
-import type { CharityItemT } from '../../../lib/orpc/private/overlay/contract'
+import type { CharityItemT } from '../../../../../lib/orpc/private/overlay/contract.ts'
 
-export const CharitiesOverlay: Component = () => {
+export const CharitiesTickerOverlay: Component = () => {
   return (
     <QueryClientProvider client={new QueryClient()}>
       <CharitiesOverlayComponent
