@@ -12,7 +12,7 @@ import '../../overlay/marquee.css'
 import { orpcPrivate } from '../../../../lib/orpc/client.ts'
 import { QueryClientProvider, useQuery } from '@tanstack/solid-query'
 import { QueryClient } from '@tanstack/query-core'
-import type { CharityItemT } from '../../../../lib/orpc/private/overlay/contract.ts'
+import type { CharityItem } from '../../../../lib/orpc/private/overlay/contract.ts'
 
 // Header cards (mirrors V1 CharityOverlay2)
 function bg(theme: string) {
@@ -207,7 +207,7 @@ const Charities2OverlayBody: Component<Props> = (props) => {
           : 'blue'
       : theme()
 
-  const current = (): CharityItemT | undefined => {
+  const current = (): CharityItem | undefined => {
     const list = filteredCharities()
     if (list.length === 0) return undefined
     return list[idx() % list.length]
@@ -253,7 +253,7 @@ const Charities2OverlayBody: Component<Props> = (props) => {
               }}
             >
               <CharityItem
-                charity={c() as CharityItemT}
+                charity={c() as CharityItem}
                 theme={currentTheme(idx())}
                 showDesc={showDesc()}
                 showQRCode={showQRCode()}
@@ -269,7 +269,7 @@ const Charities2OverlayBody: Component<Props> = (props) => {
 }
 
 const CharityItem: Component<{
-  charity: CharityItemT
+  charity: CharityItem
   theme: string
   showDesc: boolean
   showQRCode: boolean

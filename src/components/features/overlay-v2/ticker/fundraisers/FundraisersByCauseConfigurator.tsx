@@ -1,10 +1,5 @@
 import { type Component, createMemo, createSignal, For } from 'solid-js'
-import {
-  buildUrl,
-  FieldRow,
-  LinkPreview,
-  PreviewFrame,
-} from '../../overview/Common.tsx'
+import { buildUrl, FieldRow, LinkPreview, PreviewFrame, } from '../../overview/Common.tsx'
 import { orpcPrivate } from '../../../../../lib/orpc/client.ts'
 import { useQuery } from '@tanstack/solid-query'
 
@@ -14,6 +9,7 @@ export const FundraisersByCauseConfigurator: Component<{
   const [theme, setTheme] = createSignal<'default' | 'red' | 'blue'>('default')
   const [showRaised, setShowRaised] = createSignal<boolean>(true)
   const [causeId, setCauseId] = createSignal<number | ''>('')
+  const [currency, setCurrency] = createSignal<'GBP' | 'USD'>('GBP')
 
   // Load causes to populate selector
   const causesQ = useQuery(() =>
@@ -31,6 +27,7 @@ export const FundraisersByCauseConfigurator: Component<{
       cause: causeId() || undefined,
       theme: theme(),
       showraised: showRaised(),
+      currency: currency(),
     }),
   )
 
@@ -45,7 +42,7 @@ export const FundraisersByCauseConfigurator: Component<{
             setCauseId(v ? Number(v) : '')
           }}
         >
-          <option value="">All causes</option>
+          <option value="">Select a causes</option>
           <For each={causes()}>
             {(c: any) => <option value={c.id}>{c.name}</option>}
           </For>
@@ -60,6 +57,16 @@ export const FundraisersByCauseConfigurator: Component<{
           <option value="default">Default</option>
           <option value="red">Red</option>
           <option value="blue">Blue</option>
+        </select>
+      </FieldRow>
+      <FieldRow label="Currency">
+        <select
+          value={currency()}
+          onChange={(e) => setCurrency(e.currentTarget.value as 'GBP' | 'USD')}
+          class="w-40 rounded bg-black/40 px-2 py-1"
+        >
+          <option value="GBP">GBP</option>
+          <option value="USD">USD</option>
         </select>
       </FieldRow>
       <FieldRow label="Show Raised">

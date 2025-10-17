@@ -15,6 +15,7 @@ export const FundraisersByTeamConfigurator: Component<{
   const [theme, setTheme] = createSignal<'default' | 'red' | 'blue'>('default')
   const [showRaised, setShowRaised] = createSignal<boolean>(true)
   const [teamSlug, setTeamSlug] = createSignal<string>('')
+  const [currency, setCurrency] = createSignal<'GBP' | 'USD'>('GBP')
 
   const { user } = useUser()
 
@@ -34,6 +35,7 @@ export const FundraisersByTeamConfigurator: Component<{
       team: teamSlug() || undefined,
       theme: theme(),
       showraised: showRaised(),
+      currency: currency(),
     }),
   )
 
@@ -60,6 +62,16 @@ export const FundraisersByTeamConfigurator: Component<{
           <option value="default">Default</option>
           <option value="red">Red</option>
           <option value="blue">Blue</option>
+        </select>
+      </FieldRow>
+      <FieldRow label="Currency">
+        <select
+          value={currency()}
+          onChange={(e) => setCurrency(e.currentTarget.value as 'GBP' | 'USD')}
+          class="w-40 rounded bg-black/40 px-2 py-1"
+        >
+          <option value="GBP">GBP</option>
+          <option value="USD">USD</option>
         </select>
       </FieldRow>
       <FieldRow label="Show Raised">

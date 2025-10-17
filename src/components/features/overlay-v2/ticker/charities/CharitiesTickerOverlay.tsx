@@ -8,7 +8,7 @@ import { useLocale } from '@kobalte/core'
 import { orpcPrivate } from '../../../../../lib/orpc/client.ts'
 import { useQuery, QueryClientProvider } from '@tanstack/solid-query'
 import { QueryClient } from '@tanstack/query-core'
-import type { CharityItemT } from '../../../../../lib/orpc/private/overlay/contract.ts'
+import type { CharityItem } from '../../../../../lib/orpc/private/overlay/contract.ts'
 
 export const CharitiesTickerOverlay: Component = () => {
   return (
@@ -140,9 +140,13 @@ export const Body: Component<{
   )
 }
 
+// NOTE: This local Child component can be replaced by the shared CharityTickerChild
+// from src/components/features/overlay-v2/ticker/common/CharityTickerChild.tsx
+// Example:
+//   <CharityTickerChild item={d} theme={props.theme} showRaised={props.showRaised} />
 interface ChildProps {
   theme: string
-  d: CharityItemT
+  d: CharityItem
   showRaised: boolean
 }
 
@@ -203,6 +207,13 @@ interface TitleProps {
   titleLogo: string
 }
 
+// NOTE: This Title block could be generalized using the shared TickerHeader
+// from src/components/features/overlay-v2/ticker/common/TickerHeader.tsx
+// Example replacement:
+//   <TickerHeader theme={props.theme} logoUrl={props.titleLogo} title="Jingle Jam" subtitle="Charities" />
+// Or use the prebuilt variants from TickerHeaderVariants:
+//   import { JJHeader } from '../common/TickerHeaderVariants'
+//   <JJHeader theme={props.theme} logoUrl={props.titleLogo} subtitle="Charities" />
 const Title: Component<TitleProps> = (props) => {
   const community = () => {
     switch (props.theme) {

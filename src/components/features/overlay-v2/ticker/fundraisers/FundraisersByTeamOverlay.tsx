@@ -3,6 +3,7 @@ import { QueryClientProvider, useQuery } from '@tanstack/solid-query'
 import { QueryClient } from '@tanstack/query-core'
 import { orpcPrivate } from '../../../../../lib/orpc/client.ts'
 import '../../../overlay/marquee.css'
+import { FundraiserTickerChild } from '../common/FundraiserTickerChild'
 
 // Props for the Team Fundraiser overlay
 // - teamSlug: optional selected team to scope/label the list (future backend filtering)
@@ -14,6 +15,7 @@ export type TeamFundraiserProps = {
   theme?: 'default'  | 'red' | 'blue'
   speed?: number
   showRaised?: boolean
+  currency?: 'GBP' | 'USD'
 }
 
 // Internal item shape (re-using private overlay fundraisers output)
@@ -62,6 +64,10 @@ const raisedColorByTheme = (theme: string | undefined) => {
   }
 }
 
+// NOTE: This local Child can be replaced by shared FundraiserTickerChild
+// from src/components/features/overlay-v2/ticker/common/FundraiserTickerChild.tsx
+// Example:
+//   <FundraiserTickerChild item={d} theme={props.theme} showRaised={showRaised()} />
 const Child: Component<{ item: FundraiserItem; theme?: string; showRaised: boolean }> = (p) => {
   return (
     <div class={`h-full w-full rounded-2xl ${bgByTheme(p.theme)} p-2 shadow-2xl`}>
@@ -101,7 +107,7 @@ const Body: Component<TeamFundraiserProps> = (props) => {
   // When a team is selected, fetch team-specific fundraisers via new oRPC endpoint
   const teamQ = useQuery(() =>
     orpcPrivate.overlay.teamFundraisers.queryOptions({
-      input: { teamSlug: teamSlug() },
+      input: { teamSlug: teamSlug(), currency: props.currency ?? 'GBP' },
       staleTime: 30_000,
       refetchInterval: 30_000,
       refetchOnWindowFocus: false,
@@ -113,7 +119,7 @@ const Body: Component<TeamFundraiserProps> = (props) => {
   // Fallback: fetch global fundraisers when no team selected
   const allQ = useQuery(() =>
     orpcPrivate.overlay.fundraisers.queryOptions({
-      input: { orderBy: 'top', pageSize: 200 },
+      input: { orderBy: 'top', pageSize: 200, currency: props.currency ?? 'GBP' },
       staleTime: 30_000,
       refetchOnWindowFocus: false,
       enabled: !Boolean(teamSlug()),
@@ -137,7 +143,7 @@ const Body: Component<TeamFundraiserProps> = (props) => {
         <For each={items()}>
           {(d) => (
             <div class="inline-block h-[80px] w-[256px] items-center justify-center px-2 py-1">
-              <Child item={d} theme={props.theme} showRaised={showRaised()} />
+              <FundraiserTickerChild item={d} theme={props.theme} showRaised={showRaised()} />
             </div>
           )}
         </For>
@@ -151,7 +157,7 @@ const Body: Component<TeamFundraiserProps> = (props) => {
         <For each={items()}>
           {(d) => (
             <div class="inline-block h-[80px] w-[256px] items-center justify-center px-2 py-1">
-              <Child item={d} theme={props.theme} showRaised={showRaised()} />
+              <FundraiserTickerChild item={d} theme={props.theme} showRaised={showRaised()} />
             </div>
           )}
         </For>

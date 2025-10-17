@@ -13,11 +13,13 @@ export const FundraisersTickerConfigurator: Component<{
 }> = (p) => {
   const [orderBy, setOrderBy] = createSignal<OrderBy>('recent')
   const [pageSizeF, setPageSizeF] = createSignal<number>(25)
+  const [currency, setCurrency] = createSignal<'GBP' | 'USD'>('GBP')
 
   const fundraisersUrl = createMemo(() =>
     buildUrl('/overlays-v2/fundraisers', {
       orderBy: orderBy(),
       pageSize: pageSizeF(),
+      currency: currency(),
     }),
   )
 
@@ -43,6 +45,16 @@ export const FundraisersTickerConfigurator: Component<{
           onInput={(e) => setPageSizeF(Number(e.currentTarget.value))}
           class="w-24 rounded bg-black/40 px-2 py-1"
         />
+      </FieldRow>
+      <FieldRow label="Currency">
+        <select
+          value={currency()}
+          onChange={(e) => setCurrency(e.currentTarget.value as 'GBP' | 'USD')}
+          class="w-40 rounded bg-black/40 px-2 py-1"
+        >
+          <option value="GBP">GBP</option>
+          <option value="USD">USD</option>
+        </select>
       </FieldRow>
       <LinkPreview url={fundraisersUrl()} />
       <PreviewFrame url={fundraisersUrl()} visible={p.visible} />

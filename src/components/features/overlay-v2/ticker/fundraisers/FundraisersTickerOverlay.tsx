@@ -8,6 +8,7 @@ export type FundraisersOrder = 'recent' | 'top' | 'alphabetical'
 type Props = {
   orderBy?: FundraisersOrder
   pageSize?: number
+  currency?: 'GBP' | 'USD'
 }
 
 
@@ -17,7 +18,7 @@ const Body: Component<Props> = (props) => {
 
   const q = useQuery(() =>
     orpcPrivate.overlay.fundraisers.queryOptions({
-      input: { orderBy: orderBy(), pageSize: pageSize() },
+      input: { orderBy: orderBy(), pageSize: pageSize(), currency: props.currency ?? 'GBP' },
       staleTime: 60_000,
       refetchOnWindowFocus: false,
     }),
@@ -38,6 +39,10 @@ const Body: Component<Props> = (props) => {
       <Show when={items().length === 0 && !q.isLoading}>
         <p class="opacity-70">No fundraisers found.</p>
       </Show>
+      {/* NOTE: For consistency with marquee tickers, individual list cards could reuse
+          FundraiserTickerChild from src/components/features/overlay-v2/ticker/common/FundraiserTickerChild.tsx.
+          This overlay is a vertical list (not marquee), so you could either use the child inside an <li> or
+          adapt it into a non-marquee card. */}
       <ul class="flex flex-col gap-2 overflow-hidden">
         <For each={items()}>
           {(f) => (

@@ -7,7 +7,7 @@ import {
 } from '../overview/Common.tsx'
 import { useQuery } from '@tanstack/solid-query'
 import { orpcPrivate } from '../../../../lib/orpc/client.ts'
-import type { CharityItemT } from '../../../../lib/orpc/private/overlay/contract.ts'
+import type { CharityItem } from '../../../../lib/orpc/private/overlay/contract.ts'
 
 type Theme2 = 'default' | 'red' | 'blue' | 'carousel'
 type HeaderTheme2 = 'default' | 'red' | 'blue'
@@ -34,7 +34,7 @@ export const CharitiesConfigurator: Component<{ visible?: boolean }> = (p) => {
       input: { includeTotals: includeTotals2() },
     }),
   )
-  const charities = () => (q.data ?? []) as CharityItemT[]
+  const charities = () => (q.data ?? []) as CharityItem[]
   const allSelected = () =>
     selectedIds().length > 0 && selectedIds().length === charities().length
   const toggleAll = (checked: boolean) =>

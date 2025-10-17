@@ -6,13 +6,15 @@ const teamParam = Astro.url.searchParams.get('team')
 const themeParam = Astro.url.searchParams.get('theme')
 const speedParam = Astro.url.searchParams.get('speed')
 const showRaisedParam = Astro.url.searchParams.get('showraised')
+const currencyParam = Astro.url.searchParams.get('currency')
 
 const team = teamParam ?? undefined
 const theme = (themeParam as any) ?? undefined
 const speed = speedParam ? Number(speedParam) : undefined
 const showRaised = showRaisedParam === '1' || showRaisedParam === 'true' || showRaisedParam === null ? true : false
+const currency = currencyParam === 'USD' ? 'USD' : 'GBP'
 ---
 
 <div class="min-h-screen bg-transparent text-white">
-  <FundraisersByTeamOverlay client:only="solid-js" teamSlug={team} theme={theme} speed={speed} showRaised={showRaised} />
+  <FundraisersByTeamOverlay client:only="solid-js" teamSlug={team} theme={theme} speed={speed} showRaised={showRaised} currency={currency} />
 </div>

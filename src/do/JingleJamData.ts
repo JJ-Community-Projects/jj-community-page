@@ -63,6 +63,12 @@ export class JingleJamData extends DurableObject<Env> {
     return Array.from(map.values()) as JJCampaign[]
   }
 
+
+  public async getCampaignsForCause(causeId: number) {
+    const campaigns = await this.getCampaigns()
+    return campaigns.filter((c) => c.causeId === causeId)
+  }
+
   // Refresh from API and persist to storage and DB
   public async refresh() {
     const res = await fetch(this.env.JJ_DASHBOARD_URL)
@@ -201,6 +207,11 @@ export class JingleJamData extends DurableObject<Env> {
     } catch (e) {
       console.error('db.batch persist JJ data', e)
     }
+  }
+
+  public async getAvgConversionRate() {
+    const avgConversionRate = await this.storage.get<number>('avgConversionRate')
+    return avgConversionRate ?? 1
   }
 
   // Key helpers

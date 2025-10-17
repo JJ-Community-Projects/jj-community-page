@@ -4,38 +4,31 @@ import { z } from 'zod/v4'
 // ----------------------
 // Shared overlay types
 // ----------------------
-export const CharityItem = z.object({
+export const CharityItemSchema = z.object({
   id: z.number().int().nonnegative(),
   name: z.string(),
   description: z.string(),
   logoUrl: z.string().url().optional(),
   tagline: z.string().optional(),
   websiteUrl: z.string().url().optional(),
-  amountRaised: z.number().optional(),
-  currency: z.string().optional(),
+  raised: z.number().optional(),
+  raisedFormatted: z.string().optional(),
 })
-export type CharityItemT = z.infer<typeof CharityItem>
 
-export const FundraiserItem = z.object({
+export type CharityItem = z.infer<typeof CharityItemSchema>
+
+export const FundraiserItemSchema = z.object({
   id: z.string(),
   title: z.string(),
-  creatorName: z.string(),
-  amountRaised: z.number(),
-  goal: z.number().optional(),
-  currency: z.string().optional(),
+  raisedFormatted: z.string(),
+  raised: z.number(),
   imageUrl: z.string().url().optional(),
-  urlSlug: z.string().optional(),
-  livestream: z
-    .object({
-      channel: z.string().nullable(),
-      type: z.string(),
-    })
-    .optional(),
 })
-export type FundraiserItemT = z.infer<typeof FundraiserItem>
+
+export type FundraiserItem = z.infer<typeof FundraiserItemSchema>
 
 // For schedule-simple
-export const SimpleScheduleBlock = z.object({
+export const SimpleScheduleBlockSchema = z.object({
   id: z.number().int().nonnegative(),
   start: z.string(), // ISO
   end: z.string(), // ISO
@@ -44,11 +37,11 @@ export const SimpleScheduleBlock = z.object({
   color: z.string().nullable().optional(),
 })
 
-export const SimpleScheduleView = z.object({
+export const SimpleScheduleViewSchema = z.object({
   schedule: z.object({ id: z.number(), name: z.string(), slug: z.string() }),
-  blocks: z.array(SimpleScheduleBlock),
+  blocks: z.array(SimpleScheduleBlockSchema),
 })
-export type SimpleScheduleViewT = z.infer<typeof SimpleScheduleView>
+export type SimpleScheduleViewT = z.infer<typeof SimpleScheduleViewSchema>
 
 // ----------------------
 // Inputs
@@ -77,9 +70,10 @@ const scheduleSimpleInput = z
 // ----------------------
 // Routes
 // ----------------------
+
 const charitiesContract = oc
   .input(charitiesInput)
-  .output(z.array(CharityItem))
+  .output(z.array(CharityItemSchema))
   .route({
     path: '/overlay/charities',
     method: 'GET',
@@ -87,9 +81,28 @@ const charitiesContract = oc
     tags: ['overlay', 'v2'],
   })
 
+const causeByIdContract = oc
+  .input(
+    z.object({
+      causeId: z.number().int().nonnegative(),
+      includeTotals: z.boolean().optional(),
+    }),
+  )
+  .output(CharityItemSchema.nullable())
+  .route({
+    path: '/overlay/cause',
+    method: 'GET',
+    summary: 'Overlay V2 single cause by ID (UI-ready)',
+    tags: ['overlay', 'v2', 'causes'],
+  })
+
 const fundraisersContract = oc
-  .input(fundraisersInput)
-  .output(z.array(FundraiserItem))
+  .input(z.object({
+    orderBy: z.enum(['recent', 'top', 'alphabetical']).optional(),
+    pageSize: z.number().int().min(1).max(200).optional(),
+    currency: z.enum(['USD', 'GBP']).default('GBP'),
+  }))
+  .output(z.array(FundraiserItemSchema))
   .route({
     path: '/overlay/fundraisers',
     method: 'GET',
@@ -99,8 +112,14 @@ const fundraisersContract = oc
 
 // Team fundraisers: campaigns by users who are members of a given team (by slug)
 const teamFundraisersContract = oc
-  .input(z.object({ teamSlug: z.string().min(1) }))
-  .output(z.array(FundraiserItem))
+  .input(
+    z.object({
+      teamSlug: z.string().min(1),
+      orderBy: z.enum(['recent', 'top', 'alphabetical']).optional(),
+      currency: z.enum(['USD', 'GBP']).default('GBP'),
+    }),
+  )
+  .output(z.array(FundraiserItemSchema))
   .route({
     path: '/overlay/team-fundraisers',
     method: 'GET',
@@ -108,20 +127,16 @@ const teamFundraisersContract = oc
     tags: ['overlay', 'v2', 'teams'],
   })
 
-const scheduleSimpleContract = oc
-  .input(scheduleSimpleInput)
-  .output(SimpleScheduleView)
-  .route({
-    path: '/overlay/schedule-simple',
-    method: 'GET',
-    summary: 'Overlay V2 schedule simple (UI-ready)',
-    tags: ['overlay', 'v2', 'schedule'],
-  })
-
 // Cause fundraisers: campaigns with a given JJ cause ID
 const causeFundraisersContract = oc
-  .input(z.object({ causeId: z.number().int().nonnegative() }))
-  .output(z.array(FundraiserItem))
+  .input(
+    z.object({
+      causeId: z.number().int().nonnegative(),
+      orderBy: z.enum(['recent', 'top', 'alphabetical']).optional(),
+      currency: z.enum(['USD', 'GBP']).default('GBP'),
+    }),
+  )
+  .output(z.array(FundraiserItemSchema))
   .route({
     path: '/overlay/cause-fundraisers',
     method: 'GET',
@@ -129,22 +144,24 @@ const causeFundraisersContract = oc
     tags: ['overlay', 'v2', 'causes'],
   })
 
-// Single cause by ID
-const causeByIdContract = oc
-  .input(z.object({ causeId: z.number().int().nonnegative(), includeTotals: z.boolean().optional() }))
-  .output(CharityItem.nullable())
+const scheduleSimpleContract = oc
+  .input(scheduleSimpleInput)
+  .output(SimpleScheduleViewSchema)
   .route({
-    path: '/overlay/cause',
+    path: '/overlay/schedule-simple',
     method: 'GET',
-    summary: 'Overlay V2 single cause by ID (UI-ready)',
-    tags: ['overlay', 'v2', 'causes'],
+    summary: 'Overlay V2 schedule simple (UI-ready)',
+    tags: ['overlay', 'v2', 'schedule'],
   })
 
 export const contracts = {
+  // Charity outputs
   charitiesContract,
+  causeByIdContract,
+  // Fundraiser outputs
   fundraisersContract,
   teamFundraisersContract,
-  scheduleSimpleContract,
   causeFundraisersContract,
-  causeByIdContract,
+  // Schedule output
+  scheduleSimpleContract,
 }
