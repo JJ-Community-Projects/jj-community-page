@@ -27,7 +27,6 @@ const textColorByTheme = (theme: string | undefined) => {
   }
 }
 
-// Basic header for overlay-v2 team schedule
 export const TeamScheduleOverlayHeader: Component<Props> = (props) => {
   const offsetNameShort = () =>
     DateTime.fromObject(

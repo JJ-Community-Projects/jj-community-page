@@ -44,8 +44,8 @@ export const AdminMobileNav: Component<MobileNavProps> = (props) => {
         ref={setRef}
       >
         <a href={`/dashboard`}>My Dashboard</a>
+        <a href="/overlays-old">Stream Overlays (Old)</a>
         <a href="/overlays">Stream Overlays</a>
-        <a href="/overlays-v2">Stream Overlays V2</a>
         <a href="/twitch-extension">Twitch Extension</a>
       </div>
     </div>

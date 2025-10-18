@@ -1,10 +1,5 @@
 import { type Component, createMemo, createSignal } from 'solid-js'
-import {
-  buildUrl,
-  FieldRow,
-  LinkPreview,
-  PreviewFrame,
-} from '../../overview/Common.tsx'
+import { buildUrl, FieldRow, LinkPreview, PreviewFrame, } from '../../overview/Common.tsx'
 import { useUser } from '../../../users/user-dashboard/providers/UserProvider.tsx'
 
 type OrderBy = 'recent' | 'top' | 'alphabetical'
@@ -18,7 +13,7 @@ export const FundraisersTickerConfigurator: Component<{
   const { user } = useUser()
 
   const fundraisersUrl = createMemo(() =>
-    buildUrl('/overlays-v2/fundraisers', {
+    buildUrl('/overlays/fundraisers', {
       orderBy: orderBy(),
       currency: currency(),
       user: user.tiltifyName,

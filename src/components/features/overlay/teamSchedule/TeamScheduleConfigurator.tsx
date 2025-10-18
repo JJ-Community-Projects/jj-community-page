@@ -21,7 +21,7 @@ const Body: Component<{ visible?: boolean }> = (p) => {
   const [teamId, setTeamId] = createSignal<number | undefined>(undefined)
 
   const scheduleUrl = createMemo(() =>
-    buildUrl('/overlays-v2/team-schedule', {
+    buildUrl('/overlays/team-schedule', {
       teamId: teamId(),
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       theme: theme(),

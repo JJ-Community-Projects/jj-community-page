@@ -16,7 +16,7 @@ export const CharitiesTickerConfigurator: Component<{ visible?: boolean }> = (
   const { user } = useUser()
 
   const charitiesUrl = createMemo(() =>
-    buildUrl('/overlays-v2/charities', {
+    buildUrl('/overlays/charities', {
       theme: theme(),
       currency: currency(),
       user: user.tiltifyName,

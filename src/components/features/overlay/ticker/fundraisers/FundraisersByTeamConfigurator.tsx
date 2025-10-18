@@ -25,7 +25,7 @@ const Body: Component<{ visible?: boolean }> = (p) => {
   const noTeams = () => (qTeams.data?.length ?? 0) === 0
 
   const url = createMemo(() =>
-    buildUrl('/overlays-v2/team-fundraiser', {
+    buildUrl('/overlays/team-fundraiser', {
       team: teamSlug() || undefined,
       theme: theme(),
       showraised: showRaised(),
@@ -37,7 +37,8 @@ const Body: Component<{ visible?: boolean }> = (p) => {
     <div class="flex flex-col gap-2 rounded bg-black/30 p-3">
       <Show when={!qTeams.isLoading && noTeams()}>
         <div class="mb-2 rounded border border-yellow-400/40 bg-yellow-500/10 p-2 text-sm text-yellow-300">
-          You are not part of any team yet. Create or join a team to filter by team.
+          You are not part of any team yet. Create or join a team to filter by
+          team.
         </div>
       </Show>
       <FieldRow label="Team">
@@ -46,7 +47,9 @@ const Body: Component<{ visible?: boolean }> = (p) => {
             class="w-60 rounded bg-black/40 px-2 py-1"
             value={teamSlug()}
             onChange={(e) => setTeamSlug(e.currentTarget.value)}
-            title={noTeams() ? 'Join or create a team to select it here' : undefined}
+            title={
+              noTeams() ? 'Join or create a team to select it here' : undefined
+            }
           >
             <option value="">All teams</option>
             <For each={qTeams.data ?? []}>
@@ -93,7 +96,9 @@ const Body: Component<{ visible?: boolean }> = (p) => {
   )
 }
 
-export const FundraisersByTeamConfigurator: Component<{ visible?: boolean }> = (p) => {
+export const FundraisersByTeamConfigurator: Component<{ visible?: boolean }> = (
+  p,
+) => {
   return (
     <QueryClientProvider client={new QueryClient()}>
       <Body visible={p.visible} />

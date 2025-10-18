@@ -1,5 +1,10 @@
 import { type Component, createMemo, createSignal, For, Show } from 'solid-js'
-import { buildUrl, FieldRow, LinkPreview, PreviewFrame, } from '../overview/Common.tsx'
+import {
+  buildUrl,
+  FieldRow,
+  LinkPreview,
+  PreviewFrame,
+} from '../overview/Common.tsx'
 import { useQuery } from '@tanstack/solid-query'
 import { orpcPrivate } from '../../../../lib/orpc/client.ts'
 
@@ -45,7 +50,7 @@ export const CharitiesConfigurator: Component<{ visible?: boolean }> = (p) => {
   )
 
   const charities2Url = createMemo(() =>
-    buildUrl('/overlays-v2/charities2', {
+    buildUrl('/overlays/charities2', {
       header: selectedHeaders(),
       speed: speed(),
       includeTotals: includeTotals2(),
