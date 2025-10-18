@@ -1,6 +1,14 @@
-import { type Component, createMemo, createSignal, onCleanup, onMount, Show, } from 'solid-js'
+import { type Component, createMemo, createSignal, onCleanup, onMount, Show } from 'solid-js'
 import { DateTime } from 'luxon'
 import { getTextColor } from '../../../../lib/utils/textColors.ts'
+
+interface Owner {
+  userId: number
+  username: string
+  profileImage?: string | null
+  twitchLogin?: string | null
+  tiltifySlug?: string | null
+}
 
 interface OverlayStreamCardProps {
   stream: {
@@ -10,6 +18,7 @@ interface OverlayStreamCardProps {
     title: string
     subtitle: string | null
     color?: string
+    owner: Owner
   }
   timezone: string
 }
@@ -64,7 +73,27 @@ const useStreamTime = (props: OverlayStreamCardProps) => {
   return { now, start, end, showCountdown, isLive, countdown, formatDate }
 }
 
-export const OverlayStreamCardFilled: Component<OverlayStreamCardProps> = (
+const OwnerBadge: Component<{ owner: Owner; textColorClass?: string }> = (p) => {
+  return (
+    <div class={`mt-1 flex items-center gap-2 ${p.textColorClass ?? ''}`}>
+      <Show when={p.owner.profileImage}>
+        {(img) => (
+          <img
+            src={img() as string}
+            alt={p.owner.username}
+            class="h-5 w-5 rounded-full border border-black/10 object-cover"
+            loading="eager"
+          />
+        )}
+      </Show>
+      <span class="text-xs font-semibold tracking-wide opacity-90">
+        {p.owner.username}
+      </span>
+    </div>
+  )
+}
+
+export const TeamOverlayStreamCardFilled: Component<OverlayStreamCardProps> = (
   props,
 ) => {
   const { showCountdown, isLive, countdown, formatDate } = useStreamTime(props)
@@ -93,11 +122,12 @@ export const OverlayStreamCardFilled: Component<OverlayStreamCardProps> = (
           {countdown()}
         </p>
       </Show>
+      <OwnerBadge owner={props.stream.owner} />
     </div>
   )
 }
 
-export const OverlayStreamCardSidebar: Component<OverlayStreamCardProps> = (
+export const TeamOverlayStreamCardSidebar: Component<OverlayStreamCardProps> = (
   props,
 ) => {
   const { showCountdown, isLive, countdown, formatDate } = useStreamTime(props)
@@ -124,6 +154,7 @@ export const OverlayStreamCardSidebar: Component<OverlayStreamCardProps> = (
             {countdown()}
           </p>
         </Show>
+        <OwnerBadge owner={props.stream.owner} textColorClass="text-gray-800" />
       </div>
     </div>
   )

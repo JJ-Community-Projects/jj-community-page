@@ -1,10 +1,5 @@
 import { type Component, createMemo, createSignal } from 'solid-js'
-import {
-  buildUrl,
-  FieldRow,
-  LinkPreview,
-  PreviewFrame,
-} from '../../overview/Common.tsx'
+import { buildUrl, FieldRow, LinkPreview, PreviewFrame, } from '../../overview/Common.tsx'
 import { useUser } from '../../../users/user-dashboard/providers/UserProvider.tsx'
 
 type OrderBy = 'recent' | 'top' | 'alphabetical'
@@ -13,7 +8,6 @@ export const FundraisersTickerConfigurator: Component<{
   visible?: boolean
 }> = (p) => {
   const [orderBy, setOrderBy] = createSignal<OrderBy>('recent')
-  const [pageSizeF, setPageSizeF] = createSignal<number>(25)
   const [currency, setCurrency] = createSignal<'GBP' | 'USD'>('GBP')
 
   const { user } = useUser()
@@ -21,7 +15,6 @@ export const FundraisersTickerConfigurator: Component<{
   const fundraisersUrl = createMemo(() =>
     buildUrl('/overlays-v2/fundraisers', {
       orderBy: orderBy(),
-      pageSize: pageSizeF(),
       currency: currency(),
       user: user.tiltifyName,
     }),
@@ -39,16 +32,6 @@ export const FundraisersTickerConfigurator: Component<{
           <option value="top">top</option>
           <option value="alphabetical">alphabetical</option>
         </select>
-      </FieldRow>
-      <FieldRow label="Page Size">
-        <input
-          type="number"
-          min="1"
-          max="200"
-          value={pageSizeF()}
-          onInput={(e) => setPageSizeF(Number(e.currentTarget.value))}
-          class="w-24 rounded bg-black/40 px-2 py-1"
-        />
       </FieldRow>
       <FieldRow label="Currency">
         <select

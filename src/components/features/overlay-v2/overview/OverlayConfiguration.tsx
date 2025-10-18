@@ -12,6 +12,7 @@ import { FundraisersByTeamConfigurator } from '../ticker/fundraisers/Fundraisers
 import { FundraisersByCauseConfigurator } from '../ticker/fundraisers/FundraisersByCauseConfigurator.tsx'
 import { UserProvider } from '../../users/user-dashboard/providers/UserProvider.tsx'
 import type { User } from '../../../../lib/auth/User.ts'
+import { TeamScheduleConfigurator } from '../teamSchedule/TeamScheduleConfigurator.tsx'
 
 const Body: Component = () => {
   const [expanded, setExpanded] = createSignal<string[]>([])
@@ -80,6 +81,31 @@ const Body: Component = () => {
         </Accordion.Content>
       </Accordion.Item>
 
+      {/* Team Schedule (Full) */}
+      <Accordion.Item
+        value="team-schedule"
+        class="flex w-full flex-col items-center transition-all"
+      >
+        <Accordion.Header class="w-full">
+          <Accordion.Trigger
+            class={twMerge(
+              'hover:scale-102 hover:brightness-102 border-1 group m-2 flex w-full flex-row items-center rounded border-accent-500 bg-primary-200/50 p-2 text-xl text-white shadow',
+            )}
+          >
+            <p class="flex-1 text-left">Team Schedule Panel</p>
+            <FaSolidChevronDown
+              class={twMerge(
+                'transition-all group-hover:animate-none',
+                isOpen('team-schedule') && 'rotate-180 animate-none',
+              )}
+            />
+          </Accordion.Trigger>
+        </Accordion.Header>
+        <Accordion.Content class="w-full p-2">
+          <TeamScheduleConfigurator visible={isOpen('team-schedule')} />
+        </Accordion.Content>
+      </Accordion.Item>
+
       {/* Tickers Section Header */}
       <div class="mx-2 mt-6 w-full text-left text-2xl font-semibold text-white/90">
         Tickers
@@ -121,7 +147,7 @@ const Body: Component = () => {
               'hover:scale-102 hover:brightness-102 border-1 group m-2 flex w-full flex-row items-center rounded border-accent-500 bg-primary-200/50 p-2 text-xl text-white shadow',
             )}
           >
-            <p class="flex-1 text-left">Community Fundraisers</p>
+            <p class="flex-1 text-left">All Fundraisers Ticker</p>
             <FaSolidChevronDown
               class={twMerge(
                 'transition-all group-hover:animate-none',

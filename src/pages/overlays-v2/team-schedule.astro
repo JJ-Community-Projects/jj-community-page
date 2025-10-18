@@ -1,0 +1,29 @@
+---
+import { TeamScheduleOverlay } from '../../components/features/overlay-v2/teamSchedule/TeamScheduleOverlay.tsx'
+
+const teamIdParam = Astro.url.searchParams.get('teamId')
+const timezoneParam = Astro.url.searchParams.get('timezone')
+const themeParam = Astro.url.searchParams.get('theme')
+const styleParam = Astro.url.searchParams.get('style')
+const limitParam = Astro.url.searchParams.get('limit')
+
+const teamIdRaw = Number(teamIdParam)
+const teamId = Number.isFinite(teamIdRaw) ? Math.max(1, Math.floor(teamIdRaw)) : undefined
+const timezone = timezoneParam ?? undefined
+const theme = themeParam === 'red' || themeParam === 'blue' || themeParam === 'default' ? themeParam : 'default'
+const style = styleParam === 'striped' || styleParam === 'filled' ? styleParam : 'filled'
+const limitRaw = Number(limitParam)
+const limitCandidate = Number.isFinite(limitRaw) ? Math.floor(limitRaw) : undefined
+const limit = typeof limitCandidate === 'number' ? Math.max(3, Math.min(10, limitCandidate)) : undefined
+---
+
+<div class="min-h-screen bg-transparent text-white">
+  <TeamScheduleOverlay
+    client:only="solid-js"
+    teamId={teamId}
+    timezone={timezone}
+    theme={theme}
+    style={style}
+    limit={limit}
+  />
+</div>

@@ -27,9 +27,8 @@ const textColorByTheme = (theme: string | undefined) => {
   }
 }
 
-// Basic header for overlay-v2 user schedule
-// Visual style inspired by overlay/schedule/OverlayHeader.tsx, but simplified and standalone
-export const UserScheduleOverlayHeader: Component<Props> = (props) => {
+// Basic header for overlay-v2 team schedule
+export const TeamScheduleOverlayHeader: Component<Props> = (props) => {
   const offsetNameShort = () =>
     DateTime.fromObject(
       {

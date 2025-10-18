@@ -27,7 +27,6 @@ const Body: Component<Props> = (props) => {
     orpcPrivate.overlay.fundraisers.queryOptions({
       input: {
         orderBy: orderBy(),
-        pageSize: pageSize(),
         currency: props.currency ?? 'GBP',
         user: props.user,
       },

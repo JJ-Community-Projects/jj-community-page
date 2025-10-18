@@ -1,12 +1,7 @@
 import { implement, ORPCError } from '@orpc/server'
 import { contracts, type FundraiserItem } from './contract'
 import { dbMiddleware } from '../../middleware/dbMiddleware'
-import {
-  schedulesTable,
-  streamsTable,
-  teamMembersTable,
-  teamsTable,
-} from '../../../db/schema/jj-schema'
+import { schedulesTable, streamsTable, teamMembersTable, teamsTable, } from '../../../db/schema/jj-schema'
 import { and, eq, gte, inArray } from 'drizzle-orm'
 import { getScheduleStreams } from '../../public/schedules/util'
 import { accounts } from '../../../db/schema/auth-schema'
@@ -219,7 +214,7 @@ const fundraisers = os.fundraisersContract.handler(
 
     return {
       userFundraiser,
-      fundraisers: mapped.slice(0, pageSize),
+      fundraisers: mapped,
     }
   },
 )
@@ -599,13 +594,16 @@ const scheduleByTeamId = os.scheduleByTeamIdContract.handler(
               .all()
           : []
 
-        const ownerById = new Map<number, {
-          userId: number
-          username: string
-          profileImage: string | null
-          twitchLogin: string | null
-          tiltifySlug: string | null
-        }>()
+        const ownerById = new Map<
+          number,
+          {
+            userId: number
+            username: string
+            profileImage: string | null
+            twitchLogin: string | null
+            tiltifySlug: string | null
+          }
+        >()
         for (const o of owners) ownerById.set(o.userId, o)
 
         blocks = limited.map((s) => {
