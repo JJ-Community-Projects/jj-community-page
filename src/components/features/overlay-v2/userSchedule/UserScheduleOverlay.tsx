@@ -1,33 +1,43 @@
 import { type Component, createMemo, For, Show } from 'solid-js'
-import { orpcPublic } from '../../../../lib/orpc/client.ts'
+import { orpcPrivate } from '../../../../lib/orpc/client.ts'
 import { QueryClientProvider, useQuery } from '@tanstack/solid-query'
 import { QueryClient } from '@tanstack/query-core'
+import { OverlayStreamCardFilled, OverlayStreamCardSidebar, } from './OverlayStreamCard.tsx'
+import { UserScheduleOverlayHeader } from './UserScheduleOverlayHeader.tsx'
 
 type Props = {
-  scheduleId?: number
-  scheduleSlug?: string
+  user?: string
+  timezone?: string
+  theme?: 'default' | 'red' | 'blue'
+  style?: 'filled' | 'stripe'
+  limit?: number
 }
 
 const Body: Component<Props> = (props) => {
   const input = createMemo(() => ({
-    scheduleId: props.scheduleId,
-    scheduleSlug: props.scheduleSlug,
+    user: props.user,
+    timezone: props.timezone,
+    limit: props.limit,
   }))
-  const hasParam = () =>
-    Boolean(input().scheduleId) || Boolean(input().scheduleSlug)
+
+  const hasParam = () => Boolean(input().user) && Boolean(input().timezone)
 
   const q = useQuery(() =>
-    orpcPublic.overlays.schedule.view.queryOptions({
+    orpcPrivate.overlay.schedulePrimary.queryOptions({
       input: input(),
       enabled: hasParam(),
-      staleTime: 30_000,
+      staleTime: 60_000 * 5,
+      refetchInterval: 60_000 * 5,
       refetchOnWindowFocus: false,
     }),
   )
 
+  const theme = () => props.theme ?? 'default'
+  const style = () => props.style ?? 'filled'
+
   return (
     <div class="p-2">
-      <Show when={hasParam()} fallback={<MissingParamHint />}>
+      <Show when={hasParam()}>
         <Show when={q.isLoading}>
           <p class="opacity-80">Loading schedule…</p>
         </Show>
@@ -38,31 +48,27 @@ const Body: Component<Props> = (props) => {
         </Show>
         <Show when={q.data}>
           {(data) => (
-            <div class="flex flex-col gap-2">
-              <header class="text-center">
-                <h1 class="text-2xl font-bold">{data().schedule.name}</h1>
-                <p class="text-sm opacity-70">Slug: {data().schedule.slug}</p>
-              </header>
-              <ul class="flex flex-col gap-1">
-                <For each={data().blocks}>
-                  {(b) => (
-                    <li class="rounded bg-black/30 px-3 py-2">
-                      <div class="flex justify-between text-sm">
-                        <span>
-                          {new Date(b.start).toLocaleString()} →{' '}
-                          {new Date(b.end).toLocaleTimeString()}
-                        </span>
-                        <span class="font-semibold">{b.title}</span>
-                      </div>
-                      <Show when={b.participants && b.participants.length}>
-                        <div class="mt-1 text-xs opacity-80">
-                          {b.participants?.join(', ')}
-                        </div>
-                      </Show>
-                    </li>
-                  )}
-                </For>
-              </ul>
+            <div class="flex flex-col gap-1">
+              <UserScheduleOverlayHeader
+                title={data().schedule.name}
+                timezone={data().timezone}
+                theme={theme()}
+              />
+              <For each={data().blocks}>
+                {(b) =>
+                  style() === 'stripe' ? (
+                    <OverlayStreamCardSidebar
+                      stream={b}
+                      timezone={data().timezone}
+                    />
+                  ) : (
+                    <OverlayStreamCardFilled
+                      stream={b}
+                      timezone={data().timezone}
+                    />
+                  )
+                }
+              </For>
             </div>
           )}
         </Show>
@@ -71,16 +77,7 @@ const Body: Component<Props> = (props) => {
   )
 }
 
-const MissingParamHint: Component = () => (
-  <div class="p-4 text-center">
-    <p class="mb-2">Please provide a schedule to display.</p>
-    <p class="text-sm opacity-80">
-      Try adding ?scheduleSlug=jinglejam-2024 or ?scheduleId=1 to the URL.
-    </p>
-  </div>
-)
-
-export const UserScheduleOverlay: Component<Props> = (props) =>{
+export const UserScheduleOverlay: Component<Props> = (props) => {
   return (
     <QueryClientProvider client={new QueryClient()}>
       <Body {...props} />

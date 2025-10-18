@@ -1,10 +1,12 @@
-import { type Component, For, Show } from 'solid-js'
+import { type Component, createMemo, For, Show } from 'solid-js'
 import { QueryClientProvider, useQuery } from '@tanstack/solid-query'
 import { QueryClient } from '@tanstack/query-core'
 import { orpcPrivate } from '../../../../../lib/orpc/client.ts'
-import '../../../overlay/marquee.css'
+import '../common/marquee.css'
 import { FundraiserTickerChild } from '../common/FundraiserTickerChild'
 import { CauseHeader } from '../common/TickerHeaderVariants'
+import { JJLogo } from '../common/JJLogo.tsx'
+import { JJLink } from '../common/JJLinkCard.tsx'
 
 export type CauseFundraiserProps = {
   causeId?: number
@@ -12,16 +14,7 @@ export type CauseFundraiserProps = {
   speed?: number
   showRaised?: boolean
   currency?: 'GBP' | 'USD'
-}
-
-function formatAmount(n: number) {
-  try {
-    return new Intl.NumberFormat('en-GB', { maximumFractionDigits: 0 }).format(
-      n,
-    )
-  } catch {
-    return String(n)
-  }
+  user?: string
 }
 
 const Body: Component<CauseFundraiserProps> = (props) => {
@@ -31,7 +24,11 @@ const Body: Component<CauseFundraiserProps> = (props) => {
 
   const causeQ = useQuery(() =>
     orpcPrivate.overlay.causeFundraisers.queryOptions({
-      input: { causeId: causeId(), currency: props.currency ?? 'GBP' },
+      input: {
+        causeId: causeId(),
+        currency: props.currency ?? 'GBP',
+        user: props.user,
+      },
       staleTime: 30_000,
       refetchInterval: 30_000,
       refetchOnWindowFocus: false,
@@ -43,7 +40,11 @@ const Body: Component<CauseFundraiserProps> = (props) => {
   // Load cause info for header card
   const causeInfoQ = useQuery(() =>
     orpcPrivate.overlay.causeById.queryOptions({
-      input: { causeId: causeId(), includeTotals: showRaised() },
+      input: {
+        causeId: causeId(),
+        includeTotals: showRaised(),
+        user: props.user,
+      },
       staleTime: 60_000,
       refetchInterval: 60_000,
       refetchOnWindowFocus: false,
@@ -52,30 +53,47 @@ const Body: Component<CauseFundraiserProps> = (props) => {
     }),
   )
 
-  const items = () => (causeId() ? (causeQ.data ?? []) : [])
+  const items = () => (causeId() ? (causeQ.data?.fundraisers ?? []) : [])
 
   const displayItems = () => {
-    const gap = 4
-    const base = items()
-    const newChildren = Array.from({ length: gap }, () => base).flat()
-
-    const result: any[] = []
     const cause = causeInfoQ.data
+    if (!cause) {
+      return []
+    }
+    const gap = 4
+    const result: any[] = []
+
+    const base = items()
+    const newChildren = Array.from({ length: gap * 2 }, () => base).flat()
+
+    let hi = 0
     for (let i = 0; i < newChildren.length; i++) {
       const d = newChildren[i]
-      if (i % gap === 0 && cause) {
-        result.push(
-          <CauseHeader
-            theme={props.theme}
-            logoUrl={cause.logoUrl}
-            name={cause.name}
-            raisedText={
-              showRaised() && cause.raised != null
-                ? `Raised £${cause.raisedFormatted}`
-                : undefined
-            }
-          />,
-        )
+      if (i % gap === 0) {
+        if (hi === 0) {
+          result.push(
+            <CauseHeader
+              theme={props.theme}
+              logoUrl={cause?.logoUrl ?? ''}
+              name={cause?.name ?? ''}
+              raisedText={
+                showRaised() && cause?.raised
+                  ? `Raised £${cause?.raisedFormatted ?? ''}`
+                  : undefined
+              }
+            />,
+          )
+        } else if (hi === 1) {
+          result.push(
+            <JJLink
+              theme={props.theme}
+              url={causeQ.data?.userFundraiser?.url}
+            />,
+          )
+        } else {
+          result.push(<JJLogo theme={props.theme} />)
+        }
+        hi = (hi + 1) % 3
       }
       result.push(
         <FundraiserTickerChild
@@ -88,13 +106,15 @@ const Body: Component<CauseFundraiserProps> = (props) => {
     return result
   }
 
+  const speed = createMemo(() => displayItems().length * 4)
+
   return (
     <>
       <Show when={causeQ.data && causeInfoQ.data}>
         <div class="relative flex overflow-x-hidden">
           <div
             style={{
-              animation: `marquee ${displayItems().length * 4}s linear infinite`,
+              animation: `marquee ${speed()}s linear infinite`,
             }}
             class="flex flex-row whitespace-nowrap"
           >
@@ -108,7 +128,7 @@ const Body: Component<CauseFundraiserProps> = (props) => {
           </div>
           <div
             style={{
-              animation: `marquee2 ${displayItems().length * 4}s linear infinite`,
+              animation: `marquee2 ${speed()}s linear infinite`,
             }}
             class="absolute top-0 flex flex-row whitespace-nowrap"
           >

@@ -2,10 +2,10 @@ import {type Component, createEffect, For, Match, Switch} from 'solid-js'
 import {createI18n, I18nProvider, Numeric} from 'solid-i18n'
 import {FaBrandsTwitch, FaBrandsYoutube} from 'solid-icons/fa'
 import {excludedChannel, minAmount, useSpeed, useTheme, useTiltifyUrl, useTitleLogo} from '../overlay_signals'
-import '../marquee.css'
-import {JJLink} from '../JJLinkCard'
+import '../../overlay-v2/ticker/common/marquee.css'
+import {JJLink} from '../../overlay-v2/ticker/common/JJLinkCard.tsx'
 import {twMerge} from 'tailwind-merge'
-import {JJTitleCard} from '../JJTitleCard'
+import {JJTitleCard} from '../../overlay-v2/ticker/common/JJTitleCard.tsx'
 import {useFundraiser} from "../../../../lib/useJJDonationTracker.ts";
 import type {Campaign} from "../../../../lib/model/jjData/JJCommunityFundraiser.ts";
 import {useLocale} from "@kobalte/core";

@@ -1,5 +1,5 @@
 import {type Component, createEffect, createSignal, onCleanup, onMount, type ParentComponent, Show} from 'solid-js'
-import '../marquee.css'
+import '../../overlay-v2/ticker/common/marquee.css'
 import {Transition} from 'solid-transition-group'
 import {createI18n, I18nProvider, Numeric} from 'solid-i18n'
 import {

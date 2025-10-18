@@ -20,7 +20,7 @@ export const FundraisersByCauseConfigurator: Component<{
     }),
   )
 
-  const causes = () => causesQ.data ?? []
+  const causes = () => causesQ.data?.charities ?? []
 
   const url = createMemo(() =>
     buildUrl('/overlays-v2/cause-fundraiser', {

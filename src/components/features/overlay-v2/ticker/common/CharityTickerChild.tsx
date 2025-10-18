@@ -6,7 +6,8 @@ export type CharityItem = {
   description?: string
   logoUrl?: string
   websiteUrl?: string
-  amountRaised?: number
+  raised?: number
+  raisedFormatted?: string
   currency?: string
 }
 
@@ -59,7 +60,7 @@ function formatGBP(n: number) {
 // Usage example in overlays:
 //   <CharityTickerChild item={d} theme={props.theme} showRaised={props.showRaised} />
 export const CharityTickerChild: Component<CharityTickerChildProps> = (p) => {
-  const value = () => p.item.amountRaised ?? 0
+  const value = () => p.item.raised ?? 0
   return (
     <div class={`h-full w-full rounded-2xl ${bgByTheme(p.theme)} p-2 shadow-2xl`}>
       <div class={'flex h-full w-full flex-row items-center justify-start'}>
@@ -72,7 +73,7 @@ export const CharityTickerChild: Component<CharityTickerChildProps> = (p) => {
           <p class={`${nameColorByTheme(p.theme)} font-bold`}>{p.item.name}</p>
           <Show when={p.showRaised}>
             <p class={`${raisedColorByTheme(p.theme)} font-bold`}>
-              Raised {formatGBP(value())}
+              Raised {p.item.raisedFormatted}
             </p>
           </Show>
         </div>

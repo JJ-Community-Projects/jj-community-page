@@ -24,7 +24,7 @@ export function buildUrl(
 }
 
 export const FieldRow: Component<{ label: string; children: any }> = (p) => (
-  <label class="flex items-center gap-2 text-sm">
+  <label class="flex items-start gap-2 text-sm">
     <span class="w-40 opacity-80">{p.label}</span>
     <div class="flex-1">{p.children}</div>
   </label>

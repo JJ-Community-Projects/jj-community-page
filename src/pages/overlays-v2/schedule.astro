@@ -1,17 +1,28 @@
 ---
-import BaseLayout from '../../layouts/BaseLayout.astro'
 import { UserScheduleOverlay } from '../../components/features/overlay-v2/userSchedule/UserScheduleOverlay.tsx'
 
-const scheduleIdParam = Astro.url.searchParams.get('scheduleId')
-const scheduleSlugParam = Astro.url.searchParams.get('scheduleSlug')
-const scheduleId = scheduleIdParam ? Number(scheduleIdParam) : undefined
-const scheduleSlug = scheduleSlugParam ?? undefined
+const userParam = Astro.url.searchParams.get('user')
+const timezoneParam = Astro.url.searchParams.get('timezone')
+const themeParam = Astro.url.searchParams.get('theme')
+const styleParam = Astro.url.searchParams.get('style')
+const limitParam = Astro.url.searchParams.get('limit')
+
+const user = userParam ?? undefined
+const timezone = timezoneParam ?? undefined
+const theme = themeParam === 'red' || themeParam === 'blue' || themeParam === 'default' ? themeParam : 'default'
+const style = styleParam === 'stripe' || styleParam === 'filled' ? styleParam : 'filled'
+const limitRaw = Number(limitParam)
+const limit = Number.isFinite(limitRaw) ? Math.min(100, Math.max(1, Math.floor(limitRaw))) : undefined
+
 ---
 
 <div class="min-h-screen bg-transparent text-white">
   <UserScheduleOverlay
     client:only="solid-js"
-    scheduleId={scheduleId}
-    scheduleSlug={scheduleSlug}
+    user={user}
+    timezone={timezone}
+    theme={theme}
+    style={style}
+    limit={limit}
   />
 </div>

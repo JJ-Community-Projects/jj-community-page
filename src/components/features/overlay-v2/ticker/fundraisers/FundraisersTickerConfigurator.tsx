@@ -5,6 +5,7 @@ import {
   LinkPreview,
   PreviewFrame,
 } from '../../overview/Common.tsx'
+import { useUser } from '../../../users/user-dashboard/providers/UserProvider.tsx'
 
 type OrderBy = 'recent' | 'top' | 'alphabetical'
 
@@ -15,11 +16,14 @@ export const FundraisersTickerConfigurator: Component<{
   const [pageSizeF, setPageSizeF] = createSignal<number>(25)
   const [currency, setCurrency] = createSignal<'GBP' | 'USD'>('GBP')
 
+  const { user } = useUser()
+
   const fundraisersUrl = createMemo(() =>
     buildUrl('/overlays-v2/fundraisers', {
       orderBy: orderBy(),
       pageSize: pageSizeF(),
       currency: currency(),
+      user: user.tiltifyName,
     }),
   )
 

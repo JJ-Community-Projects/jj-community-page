@@ -66,7 +66,7 @@ const Body: Component = () => {
               'hover:scale-102 hover:brightness-102 border-1 group m-2 flex w-full flex-row items-center rounded border-accent-500 bg-primary-200/50 p-2 text-xl text-white shadow',
             )}
           >
-            <p class="flex-1 text-left">User Schedule Panel</p>
+            <p class="flex-1 text-left">Primary User Schedule Panel</p>
             <FaSolidChevronDown
               class={twMerge(
                 'transition-all group-hover:animate-none',

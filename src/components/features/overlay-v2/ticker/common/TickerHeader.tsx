@@ -47,19 +47,34 @@ const subtitleColorByTheme = (theme: string | undefined) => {
 //      <TickerHeader theme={theme} logoUrl={cause.logoUrl} title={cause.name} />
 export const TickerHeader: Component<TickerHeaderProps> = (p) => {
   return (
-    <div class={`h-full w-full rounded-2xl ${bgByTheme(p.theme)} p-2 shadow-2xl`}>
+    <div
+      class={`h-full w-full rounded-2xl ${bgByTheme(p.theme)} p-2 shadow-2xl`}
+    >
       <div class={'flex h-full w-full flex-row items-center justify-start'}>
         <Show when={p.logoUrl}>
           {(url) => (
-            <img class={'h-12 w-12 rounded-lg'} alt={''} src={url()} loading={'eager'} />
+            <img
+              class={'h-12 w-12 rounded-lg'}
+              alt={''}
+              src={url()}
+              loading={'eager'}
+            />
           )}
         </Show>
-        <div class={'flex h-full flex-1 flex-col items-start justify-center overflow-hidden truncate pl-2'}>
+        <div
+          class={
+            'flex h-full flex-1 flex-col items-start justify-center overflow-hidden truncate pl-2'
+          }
+        >
           <Show when={p.title}>
-            {(t) => <p class={`${titleColorByTheme(p.theme)} font-bold`}>{t()}</p>}
+            {(t) => (
+              <p class={`${titleColorByTheme(p.theme)} font-bold`}>{t()}</p>
+            )}
           </Show>
           <Show when={p.subtitle}>
-            {(s) => <p class={`${subtitleColorByTheme(p.theme)} font-bold`}>{s()}</p>}
+            {(s) => (
+              <p class={`${subtitleColorByTheme(p.theme)} font-bold`}>{s()}</p>
+            )}
           </Show>
           {/* Custom content slot if needed */}
           {p.children}
@@ -68,5 +83,3 @@ export const TickerHeader: Component<TickerHeaderProps> = (p) => {
     </div>
   )
 }
-
-export default TickerHeader

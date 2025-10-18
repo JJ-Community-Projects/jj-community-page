@@ -1,106 +1,112 @@
-import { type Component, createEffect, on, For, Match, Show, Switch } from 'solid-js'
-import { createI18n, I18nProvider, Numeric } from 'solid-i18n'
-import { useShowRaised, useSpeed, useTheme, useTiltifyUrl, useTitleLogo, useShowJJLink, useShowTitle, useUsername } from '../../../overlay/overlay_signals.ts'
-import '../../../overlay/marquee.css'
-import { JJLink } from '../../../overlay/JJLinkCard.tsx'
-import { JJTitleCard } from '../../../overlay/JJTitleCard.tsx'
+import {
+  type Component,
+  createEffect,
+  on,
+  For,
+  Match,
+  Show,
+  Switch,
+  createMemo,
+} from 'solid-js'
+import { createI18n, I18nProvider } from 'solid-i18n'
+import '../common/marquee.css'
+import { JJLink } from '../common/JJLinkCard.tsx'
 import { useLocale } from '@kobalte/core'
 import { orpcPrivate } from '../../../../../lib/orpc/client.ts'
 import { useQuery, QueryClientProvider } from '@tanstack/solid-query'
 import { QueryClient } from '@tanstack/query-core'
-import type { CharityItem } from '../../../../../lib/orpc/private/overlay/contract.ts'
+import { CharityTickerChild } from '../common/CharityTickerChild'
+import { JJLogo } from '../common/JJLogo.tsx'
 
-export const CharitiesTickerOverlay: Component = () => {
+export type CharitiesProps = {
+  theme?: 'default' | 'red' | 'blue'
+  speed?: number
+  url?: string
+  titleLogo?: string
+  user?: string
+  currency?: 'GBP' | 'USD'
+}
+
+export const CharitiesTickerOverlay: Component<CharitiesProps> = (props) => {
+  const resolved = {
+    theme: props.theme ?? 'default',
+    url: props.url ?? 'jinglejam.tiltify.com',
+    titleLogo: props.titleLogo ?? 'none',
+    user: props.user,
+    currency: props.currency ?? 'GBP',
+  }
+  const i18n = createI18n({ language: useLocale().locale() })
   return (
     <QueryClientProvider client={new QueryClient()}>
-      <CharitiesOverlayComponent
-        speed={useSpeed()}
-        theme={useTheme()}
-        showRaised={useShowRaised()}
-        url={useTiltifyUrl()}
-        titleLogo={useTitleLogo()}
-        showTitle={useShowTitle()}
-        showJJLink={useShowJJLink()}
-        username={useUsername()}
-      />
+      <I18nProvider i18n={i18n}>
+        <Body
+          theme={resolved.theme}
+          url={resolved.url}
+          titleLogo={resolved.titleLogo}
+          user={resolved.user}
+          currency={resolved.currency}
+        />
+      </I18nProvider>
     </QueryClientProvider>
   )
 }
 
-export const CharitiesOverlayComponent: Component<{
-  speed: number
-  theme: string
-  showRaised: boolean
+const Body: Component<{
+  theme: 'default' | 'red' | 'blue'
   url: string
   titleLogo: string
-  showTitle: boolean
-  showJJLink: boolean
-  username: string
+  user?: string
+  currency: 'GBP' | 'USD'
 }> = (props) => {
-  const i18n = createI18n({ language: useLocale().locale() })
-  return (
-    <I18nProvider i18n={i18n}>
-      <Body
-        speed={props.speed}
-        theme={props.theme}
-        showRaised={props.showRaised}
-        url={props.url}
-        titleLogo={props.titleLogo}
-        showTitle={props.showTitle}
-        showJJLink={props.showJJLink}
-        username={props.username}
-      />
-    </I18nProvider>
-  )
-}
-
-export const Body: Component<{
-  speed: number
-  theme: string
-  showRaised: boolean
-  url: string
-  titleLogo: string
-  showTitle: boolean
-  showJJLink: boolean
-  username: string
-}> = (props) => {
-  const desc = () => 3
-
   const q = useQuery(() =>
     orpcPrivate.overlay.charities.queryOptions({
-      input: { includeTotals: props.showRaised },
+      input: { includeTotals: true, currency: props.currency, user: props.user },
       staleTime: 5_000,
       refetchInterval: 5_000,
       refetchOnWindowFocus: false,
       refetchIntervalInBackground: true,
-      placeholderData: (prev) => prev
+      placeholderData: (prev) => prev,
     }),
   )
 
-  createEffect(on(() => q.data, (data) => console.log('Charities data', new Date(), data)))
+  const displayItems = () => {
+    if (!q.data) {
+      return []
+    }
 
-  const urlWithUser = () => (props.username && props.username.length > 0 ? `${props.url}/${props.username}` : props.url)
+    const data = q.data
 
-  const items = () => {
-    const lst = q.data ?? []
-    if (!lst) return []
+    const gap = 4
     const result: any[] = []
-    for (let i = 0; i < lst.length; i++) {
-      const d = lst[i]
-      if (i % desc() == 0) {
-        if (i % (desc() * 2) == 0) {
-          if (props.showTitle) result.push(<Title theme={props.theme} titleLogo={props.titleLogo} />)
+
+    const base = data.charities
+    const newChildren = Array.from({ length: gap * 2 }, () => base).flat()
+
+    let hi = 0
+    for (let i = 0; i < newChildren.length; i++) {
+      const d = newChildren[i]
+      if (i % gap === 0) {
+        if (hi === 0) {
+          result.push(<JJLogo theme={props.theme} />)
         } else {
-          if (props.showJJLink) result.push(<JJLink theme={props.theme} url={urlWithUser()} />)
+          result.push(
+            <JJLink theme={props.theme} url={data.userFundraiser?.url} />,
+          )
         }
+        hi = (hi + 1) % 2
       }
       result.push(
-        <Child d={d} theme={props.theme} showRaised={props.showRaised} />,
+        <CharityTickerChild
+          item={d}
+          theme={props.theme as any}
+          showRaised={true}
+        />,
       )
     }
     return result
   }
 
+  const speed = createMemo(() => displayItems().length * 4)
   return (
     <Switch>
       <Match when={q.data}>
@@ -108,11 +114,11 @@ export const Body: Component<{
         <div class="relative flex overflow-x-hidden">
           <div
             style={{
-              animation: `marquee ${props.speed * (items().length * 2)}s linear infinite`,
+              animation: `marquee ${speed()}s linear infinite`,
             }}
             class="flex flex-row whitespace-nowrap"
           >
-            <For each={items()}>
+            <For each={displayItems()}>
               {(d) => (
                 <div class="inline-block h-[80px] w-[256px] items-center justify-center px-2 py-1">
                   {d}
@@ -122,11 +128,11 @@ export const Body: Component<{
           </div>
           <div
             style={{
-              animation: `marquee2 ${props.speed * (items().length * 2)}s linear infinite`,
+              animation: `marquee2 ${speed()}s linear infinite`,
             }}
             class="absolute top-0 flex flex-row whitespace-nowrap"
           >
-            <For each={items()}>
+            <For each={displayItems()}>
               {(d) => (
                 <div class="inline-block h-[80px] w-[256px] items-center justify-center px-2 py-1">
                   {d}
@@ -137,108 +143,5 @@ export const Body: Component<{
         </div>
       </Match>
     </Switch>
-  )
-}
-
-// NOTE: This local Child component can be replaced by the shared CharityTickerChild
-// from src/components/features/overlay-v2/ticker/common/CharityTickerChild.tsx
-// Example:
-//   <CharityTickerChild item={d} theme={props.theme} showRaised={props.showRaised} />
-interface ChildProps {
-  theme: string
-  d: CharityItem
-  showRaised: boolean
-}
-
-const Child: Component<ChildProps> = (props) => {
-  const useBackground = () => {
-    switch (props.theme) {
-
-      case 'red':
-        return 'bg-primary'
-      case 'blue':
-        return 'bg-accent'
-      default:
-        return 'bg-white'
-    }
-  }
-  const useNameTextColor = () => {
-    switch (props.theme) {
-
-      case 'red':
-      case 'blue':
-        return 'text-white'
-      default:
-        return 'text-accent'
-    }
-  }
-  const useRaisedTextColor = () => {
-    switch (props.theme) {
-
-      case 'red':
-      case 'blue':
-        return 'text-white'
-      default:
-        return 'text-primary'
-    }
-  }
-
-  const value = () => props.d.amountRaised ?? 0
-
-  return (
-    <div class={`h-full w-full rounded-2xl ${useBackground()} p-2 shadow-2xl`}>
-      <div class={'flex h-full w-full flex-row items-center justify-start'}>
-        <img class={'h-12 w-12 rounded-lg'} alt={''} src={props.d.logoUrl ?? ''} loading={'eager'} />
-        <div class={'flex h-full flex-1 flex-col items-start justify-center overflow-hidden truncate pl-2 '}>
-          <p class={`${useNameTextColor()} font-bold`}>{props.d.name}</p>
-          <Show when={props.showRaised}>
-            <p class={`${useRaisedTextColor()} font-bold`}>
-              Raised <Numeric value={value()} numberStyle="currency" currency={'GBP'} />
-            </p>
-          </Show>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-interface TitleProps {
-  theme: string
-  titleLogo: string
-}
-
-// NOTE: This Title block could be generalized using the shared TickerHeader
-// from src/components/features/overlay-v2/ticker/common/TickerHeader.tsx
-// Example replacement:
-//   <TickerHeader theme={props.theme} logoUrl={props.titleLogo} title="Jingle Jam" subtitle="Charities" />
-// Or use the prebuilt variants from TickerHeaderVariants:
-//   import { JJHeader } from '../common/TickerHeaderVariants'
-//   <JJHeader theme={props.theme} logoUrl={props.titleLogo} subtitle="Charities" />
-const Title: Component<TitleProps> = (props) => {
-  const community = () => {
-    switch (props.theme) {
-
-      case 'red':
-      case 'blue':
-        return 'text-white'
-      default:
-        return 'text-accent-500'
-    }
-  }
-  const fundraisers = () => {
-    switch (props.theme) {
-
-      case 'red':
-      case 'blue':
-        return 'text-white'
-      default:
-        return 'text-primary-500'
-    }
-  }
-  return (
-    <JJTitleCard theme={props.theme} titleLogo={props.titleLogo}>
-      <p class={`${community()} font-bold`}>Jingle Jam</p>
-      <p class={`${fundraisers()} font-bold`}>Charities</p>
-    </JJTitleCard>
   )
 }

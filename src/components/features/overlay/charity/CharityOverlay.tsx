@@ -1,9 +1,9 @@
 import {type Component, For, Match, Show, Switch} from 'solid-js'
 import {createI18n, I18nProvider, Numeric} from 'solid-i18n'
 import {useShowRaised, useSpeed, useTheme, useTiltifyUrl, useTitleLogo} from '../overlay_signals'
-import '../marquee.css'
-import {JJLink} from '../JJLinkCard'
-import {JJTitleCard} from '../JJTitleCard'
+import '../../overlay-v2/ticker/common/marquee.css'
+import {JJLink} from '../../overlay-v2/ticker/common/JJLinkCard.tsx'
+import {JJTitleCard} from '../../overlay-v2/ticker/common/JJTitleCard.tsx'
 import {useJJDonationTracker} from "../../../../lib/useJJDonationTracker.ts";
 import type {Cause} from "../../../../lib/model/jjData/JJData.ts";
 import {useLocale} from "@kobalte/core";
@@ -35,7 +35,7 @@ export const CharityOverlayComponent: Component<{
   </I18nProvider>
 }
 
-export const Body: Component<{
+const Body: Component<{
   speed: number
   theme: string
   showRaised: boolean

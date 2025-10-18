@@ -1,10 +1,10 @@
 ---
-import BaseLayout from '../../layouts/BaseLayout.astro'
 import { FundraisersTickerOverlay } from '../../components/features/overlay-v2/ticker/fundraisers/FundraisersTickerOverlay.tsx'
 
 const orderByParam = Astro.url.searchParams.get('orderBy')
 const pageSizeParam = Astro.url.searchParams.get('pageSize')
 const currencyParam = Astro.url.searchParams.get('currency')
+const userParam = Astro.url.searchParams.get('user')
 
 const orderBy =
   orderByParam === 'top' || orderByParam === 'alphabetical'
@@ -12,8 +12,9 @@ const orderBy =
     : 'recent'
 const pageSize = pageSizeParam ? Number(pageSizeParam) : undefined
 const currency = currencyParam === 'USD' ? 'USD' : 'GBP'
+const user = userParam ?? undefined
 ---
 
 <div class="min-h-screen bg-transparent text-white">
-  <FundraisersTickerOverlay client:only="solid-js" orderBy={orderBy} pageSize={pageSize} currency={currency} />
+  <FundraisersTickerOverlay client:only="solid-js" orderBy={orderBy} pageSize={pageSize} currency={currency} user={user} />
 </div>

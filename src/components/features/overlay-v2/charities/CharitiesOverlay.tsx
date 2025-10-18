@@ -1,14 +1,8 @@
-import {
-  type Component,
-  createSignal,
-  onCleanup,
-  onMount,
-  Show,
-} from 'solid-js'
+import { type Component, createSignal, onCleanup, onMount, Show, } from 'solid-js'
 import { Transition } from 'solid-transition-group'
 import { twMerge } from 'tailwind-merge'
 import { QRCodeSVG } from 'solid-qr-code'
-import '../../overlay/marquee.css'
+import '../ticker/common/marquee.css'
 import { orpcPrivate } from '../../../../lib/orpc/client.ts'
 import { QueryClientProvider, useQuery } from '@tanstack/solid-query'
 import { QueryClient } from '@tanstack/query-core'
@@ -180,7 +174,7 @@ const Charities2OverlayBody: Component<Props> = (props) => {
       refetchIntervalInBackground: true,
     }),
   )
-  const charities = () => q.data ?? []
+  const charities = () => q.data?.charities ?? []
   const filteredCharities = () =>
     causes().length === 0
       ? charities()
@@ -211,6 +205,38 @@ const Charities2OverlayBody: Component<Props> = (props) => {
     const list = filteredCharities()
     if (list.length === 0) return undefined
     return list[idx() % list.length]
+  }
+
+  const oneCause = () => filteredCharities().length === 1
+  const items = () => {
+    return filteredCharities().map((c, i) => {
+      return (
+        <CharityItem
+          charity={c}
+          theme={currentTheme(i)}
+          showDesc={showDesc()}
+          showQRCode={showQRCode()}
+          showUrl={showUrl()}
+          showRaised={showRaised()}
+        />
+      )
+    })
+  }
+
+  const currentItem = () => {
+    if (oneCause()) {
+      return (
+        <CharityItem
+          charity={filteredCharities()[0]}
+          theme={currentTheme(0)}
+          showDesc={showDesc()}
+          showQRCode={showQRCode()}
+          showUrl={showUrl()}
+          showRaised={showRaised()}
+        />
+      )
+    }
+    return items()[idx()]
   }
 
   return (
@@ -252,14 +278,7 @@ const Charities2OverlayBody: Component<Props> = (props) => {
                 a.finished.then(done)
               }}
             >
-              <CharityItem
-                charity={c() as CharityItem}
-                theme={currentTheme(idx())}
-                showDesc={showDesc()}
-                showQRCode={showQRCode()}
-                showUrl={showUrl()}
-                showRaised={showRaised()}
-              />
+              {currentItem()}
             </Transition>
           )}
         </Show>
@@ -316,8 +335,6 @@ const CharityItem: Component<{
     return base
   }
 
-  const value = () => props.charity.amountRaised ?? 0
-
   return (
     <div class={'h-full p-2'}>
       <div
@@ -343,14 +360,7 @@ const CharityItem: Component<{
               raisedColor(),
             )}
           >
-            Raised{' '}
-            <span>
-              {new Intl.NumberFormat('en-GB', {
-                style: 'currency',
-                currency: 'GBP',
-                maximumFractionDigits: 0,
-              }).format(value())}
-            </span>
+            Raised <span>{props.charity.raisedFormatted}</span>
           </p>
         </Show>
         <Show when={props.showDesc}>

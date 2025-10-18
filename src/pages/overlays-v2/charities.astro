@@ -1,7 +1,17 @@
 ---
-import {CharitiesTickerOverlay} from '../../components/features/overlay-v2/ticker/charities/CharitiesTickerOverlay.tsx'
+import { CharitiesTickerOverlay } from '../../components/features/overlay-v2/ticker/charities/CharitiesTickerOverlay.tsx'
+
+const themeParam = Astro.url.searchParams.get('theme')
+const speedParam = Astro.url.searchParams.get('speed')
+const currencyParam = Astro.url.searchParams.get('currency')
+const userParam = Astro.url.searchParams.get('user')
+
+const theme = (themeParam as any) ?? undefined
+const speed = speedParam ? Number(speedParam) : undefined
+const currency = currencyParam === 'USD' ? 'USD' : 'GBP'
+const user = userParam ?? undefined
 
 ---
-  <div class="min-h-screen bg-transparent text-white">
-    <CharitiesTickerOverlay client:only="solid-js"/>
-  </div>
+<div class="min-h-screen bg-transparent text-white">
+  <CharitiesTickerOverlay client:only="solid-js" theme={theme} speed={speed} currency={currency} user={user} />
+</div>

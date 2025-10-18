@@ -1,16 +1,86 @@
 import { implement, ORPCError } from '@orpc/server'
 import { contracts, type FundraiserItem } from './contract'
 import { dbMiddleware } from '../../middleware/dbMiddleware'
-import { schedulesTable, teamMembersTable, teamsTable, } from '../../../db/schema/jj-schema'
-import { and, eq, inArray } from 'drizzle-orm'
+import {
+  schedulesTable,
+  streamsTable,
+  teamMembersTable,
+  teamsTable,
+} from '../../../db/schema/jj-schema'
+import { and, eq, gte, inArray } from 'drizzle-orm'
 import { getScheduleStreams } from '../../public/schedules/util'
 import { accounts } from '../../../db/schema/auth-schema'
 import type { JJCampaign } from '../../../../do/types/JJAPIModel.ts'
+import { jjCampaign } from '../../../db/schema/jj-api-schema.ts'
+import type { JJDrizzleDatabase } from '../../../db/db.ts'
+import { userDisplayView } from '../../../db/schema/views-schema.ts'
+import { DateTime, IANAZone } from 'luxon'
+import { getStreamColors } from '../../../../functions/jjDatesToColors.ts'
 
 const os = implement(contracts).use(dbMiddleware)
 
 function clamp(n: number, min: number, max: number) {
   return Math.max(min, Math.min(max, n))
+}
+
+function campaignMapper(
+  c: JJCampaign,
+  currency: string,
+  avgConversionRate: number,
+): FundraiserItem {
+  const cur = currency === 'USD' ? 'USD' : 'GBP'
+  const locale = cur === 'USD' ? 'en-US' : 'en-GB'
+  const raised = cur === 'USD' ? c.raised * avgConversionRate : c.raised
+  const raisedFormatted = Intl.NumberFormat(locale, {
+    style: 'currency',
+    currency: cur,
+  }).format(raised ?? 0)
+  return {
+    id: String(c.slug ?? ''),
+    title: String(c?.user?.name ?? c.name ?? ''),
+    raisedFormatted,
+    raised: raised ?? 0,
+    imageUrl: c?.user?.avatar || undefined,
+    url: c.url,
+  }
+}
+
+async function campaignBySlug(
+  db: JJDrizzleDatabase,
+  slug: string,
+  currency: string,
+  avgConversionRate: number,
+) {
+  const userCampaign = await db
+    .select()
+    .from(jjCampaign)
+    .where(eq(jjCampaign.userSlug, slug))
+    .get()
+  let jjC: JJCampaign | null = null
+  if (userCampaign) {
+    jjC = {
+      causeId: userCampaign.causeId ?? 0,
+      name: userCampaign.name,
+      description: userCampaign.description ?? '',
+      slug: userCampaign.slug,
+      url: userCampaign.url ?? '',
+      startTime: userCampaign.startTime,
+      raised: userCampaign.raised,
+      goal: userCampaign.goal,
+      livestream: {
+        channel: userCampaign.livestream?.channel ?? null,
+        type: userCampaign.livestream?.type ?? '',
+      },
+      user: {
+        id: userCampaign.userId ?? 0,
+        name: userCampaign.userName ?? '',
+        slug: userCampaign.userSlug ?? '',
+        avatar: userCampaign.userAvatar ?? '',
+        url: userCampaign.userUrl ?? '',
+      },
+    }
+  }
+  return jjC ? campaignMapper(jjC, currency, avgConversionRate) : null
 }
 
 // ----------------------
@@ -19,31 +89,49 @@ function clamp(n: number, min: number, max: number) {
 const charities = os.charitiesContract.handler(async ({ input, context }) => {
   const includeTotals = Boolean(input?.includeTotals)
   const pageSize = clamp(Math.floor(input?.pageSize ?? 50), 1, 200)
+  const currency = input.currency
 
   const DO = context.env.JingleJamData
   const stubID = DO.idFromName('JJ_API_CACHE')
   const stub = DO.get(stubID)
-  const causes: any[] | null = await stub.getCauses()
+  const causes = await stub.getCauses()
+  const avgConversionRate = await stub.getAvgConversionRate()
 
-  if (!causes?.length) return []
+  const userFundraiser = await campaignBySlug(
+    context.db,
+    input.user ?? '',
+    currency,
+    avgConversionRate,
+  )
 
-  const r = new Date().getUTCSeconds()
+  if (!causes?.length) {
+    return { userFundraiser, charities: [] }
+  }
 
-  const items = causes.map((cause: any) => ({
-    id: Number(cause.id),
-    name: String(cause.name ?? ''),
-    logoUrl: cause.logo || undefined,
-    websiteUrl: cause.url || undefined,
-    raised: includeTotals
-      ? Number(
-          (cause?.raised?.fundraisers ?? 0) + (cause?.raised?.yogscast ?? 0),
-        ) + r
-      : undefined,
-    currency: includeTotals ? 'GBP' : undefined,
-    description: cause.description,
-  }))
+  const locale = currency === 'USD' ? 'en-US' : 'en-GB'
+  const formatter = Intl.NumberFormat(locale, {
+    style: 'currency',
+    currency: currency,
+  })
+  const items = causes.map((cause) => {
+    const raised =
+      (cause?.raised?.fundraisers ?? 0) + (cause?.raised?.yogscast ?? 0)
+    const convertedRaised =
+      currency === 'USD' ? raised * avgConversionRate : raised
+    const raisedFormatted = formatter.format(convertedRaised)
+    return {
+      id: Number(cause.id),
+      name: String(cause.name ?? ''),
+      logoUrl: cause.logo || undefined,
+      websiteUrl: cause.url || undefined,
+      raised: convertedRaised,
+      raisedFormatted: raisedFormatted,
+      currency: includeTotals ? currency : undefined,
+      description: cause.description,
+    }
+  })
 
-  return items.slice(0, pageSize)
+  return { userFundraiser, charities: items.slice(0, pageSize) }
 })
 
 // ----------------------
@@ -84,27 +172,6 @@ const causeById = os.causeByIdContract.handler(async ({ input, context }) => {
 // Fundraisers
 // ----------------------
 
-function campaignMapper(
-  c: JJCampaign,
-  currency: string,
-  avgConversionRate: number,
-): FundraiserItem {
-  const cur = currency === 'USD' ? 'USD' : 'GBP'
-  const locale = cur === 'USD' ? 'en-US' : 'en-GB'
-  const raised = cur === 'USD' ? c.raised * avgConversionRate : c.raised
-  const raisedFormatted = Intl.NumberFormat(locale, {
-    style: 'currency',
-    currency: cur,
-  }).format(raised ?? 0)
-  return {
-    id: String(c.slug ?? ''),
-    title: String(c?.user?.name ?? c.name ?? ''),
-    raisedFormatted,
-    raised: raised ?? 0,
-    imageUrl: c?.user?.avatar || undefined,
-  }
-}
-
 const fundraisers = os.fundraisersContract.handler(
   async ({ input, context }) => {
     const pageSize = clamp(Math.floor(input?.pageSize ?? 25), 1, 200)
@@ -119,7 +186,20 @@ const fundraisers = os.fundraisersContract.handler(
     const stub = DO.get(stubID)
     const list = await stub.getCampaigns()
     const avgConversionRate = await stub.getAvgConversionRate()
-    if (!list?.length) return []
+
+    const userFundraiser = await campaignBySlug(
+      context.db,
+      input.user ?? '',
+      currency,
+      avgConversionRate,
+    )
+
+    if (!list?.length) {
+      return {
+        userFundraiser,
+        fundraisers: [],
+      }
+    }
 
     const mapped = list.map((c) =>
       campaignMapper(c, currency, avgConversionRate),
@@ -137,7 +217,10 @@ const fundraisers = os.fundraisersContract.handler(
         break
     }
 
-    return mapped.slice(0, pageSize)
+    return {
+      userFundraiser,
+      fundraisers: mapped.slice(0, pageSize),
+    }
   },
 )
 
@@ -150,17 +233,20 @@ const teamFundraisers = os.teamFundraisersContract.handler(
     const slug = input.teamSlug.trim()
     const orderBy = input.orderBy
     const currency = input.currency
-    if (!slug)
+    if (!slug) {
       throw new ORPCError('BAD_REQUEST', { message: 'teamSlug is required' })
+    }
 
     // Find team by slug
     const team = await db
-      .select({ id: teamsTable.id })
+      .select({ id: teamsTable.id, name: teamsTable.name })
       .from(teamsTable)
       .where(eq(teamsTable.slug, slug))
       .get()
 
-    if (!team) throw new ORPCError('NOT_FOUND', { message: 'Team not found' })
+    if (!team) {
+      throw new ORPCError('NOT_FOUND', { message: 'Team not found' })
+    }
 
     // Get member user IDs
     const members = await db
@@ -169,7 +255,9 @@ const teamFundraisers = os.teamFundraisersContract.handler(
       .where(eq(teamMembersTable.teamId, team.id))
       .all()
 
-    if (members.length === 0) return []
+    if (members.length === 0) {
+      throw new ORPCError('NOT_FOUND', { message: 'Team members not found' })
+    }
     const userIds = members.map((m) => m.userId)
 
     // Get Tiltify accounts for these users
@@ -187,7 +275,9 @@ const teamFundraisers = os.teamFundraisersContract.handler(
       )
       .all()
 
-    if (tiltifyAccounts.length === 0) return []
+    if (tiltifyAccounts.length === 0) {
+      throw new ORPCError('BAD_REQUEST')
+    }
 
     const idSet = new Set<number>()
     const slugSet = new Set<string>()
@@ -203,7 +293,9 @@ const teamFundraisers = os.teamFundraisersContract.handler(
     const stub = DO.get(stubID)
     const list = await stub.getCampaigns()
     const avgConversionRate = await stub.getAvgConversionRate()
-    if (!list?.length) return []
+    if (!list?.length) {
+      throw new ORPCError('BAD_REQUEST')
+    }
 
     const filtered = list.filter((c: any) => {
       const uid = Number(c?.user?.id ?? NaN)
@@ -211,7 +303,7 @@ const teamFundraisers = os.teamFundraisersContract.handler(
       return (uid && idSet.has(uid)) || (uslug && slugSet.has(uslug))
     })
 
-    const mapped = list.map((c) =>
+    const mapped = filtered.map((c) =>
       campaignMapper(c, currency, avgConversionRate),
     )
 
@@ -226,8 +318,17 @@ const teamFundraisers = os.teamFundraisersContract.handler(
         // recent: keep order from source
         break
     }
-
-    return mapped
+    const userFundraiser = await campaignBySlug(
+      context.db,
+      input.user ?? '',
+      currency,
+      avgConversionRate,
+    )
+    return {
+      teamName: team.name,
+      fundraisers: mapped,
+      userFundraiser,
+    }
   },
 )
 
@@ -239,6 +340,7 @@ const causeFundraisers = os.causeFundraisersContract.handler(
     const causeId = input.causeId
     const orderBy = input.orderBy
     const currency = input.currency
+    const user = input.user ?? ''
     if (!Number.isFinite(causeId) || causeId < 0) {
       throw new ORPCError('BAD_REQUEST', {
         message: 'Valid causeId is required',
@@ -252,7 +354,19 @@ const causeFundraisers = os.causeFundraisersContract.handler(
     const list = await stub.getCampaignsForCause(causeId)
     const avgConversionRate = await stub.getAvgConversionRate()
 
-    if (!list?.length) return []
+    const userFundraiser = await campaignBySlug(
+      context.db,
+      input.user ?? '',
+      currency,
+      avgConversionRate,
+    )
+
+    if (!list?.length) {
+      return {
+        userFundraiser,
+        fundraisers: [],
+      }
+    }
 
     const mapped = list.map((c) =>
       campaignMapper(c, currency, avgConversionRate),
@@ -269,21 +383,50 @@ const causeFundraisers = os.causeFundraisersContract.handler(
         // recent: keep order from source
         break
     }
-    return mapped
+    return {
+      userFundraiser,
+      fundraisers: mapped,
+    }
   },
 )
 
 // ----------------------
 // Schedule Simple
 // ----------------------
-const scheduleSimple = os.scheduleSimpleContract.handler(
+const schedulePrimary = os.schedulePrimaryContract.handler(
   async ({ input, context }) => {
     const db = context.db
-    const byId = input.scheduleId != null
-    const bySlug = input.scheduleSlug != null
-    if (byId === bySlug) {
-      throw new ORPCError('BAD_REQUEST', {
-        message: 'Provide exactly one of scheduleId or scheduleSlug',
+    const slug = input.user
+    const now = DateTime.now()
+    const currentYear = now.year
+
+    const inputTimezone = input.timezone ?? 'Europe/London'
+    console.log('inputTimezone', inputTimezone)
+
+    const timezone = IANAZone.isValidZone(inputTimezone)
+      ? inputTimezone
+      : 'Europe/London'
+
+    const user = await db
+      .select({
+        userId: userDisplayView.userId,
+        primaryLiveStream: userDisplayView.primaryLiveStream,
+        createdAt: userDisplayView.createdAt,
+        username: userDisplayView.username,
+        profileImage: userDisplayView.profileImage,
+        twitchLogin: userDisplayView.twitchLogin,
+        tiltifySlug: userDisplayView.tiltifySlug,
+        tiltifyUrl: userDisplayView.tiltifyUrl,
+        primaryColor: userDisplayView.primaryColor,
+        accentColor: userDisplayView.accentColor,
+      })
+      .from(userDisplayView)
+      .where(eq(userDisplayView.tiltifySlug, slug))
+      .get()
+
+    if (!user) {
+      throw new ORPCError('NOT_FOUND', {
+        message: 'User not found',
       })
     }
 
@@ -297,59 +440,203 @@ const scheduleSimple = os.scheduleSimpleContract.handler(
       })
       .from(schedulesTable)
       .where(
-        byId
-          ? and(
-              eq(schedulesTable.id, input.scheduleId!),
-              eq(schedulesTable.visible, true),
-            )
-          : and(
-              eq(schedulesTable.slug, input.scheduleSlug!),
-              eq(schedulesTable.visible, true),
-            ),
+        and(
+          eq(schedulesTable.visible, true),
+          eq(schedulesTable.year, currentYear),
+          eq(schedulesTable.ownerId, user.userId),
+        ),
       )
       .get()
 
-    if (!schedule)
+    if (!schedule) {
       throw new ORPCError('NOT_FOUND', { message: 'Schedule not found' })
+    }
 
     const streams = await getScheduleStreams(db, schedule.id)
     streams.sort((a, b) => a.start.getTime() - b.start.getTime())
 
-    const blocks = streams.map((s) => ({
-      id: s.id,
-      start: s.start.toISOString(),
-      end: s.end.toISOString(),
-      title: s.title,
-      participants: s.participants?.map((p) => p.username) ?? [],
-      color: undefined as string | undefined,
-    }))
+    const limit = clamp(Math.floor(input.limit ?? 4), 1, 100)
 
-    // Trim window server-side (equivalent to client trimSchedule)
-    const includePast = Boolean(input.includePast)
-    const windowSize = clamp(Math.floor(input.windowSize ?? 3), 1, 10)
-    const now = Date.now()
-
-    const upcoming: typeof blocks = []
-    let current: (typeof blocks)[number] | undefined
-    for (const b of blocks) {
-      const start = Date.parse(b.start)
-      const end = Date.parse(b.end)
-      if (end < now) continue
-      if (start <= now && now <= end) current = b
-      else if (start > now) upcoming.push(b)
-    }
-
-    const trimmed: typeof blocks = []
-    if (includePast && current) trimmed.push(current)
-    let remaining = windowSize - trimmed.length
-    for (let i = 0; i < upcoming.length && remaining > 0; i++) {
-      trimmed.push(upcoming[i])
-      remaining--
-    }
+    const blocks = streams
+      .filter((s) => {
+        return s.end.getTime() > now.toMillis()
+      })
+      .map((s) => {
+        const c = getStreamColors(
+          DateTime.fromJSDate(s.start).setZone('Europe/London'),
+        )
+        return {
+          id: s.id,
+          start: s.start,
+          end: s.end,
+          title: s.title,
+          subtitle: s.subtitle,
+          color: c['500'],
+        }
+      })
+      .slice(0, limit)
 
     return {
       schedule: { id: schedule.id, name: schedule.name, slug: schedule.slug },
-      blocks: trimmed,
+      blocks: blocks,
+      timezone,
+    }
+  },
+)
+
+const scheduleByTeamId = os.scheduleByTeamIdContract.handler(
+  async ({ input, context }) => {
+    const db = context.db
+    const teamId = input.teamId
+    const limit = clamp(Math.floor(input.limit ?? 4), 1, 100)
+
+    const inputTimezone = input.timezone ?? 'Europe/London'
+    const timezone = IANAZone.isValidZone(inputTimezone)
+      ? inputTimezone
+      : 'Europe/London'
+
+    const now = new Date()
+    const currentYear = now.getUTCFullYear()
+
+    // Fetch team
+    const team = await db
+      .select({
+        id: teamsTable.id,
+        name: teamsTable.name,
+        slug: teamsTable.slug,
+        visible: teamsTable.visible,
+      })
+      .from(teamsTable)
+      .where(eq(teamsTable.id, teamId))
+      .get()
+
+    if (!team) {
+      throw new ORPCError('NOT_FOUND', { message: 'Team not found' })
+    }
+
+    // Get team member user IDs
+    const members = await db
+      .select({ userId: teamMembersTable.userId })
+      .from(teamMembersTable)
+      .where(eq(teamMembersTable.teamId, team.id))
+      .all()
+
+    const userIds = members.map((m) => m.userId)
+
+    let blocks: {
+      id: number
+      start: Date
+      end: Date
+      title: string
+      subtitle: string | null
+      color: string
+      owner: {
+        userId: number
+        username: string
+        profileImage?: string | null
+        twitchLogin?: string | null
+        tiltifySlug?: string | null
+      }
+    }[] = []
+
+    if (userIds.length > 0) {
+      // Get all upcoming streams for member primary schedules for current year
+      const upcoming = await db
+        .select({
+          id: streamsTable.id,
+          scheduleId: streamsTable.scheduleId,
+          createdBy: streamsTable.createdBy,
+          title: streamsTable.title,
+          subtitle: streamsTable.subtitle,
+          start: streamsTable.start,
+          end: streamsTable.end,
+          visible: streamsTable.visible,
+          ownerId: schedulesTable.ownerId,
+        })
+        .from(streamsTable)
+        .innerJoin(
+          schedulesTable,
+          eq(streamsTable.scheduleId, schedulesTable.id),
+        )
+        .where(
+          and(
+            inArray(schedulesTable.ownerId, userIds),
+            eq(streamsTable.visible, true),
+            eq(schedulesTable.visible, true),
+            eq(schedulesTable.primary, true),
+            eq(schedulesTable.year, currentYear),
+            gte(streamsTable.start, now),
+          ),
+        )
+        .orderBy(streamsTable.start)
+        .all()
+
+      if (upcoming.length > 0) {
+        // One stream per schedule owner (team member), take the earliest
+        const seenOwners = new Set<number>()
+        const uniqueByOwner: typeof upcoming = []
+        for (const s of upcoming) {
+          if (seenOwners.has(s.ownerId)) continue
+          seenOwners.add(s.ownerId)
+          uniqueByOwner.push(s)
+        }
+
+        const limited = uniqueByOwner.slice(0, limit)
+
+        // Batch load owner display info
+        const ownerIds = Array.from(new Set(limited.map((s) => s.ownerId)))
+        const owners = ownerIds.length
+          ? await db
+              .select({
+                userId: userDisplayView.userId,
+                username: userDisplayView.username,
+                profileImage: userDisplayView.profileImage,
+                twitchLogin: userDisplayView.twitchLogin,
+                tiltifySlug: userDisplayView.tiltifySlug,
+              })
+              .from(userDisplayView)
+              .where(inArray(userDisplayView.userId, ownerIds))
+              .all()
+          : []
+
+        const ownerById = new Map<number, {
+          userId: number
+          username: string
+          profileImage: string | null
+          twitchLogin: string | null
+          tiltifySlug: string | null
+        }>()
+        for (const o of owners) ownerById.set(o.userId, o)
+
+        blocks = limited.map((s) => {
+          const dt = DateTime.fromJSDate(
+            s.start instanceof Date ? s.start : new Date(s.start as any),
+          ).setZone('Europe/London')
+          const c = getStreamColors(dt)
+          const owner = ownerById.get(s.ownerId) ?? {
+            userId: s.ownerId,
+            username: String(s.ownerId),
+            profileImage: null,
+            twitchLogin: null,
+            tiltifySlug: null,
+          }
+          return {
+            id: s.id,
+            start: s.start instanceof Date ? s.start : new Date(s.start as any),
+            end: s.end instanceof Date ? s.end : new Date(s.end as any),
+            title: s.title,
+            subtitle: s.subtitle,
+            color: c['500'],
+            owner,
+          }
+        })
+      }
+    }
+
+    return {
+      schedule: { id: team.id, name: team.name, slug: team.slug },
+      timezone,
+      blocks,
     }
   },
 )
@@ -363,5 +650,6 @@ export const privateOverlayRouter = {
   teamFundraisers,
   causeFundraisers,
   // Schedule output
-  scheduleSimple,
+  schedulePrimary,
+  scheduleByTeamId,
 }

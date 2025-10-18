@@ -8,9 +8,9 @@ export const CharityItemSchema = z.object({
   id: z.number().int().nonnegative(),
   name: z.string(),
   description: z.string(),
-  logoUrl: z.string().url().optional(),
+  logoUrl: z.string().optional(),
   tagline: z.string().optional(),
-  websiteUrl: z.string().url().optional(),
+  websiteUrl: z.string().optional(),
   raised: z.number().optional(),
   raisedFormatted: z.string().optional(),
 })
@@ -22,7 +22,8 @@ export const FundraiserItemSchema = z.object({
   title: z.string(),
   raisedFormatted: z.string(),
   raised: z.number(),
-  imageUrl: z.string().url().optional(),
+  imageUrl: z.string().optional(),
+  url: z.string().optional(),
 })
 
 export type FundraiserItem = z.infer<typeof FundraiserItemSchema>
@@ -44,71 +45,50 @@ export const SimpleScheduleViewSchema = z.object({
 export type SimpleScheduleViewT = z.infer<typeof SimpleScheduleViewSchema>
 
 // ----------------------
-// Inputs
-// ----------------------
-const charitiesInput = z.object({
-  includeTotals: z.boolean().optional(),
-  pageSize: z.number().int().min(1).max(200).optional(),
-})
-
-const fundraisersInput = z.object({
-  orderBy: z.enum(['recent', 'top', 'alphabetical']).optional(),
-  pageSize: z.number().int().min(1).max(200).optional(),
-})
-
-const scheduleSimpleInput = z
-  .object({
-    scheduleId: z.number().int().nonnegative().optional(),
-    scheduleSlug: z.string().min(1).optional(),
-    includePast: z.boolean().optional(),
-    windowSize: z.number().int().min(1).max(10).optional(),
-  })
-  .refine((x) => Boolean(x.scheduleId) !== Boolean(x.scheduleSlug), {
-    message: 'Provide exactly one of scheduleId or scheduleSlug',
-  })
-
-// ----------------------
 // Routes
 // ----------------------
 
 const charitiesContract = oc
-  .input(charitiesInput)
-  .output(z.array(CharityItemSchema))
-  .route({
-    path: '/overlay/charities',
-    method: 'GET',
-    summary: 'Overlay V2 charities (UI-ready)',
-    tags: ['overlay', 'v2'],
-  })
+  .input(
+    z.object({
+      includeTotals: z.boolean().optional(),
+      currency: z.enum(['USD', 'GBP']).default('GBP'),
+      pageSize: z.number().int().min(1).max(200).optional(),
+      user: z.string().optional(),
+    }),
+  )
+  .output(
+    z.object({
+      userFundraiser: FundraiserItemSchema.nullable(),
+      charities: z.array(CharityItemSchema),
+    }),
+  )
 
 const causeByIdContract = oc
   .input(
     z.object({
       causeId: z.number().int().nonnegative(),
       includeTotals: z.boolean().optional(),
+      user: z.string().optional(),
     }),
   )
   .output(CharityItemSchema.nullable())
-  .route({
-    path: '/overlay/cause',
-    method: 'GET',
-    summary: 'Overlay V2 single cause by ID (UI-ready)',
-    tags: ['overlay', 'v2', 'causes'],
-  })
 
 const fundraisersContract = oc
-  .input(z.object({
-    orderBy: z.enum(['recent', 'top', 'alphabetical']).optional(),
-    pageSize: z.number().int().min(1).max(200).optional(),
-    currency: z.enum(['USD', 'GBP']).default('GBP'),
-  }))
-  .output(z.array(FundraiserItemSchema))
-  .route({
-    path: '/overlay/fundraisers',
-    method: 'GET',
-    summary: 'Overlay V2 fundraisers (UI-ready)',
-    tags: ['overlay', 'v2'],
-  })
+  .input(
+    z.object({
+      orderBy: z.enum(['recent', 'top', 'alphabetical']).optional(),
+      pageSize: z.number().int().min(1).max(200).optional(),
+      currency: z.enum(['USD', 'GBP']).default('GBP'),
+      user: z.string().optional(),
+    }),
+  )
+  .output(
+    z.object({
+      userFundraiser: FundraiserItemSchema.nullable(),
+      fundraisers: z.array(FundraiserItemSchema),
+    }),
+  )
 
 // Team fundraisers: campaigns by users who are members of a given team (by slug)
 const teamFundraisersContract = oc
@@ -117,16 +97,16 @@ const teamFundraisersContract = oc
       teamSlug: z.string().min(1),
       orderBy: z.enum(['recent', 'top', 'alphabetical']).optional(),
       currency: z.enum(['USD', 'GBP']).default('GBP'),
+      user: z.string().optional(),
     }),
   )
-  .output(z.array(FundraiserItemSchema))
-  .route({
-    path: '/overlay/team-fundraisers',
-    method: 'GET',
-    summary: 'Overlay V2 team fundraisers (UI-ready)',
-    tags: ['overlay', 'v2', 'teams'],
-  })
-
+  .output(
+    z.object({
+      teamName: z.string(),
+      userFundraiser: FundraiserItemSchema.nullable(),
+      fundraisers: z.array(FundraiserItemSchema),
+    }),
+  )
 // Cause fundraisers: campaigns with a given JJ cause ID
 const causeFundraisersContract = oc
   .input(
@@ -134,25 +114,80 @@ const causeFundraisersContract = oc
       causeId: z.number().int().nonnegative(),
       orderBy: z.enum(['recent', 'top', 'alphabetical']).optional(),
       currency: z.enum(['USD', 'GBP']).default('GBP'),
+      user: z.string().optional(),
     }),
   )
-  .output(z.array(FundraiserItemSchema))
-  .route({
-    path: '/overlay/cause-fundraisers',
-    method: 'GET',
-    summary: 'Overlay V2 cause fundraisers (UI-ready)',
-    tags: ['overlay', 'v2', 'causes'],
-  })
+  .output(
+    z.object({
+      userFundraiser: FundraiserItemSchema.nullable(),
+      fundraisers: z.array(FundraiserItemSchema),
+    }),
+  )
 
-const scheduleSimpleContract = oc
-  .input(scheduleSimpleInput)
-  .output(SimpleScheduleViewSchema)
-  .route({
-    path: '/overlay/schedule-simple',
-    method: 'GET',
-    summary: 'Overlay V2 schedule simple (UI-ready)',
-    tags: ['overlay', 'v2', 'schedule'],
-  })
+const schedulePrimaryContract = oc
+  .input(
+    z.object({
+      user: z.string().optional(),
+      timezone: z.string().optional(),
+      limit: z.number().int().min(1).max(100).default(4),
+    }),
+  )
+  .output(
+    z.object({
+      schedule: z.object({
+        id: z.number(),
+        name: z.string(),
+        slug: z.string(),
+      }),
+      timezone: z.string(),
+      blocks: z.array(
+        z.object({
+          id: z.number().int().nonnegative(),
+          start: z.date(),
+          end: z.date(),
+          title: z.string(),
+          subtitle: z.string().nullable(),
+          color: z.string(),
+        }),
+      ),
+    }),
+  )
+
+const scheduleByTeamIdContract = oc
+  .input(
+    z.object({
+      teamId: z.number().int().nonnegative(),
+      timezone: z.string().optional(),
+      limit: z.number().int().min(1).max(100).default(4),
+    }),
+  )
+  .output(
+    z.object({
+      schedule: z.object({
+        id: z.number(),
+        name: z.string(),
+        slug: z.string(),
+      }),
+      timezone: z.string(),
+      blocks: z.array(
+        z.object({
+          id: z.number().int().nonnegative(),
+          start: z.date(),
+          end: z.date(),
+          title: z.string(),
+          subtitle: z.string().nullable(),
+          color: z.string(),
+          owner: z.object({
+            userId: z.number(),
+            username: z.string(),
+            profileImage: z.string().nullable().optional(),
+            twitchLogin: z.string().nullable().optional(),
+            tiltifySlug: z.string().nullable().optional(),
+          }),
+        }),
+      ),
+    }),
+  )
 
 export const contracts = {
   // Charity outputs
@@ -163,5 +198,6 @@ export const contracts = {
   teamFundraisersContract,
   causeFundraisersContract,
   // Schedule output
-  scheduleSimpleContract,
+  schedulePrimaryContract,
+  scheduleByTeamIdContract,
 }

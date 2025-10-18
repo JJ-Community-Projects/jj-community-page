@@ -1,6 +1,6 @@
 import { For, JSX, type VoidComponent } from 'solid-js'
 import { interleaveComponents } from './interleave'
-import '../../../overlay/marquee.css'
+import './marquee.css'
 
 export const Ticker: VoidComponent<{
   header: JSX.Element[]
