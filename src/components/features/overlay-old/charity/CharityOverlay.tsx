@@ -1,12 +1,18 @@
-import {type Component, For, Match, Show, Switch} from 'solid-js'
-import {createI18n, I18nProvider, Numeric} from 'solid-i18n'
-import {useShowRaised, useSpeed, useTheme, useTiltifyUrl, useTitleLogo} from '../overlay_signals'
-import '../../overlay-v2/ticker/common/marquee.css'
-import {JJLink} from '../../overlay-v2/ticker/common/JJLinkCard.tsx'
-import {JJTitleCard} from '../../overlay-v2/ticker/common/JJTitleCard.tsx'
-import {useJJDonationTracker} from "../../../../lib/useJJDonationTracker.ts";
-import type {Cause} from "../../../../lib/model/jjData/JJData.ts";
-import {useLocale} from "@kobalte/core";
+import { type Component, For, Match, Show, Switch } from 'solid-js'
+import { createI18n, I18nProvider, Numeric } from 'solid-i18n'
+import {
+  useShowRaised,
+  useSpeed,
+  useTheme,
+  useTiltifyUrl,
+  useTitleLogo,
+} from '../overlay_signals'
+import '../../overlay/ticker/common/marquee.css'
+import { JJLink } from '../../overlay/ticker/common/JJLinkCard.tsx'
+import { JJTitleCard } from '../../overlay/ticker/common/JJTitleCard.tsx'
+import { useJJDonationTracker } from '../../../../lib/useJJDonationTracker.ts'
+import type { Cause } from '../../../../lib/model/jjData/JJData.ts'
+import { useLocale } from '@kobalte/core'
 
 export const CharityOverlay: Component = () => {
   return (
@@ -20,19 +26,26 @@ export const CharityOverlay: Component = () => {
   )
 }
 
-
 export const CharityOverlayComponent: Component<{
   speed: number
   theme: string
   showRaised: boolean
   url: string
   titleLogo: string
-}> = props => {
-  const i18n = createI18n({language: useLocale().locale()})
+}> = (props) => {
+  const i18n = createI18n({ language: useLocale().locale() })
 
-  return <I18nProvider i18n={i18n}>
-    <Body speed={props.speed} theme={props.theme} showRaised={props.showRaised} url={props.url} titleLogo={props.titleLogo}/>
-  </I18nProvider>
+  return (
+    <I18nProvider i18n={i18n}>
+      <Body
+        speed={props.speed}
+        theme={props.theme}
+        showRaised={props.showRaised}
+        url={props.url}
+        titleLogo={props.titleLogo}
+      />
+    </I18nProvider>
+  )
 }
 
 const Body: Component<{
@@ -41,7 +54,7 @@ const Body: Component<{
   showRaised: boolean
   url: string
   titleLogo: string
-}> = props => {
+}> = (props) => {
   const charityData = useJJDonationTracker()
   const desc = () => {
     return 3
@@ -62,7 +75,9 @@ const Body: Component<{
           result.push(<JJLink theme={props.theme} url={props.url} />)
         }
       }
-      result.push(<Child d={d} theme={props.theme} showRaised={props.showRaised} />)
+      result.push(
+        <Child d={d} theme={props.theme} showRaised={props.showRaised} />,
+      )
     }
 
     return result
@@ -80,8 +95,12 @@ const Body: Component<{
             class="flex flex-row whitespace-nowrap"
           >
             <For each={items()}>
-              {d => {
-                return <div class="inline-block h-[80px] w-[256px] items-center justify-center px-2 py-1">{d}</div>
+              {(d) => {
+                return (
+                  <div class="inline-block h-[80px] w-[256px] items-center justify-center px-2 py-1">
+                    {d}
+                  </div>
+                )
               }}
             </For>
           </div>
@@ -92,8 +111,12 @@ const Body: Component<{
             class="absolute top-0 flex flex-row whitespace-nowrap"
           >
             <For each={items()}>
-              {d => {
-                return <div class="inline-block h-[80px] w-[256px] items-center justify-center px-2 py-1">{d}</div>
+              {(d) => {
+                return (
+                  <div class="inline-block h-[80px] w-[256px] items-center justify-center px-2 py-1">
+                    {d}
+                  </div>
+                )
               }}
             </For>
           </div>
@@ -109,7 +132,7 @@ interface ChildProps {
   showRaised: boolean
 }
 
-const Child: Component<ChildProps> = props => {
+const Child: Component<ChildProps> = (props) => {
   const useBackground = () => {
     switch (props.theme) {
       case 'pink':
@@ -147,12 +170,26 @@ const Child: Component<ChildProps> = props => {
   return (
     <div class={`h-full w-full rounded-2xl ${useBackground()} p-2 shadow-2xl`}>
       <div class={'flex h-full w-full flex-row items-center justify-start'}>
-        <img class={'h-12 w-12 rounded-lg'} alt={''} src={props.d.logo} loading={'eager'} />
-        <div class={'flex h-full flex-1 flex-col items-start justify-center overflow-hidden truncate pl-2 '}>
+        <img
+          class={'h-12 w-12 rounded-lg'}
+          alt={''}
+          src={props.d.logo}
+          loading={'eager'}
+        />
+        <div
+          class={
+            'flex h-full flex-1 flex-col items-start justify-center overflow-hidden truncate pl-2'
+          }
+        >
           <p class={`${useNameTextColor()} font-bold`}>{props.d.name}</p>
           <Show when={props.showRaised}>
             <p class={`${useRaisedTextColor()} font-bold`}>
-              Raised <Numeric value={value()} numberStyle="currency" currency={'GBP'} />
+              Raised{' '}
+              <Numeric
+                value={value()}
+                numberStyle="currency"
+                currency={'GBP'}
+              />
             </p>
           </Show>
         </div>
@@ -166,7 +203,7 @@ interface TitleProps {
   titleLogo: string
 }
 
-const Title: Component<TitleProps> = props => {
+const Title: Component<TitleProps> = (props) => {
   const community = () => {
     switch (props.theme) {
       case 'pink':

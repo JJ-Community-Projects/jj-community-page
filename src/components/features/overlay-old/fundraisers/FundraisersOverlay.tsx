@@ -1,14 +1,21 @@
-import {type Component, createEffect, For, Match, Switch} from 'solid-js'
-import {createI18n, I18nProvider, Numeric} from 'solid-i18n'
-import {FaBrandsTwitch, FaBrandsYoutube} from 'solid-icons/fa'
-import {excludedChannel, minAmount, useSpeed, useTheme, useTiltifyUrl, useTitleLogo} from '../overlay_signals'
-import '../../overlay-v2/ticker/common/marquee.css'
-import {JJLink} from '../../overlay-v2/ticker/common/JJLinkCard.tsx'
-import {twMerge} from 'tailwind-merge'
-import {JJTitleCard} from '../../overlay-v2/ticker/common/JJTitleCard.tsx'
-import {useFundraiser} from "../../../../lib/useJJDonationTracker.ts";
-import type {Campaign} from "../../../../lib/model/jjData/JJCommunityFundraiser.ts";
-import {useLocale} from "@kobalte/core";
+import { type Component, createEffect, For, Match, Switch } from 'solid-js'
+import { createI18n, I18nProvider, Numeric } from 'solid-i18n'
+import { FaBrandsTwitch, FaBrandsYoutube } from 'solid-icons/fa'
+import {
+  excludedChannel,
+  minAmount,
+  useSpeed,
+  useTheme,
+  useTiltifyUrl,
+  useTitleLogo,
+} from '../overlay_signals'
+import '../../overlay/ticker/common/marquee.css'
+import { JJLink } from '../../overlay/ticker/common/JJLinkCard.tsx'
+import { twMerge } from 'tailwind-merge'
+import { JJTitleCard } from '../../overlay/ticker/common/JJTitleCard.tsx'
+import { useFundraiser } from '../../../../lib/useJJDonationTracker.ts'
+import type { Campaign } from '../../../../lib/model/jjData/JJCommunityFundraiser.ts'
+import { useLocale } from '@kobalte/core'
 
 export const FundraisersOverlay = () => {
   return (
@@ -28,29 +35,36 @@ interface Props {
   titleLogo: string
 }
 
-export const FundraisersOverlayComponent: Component<Props> = props => {
+export const FundraisersOverlayComponent: Component<Props> = (props) => {
   // todo fix
   const config = {
     overlay: {
-      fundraiser: true
-    }
+      fundraiser: true,
+    },
   }
-  const i18n = createI18n({language: useLocale().locale()})
+  const i18n = createI18n({ language: useLocale().locale() })
   return (
     <I18nProvider i18n={i18n}>
       <Switch>
         <Match when={config.overlay.fundraiser}>
-          <Body speed={props.speed} theme={props.theme} url={props.url} titleLogo={props.titleLogo}/>
+          <Body
+            speed={props.speed}
+            theme={props.theme}
+            url={props.url}
+            titleLogo={props.titleLogo}
+          />
         </Match>
         <Match when={!config.overlay.fundraiser}>
-          <p class={'rounded bg-white p-2 text-black'}>The Fundraisers are not available yet</p>
+          <p class={'rounded bg-white p-2 text-black'}>
+            The Fundraisers are not available yet
+          </p>
         </Match>
       </Switch>
     </I18nProvider>
   )
 }
 
-const Body: Component<Props> = props => {
+const Body: Component<Props> = (props) => {
   const e = excludedChannel()
 
   const fundraiserData = useFundraiser()
@@ -63,7 +77,7 @@ const Body: Component<Props> = props => {
     fundraiserData.data?.campaigns
       // .filter(d => !e.includes(d.login))
       // .filter(d => !e.includes(d.display_name))
-      .filter(d => d.raised >= minAmount()) ?? []
+      .filter((d) => d.raised >= minAmount()) ?? []
 
   const desc = () => {
     if (useData().length % 4 == 0) {
@@ -80,12 +94,12 @@ const Body: Component<Props> = props => {
       const d = lst[i]
       if (i % desc() == 0) {
         if (i % (desc() * 2) == 0) {
-          result.push(<Title theme={props.theme} titleLogo={props.titleLogo}/>)
+          result.push(<Title theme={props.theme} titleLogo={props.titleLogo} />)
         } else {
-          result.push(<JJLink theme={props.theme} url={props.url}/>)
+          result.push(<JJLink theme={props.theme} url={props.url} />)
         }
       }
-      result.push(<Child d={d} theme={props.theme}/>)
+      result.push(<Child d={d} theme={props.theme} />)
     }
 
     return result
@@ -100,8 +114,12 @@ const Body: Component<Props> = props => {
         class="flex flex-row whitespace-nowrap"
       >
         <For each={items()}>
-          {d => {
-            return <div class="inline-block h-[80px] w-[256px] items-center justify-center px-2 py-1">{d}</div>
+          {(d) => {
+            return (
+              <div class="inline-block h-[80px] w-[256px] items-center justify-center px-2 py-1">
+                {d}
+              </div>
+            )
           }}
         </For>
       </div>
@@ -112,8 +130,12 @@ const Body: Component<Props> = props => {
         class="absolute top-0 flex flex-row whitespace-nowrap"
       >
         <For each={items()}>
-          {d => {
-            return <div class="inline-block h-[80px] w-[256px] items-center justify-center px-2 py-1">{d}</div>
+          {(d) => {
+            return (
+              <div class="inline-block h-[80px] w-[256px] items-center justify-center px-2 py-1">
+                {d}
+              </div>
+            )
           }}
         </For>
       </div>
@@ -126,7 +148,7 @@ interface ChildProps {
   d: Campaign
 }
 
-const Child: Component<ChildProps> = props => {
+const Child: Component<ChildProps> = (props) => {
   const useBackground = () => {
     switch (props.theme) {
       case 'pink':
@@ -169,11 +191,15 @@ const Child: Component<ChildProps> = props => {
     }
   }
 
-  const isTwitch = () => props.d.twitch_data && props.d.livestream.type === 'twitch'
+  const isTwitch = () =>
+    props.d.twitch_data && props.d.livestream.type === 'twitch'
   const isYoutube = () => props.d.livestream.type === 'youtube'
 
   const img = () => {
-    if (props.d.user.avatar === 'https://assets.tiltify.com/assets/default-avatar.png') {
+    if (
+      props.d.user.avatar ===
+      'https://assets.tiltify.com/assets/default-avatar.png'
+    ) {
       if (isTwitch()) {
         return props.d.twitch_data?.profile_image_url
       }
@@ -182,27 +208,61 @@ const Child: Component<ChildProps> = props => {
   }
 
   return (
-    <div class={`h-full w-full rounded-2xl ${useBackground()} p-2 text-base shadow-2xl`}>
+    <div
+      class={`h-full w-full rounded-2xl ${useBackground()} p-2 text-base shadow-2xl`}
+    >
       <div class={'flex h-full w-full flex-row items-center justify-start'}>
-        <img class={'h-12 w-12 rounded-lg'} alt={''} src={img()} loading={'eager'}/>
-        <div class={'flex h-full w-full flex-col items-start justify-center overflow-hidden truncate pl-2'}>
-          <div class={twMerge(`flex flex-row items-center font-bold`, useDisplayNameTextColor())}>{props.d.name}</div>
+        <img
+          class={'h-12 w-12 rounded-lg'}
+          alt={''}
+          src={img()}
+          loading={'eager'}
+        />
+        <div
+          class={
+            'flex h-full w-full flex-col items-start justify-center overflow-hidden truncate pl-2'
+          }
+        >
+          <div
+            class={twMerge(
+              `flex flex-row items-center font-bold`,
+              useDisplayNameTextColor(),
+            )}
+          >
+            {props.d.name}
+          </div>
           <Switch>
             <Match when={isTwitch()}>
-              <div class={twMerge(`flex flex-row items-center font-bold`, useTwitchIconColor())}>
-                <FaBrandsTwitch size={14}/>
-                <span class={twMerge(`text-xs`, useDisplayNameTextColor())}>/{props.d.twitch_data?.login}</span>
+              <div
+                class={twMerge(
+                  `flex flex-row items-center font-bold`,
+                  useTwitchIconColor(),
+                )}
+              >
+                <FaBrandsTwitch size={14} />
+                <span class={twMerge(`text-xs`, useDisplayNameTextColor())}>
+                  /{props.d.twitch_data?.login}
+                </span>
               </div>
             </Match>
             <Match when={isYoutube()}>
-              <div class={`${useTwitchIconColor()} flex flex-row items-center font-bold`}>
-                <FaBrandsYoutube size={14}/>
-                <span class={twMerge(`text-xs`, useDisplayNameTextColor())}>/{props.d.livestream.channel}</span>
+              <div
+                class={`${useTwitchIconColor()} flex flex-row items-center font-bold`}
+              >
+                <FaBrandsYoutube size={14} />
+                <span class={twMerge(`text-xs`, useDisplayNameTextColor())}>
+                  /{props.d.livestream.channel}
+                </span>
               </div>
             </Match>
           </Switch>
           <p class={`${useRaisedTextColor()} font-bold`}>
-            Raised <Numeric value={props.d.raised} numberStyle="currency" currency={'GBP'}/>
+            Raised{' '}
+            <Numeric
+              value={props.d.raised}
+              numberStyle="currency"
+              currency={'GBP'}
+            />
           </p>
         </div>
       </div>
@@ -215,7 +275,7 @@ interface TitleProps {
   titleLogo: string
 }
 
-const Title: Component<TitleProps> = props => {
+const Title: Component<TitleProps> = (props) => {
   const community = () => {
     switch (props.theme) {
       case 'pink':

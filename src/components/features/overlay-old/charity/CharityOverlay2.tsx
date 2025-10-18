@@ -1,7 +1,15 @@
-import {type Component, createEffect, createSignal, onCleanup, onMount, type ParentComponent, Show} from 'solid-js'
-import '../../overlay-v2/ticker/common/marquee.css'
-import {Transition} from 'solid-transition-group'
-import {createI18n, I18nProvider, Numeric} from 'solid-i18n'
+import {
+  type Component,
+  createEffect,
+  createSignal,
+  onCleanup,
+  onMount,
+  type ParentComponent,
+  Show,
+} from 'solid-js'
+import '../../overlay/ticker/common/marquee.css'
+import { Transition } from 'solid-transition-group'
+import { createI18n, I18nProvider, Numeric } from 'solid-i18n'
 import {
   useCauses,
   useHeader,
@@ -13,11 +21,11 @@ import {
   useSpeed,
   useTheme,
 } from '../overlay_signals'
-import {twMerge} from 'tailwind-merge'
-import {QRCodeSVG} from 'solid-qr-code'
-import {useJJDonationTracker} from "../../../../lib/useJJDonationTracker.ts";
-import type {Cause} from "../../../../lib/model/jjData/JJData.ts";
-import {useLocale} from "@kobalte/core";
+import { twMerge } from 'tailwind-merge'
+import { QRCodeSVG } from 'solid-qr-code'
+import { useJJDonationTracker } from '../../../../lib/useJJDonationTracker.ts'
+import type { Cause } from '../../../../lib/model/jjData/JJData.ts'
+import { useLocale } from '@kobalte/core'
 
 export const CharityOverlay2: Component = () => {
   return (
@@ -46,14 +54,18 @@ export const CharityOverlayComponent2: Component<{
   speed: number
   showRaised: boolean
   causes?: string[]
-}> = props => {
-  const i18n = createI18n({language: useLocale().locale()})
+}> = (props) => {
+  const i18n = createI18n({ language: useLocale().locale() })
 
   return (
     <I18nProvider i18n={i18n}>
       <div class={'flex h-full w-full flex-col'}>
         <div class={''}>
-          <OverlayHeader header={props.header} headerTheme={props.headerTheme} speed={props.speed}/>
+          <OverlayHeader
+            header={props.header}
+            headerTheme={props.headerTheme}
+            speed={props.speed}
+          />
         </div>
         <div class={'flex-1'}>
           <Body
@@ -79,7 +91,7 @@ const Body: Component<{
   speed: number
   showRaised: boolean
   causes: string[]
-}> = props => {
+}> = (props) => {
   const charityData = useJJDonationTracker()
 
   const [currentCharity, setCurrentCharity] = createSignal(0)
@@ -90,7 +102,7 @@ const Body: Component<{
       return []
     }
     if (props.causes.length > 0) {
-      return charityData.data.causes.filter(cause => {
+      return charityData.data.causes.filter((cause) => {
         return props.causes.includes(`${cause.id}`)
       })
     }
@@ -102,7 +114,7 @@ const Body: Component<{
     if (!oneCause()) {
       const t = setInterval(() => {
         if (charityData.data) {
-          setCurrentCharity(i => (i + 1) % charities().length)
+          setCurrentCharity((i) => (i + 1) % charities().length)
         }
       }, props.speed * 1000)
       setTimer(t)
@@ -116,7 +128,7 @@ const Body: Component<{
       }
       const t = setInterval(() => {
         if (charityData.data) {
-          setCurrentCharity(i => (i + 1) % charities().length)
+          setCurrentCharity((i) => (i + 1) % charities().length)
         }
       }, props.speed * 1000)
       setTimer(t)
@@ -202,13 +214,19 @@ const Body: Component<{
     <Show when={charityData.data}>
       <Transition
         mode={'outin'}
-        onEnter={(el: {
-          animate: (arg0: { opacity: number; transform: string }[], arg1: { duration: number }) => any
-        }, done: any) => {
+        onEnter={(
+          el: {
+            animate: (
+              arg0: { opacity: number; transform: string }[],
+              arg1: { duration: number },
+            ) => any
+          },
+          done: any,
+        ) => {
           const a = el.animate(
             [
-              {opacity: 0, transform: 'rotateY(-90deg) perspective(800px)'},
-              {opacity: 1, transform: 'rotateY(0deg) perspective(0px)'},
+              { opacity: 0, transform: 'rotateY(-90deg) perspective(800px)' },
+              { opacity: 1, transform: 'rotateY(0deg) perspective(0px)' },
             ],
             {
               duration: 900,
@@ -219,8 +237,8 @@ const Body: Component<{
         onExit={(el, done) => {
           const a = el.animate(
             [
-              {opacity: 1, transform: 'rotateY(0deg) perspective(0px)'},
-              {opacity: 0, transform: 'rotateY(90deg) perspective(800px)'},
+              { opacity: 1, transform: 'rotateY(0deg) perspective(0px)' },
+              { opacity: 0, transform: 'rotateY(90deg) perspective(800px)' },
             ],
             {
               duration: 900,
@@ -242,7 +260,7 @@ const CharityItem: Component<{
   showQRCode: boolean
   showUrl: boolean
   showRaised: boolean
-}> = props => {
+}> = (props) => {
   const background = () => {
     switch (props.theme) {
       case 'red':
@@ -321,11 +339,24 @@ const CharityItem: Component<{
           textColor(),
         )}
       >
-        <img class={'h-20 w-20 rounded-lg bg-white'} alt={''} src={props.charity.logo} loading={'eager'}/>
-        <p class={'line-clamp-2 overflow-hidden text-2xl'}>{props.charity.name}</p>
+        <img
+          class={'h-20 w-20 rounded-lg bg-white'}
+          alt={''}
+          src={props.charity.logo}
+          loading={'eager'}
+        />
+        <p class={'line-clamp-2 overflow-hidden text-2xl'}>
+          {props.charity.name}
+        </p>
         <Show when={props.showRaised}>
-          <p class={twMerge('line-clamp-2 overflow-hidden text-xl', raisedColor())}>
-            Raised <Numeric value={value()} numberStyle="currency" currency={'GBP'}/>
+          <p
+            class={twMerge(
+              'line-clamp-2 overflow-hidden text-xl',
+              raisedColor(),
+            )}
+          >
+            Raised{' '}
+            <Numeric value={value()} numberStyle="currency" currency={'GBP'} />
           </p>
         </Show>
         <Show when={props.showDesc}>
@@ -335,12 +366,22 @@ const CharityItem: Component<{
           <p>{charityUrl()}</p>
         </Show>
         <Show when={props.showQRCode}>
-          <div class={'flex w-full flex-1 flex-col content-center items-center justify-center gap-1 pt-2'}>
+          <div
+            class={
+              'flex w-full flex-1 flex-col content-center items-center justify-center gap-1 pt-2'
+            }
+          >
             <Show when={props.showQRCode}>
-              <QRCodeSVG value={props.charity.url} level={'medium'}
-                         width={qrCodeSize()} height={qrCodeSize()}
-                         backgroundColor={qrCodeBG()} foregroundColor={qrCodeFG()}
-                         backgroundAlpha={1} foregroundAlpha={1}/>
+              <QRCodeSVG
+                value={props.charity.url}
+                level={'medium'}
+                width={qrCodeSize()}
+                height={qrCodeSize()}
+                backgroundColor={qrCodeBG()}
+                foregroundColor={qrCodeFG()}
+                backgroundAlpha={1}
+                foregroundAlpha={1}
+              />
             </Show>
             <Show when={props.showUrl}>
               <p>{charityUrl()}</p>
@@ -352,23 +393,33 @@ const CharityItem: Component<{
   )
 }
 
-const OverlayHeader: Component<{ header: string[]; headerTheme: string; speed: number }> = props => {
+const OverlayHeader: Component<{
+  header: string[]
+  headerTheme: string
+  speed: number
+}> = (props) => {
   const headerLength = () => props.header.length
   const headerLength2 = props.header.length
-  const headerItemNames = () => props.header.map(h => h.toLowerCase())
+  const headerItemNames = () => props.header.map((h) => h.toLowerCase())
   const headerItems = () => {
     const items = []
     if (headerItemNames().includes('title')) {
-      items.push(<Title theme={props.headerTheme}/>)
+      items.push(<Title theme={props.headerTheme} />)
     }
-    if (headerItemNames().includes('donate') || headerItemNames().includes('donation')) {
-      items.push(<DonationChatCommand theme={props.headerTheme}/>)
+    if (
+      headerItemNames().includes('donate') ||
+      headerItemNames().includes('donation')
+    ) {
+      items.push(<DonationChatCommand theme={props.headerTheme} />)
     }
     if (headerItemNames().includes('extension')) {
-      items.push(<ExtensionAd theme={props.headerTheme}/>)
+      items.push(<ExtensionAd theme={props.headerTheme} />)
     }
-    if (headerItemNames().includes('jj') || headerItemNames().includes('jjlink')) {
-      items.push(<JJLink theme={props.headerTheme}/>)
+    if (
+      headerItemNames().includes('jj') ||
+      headerItemNames().includes('jjlink')
+    ) {
+      items.push(<JJLink theme={props.headerTheme} />)
     }
 
     return items
@@ -406,8 +457,11 @@ const OverlayHeader: Component<{ header: string[]; headerTheme: string; speed: n
             onEnter={(el, done) => {
               const a = el.animate(
                 [
-                  {opacity: 1, transform: 'rotateX(-90deg) perspective(800px)'},
-                  {opacity: 1, transform: 'rotateX(0deg) perspective(0px)'},
+                  {
+                    opacity: 1,
+                    transform: 'rotateX(-90deg) perspective(800px)',
+                  },
+                  { opacity: 1, transform: 'rotateX(0deg) perspective(0px)' },
                 ],
                 {
                   duration: 700,
@@ -418,8 +472,11 @@ const OverlayHeader: Component<{ header: string[]; headerTheme: string; speed: n
             onExit={(el, done) => {
               const a = el.animate(
                 [
-                  {opacity: 1, transform: 'rotateX(0deg) perspective(0px)'},
-                  {opacity: 1, transform: 'rotateX(90deg) perspective(800px)'},
+                  { opacity: 1, transform: 'rotateX(0deg) perspective(0px)' },
+                  {
+                    opacity: 1,
+                    transform: 'rotateX(90deg) perspective(800px)',
+                  },
                 ],
                 {
                   duration: 700,
@@ -437,7 +494,7 @@ const OverlayHeader: Component<{ header: string[]; headerTheme: string; speed: n
   )
 }
 
-const Title: Component<{ theme: string }> = props => {
+const Title: Component<{ theme: string }> = (props) => {
   const theme = () => {
     switch (props.theme) {
       case 'red':
@@ -457,7 +514,7 @@ const Title: Component<{ theme: string }> = props => {
   )
 }
 
-const DonationChatCommand: Component<{ theme: string }> = props => {
+const DonationChatCommand: Component<{ theme: string }> = (props) => {
   const donate = () => {
     switch (props.theme) {
       case 'red':
@@ -481,12 +538,13 @@ const DonationChatCommand: Component<{ theme: string }> = props => {
   return (
     <HeaderCard theme={props.theme}>
       <p class={'text-center text-xl'}>
-        <span class={donate()}>!Donate</span> <span class={inChat()}>in Chat</span>
+        <span class={donate()}>!Donate</span>{' '}
+        <span class={inChat()}>in Chat</span>
       </p>
     </HeaderCard>
   )
 }
-const JJLink: Component<{ theme: string }> = props => {
+const JJLink: Component<{ theme: string }> = (props) => {
   const theme = () => {
     switch (props.theme) {
       case 'red':
@@ -506,7 +564,7 @@ const JJLink: Component<{ theme: string }> = props => {
   )
 }
 
-const ExtensionAd: Component<{ theme: string }> = props => {
+const ExtensionAd: Component<{ theme: string }> = (props) => {
   const accent = () => {
     switch (props.theme) {
       case 'red':
@@ -529,14 +587,15 @@ const ExtensionAd: Component<{ theme: string }> = props => {
   }
   return (
     <HeaderCard theme={props.theme}>
-      <p class={twMerge('text-accent-500 text-center text-xs', accent())}>
-        See the <span class={primary()}>full schedule</span> using the <span class={accent()}>extension below</span>
+      <p class={twMerge('text-center text-xs text-accent-500', accent())}>
+        See the <span class={primary()}>full schedule</span> using the{' '}
+        <span class={accent()}>extension below</span>
       </p>
     </HeaderCard>
   )
 }
 
-const HeaderCard: ParentComponent<{ theme: string }> = props => {
+const HeaderCard: ParentComponent<{ theme: string }> = (props) => {
   const background =
     'flex h-11 flex-row items-center justify-center rounded-2xl p-2 text-4xl font-bold shadow-xl transition-all'
   const theme = () => {

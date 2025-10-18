@@ -1,6 +1,28 @@
 ---
-import {CharityOverlay2} from "../../components/features/overlay/charity/CharityOverlay2";
+import BaseLayout from '../../layouts/BaseLayout.astro'
+import {CharitiesOverlay} from '../../components/features/overlay/charities/CharitiesOverlay.tsx'
+
+const headers = Astro.url.searchParams.getAll('header')
+const speedParam = Astro.url.searchParams.get('speed')
+const includeTotalsParam = Astro.url.searchParams.get('includeTotals')
+const themeParam = Astro.url.searchParams.get('theme')
+const headerThemeParam = Astro.url.searchParams.get('headerTheme')
+const showDescParam = Astro.url.searchParams.get('showDesc')
+const showQRCodeParam = Astro.url.searchParams.get('showQRCode')
+const showUrlParam = Astro.url.searchParams.get('showUrl')
+const causesParam = Astro.url.searchParams.get('causes')
+
+const includeTotals = includeTotalsParam === 'true' || includeTotalsParam === '1'
+const speed = speedParam ? Number(speedParam) : undefined
+const theme = themeParam ?? undefined
+const headerTheme = headerThemeParam ?? undefined
+const showDesc = showDescParam === 'true' || showDescParam === '1'
+const showQRCode = showQRCodeParam === 'true' || showQRCodeParam === '1'
+const showUrl = showUrlParam === undefined ? undefined : (showUrlParam === 'true' || showUrlParam === '1')
+const causes = causesParam
+  ? causesParam.split(',').map((s) => Number(s.trim())).filter((n) => !Number.isNaN(n))
+  : undefined
 ---
-<div class="h-[300px]">
-    <CharityOverlay2  client:only="solid-js"/>
-</div>
+  <div class="h-screen bg-transparent text-white">
+    <CharitiesOverlay client:only="solid-js" headers={headers} speed={speed} includeTotals={includeTotals} theme={theme} headerTheme={headerTheme} showDesc={showDesc} showQRCode={showQRCode} showUrl={showUrl} causes={causes} />
+  </div>

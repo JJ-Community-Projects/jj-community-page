@@ -1,23 +1,28 @@
 ---
-import {SimpleScheduleOverlay} from "../../components/features/overlay/schedule/SimpleScheduleOverlay";
+import { UserScheduleOverlay } from '../../components/features/overlay/userSchedule/UserScheduleOverlay.tsx'
+
+const userParam = Astro.url.searchParams.get('user')
+const timezoneParam = Astro.url.searchParams.get('timezone')
+const themeParam = Astro.url.searchParams.get('theme')
+const styleParam = Astro.url.searchParams.get('style')
+const limitParam = Astro.url.searchParams.get('limit')
+
+const user = userParam ?? undefined
+const timezone = timezoneParam ?? undefined
+const theme = themeParam === 'red' || themeParam === 'blue' || themeParam === 'default' ? themeParam : 'default'
+const style = styleParam === 'stripe' || styleParam === 'filled' ? styleParam : 'filled'
+const limitRaw = Number(limitParam)
+const limit = Number.isFinite(limitRaw) ? Math.min(100, Math.max(1, Math.floor(limitRaw))) : undefined
+
 ---
-<style>
-    html {
-        background-color: #f00;
-    }
 
-    body {
-        background-color: transparent;
-    }
-
-    #root {
-        background-color: transparent;
-    }
-
-    :root {
-        background-color: transparent;
-    }
-</style>
-<div>
-    <SimpleScheduleOverlay client:only="solid-js"/>
+<div class="min-h-screen bg-transparent text-white">
+  <UserScheduleOverlay
+    client:only="solid-js"
+    user={user}
+    timezone={timezone}
+    theme={theme}
+    style={style}
+    limit={limit}
+  />
 </div>
