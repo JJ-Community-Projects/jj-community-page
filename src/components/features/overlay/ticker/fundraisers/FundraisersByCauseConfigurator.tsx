@@ -33,6 +33,11 @@ export const FundraisersByCauseConfigurator: Component<{
 
   return (
     <div class="flex flex-col gap-2 rounded bg-black/30 p-3">
+      <p class="mb-2 rounded border border-white/10 bg-white/5 p-2 text-sm text-white/80">
+        A horizontal scrolling ticker showing fundraisers filtered by
+        cause/charity. Choose a theme, show or hide the raised total, and select
+        a currency. Set your OBS Browser Source to 1920x80 px.
+      </p>
       <FieldRow label="Cause">
         <select
           class="w-80 rounded bg-black/40 px-2 py-1"

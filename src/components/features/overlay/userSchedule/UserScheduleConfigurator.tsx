@@ -28,6 +28,11 @@ export const UserScheduleConfigurator: Component<{ visible?: boolean }> = (
 
   return (
     <div class="flex flex-col gap-2 rounded bg-black/30 p-3">
+      <div class="mb-2 rounded border border-white/10 bg-white/5 p-2 text-sm text-white/80">
+        Display your upcoming Tiltify stream slots in a compact panel. Choose a
+        theme, pick filled or stripe style, and set how many items to show. Set
+        your OBS Browser Source to 300x450 px.
+      </div>
       <div class={'flex flex-row gap-1'}>
         <div class={'flex flex-1 flex-col gap-2'}>
           <FieldRow label="Theme">

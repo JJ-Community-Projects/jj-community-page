@@ -25,6 +25,10 @@ export const CharitiesTickerConfigurator: Component<{ visible?: boolean }> = (
 
   return (
     <div class="flex flex-col gap-2 rounded bg-black/30 p-3">
+      <p class="mb-2 rounded border border-white/10 bg-white/5 p-2 text-sm text-white/80">
+        A horizontal scrolling ticker that cycles through charities. Choose a
+        theme and currency. Set your OBS Browser Source to 1920x80 px.
+      </p>
       <FieldRow label="Theme">
         <select
           value={theme()}

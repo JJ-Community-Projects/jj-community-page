@@ -35,6 +35,10 @@ const Body: Component<{ visible?: boolean }> = (p) => {
 
   return (
     <div class="flex flex-col gap-2 rounded bg-black/30 p-3">
+      <div class="mb-2 rounded border border-white/10 bg-white/5 p-2 text-sm text-white/80">
+        A horizontal scrolling ticker showing fundraisers filtered by team.
+        Choose a theme and currency. Set your OBS Browser Source to 1920x80 px.
+      </div>
       <Show when={!qTeams.isLoading && noTeams()}>
         <div class="mb-2 rounded border border-yellow-400/40 bg-yellow-500/10 p-2 text-sm text-yellow-300">
           You are not part of any team yet. Create or join a team to filter by
