@@ -247,7 +247,16 @@ const Charities2OverlayBody: Component<Props> = (props) => {
         speed={speed()}
       />
       <div class="flex-1">
-        <Show when={current()}>
+        <Show when={!oneCause()} fallback={
+          <CharityItem
+            charity={filteredCharities()[0]}
+            theme={currentTheme(0)}
+            showDesc={showDesc()}
+            showQRCode={showQRCode()}
+            showUrl={showUrl()}
+            showRaised={showRaised()}
+          />
+        }>
           {(c) => (
             <Transition
               mode="outin"

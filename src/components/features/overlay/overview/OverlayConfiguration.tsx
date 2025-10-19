@@ -12,7 +12,7 @@ import { FundraisersByTeamConfigurator } from '../ticker/fundraisers/Fundraisers
 import { FundraisersByCauseConfigurator } from '../ticker/fundraisers/FundraisersByCauseConfigurator.tsx'
 import { UserProvider } from '../../users/user-dashboard/providers/UserProvider.tsx'
 import type { User } from '../../../../lib/auth/User.ts'
-import { TeamScheduleConfigurator } from '../schedule/schedule/TeamScheduleConfigurator.tsx'
+import { TeamScheduleConfigurator } from '../schedule/team/TeamScheduleConfigurator.tsx'
 
 const Body: Component = () => {
   const [expanded, setExpanded] = createSignal<string[]>([])

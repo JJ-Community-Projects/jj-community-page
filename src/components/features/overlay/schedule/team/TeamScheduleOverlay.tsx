@@ -2,11 +2,8 @@ import { type Component, createMemo, For, Show } from 'solid-js'
 import { QueryClientProvider, useQuery } from '@tanstack/solid-query'
 import { QueryClient } from '@tanstack/query-core'
 import { orpcPrivate } from '../../../../../lib/orpc/client.ts'
-import {
-  TeamOverlayStreamCardFilled,
-  TeamOverlayStreamCardSidebar,
-} from './OverlayStreamCard.tsx'
-import { TeamScheduleOverlayHeader } from './TeamScheduleOverlayHeader.tsx'
+import { OverlayStreamCardFilled, OverlayStreamCardSidebar, } from '../common/OverlayStreamCard.tsx'
+import { TeamScheduleOverlayHeader, TeamScheduleOverlayHeaderSidebar, } from './TeamScheduleOverlayHeader.tsx'
 
 export type TeamScheduleOverlayProps = {
   teamId?: number
@@ -52,21 +49,32 @@ const Body: Component<TeamScheduleOverlayProps> = (props) => {
         <Show when={q.data}>
           {(data) => (
             <div class="flex flex-col gap-1">
-              <TeamScheduleOverlayHeader
-                title={data().schedule.name}
-                timezone={data().timezone}
-                theme={theme()}
-              />
+              <Show
+                when={style() === 'striped'}
+                fallback={
+                  <TeamScheduleOverlayHeader
+                    title={data().schedule.name}
+                    timezone={data().timezone}
+                    theme={theme()}
+                  />
+                }
+              >
+                <TeamScheduleOverlayHeaderSidebar
+                  title={data().schedule.name}
+                  timezone={data().timezone}
+                  theme={theme()}
+                />
+              </Show>
               <For each={data().blocks}>
                 {(b) =>
                   style() === 'striped' ? (
-                    <TeamOverlayStreamCardSidebar
-                      stream={b as any}
+                    <OverlayStreamCardSidebar
+                      stream={b}
                       timezone={data().timezone}
                     />
                   ) : (
-                    <TeamOverlayStreamCardFilled
-                      stream={b as any}
+                    <OverlayStreamCardFilled
+                      stream={b}
                       timezone={data().timezone}
                     />
                   )

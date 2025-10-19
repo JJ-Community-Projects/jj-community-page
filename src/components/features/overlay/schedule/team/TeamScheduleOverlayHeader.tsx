@@ -39,9 +39,7 @@ const textColorByTheme = (theme: string | undefined) => {
   }
 }
 
-// Basic header for overlay user schedule
-// Visual style inspired by overlay/schedule/OverlayHeader.tsx, but simplified and standalone
-export const UserScheduleOverlayHeader: Component<Props> = (props) => {
+export const TeamScheduleOverlayHeader: Component<Props> = (props) => {
   const offsetNameShort = () =>
     DateTime.fromObject(
       {
@@ -53,6 +51,7 @@ export const UserScheduleOverlayHeader: Component<Props> = (props) => {
         locale: 'en-GB',
       },
     ).setZone(props.timezone).offsetNameShort
+
   const now = useNow()
 
   const formatted = () => {
@@ -68,6 +67,7 @@ export const UserScheduleOverlayHeader: Component<Props> = (props) => {
       },
     )
   }
+
   return (
     <div
       class={`flex h-auto flex-col items-center justify-center rounded-2xl p-3 text-center shadow-md ${bgByTheme(props.theme)}`}
@@ -89,7 +89,7 @@ export const UserScheduleOverlayHeader: Component<Props> = (props) => {
   )
 }
 
-export const UserScheduleOverlayHeaderSidebar: Component<Props> = (props) => {
+export const TeamScheduleOverlayHeaderSidebar: Component<Props> = (props) => {
   const offsetNameShort = () =>
     DateTime.fromObject(
       {

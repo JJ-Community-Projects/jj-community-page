@@ -1,13 +1,7 @@
-import {
-  type Component,
-  createMemo,
-  createSignal,
-  onCleanup,
-  onMount,
-  Show,
-} from 'solid-js'
+import { type Component, createMemo, Show } from 'solid-js'
 import { DateTime } from 'luxon'
 import { getTextColor } from '../../../../../lib/utils/textColors.ts'
+import { useNow } from '../../../../../lib/utils/useNow.ts'
 
 interface Owner {
   userId: number
@@ -25,20 +19,9 @@ interface OverlayStreamCardProps {
     title: string
     subtitle: string | null
     color?: string
-    owner: Owner
+    owner?: Owner
   }
   timezone: string
-}
-
-// Internal timer signal to keep countdowns fresh without external hooks
-const useNow = () => {
-  const [now, setNow] = createSignal(Date.now())
-  let t: any
-  onMount(() => {
-    t = setInterval(() => setNow(Date.now()), 1000)
-  })
-  onCleanup(() => t && clearInterval(t))
-  return () => DateTime.fromMillis(now())
 }
 
 const useStreamTime = (props: OverlayStreamCardProps) => {
@@ -102,7 +85,7 @@ const OwnerBadge: Component<{ owner: Owner; textColorClass?: string }> = (
   )
 }
 
-export const TeamOverlayStreamCardFilled: Component<OverlayStreamCardProps> = (
+export const OverlayStreamCardFilled: Component<OverlayStreamCardProps> = (
   props,
 ) => {
   const { showCountdown, isLive, countdown, formatDate } = useStreamTime(props)
@@ -133,12 +116,14 @@ export const TeamOverlayStreamCardFilled: Component<OverlayStreamCardProps> = (
           {countdown()}
         </p>
       </Show>
-      <OwnerBadge owner={props.stream.owner} />
+      <Show when={props.stream.owner}>
+        {(owner) => <OwnerBadge owner={owner()} />}
+      </Show>
     </div>
   )
 }
 
-export const TeamOverlayStreamCardSidebar: Component<OverlayStreamCardProps> = (
+export const OverlayStreamCardSidebar: Component<OverlayStreamCardProps> = (
   props,
 ) => {
   const { showCountdown, isLive, countdown, formatDate } = useStreamTime(props)
@@ -157,6 +142,8 @@ export const TeamOverlayStreamCardSidebar: Component<OverlayStreamCardProps> = (
           </p>
         </Show>
         <p class="text-sm text-gray-700">{formatDate()}</p>
+      </div>
+      <div class="flex flex-1 flex-col py-3 pl-2 pr-4 text-right">
         <Show when={isLive()}>
           <p class="line-clamp-1 font-mono text-xs font-bold tracking-wide text-gray-800">
             LIVE
@@ -167,7 +154,11 @@ export const TeamOverlayStreamCardSidebar: Component<OverlayStreamCardProps> = (
             {countdown()}
           </p>
         </Show>
-        <OwnerBadge owner={props.stream.owner} textColorClass="text-gray-800" />
+        <Show when={props.stream.owner}>
+          {(owner) => (
+            <OwnerBadge owner={owner()} textColorClass="text-gray-800" />
+          )}
+        </Show>
       </div>
     </div>
   )
