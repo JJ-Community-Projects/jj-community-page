@@ -2,8 +2,14 @@ import { type Component, createMemo, For, Show } from 'solid-js'
 import { QueryClientProvider, useQuery } from '@tanstack/solid-query'
 import { QueryClient } from '@tanstack/query-core'
 import { orpcPrivate } from '../../../../../lib/orpc/client.ts'
-import { OverlayStreamCardFilled, OverlayStreamCardSidebar, } from '../common/OverlayStreamCard.tsx'
-import { TeamScheduleOverlayHeader, TeamScheduleOverlayHeaderSidebar, } from './TeamScheduleOverlayHeader.tsx'
+import {
+  OverlayStreamCardFilled,
+  OverlayStreamCardSidebar,
+} from '../common/OverlayStreamCard.tsx'
+import {
+  TeamScheduleOverlayHeader,
+  TeamScheduleOverlayHeaderSidebar,
+} from './TeamScheduleOverlayHeader.tsx'
 
 export type TeamScheduleOverlayProps = {
   teamId?: number
