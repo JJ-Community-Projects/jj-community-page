@@ -172,8 +172,8 @@ const Charities2OverlayBody: Component<Props> = (props) => {
   const q = useQuery(() =>
     orpcPrivate.overlay.charities.queryOptions({
       input: { currency: props.currency ?? 'GBP', user: props.user },
-      staleTime: 5_000,
-      refetchInterval: 5_000,
+      staleTime: 60_000,
+      refetchInterval: 60_000,
       refetchOnWindowFocus: false,
       refetchIntervalInBackground: true,
       placeholderData: (prev) => prev,
