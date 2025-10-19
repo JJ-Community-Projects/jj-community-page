@@ -57,11 +57,7 @@ const Body: Component<{ visible?: boolean }> = (p) => {
           >
             <option value="">All teams</option>
             <For each={qTeams.data ?? []}>
-              {(t) => (
-                <option value={t.slug}>
-                  {t.name} (#{t.id})
-                </option>
-              )}
+              {(t) => <option value={t.slug}>{t.name}</option>}
             </For>
           </select>
         </Show>
