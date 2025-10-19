@@ -4,7 +4,7 @@ import { twMerge } from 'tailwind-merge'
 import { FaSolidChevronDown } from 'solid-icons/fa'
 import { QueryClientProvider } from '@tanstack/solid-query'
 import { QueryClient } from '@tanstack/query-core'
-import { UserScheduleConfigurator } from '../userSchedule/UserScheduleConfigurator.tsx'
+import { UserScheduleConfigurator } from '../schedule/user/UserScheduleConfigurator.tsx'
 import { FundraisersTickerConfigurator } from '../ticker/fundraisers/FundraisersTickerConfigurator.tsx'
 import { CharitiesTickerConfigurator } from '../ticker/charities/CharitiesTickerConfigurator.tsx'
 import { CharitiesConfigurator } from '../charities/CharitiesConfigurator.tsx'
@@ -12,7 +12,7 @@ import { FundraisersByTeamConfigurator } from '../ticker/fundraisers/Fundraisers
 import { FundraisersByCauseConfigurator } from '../ticker/fundraisers/FundraisersByCauseConfigurator.tsx'
 import { UserProvider } from '../../users/user-dashboard/providers/UserProvider.tsx'
 import type { User } from '../../../../lib/auth/User.ts'
-import { TeamScheduleConfigurator } from '../teamSchedule/TeamScheduleConfigurator.tsx'
+import { TeamScheduleConfigurator } from '../schedule/schedule/TeamScheduleConfigurator.tsx'
 
 const Body: Component = () => {
   const [expanded, setExpanded] = createSignal<string[]>([])

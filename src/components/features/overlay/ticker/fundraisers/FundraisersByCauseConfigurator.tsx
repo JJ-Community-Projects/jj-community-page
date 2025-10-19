@@ -1,5 +1,10 @@
 import { type Component, createMemo, createSignal, For } from 'solid-js'
-import { buildUrl, FieldRow, LinkPreview, PreviewFrame, } from '../../overview/Common.tsx'
+import {
+  buildUrl,
+  FieldRow,
+  LinkPreview,
+  PreviewFrame,
+} from '../../overview/Common.tsx'
 import { orpcPrivate } from '../../../../../lib/orpc/client.ts'
 import { useQuery } from '@tanstack/solid-query'
 

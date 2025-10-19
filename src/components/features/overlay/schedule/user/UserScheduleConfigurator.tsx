@@ -4,8 +4,8 @@ import {
   FieldRow,
   LinkPreview,
   PreviewFrame,
-} from '../overview/Common.tsx'
-import { useUser } from '../../users/user-dashboard/providers/UserProvider.tsx'
+} from '../../overview/Common.tsx'
+import { useUser } from '../../../users/user-dashboard/providers/UserProvider.tsx'
 
 export const UserScheduleConfigurator: Component<{ visible?: boolean }> = (
   p,

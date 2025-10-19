@@ -1,8 +1,13 @@
 import { type Component, createMemo, createSignal, For, Show } from 'solid-js'
-import { buildUrl, FieldRow, LinkPreview, PreviewFrame, } from '../overview/Common.tsx'
+import {
+  buildUrl,
+  FieldRow,
+  LinkPreview,
+  PreviewFrame,
+} from '../../overview/Common.tsx'
 import { QueryClient } from '@tanstack/query-core'
 import { QueryClientProvider, useQuery } from '@tanstack/solid-query'
-import { orpcPrivate } from '../../../../lib/orpc/client.ts'
+import { orpcPrivate } from '../../../../../lib/orpc/client.ts'
 
 const Body: Component<{ visible?: boolean }> = (p) => {
   const [theme, setTheme] = createSignal<'default' | 'red' | 'blue'>('default')

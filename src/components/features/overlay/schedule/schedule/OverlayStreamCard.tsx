@@ -1,6 +1,13 @@
-import { type Component, createMemo, createSignal, onCleanup, onMount, Show } from 'solid-js'
+import {
+  type Component,
+  createMemo,
+  createSignal,
+  onCleanup,
+  onMount,
+  Show,
+} from 'solid-js'
 import { DateTime } from 'luxon'
-import { getTextColor } from '../../../../lib/utils/textColors.ts'
+import { getTextColor } from '../../../../../lib/utils/textColors.ts'
 
 interface Owner {
   userId: number
@@ -73,7 +80,9 @@ const useStreamTime = (props: OverlayStreamCardProps) => {
   return { now, start, end, showCountdown, isLive, countdown, formatDate }
 }
 
-const OwnerBadge: Component<{ owner: Owner; textColorClass?: string }> = (p) => {
+const OwnerBadge: Component<{ owner: Owner; textColorClass?: string }> = (
+  p,
+) => {
   return (
     <div class={`mt-1 flex items-center gap-2 ${p.textColorClass ?? ''}`}>
       <Show when={p.owner.profileImage}>
@@ -115,7 +124,9 @@ export const TeamOverlayStreamCardFilled: Component<OverlayStreamCardProps> = (
       </Show>
       <p class="text-sm opacity-90">{formatDate()}</p>
       <Show when={isLive()}>
-        <p class="line-clamp-1 font-mono text-xs font-bold tracking-wide opacity-95">LIVE</p>
+        <p class="line-clamp-1 font-mono text-xs font-bold tracking-wide opacity-95">
+          LIVE
+        </p>
       </Show>
       <Show when={showCountdown()}>
         <p class="line-clamp-1 font-mono text-xs font-bold lowercase tracking-wide opacity-95">
@@ -147,7 +158,9 @@ export const TeamOverlayStreamCardSidebar: Component<OverlayStreamCardProps> = (
         </Show>
         <p class="text-sm text-gray-700">{formatDate()}</p>
         <Show when={isLive()}>
-          <p class="line-clamp-1 font-mono text-xs font-bold tracking-wide text-gray-800">LIVE</p>
+          <p class="line-clamp-1 font-mono text-xs font-bold tracking-wide text-gray-800">
+            LIVE
+          </p>
         </Show>
         <Show when={showCountdown()}>
           <p class="line-clamp-1 font-mono text-xs font-bold lowercase tracking-wide text-gray-800">

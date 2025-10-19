@@ -1,29 +1,29 @@
 import { type Component, createMemo, For, Show } from 'solid-js'
+import { orpcPrivate } from '../../../../../lib/orpc/client.ts'
 import { QueryClientProvider, useQuery } from '@tanstack/solid-query'
 import { QueryClient } from '@tanstack/query-core'
-import { orpcPrivate } from '../../../../lib/orpc/client.ts'
-import { TeamOverlayStreamCardFilled, TeamOverlayStreamCardSidebar } from './OverlayStreamCard.tsx'
-import { TeamScheduleOverlayHeader } from './TeamScheduleOverlayHeader.tsx'
+import { OverlayStreamCardFilled, OverlayStreamCardSidebar, } from './OverlayStreamCard.tsx'
+import { UserScheduleOverlayHeader } from './UserScheduleOverlayHeader.tsx'
 
-export type TeamScheduleOverlayProps = {
-  teamId?: number
+type Props = {
+  user?: string
   timezone?: string
   theme?: 'default' | 'red' | 'blue'
-  style?: 'filled' | 'striped'
+  style?: 'filled' | 'stripe'
   limit?: number
 }
 
-const Body: Component<TeamScheduleOverlayProps> = (props) => {
+const Body: Component<Props> = (props) => {
   const input = createMemo(() => ({
-    teamId: props.teamId!,
+    user: props.user,
     timezone: props.timezone,
     limit: props.limit,
   }))
 
-  const hasParam = () => Boolean(props.teamId) && Boolean(props.timezone)
+  const hasParam = () => Boolean(input().user) && Boolean(input().timezone)
 
   const q = useQuery(() =>
-    orpcPrivate.overlay.scheduleByTeamId.queryOptions({
+    orpcPrivate.overlay.schedulePrimary.queryOptions({
       input: input(),
       enabled: hasParam(),
       staleTime: 60_000 * 5,
@@ -42,22 +42,30 @@ const Body: Component<TeamScheduleOverlayProps> = (props) => {
           <p class="opacity-80">Loading schedule…</p>
         </Show>
         <Show when={q.error}>
-          <p class="text-red-400">{q.error?.message ?? 'Failed to load schedule'}</p>
+          <p class="text-red-400">
+            {q.error?.message ?? 'Failed to load schedule'}
+          </p>
         </Show>
         <Show when={q.data}>
           {(data) => (
             <div class="flex flex-col gap-1">
-              <TeamScheduleOverlayHeader
+              <UserScheduleOverlayHeader
                 title={data().schedule.name}
                 timezone={data().timezone}
                 theme={theme()}
               />
               <For each={data().blocks}>
                 {(b) =>
-                  style() === 'striped' ? (
-                    <TeamOverlayStreamCardSidebar stream={b as any} timezone={data().timezone} />
+                  style() === 'stripe' ? (
+                    <OverlayStreamCardSidebar
+                      stream={b}
+                      timezone={data().timezone}
+                    />
                   ) : (
-                    <TeamOverlayStreamCardFilled stream={b as any} timezone={data().timezone} />
+                    <OverlayStreamCardFilled
+                      stream={b}
+                      timezone={data().timezone}
+                    />
                   )
                 }
               </For>
@@ -69,7 +77,7 @@ const Body: Component<TeamScheduleOverlayProps> = (props) => {
   )
 }
 
-export const TeamScheduleOverlay: Component<TeamScheduleOverlayProps> = (props) => {
+export const UserScheduleOverlay: Component<Props> = (props) => {
   return (
     <QueryClientProvider client={new QueryClient()}>
       <Body {...props} />

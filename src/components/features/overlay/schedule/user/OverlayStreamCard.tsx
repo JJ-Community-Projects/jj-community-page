@@ -1,6 +1,13 @@
-import { type Component, createMemo, createSignal, onCleanup, onMount, Show, } from 'solid-js'
+import {
+  type Component,
+  createMemo,
+  createSignal,
+  onCleanup,
+  onMount,
+  Show,
+} from 'solid-js'
 import { DateTime } from 'luxon'
-import { getTextColor } from '../../../../lib/utils/textColors.ts'
+import { getTextColor } from '../../../../../lib/utils/textColors.ts'
 
 interface OverlayStreamCardProps {
   stream: {
@@ -86,7 +93,9 @@ export const OverlayStreamCardFilled: Component<OverlayStreamCardProps> = (
       </Show>
       <p class="text-sm opacity-90">{formatDate()}</p>
       <Show when={isLive()}>
-        <p class="line-clamp-1 font-mono text-xs font-bold tracking-wide opacity-95">LIVE</p>
+        <p class="line-clamp-1 font-mono text-xs font-bold tracking-wide opacity-95">
+          LIVE
+        </p>
       </Show>
       <Show when={showCountdown()}>
         <p class="line-clamp-1 font-mono text-xs font-bold lowercase tracking-wide opacity-95">
@@ -117,7 +126,9 @@ export const OverlayStreamCardSidebar: Component<OverlayStreamCardProps> = (
         </Show>
         <p class="text-sm text-gray-700">{formatDate()}</p>
         <Show when={isLive()}>
-          <p class="line-clamp-1 font-mono text-xs font-bold tracking-wide text-gray-800">LIVE</p>
+          <p class="line-clamp-1 font-mono text-xs font-bold tracking-wide text-gray-800">
+            LIVE
+          </p>
         </Show>
         <Show when={showCountdown()}>
           <p class="line-clamp-1 font-mono text-xs font-bold lowercase tracking-wide text-gray-800">
