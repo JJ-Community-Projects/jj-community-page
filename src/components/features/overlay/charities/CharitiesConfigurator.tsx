@@ -7,23 +7,28 @@ import {
 } from '../overview/Common.tsx'
 import { useQuery } from '@tanstack/solid-query'
 import { orpcPrivate } from '../../../../lib/orpc/client.ts'
+import { useUser } from '../../users/user-dashboard/providers/UserProvider.tsx'
 
 type Theme2 = 'default' | 'red' | 'blue' | 'carousel'
 type HeaderTheme2 = 'default' | 'red' | 'blue'
 
-export const CharitiesConfigurator: Component<{ visible?: boolean }> = (p) => {
+type Currency = 'GBP' | 'USD'
+
+ export const CharitiesConfigurator: Component<{ visible?: boolean }> = (p) => {
   // Header selection via checkboxes (mirrors V1 behavior but easier UX)
   const headerOptions = ['Title', 'Donate', 'JJLink'] as const
   const [selectedHeaders, setSelectedHeaders] = createSignal<string[]>([
     'Title',
     'JJLink',
   ])
-  const [speed, setSpeed] = createSignal<number>(5)
   const [includeTotals2, setIncludeTotals2] = createSignal<boolean>(false)
   const [theme2, setTheme2] = createSignal<Theme2>('default')
   const [headerTheme2, setHeaderTheme2] = createSignal<HeaderTheme2>('default')
   const [showDesc, setShowDesc] = createSignal<boolean>(false)
-  const [showQRCode, setShowQRCode] = createSignal<boolean>(false)
+  const [qrCode, setQrCode] = createSignal<'none' | 'fundraiser' | 'charity'>(
+    'none',
+  )
+  const [currency, setCurrency] = createSignal<Currency>('GBP')
   const [showUrl, setShowUrl] = createSignal<boolean>(true)
   const [selectedIds, setSelectedIds] = createSignal<number[]>([])
 
@@ -49,17 +54,20 @@ export const CharitiesConfigurator: Component<{ visible?: boolean }> = (p) => {
     selectedIds().length > 0 ? selectedIds().join(',') : undefined,
   )
 
+  const { user } = useUser()
+
   const charities2Url = createMemo(() =>
     buildUrl('/overlays/charities2', {
       header: selectedHeaders(),
-      speed: speed(),
       includeTotals: includeTotals2(),
       theme: theme2(),
       headerTheme: headerTheme2(),
       showDesc: showDesc(),
-      showQRCode: showQRCode(),
+      qrCode: qrCode(),
+      currency: currency(),
       showUrl: showUrl(),
       causes: causesParam(),
+      user: user.tiltifyName,
     }),
   )
 
@@ -71,95 +79,107 @@ export const CharitiesConfigurator: Component<{ visible?: boolean }> = (p) => {
         OBS Browser Source to 300x450 px.
       </p>
       <div class="flex flex-row gap-1">
-        <div class="flex flex-1 flex-col">
-          <FieldRow label="Header Cards">
-            <div class="flex w-[30rem] flex-col gap-1">
-              <For each={headerOptions as unknown as string[]}>
-                {(h) => (
-                  <label class="flex cursor-pointer items-center gap-2 text-sm">
-                    <input
-                      type="checkbox"
-                      checked={selectedHeaders().includes(h)}
-                      onChange={(e) => {
-                        const set = new Set(selectedHeaders())
-                        if (e.currentTarget.checked) set.add(h)
-                        else set.delete(h)
-                        // Preserve default display order of headerOptions
-                        setSelectedHeaders(
-                          headerOptions.filter((x) => set.has(x)),
-                        )
-                      }}
-                    />
-                    <span>{h}</span>
-                  </label>
-                )}
-              </For>
-            </div>
-          </FieldRow>
-          <FieldRow label="Speed (0.25–3.0)">
-            <input
-              type="number"
-              step="0.05"
-              min="0.25"
-              max="3"
-              value={speed()}
-              onInput={(e) => setSpeed(Number(e.currentTarget.value))}
-              class="w-24 rounded bg-black/40 px-2 py-1"
-            />
-          </FieldRow>
-          <FieldRow label="Include Totals">
-            <input
-              type="checkbox"
-              checked={includeTotals2()}
-              onChange={(e) => setIncludeTotals2(e.currentTarget.checked)}
-            />
-          </FieldRow>
-          <FieldRow label="Theme">
-            <select
-              class="rounded bg-black/40 px-2 py-1"
-              value={theme2()}
-              onChange={(e) => setTheme2(e.currentTarget.value as Theme2)}
-            >
-              <option value="default">default</option>
-              <option value="red">red</option>
-              <option value="blue">blue</option>
-              <option value="carousel">carousel</option>
-            </select>
-          </FieldRow>
-          <FieldRow label="Header Theme">
-            <select
-              class="rounded bg-black/40 px-2 py-1"
-              value={headerTheme2()}
-              onChange={(e) =>
-                setHeaderTheme2(e.currentTarget.value as HeaderTheme2)
-              }
-            >
-              <option value="default">default</option>
-              <option value="red">red</option>
-              <option value="blue">blue</option>
-            </select>
-          </FieldRow>
-          <FieldRow label="Show Description">
-            <input
-              type="checkbox"
-              checked={showDesc()}
-              onChange={(e) => setShowDesc(e.currentTarget.checked)}
-            />
-          </FieldRow>
-          <FieldRow label="Show QR Code">
-            <input
-              type="checkbox"
-              checked={showQRCode()}
-              onChange={(e) => setShowQRCode(e.currentTarget.checked)}
-            />
-          </FieldRow>
-          <FieldRow label="Show URL">
-            <input
-              type="checkbox"
-              checked={showUrl()}
-              onChange={(e) => setShowUrl(e.currentTarget.checked)}
-            />
-          </FieldRow>
+        <div class="flex flex-1 flex-col gap-4">
+          <div class="flex flex-1 flex-col">
+            <FieldRow label="Theme">
+              <select
+                class="rounded bg-black/40 px-2 py-1"
+                value={theme2()}
+                onChange={(e) => setTheme2(e.currentTarget.value as Theme2)}
+              >
+                <option value="default">default</option>
+                <option value="red">red</option>
+                <option value="blue">blue</option>
+                <option value="carousel">carousel</option>
+              </select>
+            </FieldRow>
+            <FieldRow label="Header Theme">
+              <select
+                class="rounded bg-black/40 px-2 py-1"
+                value={headerTheme2()}
+                onChange={(e) =>
+                  setHeaderTheme2(e.currentTarget.value as HeaderTheme2)
+                }
+              >
+                <option value="default">default</option>
+                <option value="red">red</option>
+                <option value="blue">blue</option>
+              </select>
+            </FieldRow>
+            <FieldRow label="Currency">
+              <select
+                class="rounded bg-black/40 px-2 py-1"
+                value={currency()}
+                onChange={(e) => setCurrency(e.currentTarget.value as Currency)}
+              >
+                <option value="GBP">GBP</option>
+                <option value="USD">USD</option>
+              </select>
+            </FieldRow>
+            <FieldRow label="Header Cards">
+              <div class="flex w-[30rem] flex-col gap-1">
+                <For each={headerOptions as unknown as string[]}>
+                  {(h) => (
+                    <label class="flex cursor-pointer items-center gap-2 text-sm">
+                      <input
+                        type="checkbox"
+                        checked={selectedHeaders().includes(h)}
+                        onChange={(e) => {
+                          const set = new Set(selectedHeaders())
+                          if (e.currentTarget.checked) set.add(h)
+                          else set.delete(h)
+                          // Preserve default display order of headerOptions
+                          setSelectedHeaders(
+                            headerOptions.filter((x) => set.has(x)),
+                          )
+                        }}
+                      />
+                      <span>{h}</span>
+                    </label>
+                  )}
+                </For>
+              </div>
+            </FieldRow>
+          </div>
+
+          <div class="flex flex-1 flex-col">
+            <FieldRow label="Include Totals">
+              <input
+                type="checkbox"
+                checked={includeTotals2()}
+                onChange={(e) => setIncludeTotals2(e.currentTarget.checked)}
+              />
+            </FieldRow>
+            <FieldRow label="Show Description">
+              <input
+                type="checkbox"
+                checked={showDesc()}
+                onChange={(e) => setShowDesc(e.currentTarget.checked)}
+              />
+            </FieldRow>
+            <FieldRow label="QR Code">
+              <select
+                class="rounded bg-black/40 px-2 py-1"
+                value={qrCode()}
+                onChange={(e) =>
+                  setQrCode(
+                    e.currentTarget.value as 'none' | 'fundraiser' | 'charity',
+                  )
+                }
+              >
+                <option value="none">none</option>
+                <option value="fundraiser">fundraiser</option>
+                <option value="charity">charity</option>
+              </select>
+            </FieldRow>
+            <FieldRow label="Show URL">
+              <input
+                type="checkbox"
+                checked={showUrl()}
+                onChange={(e) => setShowUrl(e.currentTarget.checked)}
+              />
+            </FieldRow>
+          </div>
           <FieldRow label="Select Charities">
             <div class="flex w-[30rem] flex-col gap-2">
               <div class="max-h-60 w-full overflow-y-auto rounded border border-accent-500/40 bg-black/20 p-2">

@@ -51,9 +51,7 @@ export type SimpleScheduleViewT = z.infer<typeof SimpleScheduleViewSchema>
 const charitiesContract = oc
   .input(
     z.object({
-      includeTotals: z.boolean().optional(),
       currency: z.enum(['USD', 'GBP']).default('GBP'),
-      pageSize: z.number().int().min(1).max(200).optional(),
       user: z.string().optional(),
     }),
   )

@@ -1,12 +1,7 @@
 import { implement, ORPCError } from '@orpc/server'
 import { contracts, type FundraiserItem } from './contract'
 import { dbMiddleware } from '../../middleware/dbMiddleware'
-import {
-  schedulesTable,
-  streamsTable,
-  teamMembersTable,
-  teamsTable,
-} from '../../../db/schema/jj-schema'
+import { schedulesTable, streamsTable, teamMembersTable, teamsTable, } from '../../../db/schema/jj-schema'
 import { and, eq, gte, inArray } from 'drizzle-orm'
 import { getScheduleStreams } from '../../public/schedules/util'
 import { accounts } from '../../../db/schema/auth-schema'
@@ -87,8 +82,6 @@ async function campaignBySlug(
 // Charities
 // ----------------------
 const charities = os.charitiesContract.handler(async ({ input, context }) => {
-  const includeTotals = Boolean(input?.includeTotals)
-  const pageSize = clamp(Math.floor(input?.pageSize ?? 50), 1, 200)
   const currency = input.currency
 
   const DO = context.env.JingleJamData
@@ -126,12 +119,11 @@ const charities = os.charitiesContract.handler(async ({ input, context }) => {
       websiteUrl: cause.url || undefined,
       raised: convertedRaised,
       raisedFormatted: raisedFormatted,
-      currency: includeTotals ? currency : undefined,
       description: cause.description,
     }
   })
 
-  return { userFundraiser, charities: items.slice(0, pageSize) }
+  return { userFundraiser, charities: items}
 })
 
 // ----------------------

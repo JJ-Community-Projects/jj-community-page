@@ -1,4 +1,4 @@
-import { type Component, createSignal, onCleanup, onMount, Show, } from 'solid-js'
+import { type Component, createEffect, createSignal, on, onCleanup, onMount, Show, } from 'solid-js'
 import { Transition } from 'solid-transition-group'
 import { twMerge } from 'tailwind-merge'
 import { QRCodeSVG } from 'solid-qr-code'
@@ -6,7 +6,7 @@ import '../ticker/common/marquee.css'
 import { orpcPrivate } from '../../../../lib/orpc/client.ts'
 import { QueryClientProvider, useQuery } from '@tanstack/solid-query'
 import { QueryClient } from '@tanstack/query-core'
-import type { CharityItem } from '../../../../lib/orpc/private/overlay/contract.ts'
+import type { CharityItem, FundraiserItem, } from '../../../../lib/orpc/private/overlay/contract.ts'
 
 // Header cards (mirrors V1 CharityOverlay2)
 function bg(theme: string) {
@@ -131,14 +131,15 @@ const OverlayHeader: Component<{
 // Rotating single charity card (mirrors V1 CharityOverlay2)
 export type Props = {
   headers?: string[]
-  speed?: number // seconds per rotation; default 1
   includeTotals?: boolean // maps to showRaised
   theme?: 'default' | 'red' | 'blue' | 'carousel'
   headerTheme?: 'default' | 'red' | 'blue'
   showDesc?: boolean
-  showQRCode?: boolean
+  qrCode?: 'none' | 'fundraiser' | 'charity'
   showUrl?: boolean
   causes?: number[]
+  user?: string
+  currency?: 'GBP' | 'USD'
 }
 
 function clamp(n: number, min: number, max: number) {
@@ -155,23 +156,27 @@ export const CharitiesOverlay: Component<Props> = (props) => {
 
 const Charities2OverlayBody: Component<Props> = (props) => {
   const header = () => props.headers ?? []
-  const speed = () => clamp(Number(props.speed ?? 3), 1, 30)
+  const speed = () => 10
   const theme = () => props.theme ?? 'default'
   const headerTheme = () => props.headerTheme ?? 'default'
   const showRaised = () => Boolean(props.includeTotals)
   const showDesc = () => Boolean(props.showDesc)
-  const showQRCode = () => Boolean(props.showQRCode)
+  const qrCode = () => props.qrCode ?? 'none'
+  const showQRCode = () => qrCode() !== 'none'
   const showUrl = () =>
     props.showUrl === undefined ? true : Boolean(props.showUrl)
   const causes = () => props.causes ?? []
 
+  const [displayList, setDisplayList] = createSignal<CharityItem[]>([])
+
   const q = useQuery(() =>
     orpcPrivate.overlay.charities.queryOptions({
-      input: { includeTotals: showRaised() },
+      input: { currency: props.currency ?? 'GBP', user: props.user },
       staleTime: 5_000,
       refetchInterval: 5_000,
       refetchOnWindowFocus: false,
       refetchIntervalInBackground: true,
+      placeholderData: (prev) => prev,
     }),
   )
   const charities = () => q.data?.charities ?? []
@@ -184,13 +189,31 @@ const Charities2OverlayBody: Component<Props> = (props) => {
   let timer: any
 
   onMount(() => {
+    // initialize snapshot once
+    setDisplayList(filteredCharities())
     timer = setInterval(() => {
-      if (filteredCharities().length > 0)
-        setIdx((i) => (i + 1) % filteredCharities().length)
+      const list = filteredCharities()
+      if (list.length > 0) {
+        setDisplayList(list) // snapshot updates only on ticks
+        setIdx((i) => (i + 1) % list.length)
+      }
     }, speed() * 1000)
   })
 
   onCleanup(() => timer && clearInterval(timer))
+
+  createEffect(
+    on(
+      () => q.data,
+      (data) => {
+        console.log('createEffect', 'data', data)
+        if (data && displayList().length === 0) {
+          setDisplayList(filteredCharities())
+          setIdx(0)
+        }
+      },
+    ),
+  )
 
   const currentTheme = (i: number) =>
     theme() === 'carousel'
@@ -201,42 +224,23 @@ const Charities2OverlayBody: Component<Props> = (props) => {
           : 'blue'
       : theme()
 
-  const current = (): CharityItem | undefined => {
-    const list = filteredCharities()
-    if (list.length === 0) return undefined
-    return list[idx() % list.length]
-  }
-
-  const oneCause = () => filteredCharities().length === 1
-  const items = () => {
-    return filteredCharities().map((c, i) => {
-      return (
-        <CharityItem
-          charity={c}
-          theme={currentTheme(i)}
-          showDesc={showDesc()}
-          showQRCode={showQRCode()}
-          showUrl={showUrl()}
-          showRaised={showRaised()}
-        />
-      )
-    })
-  }
+  const oneCause = () => displayList().length === 1
 
   const currentItem = () => {
-    if (oneCause()) {
-      return (
-        <CharityItem
-          charity={filteredCharities()[0]}
-          theme={currentTheme(0)}
-          showDesc={showDesc()}
-          showQRCode={showQRCode()}
-          showUrl={showUrl()}
-          showRaised={showRaised()}
-        />
-      )
-    }
-    return items()[idx()]
+    const list = displayList()
+    if (list.length === 0) return null
+    const i = idx()
+    return (
+      <CharityItem
+        charity={list[i % list.length]}
+        fundraiser={q.data?.userFundraiser ?? undefined}
+        theme={currentTheme(i)}
+        showDesc={showDesc()}
+        qrCode={qrCode()}
+        showUrl={showUrl()}
+        showRaised={showRaised()}
+      />
+    )
   }
 
   return (
@@ -247,16 +251,20 @@ const Charities2OverlayBody: Component<Props> = (props) => {
         speed={speed()}
       />
       <div class="flex-1">
-        <Show when={!oneCause()} fallback={
-          <CharityItem
-            charity={filteredCharities()[0]}
-            theme={currentTheme(0)}
-            showDesc={showDesc()}
-            showQRCode={showQRCode()}
-            showUrl={showUrl()}
-            showRaised={showRaised()}
-          />
-        }>
+        <Show
+          when={!oneCause()}
+          fallback={
+            <CharityItem
+              charity={displayList()[0]}
+              fundraiser={q.data?.userFundraiser ?? undefined}
+              theme={currentTheme(0)}
+              showDesc={showDesc()}
+              qrCode={qrCode()}
+              showUrl={showUrl()}
+              showRaised={showRaised()}
+            />
+          }
+        >
           {(c) => (
             <Transition
               mode="outin"
@@ -298,9 +306,10 @@ const Charities2OverlayBody: Component<Props> = (props) => {
 
 const CharityItem: Component<{
   charity: CharityItem
+  fundraiser?: FundraiserItem
   theme: string
   showDesc: boolean
-  showQRCode: boolean
+  qrCode: 'none' | 'fundraiser' | 'charity'
   showUrl: boolean
   showRaised: boolean
 }> = (props) => {
@@ -328,9 +337,15 @@ const CharityItem: Component<{
         ? '#3484BF'
         : '#ffffff'
 
+  const qrcodeUrl = () => {
+    if (props.qrCode === 'fundraiser') {
+      return props.fundraiser?.url ?? 'https://jinglejam.tiltify.com'
+    }
+    return props.charity.websiteUrl ?? 'https://jinglejam.tiltify.com/'
+  }
+
   const charityUrl = () => {
-    const raw = props.charity.websiteUrl ?? ''
-    const url = raw
+    const url = qrcodeUrl()
       .replace('https://', '')
       .replace('http://', '')
       .replace('www.', '')
@@ -375,17 +390,21 @@ const CharityItem: Component<{
         <Show when={props.showDesc}>
           <p class={'line-clamp-3 text-center'}>{props.charity.description}</p>
         </Show>
-        <Show when={props.showUrl && !props.showQRCode}>
+        <Show when={props.showUrl && props.qrCode === 'none'}>
           <p>{charityUrl()}</p>
         </Show>
-        <Show when={props.showQRCode}>
+        <Show when={props.qrCode !== 'none'}>
           <div
             class={
               'flex w-full flex-1 flex-col content-center items-center justify-center gap-1 pt-2'
             }
           >
             <QRCodeSVG
-              value={props.charity.websiteUrl ?? ''}
+              value={
+                props.qrCode === 'charity'
+                  ? (props.charity.websiteUrl ?? '')
+                  : 'https://jinglejam.tiltify.com/'
+              }
               level={'medium'}
               width={qrCodeSize()}
               height={qrCodeSize()}
@@ -395,7 +414,11 @@ const CharityItem: Component<{
               foregroundAlpha={1}
             />
             <Show when={props.showUrl}>
-              <p>{charityUrl()}</p>
+              <p>
+                {props.qrCode === 'charity'
+                  ? charityUrl()
+                  : 'jinglejam.tiltify.com'}
+              </p>
             </Show>
           </div>
         </Show>
