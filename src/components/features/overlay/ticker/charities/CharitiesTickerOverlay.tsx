@@ -61,8 +61,8 @@ const Body: Component<{
   const q = useQuery(() =>
     orpcPrivate.overlay.charities.queryOptions({
       input: { includeTotals: true, currency: props.currency, user: props.user },
-      staleTime: 5_000,
-      refetchInterval: 5_000,
+      staleTime: 60_000,
+      refetchInterval: 60_000,
       refetchOnWindowFocus: false,
       refetchIntervalInBackground: true,
       placeholderData: (prev) => prev,
