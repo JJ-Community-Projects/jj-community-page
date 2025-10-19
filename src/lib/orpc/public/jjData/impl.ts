@@ -163,7 +163,10 @@ const campaignByUserSlug = os.campaignByUserSlugContract.handler(
 
     // Fallback: query DB for latest by year
     const db = context.db
-    const rows = await db.select().from(jjCampaign).where(eq(jjCampaign.userSlug, slug))
+    const rows = await db
+      .select()
+      .from(jjCampaign)
+      .where(eq(jjCampaign.userSlug, slug))
     if (!rows?.length) return null
     const latest = rows.reduce((a: any, b: any) => (a.year > b.year ? a : b))
     return {
@@ -200,7 +203,10 @@ const campaignByUserId = os.campaignByUserIdContract.handler(
 
     // Fallback to DB latest by year
     const db = context.db
-    const rows = await db.select().from(jjCampaign).where(eq(jjCampaign.userId, userId))
+    const rows = await db
+      .select()
+      .from(jjCampaign)
+      .where(eq(jjCampaign.userId, userId))
     if (!rows?.length) return null
     const latest = rows.reduce((a: any, b: any) => (a.year > b.year ? a : b))
     return {
@@ -242,7 +248,10 @@ const campaignByTwitchId = os.campaignByTwitchIdContract.handler(
     const current = await stub.getCampaign(userId)
     if (current) return current
 
-    const past = await db.select().from(jjCampaign).where(eq(jjCampaign.userId, userId))
+    const past = await db
+      .select()
+      .from(jjCampaign)
+      .where(eq(jjCampaign.userId, userId))
     if (!past?.length) return null
     const latest = past.reduce((a: any, b: any) => (a.year > b.year ? a : b))
     return {

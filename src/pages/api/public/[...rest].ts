@@ -46,6 +46,20 @@ const handler = new OpenAPIHandler(publicRouter, {
           title: 'Jingle Jam Community Page Public API',
           version: '0.0.1',
         },
+        servers: [
+          {
+            description: 'Dev',
+            url: 'http://localhost:3000/api/public',
+          },
+          {
+            description: 'Beta',
+            url: 'https://beta.jinglejam.ostof.dev/api/public',
+          },
+          {
+            description: 'Prod',
+            url: 'https://jinglejam.ostof.dev/api/public',
+          },
+        ],
         commonSchemas: {
           // User Schemas
           UserSlugInputSchema: { schema: UserSlugInputSchema },

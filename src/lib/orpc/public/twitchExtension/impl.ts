@@ -6,6 +6,7 @@ import { getStreamColors } from '../../../../functions/jjDatesToColors.ts'
 import { DateTime } from 'luxon'
 import { cacheMiddleware } from '../../middleware/cacheControl.ts'
 import { rangeFromData } from '../../../utils/rangeFromData.ts'
+import type { JJCause } from '../../../../do/types/JJAPIModel.ts'
 
 const os = implement(contracts).use(hasAstroContext)
 
@@ -77,6 +78,65 @@ const extensionConfig = os.extensionConfigContract
         text: donationLinkText ?? 'Donate',
       },
       donationTrackerUrl: donationTrackerUrl ?? '',
+    }
+  })
+
+// List all campaigns from DO cache
+const campaigns = os.campaignsContract
+  .use(
+    cacheMiddleware({
+      maxAge: 60,
+      sMaxAge: 60,
+      staleWhileRevalidate: 30,
+    }),
+  )
+  .handler(async ({ context }) => {
+    const DO = context.env.JingleJamData
+    const stubID = DO.idFromName('JJ_API_CACHE')
+    const stub = DO.get(stubID)
+    try {
+      const list = await stub.getCampaigns()
+      console.log('campaigns', list)
+      if (!list) {
+        return {
+          count: 0,
+          list: [],
+        }
+      }
+
+      return {
+        list,
+        count: list.length,
+      }
+    } catch (e) {
+      console.log(JSON.stringify(e, null, 2))
+      throw e
+    }
+  })
+
+// List all causes from DO cache
+const causes = os.causesContract
+  .use(
+    cacheMiddleware({
+      maxAge: 60,
+      sMaxAge: 60,
+      staleWhileRevalidate: 30,
+    }),
+  )
+  .handler(async ({ context }) => {
+    const DO = context.env.JingleJamData
+    const stubID = DO.idFromName('JJ_API_CACHE')
+    const stub = DO.get(stubID)
+
+    const causes = await stub.getCauses()
+    console.log('causes', causes)
+    if (!causes) {
+      return { count: 0, list: [] }
+    }
+
+    return {
+      count: causes.length,
+      list: causes as JJCause[],
     }
   })
 
@@ -232,4 +292,9 @@ const yogsSchedule = os.yogsScheduleContract
     }
   })
 
-export const twitchExtensionRouter = { extensionConfig, yogsSchedule }
+export const twitchExtensionRouter = {
+  extensionConfig,
+  campaigns,
+  causes,
+  yogsSchedule,
+}

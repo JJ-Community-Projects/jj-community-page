@@ -1,5 +1,61 @@
 import z from 'zod/v4'
 import { oc } from '@orpc/contract'
+// JJRaised schema (used inside JJCause)
+export const JJRaisedSchema = z.object({
+  yogscast: z.number(),
+  fundraisers: z.number(),
+})
+
+// JJCause schema
+export const JJCauseSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  logo: z.string().url(), // logo is always a URL
+  description: z.string(),
+  url: z.string().url(),
+  donateUrl: z.string().url(),
+  raised: JJRaisedSchema,
+})
+
+// JJLivestream schema (used inside JJCampaign)
+export const JJLivestreamSchema = z.object({
+  channel: z.string().nullable(),
+  type: z.string(),
+})
+
+// JJUser schema (used inside JJCampaign)
+export const JJUserSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  slug: z.string(),
+  avatar: z.string(),
+  url: z.string(),
+})
+
+// JJCampaign schema
+export const JJCampaignSchema = z.object({
+  causeId: z.number().nullable(),
+  name: z.string(),
+  description: z.string(),
+  slug: z.string(),
+  url: z.string(),
+  startTime: z.string(), // ISO datetime
+  raised: z.number(),
+  goal: z.number(),
+  livestream: JJLivestreamSchema,
+  user: JJUserSchema,
+})
+
+// JJCampaigns schema
+export const JJCampaignsSchema = z.object({
+  count: z.number(),
+  list: z.array(JJCampaignSchema),
+})
+
+// --- Inferred TS types (optional, matches your interfaces) ---
+export type JJCauseType = z.infer<typeof JJCauseSchema>
+export type JJCampaignType = z.infer<typeof JJCampaignSchema>
+export type JJCampaignsType = z.infer<typeof JJCampaignsSchema>
 
 const CreatorSchema = z.object({
   id: z.string(),
@@ -28,7 +84,6 @@ const StreamSchema = z.object({
   color: z.string(),
 })
 
-
 const ExtensionConfigSchema = z.object({
   year: z.number(),
   showYogsSchedule: z.boolean(),
@@ -42,21 +97,49 @@ const ExtensionConfigSchema = z.object({
   donationLink: z.object({
     url: z.string(),
     visible: z.boolean(),
-    text: z.string()
+    text: z.string(),
   }),
   donationTrackerUrl: z.string(),
 })
 
-const extensionConfigContract = oc
-  .output(ExtensionConfigSchema)
+const extensionConfigContract = oc.output(ExtensionConfigSchema).route({
+  path: '/twitch-extension/config',
+  method: 'GET',
+  operationId: 'getExtensionConfig',
+  summary: 'Get the extension configuration',
+  description: 'Get the extension configuration',
+  tags: ['twitch-extension'],
+  successDescription: 'Extension configuration retrieved successfully',
+})
+
+// List endpoints (existing)
+const campaignsContract = oc.output(JJCampaignsSchema).route({
+  path: '/twitch-extension/campaigns',
+  method: 'GET',
+  operationId: 'getCampaigns',
+  summary: 'Get campaigns',
+  description: 'Retrieve all campaigns from the jj api',
+  tags: ['twitch-extension'],
+  successDescription: 'Campaigns retrieved successfully',
+  deprecated: false,
+})
+
+const causesContract = oc
+  .output(
+    z.object({
+      count: z.number(),
+      list: z.array(JJCauseSchema),
+    }),
+  )
   .route({
-    path: '/twitch-extension/config',
+    path: '/twitch-extension/causes',
     method: 'GET',
-    operationId: 'getExtensionConfig',
-    summary: 'Get the extension configuration',
-    description: 'Get the extension configuration',
+    operationId: 'getCauses',
+    summary: 'Get causes',
+    description: 'Retrieve all causes from the jj api',
     tags: ['twitch-extension'],
-    successDescription: 'Extension configuration retrieved successfully',
+    successDescription: 'Causes retrieved successfully',
+    deprecated: false,
   })
 
 const yogsScheduleContract = oc
@@ -102,4 +185,9 @@ const yogsScheduleContract = oc
     successDescription: 'Yogs schedule retrieved successfully',
   })
 
-export const contracts = { extensionConfigContract, yogsScheduleContract }
+export const contracts = {
+  extensionConfigContract,
+  campaignsContract,
+  causesContract,
+  yogsScheduleContract,
+}
