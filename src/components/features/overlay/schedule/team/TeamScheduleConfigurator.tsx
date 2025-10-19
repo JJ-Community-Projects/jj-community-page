@@ -1,10 +1,5 @@
 import { type Component, createMemo, createSignal, For, Show } from 'solid-js'
-import {
-  buildUrl,
-  FieldRow,
-  LinkPreview,
-  PreviewFrame,
-} from '../../overview/Common.tsx'
+import { buildUrl, FieldRow, LinkPreview, PreviewFrame, } from '../../overview/Common.tsx'
 import { QueryClient } from '@tanstack/query-core'
 import { QueryClientProvider, useQuery } from '@tanstack/solid-query'
 import { orpcPrivate } from '../../../../../lib/orpc/client.ts'
@@ -69,11 +64,7 @@ const Body: Component<{ visible?: boolean }> = (p) => {
               >
                 <option value="">Select a team…</option>
                 <For each={qTeams.data ?? []}>
-                  {(t) => (
-                    <option value={String(t.id)}>
-                      {t.name} (#{t.id})
-                    </option>
-                  )}
+                  {(t) => <option value={String(t.id)}>{t.name}</option>}
                 </For>
               </select>
             </Show>
