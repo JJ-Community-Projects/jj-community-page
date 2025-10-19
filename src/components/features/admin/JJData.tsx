@@ -1,4 +1,4 @@
-import { type Component, createEffect, on, Show } from 'solid-js'
+import { type Component, createEffect, on } from 'solid-js'
 import { orpcPrivate } from '../../../lib/orpc/client.ts'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/solid-query'
 
@@ -47,19 +47,6 @@ export const JJData: Component = () => {
         Refresh
       </button>
       <p>{causes.status}</p>
-      <Show when={causes.error}>
-        {(e) => <p>{JSON.stringify(e, null, 2)}</p>}
-      </Show>
-      <Show when={causes.data}>
-        {(data) => {
-          return (
-            <>
-              <p>Causes:</p>
-              <pre>{JSON.stringify(data(), null, 2)}</pre>
-            </>
-          )
-        }}
-      </Show>
     </div>
   )
 }

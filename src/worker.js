@@ -42,3 +42,6 @@ export { UserTeamsObject } from './lib/orpc/private/teamsWS/do/UserTeamsObject.t
 export { TeamAdminInvitesObject } from './lib/orpc/private/teamsWS/do/TeamAdminInvitesObject.ts'
 export { TeamAdminMembersObject } from './lib/orpc/private/teamsWS/do/TeamAdminMembersObject.ts'
 export { ScheduleEditingObject } from './lib/orpc/private/scheduleEditingWS/do/ScheduleEditingObject.ts'
+
+
+export {ConfigDO} from './do/ConfigDO.js'
