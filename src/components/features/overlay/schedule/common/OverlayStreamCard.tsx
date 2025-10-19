@@ -67,7 +67,7 @@ const OwnerBadge: Component<{ owner: Owner; textColorClass?: string }> = (
   p,
 ) => {
   return (
-    <div class={`mt-1 flex items-center gap-2 ${p.textColorClass ?? ''}`}>
+    <div class={`flex items-center gap-2 ${p.textColorClass ?? ''}`}>
       <Show when={p.owner.profileImage}>
         {(img) => (
           <img
@@ -143,7 +143,7 @@ export const OverlayStreamCardSidebar: Component<OverlayStreamCardProps> = (
         </Show>
         <p class="text-sm text-gray-700">{formatDate()}</p>
       </div>
-      <div class="flex flex-1 flex-col py-3 pl-2 pr-4 text-right">
+      <div class="flex flex-1 flex-col py-3 pl-2 pr-4 text-right items-end">
         <Show when={isLive()}>
           <p class="line-clamp-1 font-mono text-xs font-bold tracking-wide text-gray-800">
             LIVE
