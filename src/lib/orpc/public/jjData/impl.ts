@@ -5,6 +5,8 @@ import { and, eq } from 'drizzle-orm'
 import { jjCampaign } from '../../../db/schema/jj-api-schema.ts'
 import { cacheMiddleware } from '../../middleware/cacheControl.ts'
 import type { JJCause } from '../../../../do/types/JJAPIModel.ts'
+// New: get campaign by Twitch id
+import { twitchChannelSchema } from '../../../db/schema/twitch-channel-schema.ts'
 
 const jjDataCacheMiddleware = cacheMiddleware({
   maxAge: 30,
@@ -222,8 +224,6 @@ const campaignByUserId = os.campaignByUserIdContract.handler(
   },
 )
 
-// New: get campaign by Twitch id
-import { twitchChannelSchema } from '../../../db/schema/twitch-channel-schema.ts'
 const campaignByTwitchId = os.campaignByTwitchIdContract.handler(
   async ({ input, context }) => {
     const { twitchId } = input
@@ -232,7 +232,8 @@ const campaignByTwitchId = os.campaignByTwitchIdContract.handler(
       .select({ userId: twitchChannelSchema.userId })
       .from(twitchChannelSchema)
       .where(eq(twitchChannelSchema.id, twitchId))
-    const userId = rows?.[0]?.userId
+      .get()
+    const userId = rows?.userId
     if (!userId) return null
 
     const DO = context.env.JingleJamData

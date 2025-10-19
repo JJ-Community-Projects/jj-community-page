@@ -30,8 +30,17 @@ import { hasAstroContext } from './hasAstroContext.ts'
  *   interpolation below to `cacheControl.maxAge ?? 60`.
  */
 export const cacheMiddleware = (cacheControl: {
+  // maxAge: Number of seconds browsers (private caches) may cache the response.
+  // Maps to the Cache-Control "max-age" directive. Typical use: short values for
+  // rapidly changing data so end users do not see stale content for long.
   maxAge?: number
+  // sMaxAge: Number of seconds shared caches/CDNs (public caches) may cache the response.
+  // Maps to the Cache-Control "s-maxage" directive. Often set higher than maxAge to let
+  // your CDN cache content longer while browsers revalidate more frequently.
   sMaxAge?: number
+  // staleWhileRevalidate: Window (in seconds) during which caches may serve a stale
+  // response while they asynchronously fetch a fresh copy in the background. Useful to
+  // hide latency spikes and keep responses instant while updates happen.
   staleWhileRevalidate?: number
 }) =>
   // Ensure we have Astro context and (via ResponseHeadersPlugin) a resHeaders setter

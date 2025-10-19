@@ -6,13 +6,18 @@ import { hasAstroContext } from '../middleware/hasAstroContext.ts'
 import { dbMiddleware } from '../middleware/dbMiddleware.ts'
 import { jjRouter } from './jjData/impl.ts'
 import { overlaysScheduleRouter } from './overlays/schedule/impl.ts'
+import { twitchExtensionRouter } from './twitchExtension/impl.ts'
 
-export const publicRouter = os.use(hasAstroContext).use(dbMiddleware).router({
-  jj: jjRouter,
-  users: publicUsersRouter,
-  teams: publicTeamsRouter,
-  schedules: publicSchedulesRouter,
-  overlays: {
-    schedule: overlaysScheduleRouter,
-  },
-})
+export const publicRouter = os
+  .use(hasAstroContext)
+  .use(dbMiddleware)
+  .router({
+    jj: jjRouter,
+    users: publicUsersRouter,
+    teams: publicTeamsRouter,
+    schedules: publicSchedulesRouter,
+    overlays: {
+      schedule: overlaysScheduleRouter,
+    },
+    twitchExtension: twitchExtensionRouter,
+  })

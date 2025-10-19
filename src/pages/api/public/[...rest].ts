@@ -17,14 +17,8 @@ import {
   ScheduleSlugInputSchema,
   UserSlugWithYearSchema,
 } from '../../../lib/orpc/public/schemas/schedules.ts'
-import {
-  TeamSchema,
-  TeamWithMemberCountSchema,
-} from '../../../lib/orpc/public/schemas/teams.ts'
-import {
-  UserSlugInputSchema,
-  UserSlugSchema,
-} from '../../../lib/orpc/public/schemas/common.ts'
+import { TeamSchema, TeamWithMemberCountSchema, } from '../../../lib/orpc/public/schemas/teams.ts'
+import { UserSlugInputSchema, UserSlugSchema, } from '../../../lib/orpc/public/schemas/common.ts'
 import { UserDisplaySchema } from '../../../lib/orpc/public/schemas/UserDisplaySchema.ts'
 
 const handler = new OpenAPIHandler(publicRouter, {
@@ -45,7 +39,7 @@ const handler = new OpenAPIHandler(publicRouter, {
       schemaConverters: [new ZodToJsonSchemaConverter()],
     }),
     new OpenAPIReferencePlugin({
-      // docsProvider: 'swagger',
+      docsProvider: 'swagger',
       schemaConverters: [new ZodToJsonSchemaConverter()],
       specGenerateOptions: {
         info: {
