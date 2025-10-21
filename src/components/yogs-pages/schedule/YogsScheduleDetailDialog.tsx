@@ -1,20 +1,19 @@
-import {type Component, For, Show} from "solid-js";
-import {Dialog} from "@kobalte/core";
-import {FaBrandsTwitch, FaBrandsYoutube} from "solid-icons/fa";
-import {FaSolidXmark} from "solid-icons/fa";
-import {DateTime} from "luxon";
-import {getTextColor} from "../../../lib/utils/textColors.ts";
-import type {ContentVod, FullCreator, FullStream} from "../../../lib/model/ContentTypes.ts";
-import {YogsStreamUtils} from "../../../lib/utils/YogsStreamUtils.ts";
-import {useNow} from "../../../lib/utils/useNow.ts";
-import {logCreatorFromSlotClick, logCreatorSlotFilterClick} from "../../../lib/analytics.ts";
-import {createModalSignal, type ModalSignal} from "../../../lib/createModalSignal.ts";
-import {useYogsSchedule} from "./provider/YogsScheduleProvider.tsx";
-import {useCreatorFilter} from "./provider/CreatorFilterProvider.tsx";
-import {SolidMarkdown} from "solid-markdown";
-import remarkGfm from "remark-gfm";
-import {YogsStreamDisclaimer} from "./YogsScheduleDisclaimer.tsx";
-import {YogsCreatorDialog} from "../creators/YogsCreatorDialog.tsx";
+import { type Component, For, Show } from 'solid-js'
+import { Dialog } from '@kobalte/core'
+import { FaBrandsTwitch, FaBrandsYoutube, FaSolidXmark } from 'solid-icons/fa'
+import { DateTime } from 'luxon'
+import { getTextColor } from '../../../lib/utils/textColors.ts'
+import type { ContentVod, FullCreator, FullStream } from '../../../lib/model/ContentTypes.ts'
+import { YogsStreamUtils } from '../../../lib/utils/YogsStreamUtils.ts'
+import { useNow } from '../../../lib/utils/useNow.ts'
+import { logCreatorFromSlotClick, logCreatorSlotFilterClick } from '../../../lib/analytics.ts'
+import { createModalSignal, type ModalSignal } from '../../../lib/createModalSignal.ts'
+import { useYogsSchedule } from './provider/YogsScheduleProvider.tsx'
+import { useCreatorFilter } from './provider/CreatorFilterProvider.tsx'
+import { SolidMarkdown } from 'solid-markdown'
+import remarkGfm from 'remark-gfm'
+import { YogsStreamDisclaimer } from './YogsScheduleDisclaimer.tsx'
+import { YogsCreatorDialog } from '../creators/YogsCreatorDialog.tsx'
 
 interface YogsScheduleDetailDialogProps {
   stream: FullStream
@@ -180,7 +179,7 @@ const VodComponent: Component<VodProps> = (props) => {
           }
           href={props.vod.link}
         >
-          <BsTwitch/> {props.vod.label}
+          <FaBrandsTwitch/> {props.vod.label}
         </a>
       </div>
     )
@@ -194,7 +193,7 @@ const VodComponent: Component<VodProps> = (props) => {
           }
           href={props.vod.link}
         >
-          <BsTwitch/> {props.vod.label}
+          <FaBrandsTwitch/> {props.vod.label}
         </a>
       </div>
     )
@@ -277,7 +276,7 @@ const LiveButton = () => {
         }
         href={'https://twitch.tv/yogscast'}
       >
-        <BsTwitch/> Watch Live <div class={'h-2 w-2'}>
+        <FaBrandsTwitch/> Watch Live <div class={'h-2 w-2'}>
                   <span class="relative flex h-2 w-2">
                     <span
                       class={'absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75 duration-700'}
