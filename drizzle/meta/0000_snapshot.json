@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "e6e0f975-7f5e-4995-b3fe-1b4fddc44bf5",
+  "id": "f73f6c67-79ff-4d43-abf6-54b1a068610e",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "accounts": {
@@ -2760,12 +2760,6 @@
     }
   },
   "views": {
-    "full_users": {
-      "columns": {},
-      "name": "full_users",
-      "isExisting": false,
-      "definition": "select \"users\".\"id\", \"users\".\"created_at\", \"users\".\"role\", \"users\".\"primaryLiveStream\", \"id\", \"username\", \"avatar_src\", \"description\", \"slug\", \"twitch_channels\".\"user_id\", \"twitch_channels\".\"id\", \"twitch_channels\".\"login\", \"twitch_channels\".\"display_name\", \"twitch_channels\".\"description\", \"twitch_channels\".\"profile_image_url\", \"twitch_channels\".\"offline_image_url\" from \"users\" inner join \"tiltify_metadata_view\" on \"users\".\"id\" = \"tiltify_metadata_view\".\"user_id\" left join \"twitch_channels\" on \"users\".\"id\" = \"twitch_channels\".\"user_id\""
-    },
     "social_names_view": {
       "columns": {
         "user_id": {
@@ -2886,64 +2880,6 @@
       "name": "stream_participants_ui_view",
       "isExisting": false,
       "definition": "select \"stream_participants\".\"stream_id\", \"stream_participants\".\"schedule_id\", \"stream_participants\".\"user_id\", \"accounts\".\"provider_username\", \"accounts\".\"provider_id\", \"accounts\".\"meta\", \"user_styles\".\"primary_color\", \"user_styles\".\"accent_color\" from \"stream_participants\" inner join \"accounts\" on (\"stream_participants\".\"user_id\" = \"accounts\".\"user_id\" and \"accounts\".\"provider\" = 'tiltify') left join \"user_styles\" on \"stream_participants\".\"user_id\" = \"user_styles\".\"user_id\""
-    },
-    "tiltify_accounts": {
-      "columns": {
-        "user_id": {
-          "name": "user_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "provider": {
-          "name": "provider",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "provider_id": {
-          "name": "provider_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "provider_username": {
-          "name": "provider_username",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "((unixepoch())\n                     )"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "((unixepoch())\n                     )"
-        },
-        "meta": {
-          "name": "meta",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        }
-      },
-      "name": "tiltify_accounts",
-      "isExisting": false,
-      "definition": "select \"user_id\", \"provider\", \"provider_id\", \"provider_username\", \"created_at\", \"updated_at\", \"meta\" from \"accounts\" where \"accounts\".\"provider\" = 'tiltify'"
     },
     "tiltify_metadata_view": {
       "columns": {
