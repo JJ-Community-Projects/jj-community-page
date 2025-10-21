@@ -1,13 +1,13 @@
-import type {APIRoute} from "astro";
+import type { APIRoute } from 'astro'
 
 export const GET: APIRoute = async (ctx) => {
   // Get the userId from the URL parameters
-  const userId = ctx.params.userId;
+  const userId = ctx.params.userId
   if (!userId) {
-    return new Response('User ID is required', {status: 400});
+    return new Response('User ID is required', { status: 400 })
   }
 
-  return new Response('Live Notifier', {status: 200});
+  return new Response('Live Notifier', { status: 200 })
 
   /*
   // Get database connection and create TwitchRepo instance
@@ -61,7 +61,7 @@ export const GET: APIRoute = async (ctx) => {
       };
     }
 
-    const notifier = new TwitchLiveNotifierQueue()
+    const notifier = new twitch-live-notifierQueue()
 
     await notifier.send([channel.id], ctx.locals.runtime.env)
 

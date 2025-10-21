@@ -27,7 +27,7 @@ export const ScheduleAdminEditorHeader: Component = () => {
       if (!a && !b) {
         return undefined
       }
-      if (a!.getTime() > b!.getTime()) {
+      if ((a?.getTime() ?? 0) > (b?.getTime() ?? 0)) {
         return a
       }
       return b

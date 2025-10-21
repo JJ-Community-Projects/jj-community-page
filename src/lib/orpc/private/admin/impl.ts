@@ -88,6 +88,43 @@ const getAllConfigs = os.getAllConfigsContract.handler(async ({ context }) => {
     })
 })
 
+const getKVValue = os.getKVValueContract.handler(async ({ context, input }) => {
+  const { key } = input
+  const KV = context.env.KV
+  const value = await KV.get(key)
+  if (value === null) {
+    throw new ORPCError('NOT_FOUND', {
+      message: `Value for key: ${key} not found`,
+    })
+  }
+  return {
+    key,
+    value,
+  }
+})
+
+const getAllKVKeys = os.getAllKVKeysContract
+  .handler(async ({ context }) => {
+    const KV = context.env.KV
+    const result = await KV.list()
+    const keys = result.keys
+    return keys.map(k => k.name)
+  })
+
+const putKVValue = os.putKVValueContract.handler(async ({ context, input }) => {
+  const { key, value } = input
+  const KV = context.env.KV
+  await KV.put(key, value)
+})
+
+const deleteKVValue = os.deleteKVValueContract.handler(
+  async ({ context, input }) => {
+    const { key } = input
+    const KV = context.env.KV
+    await KV.delete(key)
+  },
+)
+
 export const adminRouter = {
   refreshJJAPIData,
   addStringConfig,
@@ -95,4 +132,8 @@ export const adminRouter = {
   addBooleanConfig,
   removeConfigContract,
   getAllConfigs,
+  getKVValue,
+  getAllKVKeys,
+  putKVValue,
+  deleteKVValue,
 }

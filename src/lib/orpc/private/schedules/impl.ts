@@ -220,13 +220,11 @@ const save = os.save.use(authMiddleware).handler(async ({ context, input }) => {
       })
     }
 
-    const DO = context.env.ScheduleEditorDO
+    const DO = context.env.ScheduleEditingObject
 
     const stubID = DO.idFromName(`${scheduleId}`)
 
     const stub = DO.get(stubID)
-
-    await stub.saveToDB(`${scheduleId}`)
 
     return { message: 'Schedule saved successfully' }
   } catch (error) {

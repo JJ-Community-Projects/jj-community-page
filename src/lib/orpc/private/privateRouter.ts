@@ -11,7 +11,6 @@ import { privateSchedulesRouter } from './schedules/impl.ts'
 import { socialRouter } from './social/impl.ts'
 import { privateTeamsSSERouter } from './teamsSSE/impl.ts'
 import { privateFriendsSSERouter } from './friendsSSE/impl.ts'
-import { privateScheduleEditingRouter } from './scheduleEditing'
 import { os } from '@orpc/server'
 import { hasAstroContext } from '../middleware/hasAstroContext.ts'
 import { privateFriendsWSRouter } from './friendsWS/impl.ts'
@@ -38,7 +37,6 @@ export const privateRouter = os.use(hasAstroContext).router({
   teamsSSE: privateTeamsSSERouter,
   teamsWS: privateTeamsWSRouter,
   schedules: privateSchedulesRouter,
-  scheduleEditing: privateScheduleEditingRouter,
   scheduleEditingWS: privateScheduleEditingWSRouter,
   overlay: privateOverlayRouter,
   twitch: twitchRouter,

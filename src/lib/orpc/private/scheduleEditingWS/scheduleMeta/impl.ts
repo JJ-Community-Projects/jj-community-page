@@ -87,6 +87,7 @@ const upsertScheduleMeta = os.upsertScheduleMetaContract
 
     // WS publish schedule meta change
     const stub = getScheduleEditingStub(context.env as any, scheduleId)
+    // @ts-ignore
     await stub.publishScheduleUpdated(scheduleId, editorId, { patch })
 
     const row = await db
@@ -335,6 +336,7 @@ const publishDraft = os.publishDraftContract
     const publishedAt = new Date()
 
     const stub = getScheduleEditingStub(context.env as any, scheduleId)
+    // @ts-ignore
     await stub.publishDraftPublished(scheduleId, editorId, {})
 
     // 8) Return a publish summary including counts of created/updated/deleted items
@@ -382,6 +384,7 @@ const discardDraft = os.discardDraftContract
       .run()
 
     const stub = getScheduleEditingStub(context.env as any, scheduleId)
+    // @ts-ignore
     await stub.publishDraftDiscarded(scheduleId, editorId, {})
 
     return { ok: true as const }

@@ -5,13 +5,6 @@ import { accounts, users, userSocials, userStyles } from './auth-schema'
 import { and, eq, sql } from 'drizzle-orm'
 import { twitchChannelSchema } from './twitch-channel-schema.ts'
 
-/**
- * Tiltify accounts view that filters accounts to show only those from the Tiltify provider.
- * Used for accessing Tiltify-specific account information.
- */
-export const tiltifyAccountsView = sqliteView('tiltify_accounts').as((qb) => {
-  return qb.select().from(accounts).where(eq(accounts.provider, 'tiltify'))
-})
 
 /**
  * View that extracts Tiltify metadata from the accounts table
@@ -62,32 +55,6 @@ export const tiltifyMetadataView = sqliteView('tiltify_metadata_view').as(
       .where(eq(accounts.provider, 'tiltify'))
   }
 )
-
-/**
- * Full users view that combines user data with their Tiltify and Twitch information.
- * Provides a comprehensive view of user profiles across multiple platforms.
- * Used for displaying complete user information in the UI.
- */
-export const fullUsersView = sqliteView('full_users').as((qb) => {
-  return qb
-    .select({
-      user: users,
-      tiltify: {
-        id: tiltifyMetadataView.id,
-        username: tiltifyMetadataView.username,
-        avatarSrc: tiltifyMetadataView.avatarSrc,
-        description: tiltifyMetadataView.description,
-        slug: tiltifyMetadataView.slug,
-      },
-      twitch: twitchChannelSchema,
-    })
-    .from(users)
-    .innerJoin(
-      tiltifyMetadataView,
-      and(eq(users.id, tiltifyMetadataView.userId))
-    )
-    .leftJoin(twitchChannelSchema, eq(users.id, twitchChannelSchema.userId))
-})
 
 /**
  * User display view that combines user data with display information from multiple sources.

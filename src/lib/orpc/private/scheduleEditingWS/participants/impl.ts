@@ -1,13 +1,16 @@
-import {implement, ORPCError} from '@orpc/server'
-import {dbMiddleware} from '../../../middleware/dbMiddleware.ts'
-import {authMiddleware} from '../../../middleware/authMiddleware.ts'
-import {scheduleOwnerOrEditorMiddleware} from '../middleware.ts'
-import {addParticipantContract, removeParticipantContract} from './contract.ts'
-import {assertStreamLockAvailableOrOwned} from '../streamEditingLock.ts'
-import {userDisplayView} from '../../../../db/schema/views-schema.ts'
-import {and, eq} from 'drizzle-orm'
-import {editStreamParticipantsTable} from '../../../../db/schema/edit-stream-participants-schema.ts'
-import {scheduleEditingChannels} from '../channels.ts'
+import { implement, ORPCError } from '@orpc/server'
+import { dbMiddleware } from '../../../middleware/dbMiddleware.ts'
+import { authMiddleware } from '../../../middleware/authMiddleware.ts'
+import { scheduleOwnerOrEditorMiddleware } from '../middleware.ts'
+import {
+  addParticipantContract,
+  removeParticipantContract,
+} from './contract.ts'
+import { assertStreamLockAvailableOrOwned } from '../streamEditingLock.ts'
+import { userDisplayView } from '../../../../db/schema/views-schema.ts'
+import { and, eq } from 'drizzle-orm'
+import { editStreamParticipantsTable } from '../../../../db/schema/edit-stream-participants-schema.ts'
+import { scheduleEditingChannels } from '../channels.ts'
 
 const os = implement({
   addParticipantContract,
@@ -23,30 +26,38 @@ function getScheduleEditingStub(env: Env, scheduleId: number) {
 export const addParticipant = os.addParticipantContract
   .use(authMiddleware)
   .use(scheduleOwnerOrEditorMiddleware)
-  .handler(async ({context, input}) => {
+  .handler(async ({ context, input }) => {
     const db = context.db
     const editorId = context.userId
     const { scheduleId, streamId, userId } = input
 
     // Lock check: stream must be unlocked or locked by current user
-    await assertStreamLockAvailableOrOwned(context.env as any, scheduleId, streamId, editorId)
+    await assertStreamLockAvailableOrOwned(
+      context.env as any,
+      scheduleId,
+      streamId,
+      editorId,
+    )
 
-    const user = await db.select()
+    const user = await db
+      .select()
       .from(userDisplayView)
       .where(eq(userDisplayView.userId, userId))
       .get()
 
     if (!user) {
-      throw new ORPCError('NOT_FOUND', {message:'User not found'})
+      throw new ORPCError('NOT_FOUND', { message: 'User not found' })
     }
 
-    await db.insert(editStreamParticipantsTable)
+    await db
+      .insert(editStreamParticipantsTable)
       .values({ scheduleId, streamId, userId })
       .onConflictDoNothing()
       .run()
 
     // WS publish via DO
     const stub = getScheduleEditingStub(context.env as any, scheduleId)
+    // @ts-ignore
     await stub.publishParticipantAdded(scheduleId, editorId, { streamId, user })
 
     return { ok: true as const }
@@ -55,20 +66,28 @@ export const addParticipant = os.addParticipantContract
 export const removeParticipant = os.removeParticipantContract
   .use(authMiddleware)
   .use(scheduleOwnerOrEditorMiddleware)
-  .handler(async ({context, input}) => {
+  .handler(async ({ context, input }) => {
     const db = context.db
     const editorId = context.userId
     const { scheduleId, streamId, userId } = input
 
     // Lock check: stream must be unlocked or locked by current user
-    await assertStreamLockAvailableOrOwned(context.env as any, scheduleId, streamId, editorId)
+    await assertStreamLockAvailableOrOwned(
+      context.env as any,
+      scheduleId,
+      streamId,
+      editorId,
+    )
 
-    const res = await db.delete(editStreamParticipantsTable)
-      .where(and(
-        eq(editStreamParticipantsTable.scheduleId, scheduleId),
-        eq(editStreamParticipantsTable.streamId, streamId),
-        eq(editStreamParticipantsTable.userId, userId)
-      ))
+    const res = await db
+      .delete(editStreamParticipantsTable)
+      .where(
+        and(
+          eq(editStreamParticipantsTable.scheduleId, scheduleId),
+          eq(editStreamParticipantsTable.streamId, streamId),
+          eq(editStreamParticipantsTable.userId, userId),
+        ),
+      )
       .run()
 
     if ((res as any).rowsAffected === 0) {
@@ -77,7 +96,11 @@ export const removeParticipant = os.removeParticipantContract
 
     // WS publish via DO
     const stub = getScheduleEditingStub(context.env as any, scheduleId)
-    await stub.publishParticipantRemoved(scheduleId, editorId, { streamId, userId })
+    // @ts-ignore
+    await stub.publishParticipantRemoved(scheduleId, editorId, {
+      streamId,
+      userId,
+    })
 
     return { ok: true as const }
   })

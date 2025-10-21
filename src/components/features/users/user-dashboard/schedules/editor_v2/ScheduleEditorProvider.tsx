@@ -1,11 +1,4 @@
-import {
-  createContext,
-  createEffect,
-  createSignal,
-  on,
-  type ParentComponent,
-  useContext,
-} from 'solid-js'
+import { createContext, createEffect, createSignal, on, type ParentComponent, useContext, } from 'solid-js'
 import { useMutation, useQuery } from '@tanstack/solid-query'
 import { orpcPrivate } from '../../../../../../lib/orpc/client.ts'
 import { createStore } from 'solid-js/store'
@@ -13,9 +6,11 @@ import type {
   EditChannelMessage,
   InitDraftStream,
   InitTag,
-} from '../../../../../../lib/orpc/private/scheduleEditing/scheduleEditingTypes.ts'
-import { normalizeInitPayloadDates } from '../../../../../../lib/orpc/private/scheduleEditing/scheduleEditingTypes.ts'
-import type { EditScheduleMetaPatch } from '../../../../../../lib/orpc/private/scheduleEditing/scheduleMeta/contract.ts'
+} from '../../../../../../lib/orpc/private/scheduleEditingWS/scheduleEditingTypes.ts'
+import { normalizeInitPayloadDates } from '../../../../../../lib/orpc/private/scheduleEditingWS/scheduleEditingTypes.ts'
+import type {
+  EditScheduleMetaPatch
+} from '../../../../../../lib/orpc/private/scheduleEditingWS/scheduleMeta/contract.ts'
 import type { UserDisplay } from '../../../../../../lib/orpc/private/schemas/users.ts'
 
 // Shared schedule-editing types; UI-only tempId extension

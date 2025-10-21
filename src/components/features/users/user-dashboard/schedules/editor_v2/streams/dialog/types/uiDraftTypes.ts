@@ -2,7 +2,7 @@ import type {
   InitDraftStream,
   InitParticipant,
   InitTag,
-} from '../../../../../../../../../lib/orpc/private/scheduleEditing/scheduleEditingTypes.ts'
+} from '../../../../../../../../../lib/orpc/private/scheduleEditingWS/scheduleEditingTypes.ts'
 
 // UI-local draft types derived from shared canonical shapes
 export type LocalDraftStream = Pick<InitDraftStream,

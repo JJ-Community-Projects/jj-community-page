@@ -100,31 +100,59 @@ const ExtensionConfigSchema = z.object({
     text: z.string(),
   }),
   donationTrackerUrl: z.string(),
+  timestamp: z.string(),
 })
 
-const extensionConfigContract = oc.output(ExtensionConfigSchema).route({
-  path: '/twitch-extension/config',
-  method: 'GET',
-  operationId: 'getExtensionConfig',
-  summary: 'Get the extension configuration',
-  description: 'Get the extension configuration',
-  tags: ['twitch-extension'],
-  successDescription: 'Extension configuration retrieved successfully',
-})
+const extensionConfigContract = oc
+  .input(
+    z.object({
+      twitch: z.object({
+        channelId: z.string(),
+        userId: z.string(),
+      }),
+    }),
+  )
+  .output(ExtensionConfigSchema)
+  .route({
+    path: '/twitch-extension/config',
+    method: 'GET',
+    operationId: 'getExtensionConfig',
+    summary: 'Get the extension configuration',
+    description: 'Get the extension configuration',
+    tags: ['twitch-extension'],
+    successDescription: 'Extension configuration retrieved successfully',
+  }) 
 
 // List endpoints (existing)
-const campaignsContract = oc.output(JJCampaignsSchema).route({
-  path: '/twitch-extension/campaigns',
-  method: 'GET',
-  operationId: 'getCampaigns',
-  summary: 'Get campaigns',
-  description: 'Retrieve all campaigns from the jj api',
-  tags: ['twitch-extension'],
-  successDescription: 'Campaigns retrieved successfully',
-  deprecated: false,
-})
+const campaignsContract = oc
+  .input(
+    z.object({
+      twitch: z.object({
+        channelId: z.string(),
+        userId: z.string(),
+      }),
+    }),
+  )
+  .output(JJCampaignsSchema)
+  .route({
+    path: '/twitch-extension/campaigns',
+    method: 'GET',
+    operationId: 'getCampaigns',
+    summary: 'Get campaigns',
+    description: 'Retrieve all campaigns from the jj api',
+    tags: ['twitch-extension'],
+    successDescription: 'Campaigns retrieved successfully',
+  })
 
 const causesContract = oc
+  .input(
+    z.object({
+      twitch: z.object({
+        channelId: z.string(),
+        userId: z.string(),
+      }),
+    }),
+  )
   .output(
     z.object({
       count: z.number(),
@@ -143,6 +171,14 @@ const causesContract = oc
   })
 
 const yogsScheduleContract = oc
+  .input(
+    z.object({
+      twitch: z.object({
+        channelId: z.string(),
+        userId: z.string(),
+      }),
+    }),
+  )
   .output(
     z.object({
       /**

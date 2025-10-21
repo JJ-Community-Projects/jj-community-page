@@ -16,9 +16,9 @@ import type {
   TagRemovedPayload,
   UnlockPayload,
 } from '../scheduleEditingTypes.ts'
+import { normalizeInitPayloadDates } from '../scheduleEditingTypes.ts'
 import { getDB } from '../../../../db/db.ts'
-import { loadDraftSnapshot } from '../../scheduleEditing/utils.ts'
-import { normalizeInitPayloadDates } from '../../scheduleEditing/scheduleEditingTypes.ts'
+import { loadDraftSnapshot } from '../utils.ts'
 
 /**
  * Durable Object for Schedule Editing WebSocket stream.

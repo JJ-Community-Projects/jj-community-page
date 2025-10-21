@@ -60,6 +60,7 @@ export const addTagToStream = os.addTagToStreamContract
       .run()
 
     const stub = getScheduleEditingStub(context.env as any, scheduleId)
+    // @ts-ignore
     await stub.publishTagAdded(scheduleId, editorId, {
       streamId,
       id: t.id,
@@ -100,6 +101,7 @@ export const removeTagFromStream = os.removeTagFromStreamContract
     }
 
     const stub = getScheduleEditingStub(context.env as any, scheduleId)
+    // @ts-ignore
     await stub.publishTagRemoved(scheduleId, editorId, { streamId, id })
     return { ok: true as const }
   })

@@ -1,6 +1,6 @@
-import {z} from 'zod/v4'
-import {UserDisplaySchema} from "../schemas/users.ts";
-import {ScheduleSchema} from "../schemas/schedules.ts";
+import { z } from 'zod/v4'
+import { UserDisplaySchema } from '../schemas/users.ts'
+import { ScheduleSchema } from '../schemas/schedules.ts'
 
 /**
  * 1) Core stream schemas
@@ -149,6 +149,7 @@ export type InitScheduleMeta = z.infer<typeof InitScheduleMetaSchema>
 export type InitDraftStream = z.infer<typeof DraftStreamSchema>
 export type InitTag = z.infer<typeof TagSchema>
 export type InitPayload = z.infer<typeof InitPayloadSchema>
+export type InitParticipant = z.infer<typeof UserDisplaySchema>
 
 export type ScheduleUpdatedPayload = z.infer<typeof ScheduleUpdatedPayloadSchema>
 export type StreamAddedPayload = z.infer<typeof StreamAddedPayloadSchema>

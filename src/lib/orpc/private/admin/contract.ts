@@ -3,15 +3,23 @@ import { z } from 'zod/v4'
 
 const refreshJJAPIDataContract = oc.output(z.void())
 
-const addStringConfigContract = oc.input(z.object({key: z.string(), value: z.string()})).output(z.void())
+const addStringConfigContract = oc
+  .input(z.object({ key: z.string(), value: z.string() }))
+  .output(z.void())
 
-const addNumberConfigContract = oc.input(z.object({key: z.string(), value: z.number()})).output(z.void())
+const addNumberConfigContract = oc
+  .input(z.object({ key: z.string(), value: z.number() }))
+  .output(z.void())
 
-const addBooleanConfigContract = oc.input(z.object({key: z.string(), value: z.boolean()})).output(z.void())
+const addBooleanConfigContract = oc
+  .input(z.object({ key: z.string(), value: z.boolean() }))
+  .output(z.void())
 
-const removeConfigContract = oc.input(z.object({key: z.string()})).output(z.void())
+const removeConfigContract = oc
+  .input(z.object({ key: z.string() }))
+  .output(z.void())
 
-const ConfigSchema =  z.union([
+const ConfigSchema = z.union([
   z.object({
     key: z.string(),
     type: z.literal('string'),
@@ -26,14 +34,26 @@ const ConfigSchema =  z.union([
     key: z.string(),
     type: z.literal('boolean'),
     value: z.boolean(),
-  })
+  }),
 ])
 
 export type Config = z.infer<typeof ConfigSchema>
 
-const getAllConfigsContract = oc.output(
-  z.array(ConfigSchema)
-)
+const getAllConfigsContract = oc.output(z.array(ConfigSchema))
+
+const getKVValueContract = oc
+  .input(z.object({ key: z.string() }))
+  .output(z.object({ key: z.string(), value: z.string() }))
+
+const getAllKVKeysContract = oc.output(z.array(z.string()))
+
+const putKVValueContract = oc
+  .input(z.object({ key: z.string(), value: z.string() }))
+  .output(z.void())
+
+const deleteKVValueContract = oc
+  .input(z.object({ key: z.string() }))
+  .output(z.void())
 
 export const contracts = {
   refreshJJAPIDataContract,
@@ -41,5 +61,9 @@ export const contracts = {
   addNumberConfigContract,
   addBooleanConfigContract,
   removeConfigContract,
-  getAllConfigsContract
+  getAllConfigsContract,
+  getKVValueContract,
+  getAllKVKeysContract,
+  putKVValueContract,
+  deleteKVValueContract,
 }

@@ -15,11 +15,7 @@ import {
 } from './contract.ts'
 import { scheduleOwnerOrEditorMiddleware } from '../middleware.ts'
 import { ensureDraftInitialized } from '../utils.ts'
-import {
-  assertStreamLockAvailableOrOwned,
-  lockStreamEditing,
-  unlockStreamEditing,
-} from '../streamEditingLock.ts'
+import { assertStreamLockAvailableOrOwned, lockStreamEditing, unlockStreamEditing, } from '../streamEditingLock.ts'
 import { and, eq, inArray, sql } from 'drizzle-orm'
 import { editStreamsTable } from '../../../../db/schema/edit-streams-schema.ts'
 import { editStreamParticipantsTable } from '../../../../db/schema/edit-stream-participants-schema.ts'
@@ -71,7 +67,11 @@ export const addStream = os.addStreamContract
     await ensureDraftInitialized(db, scheduleId, editorId)
 
     // Enforce per-date stream limit for the day of `start`
-    const dateLimit = await checkCanAddStreamOnDate(db, scheduleId, new Date(start))
+    const dateLimit = await checkCanAddStreamOnDate(
+      db,
+      scheduleId,
+      new Date(start),
+    )
     if (!dateLimit.canAdd) {
       throw new ORPCError('FORBIDDEN', {
         message: 'Daily stream limit reached',
@@ -87,10 +87,10 @@ export const addStream = os.addStreamContract
     const nonNegSet = new Set(
       existingIds
         .map((r: any) => Number(r.id))
-        .filter((id) => Number.isFinite(id) && id >= 0),
+        .filter((id) => Number.isFinite(id) && id > 0),
     )
 
-    let smallestAvailable = 0
+    let smallestAvailable = 1
     while (nonNegSet.has(smallestAvailable)) smallestAvailable += 1
 
     const id = smallestAvailable
@@ -111,6 +111,7 @@ export const addStream = os.addStreamContract
     await db.insert(editStreamsTable).values(stream).run()
 
     const stub = getScheduleEditingStub(context.env as any, scheduleId)
+    // @ts-ignore
     await stub.publishStreamAdded(scheduleId, editorId, stream)
     return { id }
   })
@@ -173,6 +174,7 @@ export const updateStream = os.updateStreamContract
       throw new Error('Draft stream not found')
 
     const stub = getScheduleEditingStub(context.env as any, scheduleId)
+    // @ts-ignore
     await stub.publishStreamUpdated(scheduleId, editorId, {
       id,
       patch: allowed,
@@ -221,6 +223,7 @@ export const deleteStream = os.deleteStreamContract
       throw new Error('Draft stream not found')
 
     const stub = getScheduleEditingStub(context.env as any, scheduleId)
+    // @ts-ignore
     await stub.publishStreamDeleted(scheduleId, editorId, { id })
     return { ok: true as const }
   })
@@ -264,7 +267,7 @@ export const updateStreams = os.updateStreamsContract
         const limit = await checkCanAddStreamOnDate(db, scheduleId, newDate)
         if (!limit.canAdd) {
           throw new ORPCError('FORBIDDEN', {
-            message: `Daily stream limit reached for ${newDate.toISOString().slice(0,10)} (${limit.streams}/${limit.maxStreams}).`,
+            message: `Daily stream limit reached for ${newDate.toISOString().slice(0, 10)} (${limit.streams}/${limit.maxStreams}).`,
             ...limit,
           } as any)
         }
@@ -285,6 +288,7 @@ export const updateStreams = os.updateStreamsContract
         throw new Error('Draft stream not found')
 
       const stub = getScheduleEditingStub(context.env as any, scheduleId)
+      // @ts-ignore
       await stub.publishStreamUpdated(scheduleId, editorId, {
         id,
         patch: allowed,
@@ -336,6 +340,7 @@ export const deleteStreams = os.deleteStreamsContract
       if ((res as any).rowsAffected === 0)
         throw new Error('Draft stream not found')
       const stub = getScheduleEditingStub(context.env as any, scheduleId)
+      // @ts-ignore
       await stub.publishStreamDeleted(scheduleId, editorId, { id })
       deletedIds.push(id)
     }
@@ -351,6 +356,7 @@ export const lockStream = os.lockStreamContract
     const userId = context.userId
     await lockStreamEditing(context.env as any, scheduleId, streamId, userId)
     const stub = getScheduleEditingStub(context.env as any, scheduleId)
+    // @ts-ignore
     await stub.publishLock(scheduleId, userId, { streamId, userId })
     return { ok: true as const }
   })
@@ -363,6 +369,7 @@ export const unlockStream = os.unlockStreamContract
     const userId = context.userId
     await unlockStreamEditing(context.env as any, scheduleId, streamId, userId)
     const stub = getScheduleEditingStub(context.env as any, scheduleId)
+    // @ts-ignore
     await stub.publishUnlock(scheduleId, userId, { streamId, userId })
     return { ok: true as const }
   })
@@ -569,6 +576,7 @@ export const updateStreamWithDetails = os.updateStreamWithDetailsContract
     }
 
     const stub = getScheduleEditingStub(context.env as any, scheduleId)
+    // @ts-ignore
     await stub.publishStreamUpdatedWithDetails(scheduleId, editorId, payload)
   })
 
@@ -778,6 +786,7 @@ export const updateStreamsWithDetails = os.updateStreamsWithDetailsContract
     }
     const stub = getScheduleEditingStub(context.env, scheduleId)
     for (const payload of payloads) {
+      // @ts-ignore
       await stub.publishStreamUpdatedWithDetails(scheduleId, editorId, payload)
     }
   })

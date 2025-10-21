@@ -1,6 +1,6 @@
-import {getDB} from "../lib/db/db.ts";
-import {TwitchLiveCheckQueue} from "../queues/TwitchLiveCheckQueue.ts";
-import {twitchChannelSchema} from "../lib/db/schema/twitch-channel-schema.ts";
+import { getDB } from '../lib/db/db.ts'
+import { TwitchLiveCheckQueue } from '../queues/TwitchLiveCheckQueue.ts'
+import { twitchChannelSchema } from '../lib/db/schema/twitch-channel-schema.ts'
 
 export async function scheduledTwitch(
   controller: ScheduledController,
