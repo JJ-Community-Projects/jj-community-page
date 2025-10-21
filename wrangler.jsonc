@@ -5,6 +5,7 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "jj-community-page",
+  "keep_vars": true,
   // "main": "./dist/_worker.js/index.js",
   "main": "./src/worker.js",
   "compatibility_date": "2025-04-07",
@@ -23,7 +24,6 @@
     {
       "tag": "v1",
       "new_sqlite_classes": [
-        "ScheduleEditorDO",
         "UserDO",
         "TeamDO",
         "JingleJamData",
@@ -60,16 +60,13 @@
 
       "tag": "v4",
       "new_sqlite_classes": [
-        "ConfigDO"
+        "ConfigDO",
+        "TwitchExtensionRateLimiter"
       ]
     }
   ],
   "durable_objects": {
     "bindings": [
-      {
-        "name": "ScheduleEditorDO",
-        "class_name": "ScheduleEditorDO"
-      },
       {
         "name": "JingleJamData",
         "class_name": "JingleJamData"
@@ -113,6 +110,10 @@
       {
         "name": "ConfigDO",
         "class_name": "ConfigDO"
+      },
+      {
+        "name": "TwitchExtensionRateLimiter",
+        "class_name": "TwitchExtensionRateLimiter"
       }
     ]
   },
@@ -133,31 +134,31 @@
   "queues": {
     "producers": [
       {
-        "queue": "TWITCH_LIVE_CHECK",
-        "binding": "TWITCH_LIVE_CHECK"
+        "queue": "twitch-live-check",
+        "binding": "twitch-live-check"
       },
       {
-        "queue": "YOUTUBE_LIVE_CHECK",
-        "binding": "YOUTUBE_LIVE_CHECK"
+        "queue": "youtube-live-check",
+        "binding": "youtube-live-check"
       },
       {
-        "queue": "TWITCH_LIVE_NOTIFIER",
-        "binding": "TWITCH_LIVE_NOTIFIER"
+        "queue": "twitch-live-notifier",
+        "binding": "twitch-live-notifier"
       }
     ],
     "consumers": [
       {
-        "queue": "TWITCH_LIVE_CHECK",
+        "queue": "twitch-live-check",
         "max_batch_size": 100,
         "max_batch_timeout": 30
       },
       {
-        "queue": "YOUTUBE_LIVE_CHECK",
+        "queue": "youtube-live-check",
         "max_batch_size": 5,
         "max_batch_timeout": 30
       },
       {
-        "queue": "TWITCH_LIVE_NOTIFIER",
+        "queue": "twitch-live-notifier",
         "max_batch_size": 10,
         "max_batch_timeout": 5
       }
@@ -205,9 +206,6 @@
           "tag": "v1",
           "new_sqlite_classes": [
             "JingleJamData",
-            "ScheduleEditorDO",
-            "UserDO",
-            "TeamDO",
             "UserRateLimiter"
           ]
         }
@@ -215,10 +213,6 @@
       "durable_objects": {
         "bindings": [
           // TODO
-          {
-            "name": "ScheduleEditorDO",
-            "class_name": "ScheduleEditorDO"
-          },
           {
             "name": "JingleJamData",
             "class_name": "JingleJamData"
@@ -264,6 +258,7 @@
       }
     },
     "beta": {
+      "keep_vars": true,
       "compatibility_flags": [
         "nodejs_compat",
         "global_fetch_strictly_public"
@@ -285,7 +280,6 @@
         {
           "tag": "v1",
           "new_sqlite_classes": [
-            "ScheduleEditorDO",
             "UserDO",
             "TeamDO",
             "JingleJamData"
@@ -296,30 +290,91 @@
           "new_sqlite_classes": [
             "UserRateLimiter"
           ]
+        },
+        {
+          "tag": "v3",
+          "deleted_classes": [
+            "UserDO",
+            "TeamDO",
+            "ScheduleEditorDO"
+          ],
+          "new_sqlite_classes": [
+
+            // friends
+            "FriendRequestIncomingObject",
+            "FriendRequestSentObject",
+            "FriendsListObject",
+
+            // team invites
+            "UserTeamInvitesObject",
+            "UserTeamsObject",
+            "TeamAdminInvitesObject",
+            "TeamAdminMembersObject",
+
+            // schedule editing
+            "ScheduleEditingObject",
+
+            // other
+            "ConfigDO",
+            "TwitchExtensionRateLimiter"
+          ]
         }
       ],
       "durable_objects": {
         "bindings": [
-          // TODO
-          {
-            "name": "ScheduleEditorDO",
-            "class_name": "ScheduleEditorDO"
-          },
           {
             "name": "JingleJamData",
             "class_name": "JingleJamData"
           },
           {
-            "name": "UserDO",
-            "class_name": "UserDO"
-          },
-          {
-            "name": "TeamDO",
-            "class_name": "TeamDO"
-          },
-          {
             "name": "UserRateLimiter",
             "class_name": "UserRateLimiter"
+          },
+          // friends
+          {
+            "name": "FriendRequestIncomingObject",
+            "class_name": "FriendRequestIncomingObject"
+          },
+          {
+            "name": "FriendRequestSentObject",
+            "class_name": "FriendRequestSentObject"
+          },
+          {
+            "name": "FriendsListObject",
+            "class_name": "FriendsListObject"
+          },
+          // users
+          {
+            "name": "UserTeamInvitesObject",
+            "class_name": "UserTeamInvitesObject"
+          },
+          {
+            "name": "UserTeamsObject",
+            "class_name": "UserTeamsObject"
+          },
+
+          // team
+          {
+            "name": "TeamAdminInvitesObject",
+            "class_name": "TeamAdminInvitesObject"
+          },
+          {
+            "name": "TeamAdminMembersObject",
+            "class_name": "TeamAdminMembersObject"
+          },
+
+          // ather
+          {
+            "name": "ScheduleEditingObject",
+            "class_name": "ScheduleEditingObject"
+          },
+          {
+            "name": "ConfigDO",
+            "class_name": "ConfigDO"
+          },
+          {
+            "name": "TwitchExtensionRateLimiter",
+            "class_name": "TwitchExtensionRateLimiter"
           }
         ]
       },
@@ -337,6 +392,45 @@
           "id": "9f2c6f601baf4a07a89a5887a641e4fb"
         }
       ],
+      "queues": {
+        "producers": [
+          {
+            "queue": "twitch-live-check",
+            "binding": "twitch_live_check"
+          },
+          {
+            "queue": "youtube-live-check",
+            "binding": "youtube_live_check"
+          },
+          {
+            "queue": "twitch-live-notifier",
+            "binding": "twitch_live_notifier"
+          }
+        ],
+        "consumers": [
+          {
+            "queue": "twitch-live-check",
+            "max_batch_size": 100,
+            "max_batch_timeout": 30
+          },
+          {
+            "queue": "youtube-live-check",
+            "max_batch_size": 5,
+            "max_batch_timeout": 30
+          },
+          {
+            "queue": "twitch-live-notifier",
+            "max_batch_size": 10,
+            "max_batch_timeout": 5
+          }
+        ]
+      },
+      "triggers": {
+        "crons": [
+          "*/2 * * * *"
+          // every 2 minutes
+        ]
+      },
       "vars": {
         "ENVIRONMENT": "BETA",
         "TWITCH_CLIENT_ID": "<PLACEHOLDER>",
@@ -346,7 +440,8 @@
         "TILTIFY_API": "<PLACEHOLDER>",
         "TILTIFY_REDIRECT_URI": "<PLACEHOLDER>",
         "JJ_DASHBOARD_URL": "<PLACEHOLDER>",
-        "YOUTUBE_API_KEY": "<PLACEHOLDER>"
+        "YOUTUBE_API_KEY": "<PLACEHOLDER>",
+        "ORPC_DEI_SIGNING_KEY": "<SET_SECRET>"
       }
     }
   }

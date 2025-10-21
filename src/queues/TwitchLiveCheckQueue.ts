@@ -1,8 +1,6 @@
-import type {MessageSendRequest} from "@cloudflare/workers-types/experimental/index.ts";
-
+import type { MessageSendRequest } from '@cloudflare/workers-types/experimental/index.ts'
 
 export class TwitchLiveCheckQueue {
-
   /**
    * Sends a batch of Twitch user IDs to the queue for live status checking
    *
@@ -13,11 +11,13 @@ export class TwitchLiveCheckQueue {
   send(ids: string[], env: Env) {
     const msgs: MessageSendRequest[] = ids.map((id) => ({
       body: id,
-      contentType: 'text'
+      contentType: 'text',
     }))
-    return env.TWITCH_LIVE_CHECK.sendBatch(msgs, {
-      delaySeconds: 5,
-    })
+    return (
+      env["twitch-live-check"].sendBatch(msgs, {
+        delaySeconds: 5,
+      })
+    )
   }
 
   /**
@@ -33,14 +33,14 @@ export class TwitchLiveCheckQueue {
   async handle(batch: MessageBatch<string>, env: Env, ctx: ExecutionContext) {
     // Extract user IDs from the message batch
     const messages = batch.messages
-    const ids = messages.map(message => message.body)
+    const ids = messages.map((message) => message.body)
     batch.ackAll()
 
     /*
 
     // Get the TwitchAPI Durable Object to fetch stream data
     const DO = env.TwitchAPIDO
-    const id = DO.idFromName("TwitchLiveCheckQueue")
+    const id = DO.idFromName("twitch-live-checkQueue")
     const stub = DO.get(id)
 
     // If we can't get the DO, retry the batch
@@ -100,17 +100,15 @@ export class TwitchLiveCheckQueue {
         await twitchRepo.insertMultipleStreams(streamsToInsert);
       }
 
-      const notifier = new TwitchLiveNotifierQueue()
+      const notifier = new twitch-live-notifierQueue()
       await notifier.send(ids, env)
       batch.ackAll()
-      console.log('TwitchLiveCheckQueue', 'handle', 'done')
+      console.log('twitch-live-checkQueue', 'handle', 'done')
     } catch (e) {
-      console.error('TwitchLiveCheckQueue', 'handle', e)
+      console.error('twitch-live-checkQueue', 'handle', e)
       batch.retryAll({
         delaySeconds: 10,
       })
     }*/
   }
-
-
 }

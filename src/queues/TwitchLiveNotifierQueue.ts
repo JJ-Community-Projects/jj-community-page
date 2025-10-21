@@ -1,21 +1,18 @@
-import type {MessageSendRequest} from "@cloudflare/workers-types/experimental/index.ts";
-
+import type { MessageSendRequest } from '@cloudflare/workers-types/experimental/index.ts'
 
 export class TwitchLiveNotifierQueue {
-
   send(twitchIds: string[], env: Env) {
     const msgs: MessageSendRequest[] = twitchIds.map((id) => ({
       body: id,
-      contentType: 'text'
+      contentType: 'text',
     }))
-    return env.TWITCH_LIVE_NOTIFIER.sendBatch(msgs, {
+    return env['twitch-live-notifier'].sendBatch(msgs, {
       delaySeconds: 5,
     })
   }
 
-
   async handle(batch: MessageBatch<string>, env: Env, ctx: ExecutionContext) {
-    console.log('TwitchLiveNotifierQueue', 'Received batch', batch)
+    console.log('twitch-live-notifierQueue', 'Received batch', batch)
     for (const msg of batch.messages) {
       try {
         const result = await this.handleSingleId(msg.body, env)
@@ -27,7 +24,7 @@ export class TwitchLiveNotifierQueue {
           })
         }
       } catch (e) {
-        console.error('TwitchLiveNotifierQueue', 'handle', e)
+        console.error('twitch-live-notifierQueue', 'handle', e)
         msg.retry({
           delaySeconds: 10,
         })
@@ -37,14 +34,14 @@ export class TwitchLiveNotifierQueue {
 
   private async handleSingleId(twitchId: string, env: Env): Promise<boolean> {
     /*
-    console.log('TwitchLiveNotifierQueue', 'handleSingleId', twitchId)
+    console.log('twitch-live-notifierQueue', 'handleSingleId', twitchId)
     const userRepo = UserRepo.withEnv(env, 'queue')
     const twitchRepo = TwitchRepo.withEnv(env, 'queue')
 
     const channel = await twitchRepo.getChannelByTwitchId(twitchId)
 
     if (!channel) {
-      console.error('TwitchLiveNotifierQueue', 'handleSingleId', twitchId, 'channel not found')
+      console.error('twitch-live-notifierQueue', 'handleSingleId', twitchId, 'channel not found')
       return false
     }
 
@@ -53,20 +50,20 @@ export class TwitchLiveNotifierQueue {
     const user = await userRepo.findById(userId)
 
     if (!user) {
-      console.error('TwitchLiveNotifierQueue', 'handleSingleId', twitchId, 'userId not found')
+      console.error('twitch-live-notifierQueue', 'handleSingleId', twitchId, 'userId not found')
       return false
     }
 
     const tiltifyMetaData = await userRepo.getTiltifyMetaData(userId)
 
     if (!tiltifyMetaData) {
-      console.error('TwitchLiveNotifierQueue', 'handleSingleId', twitchId, 'tiltify userId not found')
+      console.error('twitch-live-notifierQueue', 'handleSingleId', twitchId, 'tiltify userId not found')
       return false
     }
 
     const twitchStream = await twitchRepo.getStreamByUserId(twitchId)
 
-    console.log('TwitchLiveNotifierQueue', 'userId', userId)
+    console.log('twitch-live-notifierQueue', 'userId', userId)
     const DO = env.UserLiveStatusDO
     const doId = DO.idFromName(`${userId}`)
     const userStub = DO.get(doId)
@@ -85,7 +82,7 @@ export class TwitchLiveNotifierQueue {
         primaryLiveStream: user.primaryLiveStream,
         channel: {}
       }
-      console.log('TwitchLiveNotifierQueue', 'handleSingleId', 'state', state)
+      console.log('twitch-live-notifierQueue', 'handleSingleId', 'state', state)
       await rpc.setUserLiveState(state)
     } else {
       const state: UserLiveState = {
@@ -98,18 +95,16 @@ export class TwitchLiveNotifierQueue {
           twitch: channel,
         }
       }
-      console.log('TwitchLiveNotifierQueue', 'handleSingleId', 'state', state)
+      console.log('twitch-live-notifierQueue', 'handleSingleId', 'state', state)
 
       await rpc.setUserLiveState(state)
     }
 
     (await rpc)[Symbol.dispose]?.()
 
-    console.log('TwitchLiveNotifierQueue', 'handleSingleId', twitchId, 'done')
+    console.log('twitch-live-notifierQueue', 'handleSingleId', twitchId, 'done')
 
     */
     return true
   }
-
-
 }
