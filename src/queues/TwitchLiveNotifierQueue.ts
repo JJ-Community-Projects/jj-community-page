@@ -6,7 +6,10 @@ export class TwitchLiveNotifierQueue {
       body: id,
       contentType: 'text',
     }))
-    return env['twitch-live-notifier'].sendBatch(msgs, {
+    if (msgs.length === 0) {
+      return
+    }
+    return env.TWITCH_LIVE_NOTIFIER.sendBatch(msgs, {
       delaySeconds: 5,
     })
   }

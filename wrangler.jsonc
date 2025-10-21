@@ -131,19 +131,20 @@
       "id": "9f2c6f601baf4a07a89a5887a641e4fb"
     }
   ],
+
   "queues": {
     "producers": [
       {
         "queue": "twitch-live-check",
-        "binding": "twitch-live-check"
+        "binding": "TWITCH_LIVE_CHECK"
       },
       {
         "queue": "youtube-live-check",
-        "binding": "youtube-live-check"
+        "binding": "YOUTUBE_LIVE_CHECK"
       },
       {
         "queue": "twitch-live-notifier",
-        "binding": "twitch-live-notifier"
+        "binding": "TWITCH_LIVE_NOTIFIER"
       }
     ],
     "consumers": [
@@ -396,15 +397,15 @@
         "producers": [
           {
             "queue": "twitch-live-check",
-            "binding": "twitch_live_check"
+            "binding": "TWITCH_LIVE_CHECK"
           },
           {
             "queue": "youtube-live-check",
-            "binding": "youtube_live_check"
+            "binding": "YOUTUBE_LIVE_CHECK"
           },
           {
             "queue": "twitch-live-notifier",
-            "binding": "twitch_live_notifier"
+            "binding": "TWITCH_LIVE_NOTIFIER"
           }
         ],
         "consumers": [
@@ -432,16 +433,7 @@
         ]
       },
       "vars": {
-        "ENVIRONMENT": "BETA",
-        "TWITCH_CLIENT_ID": "<PLACEHOLDER>",
-        "TWITCH_CLIENT_SECRET": "<PLACEHOLDER>",
-        "TILTIFY_CLIENT_ID": "<PLACEHOLDER>",
-        "TILTIFY_SECRET": "<PLACEHOLDER>",
-        "TILTIFY_API": "<PLACEHOLDER>",
-        "TILTIFY_REDIRECT_URI": "<PLACEHOLDER>",
-        "JJ_DASHBOARD_URL": "<PLACEHOLDER>",
-        "YOUTUBE_API_KEY": "<PLACEHOLDER>",
-        "ORPC_DEI_SIGNING_KEY": "<SET_SECRET>"
+        "ENVIRONMENT": "BETA"
       }
     }
   }

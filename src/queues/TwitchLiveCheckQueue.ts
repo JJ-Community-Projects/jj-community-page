@@ -13,8 +13,11 @@ export class TwitchLiveCheckQueue {
       body: id,
       contentType: 'text',
     }))
+    if (msgs.length === 0) {
+      return
+    }
     return (
-      env["twitch-live-check"].sendBatch(msgs, {
+      env.TWITCH_LIVE_CHECK.sendBatch(msgs, {
         delaySeconds: 5,
       })
     )
@@ -35,6 +38,7 @@ export class TwitchLiveCheckQueue {
     const messages = batch.messages
     const ids = messages.map((message) => message.body)
     batch.ackAll()
+    console.log('twitch-live-checkQueue', 'handle', 'done', ids)
 
     /*
 
