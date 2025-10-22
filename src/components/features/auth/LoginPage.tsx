@@ -71,9 +71,14 @@ export const LoginPage: Component = () => {
                 before continuing.
               </Dialog.Description>
 
-              <div class="max-h-[60vh] space-y-5 overflow-y-auto pr-1">
+              <div class="max-h-[60vh] space-y-5 overflow-y-auto gap-2">
+                {' '}
+                <p class="rounded-md bg-primary/5 px-4 py-2 text-neutral-700">
+                  This is a community run project and not associated with the
+                  Jingle Jam.
+                </p>
                 {/* Account Purpose */}
-                <section class="rounded-xl border-2 border-white/10 bg-white p-4 shadow-sm">
+                <section class="rounded-xl border-2 border-white/10 bg-white px-4 shadow-sm">
                   <p class="mb-2 text-neutral-600 ~text-base/xl">
                     By logging in, you agree to our community guidelines
                   </p>
@@ -95,10 +100,9 @@ export const LoginPage: Component = () => {
                     </li>
                   </ul>
                 </section>
-
                 {/* Community Guidelines */}
-                <section class="rounded-xl border-2 border-white/10 bg-white p-4 shadow-sm">
-                  <h3 class="mb-3 font-poppins font-semibold text-neutral-700 ~text-lg/xl">
+                <section class="rounded-xl border-2 border-white/10 bg-white px-4 shadow-sm">
+                  <h3 class="font-poppins font-semibold text-neutral-700 ~text-lg/xl">
                     Community Guidelines
                   </h3>
                   <div class="space-y-3 text-neutral-600 ~text-sm/base">
@@ -124,7 +128,7 @@ export const LoginPage: Component = () => {
                       </div>
                     </div>
                   </div>
-                  <div class="mt-4 border-t border-neutral-200 pt-3">
+                  <div class="mt-4 border-t border-neutral-200">
                     <p class="text-neutral-500 ~text-xs/sm">
                       Questions? Contact{' '}
                       <span class="font-medium text-accent">@Ostof</span> on
