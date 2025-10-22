@@ -1,57 +1,106 @@
 ---
-import {Countdown} from "../components/common/ui/Countdown";
+import {
+  MainCountdownSimple,
+  MainJJStartTimes,
+} from '../components/common/ui/MainHeader.tsx'
 const prerender = true
-import BaseLayout from "../layouts/BaseLayout.astro";
+import BaseLayout4xl from '../layouts/BaseLayout4xl.astro'
 ---
-<BaseLayout
+
+<BaseLayout4xl
   title="Jingle Jam Community"
   description="A central place to showcase the streams of the Jingle Jam!"
   canonical="https://jinglejam.ostof.dev"
 >
-    <div class="flex flex-col justify-center items-center text-white p-2">
-        <p class="~text-2xl/4xl w-full text-center">The Jingle Jam Community</p>
-        <p class="~text-xl/2xl text-center">A central place to showcase the streams of the Jingle Jam!</p>
-    </div>
-    <Countdown client:only="solid-js"/>
-
-    <div class="flex flex-col gap-4 pt-4">
-
-        <div class="text-white flex flex-col gap-2">
-            <p class="text-xl">How does it work</p>
-            <div>
-                <p>jinglejam.ostof.dev uses mostly publicly available information</p>
-                <p>and combines them so people have an easier time to find streamer.</p>
-                <p>In the past this only included the streaming schedule of the Yogscast and links to their socials and
-                    channels.</p>
-            </div>
-            <div>
-                <p><b>Last year</b>, with the help of <a href=""
-                                                         class="cursor-pointer underline hover:text-accent-50 transition-all">No1mann</a>
-                    we added:</p>
-                <ul class="list-disc">
-                    <li>
-                        A list of all registered Jingle Jam Fundraiser from Tiltify
-                    </li>
-                    <li>
-                        A list of all currently live Twitch Channels
-                    </li>
-                    <li>
-                        Up to date donation amounts
-                    </li>
-                </ul>
-            </div>
-
-            <div>
-                <p><b>This year</b>, due to personal reasons we had to change plans and focus more on internal updates</p>
-                <p>which will help to make it easier and cheaper to maintain this project</p>
-            </div>
-
-            <div>
-                <p>All this data is also available in the in the <a href="/twitch-extension"
-                                                                    class="cursor-pointer underline hover:text-accent-50 transition-all">Jingle
-                    Jam Community Twitch Extension</a></p>
-            </div>
-        </div>
+  <div
+    class={'flex w-full flex-col items-center gap-1 rounded-xl border border-white/10 bg-white/5 p-4 text-center text-white text-white/90 sm:p-4'}
+  >
+    <div class="flex flex-col items-center justify-center text-white">
+      <p class="w-full text-center ~text-2xl/4xl">The Jingle Jam Community</p>
+      <p class="text-center ~text-lg/xl">
+        A central place to showcase the streams of the Jingle Jam!
+      </p>
     </div>
 
-</BaseLayout>
+    <MainCountdownSimple client:only="solid-js" />
+
+    <MainJJStartTimes client:only="solid-js" />
+  </div>
+  <div class="flex flex-col gap-6 pt-4">
+    <!-- Summary section -->
+    <section
+      class="text-white/90 bg-white/5 border border-white/10 rounded-xl p-4 sm:p-6"
+    >
+      <h2 class="text-xl sm:text-2xl font-semibold text-white">
+        What is this site?
+      </h2>
+      <p class="mt-2">
+        A community hub that brings together streams, schedules, and fundraising
+        for the Jingle Jam.
+      </p>
+      <ul class="mt-4 list-disc pl-5 space-y-1">
+        <li>
+          <b>Overview of community fundraiser</b> — see totals and progress from
+          community Tiltify campaigns.
+        </li>
+        <li>
+          <b>Schedules of streamers</b> using this site — quickly find who is live
+          and what’s coming up.
+        </li>
+      </ul>
+      <p class="mt-4 text-xs sm:text-sm text-white/60">
+        Disclaimer: This is a community‑run project and is not affiliated with, endorsed by, or sponsored by Jingle Jam or any associated organizations.
+      </p>
+    </section>
+
+    <!-- Streamer features section -->
+    <section
+      class="text-white/90 bg-white/5 border border-white/10 rounded-xl p-4 sm:p-6"
+    >
+      <h2 class="text-xl sm:text-2xl font-semibold text-white">
+        For Streamers
+      </h2>
+      <p class="mt-2">
+        Tools to help you participate and share your Jingle Jam efforts:
+      </p>
+      <ul class="mt-3 grid gap-x-4 gap-2 sm:grid-cols-2 list-disc pl-5">
+        <li><b>User profile</b> — showcase your links and fundraising info.</li>
+        <li><b>Friends</b> — highlight and collaborate with other creators.</li>
+        <li><b>Teams</b> — group up for joint schedules.</li>
+        <li>
+          <b>OBS Overlays</b> — drop-in overlays for donations and schedules.
+        </li>
+        <li>
+          <b>Twitch Extension</b> — Much of this data is also available via the <a
+            href="/twitch-extension"
+            class="cursor-pointer underline hover:text-accent-50 transition-all"
+            >Jingle Jam Community Twitch Extension</a
+          >.
+        </li>
+      </ul>
+      <div class="mt-4 flex justify-center">
+        <a
+          href="/login"
+          class="inline-flex items-center rounded-md border border-white/20 bg-white/10 px-4 py-2 text-sm font-medium text-white hover:bg-white/15 transition-colors"
+        >
+          Log in to get started
+        </a>
+      </div>
+    </section>
+
+    <!-- Special thanks -->
+    <section
+      class="text-white/80 bg-white/5 border border-white/10 rounded-xl p-4 sm:p-6"
+    >
+      <h2 class="text-xl sm:text-2xl font-semibold text-white">
+        Special thanks
+      </h2>
+      <p class="mt-2 text-sm">
+        Special thanks to <a
+          href="https://www.twitch.tv/no1mann"
+          class="underline hover:text-accent-50 transition-all">No1mann</a
+        > for helping to expand the features.
+      </p>
+    </section>
+  </div>
+</BaseLayout4xl>
