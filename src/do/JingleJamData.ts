@@ -31,9 +31,7 @@ export class JingleJamData extends DurableObject<Env> {
       string,
       unknown
     >
-    console.log('getCauses', map)
     const causes = Array.from(map.values()) as JJCause[]
-    console.log('getCauses', causes)
     return causes
   }
 
@@ -59,7 +57,6 @@ export class JingleJamData extends DurableObject<Env> {
       string,
       unknown
     >
-    console.log('getCampaigns', map)
     return Array.from(map.values()) as JJCampaign[]
   }
 
@@ -79,8 +76,6 @@ export class JingleJamData extends DurableObject<Env> {
     }
 
     const data = (await res.json()) as JingleJamResponse
-
-    // console.log('data', data)
 
     // Update DO storage (granular)
     try {
