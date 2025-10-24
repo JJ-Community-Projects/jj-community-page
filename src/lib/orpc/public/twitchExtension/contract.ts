@@ -1,5 +1,6 @@
 import z from 'zod/v4'
 import { oc } from '@orpc/contract'
+import { UserDisplaySchema } from '../schemas/UserDisplaySchema.ts'
 // JJRaised schema (used inside JJCause)
 export const JJRaisedSchema = z.object({
   yogscast: z.number(),
@@ -106,31 +107,27 @@ const ExtensionConfigSchema = z.object({
 const extensionConfigContract = oc
   .input(
     z.object({
-      twitch: z.object({
-        channelId: z.string(),
-        userId: z.string(),
-      }),
+      channelId: z.string(),
+      userId: z.string(),
     }),
   )
   .output(ExtensionConfigSchema)
   .route({
-    path: '/twitch-extension/config',
+    path: '/twitch-extension/config/{channelId}',
     method: 'GET',
     operationId: 'getExtensionConfig',
     summary: 'Get the extension configuration',
     description: 'Get the extension configuration',
     tags: ['twitch-extension'],
     successDescription: 'Extension configuration retrieved successfully',
-  }) 
+  })
 
 // List endpoints (existing)
 const campaignsContract = oc
   .input(
     z.object({
-      twitch: z.object({
-        channelId: z.string(),
-        userId: z.string(),
-      }),
+      channelId: z.string(),
+      userId: z.string(),
     }),
   )
   .output(JJCampaignsSchema)
@@ -147,10 +144,8 @@ const campaignsContract = oc
 const causesContract = oc
   .input(
     z.object({
-      twitch: z.object({
-        channelId: z.string(),
-        userId: z.string(),
-      }),
+      channelId: z.string(),
+      userId: z.string(),
     }),
   )
   .output(
@@ -173,10 +168,8 @@ const causesContract = oc
 const yogsScheduleContract = oc
   .input(
     z.object({
-      twitch: z.object({
-        channelId: z.string(),
-        userId: z.string(),
-      }),
+      channelId: z.string(),
+      userId: z.string(),
     }),
   )
   .output(
@@ -221,9 +214,110 @@ const yogsScheduleContract = oc
     successDescription: 'Yogs schedule retrieved successfully',
   })
 
+const userDataContract = oc
+  .input(
+    z.object({
+      channelId: z.string(),
+      userId: z.string(),
+    }),
+  )
+  .output(JJCampaignSchema)
+  .route({
+    path: '/twitch-extension/user-data',
+    method: 'GET',
+    operationId: 'getUserData',
+    summary: 'Get the users data',
+    description: 'Get the use data',
+    tags: ['twitch-extension'],
+    successDescription: 'User data retrieved successfully',
+  })
+
+const userScheduleContract = oc
+  .input(
+    z.object({
+      channelId: z.string(),
+      userId: z.string(),
+    }),
+  )
+  .output(
+    z.object({
+      /**
+       * The date of the earliest stream in the schedule.
+       */
+      start: z.date(),
+      /**
+       * The date of the latest stream in the schedule.
+       */
+      end: z.date(),
+      /**
+       * List of all streams from the primary schedule of the user.
+       */
+      streams: z.array(StreamSchema),
+    }),
+  )
+  .route({
+    path: '/twitch-extension/user-schedule',
+    method: 'GET',
+    operationId: 'getUserSchedule',
+    summary: 'Get the users schedule',
+    description: 'Get the use schedule',
+    tags: ['twitch-extension'],
+    successDescription: 'User schedule retrieved successfully',
+  })
+
+const userRelationsContract = oc
+  .input(
+    z.object({
+      channelId: z.string(),
+      userId: z.string(),
+    }),
+  )
+  .output(
+    z.object({
+      friends: z.array(UserDisplaySchema),
+    }),
+  )
+  .route({
+    path: '/twitch-extension/user-relations',
+    method: 'GET',
+    operationId: 'getUserRelations',
+    summary: 'Get the user relations',
+    description: 'Find the user by Twitch channel and return their friends',
+    tags: ['twitch-extension'],
+    successDescription: 'User relations retrieved successfully',
+  })
+
+const userRelatedScheduleContract = oc
+  .input(
+    z.object({
+      channelId: z.string(),
+      userId: z.string(),
+    }),
+  )
+  .output(
+    z.object({
+      teams: z.object({
+        streams: z.array(StreamSchema),
+      }),
+    }),
+  )
+  .route({
+    path: '/twitch-extension/user-related-schedule',
+    method: 'GET',
+    operationId: 'getUserRelatedSchedule',
+    summary: 'Get the user related schedule',
+    description: 'Find the user by Twitch channel and return next streams from their teams',
+    tags: ['twitch-extension'],
+    successDescription: 'User related schedule retrieved successfully',
+  })
+
 export const contracts = {
   extensionConfigContract,
   campaignsContract,
   causesContract,
   yogsScheduleContract,
+  userDataContract,
+  userScheduleContract,
+  userRelationsContract,
+  userRelatedScheduleContract,
 }

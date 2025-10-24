@@ -8,6 +8,30 @@ import { cacheMiddleware } from '../../middleware/cacheControl.ts'
 import { rangeFromData } from '../../../utils/rangeFromData.ts'
 import type { JJCause } from '../../../../do/types/JJAPIModel.ts'
 import type { ResponseHeadersPluginContext } from '@orpc/server/plugins'
+import { dbMiddleware } from '../../middleware/dbMiddleware.ts'
+import { and, eq, gte, inArray, or } from 'drizzle-orm'
+import { jjCampaign } from '../../../db/schema/jj-api-schema.ts'
+import {
+  schedulesTable,
+  streamParticipantsTable,
+  streamsTable,
+  teamMembersTable,
+} from '../../../db/schema/jj-schema.ts'
+import { userDisplayView } from '../../../db/schema/views-schema.ts'
+import { friendsTable } from '../../../db/schema/auth-schema.ts'
+import {
+  getUserIdByTwitchChannelId,
+  loadUserData,
+  loadUserRelatedSchedule,
+  loadUserRelations,
+  loadUserSchedule,
+  loadYogsSchedule,
+  storeUserData,
+  storeUserRelatedSchedule,
+  storeUserRelations,
+  storeUserSchedule,
+  storeYogsSchedule,
+} from './util.ts'
 
 interface ORPCContext extends ResponseHeadersPluginContext {
   locals?: App.Locals
@@ -18,13 +42,11 @@ const rateLimit = server.$context<ORPCContext>().middleware(
   async (
     { context, next },
     input: {
-      twitch: {
-        channelId: string
-        userId: string
-      }
+      channelId: string
+      userId: string
     },
   ) => {
-    const key = `TwitchExtensionRateLimiter:${input.twitch.channelId}:${input.twitch.userId}`
+    const key = `TwitchExtensionRateLimiter:${input.channelId}:${input.userId}`
     const TwitchExtensionRateLimiter = context.env!.TwitchExtensionRateLimiter
     const doId = TwitchExtensionRateLimiter.idFromName(key)
     const stub = TwitchExtensionRateLimiter.get(doId)
@@ -56,7 +78,7 @@ const extensionConfig = os.extensionConfigContract
       staleWhileRevalidate: 30,
     }),
   )
-  .handler(async ({ context }) => {
+  .handler(async ({ context, input }) => {
     const cachedConfig = await context.env.KV.get('twitch-extension:config')
 
     if (cachedConfig !== null) {
@@ -212,6 +234,13 @@ const yogsSchedule = os.yogsScheduleContract
     }),
   )
   .handler(async ({ context }) => {
+    const yogsSchedule = await loadYogsSchedule(context.env.KV)
+
+    if (yogsSchedule) {
+      console.log('yogsSchedule', 'KV')
+      return yogsSchedule
+    }
+
     // Resolve the current schedule year from the Config Durable Object
     const ConfigDO = context.env.ConfigDO
     const stubId = ConfigDO.idFromName('ConfigDO')
@@ -346,13 +375,422 @@ const yogsSchedule = os.yogsScheduleContract
       initialDayIndex = Math.max(0, days.length - 1)
     }
 
-    return {
+    const result = {
       start: range.start,
       end: range.end,
       initialDayIndex,
       days,
       streams: outStreams,
     }
+    await storeYogsSchedule(context.env.KV, result, 600)
+    console.log('yogsSchedule', 'New')
+    return result
+  })
+
+// Resolve user by Twitch channel, return JJ campaign for current year
+const userData = os.userDataContract
+  .use(rateLimit)
+  .use(
+    cacheMiddleware({
+      maxAge: 60,
+      sMaxAge: 60,
+      staleWhileRevalidate: 30,
+    }),
+  )
+  .use(dbMiddleware)
+  .handler(async ({ context, input }) => {
+    const userData = await loadUserData(context.env.KV, input.channelId)
+    if (userData) {
+      return userData
+    }
+
+    const db = context.db
+
+    // find twitch channel
+    const userId = await getUserIdByTwitchChannelId(db, input.channelId)
+
+    if (!userId) {
+      throw new ORPCError('NOT_FOUND', { message: 'Twitch channel not found' })
+    }
+
+    // get current year from config
+    const ConfigDO = context.env!.ConfigDO
+    const stub = ConfigDO.get(ConfigDO.idFromName('ConfigDO'))
+    const year =
+      (await stub.getNumberConfig('twitch-extension-year')) ??
+      new Date().getUTCFullYear()
+
+    const camp = await db
+      .select()
+      .from(jjCampaign)
+      .where(and(eq(jjCampaign.userId, userId), eq(jjCampaign.year, year)))
+      .get()
+
+    if (!camp) {
+      throw new ORPCError('NOT_FOUND', { message: 'JJ campaign not found' })
+    }
+
+    // Map DB row to API shape
+    const result = {
+      causeId: camp.causeId ?? null,
+      name: camp.name,
+      description: camp.description ?? '',
+      slug: camp.slug,
+      url: camp.url ?? '',
+      startTime: camp.startTime,
+      raised: camp.raised,
+      goal: camp.goal,
+      livestream: camp.livestream ?? { channel: null, type: '' },
+      user: {
+        id: camp.userId ?? 0,
+        name: camp.userName ?? '',
+        slug: camp.userSlug ?? '',
+        avatar: camp.userAvatar ?? '',
+        url: camp.userUrl ?? '',
+      },
+    }
+
+    await storeUserData(context.env.KV, input.channelId, result)
+    return result
+  })
+
+// Resolve user's primary schedule and upcoming streams
+const userSchedule = os.userScheduleContract
+  .use(rateLimit)
+  .use(
+    cacheMiddleware({
+      maxAge: 60,
+      sMaxAge: 60,
+      staleWhileRevalidate: 30,
+    }),
+  )
+  .use(dbMiddleware)
+  .handler(async ({ context, input }) => {
+    const userSchedule = await loadUserSchedule(context.env.KV, input.channelId)
+    if (userSchedule) {
+      return userSchedule
+    }
+
+    const db = context.db
+
+    // find twitch channel
+    const userId = await getUserIdByTwitchChannelId(db, input.channelId)
+
+    if (!userId) {
+      throw new ORPCError('NOT_FOUND', { message: 'Twitch channel not found' })
+    }
+
+    const ConfigDO = context.env!.ConfigDO
+    const stub = ConfigDO.get(ConfigDO.idFromName('ConfigDO'))
+    const year =
+      (await stub.getNumberConfig('twitch-extension-year')) ??
+      new Date().getUTCFullYear()
+
+    const schedule = await db
+      .select({ id: schedulesTable.id })
+      .from(schedulesTable)
+      .where(
+        and(
+          eq(schedulesTable.ownerId, userId),
+          eq(schedulesTable.year, year),
+          eq(schedulesTable.primary, true),
+          eq(schedulesTable.visible, true),
+        ),
+      )
+      .get()
+
+    if (!schedule)
+      throw new ORPCError('NOT_FOUND', { message: 'No schedule for user/year' })
+
+    const now = new Date()
+    const streams = await db
+      .select({
+        id: streamsTable.id,
+        scheduleId: streamsTable.scheduleId,
+        title: streamsTable.title,
+        subtitle: streamsTable.subtitle,
+        description: streamsTable.description,
+        start: streamsTable.start,
+        end: streamsTable.end,
+      })
+      .from(streamsTable)
+      .where(
+        and(
+          eq(streamsTable.scheduleId, schedule.id),
+          gte(streamsTable.end, now),
+        ),
+      )
+      .orderBy(streamsTable.start)
+      .all()
+
+    if (streams.length === 0) {
+      const now = new Date()
+      return { start: now, end: now, streams: [] }
+    }
+
+    // Load participants per stream and map to creators
+    const creatorsByKey = new Map<string, any[]>()
+    for (const s of streams) {
+      const parts = await db
+        .select({
+          userId: userDisplayView.userId,
+          username: userDisplayView.username,
+          profileImage: userDisplayView.profileImage,
+          primaryColor: userDisplayView.primaryColor,
+          twitchLogin: userDisplayView.twitchLogin,
+        })
+        .from(streamParticipantsTable)
+        .innerJoin(
+          userDisplayView,
+          eq(streamParticipantsTable.userId, userDisplayView.userId),
+        )
+        .where(
+          and(
+            eq(streamParticipantsTable.scheduleId, s.scheduleId),
+            eq(streamParticipantsTable.streamId, s.id),
+          ),
+        )
+        .all()
+      creatorsByKey.set(`${s.scheduleId}-${s.id}`, parts)
+    }
+
+    const out = streams.map((s) => {
+      const key = `${s.scheduleId}-${s.id}`
+      const creators = (creatorsByKey.get(key) ?? []).map((u) => ({
+        id: String(u.userId),
+        name: u.username,
+        url: u.twitchLogin ? `https://twitch.tv/${u.twitchLogin}` : '',
+        imageUrl: u.profileImage ?? undefined,
+        color: u.primaryColor ?? '#000000',
+      }))
+      const colorMap = getStreamColors(DateTime.fromJSDate(s.start as any))
+      return {
+        title: s.title,
+        subtitle: s.subtitle ?? undefined,
+        description: s.description ?? undefined,
+        start: s.start,
+        end: s.end,
+        creators,
+        color: colorMap['500'],
+      }
+    })
+
+    const range = rangeFromData(out) || {
+      start: out[0]!.start,
+      end: out[out.length - 1]!.end,
+    }
+    const result = { start: range.start, end: range.end, streams: out }
+    await storeUserSchedule(context.env.KV, input.channelId, result, 600)
+    return result
+  })
+
+// Find user friends
+const userRelations = os.userRelationsContract
+  .use(rateLimit)
+  .use(
+    cacheMiddleware({
+      maxAge: 60,
+      sMaxAge: 60,
+      staleWhileRevalidate: 30,
+    }),
+  )
+  .use(dbMiddleware)
+  .handler(async ({ context, input }) => {
+    const relations = await loadUserRelations(context.env.KV, input.channelId)
+
+    if (relations) {
+      return relations
+    }
+
+    const db = context.db
+    // find twitch channel
+    const userId = await getUserIdByTwitchChannelId(db, input.channelId)
+
+    if (!userId) {
+      throw new ORPCError('NOT_FOUND', { message: 'Twitch channel not found' })
+    }
+
+    const rows = await db
+      .select({
+        fromUserId: friendsTable.fromUserId,
+        toUserId: friendsTable.toUserId,
+      })
+      .from(friendsTable)
+      .where(
+        or(
+          eq(friendsTable.fromUserId, userId),
+          eq(friendsTable.toUserId, userId),
+        ),
+      )
+      .all()
+
+    const friendIds = Array.from(
+      new Set(
+        rows.map((r) => (r.fromUserId === userId ? r.toUserId : r.fromUserId)),
+      ),
+    )
+
+    if (friendIds.length === 0) return { friends: [] }
+
+    const friends = await db
+      .select({
+        userId: userDisplayView.userId,
+        primaryLiveStream: userDisplayView.primaryLiveStream,
+        createdAt: userDisplayView.createdAt,
+        username: userDisplayView.username,
+        profileImage: userDisplayView.profileImage,
+        twitchLogin: userDisplayView.twitchLogin,
+        tiltifySlug: userDisplayView.tiltifySlug,
+        tiltifyUrl: userDisplayView.tiltifyUrl,
+        primaryColor: userDisplayView.primaryColor,
+        accentColor: userDisplayView.accentColor,
+      })
+      .from(userDisplayView)
+      .where(inArray(userDisplayView.userId as any, friendIds as any))
+      .all()
+
+    // Cast createdAt to Date
+    const mapped = friends.map((f) => ({ ...f, createdAt: f.createdAt as any }))
+    const result = { friends: mapped }
+
+    await storeUserRelations(context.env.KV, input.channelId, result, 600)
+
+    return result
+  })
+
+// Related schedule via teams: next 3 streams across user's teams
+const userRelatedSchedule = os.userRelatedScheduleContract
+  .use(rateLimit)
+  .use(
+    cacheMiddleware({
+      maxAge: 60,
+      sMaxAge: 60,
+      staleWhileRevalidate: 30,
+    }),
+  )
+  .use(dbMiddleware)
+  .handler(async ({ context, input }) => {
+    const related = await loadUserRelatedSchedule(
+      context.env.KV,
+      input.channelId,
+    )
+
+    if (related) {
+      return related
+    }
+
+    const db = context.db
+    // find twitch channel
+    const userId = await getUserIdByTwitchChannelId(db, input.channelId)
+
+    if (!userId) {
+      throw new ORPCError('NOT_FOUND', { message: 'Twitch channel not found' })
+    }
+
+    // find all teams the user is part of
+    const myTeams = await db
+      .select({ teamId: teamMembersTable.teamId })
+      .from(teamMembersTable)
+      .where(eq(teamMembersTable.userId, userId))
+      .all()
+
+    if (myTeams.length === 0) return { teams: { streams: [] } }
+
+    const teamIds = myTeams.map((t) => t.teamId)
+
+    // get all users who are members of these teams (including self)
+    const members = await db
+      .select({ userId: teamMembersTable.userId })
+      .from(teamMembersTable)
+      .where(inArray(teamMembersTable.teamId, teamIds))
+      .all()
+
+    const userIds = Array.from(new Set(members.map((m) => m.userId)))
+
+    const ConfigDO = context.env!.ConfigDO
+    const stub = ConfigDO.get(ConfigDO.idFromName('ConfigDO'))
+    const year =
+      (await stub.getNumberConfig('twitch-extension-year')) ??
+      new Date().getUTCFullYear()
+
+    const now = new Date()
+    const upcoming = await db
+      .select({
+        id: streamsTable.id,
+        scheduleId: streamsTable.scheduleId,
+        title: streamsTable.title,
+        subtitle: streamsTable.subtitle,
+        description: streamsTable.description,
+        start: streamsTable.start,
+        end: streamsTable.end,
+      })
+      .from(streamsTable)
+      .innerJoin(schedulesTable, eq(streamsTable.scheduleId, schedulesTable.id))
+      .where(
+        and(
+          inArray(schedulesTable.ownerId, userIds),
+          eq(schedulesTable.year, year),
+          eq(schedulesTable.visible, true),
+          eq(schedulesTable.primary, true),
+          gte(streamsTable.start, now),
+        ),
+      )
+      .orderBy(streamsTable.start)
+      .all()
+
+    const limited = upcoming.slice(0, 3)
+
+    const creatorsByKey = new Map<string, any[]>()
+    for (const s of limited) {
+      const parts = await db
+        .select({
+          userId: userDisplayView.userId,
+          username: userDisplayView.username,
+          profileImage: userDisplayView.profileImage,
+          primaryColor: userDisplayView.primaryColor,
+          twitchLogin: userDisplayView.twitchLogin,
+        })
+        .from(streamParticipantsTable)
+        .innerJoin(
+          userDisplayView,
+          eq(streamParticipantsTable.userId, userDisplayView.userId),
+        )
+        .where(
+          and(
+            eq(streamParticipantsTable.scheduleId, s.scheduleId),
+            eq(streamParticipantsTable.streamId, s.id),
+          ),
+        )
+        .all()
+      creatorsByKey.set(`${s.scheduleId}-${s.id}`, parts)
+    }
+
+    const mapped = limited.map((s) => {
+      const key = `${s.scheduleId}-${s.id}`
+      const creators = (creatorsByKey.get(key) ?? []).map((u) => ({
+        id: String(u.userId),
+        name: u.username,
+        url: u.twitchLogin ? `https://twitch.tv/${u.twitchLogin}` : '',
+        imageUrl: u.profileImage ?? undefined,
+        color: u.primaryColor ?? '#000000',
+      }))
+      const colorMap = getStreamColors(DateTime.fromJSDate(s.start as any))
+      return {
+        title: s.title,
+        subtitle: s.subtitle ?? undefined,
+        description: s.description ?? undefined,
+        start: s.start as any,
+        end: s.end as any,
+        creators,
+        color: colorMap['500'],
+      }
+    })
+
+    const result = { teams: { streams: mapped } }
+
+    await storeUserRelatedSchedule(context.env.KV, input.channelId, result, 600)
+
+    return result
   })
 
 export const twitchExtensionRouter = {
@@ -360,4 +798,8 @@ export const twitchExtensionRouter = {
   campaigns,
   causes,
   yogsSchedule,
+  userData,
+  userSchedule,
+  userRelations,
+  userRelatedSchedule,
 }
