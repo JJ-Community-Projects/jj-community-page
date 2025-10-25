@@ -104,6 +104,11 @@ const ExtensionConfigSchema = z.object({
   timestamp: z.string(),
 })
 
+const UserExtensionConfigSchema = z.object({
+  haseCampaign: z.boolean(),
+  hasSchedule: z.boolean(),
+})
+
 const extensionConfigContract = oc
   .input(
     z.object({
@@ -122,6 +127,24 @@ const extensionConfigContract = oc
     successDescription: 'Extension configuration retrieved successfully',
   })
 
+const userExtensionConfigContract = oc
+  .input(
+    z.object({
+      channelId: z.string(),
+      userId: z.string(),
+    }),
+  )
+  .output(UserExtensionConfigSchema)
+  .route({
+    path: '/twitch-extension/user-config/{channelId}',
+    method: 'GET',
+    operationId: 'getExtensionConfig',
+    summary: 'Get the extension configuration',
+    description: 'Get the extension configuration',
+    tags: ['twitch-extension'],
+    successDescription: 'Extension configuration retrieved successfully',
+  })
+
 // List endpoints (existing)
 const campaignsContract = oc
   .input(
@@ -132,7 +155,7 @@ const campaignsContract = oc
   )
   .output(JJCampaignsSchema)
   .route({
-    path: '/twitch-extension/campaigns',
+    path: '/twitch-extension/campaigns/{channelId}',
     method: 'GET',
     operationId: 'getCampaigns',
     summary: 'Get campaigns',
@@ -155,7 +178,7 @@ const causesContract = oc
     }),
   )
   .route({
-    path: '/twitch-extension/causes',
+    path: '/twitch-extension/causes/{channelId}',
     method: 'GET',
     operationId: 'getCauses',
     summary: 'Get causes',
@@ -256,7 +279,7 @@ const userScheduleContract = oc
     }),
   )
   .route({
-    path: '/twitch-extension/user-schedule',
+    path: '/twitch-extension/user-schedule/{channelId}',
     method: 'GET',
     operationId: 'getUserSchedule',
     summary: 'Get the users schedule',
@@ -278,7 +301,7 @@ const userRelationsContract = oc
     }),
   )
   .route({
-    path: '/twitch-extension/user-relations',
+    path: '/twitch-extension/user-relations/{channelId}',
     method: 'GET',
     operationId: 'getUserRelations',
     summary: 'Get the user relations',
@@ -302,17 +325,19 @@ const userRelatedScheduleContract = oc
     }),
   )
   .route({
-    path: '/twitch-extension/user-related-schedule',
+    path: '/twitch-extension/user-related-schedule/{channelId}',
     method: 'GET',
     operationId: 'getUserRelatedSchedule',
     summary: 'Get the user related schedule',
-    description: 'Find the user by Twitch channel and return next streams from their teams',
+    description:
+      'Find the user by Twitch channel and return next streams from their teams',
     tags: ['twitch-extension'],
     successDescription: 'User related schedule retrieved successfully',
   })
 
 export const contracts = {
   extensionConfigContract,
+  userExtensionConfigContract,
   campaignsContract,
   causesContract,
   yogsScheduleContract,

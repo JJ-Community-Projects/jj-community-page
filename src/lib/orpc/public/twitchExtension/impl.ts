@@ -31,6 +31,8 @@ import {
   storeUserRelations,
   storeUserSchedule,
   storeYogsSchedule,
+  loadUserExtensionConfig,
+  storeUserExtensionConfig,
 } from './util.ts'
 
 interface ORPCContext extends ResponseHeadersPluginContext {
@@ -163,6 +165,69 @@ const extensionConfig = os.extensionConfigContract
     return config
   })
 
+const userExtensionConfig = os.userExtensionConfigContract
+  .use(rateLimit)
+  .use(
+    cacheMiddleware({
+      maxAge: 300,
+      sMaxAge: 300,
+      staleWhileRevalidate: 180,
+    }),
+  )
+  .use(dbMiddleware)
+  .handler(async ({ context, input }) => {
+    // Try KV cache first
+    const cached = await loadUserExtensionConfig(context.env.KV, input.channelId)
+    if (cached) {
+      return cached
+    }
+
+    const db = context.db
+
+    // Resolve user by Twitch channel ID
+    const userId = await getUserIdByTwitchChannelId(db, input.channelId)
+    if (!userId) {
+      throw new ORPCError('NOT_FOUND', { message: 'Twitch channel not found' })
+    }
+
+    // Determine the current campaign year from ConfigDO
+    const ConfigDO = context.env!.ConfigDO
+    const stub = ConfigDO.get(ConfigDO.idFromName('ConfigDO'))
+    const year =
+      (await stub.getNumberConfig('twitch-extension:config.year')) ??
+      new Date().getUTCFullYear()
+
+    // Check if JJ campaign exists for user/year
+    const camp = await db
+      .select({ id: jjCampaign.userId })
+      .from(jjCampaign)
+      .where(and(eq(jjCampaign.userId, userId), eq(jjCampaign.year, year)))
+      .get()
+
+    // Check if a primary & visible schedule exists for user/year
+    const schedule = await db
+      .select({ id: schedulesTable.id })
+      .from(schedulesTable)
+      .where(
+        and(
+          eq(schedulesTable.ownerId, userId),
+          eq(schedulesTable.year, year),
+          eq(schedulesTable.primary, true),
+          eq(schedulesTable.visible, true),
+        ),
+      )
+      .get()
+
+    const result = {
+      haseCampaign: !!camp,
+      hasSchedule: !!schedule,
+    }
+
+    await storeUserExtensionConfig(context.env.KV, input.channelId, result, 300)
+
+    return result
+  })
+
 // List all campaigns from DO cache
 const campaigns = os.campaignsContract
   .use(rateLimit)
@@ -245,7 +310,7 @@ const yogsSchedule = os.yogsScheduleContract
     const ConfigDO = context.env.ConfigDO
     const stubId = ConfigDO.idFromName('ConfigDO')
     const stub = ConfigDO.get(stubId)
-    const year = await stub.getNumberConfig('twitch-extension-year')
+    const year = await stub.getNumberConfig('twitch-extension:config.year')
 
     // Load the schedule entry for the given year from Astro content collections
     const schedule = await getEntry('schedules', `${year ?? 2024}`)
@@ -417,7 +482,7 @@ const userData = os.userDataContract
     const ConfigDO = context.env!.ConfigDO
     const stub = ConfigDO.get(ConfigDO.idFromName('ConfigDO'))
     const year =
-      (await stub.getNumberConfig('twitch-extension-year')) ??
+      (await stub.getNumberConfig('twitch-extension:config.year')) ??
       new Date().getUTCFullYear()
 
     const camp = await db
@@ -483,7 +548,7 @@ const userSchedule = os.userScheduleContract
     const ConfigDO = context.env!.ConfigDO
     const stub = ConfigDO.get(ConfigDO.idFromName('ConfigDO'))
     const year =
-      (await stub.getNumberConfig('twitch-extension-year')) ??
+      (await stub.getNumberConfig('twitch-extension:config.year')) ??
       new Date().getUTCFullYear()
 
     const schedule = await db
@@ -710,7 +775,7 @@ const userRelatedSchedule = os.userRelatedScheduleContract
     const ConfigDO = context.env!.ConfigDO
     const stub = ConfigDO.get(ConfigDO.idFromName('ConfigDO'))
     const year =
-      (await stub.getNumberConfig('twitch-extension-year')) ??
+      (await stub.getNumberConfig('twitch-extension:config.year')) ??
       new Date().getUTCFullYear()
 
     const now = new Date()
@@ -795,6 +860,7 @@ const userRelatedSchedule = os.userRelatedScheduleContract
 
 export const twitchExtensionRouter = {
   extensionConfig,
+  userExtensionConfig,
   campaigns,
   causes,
   yogsSchedule,

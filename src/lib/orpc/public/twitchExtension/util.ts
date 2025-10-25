@@ -105,6 +105,11 @@ export type UserScheduleOutput = {
 export type UserRelationsOutput = { friends: UserDisplay[] }
 export type UserRelatedScheduleOutput = { teams: { streams: StreamType[] } }
 
+export type UserExtensionConfigOutput = {
+  haseCampaign: boolean
+  hasSchedule: boolean
+}
+
 export async function storeExtensionConfig(
   kv: KVNamespace,
   channelId: string,
@@ -179,6 +184,15 @@ export async function storeUserRelatedSchedule(
     data,
     ttlSeconds,
   )
+}
+
+export async function storeUserExtensionConfig(
+  kv: KVNamespace,
+  channelId: string,
+  data: UserExtensionConfigOutput,
+  ttlSeconds: number = 60,
+) {
+  return putJSON(kv, makeKey(channelId, 'user-config'), data, ttlSeconds)
 }
 
 // --- Load helpers (KV -> typed outputs) ---
@@ -298,4 +312,14 @@ export async function loadUserRelatedSchedule(
     },
   }
   return revived
+}
+
+export async function loadUserExtensionConfig(
+  kv: KVNamespace,
+  channelId: string,
+): Promise<UserExtensionConfigOutput | null> {
+  return getJSON<UserExtensionConfigOutput>(
+    kv,
+    makeKey(channelId, 'user-config'),
+  )
 }
