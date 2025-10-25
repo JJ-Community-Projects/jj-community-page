@@ -138,7 +138,7 @@ const userExtensionConfigContract = oc
   .route({
     path: '/twitch-extension/user-config/{channelId}',
     method: 'GET',
-    operationId: 'getExtensionConfig',
+    operationId: 'getUserExtensionConfig',
     summary: 'Get the extension configuration',
     description: 'Get the extension configuration',
     tags: ['twitch-extension'],
