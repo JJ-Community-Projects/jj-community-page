@@ -139,10 +139,10 @@ const userExtensionConfigContract = oc
     path: '/twitch-extension/user-config/{channelId}',
     method: 'GET',
     operationId: 'getUserExtensionConfig',
-    summary: 'Get the extension configuration',
-    description: 'Get the extension configuration',
+    summary: 'Get the user extension configuration',
+    description: 'Get the user extension configuration',
     tags: ['twitch-extension'],
-    successDescription: 'Extension configuration retrieved successfully',
+    successDescription: 'User extension configuration retrieved successfully',
   })
 
 // List endpoints (existing)
