@@ -246,7 +246,7 @@ const userDataContract = oc
   )
   .output(JJCampaignSchema)
   .route({
-    path: '/twitch-extension/user-data',
+    path: '/twitch-extension/user-data/{channelId}',
     method: 'GET',
     operationId: 'getUserData',
     summary: 'Get the users data',
