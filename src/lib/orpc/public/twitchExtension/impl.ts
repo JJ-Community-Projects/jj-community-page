@@ -54,7 +54,6 @@ const rateLimit = server.$context<ORPCContext>().middleware(
     const doId = TwitchExtensionRateLimiter.idFromName(key)
     const stub = TwitchExtensionRateLimiter.get(doId)
     const result = await stub.attempt()
-    console.log('ratelimit', result)
     context.resHeaders?.set(
       'X-RateLimit-Remaining',
       result.remainingTokens.toString(),
@@ -271,7 +270,6 @@ const campaigns = os.campaignsContract
     const stub = DO.get(stubID)
     try {
       const list = await stub.getCampaigns()
-      console.log('campaigns', list)
       if (!list) {
         return {
           count: 0,
@@ -284,7 +282,6 @@ const campaigns = os.campaignsContract
         count: list.length,
       }
     } catch (e) {
-      console.log(JSON.stringify(e, null, 2))
       throw e
     }
   })
@@ -305,7 +302,6 @@ const causes = os.causesContract
     const stub = DO.get(stubID)
 
     const causes = await stub.getCauses()
-    console.log('causes', causes)
     if (!causes) {
       return { count: 0, list: [] }
     }
@@ -329,7 +325,6 @@ const yogsSchedule = os.yogsScheduleContract
     const yogsSchedule = await loadYogsSchedule(context.env.KV)
 
     if (yogsSchedule) {
-      console.log('yogsSchedule', 'KV')
       return yogsSchedule
     }
 
@@ -475,7 +470,6 @@ const yogsSchedule = os.yogsScheduleContract
       streams: outStreams,
     }
     await storeYogsSchedule(context.env.KV, result, 600)
-    console.log('yogsSchedule', 'New')
     return result
   })
 
