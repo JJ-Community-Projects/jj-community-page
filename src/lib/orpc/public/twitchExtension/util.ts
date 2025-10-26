@@ -1,8 +1,11 @@
 import type { JJDrizzleDatabase } from '../../../db/db.ts'
 import { twitchChannelSchema } from '../../../db/schema/twitch-channel-schema.ts'
-import { eq } from 'drizzle-orm'
+import { and, eq, sql } from 'drizzle-orm'
 import type { JJCampaignType, JJCauseType } from './contract.ts'
 import type { UserDisplay } from '../schemas/UserDisplaySchema.ts'
+import { jjCampaign } from '../../../db/schema/jj-api-schema.ts'
+import { ORPCError } from '@orpc/server'
+import { TwitchAPI } from '../../../twitchAPI.ts'
 
 export async function getUserIdByTwitchChannelId(
   db: JJDrizzleDatabase,
@@ -330,4 +333,75 @@ export async function loadUserExtensionConfig(
     kv,
     makeKey(channelId, 'user-config'),
   )
+}
+
+export async function getCampaignByTwitchChannelId(
+  channelId: string,
+  env: Env,
+  db: JJDrizzleDatabase,
+) {
+  // find twitch channel
+  const userId = await getUserIdByTwitchChannelId(db, channelId)
+
+  const ConfigDO = env!.ConfigDO
+  const stub = ConfigDO.get(ConfigDO.idFromName('ConfigDO'))
+  const year =
+    (await stub.getNumberConfig('twitch-extension:config.year')) ??
+    new Date().getUTCFullYear()
+
+  if (userId) {
+    const camp = await db
+      .select()
+      .from(jjCampaign)
+      .where(and(eq(jjCampaign.userId, userId), eq(jjCampaign.year, year)))
+      .get()
+
+    return {
+      camp,
+      userId,
+    }
+  }
+
+  const twitchAPI = new TwitchAPI(env)
+
+  const { data, error } = await twitchAPI.fetchUserByIdWithCache(channelId)
+
+  if (error) {
+    console.error('twitch error', error)
+    // Map 404 to NOT_FOUND; others to INTERNAL_SERVER_ERROR
+    if (error.status === 404) {
+      throw new ORPCError('NOT_FOUND', { message: 'Twitch user not found' })
+    }
+    throw new ORPCError('INTERNAL_SERVER_ERROR', {
+      message: error.description ?? 'Error fetching Twitch user',
+    })
+  }
+
+  if (!data) {
+    // Shouldn’t happen after the above, but keep as safety
+    throw new ORPCError('NOT_FOUND', { message: 'Twitch user not found' })
+  }
+
+  const camp = await db
+    .select()
+    .from(jjCampaign)
+    .where(
+      and(
+        eq(
+          sql<string>`json_extract(${jjCampaign.livestream}, '$.channel')`,
+          data.login,
+        ),
+        eq(
+          sql<string>`json_extract(${jjCampaign.livestream}, '$.type')`,
+          'twitch',
+        ),
+        eq(jjCampaign.year, year),
+      ),
+    )
+    .get()
+
+  return {
+    camp,
+    userId,
+  }
 }
