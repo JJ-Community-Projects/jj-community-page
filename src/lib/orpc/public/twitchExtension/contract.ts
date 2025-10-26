@@ -58,7 +58,7 @@ export type JJCauseType = z.infer<typeof JJCauseSchema>
 export type JJCampaignType = z.infer<typeof JJCampaignSchema>
 export type JJCampaignsType = z.infer<typeof JJCampaignsSchema>
 
-const CreatorSchema = z.object({
+export const CreatorSchema = z.object({
   id: z.string(),
   name: z.string(),
   url: z.string(),
@@ -66,7 +66,7 @@ const CreatorSchema = z.object({
   color: z.string(),
 })
 
-const StreamSchema = z.object({
+export const StreamSchema = z.object({
   title: z.string(),
   subtitle: z.string().optional(),
   description: z.string().optional(),
@@ -85,7 +85,7 @@ const StreamSchema = z.object({
   color: z.string(),
 })
 
-const ExtensionConfigSchema = z.object({
+export const ExtensionConfigSchema = z.object({
   year: z.number(),
   showYogsSchedule: z.boolean(),
   showCharities: z.boolean(),
@@ -104,9 +104,18 @@ const ExtensionConfigSchema = z.object({
   timestamp: z.string(),
 })
 
-const UserExtensionConfigSchema = z.object({
-  haseCampaign: z.boolean(),
+export const TabSchema = z.enum([
+  'full-user',
+  'user-schedule',
+  'yogs',
+  'charities',
+  'fundraisers',
+])
+
+export const UserExtensionConfigSchema = z.object({
+  hasCampaign: z.boolean(),
   hasSchedule: z.boolean(),
+  tabs: z.array(TabSchema),
 })
 
 const extensionConfigContract = oc
