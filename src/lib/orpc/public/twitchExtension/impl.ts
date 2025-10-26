@@ -9,7 +9,7 @@ import { rangeFromData } from '../../../utils/rangeFromData.ts'
 import type { JJCause } from '../../../../do/types/JJAPIModel.ts'
 import type { ResponseHeadersPluginContext } from '@orpc/server/plugins'
 import { dbMiddleware } from '../../middleware/dbMiddleware.ts'
-import { and, eq, gte, inArray, or } from 'drizzle-orm'
+import { and, eq, gte, inArray, or, sql } from 'drizzle-orm'
 import { jjCampaign } from '../../../db/schema/jj-api-schema.ts'
 import {
   schedulesTable,
@@ -22,18 +22,20 @@ import { friendsTable } from '../../../db/schema/auth-schema.ts'
 import {
   getUserIdByTwitchChannelId,
   loadUserData,
+  loadUserExtensionConfig,
   loadUserRelatedSchedule,
   loadUserRelations,
   loadUserSchedule,
   loadYogsSchedule,
   storeUserData,
+  storeUserExtensionConfig,
   storeUserRelatedSchedule,
   storeUserRelations,
   storeUserSchedule,
   storeYogsSchedule,
-  loadUserExtensionConfig,
-  storeUserExtensionConfig,
+  type UserExtensionTab,
 } from './util.ts'
+import { TwitchAPI } from '../../../twitchAPI.ts'
 
 interface ORPCContext extends ResponseHeadersPluginContext {
   locals?: App.Locals
@@ -177,7 +179,10 @@ const userExtensionConfig = os.userExtensionConfigContract
   .use(dbMiddleware)
   .handler(async ({ context, input }) => {
     // Try KV cache first
-    const cached = await loadUserExtensionConfig(context.env.KV, input.channelId)
+    const cached = await loadUserExtensionConfig(
+      context.env.KV,
+      input.channelId,
+    )
     if (cached) {
       return cached
     }
@@ -218,9 +223,35 @@ const userExtensionConfig = os.userExtensionConfigContract
       )
       .get()
 
+    const hasCampaign = !!camp
+    const hasSchedule = !!schedule
+
+    const yogsId = '20786541'
+
+    const isYogs = input.channelId === yogsId
+
+    let tabs: UserExtensionTab[] = []
+
+    if (isYogs) {
+      tabs = ['yogs', 'charities', 'fundraisers']
+    } else {
+      if (!hasSchedule && !hasCampaign) {
+        tabs = ['charities', 'fundraisers', 'yogs']
+      } else if (hasSchedule && hasCampaign) {
+        tabs = ['full-user', 'charities', 'fundraisers']
+      } else if (!hasSchedule && hasCampaign) {
+        tabs = ['charities', 'fundraisers', 'yogs']
+      } else if (hasSchedule && !hasCampaign) {
+        tabs = ['user-schedule', 'charities', 'fundraisers']
+      } else {
+        tabs = ['charities', 'fundraisers', 'yogs']
+      }
+    }
+
     const result = {
-      haseCampaign: !!camp,
-      hasSchedule: !!schedule,
+      hasCampaign,
+      hasSchedule,
+      tabs,
     }
 
     await storeUserExtensionConfig(context.env.KV, input.channelId, result, 300)
@@ -474,21 +505,87 @@ const userData = os.userDataContract
     // find twitch channel
     const userId = await getUserIdByTwitchChannelId(db, input.channelId)
 
-    if (!userId) {
-      throw new ORPCError('NOT_FOUND', { message: 'Twitch channel not found' })
-    }
-
-    // get current year from config
     const ConfigDO = context.env!.ConfigDO
     const stub = ConfigDO.get(ConfigDO.idFromName('ConfigDO'))
     const year =
       (await stub.getNumberConfig('twitch-extension:config.year')) ??
       new Date().getUTCFullYear()
 
+    if (userId) {
+      // get current year from config
+
+      const camp = await db
+        .select()
+        .from(jjCampaign)
+        .where(and(eq(jjCampaign.userId, userId), eq(jjCampaign.year, year)))
+        .get()
+
+      if (!camp) {
+        throw new ORPCError('NOT_FOUND', { message: 'JJ campaign not found' })
+      }
+
+      // Map DB row to API shape
+      const result = {
+        causeId: camp.causeId ?? null,
+        name: camp.name,
+        description: camp.description ?? '',
+        slug: camp.slug,
+        url: camp.url ?? '',
+        startTime: camp.startTime,
+        raised: camp.raised,
+        goal: camp.goal,
+        livestream: camp.livestream ?? { channel: null, type: '' },
+        user: {
+          id: camp.userId ?? 0,
+          name: camp.userName ?? '',
+          slug: camp.userSlug ?? '',
+          avatar: camp.userAvatar ?? '',
+          url: camp.userUrl ?? '',
+        },
+      }
+
+      await storeUserData(context.env.KV, input.channelId, result)
+      return result
+    }
+
+    const twitchAPI = new TwitchAPI(context.env)
+
+    const { data, error } = await twitchAPI.fetchUserByIdWithCache(
+      input.channelId,
+    )
+
+    if (error) {
+      console.error('twitch error', error)
+      // Map 404 to NOT_FOUND; others to INTERNAL_SERVER_ERROR
+      if (error.status === 404) {
+        throw new ORPCError('NOT_FOUND', { message: 'Twitch user not found' })
+      }
+      throw new ORPCError('INTERNAL_SERVER_ERROR', {
+        message: error.description ?? 'Error fetching Twitch user',
+      })
+    }
+
+    if (!data) {
+      // Shouldn’t happen after the above, but keep as safety
+      throw new ORPCError('NOT_FOUND', { message: 'Twitch user not found' })
+    }
+
     const camp = await db
       .select()
       .from(jjCampaign)
-      .where(and(eq(jjCampaign.userId, userId), eq(jjCampaign.year, year)))
+      .where(
+        and(
+          eq(
+            sql<string>`json_extract(${jjCampaign.livestream}, '$.channel')`,
+            data.login,
+          ),
+          eq(
+            sql<string>`json_extract(${jjCampaign.livestream}, '$.type')`,
+            'twitch',
+          ),
+          eq(jjCampaign.year, year),
+        ),
+      )
       .get()
 
     if (!camp) {

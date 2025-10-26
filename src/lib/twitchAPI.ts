@@ -1,10 +1,65 @@
-import type { StreamResult, TokenData, TwitchAPIResult, UserResult, } from './model/TwitchAPIModel.ts'
+import type { StreamResult, TokenData, TwitchAPIResult, TwitchUser } from './model/TwitchAPIModel.ts'
 
 export class TwitchAPI {
   private env: Env
 
   constructor(env: Env) {
     this.env = env
+  }
+
+  /**
+   * Store a Twitch user object in KV for quick caching
+   * - Saves under both login and id keys to allow retrieval by either
+   * @param user Twitch user object from Helix API (snake_case fields)
+   * @param ttlSeconds Time-to-live in seconds (default: 1 hour)
+   */
+  public async storeTwitchUser(
+    user: TwitchUser,
+    ttlSeconds: number = 60 * 60,
+  ): Promise<void> {
+    try {
+      const byLoginKey = this.makeTwitchUserKeyByLogin(user.login)
+      const byIdKey = this.makeTwitchUserKeyById(user.id)
+      const payload = JSON.stringify(user)
+      await this.env.KV.put(byLoginKey, payload, { expirationTtl: ttlSeconds })
+      await this.env.KV.put(byIdKey, payload, { expirationTtl: ttlSeconds })
+    } catch (error) {
+      console.error('Error storing Twitch user in KV:', error)
+    }
+  }
+
+  /**
+   * Load a cached Twitch user by login
+   * @param login Twitch login name
+   * @returns The cached user or null if missing/not parseable
+   */
+  public async loadTwitchUserByLogin(login: string): Promise<TwitchUser | null> {
+    if (!login) return null
+    try {
+      const raw = await this.env.KV.get(this.makeTwitchUserKeyByLogin(login))
+      if (!raw) return null
+      return JSON.parse(raw) as TwitchUser
+    } catch (error) {
+      console.error('Error loading Twitch user by login from KV:', error)
+      return null
+    }
+  }
+
+  /**
+   * Load a cached Twitch user by id
+   * @param id Twitch user id
+   * @returns The cached user or null if missing/not parseable
+   */
+  public async loadTwitchUserById(id: string): Promise<TwitchUser | null> {
+    if (!id) return null
+    try {
+      const raw = await this.env.KV.get(this.makeTwitchUserKeyById(id))
+      if (!raw) return null
+      return JSON.parse(raw) as TwitchUser
+    } catch (error) {
+      console.error('Error loading Twitch user by id from KV:', error)
+      return null
+    }
   }
 
   /**
@@ -38,7 +93,7 @@ export class TwitchAPI {
    */
   public async fetchChannelById(
     channelId: string,
-  ): Promise<TwitchAPIResult<any>> {
+  ): Promise<TwitchAPIResult<TwitchUser>> {
     if (!channelId) {
       return {
         data: null,
@@ -63,7 +118,7 @@ export class TwitchAPI {
         }
       }
 
-      const data = await response.json()
+      const data = (await response.json()) as TwitchUser
       return { data, error: null }
     } catch (error) {
       return {
@@ -83,7 +138,7 @@ export class TwitchAPI {
    */
   public async fetchUserByLogin(
     login: string,
-  ): Promise<TwitchAPIResult<UserResult>> {
+  ): Promise<TwitchAPIResult<TwitchUser[]>> {
     if (!login) {
       return {
         data: null,
@@ -108,7 +163,46 @@ export class TwitchAPI {
         }
       }
 
-      const data = (await response.json()) as UserResult
+      const data = (await response.json()) as TwitchUser[]
+      return { data, error: null }
+    } catch (error) {
+      return {
+        data: null,
+        error: {
+          status: 500,
+          description: error instanceof Error ? error.message : 'Unknown error',
+        },
+      }
+    }
+  }
+  public async fetchUserById(
+    id: string,
+  ): Promise<TwitchAPIResult<TwitchUser[]>> {
+    if (!id) {
+      return {
+        data: null,
+        error: {
+          status: 400,
+          description: 'Login id is required',
+        },
+      }
+    }
+
+    try {
+      const url = `https://api.twitch.tv/helix/users?id=${id}`
+      const response = await this.makeAuthenticatedRequest(url)
+
+      if (!response.ok) {
+        return {
+          data: null,
+          error: {
+            status: response.status,
+            description: `Twitch API error: ${response.statusText}`,
+          },
+        }
+      }
+
+      const data = (await response.json()) as TwitchUser[]
       return { data, error: null }
     } catch (error) {
       return {
@@ -121,6 +215,40 @@ export class TwitchAPI {
     }
   }
 
+  public async fetchUserByLoginWithCache(login: string): Promise<TwitchAPIResult<TwitchUser>> {
+    const cachedUser = await this.loadTwitchUserByLogin(login)
+    if (cachedUser) {
+      return { data: cachedUser, error: null }
+    }
+    const result = await this.fetchUserByLogin(login)
+    const user = result?.data?.[0]
+    if (user) {
+      await this.storeTwitchUser(user)
+      return { data: user, error: null }
+    }
+    // Propagate API error or return 404 when empty
+    return result.error
+      ? { data: null, error: result.error }
+      : { data: null, error: { status: 404, description: 'User not found' } }
+  }
+
+  public async fetchUserByIdWithCache(id: string): Promise<TwitchAPIResult<TwitchUser>> {
+    const cachedUser = await this.loadTwitchUserById(id)
+    if (cachedUser) {
+      return { data: cachedUser, error: null }
+    }
+    const result = await this.fetchUserById(id)
+    const user = result?.data?.[0]
+    if (user) {
+      await this.storeTwitchUser(user)
+      return { data: user, error: null }
+    }
+    // Propagate API error or return 404 when empty
+    return result.error
+      ? { data: null, error: result.error }
+      : { data: null, error: { status: 404, description: 'User not found' } }
+  }
+
   /**
    * Fetch multiple Twitch users by their login names
    * @param logins - Array of Twitch login names
@@ -128,7 +256,7 @@ export class TwitchAPI {
    */
   public async fetchUsersByLogins(
     logins: string[],
-  ): Promise<TwitchAPIResult<UserResult>> {
+  ): Promise<TwitchAPIResult<TwitchUser[]>> {
     if (!logins || logins.length === 0) {
       return {
         data: null,
@@ -154,7 +282,7 @@ export class TwitchAPI {
         }
       }
 
-      const data = (await response.json()) as UserResult
+      const data = (await response.json()) as TwitchUser[]
       return { data, error: null }
     } catch (error) {
       return {
@@ -291,11 +419,20 @@ export class TwitchAPI {
   public async getTwitchDataByLogins(
     logins: string[],
     accessToken?: string,
-  ): Promise<UserResult> {
+  ): Promise<TwitchUser[]> {
     const q = logins.join('&login=')
     const url = `https://api.twitch.tv/helix/users?login=${q}`
     const response = await this.makeAuthenticatedRequest(url, accessToken)
     return response.json()
+  }
+
+  // --- TwitchUser KV helpers ---
+  private makeTwitchUserKeyByLogin(login: string) {
+    return `twitch:user:login:${login}`
+  }
+
+  private makeTwitchUserKeyById(id: string) {
+    return `twitch:user:id:${id}`
   }
 
   /**
