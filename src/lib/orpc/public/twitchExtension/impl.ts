@@ -320,7 +320,8 @@ const causes = os.causesContract
         total: {
           raised: {
             yogscast: valueToCurrencies(raised.yogscast, conversionRate),
-            fundraisers: valueToCurrencies(raised.fundraisers, conversionRate)
+            fundraisers: valueToCurrencies(raised.fundraisers, conversionRate),
+            total: valueToCurrencies(raised.fundraisers + raised.yogscast, conversionRate)
           },
           collections: collections,
           donations: donations.count
@@ -339,13 +340,18 @@ const causes = os.causesContract
               c.raised.fundraisers,
               conversionRate,
             ),
+            total: valueToCurrencies(
+              c.raised.fundraisers + c.raised.yogscast,
+              conversionRate,
+            ),
           },
         }
       }),
       total: {
         raised: {
           yogscast: valueToCurrencies(raised.yogscast, conversionRate),
-          fundraisers: valueToCurrencies(raised.fundraisers, conversionRate)
+          fundraisers: valueToCurrencies(raised.fundraisers, conversionRate),
+          total: valueToCurrencies(raised.fundraisers + raised.yogscast, conversionRate)
         },
         collections: collections,
         donations: donations.count

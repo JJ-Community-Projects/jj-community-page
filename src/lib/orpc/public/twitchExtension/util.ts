@@ -418,10 +418,11 @@ export function valueToCurrencies(
     style: 'currency',
     currency: 'USD',
   })
+  const usd = parseFloat((value * conversionRate).toFixed(2))
   return {
     gbp: value,
-    usd: value * conversionRate,
+    usd: usd,
     gbpFormatted: GBP.format(value),
-    usdFormatted: USD.format(value * conversionRate),
+    usdFormatted: USD.format(usd),
   }
 }

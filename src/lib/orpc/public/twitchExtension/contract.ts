@@ -15,6 +15,7 @@ export type Currencies = z.infer<typeof CurrenciesSchema>
 export const JJRaisedSchema = z.object({
   yogscast: CurrenciesSchema,
   fundraisers: CurrenciesSchema,
+  total: CurrenciesSchema,
 })
 
 // JJCause schema
