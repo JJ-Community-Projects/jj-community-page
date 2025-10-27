@@ -129,7 +129,7 @@ export const UserExtensionConfigSchema = z.object({
   tabs: z.array(TabSchema),
 })
 
-export const TotalSchema = z.object({
+export const OverviewSchema = z.object({
   raised: JJRaisedSchema,
   collections: z.object({
     redeemed: z.number(),
@@ -204,7 +204,7 @@ const causesContract = oc
     z.object({
       count: z.number(),
       list: z.array(JJCauseSchema),
-      total: TotalSchema,
+      overview: OverviewSchema,
     }),
   )
   .route({

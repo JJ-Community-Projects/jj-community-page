@@ -12,8 +12,8 @@ import {
   JJLivestreamSchema,
   JJRaisedSchema,
   JJUserSchema,
+  OverviewSchema,
   StreamSchema,
-  TotalSchema,
   UserExtensionConfigSchema,
 } from '../../../lib/orpc/public/twitchExtension/contract.ts'
 import { UserDisplaySchema } from '../../../lib/orpc/public/schemas/UserDisplaySchema.ts'
@@ -55,7 +55,7 @@ export const ALL: APIRoute = async () => {
       ExtensionConfig: { schema: ExtensionConfigSchema },
       UserExtensionConfig: { schema: UserExtensionConfigSchema },
       CurrenciesSchema: { schema: CurrenciesSchema },
-      TotalSchema: { schema: TotalSchema },
+      OverviewSchema: { schema: OverviewSchema },
 
       // Imported in contract.ts
       UserDisplay: { schema: UserDisplaySchema },
