@@ -62,7 +62,7 @@ export const JJCampaignSchema = z.object({
 export const JJCampaignsSchema = z.object({
   count: z.number(),
   list: z.array(JJCampaignSchema),
-  date: new Date()
+  date: z.date()
 })
 
 // --- Inferred TS types (optional, matches your interfaces) ---
