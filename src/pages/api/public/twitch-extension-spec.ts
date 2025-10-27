@@ -3,6 +3,7 @@ import { ZodToJsonSchemaConverter } from '@orpc/zod/zod4'
 import { publicRouter } from '../../../lib/orpc/public/publicRouter.ts'
 import { OpenAPIGenerator } from '@orpc/openapi'
 import {
+  CausesDisplaySchema,
   CreatorSchema,
   CurrenciesSchema,
   ExtensionConfigSchema,
@@ -15,6 +16,8 @@ import {
   OverviewSchema,
   StreamSchema,
   UserExtensionConfigSchema,
+  UserScheduleSchema,
+  YogsScheduleSchema,
 } from '../../../lib/orpc/public/twitchExtension/contract.ts'
 import { UserDisplaySchema } from '../../../lib/orpc/public/schemas/UserDisplaySchema.ts'
 
@@ -56,6 +59,9 @@ export const ALL: APIRoute = async () => {
       UserExtensionConfig: { schema: UserExtensionConfigSchema },
       CurrenciesSchema: { schema: CurrenciesSchema },
       OverviewSchema: { schema: OverviewSchema },
+      YogsScheduleSchema: { schema: YogsScheduleSchema },
+      UserScheduleSchema: { schema: UserScheduleSchema },
+      CausesDisplaySchema: { schema: CausesDisplaySchema },
 
       // Imported in contract.ts
       UserDisplay: { schema: UserDisplaySchema },

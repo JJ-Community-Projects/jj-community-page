@@ -50,18 +50,20 @@ export const JJCampaignSchema = z.object({
   tiltifyUrl: z.string(),
   raised: CurrenciesSchema,
   goal: CurrenciesSchema,
-  twitch: z.object({
-    name: z.string(),
-    isLive: z.boolean(),
-    url: z.string()
-  }).optional()
+  twitch: z
+    .object({
+      name: z.string(),
+      isLive: z.boolean(),
+      url: z.string(),
+    })
+    .optional(),
 })
 
 // JJCampaigns schema
 export const JJCampaignsSchema = z.object({
   count: z.number(),
   campaigns: z.array(JJCampaignSchema),
-  date: z.date()
+  date: z.date(),
 })
 
 // --- Inferred TS types (optional, matches your interfaces) ---
@@ -139,14 +141,59 @@ export const OverviewSchema = z.object({
   date: z.date(),
 })
 
-
 export const CausesDisplaySchema = z.object({
-    count: z.number(),
-    causes: z.array(JJCauseSchema),
-    overview: OverviewSchema,
-  })
+  count: z.number(),
+  causes: z.array(JJCauseSchema),
+  overview: OverviewSchema,
+})
 
 export type CausesDisplayType = z.infer<typeof CausesDisplaySchema>
+
+export const YogsScheduleSchema = z.object({
+  /**
+   * The date of the earliest stream in the schedule.
+   */
+  start: z.date(),
+  /**
+   * The date of the latest stream in the schedule.
+   */
+  end: z.date(),
+  /**
+   * The index of the day in the schedule that should be shown first.
+   * The index is 0-based, so the first day is day 0.
+   * This is used to determine the initial day when the user first visits the extension.
+   */
+  initialDayIndex: z.number(),
+  days: z.array(
+    z.object({
+      /**
+       * The date of the first stream in the day.
+       */
+      start: z.date(),
+      /**
+       * The date of the last stream in the day.
+       */
+      end: z.date(),
+      streams: z.array(StreamSchema),
+    }),
+  ),
+  streams: z.array(StreamSchema),
+})
+
+export const UserScheduleSchema = z.object({
+  /**
+   * The date of the earliest stream in the schedule.
+   */
+  start: z.date(),
+  /**
+   * The date of the latest stream in the schedule.
+   */
+  end: z.date(),
+  /**
+   * List of all streams from the primary schedule of the user.
+   */
+  streams: z.array(StreamSchema),
+})
 
 const extensionConfigContract = oc
   .input(
@@ -210,8 +257,7 @@ const causesContract = oc
       userId: z.string(),
     }),
   )
-  .output(CausesDisplaySchema
-  )
+  .output(CausesDisplaySchema)
   .route({
     path: '/twitch-extension/causes/{channelId}',
     method: 'GET',
@@ -230,38 +276,7 @@ const yogsScheduleContract = oc
       userId: z.string(),
     }),
   )
-  .output(
-    z.object({
-      /**
-       * The date of the earliest stream in the schedule.
-       */
-      start: z.date(),
-      /**
-       * The date of the latest stream in the schedule.
-       */
-      end: z.date(),
-      /**
-       * The index of the day in the schedule that should be shown first.
-       * The index is 0-based, so the first day is day 0.
-       * This is used to determine the initial day when the user first visits the extension.
-       */
-      initialDayIndex: z.number(),
-      days: z.array(
-        z.object({
-          /**
-           * The date of the first stream in the day.
-           */
-          start: z.date(),
-          /**
-           * The date of the last stream in the day.
-           */
-          end: z.date(),
-          streams: z.array(StreamSchema),
-        }),
-      ),
-      streams: z.array(StreamSchema),
-    }),
-  )
+  .output(YogsScheduleSchema)
   .route({
     path: '/twitch-extension/yogs-schedule',
     method: 'GET',
@@ -297,22 +312,7 @@ const userScheduleContract = oc
       userId: z.string(),
     }),
   )
-  .output(
-    z.object({
-      /**
-       * The date of the earliest stream in the schedule.
-       */
-      start: z.date(),
-      /**
-       * The date of the latest stream in the schedule.
-       */
-      end: z.date(),
-      /**
-       * List of all streams from the primary schedule of the user.
-       */
-      streams: z.array(StreamSchema),
-    }),
-  )
+  .output(UserScheduleSchema)
   .route({
     path: '/twitch-extension/user-schedule/{channelId}',
     method: 'GET',
