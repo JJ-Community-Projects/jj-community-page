@@ -413,7 +413,6 @@ const yogsSchedule = os.yogsScheduleContract
       const now = new Date()
       return { start: now, end: now, initialDayIndex: 0, days: [], streams: [] }
     }
-
     const outStreams: Array<{
       title: string
       subtitle?: string
