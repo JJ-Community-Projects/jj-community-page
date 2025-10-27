@@ -579,15 +579,33 @@ const userData = os.userDataContract
     const stub = DO.get(stubID)
     const conversionRate = await stub.getAvgConversionRate()
 
-    // Map DB row to API shape
+    // Build result matching JJCampaignSchema (with avatar and optional twitch)
+    // Determine Twitch details
+    const login =
+      (camp.livestream as any)?.type === 'twitch' && (camp.livestream as any)?.channel
+        ? String((camp.livestream as any).channel).toLowerCase()
+        : ''
+
+    // Live state via DO live logins set
+    const liveLogins = await stub.getLiveLogins()
+    const isLive = Array.isArray(liveLogins)
+      ? new Set(liveLogins.map((l: string) => l.toLowerCase())).has(login)
+      : false
+
     const result = {
       campaignName: camp.name,
       tiltifyUrl: camp.url ?? '',
+      avatar: (camp as any).userAvatar ?? '',
       raised: valueToCurrencies(camp.raised, conversionRate),
       goal: valueToCurrencies(camp.goal, conversionRate),
-      isTwitch: false,
-      isLive: false,
-      twitchUrl: '',
+      twitch: login
+        ? {
+            name: login,
+            avatar: (camp as any).userAvatar ?? '',
+            isLive,
+            url: `https://twitch.tv/${login}`,
+          }
+        : undefined,
     }
 
     await storeUserData(context.env.KV, input.channelId, result)

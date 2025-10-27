@@ -48,11 +48,13 @@ export const JJUserSchema = z.object({
 export const JJCampaignSchema = z.object({
   campaignName: z.string(),
   tiltifyUrl: z.string(),
+  avatar: z.string(),
   raised: CurrenciesSchema,
   goal: CurrenciesSchema,
   twitch: z
     .object({
       name: z.string(),
+      avatar: z.string(),
       isLive: z.boolean(),
       url: z.string(),
     })

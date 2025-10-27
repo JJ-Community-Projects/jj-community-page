@@ -397,7 +397,17 @@ export class JingleJamData extends DurableObject<Env> {
             ? String(c.livestream.channel).toLowerCase()
             : ''
         if (login) {
-          twitch = { name: login, isLive, url: `https://twitch.tv/${login}` }
+          let twitchAvatar: string | undefined
+          try {
+            const tuser = await this.storage.get<any>(`twitch:login:${login}`)
+            twitchAvatar = (tuser as any)?.profile_image_url
+          } catch {}
+          twitch = {
+            name: login,
+            avatar: twitchAvatar ?? c.user.avatar ?? '',
+            isLive,
+            url: `https://twitch.tv/${login}`,
+          }
           // maintain index for login -> userId
           try {
             await this.storage.put(`idx:twitch:login:${login}`, { userId })
@@ -407,6 +417,7 @@ export class JingleJamData extends DurableObject<Env> {
         const display: JJCampaignType = {
           campaignName: c.name,
           tiltifyUrl: c.url,
+          avatar: c.user.avatar ?? '',
           raised: toCurrencies(c.raised, data.avgConversionRate),
           goal: toCurrencies(c.goal, data.avgConversionRate),
           twitch,
