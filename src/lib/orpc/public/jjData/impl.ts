@@ -48,7 +48,6 @@ const causes = os.causesContract.handler(async ({ context }) => {
   const stub = DO.get(stubID)
 
   const causes = await stub.getCauses()
-  console.log('causes', causes)
   if (!causes) {
     return { count: 0, list: [] }
   }

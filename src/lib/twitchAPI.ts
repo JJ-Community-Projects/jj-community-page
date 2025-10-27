@@ -1,4 +1,9 @@
-import type { StreamResult, TokenData, TwitchAPIResult, TwitchUser, } from './model/TwitchAPIModel.ts'
+import type {
+  TokenData,
+  TwitchAPIResult,
+  TwitchStream,
+  TwitchUser,
+} from './model/TwitchAPIModel.ts'
 
 export class TwitchAPI {
   private env: Env
@@ -177,6 +182,7 @@ export class TwitchAPI {
       }
     }
   }
+
   public async fetchUserById(
     id: string,
   ): Promise<TwitchAPIResult<TwitchUser[]>> {
@@ -281,9 +287,15 @@ export class TwitchAPI {
     try {
       const q = logins.join('&login=')
       const url = `https://api.twitch.tv/helix/users?login=${q}`
+      console.log('fetchUsersByLogins', 'url', url)
       const response = await this.makeAuthenticatedRequest(url)
 
       if (!response.ok) {
+        console.log(
+          'fetchUsersByLogins',
+          'error response',
+          await response.json(),
+        )
         return {
           data: null,
           error: {
@@ -305,6 +317,65 @@ export class TwitchAPI {
     }
   }
 
+  public async fetchUsersByLogin(
+    login: string,
+    accessToken?: string,
+  ): Promise<TwitchAPIResult<TwitchUser>> {
+    if (!login) {
+      return {
+        data: null,
+        error: {
+          status: 400,
+          description: 'At least one login name is required',
+        },
+      }
+    }
+
+    try {
+      const url = `https://api.twitch.tv/helix/users?login=${login}`
+      console.log('fetchUsersByLogins', 'url', url)
+      const response = await this.makeAuthenticatedRequest(url, accessToken)
+
+      if (!response.ok) {
+        console.log(
+          'fetchUsersByLogins',
+          'error response',
+          await response.json(),
+        )
+        return {
+          data: null,
+          error: {
+            status: response.status,
+            description: `Twitch API error: ${response.statusText}`,
+          },
+        }
+      }
+
+      const resp = (await response.json()) as TwitchAPIResult<TwitchUser[]>
+      if (!resp.data || resp.data.length === 0) {
+        return {
+          data: null,
+          error: {
+            status: 404,
+            description: 'User not found',
+          },
+        }
+      }
+      return {
+        data: resp.data![0],
+        error: null,
+      }
+    } catch (error) {
+      return {
+        data: null,
+        error: {
+          status: 500,
+          description: error instanceof Error ? error.message : 'Unknown error',
+        },
+      }
+    }
+  }
+
   /**
    * Fetch streams for a specific user
    * @param userId - Twitch user ID
@@ -312,7 +383,7 @@ export class TwitchAPI {
    */
   public async fetchStreamsByUserId(
     userId: string,
-  ): Promise<TwitchAPIResult<StreamResult>> {
+  ): Promise<TwitchAPIResult<TwitchStream[]>> {
     if (!userId) {
       return {
         data: null,
@@ -337,7 +408,61 @@ export class TwitchAPI {
         }
       }
 
-      return (await response.json()) as TwitchAPIResult<StreamResult>
+      return (await response.json()) as TwitchAPIResult<TwitchStream[]>
+    } catch (error) {
+      return {
+        data: null,
+        error: {
+          status: 500,
+          description: error instanceof Error ? error.message : 'Unknown error',
+        },
+      }
+    }
+  }
+
+  public async fetchStreamsByLogin(
+    login: string,
+    accessToken?: string,
+  ): Promise<TwitchAPIResult<TwitchStream>> {
+    if (!login) {
+      return {
+        data: null,
+        error: {
+          status: 400,
+          description: 'User login is required',
+        },
+      }
+    }
+
+    try {
+      const url = `https://api.twitch.tv/helix/streams?user_login=${login}`
+
+      const response = await this.makeAuthenticatedRequest(url, accessToken)
+
+      if (!response.ok) {
+        return {
+          data: null,
+          error: {
+            status: response.status,
+            description: `Twitch API error: ${response.statusText}`,
+          },
+        }
+      }
+
+      const resp = (await response.json()) as TwitchAPIResult<TwitchStream[]>
+      if (!resp.data || resp.data.length === 0) {
+        return {
+          data: null,
+          error: {
+            status: 200,
+            description: 'Stream not found',
+          },
+        }
+      }
+      return {
+        data: resp.data![0],
+        error: null,
+      }
     } catch (error) {
       return {
         data: null,
@@ -356,7 +481,7 @@ export class TwitchAPI {
    */
   public async fetchStreamsByUserIds(
     userIds: string[],
-  ): Promise<TwitchAPIResult<StreamResult>> {
+  ): Promise<TwitchAPIResult<TwitchStream[]>> {
     if (!userIds || userIds.length === 0) {
       return {
         data: null,
@@ -382,7 +507,47 @@ export class TwitchAPI {
         }
       }
 
-      return (await response.json()) as TwitchAPIResult<StreamResult>
+      return (await response.json()) as TwitchAPIResult<TwitchStream[]>
+    } catch (error) {
+      return {
+        data: null,
+        error: {
+          status: 500,
+          description: error instanceof Error ? error.message : 'Unknown error',
+        },
+      }
+    }
+  }
+
+  public async fetchStreamsByLogins(
+    logins: string[],
+  ): Promise<TwitchAPIResult<TwitchStream[]>> {
+    if (!logins || logins.length === 0) {
+      return {
+        data: null,
+        error: {
+          status: 400,
+          description: 'At least one logni is required',
+        },
+      }
+    }
+
+    try {
+      const q = logins.join('&user_login=')
+      const url = `https://api.twitch.tv/helix/streams?user_login=${q}`
+      const response = await this.makeAuthenticatedRequest(url)
+
+      if (!response.ok) {
+        return {
+          data: null,
+          error: {
+            status: response.status,
+            description: `Twitch API error: ${response.statusText}`,
+          },
+        }
+      }
+
+      return (await response.json()) as TwitchAPIResult<TwitchStream[]>
     } catch (error) {
       return {
         data: null,

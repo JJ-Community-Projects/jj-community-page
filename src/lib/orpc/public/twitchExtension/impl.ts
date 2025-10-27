@@ -1,5 +1,5 @@
 import { implement, ORPCError, os as server } from '@orpc/server'
-import { contracts } from './contract.ts'
+import { contracts, type JJCampaignsType } from './contract.ts'
 import { getEntry } from 'astro:content'
 import { hasAstroContext } from '../../middleware/hasAstroContext.ts'
 import { getStreamColors } from '../../../../functions/jjDatesToColors.ts'
@@ -269,27 +269,34 @@ const campaigns = os.campaignsContract
     const stubID = DO.idFromName('JJ_API_CACHE')
     const stub = DO.get(stubID)
     try {
-      const list = await stub.getCampaigns()
-      const dateStr = await stub.getDate()
-      if (!list) {
-        return {
-          count: 0,
-          list: [],
-          date: new Date(dateStr)
-        }
+      const campaignsDisplay: JJCampaignsType | undefined =
+        await stub.getCampaignsDisplay()
+      const liveLogins = await stub.getLiveLogins()
+      const liveSet = new Set(
+        (liveLogins ?? []).map((l: string) => l.toLowerCase()),
+      )
+
+      if (!campaignsDisplay || !Array.isArray(campaignsDisplay.campaigns)) {
+        const dateStr = await stub.getDate()
+        return { count: 0, campaigns: [], date: new Date(dateStr) }
       }
 
-      const conversionRate = await stub.getAvgConversionRate()
-      return {
-        list: list.map((c) => {
+      // Merge latest live state into precomputed list
+      const mergedList = campaignsDisplay.campaigns.map((item: any) => {
+        if (item?.twitch?.name) {
+          const name = String(item.twitch.name).toLowerCase()
           return {
-            ...c,
-            raised: valueToCurrencies(c.raised, conversionRate),
-            goal: valueToCurrencies(c.goal, conversionRate),
+            ...item,
+            twitch: { ...item.twitch, isLive: liveSet.has(name) },
           }
-        }),
-        count: list.length,
-        date: new Date(dateStr)
+        }
+        return item
+      })
+
+      return {
+        count: campaignsDisplay.count ?? mergedList.length,
+        campaigns: mergedList,
+        date: new Date(campaignsDisplay.date ?? new Date().toISOString()),
       }
     } catch (e) {
       throw e
@@ -310,8 +317,15 @@ const causes = os.causesContract
     const DO = context.env.JingleJamData
     const stubID = DO.idFromName('JJ_API_CACHE')
     const stub = DO.get(stubID)
-    const causes = await stub.getCauses()
 
+    // Prefer precomputed causes display from DO
+    const causesDisplay = await stub.getCausesDisplay()
+    if (causesDisplay) {
+      return causesDisplay
+    }
+
+    // Fallback: compute from raw data if precomputed display is unavailable
+    const causes = await stub.getCauses()
     const conversionRate = await stub.getAvgConversionRate()
     const raised = await stub.getRaised()
     const collections = await stub.getCollections()
@@ -320,7 +334,7 @@ const causes = os.causesContract
     if (!causes) {
       return {
         count: 0,
-        list: [],
+        causes: [],
         overview: {
           raised: {
             yogscast: valueToCurrencies(raised.yogscast, conversionRate),
@@ -339,7 +353,7 @@ const causes = os.causesContract
 
     return {
       count: causes.length,
-      list: causes.map((c) => {
+      causes: causes.map((c) => {
         return {
           ...c,
           raised: {
@@ -568,22 +582,13 @@ const userData = os.userDataContract
 
     // Map DB row to API shape
     const result = {
-      causeId: camp.causeId ?? null,
-      name: camp.name,
-      description: camp.description ?? '',
-      slug: camp.slug,
-      url: camp.url ?? '',
-      startTime: camp.startTime,
+      campaignName: camp.name,
+      tiltifyUrl: camp.url ?? '',
       raised: valueToCurrencies(camp.raised, conversionRate),
       goal: valueToCurrencies(camp.goal, conversionRate),
-      livestream: camp.livestream ?? { channel: null, type: '' },
-      user: {
-        id: camp.userId ?? 0,
-        name: camp.userName ?? '',
-        slug: camp.userSlug ?? '',
-        avatar: camp.userAvatar ?? '',
-        url: camp.userUrl ?? '',
-      },
+      isTwitch: false,
+      isLive: false,
+      twitchUrl: '',
     }
 
     await storeUserData(context.env.KV, input.channelId, result)

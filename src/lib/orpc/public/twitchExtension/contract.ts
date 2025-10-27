@@ -46,22 +46,21 @@ export const JJUserSchema = z.object({
 
 // JJCampaign schema
 export const JJCampaignSchema = z.object({
-  causeId: z.number().nullable(),
-  name: z.string(),
-  description: z.string(),
-  slug: z.string(),
-  url: z.string(),
-  startTime: z.string(), // ISO datetime
+  campaignName: z.string(),
+  tiltifyUrl: z.string(),
   raised: CurrenciesSchema,
   goal: CurrenciesSchema,
-  livestream: JJLivestreamSchema,
-  user: JJUserSchema,
+  twitch: z.object({
+    name: z.string(),
+    isLive: z.boolean(),
+    url: z.string()
+  }).optional()
 })
 
 // JJCampaigns schema
 export const JJCampaignsSchema = z.object({
   count: z.number(),
-  list: z.array(JJCampaignSchema),
+  campaigns: z.array(JJCampaignSchema),
   date: z.date()
 })
 
@@ -140,6 +139,15 @@ export const OverviewSchema = z.object({
   date: z.date(),
 })
 
+
+export const CausesDisplaySchema = z.object({
+    count: z.number(),
+    causes: z.array(JJCauseSchema),
+    overview: OverviewSchema,
+  })
+
+export type CausesDisplayType = z.infer<typeof CausesDisplaySchema>
+
 const extensionConfigContract = oc
   .input(
     z.object({
@@ -202,12 +210,7 @@ const causesContract = oc
       userId: z.string(),
     }),
   )
-  .output(
-    z.object({
-      count: z.number(),
-      list: z.array(JJCauseSchema),
-      overview: OverviewSchema,
-    }),
+  .output(CausesDisplaySchema
   )
   .route({
     path: '/twitch-extension/causes/{channelId}',
