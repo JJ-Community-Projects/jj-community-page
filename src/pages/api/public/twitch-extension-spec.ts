@@ -13,6 +13,7 @@ import {
   JJRaisedSchema,
   JJUserSchema,
   StreamSchema,
+  TotalSchema,
   UserExtensionConfigSchema,
 } from '../../../lib/orpc/public/twitchExtension/contract.ts'
 import { UserDisplaySchema } from '../../../lib/orpc/public/schemas/UserDisplaySchema.ts'
@@ -54,12 +55,12 @@ export const ALL: APIRoute = async () => {
       ExtensionConfig: { schema: ExtensionConfigSchema },
       UserExtensionConfig: { schema: UserExtensionConfigSchema },
       CurrenciesSchema: { schema: CurrenciesSchema },
+      TotalSchema: { schema: TotalSchema },
 
       // Imported in contract.ts
       UserDisplay: { schema: UserDisplaySchema },
     },
     filter: (v) => {
-      console.log(v.path)
       return v.path.includes('twitchExtension')
     },
   })

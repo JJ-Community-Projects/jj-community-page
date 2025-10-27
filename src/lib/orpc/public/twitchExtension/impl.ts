@@ -307,13 +307,26 @@ const causes = os.causesContract
     const DO = context.env.JingleJamData
     const stubID = DO.idFromName('JJ_API_CACHE')
     const stub = DO.get(stubID)
-
     const causes = await stub.getCauses()
-    if (!causes) {
-      return { count: 0, list: [] }
-    }
 
     const conversionRate = await stub.getAvgConversionRate()
+    const raised = await stub.getRaised()
+    const collections = await stub.getCollections()
+    const donations = await stub.getDonations()
+    if (!causes) {
+      return {
+        count: 0,
+        list: [],
+        total: {
+          raised: {
+            yogscast: valueToCurrencies(raised.yogscast, conversionRate),
+            fundraisers: valueToCurrencies(raised.fundraisers, conversionRate)
+          },
+          collections: collections,
+          donations: donations.count
+        },
+      }
+    }
 
     return {
       count: causes.length,
@@ -329,6 +342,14 @@ const causes = os.causesContract
           },
         }
       }),
+      total: {
+        raised: {
+          yogscast: valueToCurrencies(raised.yogscast, conversionRate),
+          fundraisers: valueToCurrencies(raised.fundraisers, conversionRate)
+        },
+        collections: collections,
+        donations: donations.count
+      },
     }
   })
 

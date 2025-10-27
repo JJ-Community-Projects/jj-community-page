@@ -128,6 +128,15 @@ export const UserExtensionConfigSchema = z.object({
   tabs: z.array(TabSchema),
 })
 
+export const TotalSchema = z.object({
+  raised: JJRaisedSchema,
+  collections: z.object({
+    redeemed: z.number(),
+    total: z.number(),
+  }),
+  donations: z.number(),
+})
+
 const extensionConfigContract = oc
   .input(
     z.object({
@@ -194,6 +203,7 @@ const causesContract = oc
     z.object({
       count: z.number(),
       list: z.array(JJCauseSchema),
+      total: TotalSchema,
     }),
   )
   .route({

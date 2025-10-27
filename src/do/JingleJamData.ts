@@ -1,7 +1,7 @@
 import { DurableObject } from 'cloudflare:workers'
 import { getDB } from '../lib/db/db.ts'
 import { jjCampaign, jjCauses } from '../lib/db/schema/jj-api-schema.ts'
-import type { JingleJamResponse, JJCampaign, JJCause, } from './types/JJAPIModel.ts'
+import type { JingleJamResponse, JJCampaign, JJCause, JJRaised, JJCollections, JJDonations } from './types/JJAPIModel.ts'
 import type { BatchItem } from 'drizzle-orm/batch'
 
 export class JingleJamData extends DurableObject<Env> {
@@ -207,6 +207,21 @@ export class JingleJamData extends DurableObject<Env> {
   public async getAvgConversionRate() {
     const avgConversionRate = await this.storage.get<number>('avgConversionRate')
     return avgConversionRate ?? 1
+  }
+
+  public async getRaised() {
+    const raised = await this.storage.get<JJRaised>('raised')
+    return raised ?? { yogscast: 0, fundraisers: 0 }
+  }
+
+  public async getCollections() {
+    const collections = await this.storage.get<JJCollections>('collections')
+    return collections ?? { redeemed: 0, total: 0 }
+  }
+
+  public async getDonations() {
+    const donations = await this.storage.get<JJDonations>('donations')
+    return donations ?? { count: 0 }
   }
 
   // Key helpers
