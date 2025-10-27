@@ -1,7 +1,7 @@
 import type { JJDrizzleDatabase } from '../../../db/db.ts'
 import { twitchChannelSchema } from '../../../db/schema/twitch-channel-schema.ts'
 import { and, eq, sql } from 'drizzle-orm'
-import type { JJCampaignType, JJCauseType } from './contract.ts'
+import type { Currencies, JJCampaignType, JJCauseType } from './contract.ts'
 import type { UserDisplay } from '../schemas/UserDisplaySchema.ts'
 import { jjCampaign } from '../../../db/schema/jj-api-schema.ts'
 import { ORPCError } from '@orpc/server'
@@ -403,5 +403,25 @@ export async function getCampaignByTwitchChannelId(
   return {
     camp,
     userId,
+  }
+}
+
+export function valueToCurrencies(
+  value: number,
+  conversionRate: number,
+): Currencies {
+  const GBP = Intl.NumberFormat('en-GB', {
+    style: 'currency',
+    currency: 'GBP',
+  })
+  const USD = Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+  })
+  return {
+    gbp: value,
+    usd: value * conversionRate,
+    gbpFormatted: GBP.format(value),
+    usdFormatted: USD.format(value * conversionRate),
   }
 }

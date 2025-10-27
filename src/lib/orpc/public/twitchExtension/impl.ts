@@ -6,7 +6,6 @@ import { getStreamColors } from '../../../../functions/jjDatesToColors.ts'
 import { DateTime } from 'luxon'
 import { cacheMiddleware } from '../../middleware/cacheControl.ts'
 import { rangeFromData } from '../../../utils/rangeFromData.ts'
-import type { JJCause } from '../../../../do/types/JJAPIModel.ts'
 import type { ResponseHeadersPluginContext } from '@orpc/server/plugins'
 import { dbMiddleware } from '../../middleware/dbMiddleware.ts'
 import { and, eq, gte, inArray, or } from 'drizzle-orm'
@@ -34,6 +33,7 @@ import {
   storeUserSchedule,
   storeYogsSchedule,
   type UserExtensionTab,
+  valueToCurrencies,
 } from './util.ts'
 
 interface ORPCContext extends ResponseHeadersPluginContext {
@@ -276,9 +276,16 @@ const campaigns = os.campaignsContract
           list: [],
         }
       }
+      const conversionRate = await stub.getAvgConversionRate()
 
       return {
-        list,
+        list: list.map((c) => {
+          return {
+            ...c,
+            raised: valueToCurrencies(c.raised, conversionRate),
+            goal: valueToCurrencies(c.goal, conversionRate),
+          }
+        }),
         count: list.length,
       }
     } catch (e) {
@@ -306,9 +313,22 @@ const causes = os.causesContract
       return { count: 0, list: [] }
     }
 
+    const conversionRate = await stub.getAvgConversionRate()
+
     return {
       count: causes.length,
-      list: causes as JJCause[],
+      list: causes.map((c) => {
+        return {
+          ...c,
+          raised: {
+            yogscast: valueToCurrencies(c.raised.yogscast, conversionRate),
+            fundraisers: valueToCurrencies(
+              c.raised.fundraisers,
+              conversionRate,
+            ),
+          },
+        }
+      }),
     }
   })
 
@@ -502,6 +522,11 @@ const userData = os.userDataContract
       throw new ORPCError('NOT_FOUND', { message: 'JJ campaign not found' })
     }
 
+    const DO = context.env.JingleJamData
+    const stubID = DO.idFromName('JJ_API_CACHE')
+    const stub = DO.get(stubID)
+    const conversionRate = await stub.getAvgConversionRate()
+
     // Map DB row to API shape
     const result = {
       causeId: camp.causeId ?? null,
@@ -510,8 +535,8 @@ const userData = os.userDataContract
       slug: camp.slug,
       url: camp.url ?? '',
       startTime: camp.startTime,
-      raised: camp.raised,
-      goal: camp.goal,
+      raised: valueToCurrencies(camp.raised, conversionRate),
+      goal: valueToCurrencies(camp.goal, conversionRate),
       livestream: camp.livestream ?? { channel: null, type: '' },
       user: {
         id: camp.userId ?? 0,

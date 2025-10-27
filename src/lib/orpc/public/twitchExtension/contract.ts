@@ -2,9 +2,19 @@ import z from 'zod/v4'
 import { oc } from '@orpc/contract'
 import { UserDisplaySchema } from '../schemas/UserDisplaySchema.ts'
 // JJRaised schema (used inside JJCause)
+
+export const CurrenciesSchema = z.object({
+  gbp: z.number(),
+  gbpFormatted: z.string(),
+  usd: z.number(),
+  usdFormatted: z.string(),
+})
+
+export type Currencies = z.infer<typeof CurrenciesSchema>
+
 export const JJRaisedSchema = z.object({
-  yogscast: z.number(),
-  fundraisers: z.number(),
+  yogscast: CurrenciesSchema,
+  fundraisers: CurrenciesSchema,
 })
 
 // JJCause schema
@@ -41,8 +51,8 @@ export const JJCampaignSchema = z.object({
   slug: z.string(),
   url: z.string(),
   startTime: z.string(), // ISO datetime
-  raised: z.number(),
-  goal: z.number(),
+  raised: CurrenciesSchema,
+  goal: CurrenciesSchema,
   livestream: JJLivestreamSchema,
   user: JJUserSchema,
 })

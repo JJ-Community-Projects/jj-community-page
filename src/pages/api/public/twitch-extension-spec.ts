@@ -4,6 +4,7 @@ import { publicRouter } from '../../../lib/orpc/public/publicRouter.ts'
 import { OpenAPIGenerator } from '@orpc/openapi'
 import {
   CreatorSchema,
+  CurrenciesSchema,
   ExtensionConfigSchema,
   JJCampaignSchema,
   JJCampaignsSchema,
@@ -52,6 +53,7 @@ export const ALL: APIRoute = async () => {
       Stream: { schema: StreamSchema },
       ExtensionConfig: { schema: ExtensionConfigSchema },
       UserExtensionConfig: { schema: UserExtensionConfigSchema },
+      CurrenciesSchema: { schema: CurrenciesSchema },
 
       // Imported in contract.ts
       UserDisplay: { schema: UserDisplaySchema },
