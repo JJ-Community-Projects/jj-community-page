@@ -270,14 +270,16 @@ const campaigns = os.campaignsContract
     const stub = DO.get(stubID)
     try {
       const list = await stub.getCampaigns()
+      const dateStr = await stub.getDate()
       if (!list) {
         return {
           count: 0,
           list: [],
+          date: new Date(dateStr)
         }
       }
-      const conversionRate = await stub.getAvgConversionRate()
 
+      const conversionRate = await stub.getAvgConversionRate()
       return {
         list: list.map((c) => {
           return {
@@ -287,6 +289,7 @@ const campaigns = os.campaignsContract
           }
         }),
         count: list.length,
+        date: new Date(dateStr)
       }
     } catch (e) {
       throw e
