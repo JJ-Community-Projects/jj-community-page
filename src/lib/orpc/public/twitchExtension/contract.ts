@@ -136,6 +136,7 @@ export const OverviewSchema = z.object({
     total: z.number(),
   }),
   donations: z.number(),
+  date: z.date(),
 })
 
 const extensionConfigContract = oc

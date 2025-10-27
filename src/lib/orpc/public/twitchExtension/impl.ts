@@ -313,6 +313,7 @@ const causes = os.causesContract
     const raised = await stub.getRaised()
     const collections = await stub.getCollections()
     const donations = await stub.getDonations()
+    const dateStr = await stub.getDate()
     if (!causes) {
       return {
         count: 0,
@@ -328,6 +329,7 @@ const causes = os.causesContract
           },
           collections: collections,
           donations: donations.count,
+          date: new Date(dateStr),
         },
       }
     }
@@ -361,6 +363,7 @@ const causes = os.causesContract
         },
         collections: collections,
         donations: donations.count,
+        date: new Date(dateStr),
       },
     }
   })

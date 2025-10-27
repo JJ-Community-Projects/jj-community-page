@@ -1,7 +1,14 @@
 import { DurableObject } from 'cloudflare:workers'
 import { getDB } from '../lib/db/db.ts'
 import { jjCampaign, jjCauses } from '../lib/db/schema/jj-api-schema.ts'
-import type { JingleJamResponse, JJCampaign, JJCause, JJRaised, JJCollections, JJDonations } from './types/JJAPIModel.ts'
+import type {
+  JingleJamResponse,
+  JJCampaign,
+  JJCause,
+  JJCollections,
+  JJDonations,
+  JJRaised,
+} from './types/JJAPIModel.ts'
 import type { BatchItem } from 'drizzle-orm/batch'
 
 export class JingleJamData extends DurableObject<Env> {
@@ -60,7 +67,6 @@ export class JingleJamData extends DurableObject<Env> {
     return Array.from(map.values()) as JJCampaign[]
   }
 
-
   public async getCampaignsForCause(causeId: number) {
     const campaigns = await this.getCampaigns()
     return campaigns.filter((c) => c.causeId === causeId)
@@ -90,6 +96,11 @@ export class JingleJamData extends DurableObject<Env> {
     }
 
     // Store event metadata as separate keys
+    try {
+      await this.storage.put('date', data.date)
+    } catch (e) {
+      console.error('put date', e)
+    }
     try {
       await this.storage.put('event:year', data.event.year)
     } catch (e) {
@@ -205,7 +216,8 @@ export class JingleJamData extends DurableObject<Env> {
   }
 
   public async getAvgConversionRate() {
-    const avgConversionRate = await this.storage.get<number>('avgConversionRate')
+    const avgConversionRate =
+      await this.storage.get<number>('avgConversionRate')
     return avgConversionRate ?? 1
   }
 
@@ -222,6 +234,11 @@ export class JingleJamData extends DurableObject<Env> {
   public async getDonations() {
     const donations = await this.storage.get<JJDonations>('donations')
     return donations ?? { count: 0 }
+  }
+
+  public async getDate() {
+    const donations = await this.storage.get<string>('date')
+    return donations ?? new Date().toISOString()
   }
 
   // Key helpers
