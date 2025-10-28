@@ -10,6 +10,8 @@ const refreshJJAPIData = os.refreshJJAPIDataContract.handler(
     const stubID = DO.idFromName('JJ_API_CACHE')
     const stub = DO.get(stubID)
     try {
+      await stub.validateTwitchChannels()
+      await stub.checkLiveStreams()
       await stub.refresh()
     } catch (e: any) {
       throw new ORPCError('INTERNAL_SERVER_ERROR', {
