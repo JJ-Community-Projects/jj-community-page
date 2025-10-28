@@ -176,6 +176,18 @@ const userExtensionConfig = os.userExtensionConfigContract
   )
   .use(dbMiddleware)
   .handler(async ({ context, input }) => {
+    const yogsId = '20786541'
+
+    const isYogs = input.channelId === yogsId
+
+    if (isYogs) {
+      return {
+        hasCampaign: false,
+        hasSchedule: false,
+        tabs: ['yogs', 'charities', 'fundraisers'],
+      }
+    }
+
     // Try KV cache first
     const cached = await loadUserExtensionConfig(
       context.env.KV,
@@ -223,26 +235,18 @@ const userExtensionConfig = os.userExtensionConfigContract
 
     const hasCampaign = !!camp
 
-    const yogsId = '20786541'
-
-    const isYogs = input.channelId === yogsId
-
     let tabs: UserExtensionTab[] = []
 
-    if (isYogs) {
-      tabs = ['yogs', 'charities', 'fundraisers']
+    if (!hasSchedule && !hasCampaign) {
+      tabs = ['charities', 'fundraisers', 'yogs']
+    } else if (hasSchedule && hasCampaign) {
+      tabs = ['user-schedule', 'charities', 'fundraisers']
+    } else if (!hasSchedule && hasCampaign) {
+      tabs = ['charities', 'fundraisers', 'yogs']
+    } else if (hasSchedule && !hasCampaign) {
+      tabs = ['user-schedule', 'charities', 'fundraisers']
     } else {
-      if (!hasSchedule && !hasCampaign) {
-        tabs = ['charities', 'fundraisers', 'yogs']
-      } else if (hasSchedule && hasCampaign) {
-        tabs = ['full-user', 'charities', 'fundraisers']
-      } else if (!hasSchedule && hasCampaign) {
-        tabs = ['charities', 'fundraisers', 'yogs']
-      } else if (hasSchedule && !hasCampaign) {
-        tabs = ['user-schedule', 'charities', 'fundraisers']
-      } else {
-        tabs = ['charities', 'fundraisers', 'yogs']
-      }
+      tabs = ['charities', 'fundraisers', 'yogs']
     }
 
     const result = {

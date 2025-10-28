@@ -111,7 +111,6 @@ export type UserRelationsOutput = { friends: UserDisplay[] }
 export type UserRelatedScheduleOutput = { teams: { streams: StreamType[] } }
 
 export type UserExtensionTab =
-  | 'full-user'
   | 'user-schedule'
   | 'charities'
   | 'fundraisers'

@@ -122,7 +122,6 @@ export const ExtensionConfigSchema = z.object({
 })
 
 export const TabSchema = z.enum([
-  'full-user',
   'user-schedule',
   'yogs',
   'charities',
