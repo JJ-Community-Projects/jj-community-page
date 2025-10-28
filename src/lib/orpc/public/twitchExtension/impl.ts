@@ -1,18 +1,40 @@
-import {implement, ORPCError, os as server} from '@orpc/server'
-import {contracts, type JJCampaignsType} from './contract.ts'
-import {getEntry} from 'astro:content'
-import {hasAstroContext} from '../../middleware/hasAstroContext.ts'
-import {getStreamColors} from '../../../../functions/jjDatesToColors.ts'
-import {DateTime} from 'luxon'
-import {cacheMiddleware} from '../../middleware/cacheControl.ts'
-import {rangeFromData} from '../../../utils/rangeFromData.ts'
-import type {ResponseHeadersPluginContext} from '@orpc/server/plugins'
-import {dbMiddleware} from '../../middleware/dbMiddleware.ts'
-import {and, eq, gte, inArray, or} from 'drizzle-orm'
-import {schedulesTable, streamParticipantsTable, streamsTable, teamMembersTable, } from '../../../db/schema/jj-schema.ts'
-import {userDisplayView} from '../../../db/schema/views-schema.ts'
-import {friendsTable} from '../../../db/schema/auth-schema.ts'
-import {getCampaignByTwitchChannelId, getUserIdByTwitchChannelId, loadUserData, loadUserExtensionConfig, loadUserRelatedSchedule, loadUserRelations, loadUserSchedule, loadYogsSchedule, storeUserData, storeUserExtensionConfig, storeUserRelatedSchedule, storeUserRelations, storeUserSchedule, storeYogsSchedule, type UserExtensionTab, valueToCurrencies, } from './util.ts'
+import { implement, ORPCError, os as server } from '@orpc/server'
+import { contracts, type JJCampaignsType } from './contract.ts'
+import { getEntry } from 'astro:content'
+import { hasAstroContext } from '../../middleware/hasAstroContext.ts'
+import { getStreamColors } from '../../../../functions/jjDatesToColors.ts'
+import { DateTime } from 'luxon'
+import { cacheMiddleware } from '../../middleware/cacheControl.ts'
+import { rangeFromData } from '../../../utils/rangeFromData.ts'
+import type { ResponseHeadersPluginContext } from '@orpc/server/plugins'
+import { dbMiddleware } from '../../middleware/dbMiddleware.ts'
+import { and, eq, gte, inArray, or } from 'drizzle-orm'
+import {
+  schedulesTable,
+  streamParticipantsTable,
+  streamsTable,
+  teamMembersTable,
+} from '../../../db/schema/jj-schema.ts'
+import { userDisplayView } from '../../../db/schema/views-schema.ts'
+import { friendsTable } from '../../../db/schema/auth-schema.ts'
+import {
+  getCampaignByTwitchChannelId,
+  getUserIdByTwitchChannelId,
+  loadUserData,
+  loadUserExtensionConfig,
+  loadUserRelatedSchedule,
+  loadUserRelations,
+  loadUserSchedule,
+  loadYogsSchedule,
+  storeUserData,
+  storeUserExtensionConfig,
+  storeUserRelatedSchedule,
+  storeUserRelations,
+  storeUserSchedule,
+  storeYogsSchedule,
+  type UserExtensionTab,
+  valueToCurrencies,
+} from './util.ts'
 
 interface ORPCContext extends ResponseHeadersPluginContext {
   locals?: App.Locals
@@ -575,8 +597,9 @@ const userData = os.userDataContract
       return userData
     }
 
-    const db = context.db
+    // const db = context.db
 
+    /*
     const { camp } = await getCampaignByTwitchChannelId(
       input.channelId,
       context.env,
@@ -585,11 +608,18 @@ const userData = os.userDataContract
 
     if (!camp) {
       throw new ORPCError('NOT_FOUND', { message: 'JJ campaign not found' })
-    }
+    }*/
 
     const DO = context.env.JingleJamData
     const stubID = DO.idFromName('JJ_API_CACHE')
     const stub = DO.get(stubID)
+    const campaign = await stub.getCampaignDisplay(input.channelId)
+
+    if (!campaign) {
+      throw new ORPCError('NOT_FOUND')
+    }
+
+    /*
     const conversionRate = await stub.getAvgConversionRate()
 
     // Build result matching JJCampaignSchema (with avatar and optional twitch)
@@ -622,10 +652,10 @@ const userData = os.userDataContract
             url: `https://twitch.tv/${login}`,
           }
         : undefined,
-    }
+    }*/
 
-    await storeUserData(context.env.KV, input.channelId, result)
-    return result
+    await storeUserData(context.env.KV, input.channelId, campaign)
+    return campaign
   })
 
 // Resolve user's primary schedule and upcoming streams
