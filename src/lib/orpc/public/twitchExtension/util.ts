@@ -353,6 +353,8 @@ export async function getCampaignByTwitchChannelId(
     (await stub.getNumberConfig('twitch-extension:config.year')) ??
     new Date().getUTCFullYear()
 
+  console.log('user id', userId, 'year', year, 'channel id', channelId)
+
   if (userId) {
     const camp = await db
       .select()
@@ -385,6 +387,8 @@ export async function getCampaignByTwitchChannelId(
     // Shouldn’t happen after the above, but keep as safety
     throw new ORPCError('NOT_FOUND', { message: 'Twitch user not found' })
   }
+
+  console.log('twitch user', data)
 
   const camp = await db
     .select()
