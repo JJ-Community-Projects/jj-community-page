@@ -1,9 +1,4 @@
-import type {
-  TokenData,
-  TwitchAPIResult,
-  TwitchStream,
-  TwitchUser,
-} from './model/TwitchAPIModel.ts'
+import type { TokenData, TwitchAPIResult, TwitchStream, TwitchUser, } from './model/TwitchAPIModel.ts'
 
 export class TwitchAPI {
   private env: Env
@@ -200,7 +195,6 @@ export class TwitchAPI {
       const url = `https://api.twitch.tv/helix/users?id=${id}`
       console.log('fetchUserById', 'url', url)
       const response = await this.makeAuthenticatedRequest(url)
-      console.log('fetchUserById', 'response', response)
       if (!response.ok) {
         return {
           data: null,
