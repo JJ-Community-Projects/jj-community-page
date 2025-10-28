@@ -411,7 +411,14 @@ const yogsSchedule = os.yogsScheduleContract
     const schedule = await getEntry('schedules', `${year ?? 2024}`)
     if (!schedule) {
       const now = new Date()
-      return { start: now, end: now, initialDayIndex: 0, days: [], streams: [] }
+      return {
+        title: `Yogscast Jingle Jam ${year ?? 2024}`,
+        start: now,
+        end: now,
+        initialDayIndex: 0,
+        days: [],
+        streams: [],
+      }
     }
     const outStreams: Array<{
       title: string
@@ -535,6 +542,7 @@ const yogsSchedule = os.yogsScheduleContract
     }
 
     const result = {
+      title: `Yogscast Jingle Jam ${year ?? 2024}`,
       start: range.start,
       end: range.end,
       initialDayIndex,
@@ -582,7 +590,8 @@ const userData = os.userDataContract
     // Build result matching JJCampaignSchema (with avatar and optional twitch)
     // Determine Twitch details
     const login =
-      (camp.livestream as any)?.type === 'twitch' && (camp.livestream as any)?.channel
+      (camp.livestream as any)?.type === 'twitch' &&
+      (camp.livestream as any)?.channel
         ? String((camp.livestream as any).channel).toLowerCase()
         : ''
 
@@ -645,7 +654,7 @@ const userSchedule = os.userScheduleContract
       new Date().getUTCFullYear()
 
     const schedule = await db
-      .select({ id: schedulesTable.id })
+      .select({ id: schedulesTable.id, title: schedulesTable.title })
       .from(schedulesTable)
       .where(
         and(
@@ -683,7 +692,7 @@ const userSchedule = os.userScheduleContract
 
     if (streams.length === 0) {
       const now = new Date()
-      return { start: now, end: now, streams: [] }
+      return { title: schedule.title, start: now, end: now, streams: [] }
     }
 
     // Load participants per stream and map to creators
@@ -737,7 +746,12 @@ const userSchedule = os.userScheduleContract
       start: out[0]!.start,
       end: out[out.length - 1]!.end,
     }
-    const result = { start: range.start, end: range.end, streams: out }
+    const result = {
+      title: schedule.title,
+      start: range.start,
+      end: range.end,
+      streams: out,
+    }
     await storeUserSchedule(context.env.KV, input.channelId, result, 600)
     return result
   })
@@ -962,3 +976,5 @@ export const twitchExtensionRouter = {
   userRelations,
   userRelatedSchedule,
 }
+
+// {"year":2024,"showYogsSchedule":true,"showCharities":true,"showFundraisers":true,"refreshInterval":{"yogsSchedule":600000,"charities":60000,"fundraisers":60000},"donationLink":{"url":"","visible":true,"text":"Donate"},"donationTrackerUrl":"","timestamp":"2025-10-27T11:01:56.994Z"}

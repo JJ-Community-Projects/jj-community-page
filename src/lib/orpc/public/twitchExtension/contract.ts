@@ -152,6 +152,7 @@ export const CausesDisplaySchema = z.object({
 export type CausesDisplayType = z.infer<typeof CausesDisplaySchema>
 
 export const YogsScheduleSchema = z.object({
+  title: z.string(),
   /**
    * The date of the earliest stream in the schedule.
    */
@@ -183,6 +184,7 @@ export const YogsScheduleSchema = z.object({
 })
 
 export const UserScheduleSchema = z.object({
+  title: z.string(),
   /**
    * The date of the earliest stream in the schedule.
    */

@@ -87,6 +87,7 @@ export type StreamType = {
 }
 
 export type YogsScheduleOutput = {
+  title: string,
   start: Date
   end: Date
   initialDayIndex: number
@@ -101,6 +102,7 @@ export type YogsScheduleOutput = {
 export type CampaignsOutput = { count: number; list: JJCampaignType[] }
 export type CausesOutput = { count: number; list: JJCauseType[] }
 export type UserScheduleOutput = {
+  title: string,
   start: Date
   end: Date
   streams: StreamType[]
@@ -270,6 +272,7 @@ export async function loadYogsSchedule(
       }))
     : []
   const revived: YogsScheduleOutput = {
+    title: data.title,
     start: new Date(data.start),
     end: new Date(data.end),
     initialDayIndex: Number(data.initialDayIndex ?? 0),
@@ -294,6 +297,7 @@ export async function loadUserSchedule(
   const data = await getJSON<any>(kv, makeKey(channelId, 'user-schedule'))
   if (!data) return null
   const revived: UserScheduleOutput = {
+    title: data.title,
     start: new Date(data.start),
     end: new Date(data.end),
     streams: reviveStreams(data.streams),
