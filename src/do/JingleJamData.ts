@@ -417,6 +417,8 @@ export class JingleJamData extends DurableObject<Env> {
         const display: JJCampaignType = {
           campaignName: c.name,
           tiltifyUrl: c.url,
+          tiltifyName: c.user.name,
+          tiltifyDescription: c.description,
           avatar: c.user.avatar ?? '',
           raised: toCurrencies(c.raised, data.avgConversionRate),
           goal: toCurrencies(c.goal, data.avgConversionRate),

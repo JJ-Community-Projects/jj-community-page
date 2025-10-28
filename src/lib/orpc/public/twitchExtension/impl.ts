@@ -604,7 +604,9 @@ const userData = os.userDataContract
     const result = {
       campaignName: camp.name,
       tiltifyUrl: camp.url ?? '',
-      avatar: (camp as any).userAvatar ?? '',
+      tiltifyName: camp.userName ?? '',
+      tiltifyDescription: camp.description ?? undefined,
+      avatar: camp.userAvatar ?? '',
       raised: valueToCurrencies(camp.raised, conversionRate),
       goal: valueToCurrencies(camp.goal, conversionRate),
       twitch: login

@@ -48,6 +48,8 @@ export const JJUserSchema = z.object({
 export const JJCampaignSchema = z.object({
   campaignName: z.string(),
   tiltifyUrl: z.string(),
+  tiltifyName: z.string(),
+  tiltifyDescription: z.string().optional(),
   avatar: z.string(),
   raised: CurrenciesSchema,
   goal: CurrenciesSchema,
