@@ -19,7 +19,6 @@ import type {
   JJCauseType,
 } from '../lib/orpc/public/twitchExtension/contract.ts'
 
-
 export class JingleJamData extends DurableObject<Env> {
   private get storage() {
     return this.ctx.storage
@@ -363,6 +362,12 @@ export class JingleJamData extends DurableObject<Env> {
     }
   }
 
+  async getCampaignDisplay(channelId: string) {
+    return this.storage.get<JJCampaignType>(
+      `campaign:display:twitchId:${channelId}`,
+    )
+  }
+
   // Extracted from refresh: builds and stores display projections matching JJCampaignsSchema
   private async buildAndStoreCampaignsDisplay(data: JingleJamResponse) {
     try {
@@ -396,12 +401,12 @@ export class JingleJamData extends DurableObject<Env> {
           c.livestream?.type === 'twitch' && c.livestream?.channel
             ? String(c.livestream.channel).toLowerCase()
             : ''
+        let twitchId = ''
         if (login) {
           let twitchAvatar: string | undefined
-          try {
-            const tuser = await this.storage.get<any>(`twitch:login:${login}`)
-            twitchAvatar = (tuser as any)?.profile_image_url
-          } catch {}
+          const tuser = await this.storage.get<any>(`twitch:login:${login}`)
+          twitchAvatar = (tuser as any)?.profile_image_url
+          twitchId = (tuser as any)?.id ?? ''
           twitch = {
             name: login,
             avatar: twitchAvatar ?? c.user.avatar ?? '',
@@ -427,6 +432,12 @@ export class JingleJamData extends DurableObject<Env> {
         displayList.push(display)
         try {
           await this.storage.put(`campaign:display:${userId}`, display)
+          if (twitchId !== '') {
+            await this.storage.put(
+              `campaign:display:twitchId:${twitchId}`,
+              display,
+            )
+          }
         } catch {}
       }
 
