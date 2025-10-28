@@ -1,40 +1,18 @@
-import { implement, ORPCError, os as server } from '@orpc/server'
-import { contracts, type JJCampaignsType } from './contract.ts'
-import { getEntry } from 'astro:content'
-import { hasAstroContext } from '../../middleware/hasAstroContext.ts'
-import { getStreamColors } from '../../../../functions/jjDatesToColors.ts'
-import { DateTime } from 'luxon'
-import { cacheMiddleware } from '../../middleware/cacheControl.ts'
-import { rangeFromData } from '../../../utils/rangeFromData.ts'
-import type { ResponseHeadersPluginContext } from '@orpc/server/plugins'
-import { dbMiddleware } from '../../middleware/dbMiddleware.ts'
-import { and, eq, gte, inArray, or } from 'drizzle-orm'
-import {
-  schedulesTable,
-  streamParticipantsTable,
-  streamsTable,
-  teamMembersTable,
-} from '../../../db/schema/jj-schema.ts'
-import { userDisplayView } from '../../../db/schema/views-schema.ts'
-import { friendsTable } from '../../../db/schema/auth-schema.ts'
-import {
-  getCampaignByTwitchChannelId,
-  getUserIdByTwitchChannelId,
-  loadUserData,
-  loadUserExtensionConfig,
-  loadUserRelatedSchedule,
-  loadUserRelations,
-  loadUserSchedule,
-  loadYogsSchedule,
-  storeUserData,
-  storeUserExtensionConfig,
-  storeUserRelatedSchedule,
-  storeUserRelations,
-  storeUserSchedule,
-  storeYogsSchedule,
-  type UserExtensionTab,
-  valueToCurrencies,
-} from './util.ts'
+import {implement, ORPCError, os as server} from '@orpc/server'
+import {contracts, type JJCampaignsType} from './contract.ts'
+import {getEntry} from 'astro:content'
+import {hasAstroContext} from '../../middleware/hasAstroContext.ts'
+import {getStreamColors} from '../../../../functions/jjDatesToColors.ts'
+import {DateTime} from 'luxon'
+import {cacheMiddleware} from '../../middleware/cacheControl.ts'
+import {rangeFromData} from '../../../utils/rangeFromData.ts'
+import type {ResponseHeadersPluginContext} from '@orpc/server/plugins'
+import {dbMiddleware} from '../../middleware/dbMiddleware.ts'
+import {and, eq, gte, inArray, or} from 'drizzle-orm'
+import {schedulesTable, streamParticipantsTable, streamsTable, teamMembersTable, } from '../../../db/schema/jj-schema.ts'
+import {userDisplayView} from '../../../db/schema/views-schema.ts'
+import {friendsTable} from '../../../db/schema/auth-schema.ts'
+import {getCampaignByTwitchChannelId, getUserIdByTwitchChannelId, loadUserData, loadUserExtensionConfig, loadUserRelatedSchedule, loadUserRelations, loadUserSchedule, loadYogsSchedule, storeUserData, storeUserExtensionConfig, storeUserRelatedSchedule, storeUserRelations, storeUserSchedule, storeYogsSchedule, type UserExtensionTab, valueToCurrencies, } from './util.ts'
 
 interface ORPCContext extends ResponseHeadersPluginContext {
   locals?: App.Locals
@@ -201,6 +179,8 @@ const userExtensionConfig = os.userExtensionConfigContract
       db,
     )
 
+    console.log('camp', camp)
+
     let hasSchedule = false
     if (userId) {
       // Check if a primary & visible schedule exists for user/year
@@ -282,7 +262,7 @@ const campaigns = os.campaignsContract
       }
 
       // Merge latest live state into precomputed list
-      const mergedList = campaignsDisplay.campaigns.map((item: any) => {
+      const mergedList = campaignsDisplay.campaigns.map((item) => {
         if (item?.twitch?.name) {
           const name = String(item.twitch.name).toLowerCase()
           return {
@@ -293,9 +273,34 @@ const campaigns = os.campaignsContract
         return item
       })
 
+      // Sort the merged list in the following order:
+      // 1) campaigns with twitch channel that are live
+      // 2) campaigns with twitch channel that are not live
+      // 3) all other campaigns
+      // Additionally, sort by raised.gbp (descending) within each group
+      const getGroupRank = (it: any) => {
+        if (it?.twitch?.name) {
+          return it?.twitch?.isLive ? 0 : 1
+        }
+        return 2
+      }
+      const getRaisedGbp = (it: any) => {
+        const val = it?.raised?.gbp
+        return typeof val === 'number' ? val : 0
+      }
+      const sortedList = mergedList.toSorted((a: any, b: any) => {
+        const ga = getGroupRank(a)
+        const gb = getGroupRank(b)
+        if (ga !== gb) return ga - gb
+        const ra = getRaisedGbp(a)
+        const rb = getRaisedGbp(b)
+        if (ra !== rb) return rb - ra // higher raised first
+        return 0
+      })
+
       return {
-        count: campaignsDisplay.count ?? mergedList.length,
-        campaigns: mergedList,
+        count: campaignsDisplay.count ?? sortedList.length,
+        campaigns: sortedList,
         date: new Date(campaignsDisplay.date ?? new Date().toISOString()),
       }
     } catch (e) {
