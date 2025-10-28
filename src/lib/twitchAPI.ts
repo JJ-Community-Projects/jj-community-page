@@ -1,4 +1,9 @@
-import type { TokenData, TwitchAPIResult, TwitchStream, TwitchUser, } from './model/TwitchAPIModel.ts'
+import type {
+  TokenData,
+  TwitchAPIResult,
+  TwitchStream,
+  TwitchUser,
+} from './model/TwitchAPIModel.ts'
 
 export class TwitchAPI {
   private env: Env
