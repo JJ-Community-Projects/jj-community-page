@@ -405,19 +405,21 @@ export class JingleJamData extends DurableObject<Env> {
         if (login) {
           let twitchAvatar: string | undefined
           const tuser = await this.storage.get<any>(`twitch:login:${login}`)
-          twitchAvatar = (tuser as any)?.profile_image_url
-          twitchId = (tuser as any)?.id ?? ''
-          const displayName = (tuser as any)?.display_name
-          twitch = {
-            name: displayName,
-            avatar: twitchAvatar ?? c.user.avatar ?? '',
-            isLive,
-            url: `https://twitch.tv/${login}`,
+          if (tuser) {
+            twitchAvatar = (tuser as any)?.profile_image_url
+            twitchId = (tuser as any)?.id ?? ''
+            const displayName = (tuser as any)?.display_name
+            twitch = {
+              name: displayName ?? login,
+              avatar: twitchAvatar ?? c.user.avatar ?? '',
+              isLive,
+              url: `https://twitch.tv/${login}`,
+            }
+            // maintain index for login -> userId
+            try {
+              await this.storage.put(`idx:twitch:login:${login}`, { userId })
+            } catch {}
           }
-          // maintain index for login -> userId
-          try {
-            await this.storage.put(`idx:twitch:login:${login}`, { userId })
-          } catch {}
         }
 
         const display: JJCampaignType = {
