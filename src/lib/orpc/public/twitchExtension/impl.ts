@@ -186,8 +186,9 @@ const userExtensionConfig = os.userExtensionConfigContract
     }
 
     const yogsId = '20786541'
+    const ostofbot = '960814823'
 
-    const isYogs = input.channelId === yogsId
+    const isYogs = input.channelId === yogsId || input.channelId === ostofbot
 
     if (isYogs) {
       return {
@@ -287,7 +288,11 @@ const userExtensionConfig = os.userExtensionConfigContract
     let tabs: UserExtensionTab[] = []
 
     if (yogsMembers.includes(input.channelId)) {
-      tabs = ['charities', 'fundraisers', 'yogs']
+      if (hasSchedule) {
+        tabs = ['user-schedule', 'charities', 'fundraisers', 'yogs']
+      } else {
+        tabs = ['charities', 'fundraisers', 'yogs']
+      }
     } else if (!hasSchedule && !hasCampaign) {
       tabs = ['charities', 'fundraisers']
     } else if (hasSchedule && hasCampaign) {
