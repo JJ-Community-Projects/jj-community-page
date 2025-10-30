@@ -246,14 +246,6 @@ const userExtensionConfig = os.userExtensionConfigContract
       '1012950837',
     ]
 
-    if (yogsMembers.includes(input.channelId)) {
-      return {
-        hasCampaign: false,
-        hasSchedule: false,
-        tabs: ['charities', 'fundraisers', 'yogs'],
-      }
-    }
-
     const db = context.db
 
     // Determine the current campaign year from ConfigDO
@@ -294,16 +286,18 @@ const userExtensionConfig = os.userExtensionConfigContract
 
     let tabs: UserExtensionTab[] = []
 
-    if (!hasSchedule && !hasCampaign) {
+    if (yogsMembers.includes(input.channelId)) {
       tabs = ['charities', 'fundraisers', 'yogs']
+    } else if (!hasSchedule && !hasCampaign) {
+      tabs = ['charities', 'fundraisers']
     } else if (hasSchedule && hasCampaign) {
       tabs = ['user-schedule', 'charities', 'fundraisers']
     } else if (!hasSchedule && hasCampaign) {
-      tabs = ['charities', 'fundraisers', 'yogs']
+      tabs = ['charities', 'fundraisers']
     } else if (hasSchedule && !hasCampaign) {
       tabs = ['user-schedule', 'charities', 'fundraisers']
     } else {
-      tabs = ['charities', 'fundraisers', 'yogs']
+      tabs = ['charities', 'fundraisers']
     }
 
     const result = {
