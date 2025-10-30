@@ -176,6 +176,15 @@ const userExtensionConfig = os.userExtensionConfigContract
   )
   .use(dbMiddleware)
   .handler(async ({ context, input }) => {
+    // Try KV cache first
+    const cached = await loadUserExtensionConfig(
+      context.env.KV,
+      input.channelId,
+    )
+    if (cached) {
+      return cached
+    }
+
     const yogsId = '20786541'
 
     const isYogs = input.channelId === yogsId
@@ -188,13 +197,61 @@ const userExtensionConfig = os.userExtensionConfigContract
       }
     }
 
-    // Try KV cache first
-    const cached = await loadUserExtensionConfig(
-      context.env.KV,
-      input.channelId,
-    )
-    if (cached) {
-      return cached
+    const yogsMembers = [
+      '20786541',
+      '26538483',
+      '21945983',
+      '19309473',
+      '22168131',
+      '38051463',
+      '12131870',
+      '21615575',
+      '26574506',
+      '43903804',
+      '91990032',
+      '87245015',
+      '145983935',
+      '46969360',
+      '96502692',
+      '21285936',
+      '38167015',
+      '43903922',
+      '113954840',
+      '42314834',
+      '37569443',
+      '24070690',
+      '219068259',
+      '62568743',
+      '52172280',
+      '62904151',
+      '31883069',
+      '40639871',
+      '141902679',
+      '416016021',
+      '44135610',
+      '27063689',
+      '38180017',
+      '79911474',
+      '64758947',
+      '239617169',
+      '150004439',
+      '21069037',
+      '465613748',
+      '91904368',
+      '48950229',
+      '68525019',
+      '172932486',
+      '57595823',
+      '32155062',
+      '1012950837',
+    ]
+
+    if (yogsMembers.includes(input.channelId)) {
+      return {
+        hasCampaign: false,
+        hasSchedule: false,
+        tabs: ['charities', 'fundraisers', 'yogs'],
+      }
     }
 
     const db = context.db
