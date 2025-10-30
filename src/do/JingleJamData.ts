@@ -407,8 +407,9 @@ export class JingleJamData extends DurableObject<Env> {
           const tuser = await this.storage.get<any>(`twitch:login:${login}`)
           twitchAvatar = (tuser as any)?.profile_image_url
           twitchId = (tuser as any)?.id ?? ''
+          const displayName = (tuser as any)?.display_name
           twitch = {
-            name: login,
+            name: displayName,
             avatar: twitchAvatar ?? c.user.avatar ?? '',
             isLive,
             url: `https://twitch.tv/${login}`,
