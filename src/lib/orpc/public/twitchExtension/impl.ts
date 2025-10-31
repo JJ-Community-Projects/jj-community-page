@@ -20,20 +20,20 @@ import { friendsTable } from '../../../db/schema/auth-schema.ts'
 import {
   getCampaignByTwitchChannelId,
   getUserIdByTwitchChannelId,
+  loadOverview,
   loadUserData,
   loadUserExtensionConfig,
   loadUserRelatedSchedule,
   loadUserRelations,
   loadUserSchedule,
   loadYogsSchedule,
-  loadOverview,
+  storeOverview,
   storeUserData,
   storeUserExtensionConfig,
   storeUserRelatedSchedule,
   storeUserRelations,
   storeUserSchedule,
   storeYogsSchedule,
-  storeOverview,
   type UserExtensionTab,
   valueToCurrencies,
 } from './util.ts'
@@ -425,27 +425,10 @@ const causes = os.causesContract
     // Fallback: compute from raw data if precomputed display is unavailable
     const causes = await stub.getCauses()
     const conversionRate = await stub.getAvgConversionRate()
-    const raised = await stub.getRaised()
-    const collections = await stub.getCollections()
-    const donations = await stub.getDonations()
-    const dateStr = await stub.getDate()
     if (!causes) {
       return {
         count: 0,
         causes: [],
-        overview: {
-          raised: {
-            yogscast: valueToCurrencies(raised.yogscast, conversionRate),
-            fundraisers: valueToCurrencies(raised.fundraisers, conversionRate),
-            total: valueToCurrencies(
-              parseFloat((raised.fundraisers + raised.yogscast).toFixed(2)),
-              conversionRate,
-            ),
-          },
-          collections: collections,
-          donations: donations.count,
-          date: new Date(dateStr),
-        },
       }
     }
 
@@ -467,19 +450,6 @@ const causes = os.causesContract
           },
         }
       }),
-      overview: {
-        raised: {
-          yogscast: valueToCurrencies(raised.yogscast, conversionRate),
-          fundraisers: valueToCurrencies(raised.fundraisers, conversionRate),
-          total: valueToCurrencies(
-            parseFloat((raised.fundraisers + raised.yogscast).toFixed(2)),
-            conversionRate,
-          ),
-        },
-        collections: collections,
-        donations: donations.count,
-        date: new Date(dateStr),
-      },
     }
   })
 
@@ -903,27 +873,28 @@ const userSchedule = os.userScheduleContract
       creatorsByKey.set(`${s.scheduleId}-${s.id}`, parts)
     }
 
-    const out = streams.map((s) => {
-      const key = `${s.scheduleId}-${s.id}`
-      const creators = (creatorsByKey.get(key) ?? []).map((u) => ({
-        id: String(u.userId),
-        name: u.username,
-        url: u.twitchLogin ? `https://twitch.tv/${u.twitchLogin}` : '',
-        imageUrl: u.profileImage ?? undefined,
-        color: u.primaryColor ?? '#000000',
-      }))
-      const colorMap = getStreamColors(DateTime.fromJSDate(s.start as any))
-      return {
-        title: s.title,
-        subtitle: s.subtitle ?? undefined,
-        description: s.description ?? undefined,
-        start: s.start,
-        end: s.end,
-        creators,
-        color: colorMap['500'],
-      }
-    })
-      .toSorted((a,b) => {
+    const out = streams
+      .map((s) => {
+        const key = `${s.scheduleId}-${s.id}`
+        const creators = (creatorsByKey.get(key) ?? []).map((u) => ({
+          id: String(u.userId),
+          name: u.username,
+          url: u.twitchLogin ? `https://twitch.tv/${u.twitchLogin}` : '',
+          imageUrl: u.profileImage ?? undefined,
+          color: u.primaryColor ?? '#000000',
+        }))
+        const colorMap = getStreamColors(DateTime.fromJSDate(s.start as any))
+        return {
+          title: s.title,
+          subtitle: s.subtitle ?? undefined,
+          description: s.description ?? undefined,
+          start: s.start,
+          end: s.end,
+          creators,
+          color: colorMap['500'],
+        }
+      })
+      .toSorted((a, b) => {
         return a.end.getTime() - b.end.getTime()
       })
 

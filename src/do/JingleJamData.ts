@@ -496,6 +496,7 @@ export class JingleJamData extends DurableObject<Env> {
         }
       })
 
+      /*
       const overview: CausesDisplayType['overview'] = {
         raised: {
           yogscast: toCurrencies(data.raised.yogscast, data.avgConversionRate),
@@ -514,11 +515,12 @@ export class JingleJamData extends DurableObject<Env> {
         donations: data.donations.count,
         date: new Date(data.date),
       }
+      */
 
       const output: CausesDisplayType = {
         count: causes.length,
         causes,
-        overview,
+        // overview,
       }
 
       await this.storage.put('causes:display', output)

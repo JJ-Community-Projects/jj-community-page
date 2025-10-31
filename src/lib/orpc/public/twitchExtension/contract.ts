@@ -147,7 +147,6 @@ export const OverviewSchema = z.object({
 export const CausesDisplaySchema = z.object({
   count: z.number(),
   causes: z.array(JJCauseSchema),
-  overview: OverviewSchema,
 })
 
 export type CausesDisplayType = z.infer<typeof CausesDisplaySchema>
