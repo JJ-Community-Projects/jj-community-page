@@ -26,12 +26,14 @@ import {
   loadUserRelations,
   loadUserSchedule,
   loadYogsSchedule,
+  loadOverview,
   storeUserData,
   storeUserExtensionConfig,
   storeUserRelatedSchedule,
   storeUserRelations,
   storeUserSchedule,
   storeYogsSchedule,
+  storeOverview,
   type UserExtensionTab,
   valueToCurrencies,
 } from './util.ts'
@@ -481,6 +483,51 @@ const causes = os.causesContract
     }
   })
 
+const overview = os.overviewContract
+  .use(rateLimit)
+  .use(
+    cacheMiddleware({
+      maxAge: 60,
+      sMaxAge: 60,
+      staleWhileRevalidate: 30,
+    }),
+  )
+  .handler(async ({ context }) => {
+    // Try KV cache first
+    const cached = await loadOverview(context.env.KV)
+    if (cached) {
+      return cached
+    }
+
+    const DO = context.env.JingleJamData
+    const stubID = DO.idFromName('JJ_API_CACHE')
+    const stub = DO.get(stubID)
+
+    const conversionRate = await stub.getAvgConversionRate()
+    const raised = await stub.getRaised()
+    const collections = await stub.getCollections()
+    const donations = await stub.getDonations()
+    const dateStr = await stub.getDate()
+
+    const overview = {
+      raised: {
+        yogscast: valueToCurrencies(raised.yogscast, conversionRate),
+        fundraisers: valueToCurrencies(raised.fundraisers, conversionRate),
+        total: valueToCurrencies(
+          parseFloat((raised.fundraisers + raised.yogscast).toFixed(2)),
+          conversionRate,
+        ),
+      },
+      collections: collections,
+      donations: donations.count,
+      date: new Date(dateStr),
+    }
+
+    await storeOverview(context.env.KV, overview, 60)
+
+    return overview
+  })
+
 const yogsSchedule = os.yogsScheduleContract
   .use(rateLimit)
   .use(
@@ -819,7 +866,7 @@ const userSchedule = os.userScheduleContract
       .where(
         and(
           eq(streamsTable.scheduleId, schedule.id),
-          gte(streamsTable.end, now),
+          // gte(streamsTable.end, now),
         ),
       )
       .orderBy(streamsTable.start)
@@ -876,6 +923,9 @@ const userSchedule = os.userScheduleContract
         color: colorMap['500'],
       }
     })
+      .toSorted((a,b) => {
+        return a.end.getTime() - b.end.getTime()
+      })
 
     const range = rangeFromData(out) || {
       start: out[0]!.start,
@@ -1105,6 +1155,7 @@ export const twitchExtensionRouter = {
   userExtensionConfig,
   campaigns,
   causes,
+  overview,
   yogsSchedule,
   userData,
   userSchedule,

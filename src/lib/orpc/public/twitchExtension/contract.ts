@@ -274,6 +274,25 @@ const causesContract = oc
     deprecated: false,
   })
 
+const overviewContract = oc
+  .input(
+    z.object({
+      channelId: z.string(),
+      userId: z.string(),
+    }),
+  )
+  .output(OverviewSchema)
+  .route({
+    path: '/twitch-extension/overview/{channelId}',
+    method: 'GET',
+    operationId: 'getOverview',
+    summary: 'Get overview',
+    description: 'Retrieve overview from the jj api',
+    tags: ['twitch-extension'],
+    successDescription: 'Overview retrieved successfully',
+    deprecated: false,
+  })
+
 const yogsScheduleContract = oc
   .input(
     z.object({
@@ -380,6 +399,7 @@ export const contracts = {
   userExtensionConfigContract,
   campaignsContract,
   causesContract,
+  overviewContract,
   yogsScheduleContract,
   userDataContract,
   userScheduleContract,

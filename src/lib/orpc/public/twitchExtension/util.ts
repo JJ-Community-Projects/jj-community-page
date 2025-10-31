@@ -110,6 +110,18 @@ export type UserScheduleOutput = {
 export type UserRelationsOutput = { friends: UserDisplay[] }
 export type UserRelatedScheduleOutput = { teams: { streams: StreamType[] } }
 
+export type OverviewOutput = {
+  raised: {
+    yogscast: Currencies
+    fundraisers: Currencies
+    total: Currencies
+  }
+  // Type of collections comes from DO; keep it generic to avoid tight coupling
+  collections: any
+  donations: number
+  date: Date
+}
+
 export type UserExtensionTab =
   | 'user-schedule'
   | 'charities'
@@ -147,6 +159,14 @@ export async function storeCauses(
   ttlSeconds: number = 60,
 ) {
   return putJSON(kv, makeKey(channelId, 'causes'), data, ttlSeconds)
+}
+
+export async function storeOverview(
+  kv: KVNamespace,
+  data: OverviewOutput,
+  ttlSeconds: number = 60,
+) {
+  return putJSON(kv, 'twitch-extension:overview', data, ttlSeconds)
 }
 
 export async function storeYogsSchedule(
@@ -256,6 +276,20 @@ export async function loadCauses(
   channelId: string,
 ): Promise<CausesOutput | null> {
   return getJSON<CausesOutput>(kv, makeKey(channelId, 'causes'))
+}
+
+export async function loadOverview(
+  kv: KVNamespace,
+): Promise<OverviewOutput | null> {
+  const data = await getJSON<any>(kv, 'twitch-extension:overview')
+  if (!data) return null
+  const revived: OverviewOutput = {
+    raised: data.raised,
+    collections: data.collections,
+    donations: Number(data.donations ?? 0),
+    date: new Date(data.date),
+  }
+  return revived
 }
 
 export async function loadYogsSchedule(
