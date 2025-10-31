@@ -187,8 +187,17 @@ const userExtensionConfig = os.userExtensionConfigContract
 
     const yogsId = '20786541'
     const ostofbot = '960814823'
+    const ostof = '96860795'
 
-    const isYogs = input.channelId === yogsId || input.channelId === ostofbot
+    if (input.channelId === ostofbot) {
+      return {
+        hasCampaign: true,
+        hasSchedule: true,
+        tabs: ['user-schedule', 'charities', 'fundraisers'],
+      }
+    }
+
+    const isYogs = input.channelId === yogsId || input.channelId === ostof
 
     if (isYogs) {
       return {
@@ -652,6 +661,35 @@ const userData = os.userDataContract
   )
   .use(dbMiddleware)
   .handler(async ({ context, input }) => {
+    const ostofbot = '960814823'
+    if (input.channelId === ostofbot) {
+      return {
+        campaignName: 'Test Campaign',
+        tiltifyUrl: 'https://jinglejam.tiltify.com',
+        tiltifyName: 'ostofbot',
+        avatar: 'https://assets.tiltify.com/assets/default-avatar.png',
+        raised: {
+          gbp: 300,
+          gbpFormatted: '420',
+          usd: 300,
+          usdFormatted: '300',
+        },
+        goal: {
+          gbp: 0,
+          gbpFormatted: '0',
+          usd: 0,
+          usdFormatted: '',
+        },
+        twitch: {
+          name: 'ostofbot',
+          avatar:
+            'https://static-cdn.jtvnw.net/user-default-pictures-uv/ce57700a-def9-11e9-842d-784f43822e80-profile_image-70x70.png',
+          isLive: false,
+          url: 'https://www.twitch.tv/ostofbot',
+        },
+      }
+    }
+
     const userData = await loadUserData(context.env.KV, input.channelId)
     if (userData) {
       return userData
