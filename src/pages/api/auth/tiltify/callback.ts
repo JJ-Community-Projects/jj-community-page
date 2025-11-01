@@ -1,9 +1,11 @@
 import type {APIRoute} from "astro";
 import {drizzle} from "drizzle-orm/d1";
-import {accounts, users} from "../../../../lib/db/schema/auth-schema.ts";
+import {accounts, users, userSocials} from "../../../../lib/db/schema/auth-schema.ts";
 import {and, eq} from "drizzle-orm";
 import {Configuration, UserApi} from "../../../../lib/externalAPI/tiltify/api/src";
 import {TiltifyAPI, type TiltifyUserResponse} from "../../../../lib/TiltifyAPI.ts";
+import {TwitchAPI} from "../../../../lib/twitchAPI.ts";
+import {twitchChannelSchema} from "../../../../lib/db/schema/twitch-channel-schema.ts";
 import {
   createNewUserSession,
   createSession,
@@ -78,6 +80,67 @@ export const GET: APIRoute = async (ctx) => {
   if (!session) {
     return ctx.redirect('/auth-error?error=session-creation-failed');
   }
+
+  // If Tiltify profile includes Twitch, handle like manual addSocial (also store Twitch profile)
+  try {
+    const twitchValue = tiltifyUser?.data?.social?.twitch;
+    if (twitchValue) {
+      // Normalize to URL
+      const twitchUrl = twitchValue.startsWith('http')
+        ? twitchValue
+        : `https://twitch.tv/${twitchValue}`;
+
+      // Extract username
+      const parts = twitchUrl.split('/');
+      const username = parts[parts.length - 1];
+
+      // Resolve Twitch channel and upsert channel profile
+      const twitchAPI = new TwitchAPI(ctx.locals.runtime.env);
+      const { data, error } = await twitchAPI.fetchUserByLogin(username);
+      if (!error && data && data.length > 0) {
+        const channel = data[0];
+        await db
+          .insert(twitchChannelSchema)
+          .values({
+            userId: session.userId,
+            id: channel.id,
+            login: channel.login,
+            displayName: channel.display_name,
+            description: channel.description,
+            profileImageUrl: channel.profile_image_url,
+            offlineImageUrl: channel.offline_image_url,
+          })
+          .onConflictDoUpdate({
+            target: [twitchChannelSchema.id],
+            set: {
+              id: channel.id,
+              login: channel.login,
+              displayName: channel.display_name,
+              description: channel.description,
+              profileImageUrl: channel.profile_image_url,
+              offlineImageUrl: channel.offline_image_url,
+            },
+          });
+      }
+
+      // Upsert social link
+      await db
+        .insert(userSocials)
+        .values({
+          userId: session.userId,
+          provider: 'twitch',
+          url: twitchUrl,
+        })
+        .onConflictDoUpdate({
+          target: [userSocials.userId, userSocials.provider],
+          set: { url: twitchUrl },
+        });
+    }
+  } catch (e) {
+    console.error('Tiltify signup Twitch handling failed', e);
+    // Do not block signup on Twitch enrichment failure
+  }
+
   setSessionTokenCookie(ctx, sessionToken, session.expiresAt);
   // const stub = await getRPCUserDO(ctx, session.userId)
   return ctx.redirect(`/dashboard`);
