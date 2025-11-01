@@ -195,7 +195,7 @@
       },
       "routes": [
         {
-          "pattern": "beta.jinglejam.ostof.dev",
+          "pattern": "jinglejam.ostof.dev",
           "custom_domain": true
         }
       ],
@@ -206,29 +206,86 @@
         {
           "tag": "v1",
           "new_sqlite_classes": [
+            "UserDO",
+            "TeamDO",
             "JingleJamData",
-            "UserRateLimiter"
+            "UserRateLimiter",
+
+            // friends
+            "FriendRequestIncomingObject",
+            "FriendRequestSentObject",
+            "FriendsListObject",
+
+            // team invites
+            "UserTeamInvitesObject",
+            "UserTeamsObject",
+            "TeamAdminInvitesObject",
+            "TeamAdminMembersObject",
+
+            // schedule editing
+            "ScheduleEditingObject",
+
+            // other
+            "ConfigDO",
+            "TwitchExtensionRateLimiter"
           ]
         }
       ],
       "durable_objects": {
         "bindings": [
-          // TODO
           {
             "name": "JingleJamData",
             "class_name": "JingleJamData"
           },
           {
-            "name": "UserDO",
-            "class_name": "UserDO"
-          },
-          {
-            "name": "TeamDO",
-            "class_name": "TeamDO"
-          },
-          {
             "name": "UserRateLimiter",
             "class_name": "UserRateLimiter"
+          },
+          // friends
+          {
+            "name": "FriendRequestIncomingObject",
+            "class_name": "FriendRequestIncomingObject"
+          },
+          {
+            "name": "FriendRequestSentObject",
+            "class_name": "FriendRequestSentObject"
+          },
+          {
+            "name": "FriendsListObject",
+            "class_name": "FriendsListObject"
+          },
+          // users
+          {
+            "name": "UserTeamInvitesObject",
+            "class_name": "UserTeamInvitesObject"
+          },
+          {
+            "name": "UserTeamsObject",
+            "class_name": "UserTeamsObject"
+          },
+
+          // team
+          {
+            "name": "TeamAdminInvitesObject",
+            "class_name": "TeamAdminInvitesObject"
+          },
+          {
+            "name": "TeamAdminMembersObject",
+            "class_name": "TeamAdminMembersObject"
+          },
+
+          // ather
+          {
+            "name": "ScheduleEditingObject",
+            "class_name": "ScheduleEditingObject"
+          },
+          {
+            "name": "ConfigDO",
+            "class_name": "ConfigDO"
+          },
+          {
+            "name": "TwitchExtensionRateLimiter",
+            "class_name": "TwitchExtensionRateLimiter"
           }
         ]
       },
@@ -247,19 +304,10 @@
         }
       ],
       "vars": {
-        "ENVIRONMENT": "PRDD",
-        "TWITCH_CLIENT_ID": "<PLACEHOLDER>",
-        "TWITCH_CLIENT_SECRET": "<PLACEHOLDER>",
-        "TILTIFY_CLIENT_ID": "<PLACEHOLDER>",
-        "TILTIFY_SECRET": "<PLACEHOLDER>",
-        "TILTIFY_API": "<PLACEHOLDER>",
-        "TILTIFY_REDIRECT_URI": "<PLACEHOLDER>",
-        "JJ_DASHBOARD_URL": "<PLACEHOLDER>",
-        "YOUTUBE_API_KEY": "<PLACEHOLDER>"
+        "ENVIRONMENT": "PRDD"
       }
     },
     "beta": {
-      "keep_vars": true,
       "compatibility_flags": [
         "nodejs_compat",
         "global_fetch_strictly_public"
