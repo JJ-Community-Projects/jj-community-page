@@ -1,10 +1,5 @@
 import { type Component, createMemo, createSignal } from 'solid-js'
-import {
-  buildUrl,
-  FieldRow,
-  LinkPreview,
-  PreviewFrame,
-} from '../../overview/Common.tsx'
+import { buildUrl, FieldRow, LinkPreview, PreviewFrame, } from '../../overview/Common.tsx'
 import { useUser } from '../../../users/user-dashboard/providers/UserProvider.tsx'
 
 export const CharitiesTickerConfigurator: Component<{ visible?: boolean }> = (
@@ -19,7 +14,7 @@ export const CharitiesTickerConfigurator: Component<{ visible?: boolean }> = (
     buildUrl('/overlays/charities', {
       theme: theme(),
       currency: currency(),
-      user: user.tiltifyName,
+      user: user?.tiltifyName,
     }),
   )
 

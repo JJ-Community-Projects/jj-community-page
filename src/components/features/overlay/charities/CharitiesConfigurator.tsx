@@ -1,10 +1,5 @@
 import { type Component, createMemo, createSignal, For, Show } from 'solid-js'
-import {
-  buildUrl,
-  FieldRow,
-  LinkPreview,
-  PreviewFrame,
-} from '../overview/Common.tsx'
+import { buildUrl, FieldRow, LinkPreview, PreviewFrame, } from '../overview/Common.tsx'
 import { useQuery } from '@tanstack/solid-query'
 import { orpcPrivate } from '../../../../lib/orpc/client.ts'
 import { useUser } from '../../users/user-dashboard/providers/UserProvider.tsx'
@@ -67,7 +62,7 @@ type Currency = 'GBP' | 'USD'
       currency: currency(),
       showUrl: showUrl(),
       causes: causesParam(),
-      user: user.tiltifyName,
+      user: user?.tiltifyName,
     }),
   )
 

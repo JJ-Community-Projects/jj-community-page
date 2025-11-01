@@ -1,10 +1,5 @@
 import { type Component, createMemo, createSignal } from 'solid-js'
-import {
-  buildUrl,
-  FieldRow,
-  LinkPreview,
-  PreviewFrame,
-} from '../../overview/Common.tsx'
+import { buildUrl, FieldRow, LinkPreview, PreviewFrame, } from '../../overview/Common.tsx'
 import { useUser } from '../../../users/user-dashboard/providers/UserProvider.tsx'
 
 export const UserScheduleConfigurator: Component<{ visible?: boolean }> = (
@@ -18,7 +13,7 @@ export const UserScheduleConfigurator: Component<{ visible?: boolean }> = (
   const { user } = useUser()
   const scheduleUrl = createMemo(() =>
     buildUrl('/overlays/schedule', {
-      user: user.tiltifyName,
+      user: user?.tiltifyName,
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       theme: theme(),
       style: streamStyle(),

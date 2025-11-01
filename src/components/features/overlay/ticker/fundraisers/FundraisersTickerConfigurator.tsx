@@ -16,7 +16,7 @@ export const FundraisersTickerConfigurator: Component<{
     buildUrl('/overlays/fundraisers', {
       orderBy: orderBy(),
       currency: currency(),
-      user: user.tiltifyName,
+      user: user?.tiltifyName,
     }),
   )
 
