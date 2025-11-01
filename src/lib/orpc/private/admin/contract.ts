@@ -55,6 +55,22 @@ const deleteKVValueContract = oc
   .input(z.object({ key: z.string() }))
   .output(z.void())
 
+const triggerTwitchLiveCheckContract = oc.input(z.void()).output(z.void())
+
+const twitchStreamListItemSchema = z.object({
+  userLogin: z.string(),
+  displayName: z.string().optional(),
+  title: z.string().nullable().optional(),
+  isLive: z.boolean(),
+  url: z.string(),
+})
+
+export type AdminTwitchStreamListItem = z.infer<typeof twitchStreamListItemSchema>
+
+const getTwitchStreamsContract = oc.output(z.array(twitchStreamListItemSchema))
+
+const getGBPToEURRateContract = oc.output(z.number())
+
 export const contracts = {
   refreshJJAPIDataContract,
   addStringConfigContract,
@@ -66,4 +82,7 @@ export const contracts = {
   getAllKVKeysContract,
   putKVValueContract,
   deleteKVValueContract,
+  triggerTwitchLiveCheckContract,
+  getTwitchStreamsContract,
+  getGBPToEURRateContract,
 }

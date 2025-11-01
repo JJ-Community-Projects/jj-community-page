@@ -1,9 +1,18 @@
 import z from 'zod/v4'
 import { oc } from '@orpc/contract'
+
 // JJRaised schema (used inside JJCause)
-export const JJRaisedSchema = z.object({
-  yogscast: z.number(),
-  fundraisers: z.number(),
+const CurrenciesSchema = z.object({
+  gbp: z.number(),
+  gbpFormatted: z.string(),
+  usd: z.number(),
+  usdFormatted: z.string(),
+})
+
+const JJRaisedSchema = z.object({
+  yogscast: CurrenciesSchema,
+  fundraisers: CurrenciesSchema,
+  total: CurrenciesSchema,
 })
 
 // JJCause schema
@@ -60,13 +69,12 @@ export type JJCampaignsType = z.infer<typeof JJCampaignsSchema>
 // List endpoints (existing)
 const campaignsContract = oc.output(JJCampaignsSchema)
 
-const causesContract = oc
-  .output(
-    z.object({
-      count: z.number(),
-      list: z.array(JJCauseSchema),
-    }),
-  )
+const causesContract = oc.output(
+  z.object({
+    count: z.number(),
+    list: z.array(JJCauseSchema),
+  }),
+)
 
 // New: Get single cause by path parameter
 const causeByIdContract = oc

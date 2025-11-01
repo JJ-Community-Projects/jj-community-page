@@ -4,7 +4,6 @@ import { implement } from '@orpc/server'
 import { and, eq } from 'drizzle-orm'
 import { jjCampaign } from '../../../db/schema/jj-api-schema.ts'
 import { cacheMiddleware } from '../../middleware/cacheControl.ts'
-import type { JJCause } from '../../../../do/types/JJAPIModel.ts'
 // New: get campaign by Twitch id
 import { twitchChannelSchema } from '../../../db/schema/twitch-channel-schema.ts'
 
@@ -48,13 +47,14 @@ const causes = os.causesContract.handler(async ({ context }) => {
   const stub = DO.get(stubID)
 
   const causes = await stub.getCauses()
+  console.log('causes', causes)
   if (!causes) {
     return { count: 0, list: [] }
   }
 
   return {
     count: causes.length,
-    list: causes as JJCause[],
+    list: causes  ,
   }
 })
 
@@ -64,7 +64,10 @@ const causeById = os.causeByIdContract.handler(async ({ input, context }) => {
   const stubID = DO.idFromName('JJ_API_CACHE')
   const stub = DO.get(stubID)
   const cause = await stub.getCause(input.id)
-  return cause ?? null
+  if (!cause) {
+    return null
+  }
+  return cause
 })
 
 // Current-year campaign lookup (DO only), returns a single campaign or null
