@@ -25,7 +25,7 @@ export class JingleJamData extends DurableObject<Env> {
   }
 
   // Causes
-  public async setCause(cause: JJCause) {
+  public async setCause(cause: JJCauseType) {
     await this.storage.put(this.causeKey(cause.id), cause)
   }
 
@@ -37,7 +37,7 @@ export class JingleJamData extends DurableObject<Env> {
 
   public getCause(causeId: number) {
     return this.storage.get(this.causeKey(causeId)) as Promise<
-      JJCause | undefined
+      JJCauseType | undefined
     >
   }
 
@@ -427,6 +427,7 @@ export class JingleJamData extends DurableObject<Env> {
           tiltifyUrl: c.url,
           tiltifyName: c.user.name,
           tiltifyDescription: c.description,
+          tiltifyCauseId: c.causeId ?? undefined,
           avatar: c.user.avatar ?? '',
           raised: toCurrencies(c.raised, data.avgConversionRate),
           goal: toCurrencies(c.goal, data.avgConversionRate),
@@ -495,6 +496,8 @@ export class JingleJamData extends DurableObject<Env> {
           },
         }
       })
+
+      await Promise.all(causes.map((c) => this.setCause(c)))
 
       /*
       const overview: CausesDisplayType['overview'] = {

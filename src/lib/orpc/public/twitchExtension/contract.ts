@@ -50,6 +50,7 @@ export const JJCampaignSchema = z.object({
   tiltifyUrl: z.string(),
   tiltifyName: z.string(),
   tiltifyDescription: z.string().optional(),
+  tiltifyCauseId: z.number().optional(),
   avatar: z.string(),
   raised: CurrenciesSchema,
   goal: CurrenciesSchema,
@@ -199,6 +200,14 @@ export const UserScheduleSchema = z.object({
   streams: z.array(StreamSchema),
 })
 
+
+export const UserDataSchema = z.object({
+  campaign: JJCampaignSchema,
+  cause: JJCauseSchema.optional()
+})
+
+export type UserDataType = z.infer<typeof UserDataSchema>
+
 const extensionConfigContract = oc
   .input(
     z.object({
@@ -317,7 +326,7 @@ const userDataContract = oc
       userId: z.string(),
     }),
   )
-  .output(JJCampaignSchema)
+  .output(UserDataSchema)
   .route({
     path: '/twitch-extension/user-data/{channelId}',
     method: 'GET',

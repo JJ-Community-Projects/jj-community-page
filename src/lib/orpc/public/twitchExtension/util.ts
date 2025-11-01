@@ -87,7 +87,7 @@ export type StreamType = {
 }
 
 export type YogsScheduleOutput = {
-  title: string,
+  title: string
   start: Date
   end: Date
   initialDayIndex: number
@@ -102,7 +102,7 @@ export type YogsScheduleOutput = {
 export type CampaignsOutput = { count: number; list: JJCampaignType[] }
 export type CausesOutput = { count: number; list: JJCauseType[] }
 export type UserScheduleOutput = {
-  title: string,
+  title: string
   start: Date
   end: Date
   streams: StreamType[]
@@ -159,6 +159,14 @@ export async function storeCauses(
   ttlSeconds: number = 60,
 ) {
   return putJSON(kv, makeKey(channelId, 'causes'), data, ttlSeconds)
+}
+
+export async function storeCause(
+  kv: KVNamespace,
+  data: JJCauseType,
+  ttlSeconds: number = 60,
+) {
+  return putJSON(kv, makeKey(`${data.id}`, 'causes'), data, ttlSeconds)
 }
 
 export async function storeOverview(
@@ -276,6 +284,12 @@ export async function loadCauses(
   channelId: string,
 ): Promise<CausesOutput | null> {
   return getJSON<CausesOutput>(kv, makeKey(channelId, 'causes'))
+}
+export async function loadCause(
+  kv: KVNamespace,
+  causeId: number,
+): Promise<JJCauseType | null> {
+  return getJSON<JJCauseType>(kv, makeKey(`${causeId}`, 'causes'))
 }
 
 export async function loadOverview(

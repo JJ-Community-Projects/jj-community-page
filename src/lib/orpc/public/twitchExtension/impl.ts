@@ -20,6 +20,7 @@ import { friendsTable } from '../../../db/schema/auth-schema.ts'
 import {
   getCampaignByTwitchChannelId,
   getUserIdByTwitchChannelId,
+  loadCause,
   loadOverview,
   loadUserData,
   loadUserExtensionConfig,
@@ -27,6 +28,7 @@ import {
   loadUserRelations,
   loadUserSchedule,
   loadYogsSchedule,
+  storeCause,
   storeOverview,
   storeUserData,
   storeUserExtensionConfig,
@@ -411,14 +413,36 @@ const causes = os.causesContract
       staleWhileRevalidate: 30,
     }),
   )
-  .handler(async ({ context }) => {
+  .handler(async ({ context, input }) => {
     const DO = context.env.JingleJamData
     const stubID = DO.idFromName('JJ_API_CACHE')
     const stub = DO.get(stubID)
 
+    const campaign = await stub.getCampaignDisplay(input.channelId)
+
     // Prefer precomputed causes display from DO
     const causesDisplay = await stub.getCausesDisplay()
     if (causesDisplay) {
+      if (!campaign) {
+        return causesDisplay
+      }
+
+      const causeId = campaign.tiltifyCauseId
+      console.log('causeId', causeId)
+      if (!causeId) {
+        return causesDisplay
+      }
+
+      const cause = causesDisplay.causes.find((c) => c.id === causeId)
+      if (cause) {
+        console.log('cause', cause)
+        const otherCauses = causesDisplay.causes.filter((c) => c.id !== causeId)
+        return {
+          count: causesDisplay.count,
+          causes: [cause, ...otherCauses],
+        }
+      }
+      console.log('causesDisplay', causesDisplay)
       return causesDisplay
     }
 
@@ -432,24 +456,38 @@ const causes = os.causesContract
       }
     }
 
+    const displayCauses = causes.map((c) => {
+      return {
+        ...c,
+        raised: {
+          yogscast: valueToCurrencies(c.raised.yogscast, conversionRate),
+          fundraisers: valueToCurrencies(c.raised.fundraisers, conversionRate),
+          total: valueToCurrencies(
+            parseFloat((c.raised.fundraisers + c.raised.yogscast).toFixed(2)),
+            conversionRate,
+          ),
+        },
+      }
+    })
+
+    if (campaign) {
+      const causeId = campaign.tiltifyCauseId
+
+      if (causeId) {
+        const cause = displayCauses.find((c) => c.id === causeId)
+        if (cause) {
+          const otherCauses = displayCauses.filter((c) => c.id !== causeId)
+          return {
+            count: causes.length,
+            causes: [cause, ...otherCauses],
+          }
+        }
+      }
+    }
+
     return {
       count: causes.length,
-      causes: causes.map((c) => {
-        return {
-          ...c,
-          raised: {
-            yogscast: valueToCurrencies(c.raised.yogscast, conversionRate),
-            fundraisers: valueToCurrencies(
-              c.raised.fundraisers,
-              conversionRate,
-            ),
-            total: valueToCurrencies(
-              parseFloat((c.raised.fundraisers + c.raised.yogscast).toFixed(2)),
-              conversionRate,
-            ),
-          },
-        }
-      }),
+      causes: displayCauses,
     }
   })
 
@@ -681,35 +719,62 @@ const userData = os.userDataContract
     const ostofbot = '960814823'
     if (input.channelId === ostofbot) {
       return {
-        campaignName: 'Test Campaign',
-        tiltifyUrl: 'https://jinglejam.tiltify.com',
-        tiltifyName: 'ostofbot',
-        avatar: 'https://assets.tiltify.com/assets/default-avatar.png',
-        raised: {
-          gbp: 300,
-          gbpFormatted: '420',
-          usd: 300,
-          usdFormatted: '300',
-        },
-        goal: {
-          gbp: 0,
-          gbpFormatted: '0',
-          usd: 0,
-          usdFormatted: '',
-        },
-        twitch: {
-          name: 'ostofbot',
-          avatar:
-            'https://static-cdn.jtvnw.net/user-default-pictures-uv/ce57700a-def9-11e9-842d-784f43822e80-profile_image-70x70.png',
-          isLive: false,
-          url: 'https://www.twitch.tv/ostofbot',
+        campaign: {
+          campaignName: 'Test Campaign',
+          tiltifyUrl: 'https://jinglejam.tiltify.com',
+          tiltifyName: 'ostofbot',
+          avatar: 'https://assets.tiltify.com/assets/default-avatar.png',
+          raised: {
+            gbp: 300,
+            gbpFormatted: '420',
+            usd: 300,
+            usdFormatted: '300',
+          },
+          goal: {
+            gbp: 0,
+            gbpFormatted: '0',
+            usd: 0,
+            usdFormatted: '',
+          },
+          twitch: {
+            name: 'ostofbot',
+            avatar:
+              'https://static-cdn.jtvnw.net/user-default-pictures-uv/ce57700a-def9-11e9-842d-784f43822e80-profile_image-70x70.png',
+            isLive: false,
+            url: 'https://www.twitch.tv/ostofbot',
+          },
         },
       }
     }
 
+    const DO = context.env.JingleJamData
+    const stubID = DO.idFromName('JJ_API_CACHE')
+    const stub = DO.get(stubID)
+
     const userData = await loadUserData(context.env.KV, input.channelId)
     if (userData) {
-      return userData
+      if (userData.tiltifyCauseId) {
+        const cachedCause = await loadCause(
+          context.env.KV,
+          userData.tiltifyCauseId,
+        )
+        if (cachedCause) {
+          return {
+            campaign: userData,
+            cause: cachedCause,
+          }
+        }
+        const cause = await stub.getCause(userData.tiltifyCauseId)
+        if (cause) {
+          await storeCause(context.env.KV, cause)
+        }
+        return {
+          campaign: userData,
+          cause: cause,
+        }
+      }
+
+      return { campaign: userData }
     }
 
     // const db = context.db
@@ -725,52 +790,34 @@ const userData = os.userDataContract
       throw new ORPCError('NOT_FOUND', { message: 'JJ campaign not found' })
     }*/
 
-    const DO = context.env.JingleJamData
-    const stubID = DO.idFromName('JJ_API_CACHE')
-    const stub = DO.get(stubID)
     const campaign = await stub.getCampaignDisplay(input.channelId)
 
     if (!campaign) {
       throw new ORPCError('NOT_FOUND')
     }
 
-    /*
-    const conversionRate = await stub.getAvgConversionRate()
-
-    // Build result matching JJCampaignSchema (with avatar and optional twitch)
-    // Determine Twitch details
-    const login =
-      (camp.livestream as any)?.type === 'twitch' &&
-      (camp.livestream as any)?.channel
-        ? String((camp.livestream as any).channel).toLowerCase()
-        : ''
-
-    // Live state via DO live logins set
-    const liveLogins = await stub.getLiveLogins()
-    const isLive = Array.isArray(liveLogins)
-      ? new Set(liveLogins.map((l: string) => l.toLowerCase())).has(login)
-      : false
-
-    const result = {
-      campaignName: camp.name,
-      tiltifyUrl: camp.url ?? '',
-      tiltifyName: camp.userName ?? '',
-      tiltifyDescription: camp.description ?? undefined,
-      avatar: camp.userAvatar ?? '',
-      raised: valueToCurrencies(camp.raised, conversionRate),
-      goal: valueToCurrencies(camp.goal, conversionRate),
-      twitch: login
-        ? {
-            name: login,
-            avatar: (camp as any).userAvatar ?? '',
-            isLive,
-            url: `https://twitch.tv/${login}`,
-          }
-        : undefined,
-    }*/
-
     await storeUserData(context.env.KV, input.channelId, campaign)
-    return campaign
+
+    const causeId = campaign.tiltifyCauseId
+    if (causeId) {
+      const cachedCause = await loadCause(context.env.KV, causeId)
+      if (cachedCause) {
+        return {
+          campaign,
+          cause: cachedCause,
+        }
+      }
+      const cause = await stub.getCause(causeId)
+      if (cause) {
+        await storeCause(context.env.KV, cause)
+      }
+      return {
+        campaign,
+        cause,
+      }
+    }
+
+    return { campaign }
   })
 
 // Resolve user's primary schedule and upcoming streams

@@ -54,7 +54,7 @@ export interface JJUser {
 }
 
 export interface JJCampaign {
-  causeId: number;
+  causeId: number | null;
   name: string;
   description: string;
   slug: string;
