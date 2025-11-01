@@ -12,14 +12,16 @@ export async function scheduledTwitch(
   // Get all Twitch channels
   const twitchChannels = await db.select().from(twitchChannelSchema).all()
 
-  // Extract channel IDs
-  const ids = twitchChannels.map((channel) => channel.id)
-
-  const queue = new TwitchLiveCheckQueue()
-  await queue.send(ids, env)
-
   const DO = env.JingleJamData
   const stubID = DO.idFromName('JJ_API_CACHE')
   const stub = DO.get(stubID)
-  await stub.checkLiveStreams()
+
+  const dbLogins = twitchChannels.map((channel) => channel.login)
+  const validLogins = await stub.getValidTwitchLogins()
+
+  const logins = [...dbLogins, ...validLogins]
+
+  const uniqueLogins = [...new Set(logins)]
+  const queue = new TwitchLiveCheckQueue()
+  await queue.sendLogins(uniqueLogins, env)
 }
