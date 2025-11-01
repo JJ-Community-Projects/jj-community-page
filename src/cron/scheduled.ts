@@ -17,7 +17,16 @@ export async function scheduled(
       const DO = env.JingleJamData
       const stubID = DO.idFromName('JJ_API_CACHE')
       const stub = DO.get(stubID)
-      await stub.validateTwitchChannels()
+      try {
+        await stub.fetchGBPToEURConversionRate()
+      } catch (e) {
+        console.error(e)
+      }
+      try {
+        await stub.validateTwitchChannels()
+      } catch (e) {
+        console.error(e)
+      }
       break
   }
 }

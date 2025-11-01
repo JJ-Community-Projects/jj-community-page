@@ -46,8 +46,7 @@ export class JingleJamData extends DurableObject<Env> {
       string,
       unknown
     >
-    const causes = Array.from(map.values()) as JJCause[]
-    return causes
+    return Array.from(map.values()) as JJCauseType[]
   }
 
   // Campaigns
@@ -68,7 +67,7 @@ export class JingleJamData extends DurableObject<Env> {
   }
 
   public async getCampaigns() {
-    const map = (await this.storage.list({ prefix: 'campaign:' })) as Map<
+    const map = (await this.storage.list({ prefix: 'campaign:api:' })) as Map<
       string,
       unknown
     >
@@ -236,6 +235,12 @@ export class JingleJamData extends DurableObject<Env> {
     return avgConversionRate ?? 1
   }
 
+  // Returns the cached GBP->EUR rate or 1 if not available
+  public async getGbpToEurRate() {
+    const rate = await this.storage.get<number>('gbp:eur:rate')
+    return rate ?? 1
+  }
+
   public async getRaised() {
     const raised = await this.storage.get<JJRaised>('raised')
     return raised ?? { yogscast: 0, fundraisers: 0 }
@@ -368,14 +373,54 @@ export class JingleJamData extends DurableObject<Env> {
     )
   }
 
+  public getValidTwitchLogins() {
+    return this.getStringArray('twitch:validLogins')
+  }
+
+  // GBP->EUR conversion via Google Finance
+  public async fetchGBPToEURConversionRate() {
+    const url = 'https://www.google.com/finance/quote/GBP-EUR'
+    const res = await fetch(url, {
+      headers: {
+        // Some sites return different content for bots; set a common UA
+        'User-Agent':
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36',
+        'Accept-Language': 'en-US,en;q=0.9',
+      },
+    })
+    if (!res.ok) {
+      throw new Error(`Failed to fetch GBP->EUR page: ${res.status} ${res.statusText}`)
+    }
+    const html = await res.text()
+
+    // Look for an element that contains both classes "YMlKec" and "fxKbKc"
+    const match = html.match(/<[^>]*class=\"[^\"]*\bYMlKec\b[^\"]*\bfxKbKc\b[^\"]*\"[^>]*>([^<]+)<\/[^>]*>/i)
+    if (!match) {
+      throw new Error('GBP->EUR conversion rate element not found')
+    }
+    const rawText = match[1].trim()
+    const numericText = rawText.replace(/[^0-9.,-]/g, '').replace(/,/g, '')
+    const value = parseFloat(numericText)
+    if (!Number.isFinite(value)) {
+      throw new Error(`Unable to parse GBP->EUR conversion rate from text: "${rawText}"`)
+    }
+
+    await this.storage.put('gbp:eur:rate', value)
+    return value
+  }
+
   // Extracted from refresh: builds and stores display projections matching JJCampaignsSchema
   private async buildAndStoreCampaignsDisplay(data: JingleJamResponse) {
     try {
-      const toCurrencies = (gbp: number, avgRate: number): Currencies => {
-        const usd = Math.round(gbp * avgRate * 100) / 100
+      const usdRate = data.avgConversionRate
+      const eurRate = await this.getGbpToEurRate()
+      const toCurrencies = (gbp: number, usdRateIn: number, eurRateIn: number): Currencies => {
+        const usd = Math.round(gbp * usdRateIn * 100) / 100
+        const euro = Math.round(gbp * eurRateIn * 100) / 100
         return {
           gbp,
           usd,
+          euro,
           gbpFormatted: new Intl.NumberFormat('en-GB', {
             style: 'currency',
             currency: 'GBP',
@@ -384,6 +429,10 @@ export class JingleJamData extends DurableObject<Env> {
             style: 'currency',
             currency: 'USD',
           }).format(usd),
+          euroFormatted: new Intl.NumberFormat('de-DE', {
+            style: 'currency',
+            currency: 'EUR',
+          }).format(euro),
         }
       }
 
@@ -429,8 +478,8 @@ export class JingleJamData extends DurableObject<Env> {
           tiltifyDescription: c.description,
           tiltifyCauseId: c.causeId ?? undefined,
           avatar: c.user.avatar ?? '',
-          raised: toCurrencies(c.raised, data.avgConversionRate),
-          goal: toCurrencies(c.goal, data.avgConversionRate),
+          raised: toCurrencies(c.raised, usdRate, eurRate),
+          goal: toCurrencies(c.goal, usdRate, eurRate),
           twitch,
         }
         displayList.push(display)
@@ -459,11 +508,15 @@ export class JingleJamData extends DurableObject<Env> {
   // Build and store display projections for causes matching causesContract output
   private async buildAndStoreCausesDisplay(data: JingleJamResponse) {
     try {
-      const toCurrencies = (gbp: number, avgRate: number): Currencies => {
-        const usd = Math.round(gbp * avgRate * 100) / 100
+      const usdRate = data.avgConversionRate
+      const eurRate = await this.getGbpToEurRate()
+      const toCurrencies = (gbp: number, usdRateIn: number, eurRateIn: number): Currencies => {
+        const usd = Math.round(gbp * usdRateIn * 100) / 100
+        const euro = Math.round(gbp * eurRateIn * 100) / 100
         return {
           gbp,
           usd,
+          euro,
           gbpFormatted: new Intl.NumberFormat('en-GB', {
             style: 'currency',
             currency: 'GBP',
@@ -472,15 +525,20 @@ export class JingleJamData extends DurableObject<Env> {
             style: 'currency',
             currency: 'USD',
           }).format(usd),
+          euroFormatted: new Intl.NumberFormat('de-DE', {
+            style: 'currency',
+            currency: 'EUR',
+          }).format(euro),
         }
       }
 
       const causes: JJCauseType[] = data.causes.map((c) => {
-        const yog = toCurrencies(c.raised.yogscast, data.avgConversionRate)
-        const fund = toCurrencies(c.raised.fundraisers, data.avgConversionRate)
+        const yog = toCurrencies(c.raised.yogscast, usdRate, eurRate)
+        const fund = toCurrencies(c.raised.fundraisers, usdRate, eurRate)
         const total = toCurrencies(
           parseFloat((c.raised.fundraisers + c.raised.yogscast).toFixed(2)),
-          data.avgConversionRate,
+          usdRate,
+          eurRate,
         )
         return {
           id: c.id,
@@ -534,7 +592,7 @@ export class JingleJamData extends DurableObject<Env> {
 
   // Key helpers
   private campaignKey(userId: number) {
-    return `campaign:${userId}`
+    return `campaign:api:${userId}`
   }
 
   private causeKey(causeId: number) {

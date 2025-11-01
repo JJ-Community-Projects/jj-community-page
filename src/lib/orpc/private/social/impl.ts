@@ -35,13 +35,13 @@ const addSocial = os.addSocialContract
         })
       }
 
-      if (!data || data.data.length === 0) {
+      if (!data || data.length === 0) {
         throw new ORPCError('NOT_FOUND', {
           message: 'Twitch channel not found',
         })
       }
 
-      const channel = data.data[0]
+      const channel = data[0]
 
       // Insert or update the channel data directly in the database
       await db
@@ -238,13 +238,13 @@ const importFromTiltify = os.importFromTiltifyContract
               })
             }
 
-            if (!data || data.data.length === 0) {
+            if (!data || data.length === 0) {
               throw new ORPCError('NOT_FOUND', {
                 message: 'Twitch channel not found',
               })
             }
 
-            const channel = data.data[0]
+            const channel = data[0]
 
             // Insert or update the channel data directly in the database
             try {

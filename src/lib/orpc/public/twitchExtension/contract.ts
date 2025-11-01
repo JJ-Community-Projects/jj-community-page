@@ -8,6 +8,8 @@ export const CurrenciesSchema = z.object({
   gbpFormatted: z.string(),
   usd: z.number(),
   usdFormatted: z.string(),
+  euro: z.number(),
+  euroFormatted: z.string(),
 })
 
 export type Currencies = z.infer<typeof CurrenciesSchema>

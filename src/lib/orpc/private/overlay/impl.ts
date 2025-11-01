@@ -107,10 +107,9 @@ const charities = os.charitiesContract.handler(async ({ input, context }) => {
     currency: currency,
   })
   const items = causes.map((cause) => {
-    const raised =
-      (cause?.raised?.fundraisers ?? 0) + (cause?.raised?.yogscast ?? 0)
-    const convertedRaised =
-      currency === 'USD' ? raised * avgConversionRate : raised
+    const raisedGBP = cause?.raised?.total.gbp ?? 0
+    const raisedUSD = cause?.raised?.total.usd ?? 0
+    const convertedRaised = currency === 'USD' ? raisedUSD : raisedGBP
     const raisedFormatted = formatter.format(convertedRaised)
     return {
       id: Number(cause.id),
@@ -123,7 +122,7 @@ const charities = os.charitiesContract.handler(async ({ input, context }) => {
     }
   })
 
-  return { userFundraiser, charities: items}
+  return { userFundraiser, charities: items }
 })
 
 // ----------------------
@@ -134,13 +133,13 @@ const causeById = os.causeByIdContract.handler(async ({ input, context }) => {
   const DO = context.env.JingleJamData
   const stubID = DO.idFromName('JJ_API_CACHE')
   const stub = DO.get(stubID)
-  const causes: any[] | null = await stub.getCauses()
+  const causes = await stub.getCauses()
   if (!causes?.length) return null
 
   const id = Math.floor(input.causeId)
   if (!Number.isFinite(id) || id < 0) return null
 
-  const cause = causes.find((c: any) => Number(c?.id) === id)
+  const cause = causes.find((c ) => Number(c?.id) === id)
   if (!cause) return null
 
   const r = new Date().getUTCSeconds()
@@ -152,7 +151,7 @@ const causeById = os.causeByIdContract.handler(async ({ input, context }) => {
     websiteUrl: cause.url || undefined,
     raised: includeTotals
       ? Number(
-          (cause?.raised?.fundraisers ?? 0) + (cause?.raised?.yogscast ?? 0),
+          (cause?.raised?.total.gbp ?? 0),
         ) + r
       : undefined,
     currency: includeTotals ? 'GBP' : undefined,
@@ -186,13 +185,17 @@ const fundraisers = os.fundraisersContract.handler(
       avgConversionRate,
     )
 
+    console.log('userFundraiser', userFundraiser)
+
     if (!list?.length) {
       return {
         userFundraiser,
         fundraisers: [],
       }
     }
-
+    list.forEach((c) =>{
+      console.log(c)
+    })
     const mapped = list.map((c) =>
       campaignMapper(c, currency, avgConversionRate),
     )

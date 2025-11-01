@@ -463,7 +463,8 @@ export async function getCampaignByTwitchChannelId(
 
 export function valueToCurrencies(
   value: number,
-  conversionRate: number,
+  usdConversionRate: number,
+  eurConversionRate: number,
 ): Currencies {
   const GBP = Intl.NumberFormat('en-GB', {
     style: 'currency',
@@ -473,11 +474,18 @@ export function valueToCurrencies(
     style: 'currency',
     currency: 'USD',
   })
-  const usd = parseFloat((value * conversionRate).toFixed(2))
+  const EUR = Intl.NumberFormat('de-DE', {
+    style: 'currency',
+    currency: 'EUR',
+  })
+  const usd = parseFloat((value * usdConversionRate).toFixed(2))
+  const euro = parseFloat((value * eurConversionRate).toFixed(2))
   return {
     gbp: value,
     usd: usd,
+    euro: euro,
     gbpFormatted: GBP.format(value),
     usdFormatted: USD.format(usd),
+    euroFormatted: EUR.format(euro),
   }
 }

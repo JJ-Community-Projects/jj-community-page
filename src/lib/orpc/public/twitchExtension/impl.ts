@@ -73,6 +73,30 @@ const rateLimit = server.$context<ORPCContext>().middleware(
   },
 )
 
+const originCheck = server.$context<ORPCContext>().middleware(
+  async (
+    { context, next },
+    input: {
+      channelId: string
+      userId: string
+    },
+  ) => {
+    const origin = context.resHeaders?.get('origin')
+    if (!origin) {
+      return next()
+    }
+
+    if (origin.includes('ext-twitch.tv')) {
+      return next()
+    }
+    if (origin.includes('http://localhost')) {
+      return next()
+    }
+
+    return next()
+  },
+)
+
 const os = implement(contracts).use(hasAstroContext)
 
 const extensionConfig = os.extensionConfigContract
@@ -448,7 +472,8 @@ const causes = os.causesContract
 
     // Fallback: compute from raw data if precomputed display is unavailable
     const causes = await stub.getCauses()
-    const conversionRate = await stub.getAvgConversionRate()
+    const usdRate = await stub.getAvgConversionRate()
+    const eurRate = await stub.getGbpToEurRate()
     if (!causes) {
       return {
         count: 0,
@@ -456,27 +481,14 @@ const causes = os.causesContract
       }
     }
 
-    const displayCauses = causes.map((c) => {
-      return {
-        ...c,
-        raised: {
-          yogscast: valueToCurrencies(c.raised.yogscast, conversionRate),
-          fundraisers: valueToCurrencies(c.raised.fundraisers, conversionRate),
-          total: valueToCurrencies(
-            parseFloat((c.raised.fundraisers + c.raised.yogscast).toFixed(2)),
-            conversionRate,
-          ),
-        },
-      }
-    })
 
     if (campaign) {
       const causeId = campaign.tiltifyCauseId
 
       if (causeId) {
-        const cause = displayCauses.find((c) => c.id === causeId)
+        const cause = causes.find((c) => c.id === causeId)
         if (cause) {
-          const otherCauses = displayCauses.filter((c) => c.id !== causeId)
+          const otherCauses = causes.filter((c) => c.id !== causeId)
           return {
             count: causes.length,
             causes: [cause, ...otherCauses],
@@ -487,7 +499,7 @@ const causes = os.causesContract
 
     return {
       count: causes.length,
-      causes: displayCauses,
+      causes: causes,
     }
   })
 
@@ -511,7 +523,8 @@ const overview = os.overviewContract
     const stubID = DO.idFromName('JJ_API_CACHE')
     const stub = DO.get(stubID)
 
-    const conversionRate = await stub.getAvgConversionRate()
+    const usdRate = await stub.getAvgConversionRate()
+    const eurRate = await stub.getGbpToEurRate()
     const raised = await stub.getRaised()
     const collections = await stub.getCollections()
     const donations = await stub.getDonations()
@@ -519,11 +532,12 @@ const overview = os.overviewContract
 
     const overview = {
       raised: {
-        yogscast: valueToCurrencies(raised.yogscast, conversionRate),
-        fundraisers: valueToCurrencies(raised.fundraisers, conversionRate),
+        yogscast: valueToCurrencies(raised.yogscast, usdRate, eurRate),
+        fundraisers: valueToCurrencies(raised.fundraisers, usdRate, eurRate),
         total: valueToCurrencies(
           parseFloat((raised.fundraisers + raised.yogscast).toFixed(2)),
-          conversionRate,
+          usdRate,
+          eurRate,
         ),
       },
       collections: collections,
@@ -729,12 +743,16 @@ const userData = os.userDataContract
             gbpFormatted: '420',
             usd: 300,
             usdFormatted: '300',
+            euro: 300,
+            euroFormatted: '€300',
           },
           goal: {
             gbp: 0,
             gbpFormatted: '0',
             usd: 0,
             usdFormatted: '',
+            euro: 0,
+            euroFormatted: '€0',
           },
           twitch: {
             name: 'ostofbot',
