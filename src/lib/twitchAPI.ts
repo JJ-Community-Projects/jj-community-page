@@ -1,9 +1,4 @@
-import type {
-  TokenData,
-  TwitchAPIResult,
-  TwitchStream,
-  TwitchUser,
-} from './model/TwitchAPIModel.ts'
+import type { TokenData, TwitchAPIResult, TwitchStream, TwitchUser, } from './model/TwitchAPIModel.ts'
 
 export class TwitchAPI {
   private env: Env
@@ -170,8 +165,8 @@ export class TwitchAPI {
         }
       }
 
-      const data = (await response.json()) as TwitchUser[]
-      return { data, error: null }
+      const data = (await response.json()) as TwitchAPIResult<TwitchUser[]>
+      return data
     } catch (error) {
       return {
         data: null,
