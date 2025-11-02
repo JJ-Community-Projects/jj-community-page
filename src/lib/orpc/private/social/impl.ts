@@ -4,10 +4,7 @@ import { dbMiddleware } from '../../middleware/dbMiddleware.ts'
 import { authMiddleware } from '../../middleware/authMiddleware.ts'
 import { and, eq } from 'drizzle-orm'
 import { TwitchAPI } from '../../../twitchAPI.ts'
-import {
-  twitchChannelSchema,
-  twitchStreamSchema,
-} from '../../../db/schema/twitch-channel-schema.ts'
+import { twitchChannelSchema, twitchStreamSchema, } from '../../../db/schema/twitch-channel-schema.ts'
 import { userSocials } from '../../../db/schema/auth-schema.ts'
 import { TiltifyAPI } from '../../../TiltifyAPI.ts'
 
@@ -19,70 +16,77 @@ const addSocial = os.addSocialContract
     const db = context.db
     const userId = context.userId
 
-    if (input.provider === 'twitch') {
-      const twitchAPI = new TwitchAPI(context.env)
+    try {
+      if (input.provider === 'twitch') {
+        const twitchAPI = new TwitchAPI(context.env)
 
-      // Extract username from Twitch URL
-      const components = input.url.split('/')
-      const username = components[components.length - 1]
+        // Extract username from Twitch URL
+        const components = input.url.split('/')
+        const username = components[components.length - 1]
 
-      // Fetch channel data from Twitch API
-      const { data, error } = await twitchAPI.fetchUserByLogin(username)
+        // Fetch channel data from Twitch API
+        const { data, error } = await twitchAPI.fetchUserByLogin(username)
 
-      if (error) {
-        throw new ORPCError('NOT_FOUND', {
-          message: `Failed to fetch Twitch channel: ${error.description}`,
-        })
-      }
+        if (error) {
+          throw new ORPCError('NOT_FOUND', {
+            message: `Failed to fetch Twitch channel: ${error.description}`,
+          })
+        }
 
-      if (!data || data.length === 0) {
-        throw new ORPCError('NOT_FOUND', {
-          message: 'Twitch channel not found',
-        })
-      }
+        if (!data || data.length === 0) {
+          throw new ORPCError('NOT_FOUND', {
+            message: 'Twitch channel not found',
+          })
+        }
 
-      const channel = data[0]
+        const channel = data[0]
 
-      // Insert or update the channel data directly in the database
-      await db
-        .insert(twitchChannelSchema)
-        .values({
-          userId: userId,
-          id: channel.id,
-          login: channel.login,
-          displayName: channel.display_name,
-          description: channel.description,
-          profileImageUrl: channel.profile_image_url,
-          offlineImageUrl: channel.offline_image_url,
-        })
-        .onConflictDoUpdate({
-          target: [twitchChannelSchema.id],
-          set: {
+        // Insert or update the channel data directly in the database
+        await db
+          .insert(twitchChannelSchema)
+          .values({
+            userId: userId,
             id: channel.id,
             login: channel.login,
             displayName: channel.display_name,
             description: channel.description,
             profileImageUrl: channel.profile_image_url,
             offlineImageUrl: channel.offline_image_url,
-          },
+          })
+          .onConflictDoUpdate({
+            target: [twitchChannelSchema.id],
+            set: {
+              id: channel.id,
+              login: channel.login,
+              displayName: channel.display_name,
+              description: channel.description,
+              profileImageUrl: channel.profile_image_url,
+              offlineImageUrl: channel.offline_image_url,
+            },
+          })
+      }
+
+      // Insert or update the social media link in the database
+      const [result] = await db
+        .insert(userSocials)
+        .values({
+          userId: userId,
+          provider: input.provider,
+          url: input.url,
         })
+        .onConflictDoUpdate({
+          target: [userSocials.userId, userSocials.provider],
+          set: { url: input.url },
+        })
+        .returning()
+
+      return result
+    } catch (e) {
+      console.error(e)
+      throw new ORPCError('INTERNAL_SERVER_ERROR', {
+        message: `Failed to add social`,
+      })
     }
-
-    // Insert or update the social media link in the database
-    const [result] = await db
-      .insert(userSocials)
-      .values({
-        userId: userId,
-        provider: input.provider,
-        url: input.url,
-      })
-      .onConflictDoUpdate({
-        target: [userSocials.userId, userSocials.provider],
-        set: { url: input.url },
-      })
-      .returning()
-
-    return result
   })
 
 const removeSocial = os.removeSocialContract
