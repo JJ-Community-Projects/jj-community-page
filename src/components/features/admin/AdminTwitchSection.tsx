@@ -17,11 +17,37 @@ export const AdminTwitchSection: Component = () => {
     }),
   )
 
+  const syncFromSocials = useMutation(() =>
+    admin.syncTwitchChannelsFromSocials.mutationOptions({
+      onSuccess: async () => {
+        // After syncing channels, refresh the stream list as new channels may appear
+        await qc.invalidateQueries({ queryKey: admin.getTwitchStreams.queryKey() })
+      },
+    }),
+  )
+
   return (
     <div class="flex flex-col gap-3 rounded border bg-white border-gray-300 p-4">
       <div class="flex items-center justify-between">
-        <h2 class="text-lg font-semibold">Twitch Live Check</h2>
+        <h2 class="text-lg font-semibold">Twitch Tools</h2>
         <div class="flex items-center gap-3">
+          <button
+            class={`rounded px-4 py-2 text-white ${
+              syncFromSocials.isPending
+                ? 'bg-gray-400'
+                : 'bg-primary hover:bg-primary-600'
+            }`}
+            disabled={syncFromSocials.isPending}
+            onClick={() => syncFromSocials.mutate()}
+          >
+            {syncFromSocials.isPending ? 'Syncing…' : 'Sync channels from socials'}
+          </button>
+          {syncFromSocials.isSuccess && (
+            <span class="text-sm text-green-700">Sync completed.</span>
+          )}
+          {syncFromSocials.isError && (
+            <span class="text-sm text-red-700">Failed to sync.</span>
+          )}
           <button
             class={`rounded px-4 py-2 text-white ${
               triggerCheck.isPending
@@ -60,8 +86,9 @@ export const AdminTwitchSection: Component = () => {
       </div>
 
       <p class="text-sm text-gray-600">
-        Manually trigger a Twitch live check for all known channels. This enqueues
-        live checks similar to the scheduled job. Below is the current status list.
+        Use these tools to manage Twitch integration:
+        - Sync channels from user socials to populate missing twitch_channels rows.
+        - Trigger live checks for all known channels. Below is the current status list.
       </p>
 
       <div class="mt-2">

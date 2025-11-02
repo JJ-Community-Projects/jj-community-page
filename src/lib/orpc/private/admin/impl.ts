@@ -4,6 +4,10 @@ import { adminAuthMiddleware } from '../../middleware/authAdminMiddleware.ts'
 import { getDB } from '../../../db/db.ts'
 import { twitchChannelSchema, twitchStreamSchema, } from '../../../db/schema/twitch-channel-schema.ts'
 import { TwitchLiveCheckQueue } from '../../../../queues/TwitchLiveCheckQueue.ts'
+import { getToken, getTwitchDataByLogins } from '../../../twitchAPIFuncs.ts'
+import { eq } from 'drizzle-orm'
+import type { TwitchUser } from '../../../model/TwitchAPIModel.ts'
+import { userSocials } from '../../../db/schema/auth-schema.ts'
 
 const os = implement(contracts).use(adminAuthMiddleware)
 
@@ -193,18 +197,107 @@ const getTwitchStreams = os.getTwitchStreamsContract.handler(
   },
 )
 
-const getGBPToEURRate = os.getGBPToEURRateContract.handler(async ({ context }) => {
-  const DO = context.env.JingleJamData
-  const stubID = DO.idFromName('JJ_API_CACHE')
-  const stub = DO.get(stubID)
-  try {
-    const value = await stub.fetchGBPToEURConversionRate()
-    return value
-  } catch (e: any) {
-    console.error('getGBPToEURRate', e)
-    throw new ORPCError('INTERNAL_SERVER_ERROR', { message: e?.message ?? 'Failed to fetch GBP→EUR rate' })
-  }
-})
+const getGBPToEURRate = os.getGBPToEURRateContract.handler(
+  async ({ context }) => {
+    const DO = context.env.JingleJamData
+    const stubID = DO.idFromName('JJ_API_CACHE')
+    const stub = DO.get(stubID)
+    try {
+      const value = await stub.fetchGBPToEURConversionRate()
+      return value
+    } catch (e: any) {
+      console.error('getGBPToEURRate', e)
+      throw new ORPCError('INTERNAL_SERVER_ERROR', {
+        message: e?.message ?? 'Failed to fetch GBP→EUR rate',
+      })
+    }
+  },
+)
+
+// Sync Twitch channels from user socials (provider: 'twitch')
+const syncTwitchChannelsFromSocials =
+  os.syncTwitchChannelsFromSocialsContract.handler(async ({ context }) => {
+    const db = context.db
+
+    // 1) Get all socials with provider = 'twitch' and extract logins via the view
+    const socials = await db
+      .select({ userId: userSocials.userId, provider: userSocials.provider, url: userSocials.url })
+      .from(userSocials)
+      .where(eq(userSocials.provider, 'twitch'))
+      .all()
+    console.log('socials', socials)
+
+    if (socials.length === 0) return
+
+    // 2) Find users who already have a twitch_channels entry
+    const existing = await db
+      .select({ userId: twitchChannelSchema.userId })
+      .from(twitchChannelSchema)
+      .all()
+
+    console.log('existing', existing)
+
+    const existingUserIds = new Set(existing.map((e) => e.userId))
+
+    // 3) Build list of missing [userId, login]
+    const missing = socials
+      .filter((s) =>  !existingUserIds.has(s.userId))
+      .map((s) => ({
+        userId: s.userId,
+        login: s.url.startsWith('http') ? s.url.split('/').toReversed()[0]: s.url,
+      }))
+
+    console.log('missing', missing)
+
+    if (missing.length === 0) return
+
+    // 4) Fetch Twitch user data for the missing logins in batches
+    // Twitch helix/users supports up to 100 logins per request
+    const token = await getToken()
+
+    const chunks: (typeof missing)[] = []
+    for (let i = 0; i < missing.length; i += 100) {
+      chunks.push(missing.slice(i, i + 100))
+    }
+
+    console.log('chunks', chunks)
+
+    const userMap = new Map<string, TwitchUser>()
+    for (const chunk of chunks) {
+      const logins = chunk.map((m) => m.login)
+      try {
+        const res = await getTwitchDataByLogins(logins, token.access_token)
+        for (const u of res.data ?? []) {
+          userMap.set(u.login.toLowerCase(), u)
+        }
+      } catch (e) {
+        console.error('Failed to fetch Twitch users for chunk', e)
+      }
+    }
+
+    // 5) Insert rows for any social whose Twitch user was resolved
+    for (const m of missing) {
+      const u = userMap.get(m.login)
+      if (!u) continue
+      try {
+        await db
+          .insert(twitchChannelSchema)
+          .values({
+            userId: m.userId,
+            id: u.id,
+            login: u.login,
+            displayName: u.display_name,
+            description: u.description ?? null,
+            profileImageUrl: u.profile_image_url ?? null,
+            offlineImageUrl: u.offline_image_url ?? null,
+          })
+          .run()
+      } catch (e) {
+        // Ignore duplicates or constraint errors to keep the job idempotent
+        console.warn('Insert twitch channel failed for', m.login, e)
+      }
+    }
+  })
 
 export const adminRouter = {
   refreshJJAPIData,
@@ -220,4 +313,5 @@ export const adminRouter = {
   triggerTwitchLiveCheck,
   getTwitchStreams,
   getGBPToEURRate,
+  syncTwitchChannelsFromSocials,
 }

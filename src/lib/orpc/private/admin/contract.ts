@@ -71,6 +71,8 @@ const getTwitchStreamsContract = oc.output(z.array(twitchStreamListItemSchema))
 
 const getGBPToEURRateContract = oc.output(z.number())
 
+const syncTwitchChannelsFromSocialsContract = oc.input(z.void()).output(z.void())
+
 export const contracts = {
   refreshJJAPIDataContract,
   addStringConfigContract,
@@ -85,4 +87,5 @@ export const contracts = {
   triggerTwitchLiveCheckContract,
   getTwitchStreamsContract,
   getGBPToEURRateContract,
+  syncTwitchChannelsFromSocialsContract,
 }
