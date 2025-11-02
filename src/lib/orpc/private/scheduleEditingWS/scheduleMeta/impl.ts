@@ -11,11 +11,7 @@ import {
 import { scheduleOwnerOrEditorMiddleware } from '../middleware.ts'
 import { ensureDraftInitialized } from '../utils.ts'
 import { and, eq, inArray, sql } from 'drizzle-orm'
-import {
-  schedulesTable,
-  streamParticipantsTable,
-  streamsTable,
-} from '../../../../db/schema/jj-schema.ts'
+import { schedulesTable, streamParticipantsTable, streamsTable, } from '../../../../db/schema/jj-schema.ts'
 import { editSchedulesTable } from '../../../../db/schema/edit-schedules-schema.ts'
 import { editStreamsTable } from '../../../../db/schema/edit-streams-schema.ts'
 import { editStreamParticipantsTable } from '../../../../db/schema/edit-stream-participants-schema.ts'
@@ -107,6 +103,8 @@ const publishDraft = os.publishDraftContract
     const db = context.db
     const editorId = context.userId
     const { scheduleId } = input
+
+    await ensureDraftInitialized(db, scheduleId, editorId)
 
     // 1) Apply schedule-level metadata from the draft to the canonical schedule, if any fields were edited
     const draftMeta = await db
