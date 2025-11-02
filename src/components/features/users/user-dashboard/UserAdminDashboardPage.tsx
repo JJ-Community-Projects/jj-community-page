@@ -3,13 +3,12 @@ import { UserProvider } from './providers/UserProvider.tsx'
 import type { User } from '../../../../lib/auth/User.ts'
 import './UserAdminDashboardPage.css'
 import { orpcPrivate } from '../../../../lib/orpc/client.ts'
-import { QueryClientProvider, useQuery, useQueryClient, } from '@tanstack/solid-query'
+import { QueryClientProvider, useQuery } from '@tanstack/solid-query'
 import { QueryClient } from '@tanstack/query-core'
 import { FaSolidArrowUpRightFromSquare, FaSolidUser } from 'solid-icons/fa'
 import { UserDashboardCards } from './UserDashboardCards.tsx'
 
 const ProfileCard: Component = () => {
-  const queryClient = useQueryClient()
 
   const user = useQuery(() =>
     orpcPrivate.users.getCurrentUser.queryOptions({
