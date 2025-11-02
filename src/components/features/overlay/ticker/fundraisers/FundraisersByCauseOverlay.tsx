@@ -13,7 +13,7 @@ export type CauseFundraiserProps = {
   theme?: 'default' | 'red' | 'blue'
   speed?: number
   showRaised?: boolean
-  currency?: 'GBP' | 'USD'
+  currency?: 'GBP' | 'USD' | 'EUR'
   user?: string
 }
 

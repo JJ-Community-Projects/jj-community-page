@@ -7,7 +7,7 @@ import { useUser } from '../../users/user-dashboard/providers/UserProvider.tsx'
 type Theme2 = 'default' | 'red' | 'blue' | 'carousel'
 type HeaderTheme2 = 'default' | 'red' | 'blue'
 
-type Currency = 'GBP' | 'USD'
+type Currency = 'GBP' | 'USD' | 'EUR'
 
  export const CharitiesConfigurator: Component<{ visible?: boolean }> = (p) => {
   // Header selection via checkboxes (mirrors V1 behavior but easier UX)
@@ -109,6 +109,7 @@ type Currency = 'GBP' | 'USD'
               >
                 <option value="GBP">GBP</option>
                 <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
               </select>
             </FieldRow>
             <FieldRow label="Header Cards">

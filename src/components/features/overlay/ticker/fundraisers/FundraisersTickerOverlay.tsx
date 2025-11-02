@@ -12,7 +12,7 @@ export type FundraisersOrder = 'recent' | 'top' | 'alphabetical'
 type Props = {
   orderBy?: FundraisersOrder
   pageSize?: number
-  currency?: 'GBP' | 'USD'
+  currency?: 'GBP' | 'USD' | 'EUR'
   theme?: 'default' | 'red' | 'blue'
   showRaised?: boolean
   user?: string

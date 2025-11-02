@@ -139,7 +139,7 @@ export type Props = {
   showUrl?: boolean
   causes?: number[]
   user?: string
-  currency?: 'GBP' | 'USD'
+  currency?: 'GBP' | 'USD' | 'EUR'
 }
 
 function clamp(n: number, min: number, max: number) {

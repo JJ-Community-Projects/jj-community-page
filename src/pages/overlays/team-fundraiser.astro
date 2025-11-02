@@ -13,7 +13,7 @@ const team = teamParam ?? undefined
 const theme = (themeParam as any) ?? undefined
 const speed = speedParam ? Number(speedParam) : undefined
 const showRaised = showRaisedParam === '1' || showRaisedParam === 'true' || showRaisedParam === null ? true : false
-const currency = currencyParam === 'USD' ? 'USD' : 'GBP'
+const currency = (() => { const v = (currencyParam ?? 'GBP').toUpperCase(); return v === 'USD' ? 'USD' : v === 'EUR' ? 'EUR' : 'GBP' })()
 const user = userParam ?? undefined
 ---
 

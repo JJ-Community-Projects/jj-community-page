@@ -43,7 +43,7 @@ export const SimpleScheduleViewSchema = z.object({
   blocks: z.array(SimpleScheduleBlockSchema),
 })
 export type SimpleScheduleViewT = z.infer<typeof SimpleScheduleViewSchema>
-
+const Currency = z.enum(['USD', 'GBP', 'EUR']).default('GBP')
 // ----------------------
 // Routes
 // ----------------------
@@ -51,7 +51,7 @@ export type SimpleScheduleViewT = z.infer<typeof SimpleScheduleViewSchema>
 const charitiesContract = oc
   .input(
     z.object({
-      currency: z.enum(['USD', 'GBP']).default('GBP'),
+      currency: Currency,
       user: z.string().optional(),
     }),
   )
@@ -77,7 +77,7 @@ const fundraisersContract = oc
     z.object({
       orderBy: z.enum(['recent', 'top', 'alphabetical']).optional(),
       pageSize: z.number().int().min(1).max(200).optional(),
-      currency: z.enum(['USD', 'GBP']).default('GBP'),
+      currency: Currency,
       user: z.string().optional(),
     }),
   )
@@ -94,7 +94,7 @@ const teamFundraisersContract = oc
     z.object({
       teamSlug: z.string().min(1),
       orderBy: z.enum(['recent', 'top', 'alphabetical']).optional(),
-      currency: z.enum(['USD', 'GBP']).default('GBP'),
+      currency: Currency,
       user: z.string().optional(),
     }),
   )
@@ -111,7 +111,7 @@ const causeFundraisersContract = oc
     z.object({
       causeId: z.number().int().nonnegative(),
       orderBy: z.enum(['recent', 'top', 'alphabetical']).optional(),
-      currency: z.enum(['USD', 'GBP']).default('GBP'),
+      currency: Currency,
       user: z.string().optional(),
     }),
   )

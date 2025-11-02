@@ -21,11 +21,14 @@ function clamp(n: number, min: number, max: number) {
 function campaignMapper(
   c: JJCampaign,
   currency: string,
-  avgConversionRate: number,
+  usdRate: number,
+  eurRate: number,
 ): FundraiserItem {
-  const cur = currency === 'USD' ? 'USD' : 'GBP'
-  const locale = cur === 'USD' ? 'en-US' : 'en-GB'
-  const raised = cur === 'USD' ? c.raised * avgConversionRate : c.raised
+  const cur = currency === 'USD' ? 'USD' : currency === 'EUR' ? 'EUR' : 'GBP'
+  const locale = cur === 'USD' ? 'en-US' : cur === 'EUR' ? 'de-DE' : 'en-GB'
+  const raisedGBP = c.raised
+  const raised = cur === 'USD' ? raisedGBP * usdRate : cur === 'EUR' ? raisedGBP * eurRate : raisedGBP
+
   const raisedFormatted = Intl.NumberFormat(locale, {
     style: 'currency',
     currency: cur,
@@ -44,7 +47,8 @@ async function campaignBySlug(
   db: JJDrizzleDatabase,
   slug: string,
   currency: string,
-  avgConversionRate: number,
+  usdRate: number,
+  eurRate: number,
 ) {
   const userCampaign = await db
     .select()
@@ -75,7 +79,7 @@ async function campaignBySlug(
       },
     }
   }
-  return jjC ? campaignMapper(jjC, currency, avgConversionRate) : null
+  return jjC ? campaignMapper(jjC, currency, usdRate, eurRate) : null
 }
 
 // ----------------------
@@ -89,19 +93,21 @@ const charities = os.charitiesContract.handler(async ({ input, context }) => {
   const stub = DO.get(stubID)
   const causes = await stub.getCauses()
   const avgConversionRate = await stub.getAvgConversionRate()
+  const eurRate = await stub.getGbpToEurRate()
 
   const userFundraiser = await campaignBySlug(
     context.db,
     input.user ?? '',
     currency,
     avgConversionRate,
+    eurRate,
   )
 
   if (!causes?.length) {
     return { userFundraiser, charities: [] }
   }
 
-  const locale = currency === 'USD' ? 'en-US' : 'en-GB'
+  const locale = currency === 'USD' ? 'en-US' : currency === 'EUR' ? 'de-DE' : 'en-GB'
   const formatter = Intl.NumberFormat(locale, {
     style: 'currency',
     currency: currency,
@@ -109,7 +115,8 @@ const charities = os.charitiesContract.handler(async ({ input, context }) => {
   const items = causes.map((cause) => {
     const raisedGBP = cause?.raised?.total.gbp ?? 0
     const raisedUSD = cause?.raised?.total.usd ?? 0
-    const convertedRaised = currency === 'USD' ? raisedUSD : raisedGBP
+    const raisedEUR = cause?.raised?.total.euro ?? 0
+    const convertedRaised = currency === 'USD' ? raisedUSD : currency === 'EUR' ? raisedEUR : raisedGBP
     const raisedFormatted = formatter.format(convertedRaised)
     return {
       id: Number(cause.id),
@@ -177,15 +184,17 @@ const fundraisers = os.fundraisersContract.handler(
     const stub = DO.get(stubID)
     const list = await stub.getCampaigns()
     const avgConversionRate = await stub.getAvgConversionRate()
+    const eurRate = await stub.getGbpToEurRate()
 
     const userFundraiser = await campaignBySlug(
       context.db,
       input.user ?? '',
       currency,
       avgConversionRate,
+      eurRate,
     )
 
-    console.log('userFundraiser', userFundraiser)
+    // console.log('userFundraiser', userFundraiser)
 
     if (!list?.length) {
       return {
@@ -193,11 +202,9 @@ const fundraisers = os.fundraisersContract.handler(
         fundraisers: [],
       }
     }
-    list.forEach((c) =>{
-      console.log(c)
-    })
+
     const mapped = list.map((c) =>
-      campaignMapper(c, currency, avgConversionRate),
+      campaignMapper(c, currency, avgConversionRate, eurRate),
     )
 
     switch (orderBy) {
@@ -288,6 +295,7 @@ const teamFundraisers = os.teamFundraisersContract.handler(
     const stub = DO.get(stubID)
     const list = await stub.getCampaigns()
     const avgConversionRate = await stub.getAvgConversionRate()
+    const eurRate = await stub.getGbpToEurRate()
     if (!list?.length) {
       throw new ORPCError('BAD_REQUEST')
     }
@@ -299,7 +307,7 @@ const teamFundraisers = os.teamFundraisersContract.handler(
     })
 
     const mapped = filtered.map((c) =>
-      campaignMapper(c, currency, avgConversionRate),
+      campaignMapper(c, currency, avgConversionRate, eurRate),
     )
 
     switch (orderBy) {
@@ -318,6 +326,7 @@ const teamFundraisers = os.teamFundraisersContract.handler(
       input.user ?? '',
       currency,
       avgConversionRate,
+      eurRate,
     )
     return {
       teamName: team.name,
@@ -348,12 +357,14 @@ const causeFundraisers = os.causeFundraisersContract.handler(
     const stub = DO.get(stubID)
     const list = await stub.getCampaignsForCause(causeId)
     const avgConversionRate = await stub.getAvgConversionRate()
+    const eurRate = await stub.getGbpToEurRate()
 
     const userFundraiser = await campaignBySlug(
       context.db,
       input.user ?? '',
       currency,
       avgConversionRate,
+      eurRate,
     )
 
     if (!list?.length) {
@@ -364,7 +375,7 @@ const causeFundraisers = os.causeFundraisersContract.handler(
     }
 
     const mapped = list.map((c) =>
-      campaignMapper(c, currency, avgConversionRate),
+      campaignMapper(c, currency, avgConversionRate, eurRate),
     )
 
     switch (orderBy) {

@@ -11,7 +11,7 @@ const orderBy =
     ? orderByParam
     : 'recent'
 const pageSize = pageSizeParam ? Number(pageSizeParam) : undefined
-const currency = currencyParam === 'USD' ? 'USD' : 'GBP'
+const currency = (() => { const v = (currencyParam ?? 'GBP').toUpperCase(); return v === 'USD' ? 'USD' : v === 'EUR' ? 'EUR' : 'GBP' })()
 const user = userParam ?? undefined
 ---
 

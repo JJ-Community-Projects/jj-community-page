@@ -23,7 +23,7 @@ const qrCode = (() => {
 })()
 const currency = (() => {
   const v = (currencyParam ?? 'GBP').toUpperCase()
-  return v === 'USD' ? 'USD' : 'GBP'
+  return v === 'USD' ? 'USD' : v === 'EUR' ? 'EUR' : 'GBP'
 })()
 const showUrl = showUrlParam === undefined ? undefined : (showUrlParam === 'true' || showUrlParam === '1')
 const causes = causesParam

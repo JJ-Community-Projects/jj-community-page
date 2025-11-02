@@ -14,7 +14,7 @@ export const FundraisersByCauseConfigurator: Component<{
   const [theme, setTheme] = createSignal<'default' | 'red' | 'blue'>('default')
   const [showRaised, setShowRaised] = createSignal<boolean>(true)
   const [causeId, setCauseId] = createSignal<number | ''>('')
-  const [currency, setCurrency] = createSignal<'GBP' | 'USD'>('GBP')
+  const [currency, setCurrency] = createSignal<'GBP' | 'USD' | 'EUR'>('GBP')
 
   // Load causes to populate selector
   const causesQ = useQuery(() =>
@@ -72,11 +72,12 @@ export const FundraisersByCauseConfigurator: Component<{
       <FieldRow label="Currency">
         <select
           value={currency()}
-          onChange={(e) => setCurrency(e.currentTarget.value as 'GBP' | 'USD')}
+          onChange={(e) => setCurrency(e.currentTarget.value as 'GBP' | 'USD' | 'EUR')}
           class="w-40 rounded bg-black/40 px-2 py-1"
         >
           <option value="GBP">GBP</option>
           <option value="USD">USD</option>
+          <option value="EUR">EUR</option>
         </select>
       </FieldRow>
       <FieldRow label="Show Raised">

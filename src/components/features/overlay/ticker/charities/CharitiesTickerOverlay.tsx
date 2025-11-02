@@ -24,7 +24,7 @@ export type CharitiesProps = {
   url?: string
   titleLogo?: string
   user?: string
-  currency?: 'GBP' | 'USD'
+  currency?: 'GBP' | 'USD' | 'EUR'
 }
 
 export const CharitiesTickerOverlay: Component<CharitiesProps> = (props) => {
@@ -56,7 +56,7 @@ const Body: Component<{
   url: string
   titleLogo: string
   user?: string
-  currency: 'GBP' | 'USD'
+  currency: 'GBP' | 'USD' | 'EUR'
 }> = (props) => {
   const q = useQuery(() =>
     orpcPrivate.overlay.charities.queryOptions({

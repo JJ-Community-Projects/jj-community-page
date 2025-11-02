@@ -8,7 +8,7 @@ const userParam = Astro.url.searchParams.get('user')
 
 const theme = (themeParam as any) ?? undefined
 const speed = speedParam ? Number(speedParam) : undefined
-const currency = currencyParam === 'USD' ? 'USD' : 'GBP'
+const currency = (() => { const v = (currencyParam ?? 'GBP').toUpperCase(); return v === 'USD' ? 'USD' : v === 'EUR' ? 'EUR' : 'GBP' })()
 const user = userParam ?? undefined
 
 ---

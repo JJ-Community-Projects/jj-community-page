@@ -12,7 +12,7 @@ export type TeamFundraiserProps = {
   teamSlug?: string
   theme?: 'default' | 'red' | 'blue'
   showRaised?: boolean
-  currency?: 'GBP' | 'USD'
+  currency?: 'GBP' | 'USD' | 'EUR'
   user?: string
 }
 

@@ -6,7 +6,7 @@ export const CharitiesTickerConfigurator: Component<{ visible?: boolean }> = (
   p,
 ) => {
   const [theme, setTheme] = createSignal<string>('default')
-  const [currency, setCurrency] = createSignal<'GBP' | 'USD'>('GBP')
+  const [currency, setCurrency] = createSignal<'GBP' | 'USD' | 'EUR'>('GBP')
 
   const { user } = useUser()
 
@@ -38,11 +38,12 @@ export const CharitiesTickerConfigurator: Component<{ visible?: boolean }> = (
       <FieldRow label="Currency">
         <select
           value={currency()}
-          onChange={(e) => setCurrency(e.currentTarget.value as 'GBP' | 'USD')}
+          onChange={(e) => setCurrency(e.currentTarget.value as 'GBP' | 'USD' | 'EUR')}
           class="w-40 rounded bg-black/40 px-2 py-1"
         >
           <option value="GBP">GBP</option>
           <option value="USD">USD</option>
+          <option value="EUR">EUR</option>
         </select>
       </FieldRow>
       <LinkPreview url={charitiesUrl()} />
