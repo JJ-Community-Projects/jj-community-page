@@ -295,10 +295,7 @@ export class JingleJamData extends DurableObject<Env> {
   public async validateTwitchChannels() {
     const api = new TwitchAPI(this.env)
 
-    const rawLogins = await this.getTwitchLoginsFromCampaigns()
-    const logins = rawLogins
-      .map((l) => this.normalizeTwitchLogin(l))
-      .filter((l) => l)
+    const logins = await this.getTwitchLoginsFromCampaigns()
 
     console.log('validateTwitchChannels', 'logins', logins)
 
@@ -311,7 +308,7 @@ export class JingleJamData extends DurableObject<Env> {
     )
     // Normalize previously stored invalid logins for proper comparison
     const storedInvalidSet = new Set(
-      storedInvalidLogins.map((l) => this.normalizeTwitchLogin(l)),
+      storedInvalidLogins,
     )
 
     console.log(
@@ -493,6 +490,9 @@ export class JingleJamData extends DurableObject<Env> {
     s = s.replace(/^(www\.)?twitch\.tv\//i, '')
     // Take only the first path segment, drop query/fragment
     s = s.split(/[\/?#]/)[0]
+    if (this.replaceMap.has(s)) {
+      s = this.replaceMap.get(s) ?? ''
+    }
     return s
   }
 
@@ -539,15 +539,8 @@ export class JingleJamData extends DurableObject<Env> {
         let twitch: JJCampaignType['twitch'] | undefined = undefined
         let login =
           c.livestream?.type === 'twitch' && c.livestream?.channel
-            ? String(c.livestream.channel).toLowerCase()
+            ? this.normalizeTwitchLogin(String(c.livestream.channel).toLowerCase())
             : ''
-        const value = this.replaceMap.get(login)
-
-        if (value) {
-          login = value
-        }
-
-        login = this.normalizeTwitchLogin(login)
 
         let twitchId = ''
         if (login) {
@@ -711,6 +704,7 @@ export class JingleJamData extends DurableObject<Env> {
     return campaigns
       .filter((c) => c.livestream?.type === 'twitch')
       .map((c) => c.livestream?.channel)
-      .filter((c) => c) as string[]
+      .filter((c) => c !== null)
+      .filter(c => this.normalizeTwitchLogin(c)) as string[]
   }
 }
