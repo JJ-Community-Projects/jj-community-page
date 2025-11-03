@@ -1,9 +1,9 @@
-import type { MessageSendRequest } from '@cloudflare/workers-types/experimental/index.ts'
-import { TwitchAPI } from '../lib/twitchAPI.ts'
-import { getDB } from '../lib/db/db.ts'
-import { twitchStreamSchema } from '../lib/db/schema/twitch-channel-schema.ts'
-import { and, inArray, notInArray } from 'drizzle-orm'
-import type { TwitchStream } from '../lib/model/TwitchAPIModel.ts'
+import type {MessageSendRequest} from '@cloudflare/workers-types/experimental/index.ts'
+import {TwitchAPI} from '../lib/twitchAPI.ts'
+import {getDB} from '../lib/db/db.ts'
+import {twitchStreamSchema} from '../lib/db/schema/twitch-channel-schema.ts'
+import {and, inArray, notInArray} from 'drizzle-orm'
+import type {TwitchStream} from '../lib/model/TwitchAPIModel.ts'
 
 export class TwitchLiveCheckQueue {
   sendIds(ids: string[], env: Env) {
@@ -168,8 +168,8 @@ export class TwitchLiveCheckQueue {
 
           // Chunk inserts to avoid SQLite/D1 parameter limits (~999 params per statement)
           const COLUMNS_PER_ROW = 14 // Keep in sync with values() fields above
-          const MAX_PARAMS = 999
-          const SAFETY_MARGIN = 0 // can be adjusted if needed
+          const MAX_PARAMS = 50
+          const SAFETY_MARGIN = 1 // can be adjusted if needed
           const MAX_ROWS_PER_INSERT = Math.max(
             1,
             Math.floor((MAX_PARAMS - SAFETY_MARGIN) / COLUMNS_PER_ROW),
