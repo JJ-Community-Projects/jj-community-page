@@ -57,6 +57,12 @@ const deleteKVValueContract = oc
 
 const triggerTwitchLiveCheckContract = oc.input(z.void()).output(z.void())
 
+// New admin procedures for Twitch/channel data
+const getAllTwitchChannelsContract = oc.output(z.array(z.string()))
+const getAllLiveChannelsContract = oc.output(z.array(z.string()))
+const validateTwitchChannelsContract = oc.input(z.void()).output(z.void())
+const checkLiveStreamsContract = oc.input(z.void()).output(z.void())
+
 const twitchStreamListItemSchema = z.object({
   userLogin: z.string(),
   displayName: z.string().optional(),
@@ -85,6 +91,11 @@ export const contracts = {
   putKVValueContract,
   deleteKVValueContract,
   triggerTwitchLiveCheckContract,
+  // new exports
+  getAllTwitchChannelsContract,
+  getAllLiveChannelsContract,
+  validateTwitchChannelsContract,
+  checkLiveStreamsContract,
   getTwitchStreamsContract,
   getGBPToEURRateContract,
   syncTwitchChannelsFromSocialsContract,

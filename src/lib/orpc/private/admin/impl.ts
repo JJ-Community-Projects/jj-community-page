@@ -299,6 +299,65 @@ const syncTwitchChannelsFromSocials =
     }
   })
 
+// New admin handlers for Twitch/channel data
+const getAllTwitchChannels = os.getAllTwitchChannelsContract.handler(
+  async ({ context }) => {
+    const DO = context.env.JingleJamData
+    const stubID = DO.idFromName('JJ_API_CACHE')
+    const stub = DO.get(stubID)
+    try {
+      const channels = await stub.getAllTwitchLogins()
+      return channels
+    } catch (e) {
+      console.error('getAllTwitchChannels', e)
+      throw new ORPCError('INTERNAL_SERVER_ERROR')
+    }
+  },
+)
+
+const getAllLiveChannels = os.getAllLiveChannelsContract.handler(
+  async ({ context }) => {
+    const DO = context.env.JingleJamData
+    const stubID = DO.idFromName('JJ_API_CACHE')
+    const stub = DO.get(stubID)
+    try {
+      const channels = await stub.getLiveLogins()
+      return channels
+    } catch (e) {
+      console.error('getAllLiveChannels', e)
+      throw new ORPCError('INTERNAL_SERVER_ERROR')
+    }
+  },
+)
+
+const validateTwitchChannels = os.validateTwitchChannelsContract.handler(
+  async ({ context }) => {
+    const DO = context.env.JingleJamData
+    const stubID = DO.idFromName('JJ_API_CACHE')
+    const stub = DO.get(stubID)
+    try {
+      await stub.validateTwitchChannels()
+    } catch (e) {
+      console.error('validateTwitchChannels', e)
+      throw new ORPCError('INTERNAL_SERVER_ERROR')
+    }
+  },
+)
+
+const checkLiveStreams = os.checkLiveStreamsContract.handler(
+  async ({ context }) => {
+    const DO = context.env.JingleJamData
+    const stubID = DO.idFromName('JJ_API_CACHE')
+    const stub = DO.get(stubID)
+    try {
+      await stub.checkLiveStreams()
+    } catch (e) {
+      console.error('checkLiveStreams', e)
+      throw new ORPCError('INTERNAL_SERVER_ERROR')
+    }
+  },
+)
+
 export const adminRouter = {
   refreshJJAPIData,
   addStringConfig,
@@ -314,4 +373,9 @@ export const adminRouter = {
   getTwitchStreams,
   getGBPToEURRate,
   syncTwitchChannelsFromSocials,
+  // new
+  getAllTwitchChannels,
+  getAllLiveChannels,
+  validateTwitchChannels,
+  checkLiveStreams,
 }

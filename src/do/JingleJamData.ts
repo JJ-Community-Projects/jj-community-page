@@ -377,6 +377,11 @@ export class JingleJamData extends DurableObject<Env> {
     return this.getStringArray('twitch:validLogins')
   }
 
+  // Returns all Twitch channels (logins) referenced by current campaigns
+  public async getAllTwitchLogins() {
+    return this.getTwitchLoginsFromCampaigns()
+  }
+
   // GBP->EUR conversion via Google Finance
   public async fetchGBPToEURConversionRate() {
     const url = 'https://www.google.com/finance/quote/GBP-EUR'

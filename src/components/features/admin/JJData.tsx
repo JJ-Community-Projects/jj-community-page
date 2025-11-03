@@ -10,18 +10,35 @@ export const JJData: Component = () => {
   const refresh = useMutation(() =>
     admin.refreshJJAPIData.mutationOptions({
       onSuccess: async () => {
-        await client.invalidateQueries({
-          queryKey: jjData.causes.queryKey(),
-        })
-        /*
-        await client.invalidateQueries({
-          queryKey: jjData.campaigns.queryKey(),
-        }*/
+        await client.invalidateQueries({ queryKey: jjData.causes.queryKey() })
+        await client.invalidateQueries({ queryKey: admin.getAllTwitchChannels.queryKey() })
+        await client.invalidateQueries({ queryKey: admin.getAllLiveChannels.queryKey() })
       },
     }),
   )
 
+  // Queries
   const causes = useQuery(() => jjData.causes.queryOptions())
+  const allTwitchChannels = useQuery(() => admin.getAllTwitchChannels.queryOptions())
+  const allLiveChannels = useQuery(() => admin.getAllLiveChannels.queryOptions())
+
+  // Mutations
+  const validateTwitchChannels = useMutation(() =>
+    admin.validateTwitchChannels.mutationOptions({
+      onSuccess: async () => {
+        await client.invalidateQueries({ queryKey: admin.getAllTwitchChannels.queryKey() })
+      },
+    }),
+  )
+
+  const checkLiveStreams = useMutation(() =>
+    admin.checkLiveStreams.mutationOptions({
+      onSuccess: async () => {
+        await client.invalidateQueries({ queryKey: admin.getAllLiveChannels.queryKey() })
+      },
+    }),
+  )
+
   // const campaigns = useQuery(() => jjData.campaigns.queryOptions())
 
   createEffect(
@@ -42,11 +59,61 @@ export const JJData: Component = () => {
   )
 
   return (
-    <div class="flex flex-col text-black">
-      <button class={'bg-accent text-white'} onClick={refresh.mutate}>
-        Refresh
-      </button>
-      <p>{causes.status}</p>
+    <div class="flex flex-col text-black gap-4">
+      <div class="flex items-center gap-2">
+        <button class={'bg-accent text-white px-3 py-1 rounded'} onClick={refresh.mutate}>
+          Refresh JJ API Data
+        </button>
+        <span class="text-sm text-gray-600">{refresh.status}</span>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2">
+        <button class="bg-blue-600 text-white px-3 py-1 rounded" onClick={() => validateTwitchChannels.mutate()}>
+          Validate Twitch Channels
+        </button>
+        <span class="text-xs text-gray-600">{validateTwitchChannels.status}</span>
+        <button class="bg-purple-600 text-white px-3 py-1 rounded" onClick={() => checkLiveStreams.mutate()}>
+          Check Live Streams
+        </button>
+        <span class="text-xs text-gray-600">{checkLiveStreams.status}</span>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="rounded border border-gray-200 bg-white p-4 shadow-sm">
+          <h3 class="font-semibold mb-2">All Twitch Channels</h3>
+          <Show when={allTwitchChannels.data} fallback={<p class="text-sm text-gray-500">Loading…</p>}>
+            {(d) => (
+              <ul class="list-disc pl-5 space-y-1">
+                <For each={d()}>{(login) => (
+                  <li class="text-sm">
+                    <a class="text-accent underline" href={`https://twitch.tv/${login}`} target="_blank" rel="noreferrer">
+                      {login}
+                    </a>
+                  </li>
+                )}</For>
+              </ul>
+            )}
+          </Show>
+        </div>
+
+        <div class="rounded border border-gray-200 bg-white p-4 shadow-sm">
+          <h3 class="font-semibold mb-2">Live Channels</h3>
+          <Show when={allLiveChannels.data} fallback={<p class="text-sm text-gray-500">Loading…</p>}>
+            {(d) => (
+              <ul class="list-disc pl-5 space-y-1">
+                <For each={d()}>{(login) => (
+                  <li class="text-sm">
+                    <a class="text-accent underline" href={`https://twitch.tv/${login}`} target="_blank" rel="noreferrer">
+                      {login}
+                    </a>
+                  </li>
+                )}</For>
+              </ul>
+            )}
+          </Show>
+        </div>
+      </div>
+
       <Show when={causes.data}>
         {(causes) => {
           return (
