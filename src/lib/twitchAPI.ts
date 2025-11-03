@@ -1,4 +1,9 @@
-import type { TokenData, TwitchAPIResult, TwitchStream, TwitchUser, } from './model/TwitchAPIModel.ts'
+import type {
+  TokenData,
+  TwitchAPIResult,
+  TwitchStream,
+  TwitchUser,
+} from './model/TwitchAPIModel.ts'
 
 export class TwitchAPI {
   private env: Env
@@ -637,8 +642,10 @@ export class TwitchAPI {
    */
   private async storeToken(tokenData: TokenData): Promise<void> {
     try {
+      const expirationTtl = Number((tokenData.expires_in / 1000).toFixed(0))
+      console.log('storeToken', 'tokenData', tokenData, expirationTtl)
       await this.env.KV.put('twitch:app_token', JSON.stringify(tokenData), {
-        expirationTtl: tokenData.expires_in,
+        expirationTtl: expirationTtl,
       })
     } catch (error) {
       console.error('Error storing Twitch token in KV:', error)

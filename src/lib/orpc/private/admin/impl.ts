@@ -17,6 +17,7 @@ const refreshJJAPIData = os.refreshJJAPIDataContract.handler(
     const stubID = DO.idFromName('JJ_API_CACHE')
     const stub = DO.get(stubID)
     try {
+      await stub.refresh()
       await stub.validateTwitchChannels()
       await stub.checkLiveStreams()
       await stub.refresh()
@@ -299,6 +300,21 @@ const syncTwitchChannelsFromSocials =
     }
   })
 
+// Admin handler to clear JJ DO storage
+const clearJingleJamData = os.clearJingleJamDataContract.handler(
+  async ({ context }) => {
+    const DO = context.env.JingleJamData
+    const stubID = DO.idFromName('JJ_API_CACHE')
+    const stub = DO.get(stubID)
+    try {
+      await stub.clear()
+    } catch (e) {
+      console.error('clearJingleJamData', e)
+      throw new ORPCError('INTERNAL_SERVER_ERROR')
+    }
+  },
+)
+
 // New admin handlers for Twitch/channel data
 const getAllTwitchChannels = os.getAllTwitchChannelsContract.handler(
   async ({ context }) => {
@@ -358,6 +374,36 @@ const checkLiveStreams = os.checkLiveStreamsContract.handler(
   },
 )
 
+// Invalid Twitch channels handlers
+const getInvalidTwitchChannels = os.getInvalidTwitchChannelsContract.handler(
+  async ({ context }) => {
+    const DO = context.env.JingleJamData
+    const stubID = DO.idFromName('JJ_API_CACHE')
+    const stub = DO.get(stubID)
+    try {
+      const channels = await stub.getInvalidTwitchLogins()
+      return channels
+    } catch (e) {
+      console.error('getInvalidTwitchChannels', e)
+      throw new ORPCError('INTERNAL_SERVER_ERROR')
+    }
+  },
+)
+
+const clearInvalidTwitchChannels = os.clearInvalidTwitchChannelsContract.handler(
+  async ({ context }) => {
+    const DO = context.env.JingleJamData
+    const stubID = DO.idFromName('JJ_API_CACHE')
+    const stub = DO.get(stubID)
+    try {
+      await stub.clearInvalidTwitchLogins()
+    } catch (e) {
+      console.error('clearInvalidTwitchChannels', e)
+      throw new ORPCError('INTERNAL_SERVER_ERROR')
+    }
+  },
+)
+
 export const adminRouter = {
   refreshJJAPIData,
   addStringConfig,
@@ -374,8 +420,11 @@ export const adminRouter = {
   getGBPToEURRate,
   syncTwitchChannelsFromSocials,
   // new
+  clearJingleJamData,
   getAllTwitchChannels,
   getAllLiveChannels,
   validateTwitchChannels,
   checkLiveStreams,
+  getInvalidTwitchChannels,
+  clearInvalidTwitchChannels,
 }

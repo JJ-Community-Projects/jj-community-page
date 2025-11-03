@@ -57,11 +57,20 @@ const deleteKVValueContract = oc
 
 const triggerTwitchLiveCheckContract = oc.input(z.void()).output(z.void())
 
+// Clear JJ DO storage
+const clearJingleJamDataContract = oc.input(z.void()).output(z.void())
+
+// New admin procedures for Twitch/channel data
+
 // New admin procedures for Twitch/channel data
 const getAllTwitchChannelsContract = oc.output(z.array(z.string()))
 const getAllLiveChannelsContract = oc.output(z.array(z.string()))
 const validateTwitchChannelsContract = oc.input(z.void()).output(z.void())
 const checkLiveStreamsContract = oc.input(z.void()).output(z.void())
+
+// Invalid Twitch channels admin contracts
+const getInvalidTwitchChannelsContract = oc.output(z.array(z.string()))
+const clearInvalidTwitchChannelsContract = oc.input(z.void()).output(z.void())
 
 const twitchStreamListItemSchema = z.object({
   userLogin: z.string(),
@@ -92,6 +101,7 @@ export const contracts = {
   deleteKVValueContract,
   triggerTwitchLiveCheckContract,
   // new exports
+  clearJingleJamDataContract,
   getAllTwitchChannelsContract,
   getAllLiveChannelsContract,
   validateTwitchChannelsContract,
@@ -99,4 +109,6 @@ export const contracts = {
   getTwitchStreamsContract,
   getGBPToEURRateContract,
   syncTwitchChannelsFromSocialsContract,
+  getInvalidTwitchChannelsContract,
+  clearInvalidTwitchChannelsContract,
 }

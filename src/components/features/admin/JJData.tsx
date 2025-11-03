@@ -11,22 +11,41 @@ export const JJData: Component = () => {
     admin.refreshJJAPIData.mutationOptions({
       onSuccess: async () => {
         await client.invalidateQueries({ queryKey: jjData.causes.queryKey() })
-        await client.invalidateQueries({ queryKey: admin.getAllTwitchChannels.queryKey() })
-        await client.invalidateQueries({ queryKey: admin.getAllLiveChannels.queryKey() })
+        await client.invalidateQueries({
+          queryKey: admin.getAllTwitchChannels.queryKey(),
+        })
+        await client.invalidateQueries({
+          queryKey: admin.getAllLiveChannels.queryKey(),
+        })
+        await client.invalidateQueries({
+          queryKey: admin.getInvalidTwitchChannels.queryKey(),
+        })
       },
     }),
   )
 
   // Queries
   const causes = useQuery(() => jjData.causes.queryOptions())
-  const allTwitchChannels = useQuery(() => admin.getAllTwitchChannels.queryOptions())
-  const allLiveChannels = useQuery(() => admin.getAllLiveChannels.queryOptions())
+  const allTwitchChannels = useQuery(() =>
+    admin.getAllTwitchChannels.queryOptions(),
+  )
+  const allLiveChannels = useQuery(() =>
+    admin.getAllLiveChannels.queryOptions(),
+  )
+  const invalidTwitchChannels = useQuery(() =>
+    admin.getInvalidTwitchChannels.queryOptions(),
+  )
 
   // Mutations
   const validateTwitchChannels = useMutation(() =>
     admin.validateTwitchChannels.mutationOptions({
       onSuccess: async () => {
-        await client.invalidateQueries({ queryKey: admin.getAllTwitchChannels.queryKey() })
+        await client.invalidateQueries({
+          queryKey: admin.getAllTwitchChannels.queryKey(),
+        })
+        await client.invalidateQueries({
+          queryKey: admin.getInvalidTwitchChannels.queryKey(),
+        })
       },
     }),
   )
@@ -34,7 +53,36 @@ export const JJData: Component = () => {
   const checkLiveStreams = useMutation(() =>
     admin.checkLiveStreams.mutationOptions({
       onSuccess: async () => {
-        await client.invalidateQueries({ queryKey: admin.getAllLiveChannels.queryKey() })
+        await client.invalidateQueries({
+          queryKey: admin.getAllLiveChannels.queryKey(),
+        })
+      },
+    }),
+  )
+
+  const clearInvalidTwitchChannels = useMutation(() =>
+    admin.clearInvalidTwitchChannels.mutationOptions({
+      onSuccess: async () => {
+        await client.invalidateQueries({
+          queryKey: admin.getInvalidTwitchChannels.queryKey(),
+        })
+      },
+    }),
+  )
+
+  const clearJJData = useMutation(() =>
+    admin.clearJingleJamData.mutationOptions({
+      onSuccess: async () => {
+        await client.invalidateQueries({ queryKey: jjData.causes.queryKey() })
+        await client.invalidateQueries({
+          queryKey: admin.getAllTwitchChannels.queryKey(),
+        })
+        await client.invalidateQueries({
+          queryKey: admin.getAllLiveChannels.queryKey(),
+        })
+        await client.invalidateQueries({
+          queryKey: admin.getInvalidTwitchChannels.queryKey(),
+        })
       },
     }),
   )
@@ -59,56 +107,133 @@ export const JJData: Component = () => {
   )
 
   return (
-    <div class="flex flex-col text-black gap-4">
+    <div class="flex flex-col gap-4 text-black">
       <div class="flex items-center gap-2">
-        <button class={'bg-accent text-white px-3 py-1 rounded'} onClick={refresh.mutate}>
+        <button
+          class={'rounded bg-accent px-3 py-1 text-white'}
+          onClick={refresh.mutate}
+        >
           Refresh JJ API Data
         </button>
         <span class="text-sm text-gray-600">{refresh.status}</span>
       </div>
 
       <div class="flex flex-wrap items-center gap-2">
-        <button class="bg-blue-600 text-white px-3 py-1 rounded" onClick={() => validateTwitchChannels.mutate()}>
+        <button
+          class="rounded bg-blue-600 px-3 py-1 text-white"
+          onClick={() => validateTwitchChannels.mutate()}
+        >
           Validate Twitch Channels
         </button>
-        <span class="text-xs text-gray-600">{validateTwitchChannels.status}</span>
-        <button class="bg-purple-600 text-white px-3 py-1 rounded" onClick={() => checkLiveStreams.mutate()}>
+        <span class="text-xs text-gray-600">
+          {validateTwitchChannels.status}
+        </span>
+        <button
+          class="rounded bg-purple-600 px-3 py-1 text-white"
+          onClick={() => checkLiveStreams.mutate()}
+        >
           Check Live Streams
         </button>
         <span class="text-xs text-gray-600">{checkLiveStreams.status}</span>
+        <button
+          class="rounded bg-amber-600 px-3 py-1 text-white"
+          onClick={() => clearInvalidTwitchChannels.mutate()}
+        >
+          Clear Invalid Twitch Channels
+        </button>
+        <span class="text-xs text-gray-600">
+          {clearInvalidTwitchChannels.status}
+        </span>
+        <button
+          class="rounded bg-red-600 px-3 py-1 text-white"
+          onClick={() => clearJJData.mutate()}
+        >
+          Clear JJ Data
+        </button>
+        <span class="text-xs text-gray-600">{clearJJData.status}</span>
       </div>
 
-      <div class="grid md:grid-cols-2 gap-6">
+      <div class="grid gap-6 md:grid-cols-3">
         <div class="rounded border border-gray-200 bg-white p-4 shadow-sm">
-          <h3 class="font-semibold mb-2">All Twitch Channels</h3>
-          <Show when={allTwitchChannels.data} fallback={<p class="text-sm text-gray-500">Loading…</p>}>
+          <h3 class="mb-2 font-semibold">All Twitch Channels</h3>
+          <Show
+            when={allTwitchChannels.data}
+            fallback={<p class="text-sm text-gray-500">Loading…</p>}
+          >
             {(d) => (
-              <ul class="list-disc pl-5 space-y-1">
-                <For each={d()}>{(login) => (
-                  <li class="text-sm">
-                    <a class="text-accent underline" href={`https://twitch.tv/${login}`} target="_blank" rel="noreferrer">
-                      {login}
-                    </a>
-                  </li>
-                )}</For>
+              <ul class="list-disc space-y-1 pl-5">
+                <For each={d()}>
+                  {(login) => (
+                    <li class="text-sm">
+                      <a
+                        class="text-accent underline"
+                        href={`https://twitch.tv/${login}`}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        {login}
+                      </a>
+                    </li>
+                  )}
+                </For>
               </ul>
             )}
           </Show>
         </div>
 
         <div class="rounded border border-gray-200 bg-white p-4 shadow-sm">
-          <h3 class="font-semibold mb-2">Live Channels</h3>
-          <Show when={allLiveChannels.data} fallback={<p class="text-sm text-gray-500">Loading…</p>}>
+          <h3 class="mb-2 font-semibold">Live Channels</h3>
+          <Show
+            when={allLiveChannels.data}
+            fallback={<p class="text-sm text-gray-500">Loading…</p>}
+          >
             {(d) => (
-              <ul class="list-disc pl-5 space-y-1">
-                <For each={d()}>{(login) => (
-                  <li class="text-sm">
-                    <a class="text-accent underline" href={`https://twitch.tv/${login}`} target="_blank" rel="noreferrer">
-                      {login}
-                    </a>
-                  </li>
-                )}</For>
+              <ul class="list-disc space-y-1 pl-5">
+                <For each={d()}>
+                  {(login) => (
+                    <li class="text-sm">
+                      <a
+                        class="text-accent underline"
+                        href={`https://twitch.tv/${login}`}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        {login}
+                      </a>
+                    </li>
+                  )}
+                </For>
               </ul>
+            )}
+          </Show>
+        </div>
+
+        <div class="rounded border border-gray-200 bg-white p-4 shadow-sm">
+          <h3 class="mb-2 font-semibold">Invalid Twitch Channels</h3>
+          <Show
+            when={invalidTwitchChannels.data}
+            fallback={<p class="text-sm text-gray-500">Loading…</p>}
+          >
+            {(d) => (
+              <>
+                <p class="mb-2 text-xs text-gray-500">Count: {d().length}</p>
+                <ul class="list-disc space-y-1 pl-5">
+                  <For each={d()}>
+                    {(login) => (
+                      <li class="text-sm">
+                        <a
+                          class="text-accent underline"
+                          href={`https://twitch.tv/${login}`}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          {login}
+                        </a>
+                      </li>
+                    )}
+                  </For>
+                </ul>
+              </>
             )}
           </Show>
         </div>
@@ -122,7 +247,11 @@ export const JJData: Component = () => {
                 return (
                   <div class="my-4 rounded border border-gray-200 bg-white p-4 shadow-sm">
                     <div class="flex items-start gap-4">
-                      <img src={cause.logo} alt={`${cause.name} logo`} class="h-16 w-16 flex-none rounded object-contain bg-gray-50" />
+                      <img
+                        src={cause.logo}
+                        alt={`${cause.name} logo`}
+                        class="h-16 w-16 flex-none rounded bg-gray-50 object-contain"
+                      />
                       <div class="min-w-0">
                         <p class="text-lg font-semibold">{cause.name}</p>
                         <p class="text-xs text-gray-500">ID: {cause.id}</p>
@@ -134,25 +263,57 @@ export const JJData: Component = () => {
                     </div>
 
                     <div class="mt-3 flex flex-wrap gap-3 text-sm">
-                      <a href={cause.url} target="_blank" rel="noopener noreferrer" class="text-accent underline">Website</a>
-                      <a href={cause.donateUrl} target="_blank" rel="noopener noreferrer" class="text-accent underline">Donate</a>
+                      <a
+                        href={cause.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="text-accent underline"
+                      >
+                        Website
+                      </a>
+                      <a
+                        href={cause.donateUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="text-accent underline"
+                      >
+                        Donate
+                      </a>
                     </div>
 
                     <div class="mt-4 grid gap-3 sm:grid-cols-3">
                       <div class="rounded border border-gray-100 p-3">
-                        <p class="text-xs font-medium text-gray-500">Yogscast Raised</p>
-                        <p class="text-sm">GBP: {cause.raised.yogscast.gbpFormatted}</p>
-                        <p class="text-sm">USD: {cause.raised.yogscast.usdFormatted}</p>
+                        <p class="text-xs font-medium text-gray-500">
+                          Yogscast Raised
+                        </p>
+                        <p class="text-sm">
+                          GBP: {cause.raised.yogscast.gbpFormatted}
+                        </p>
+                        <p class="text-sm">
+                          USD: {cause.raised.yogscast.usdFormatted}
+                        </p>
                       </div>
                       <div class="rounded border border-gray-100 p-3">
-                        <p class="text-xs font-medium text-gray-500">Fundraisers Raised</p>
-                        <p class="text-sm">GBP: {cause.raised.fundraisers.gbpFormatted}</p>
-                        <p class="text-sm">USD: {cause.raised.fundraisers.usdFormatted}</p>
+                        <p class="text-xs font-medium text-gray-500">
+                          Fundraisers Raised
+                        </p>
+                        <p class="text-sm">
+                          GBP: {cause.raised.fundraisers.gbpFormatted}
+                        </p>
+                        <p class="text-sm">
+                          USD: {cause.raised.fundraisers.usdFormatted}
+                        </p>
                       </div>
                       <div class="rounded border border-gray-100 p-3">
-                        <p class="text-xs font-medium text-gray-500">Total Raised</p>
-                        <p class="text-sm">GBP: {cause.raised.total.gbpFormatted}</p>
-                        <p class="text-sm">USD: {cause.raised.total.usdFormatted}</p>
+                        <p class="text-xs font-medium text-gray-500">
+                          Total Raised
+                        </p>
+                        <p class="text-sm">
+                          GBP: {cause.raised.total.gbpFormatted}
+                        </p>
+                        <p class="text-sm">
+                          USD: {cause.raised.total.usdFormatted}
+                        </p>
                       </div>
                     </div>
                   </div>

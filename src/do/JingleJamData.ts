@@ -20,6 +20,11 @@ import type {
 } from '../lib/orpc/public/twitchExtension/contract.ts'
 
 export class JingleJamData extends DurableObject<Env> {
+  replaceMap: Map<string, string> = new Map([
+    ['crustydoggo', 'kirsty'],
+    ['bobawitch', 'boba'],
+  ])
+
   private get storage() {
     return this.ctx.storage
   }
@@ -139,11 +144,7 @@ export class JingleJamData extends DurableObject<Env> {
       console.error('put avgConversionRate', e)
     }
 
-    // Build and store display projections matching JJCampaignsSchema
-    await this.buildAndStoreCampaignsDisplay(data)
-
-    // Build and store display projections for causes
-    await this.buildAndStoreCausesDisplay(data)
+    await this.buildDisplayData(data)
 
     try {
       const db = getDB(this.env)
@@ -229,6 +230,14 @@ export class JingleJamData extends DurableObject<Env> {
     }
   }
 
+  public async buildDisplayData(data: JingleJamResponse) {
+    // Build and store display projections matching JJCampaignsSchema
+    await this.buildAndStoreCampaignsDisplay(data)
+
+    // Build and store display projections for causes
+    await this.buildAndStoreCausesDisplay(data)
+  }
+
   public async getAvgConversionRate() {
     const avgConversionRate =
       await this.storage.get<number>('avgConversionRate')
@@ -285,22 +294,60 @@ export class JingleJamData extends DurableObject<Env> {
 
   public async validateTwitchChannels() {
     const api = new TwitchAPI(this.env)
-    const logins = await this.getTwitchLoginsFromCampaigns()
+
+    const rawLogins = await this.getTwitchLoginsFromCampaigns()
+    const logins = rawLogins
+      .map((l) => this.normalizeTwitchLogin(l))
+      .filter((l) => l)
+
+    console.log('validateTwitchChannels', 'logins', logins)
+
     const accessToken = await api.getAppToken()
-    const validLogins = []
-    const invalidLogins = []
+    const validLogins: string[] = []
+    const invalidLogins: string[] = []
+
     const storedInvalidLogins = await this.getStringArray(
       'twitch:invalidLogins',
     )
+    // Normalize previously stored invalid logins for proper comparison
+    const storedInvalidSet = new Set(
+      storedInvalidLogins.map((l) => this.normalizeTwitchLogin(l)),
+    )
+
+    console.log(
+      'validateTwitchChannels',
+      'storedInvalidLogins',
+      storedInvalidLogins,
+    )
+
     for (const login of logins) {
-      if (storedInvalidLogins.includes(login)) {
-        invalidLogins.push(login)
+      const normalized = this.normalizeTwitchLogin(login)
+      if (!normalized) continue
+
+      console.log(
+        'validateTwitchChannels',
+        'processing',
+        login,
+        '->',
+        normalized,
+      )
+
+      if (storedInvalidSet.has(normalized)) {
+        invalidLogins.push(normalized)
+        console.log('validateTwitchChannels', 'isInvalid', normalized)
         continue
       }
-      const channel = await api.fetchUsersByLogin(login, accessToken)
-      console.log('processTwitchChannels', login, channel)
+
+      const channel = await api.fetchUsersByLogin(normalized, accessToken)
+      console.log(
+        'validateTwitchChannels',
+        'processTwitchChannels',
+        normalized,
+        channel,
+      )
+
       if (channel.data && !channel.error) {
-        validLogins.push(login)
+        validLogins.push(normalized)
         await this.storage.put(`twitch:id:${channel.data.id}`, channel.data)
         await this.storage.put(
           `twitch:login:${channel.data.login}`,
@@ -309,31 +356,37 @@ export class JingleJamData extends DurableObject<Env> {
         // maintain idx mapping login -> userId from raw campaigns
         try {
           const campaigns = await this.getCampaigns()
-          const camp = campaigns.find(
-            (c) =>
-              c.livestream?.type === 'twitch' &&
-              (c.livestream.channel ?? '').toLowerCase() ===
-                login.toLowerCase(),
-          )
+          const camp = campaigns.find((c) => {
+            if (c.livestream?.type !== 'twitch') return false
+            const chan = this.normalizeTwitchLogin(c.livestream?.channel ?? '')
+            return chan.toLowerCase() === normalized.toLowerCase()
+          })
           if (camp) {
-            await this.storage.put(`idx:twitch:login:${login.toLowerCase()}`, {
-              userId: camp.user.id,
-            })
+            await this.storage.put(
+              `idx:twitch:login:${normalized.toLowerCase()}`,
+              {
+                userId: camp.user.id,
+              },
+            )
           }
         } catch {}
       } else {
-        invalidLogins.push(login)
+        if (channel.error.status !== 401) {
+          invalidLogins.push(normalized)
+        }
       }
     }
+
     console.log('validLogins', validLogins)
     console.log('invalidLogins', invalidLogins)
+
     await this.setStringArray('twitch:validLogins', validLogins)
     await this.setStringArray('twitch:invalidLogins', invalidLogins)
   }
 
   public async checkLiveStreams() {
     const logins = await this.getStringArray('twitch:validLogins')
-
+    console.log('checkLiveStreams', logins)
     const api = new TwitchAPI(this.env)
     const accessToken = await api.getAppToken()
     const liveStreamsIds: string[] = []
@@ -377,6 +430,14 @@ export class JingleJamData extends DurableObject<Env> {
     return this.getStringArray('twitch:validLogins')
   }
 
+  public getInvalidTwitchLogins() {
+    return this.getStringArray('twitch:invalidLogins')
+  }
+
+  public async clearInvalidTwitchLogins() {
+    await this.setStringArray('twitch:invalidLogins', [])
+  }
+
   // Returns all Twitch channels (logins) referenced by current campaigns
   public async getAllTwitchLogins() {
     return this.getTwitchLoginsFromCampaigns()
@@ -394,12 +455,16 @@ export class JingleJamData extends DurableObject<Env> {
       },
     })
     if (!res.ok) {
-      throw new Error(`Failed to fetch GBP->EUR page: ${res.status} ${res.statusText}`)
+      throw new Error(
+        `Failed to fetch GBP->EUR page: ${res.status} ${res.statusText}`,
+      )
     }
     const html = await res.text()
 
     // Look for an element that contains both classes "YMlKec" and "fxKbKc"
-    const match = html.match(/<[^>]*class=\"[^\"]*\bYMlKec\b[^\"]*\bfxKbKc\b[^\"]*\"[^>]*>([^<]+)<\/[^>]*>/i)
+    const match = html.match(
+      /<[^>]*class=\"[^\"]*\bYMlKec\b[^\"]*\bfxKbKc\b[^\"]*\"[^>]*>([^<]+)<\/[^>]*>/i,
+    )
     if (!match) {
       throw new Error('GBP->EUR conversion rate element not found')
     }
@@ -407,11 +472,28 @@ export class JingleJamData extends DurableObject<Env> {
     const numericText = rawText.replace(/[^0-9.,-]/g, '').replace(/,/g, '')
     const value = parseFloat(numericText)
     if (!Number.isFinite(value)) {
-      throw new Error(`Unable to parse GBP->EUR conversion rate from text: "${rawText}"`)
+      throw new Error(
+        `Unable to parse GBP->EUR conversion rate from text: "${rawText}"`,
+      )
     }
 
     await this.storage.put('gbp:eur:rate', value)
     return value
+  }
+
+  public clear() {
+    return this.storage.deleteAll()
+  }
+
+  private normalizeTwitchLogin(input: string | undefined | null) {
+    if (!input) return ''
+    let s = String(input).trim()
+    // Remove protocol and domain prefixes
+    s = s.replace(/^https?:\/\/(www\.)?twitch\.tv\//i, '')
+    s = s.replace(/^(www\.)?twitch\.tv\//i, '')
+    // Take only the first path segment, drop query/fragment
+    s = s.split(/[\/?#]/)[0]
+    return s
   }
 
   // Extracted from refresh: builds and stores display projections matching JJCampaignsSchema
@@ -419,7 +501,11 @@ export class JingleJamData extends DurableObject<Env> {
     try {
       const usdRate = data.avgConversionRate
       const eurRate = await this.getGbpToEurRate()
-      const toCurrencies = (gbp: number, usdRateIn: number, eurRateIn: number): Currencies => {
+      const toCurrencies = (
+        gbp: number,
+        usdRateIn: number,
+        eurRateIn: number,
+      ): Currencies => {
         const usd = Math.round(gbp * usdRateIn * 100) / 100
         const euro = Math.round(gbp * eurRateIn * 100) / 100
         return {
@@ -451,10 +537,18 @@ export class JingleJamData extends DurableObject<Env> {
         } catch {}
 
         let twitch: JJCampaignType['twitch'] | undefined = undefined
-        const login =
+        let login =
           c.livestream?.type === 'twitch' && c.livestream?.channel
             ? String(c.livestream.channel).toLowerCase()
             : ''
+        const value = this.replaceMap.get(login)
+
+        if (value) {
+          login = value
+        }
+
+        login = this.normalizeTwitchLogin(login)
+
         let twitchId = ''
         if (login) {
           let twitchAvatar: string | undefined
@@ -515,7 +609,11 @@ export class JingleJamData extends DurableObject<Env> {
     try {
       const usdRate = data.avgConversionRate
       const eurRate = await this.getGbpToEurRate()
-      const toCurrencies = (gbp: number, usdRateIn: number, eurRateIn: number): Currencies => {
+      const toCurrencies = (
+        gbp: number,
+        usdRateIn: number,
+        eurRateIn: number,
+      ): Currencies => {
         const usd = Math.round(gbp * usdRateIn * 100) / 100
         const euro = Math.round(gbp * eurRateIn * 100) / 100
         return {

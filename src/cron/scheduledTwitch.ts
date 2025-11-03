@@ -18,7 +18,7 @@ export async function scheduledTwitch(
 
   const dbLogins = twitchChannels.map((channel) => channel.login)
   const validLogins = await stub.getValidTwitchLogins()
-
+  console.log('validLogins', validLogins)
   const logins = [...dbLogins, ...validLogins]
 
   const uniqueLogins = [...new Set(logins)]
