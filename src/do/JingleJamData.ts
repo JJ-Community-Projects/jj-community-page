@@ -150,7 +150,7 @@ export class JingleJamData extends DurableObject<Env> {
       const db = getDB(this.env)
 
       // Conservative variable ceiling (SQLite default is 999). Leave some safety headroom.
-      const VARS_LIMIT = 100
+      const VARS_LIMIT = 50
 
       // Helper to chunk an array
       const chunk = <T>(arr: T[], size: number) => {
