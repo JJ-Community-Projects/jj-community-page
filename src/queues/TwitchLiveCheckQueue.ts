@@ -166,27 +166,39 @@ export class TwitchLiveCheckQueue {
             isMature: Boolean(s.is_mature ?? false),
           }))
 
-          await db
-            .insert(twitchStreamSchema)
-            .values(rows)
-            .onConflictDoUpdate({
-              target: twitchStreamSchema.streamId,
-              set: {
-                twitchId: (twitchStreamSchema as any).twitchId,
-                userLogin: (twitchStreamSchema as any).userLogin,
-                userName: (twitchStreamSchema as any).userName,
-                gameId: (twitchStreamSchema as any).gameId,
-                gameName: (twitchStreamSchema as any).gameName,
-                type: (twitchStreamSchema as any).type,
-                title: (twitchStreamSchema as any).title,
-                viewerCount: (twitchStreamSchema as any).viewerCount,
-                startedAt: (twitchStreamSchema as any).startedAt,
-                language: (twitchStreamSchema as any).language,
-                thumbnailUrl: (twitchStreamSchema as any).thumbnailUrl,
-                tagIds: (twitchStreamSchema as any).tagIds,
-                isMature: (twitchStreamSchema as any).isMature,
-              },
-            })
+          // Chunk inserts to avoid SQLite/D1 parameter limits (~999 params per statement)
+          const COLUMNS_PER_ROW = 14 // Keep in sync with values() fields above
+          const MAX_PARAMS = 999
+          const SAFETY_MARGIN = 0 // can be adjusted if needed
+          const MAX_ROWS_PER_INSERT = Math.max(
+            1,
+            Math.floor((MAX_PARAMS - SAFETY_MARGIN) / COLUMNS_PER_ROW),
+          )
+
+          for (let i = 0; i < rows.length; i += MAX_ROWS_PER_INSERT) {
+            const batch = rows.slice(i, i + MAX_ROWS_PER_INSERT)
+            await db
+              .insert(twitchStreamSchema)
+              .values(batch)
+              .onConflictDoUpdate({
+                target: twitchStreamSchema.streamId,
+                set: {
+                  twitchId: (twitchStreamSchema as any).twitchId,
+                  userLogin: (twitchStreamSchema as any).userLogin,
+                  userName: (twitchStreamSchema as any).userName,
+                  gameId: (twitchStreamSchema as any).gameId,
+                  gameName: (twitchStreamSchema as any).gameName,
+                  type: (twitchStreamSchema as any).type,
+                  title: (twitchStreamSchema as any).title,
+                  viewerCount: (twitchStreamSchema as any).viewerCount,
+                  startedAt: (twitchStreamSchema as any).startedAt,
+                  language: (twitchStreamSchema as any).language,
+                  thumbnailUrl: (twitchStreamSchema as any).thumbnailUrl,
+                  tagIds: (twitchStreamSchema as any).tagIds,
+                  isMature: (twitchStreamSchema as any).isMature,
+                },
+              })
+          }
         }
 
         // Delete streams for channels not live anymore within this batch
