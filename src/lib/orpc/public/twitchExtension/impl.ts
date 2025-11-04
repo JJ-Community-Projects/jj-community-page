@@ -177,11 +177,6 @@ const extensionConfig = os.extensionConfigContract
       timestamp: DateTime.now().toUTC().toISO(),
     }
 
-    await stub.setStringConfig(
-      'twitch-extension:config',
-      JSON.stringify(config),
-    )
-
     await context.env.KV.put(
       'twitch-extension:config',
       JSON.stringify(config),
@@ -644,8 +639,8 @@ const yogsSchedule = os.yogsScheduleContract
                 cd?.profileImage?.medium ||
                 cd?.profileImage?.large ||
                 cd?.profileImage?.small
-              const url: string =
-                cd?.link || (Array.isArray(cd?.links) && cd.links[0]?.url) || ''
+              const links = cd.links?.filter((c) => c.type === 'twitch').at(0)
+              const url: string = links?.url ?? ''  // cd?.link || (Array.isArray(cd?.links) && cd.links[0]?.url) || ''
               const color: string = cd?.style?.primaryColor || '#000000'
               list.push({
                 id: cEntry.id,
