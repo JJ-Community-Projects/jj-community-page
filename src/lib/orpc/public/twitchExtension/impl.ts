@@ -132,6 +132,9 @@ const extensionConfig = os.extensionConfigContract
     const showFundraisers = await stub.getBooleanConfig(
       'twitch-extension:config.showFundraisers',
     )
+    const showUserFundraiser = await stub.getBooleanConfig(
+      'twitch-extension:config.showUserFundraiser',
+    )
 
     // Refresh intervals
     const refreshIntervalYogsSchedule = await stub.getNumberConfig(
@@ -158,11 +161,14 @@ const extensionConfig = os.extensionConfigContract
       'twitch-extension:config.donationTrackerUrl',
     )
 
+
+
     const config = {
       year: year ?? 2024,
       showYogsSchedule: showYogsSchedule ?? false,
       showCharities: showCharities ?? false,
       showFundraisers: showFundraisers ?? false,
+      showUserFundraiser: showUserFundraiser ?? false,
       refreshInterval: {
         yogsSchedule: refreshIntervalYogsSchedule ?? 1000 * 60 * 10,
         charities: refreshIntervalCharities ?? 1000 * 60,

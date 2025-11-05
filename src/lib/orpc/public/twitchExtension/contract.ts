@@ -110,6 +110,7 @@ export const ExtensionConfigSchema = z.object({
   showYogsSchedule: z.boolean(),
   showCharities: z.boolean(),
   showFundraisers: z.boolean(),
+  showUserFundraiser: z.boolean(),
   refreshInterval: z.object({
     yogsSchedule: z.number(),
     charities: z.number(),
