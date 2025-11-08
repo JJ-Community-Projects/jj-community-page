@@ -1,0 +1,44 @@
+date: '2025-12-07'
+streams:
+  - creators: []
+    duration_hours: 3
+    end: '2025-12-07T14:00:00Z'
+    start: '2025-12-07T11:00:00Z'
+    style:
+      background:
+        colors:
+          - '#f07800'
+          - '#f07800'
+        orientation: TD
+      tileSize: 1
+    subtitle: Title 1
+    title: Title 1
+    vods: []
+  - creators: []
+    duration_hours: 3
+    end: '2025-12-07T17:00:00Z'
+    start: '2025-12-07T14:00:00Z'
+    style:
+      background:
+        colors:
+          - '#f07800'
+          - '#f07800'
+        orientation: TD
+      tileSize: 1
+    subtitle: Title 2
+    title: Title 2
+    vods: []
+  - creators: []
+    duration_hours: 6
+    end: '2025-12-07T23:00:00Z'
+    start: '2025-12-07T17:00:00Z'
+    style:
+      background:
+        colors:
+          - '#f07800'
+          - '#f07800'
+        orientation: TD
+      tileSize: 2
+    subtitle: Title 3
+    title: Title 3
+    vods: []

@@ -1,0 +1,64 @@
+date: '2025-12-08'
+streams:
+  - creators: []
+    duration_hours: 3
+    end: '2025-12-08T14:00:00Z'
+    start: '2025-12-08T11:00:00Z'
+    style:
+      background:
+        colors:
+          - '#3484bf'
+          - '#3484bf'
+        orientation: TD
+      tileSize: 1
+    subtitle: Title 1
+    title: Title 1
+    vods: []
+  - creators: []
+    duration_hours: 3
+    end: '2025-12-08T17:00:00Z'
+    start: '2025-12-08T14:00:00Z'
+    style:
+      background:
+        colors:
+          - '#3484bf'
+          - '#3484bf'
+        orientation: TD
+      tileSize: 1
+    subtitle: Title 2
+    title: Title 2
+    vods: []
+  - creators: []
+    duration_hours: 3
+    end: '2025-12-09T00:30:00Z'
+    start: '2025-12-08T17:00:00Z'
+    style:
+      background:
+        colors:
+          - '#3484bf'
+          - '#3484bf'
+        orientation: TD
+      tileSize: 2
+    subtitle: Title 3
+    title: Title 3
+    description: >-
+      Hosted by Tom & Pyrion  - Table 1: Briony, Lydia, Duncan, Kirsty, Boba,
+      Digby  - Table 2: Sarah, Sophie, Ben, RTGame, Lewis, Osie   - Table 3:
+      Joe, Toastie, Ped, Ravs, Mousie, Lolip  - Table 4: Spiff, Breeh, Bekki,
+      Zylus, Harry, Mango - ...
+    markdownDescription: >
+      Hosted by Tom & Pyrion 
+
+      - Table 1: Briony, Lydia, Duncan, Kirsty, Boba,
+      [Digby](https://www.twitch.tv/digbytathamwarter) 
+
+      - Table 2: Sarah, [Sophie](https://www.twitch.tv/mscupcakes), Ben, RTGame,
+      Lewis, Osie 
+
+      - Table 3: Joe, [Toastie](https://www.twitch.tv/toastie), Ped, Ravs,
+      Mousie, Lolip 
+
+      - Table 4: Spiff, Breeh, Bekki, Zylus, Harry, Mango
+
+      - ...
+    vods: []

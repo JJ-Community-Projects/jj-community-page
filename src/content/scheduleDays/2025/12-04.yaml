@@ -1,0 +1,77 @@
+date: '2025-12-04'
+streams:
+  - creators: []
+    duration_hours: 3
+    end: '2025-12-04T14:00:00Z'
+    start: '2025-12-04T11:00:00Z'
+    style:
+      background:
+        colors:
+          - '#dd5501'
+          - '#dd5501'
+        orientation: TD
+      tileSize: 1
+    subtitle: Title 1
+    title: Title 1
+    vods: []
+  - creators: []
+    duration_hours: 3
+    end: '2025-12-04T17:00:00Z'
+    start: '2025-12-04T14:00:00Z'
+    style:
+      background:
+        colors:
+          - '#dd5501'
+          - '#dd5501'
+        orientation: TD
+      tileSize: 1
+    subtitle: Title 2
+    title: Title 2
+    description: >
+      Hosted by Lewis & Spiff - Team RED: Harry, Chosenarchitect, Tangofrags,
+      Beardstone  - Team YELLOW: RT, mscupcakes, Ravs, Osie  - Team BLUE: Ben,
+      Duncan, Sparkles, Briony  - Team GREEN: Mark H, Mousie, Joe Hickson, Digby
+    markdownDescription: >2-
+       Hosted by Lewis & Spiffing Brit.
+      - Team RED: Harry,
+      [Chosenarchitect](https://www.twitch.tv/chosenarchitect),
+      [Tangofrags](https://www.twitch.tv/tangofrags),
+      [Beardstone](https://www.twitch.tv/mrbeardstone)
+
+      - Team YELLOW: RT, [mscupcakes](https://www.twitch.tv/mscupcakes), Ravs,
+      Osie 
+
+      - Team BLUE: Ben, Duncan,
+      [Sparkles*](https://www.instagram.com/ghostofsparkles/), Briony 
+
+      - Team GREEN: Mark H, Mousie, Joe Hickson,
+      [Digby](https://www.twitch.tv/digbytathamwarter)
+    vods: []
+  - creators: []
+    duration_hours: 3
+    end: '2025-12-04T20:00:00Z'
+    start: '2025-12-04T17:00:00Z'
+    style:
+      background:
+        colors:
+          - '#dd5501'
+          - '#dd5501'
+        orientation: TD
+      tileSize: 1
+    subtitle: Title 3
+    title: Title 3
+    vods: []
+  - creators: []
+    duration_hours: 4
+    end: '2025-12-05T00:00:00Z'
+    start: '2025-12-04T20:00:00Z'
+    style:
+      background:
+        colors:
+          - '#dd5501'
+          - '#dd5501'
+        orientation: TD
+      tileSize: 1
+    subtitle: Title 4
+    title: Title 4
+    vods: []

@@ -1,0 +1,70 @@
+date: '2025-12-02'
+streams:
+  - creators: []
+    duration_hours: 3
+    end: '2025-12-02T14:00:00Z'
+    start: '2025-12-02T11:00:00Z'
+    style:
+      background:
+        colors:
+          - '#fb9900'
+          - '#fb9900'
+        orientation: TD
+      tileSize: 1
+    subtitle: Title 1
+    title: Title 1
+    vods: []
+  - creators: []
+    duration_hours: 3
+    end: '2025-12-02T17:00:00Z'
+    start: '2025-12-02T14:00:00Z'
+    style:
+      background:
+        colors:
+          - '#fb9900'
+          - '#fb9900'
+        orientation: TD
+      tileSize: 1
+    subtitle: Title 2
+    title: Title 2
+    vods: []
+  - creators: []
+    duration_hours: 3
+    end: '2025-12-02T20:00:00Z'
+    start: '2025-12-02T17:00:00Z'
+    style:
+      background:
+        colors:
+          - '#fb9900'
+          - '#fb9900'
+        orientation: TD
+      tileSize: 1
+    subtitle: Title 3
+    title: Title 3
+    description: |
+      Hosted by Duncan & Osie
+      - Team 1: Hat Films
+      - Team 2: Harry, Ravs, Shadow
+      - Team 3: Ben, Fionn, Lolip
+      - Team 4: Bekki, Mousie, Breeh
+    markdownDescription: |
+      Hosted by Duncan & Osie
+      - Team 1: Hat Films
+      - Team 2: Harry, Ravs, Shadow
+      - Team 3: Ben, Fionn, Lolip
+      - Team 4: Bekki, Mousie, Breeh
+    vods: []
+  - creators: []
+    duration_hours: 3
+    end: '2025-12-02T23:23:00'
+    start: '2025-12-02T20:00:00Z'
+    style:
+      background:
+        colors:
+          - '#fb9900'
+          - '#fb9900'
+        orientation: TD
+      tileSize: 1
+    subtitle: Title 4
+    title: Title 4
+    vods: []

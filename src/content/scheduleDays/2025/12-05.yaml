@@ -1,0 +1,49 @@
+date: '2025-12-05'
+streams:
+  - creators: []
+    duration_hours: 3
+    end: '2025-12-05T14:00:00Z'
+    start: '2025-12-05T11:00:00Z'
+    style:
+      background:
+        colors:
+          - '#06b8aa'
+          - '#06b8aa'
+        orientation: TD
+      tileSize: 1
+    subtitle: Title 1
+    title: Title 1
+    vods: []
+  - creators: []
+    duration_hours: 3
+    end: '2025-12-05T17:00:00Z'
+    start: '2025-12-05T14:00:00Z'
+    style:
+      background:
+        colors:
+          - '#06b8aa'
+          - '#06b8aa'
+        orientation: TD
+      tileSize: 1
+    subtitle: Title 2
+    title: Title 2
+    description: Hosted by Ben & Alex
+    vods: []
+  - creators: []
+    duration_hours: 9
+    end: '2025-12-05T23:26:00Z'
+    start: '2025-12-05T17:00:00Z'
+    style:
+      background:
+        colors:
+          - '#06b8aa'
+          - '#06b8aa'
+        orientation: TD
+      tileSize: 2
+    subtitle: Title 3
+    title: Title 3
+    description: >-
+      Lekmod 32.8 - Spiff = Babylon | Duncan = Bolivia | Kirsty = Switzerland |
+      Daltos = Byzantium | AlexTheRambler = Korea | Lewis = Morocco | Rythian =
+      Venice
+    vods: []
