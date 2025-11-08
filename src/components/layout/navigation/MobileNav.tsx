@@ -65,9 +65,8 @@ export const MobileNav: Component<MobileNavProps> = (props) => {
           )}
         </For>
         <a href="/yogs/stats">Statistics</a>
+        <a href="/stream-resources">Stream Resources</a>
         <a href="/faq">FAQ</a>
-        <a href="/overlays">Stream Overlays</a>
-        <a href="/twitch-extension">Twitch Extension</a>
         <Show when={isJJ()}>
           <a
             class="flex flex-row items-center gap-2"

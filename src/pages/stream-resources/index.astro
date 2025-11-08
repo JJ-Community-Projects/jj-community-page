@@ -1,0 +1,14 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro'
+import StreamResources from '../../components/stream/StreamResources'
+
+const user = Astro.locals.user
+---
+
+<BaseLayout
+  title="Stream Resources: Twitch Extensions & OBS Overlays"
+  description="All Jingle Jam stream resources in one place: Twitch Extensions with screenshots and OBS Overlays configurator."
+  canonical="https://jinglejam.ostof.dev/stream-resources"
+>
+  <StreamResources client:only="solid-js" user={user} />
+</BaseLayout>
