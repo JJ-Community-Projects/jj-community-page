@@ -8,8 +8,10 @@ import {createModalSignal, type ModalSignal} from "../../../../lib/createModalSi
 import {useCreatorFilter} from "./CreatorFilterProvider.tsx";
 import {useYogsSchedule} from "./YogsScheduleProvider.tsx";
 import {rangeFromData} from "../../../../lib/utils/rangeFromData.ts";
-import type {FullStream} from "../../../../lib/model/ContentTypes.ts";
+import type { YogsStream } from "../../../../lib/orpc/private/yogs/contract.ts";
 import {log} from "../../../../lib/analytics.ts";
+
+type FullStream = YogsStream & { creators: Array<{ id: string }>; style?: any };
 
 
 export const CalendarExportButton: Component = () => {

@@ -1,28 +1,28 @@
-import {type Component, Show} from "solid-js";
-import {DateTime} from "luxon";
-import {useYogsSchedule} from "../provider/YogsScheduleProvider.tsx";
-import {rangeFromData} from "../../../../lib/utils/rangeFromData.ts";
-import {createModalSignal} from "../../../../lib/createModalSignal.ts";
-import {useCreatorFilter} from "../provider/CreatorFilterProvider.tsx";
-import {FaSolidChevronLeft, FaSolidChevronRight} from "solid-icons/fa";
-import {BiRegularReset} from "solid-icons/bi";
-import {CalendarDialog} from "../provider/ScheduleCalendarExportButton.tsx";
-import {FilterDialog} from "../provider/ScheduleCreatorFilterButton.tsx";
+import { type Component, Show } from 'solid-js'
+import { DateTime } from 'luxon'
+import { useYogsSchedule } from '../provider/YogsScheduleProvider.tsx'
+import { rangeFromData } from '../../../../lib/utils/rangeFromData.ts'
+import { createModalSignal } from '../../../../lib/createModalSignal.ts'
+import { useCreatorFilter } from '../provider/CreatorFilterProvider.tsx'
+import { FaSolidChevronLeft, FaSolidChevronRight } from 'solid-icons/fa'
+import { BiRegularReset } from 'solid-icons/bi'
+import { CalendarDialog } from '../provider/ScheduleCalendarExportButton.tsx'
+import { FilterDialog } from '../provider/ScheduleCreatorFilterButton.tsx'
 
-interface MobileScheduleHeaderProps {
-}
+interface MobileScheduleHeaderProps {}
 
-export const MobileScheduleHeader: Component<MobileScheduleHeaderProps> = (props) => {
+export const MobileScheduleHeader: Component<MobileScheduleHeaderProps> = (
+  props,
+) => {
   return (
     <div class={'schedule-header flex flex-col gap-2'}>
-      <MobileTitle/>
-      <ScheduleButtons/>
+      <MobileTitle />
+      <ScheduleButtons />
     </div>
-  );
+  )
 }
 const MobileTitle: Component = () => {
-
-  const {schedule, day} = useYogsSchedule()
+  const { schedule, day } = useYogsSchedule()
 
   const start = () => {
     const d = day()
@@ -30,12 +30,16 @@ const MobileTitle: Component = () => {
     if (range) {
       return range.start
     }
-    return d.date
+    return d.start
   }
 
   return (
     <div class={'p-schedule'}>
-      <div class={'rounded-2xl shadow-xl bg-white flex flex-col items-center justify-center'}>
+      <div
+        class={
+          'flex flex-col items-center justify-center rounded-2xl bg-white shadow-xl'
+        }
+      >
         <h3 class={'text-2xl'}>{schedule.title}</h3>
         <p class={'text-day-header flex-1 text-center text-base'}>
           {DateTime.fromJSDate(start()).toFormat("EEE',' MMM d")}
@@ -44,8 +48,6 @@ const MobileTitle: Component = () => {
     </div>
   )
 }
-
-
 
 const ScheduleButtons: Component = () => {
   const { schedule, day, nextDay, prevDay } = useYogsSchedule()
@@ -57,19 +59,47 @@ const ScheduleButtons: Component = () => {
     <>
       <div class={'h-data'}>
         <Show when={isEmpty()}>
-          <div class={'flex flex-row items-center justify-between px-2 gap-4'}>
-            <button class={'h-8 w-8 rounded-2xl bg-accent-500 text-white shadow-xl ripple flex flex-col items-center justify-center'} onclick={prevDay}>
+          <div class={'flex flex-row items-center justify-between gap-4 px-2'}>
+            <button
+              class={
+                'ripple flex h-8 w-8 flex-col items-center justify-center rounded-2xl bg-accent-500 text-white shadow-xl'
+              }
+              onclick={prevDay}
+            >
               <FaSolidChevronLeft />
             </button>
-            <button class={'h-8 rounded-2xl bg-accent-500 text-white shadow-xl flex-1'} onclick={filterModalSignal.open}>Filter</button>
-            <button class={'h-8 rounded-2xl bg-accent-500 text-white shadow-xl flex-1'} onclick={exportModalSignal.open}>Export</button>
-            <button class={'h-8 w-8 rounded-2xl bg-accent-500 text-white shadow-xl ripple flex flex-col items-center justify-center'} onclick={nextDay}>
+            <button
+              class={
+                'h-8 flex-1 rounded-2xl bg-accent-500 text-white shadow-xl'
+              }
+              onclick={filterModalSignal.open}
+            >
+              Filter
+            </button>
+            <button
+              class={
+                'h-8 flex-1 rounded-2xl bg-accent-500 text-white shadow-xl'
+              }
+              onclick={exportModalSignal.open}
+            >
+              Export
+            </button>
+            <button
+              class={
+                'ripple flex h-8 w-8 flex-col items-center justify-center rounded-2xl bg-accent-500 text-white shadow-xl'
+              }
+              onclick={nextDay}
+            >
               <FaSolidChevronRight />
             </button>
           </div>
         </Show>
         <Show when={!isEmpty()}>
-          <div class={'rounded-2xl bg-accent-500 text-white shadow-xl flex flex-row items-center justify-around'}>
+          <div
+            class={
+              'flex flex-row items-center justify-around rounded-2xl bg-accent-500 text-white shadow-xl'
+            }
+          >
             <button onclick={reset}>
               <BiRegularReset />
             </button>

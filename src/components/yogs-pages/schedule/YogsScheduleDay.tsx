@@ -1,11 +1,12 @@
-import {type Component, For} from "solid-js";
-import {YogsStreamTile} from "./YogsStreamTile.tsx";
-import {DateTime} from "luxon";
-import type {FullDay} from "../../../lib/model/ContentTypes.ts";
-import {rangeFromData} from "../../../lib/utils/rangeFromData.ts";
+import { type Component, For } from 'solid-js'
+import { YogsStreamTile } from './YogsStreamTile.tsx'
+import { DateTime } from 'luxon'
+import type { YogsScheduleDay as Day } from '../../../lib/orpc/private/yogs/contract.ts'
+import { rangeFromData } from '../../../lib/utils/rangeFromData.ts'
+
 
 interface YogsScheduleDayProps {
-  day: FullDay
+  day: Day
 }
 
 export const YogsScheduleDay: Component<YogsScheduleDayProps> = (props) => {
@@ -18,7 +19,7 @@ export const YogsScheduleDay: Component<YogsScheduleDayProps> = (props) => {
 }
 
 interface ScheduleDayBodyProps {
-  day: FullDay
+  day: Day
 }
 
 const ScheduleDayBody: Component<ScheduleDayBodyProps> = props => {
@@ -29,7 +30,7 @@ const ScheduleDayBody: Component<ScheduleDayBodyProps> = props => {
 
 
 interface ScheduleDayHeaderProps {
-  day: FullDay
+  day: Day
 }
 
 const ScheduleDayHeader: Component<ScheduleDayHeaderProps> = props => {
@@ -39,7 +40,7 @@ const ScheduleDayHeader: Component<ScheduleDayHeaderProps> = props => {
     if (range) {
       return DateTime.fromJSDate(range.start).toFormat("EEE',' MMM d")
     }
-    return DateTime.fromJSDate(props.day.date).toFormat("EEE',' MMM d")
+    return DateTime.fromJSDate(props.day.start).toFormat("EEE',' MMM d")
   }
 
   return (

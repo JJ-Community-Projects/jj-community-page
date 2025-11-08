@@ -1,31 +1,45 @@
-import {createContext, createSignal, onMount, type ParentComponent, useContext} from "solid-js";
-import type {FullCreator, FullSchedule} from "../../../../lib/model/ContentTypes.ts";
-import {DateTime} from "luxon";
-import {useNextJJEndDate} from "../../../../lib/utils/jjDates.ts";
+import {
+  createContext,
+  createSignal,
+  onMount,
+  type ParentComponent,
+  useContext,
+} from 'solid-js'
+import type {
+  YogsCreator,
+  YogsSchedule,
+} from '../../../../lib/orpc/private/yogs/contract.ts'
+import { DateTime } from 'luxon'
+import { useNextJJEndDate } from '../../../../lib/utils/jjDates.ts'
 
-const useYogsScheduleHook = (schedule: FullSchedule, _creators: FullCreator[]) => {
-
+const useYogsScheduleHook = (
+  schedule: YogsSchedule,
+  _creators: YogsCreator[],
+) => {
   const [weekIndex, setWeekIndex] = createSignal<number>(0)
   const [dayIndex, setDayIndex] = createSignal<number>(0)
   const end = useNextJJEndDate()
   const week = () => schedule.weeks[weekIndex()]
-  const days = () => schedule.weeks.map(week => week.days).flat()
+  const days = () => schedule.weeks.map((week) => week.days).flat()
   const day = () => days()[dayIndex()]
   const numberOfWeeks = () => schedule.weeks.length
-  const numberOfDays = () => schedule.weeks.reduce((acc, week) => acc + week.days.length, 0)
+  const numberOfDays = () =>
+    schedule.weeks.reduce((acc, week) => acc + week.days.length, 0)
   const nextWeek = () => setWeekIndex((prev) => (prev + 1) % numberOfWeeks())
-  const prevWeek = () => setWeekIndex((prev) => (prev - 1 + numberOfWeeks()) % numberOfWeeks())
+  const prevWeek = () =>
+    setWeekIndex((prev) => (prev - 1 + numberOfWeeks()) % numberOfWeeks())
   const nextDay = () => setDayIndex((prev) => (prev + 1) % numberOfDays())
-  const prevDay = () => setDayIndex((prev) => (prev - 1 + numberOfDays()) % numberOfDays())
+  const prevDay = () =>
+    setDayIndex((prev) => (prev - 1 + numberOfDays()) % numberOfDays())
 
-  const firstDay = DateTime.fromJSDate(days()[0].date, {
-    zone: 'Europe/London'
+  const firstDay = DateTime.fromJSDate(days()[0].start, {
+    zone: 'Europe/London',
   })
   const lastDay = end()
   const now = DateTime.now().setZone('Europe/London')
 
   console.log('numberOfDays', numberOfDays())
-  console.log('date', days()[numberOfDays() - 1].date)
+  console.log('date', days()[numberOfDays() - 1].start)
   console.log('firstDay', firstDay)
   console.log('lastDay', lastDay)
   console.log('now', now)
@@ -51,7 +65,7 @@ const useYogsScheduleHook = (schedule: FullSchedule, _creators: FullCreator[]) =
 
     for (let i = 0; i < numberOfDays(); i++) {
       const day = days()[i]
-      const date = DateTime.fromJSDate(day.date)
+      const date = DateTime.fromJSDate(day.start)
       if (date.hasSame(now, 'day')) {
         setDayIndex(i)
         break
@@ -65,12 +79,14 @@ const useYogsScheduleHook = (schedule: FullSchedule, _creators: FullCreator[]) =
 
   const streams = () => schedule.streams
 
-  const creators = (): FullCreator[] => {
-    const map: { [key: string]: FullCreator } = {}
+  const creators = (): YogsCreator[] => {
+    const map: { [key: string]: YogsCreator } = {}
     for (const stream of streams()) {
-      for (const creator of stream.creators) {
-        if (!map[creator.id]) {
-          map[creator.id] = creator
+      if (stream.creators) {
+        for (const creator of stream.creators) {
+          if (!map[creator.id]) {
+            map[creator.id] = creator
+          }
         }
       }
     }
@@ -78,7 +94,9 @@ const useYogsScheduleHook = (schedule: FullSchedule, _creators: FullCreator[]) =
   }
 
   const getCreatorStreams = (id: string) => {
-    return streams().filter(stream => stream.creators.some(creator => creator.id === id))
+    return streams().filter((stream) =>
+      stream.creators?.some((creator) => creator.id === id),
+    )
   }
 
   return {
@@ -94,23 +112,26 @@ const useYogsScheduleHook = (schedule: FullSchedule, _creators: FullCreator[]) =
     nextDay,
     prevDay,
     times,
-    getCreatorStreams
+    getCreatorStreams,
   }
 }
 
 interface YogsScheduleProps {
-  schedule: FullSchedule
-  creators: FullCreator[]
+  schedule: YogsSchedule
+  creators: YogsCreator[]
 }
 
-const YogsScheduleContext = createContext<ReturnType<typeof useYogsScheduleHook>>();
+const YogsScheduleContext =
+  createContext<ReturnType<typeof useYogsScheduleHook>>()
 
-export const YogsScheduleProvider: ParentComponent<YogsScheduleProps> = (props) => {
+export const YogsScheduleProvider: ParentComponent<YogsScheduleProps> = (
+  props,
+) => {
   const hook = useYogsScheduleHook(props.schedule, props.creators)
   return (
     <YogsScheduleContext.Provider value={hook}>
       {props.children}
     </YogsScheduleContext.Provider>
-  );
+  )
 }
-export const useYogsSchedule = () => useContext(YogsScheduleContext)!;
+export const useYogsSchedule = () => useContext(YogsScheduleContext)!

@@ -1,22 +1,22 @@
-import {DateTime} from "luxon";
-import type {FullStream} from "../model/ContentTypes.ts";
+import { DateTime } from 'luxon'
+import type { YogsStream } from '../orpc/private/yogs/contract.ts'
 
 export class YogsStreamUtils {
-  static duration(slot: FullStream) {
+  static duration(slot: YogsStream) {
     const start = DateTime.fromJSDate(slot.start)
     const end = DateTime.fromJSDate(slot.end)
     return end.diff(start).as('second')
   }
 
-  static start(slot: FullStream) {
+  static start(slot: YogsStream) {
     return DateTime.fromJSDate(slot.start)
   }
 
-  static end(slot: FullStream) {
+  static end(slot: YogsStream) {
     return YogsStreamUtils.start(slot).plus(YogsStreamUtils.duration(slot))
   }
 
-  static sortByNextStream(a: FullStream, b: FullStream, now?: DateTime) {
+  static sortByNextStream(a: YogsStream, b: YogsStream, now?: DateTime) {
     if (YogsStreamUtils.isLive(a, now) && !YogsStreamUtils.isLive(b, now)) {
       return -1
     }
@@ -29,7 +29,7 @@ export class YogsStreamUtils {
     return startA.diff(startB).as('second')
   }
 
-  static nextStream(slot: FullStream, now?: DateTime) {
+  static nextStream(slot: YogsStream, now?: DateTime) {
     if (!now) {
       now = DateTime.now()
     }
@@ -38,14 +38,16 @@ export class YogsStreamUtils {
 
     const add = start.diff(now).as('day') % 7
 
-      return start
+    return start
   }
 
-  static nextStreamEnd(slot: FullStream, now?: DateTime) {
-    return YogsStreamUtils.nextStream(slot, now).plus(YogsStreamUtils.duration(slot))
+  static nextStreamEnd(slot: YogsStream, now?: DateTime) {
+    return YogsStreamUtils.nextStream(slot, now).plus(
+      YogsStreamUtils.duration(slot),
+    )
   }
 
-  static isLive(slot: FullStream, now?: DateTime) {
+  static isLive(slot: YogsStream, now?: DateTime) {
     if (!now) {
       now = DateTime.now()
     }
@@ -54,12 +56,15 @@ export class YogsStreamUtils {
     return now > start && now < end
   }
 
-  static isOver(slot: FullStream, now?: DateTime) {
+  static isOver(slot: YogsStream, now?: DateTime) {
     now ??= DateTime.now()
-    return now > YogsStreamUtils.nextStream(slot, now).plus(YogsStreamUtils.duration(slot))
+    return (
+      now >
+      YogsStreamUtils.nextStream(slot, now).plus(YogsStreamUtils.duration(slot))
+    )
   }
 
-  static isBefore(slot: FullStream, now?: DateTime) {
+  static isBefore(slot: YogsStream, now?: DateTime) {
     now ??= DateTime.now()
     return now < YogsStreamUtils.nextStream(slot, now)
   }

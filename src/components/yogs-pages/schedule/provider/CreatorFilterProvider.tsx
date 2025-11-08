@@ -1,11 +1,17 @@
-import {createContext, createEffect, createSignal, onMount, type ParentComponent, useContext} from "solid-js";
-import {useYogsSchedule} from "./YogsScheduleProvider.tsx";
-import type {FullStream} from "../../../../lib/model/ContentTypes.ts";
-import { log } from "../../../../lib/analytics.ts";
+import {
+  createContext,
+  createEffect,
+  createSignal,
+  onMount,
+  type ParentComponent,
+  useContext,
+} from 'solid-js'
+import { useYogsSchedule } from './YogsScheduleProvider.tsx'
+import type { YogsStream } from '../../../../lib/orpc/private/yogs/contract.ts'
+import { log } from '../../../../lib/analytics.ts'
 
 const useCreatorFilterHook = () => {
-
-  const {creators, streams} = useYogsSchedule()
+  const { creators, streams } = useYogsSchedule()
 
   const idMap = new Map<string, string>()
   for (const c of creators()) {
@@ -45,7 +51,7 @@ const useCreatorFilterHook = () => {
     setFilter([...filter(), id])
   }
   const removeFilter = (id: string) => {
-    setFilter(filter().filter(i => i != id))
+    setFilter(filter().filter((i) => i != id))
   }
 
   const includesFilter = (id: string) => filter().includes(id)
@@ -63,28 +69,28 @@ const useCreatorFilterHook = () => {
   const reset = () => {
     setFilter([])
   }
-  const isSlotPartOfFilter = (stream: FullStream) => {
+  const isSlotPartOfFilter = (stream: YogsStream) => {
     if (isEmpty()) {
       return true
     }
-    const streamIds: string[] = stream.creators.map((c) => c.id)
+    const streamIds: string[] = stream.creators?.map((c) => c.id) ?? []
     if (and()) {
-      return filter().every(id => streamIds.includes(id))
+      return filter().every((id) => streamIds.includes(id))
     } else {
-      return filter().some(id => streamIds.includes(id))
+      return filter().some((id) => streamIds.includes(id))
     }
   }
 
   const filteredStreams = () => streams().filter(isSlotPartOfFilter)
   const appearanceCount = (id: string) => {
-    return streams().filter(s => {
-      const streamIds: string[] = s.creators.map((c) => c.id)
+    return streams().filter((s) => {
+      const streamIds: string[] = s.creators?.map((c) => c.id) ?? []
       return streamIds.includes(id)
-    }).length
+    })?.length
   }
   const [sortByName, setSortByName] = createSignal(true)
 
-  const toggleSortByName = () => setSortByName(v => !v)
+  const toggleSortByName = () => setSortByName((v) => !v)
   const makeLink = () => {
     const names = filter().join(',')
     let filterType = ''
@@ -127,23 +133,27 @@ const useCreatorFilterHook = () => {
     reset,
     filteredStreams,
     appearanceCount,
-    sortByName, setSortByName, toggleSortByName,
+    sortByName,
+    setSortByName,
+    toggleSortByName,
     isSlotPartOfFilter,
-    copyFilterUrl
+    copyFilterUrl,
   }
 }
 
-interface CreatorFilterProps {
-}
+interface CreatorFilterProps {}
 
-const CreatorFilterContext = createContext<ReturnType<typeof useCreatorFilterHook>>();
+const CreatorFilterContext =
+  createContext<ReturnType<typeof useCreatorFilterHook>>()
 
-export const CreatorFilterProvider: ParentComponent<CreatorFilterProps> = (props) => {
+export const CreatorFilterProvider: ParentComponent<CreatorFilterProps> = (
+  props,
+) => {
   const hook = useCreatorFilterHook()
   return (
     <CreatorFilterContext.Provider value={hook}>
       {props.children}
     </CreatorFilterContext.Provider>
-  );
+  )
 }
 export const useCreatorFilter = () => useContext(CreatorFilterContext)!

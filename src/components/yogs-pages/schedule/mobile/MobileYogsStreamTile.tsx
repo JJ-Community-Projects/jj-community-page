@@ -1,20 +1,23 @@
-import {type Component, Show} from "solid-js";
-import type {FullStream} from "../../../../lib/model/ContentTypes.ts";
-import {DateTime} from "luxon";
-import {useNow} from "../../../../lib/utils/useNow.ts";
-import {BiLogosTwitch, BiLogosYoutube} from "solid-icons/bi";
-import {getTextColor} from "../../../../lib/utils/textColors.ts";
-import {YogsStreamUtils} from "../../../../lib/utils/YogsStreamUtils.ts";
-import {BsPeopleFill} from "solid-icons/bs";
-import {YogsScheduleDetailDialog} from "../YogsScheduleDetailDialog.tsx";
-import {logSlotClick} from "../../../../lib/analytics.ts";
-import {createModalSignal} from "../../../../lib/createModalSignal.ts";
+import { type Component, Show } from 'solid-js'
+import type { YogsStream } from '../../../../lib/orpc/private/yogs/contract.ts'
+
+import { DateTime } from 'luxon'
+import { useNow } from '../../../../lib/utils/useNow.ts'
+import { BiLogosTwitch, BiLogosYoutube } from 'solid-icons/bi'
+import { getTextColor } from '../../../../lib/utils/textColors.ts'
+import { YogsStreamUtils } from '../../../../lib/utils/YogsStreamUtils.ts'
+import { BsPeopleFill } from 'solid-icons/bs'
+import { YogsScheduleDetailDialog } from '../YogsScheduleDetailDialog.tsx'
+import { logSlotClick } from '../../../../lib/analytics.ts'
+import { createModalSignal } from '../../../../lib/createModalSignal.ts'
 
 interface MobileScheduleBodyProps {
-  stream: FullStream
+  stream: YogsStream
 }
 
-export const MobileYogsStreamTile: Component<MobileScheduleBodyProps> = (props) => {
+export const MobileYogsStreamTile: Component<MobileScheduleBodyProps> = (
+  props,
+) => {
   const stream = props.stream
   const now = useNow()
 
@@ -73,7 +76,7 @@ export const MobileYogsStreamTile: Component<MobileScheduleBodyProps> = (props) 
     }
     return gradientStyle
   }*/
-  const vodTypes = () => props.stream.vods?.map(vod => vod.type) ?? []
+  const vodTypes = () => props.stream.vods?.map((vod) => vod.type) ?? []
 
   const hasYoutubeVod = () => {
     return vodTypes().includes('youtube')
@@ -84,48 +87,28 @@ export const MobileYogsStreamTile: Component<MobileScheduleBodyProps> = (props) 
   }
 
   const modal = createModalSignal()
-  const style = stream.style
-  const colors = style.background.colors ?? ['#ff0', '#f0f']
-  const orientation = style.background.orientation
 
-  function orientationInCss() {
-    switch (orientation) {
-      case 'TD':
-        return 'to bottom'
-      case 'LR':
-        return 'to right'
-      case 'RL':
-        return 'to left'
-      case 'DT':
-        return 'to top'
-      case 'TLBR':
-        return 'to bottom right'
-      case 'TRBL':
-        return 'to bottom left'
-      default:
-        return orientation
-    }
-  }
-
-  const gradient = `linear-gradient(${orientationInCss()}, ${colors.join(', ')})`
-
+  const color = () => stream.color
 
   return (
     <>
       <div
-        class={'rounded-2xl w-full'}
+        class={'w-full rounded-2xl'}
         style={{
-
-          'background-image': gradient,
-          color: getTextColor(colors[0]),
+          'background-color': color(),
+          color: getTextColor(color()),
         }}
       >
         <div class={'p-schedule h-full transition-all'}>
           <div
-            class={'schedule-card flex flex-col items-center justify-center p-1 text-center transition-all'}
-            style={{
-              //    ...background(),
-            }}
+            class={
+              'schedule-card flex flex-col items-center justify-center p-1 text-center transition-all'
+            }
+            style={
+              {
+                //    ...background(),
+              }
+            }
             onclick={() => {
               logSlotClick(stream)
               modal.open()
@@ -137,27 +120,26 @@ export const MobileYogsStreamTile: Component<MobileScheduleBodyProps> = (props) 
               <p class={'font-mono text-xs'}>{countdown()}</p>
             </Show>
             <Show when={!showCountdown() && isLive()}>
-              <p class={'~text-md/lg font-bold tracking-wide text-white'}>LIVE</p>
+              <p class={'~text-md/lg font-bold tracking-wide text-white'}>
+                LIVE
+              </p>
             </Show>
             <div class={'flex w-full flex-row justify-around'}>
               <Show when={hasTwitchVod()}>
-                <BiLogosTwitch size={18}/>
+                <BiLogosTwitch size={18} />
               </Show>
 
               <Show when={hasYoutubeVod()}>
-                <BiLogosYoutube size={18}/>
+                <BiLogosYoutube size={18} />
               </Show>
-              <Show when={props.stream.creators.length > 0}>
-                <BsPeopleFill size={18}/>
+              <Show when={(props.stream.creators?.length ?? 0) > 0}>
+                <BsPeopleFill size={18} />
               </Show>
             </div>
           </div>
         </div>
       </div>
-      <YogsScheduleDetailDialog
-        stream={props.stream}
-        modalSignal={modal}
-      />
+      <YogsScheduleDetailDialog stream={props.stream} modalSignal={modal} />
     </>
   )
 }

@@ -3,11 +3,21 @@ import { Dialog } from '@kobalte/core'
 import { FaBrandsTwitch, FaBrandsYoutube, FaSolidXmark } from 'solid-icons/fa'
 import { DateTime } from 'luxon'
 import { getTextColor } from '../../../lib/utils/textColors.ts'
-import type { ContentVod, FullCreator, FullStream } from '../../../lib/model/ContentTypes.ts'
+import type {
+  YogsCreator,
+  YogsStream,
+  YogsVOD,
+} from '../../../lib/orpc/private/yogs/contract.ts'
 import { YogsStreamUtils } from '../../../lib/utils/YogsStreamUtils.ts'
 import { useNow } from '../../../lib/utils/useNow.ts'
-import { logCreatorFromSlotClick, logCreatorSlotFilterClick } from '../../../lib/analytics.ts'
-import { createModalSignal, type ModalSignal } from '../../../lib/createModalSignal.ts'
+import {
+  logCreatorFromSlotClick,
+  logCreatorSlotFilterClick,
+} from '../../../lib/analytics.ts'
+import {
+  createModalSignal,
+  type ModalSignal,
+} from '../../../lib/createModalSignal.ts'
 import { useYogsSchedule } from './provider/YogsScheduleProvider.tsx'
 import { useCreatorFilter } from './provider/CreatorFilterProvider.tsx'
 import { SolidMarkdown } from 'solid-markdown'
@@ -16,48 +26,52 @@ import { YogsStreamDisclaimer } from './YogsScheduleDisclaimer.tsx'
 import { YogsCreatorDialog } from '../creators/YogsCreatorDialog.tsx'
 
 interface YogsScheduleDetailDialogProps {
-  stream: FullStream
+  stream: YogsStream
   modalSignal: ModalSignal
 }
 
-export const YogsScheduleDetailDialog: Component<YogsScheduleDetailDialogProps> = (props) => {
-
+export const YogsScheduleDetailDialog: Component<
+  YogsScheduleDetailDialogProps
+> = (props) => {
   const background = () => {
-    return props.stream.style?.background?.colors?.at(0) ?? '#ff0000'
+    return props.stream.color ?? '#ff0000'
   }
 
   return (
-    <Dialog.Root open={props.modalSignal.isOpen()} onOpenChange={props.modalSignal.setOpen}>
+    <Dialog.Root
+      open={props.modalSignal.isOpen()}
+      onOpenChange={props.modalSignal.setOpen}
+    >
       <Dialog.Portal>
-        <Dialog.Overlay class="fixed inset-0 bg-black/20 lg:p-16 p-2"/>
-        <Dialog.Content
-          class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-2xl shadow-xl w-[calc(100vw_-_24px)] lg:w-[min(calc(100vw_-_16px),_386px)] md:h-[90vh] h-[70vh] flex flex-col">
+        <Dialog.Overlay class="fixed inset-0 bg-black/20 p-2 lg:p-16" />
+        <Dialog.Content class="fixed left-1/2 top-1/2 flex h-[70vh] w-[calc(100vw_-_24px)] -translate-x-1/2 -translate-y-1/2 transform flex-col rounded-2xl bg-white shadow-xl md:h-[90vh] lg:w-[min(calc(100vw_-_16px),_386px)]">
           <Dialog.Title
-            class="p-2 flex flex-row gap-4 rounded-t-2xl"
+            class="flex flex-row gap-4 rounded-t-2xl p-2"
             style={{
               background: background(),
-              color: getTextColor(background())
+              color: getTextColor(background()),
             }}
           >
-            <button class={'rounded-full hover:bg-accent-200/10 aspect-square'}
-                    onClick={() => props.modalSignal.close()}>
-              <FaSolidXmark size={24}/>
+            <button
+              class={'aspect-square rounded-full hover:bg-accent-200/10'}
+              onClick={() => props.modalSignal.close()}
+            >
+              <FaSolidXmark size={24} />
             </button>
             <div class={'flex flex-col'}>
               <p class={'text-xl font-bold'}>{props.stream.title}</p>
               <p>{props.stream.subtitle}</p>
             </div>
           </Dialog.Title>
-          <Body stream={props.stream} modalSignal={props.modalSignal}/>
+          <Body stream={props.stream} modalSignal={props.modalSignal} />
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>
-  );
+  )
 }
 
-
 interface BodyProps {
-  stream: FullStream
+  stream: YogsStream
   modalSignal: ModalSignal
 }
 
@@ -67,11 +81,14 @@ const Body: Component<BodyProps> = (props) => {
 
   const countdownFormat = () => {
     if (YogsStreamUtils.start(stream()).diff(now()).as('day') < 1) {
-      return YogsStreamUtils.start(stream()).diff(now()).toFormat("hh'h' mm'm' ss's'")
+      return YogsStreamUtils.start(stream())
+        .diff(now())
+        .toFormat("hh'h' mm'm' ss's'")
     }
-    return YogsStreamUtils.start(stream()).diff(now()).toFormat("dd'd' hh'h' mm'm' ss's'")
+    return YogsStreamUtils.start(stream())
+      .diff(now())
+      .toFormat("dd'd' hh'h' mm'm' ss's'")
   }
-
 
   const isBefore = () => {
     return YogsStreamUtils.isBefore(stream(), now())
@@ -82,17 +99,26 @@ const Body: Component<BodyProps> = (props) => {
     return start < now() && end > now()
   }
   return (
-    <div class="h-full flex flex-1 flex-col overflow-hidden overscroll-none">
+    <div class="flex h-full flex-1 flex-col overflow-hidden overscroll-none">
       <div
-        class={'h-full flex flex-col overflow-auto overflow-x-hidden scrollbar-thin scrollbar-corner-primary-100 scrollbar-thumb-accent-500 scrollbar-track-accent-100'}>
-        <div class={'px-2 pt-2 pb-4 h-full flex flex-col justify-between'}>
+        class={
+          'flex h-full flex-col overflow-auto overflow-x-hidden scrollbar-thin scrollbar-track-accent-100 scrollbar-thumb-accent-500 scrollbar-corner-primary-100'
+        }
+      >
+        <div class={'flex h-full flex-col justify-between px-2 pb-4 pt-2'}>
           <div class={'flex flex-col'}>
-            <Show when={props.stream.description && !props.stream.markdownDescription}>
-              <Dialog.Description class="mb-6">{props.stream.description}</Dialog.Description>
+            <Show
+              when={
+                props.stream.description && !props.stream.markdownDescription
+              }
+            >
+              <Dialog.Description class="mb-6">
+                {props.stream.description}
+              </Dialog.Description>
             </Show>
 
             <Show when={props.stream.markdownDescription}>
-              <div class='prose'>
+              <div class="prose">
                 <SolidMarkdown
                   children={props.stream.markdownDescription}
                   renderingStrategy={'reconcile'}
@@ -103,16 +129,18 @@ const Body: Component<BodyProps> = (props) => {
             </Show>
 
             <Show when={isLive()}>
-              <LiveButton/>
+              <LiveButton />
             </Show>
-            <p>{DateTime.fromJSDate(props.stream.start).toLocaleString({
-              weekday: 'short',
-              month: 'short',
-              day: 'numeric',
-              hour: 'numeric',
-              minute: 'numeric',
-              timeZoneName: 'short'
-            })}</p>
+            <p>
+              {DateTime.fromJSDate(props.stream.start).toLocaleString({
+                weekday: 'short',
+                month: 'short',
+                day: 'numeric',
+                hour: 'numeric',
+                minute: 'numeric',
+                timeZoneName: 'short',
+              })}
+            </p>
             <Show when={isBefore()}>
               <p>{countdownFormat()}</p>
             </Show>
@@ -120,52 +148,57 @@ const Body: Component<BodyProps> = (props) => {
               <p>Vods</p>
               <div class={'flex flex-wrap gap-2'}>
                 <For each={props.stream.vods}>
-                  {
-                    vod => (<VodComponent vod={vod}/>)
-                  }
+                  {(vod) => <VodComponent vod={vod} />}
                 </For>
               </div>
             </Show>
-            <Show when={props.stream.vods && props.stream.vods.length > 0 && props.stream.creators.length > 0}>
-              <div class={'h-2'}/>
+            <Show
+              when={
+                props.stream.vods &&
+                props.stream.vods.length > 0 &&
+                (props.stream.creators?.length ?? 0) > 0
+              }
+            >
+              <div class={'h-2'} />
             </Show>
-            <Show when={props.stream.creators.length > 0}>
+            <Show when={(props.stream.creators?.length ?? 0) > 0}>
               <p class={'text-lg'}>Creators</p>
               <div class={'flex flex-wrap gap-2'}>
                 <For each={props.stream.creators}>
-                  {
-                    creator => (
-                      <CreatorComponent creator={creator} modalSignal={props.modalSignal} stream={props.stream}/>)
-                  }
+                  {(creator) => (
+                    <CreatorComponent
+                      creator={creator}
+                      modalSignal={props.modalSignal}
+                      stream={props.stream}
+                    />
+                  )}
                 </For>
               </div>
             </Show>
           </div>
-          <YogsStreamDisclaimer/>
+          <YogsStreamDisclaimer />
         </div>
       </div>
     </div>
   )
 }
 
-
 interface VodProps {
-  vod: ContentVod
+  vod: YogsVOD
 }
 
 const VodComponent: Component<VodProps> = (props) => {
-
   if (props.vod.type === 'youtube') {
     return (
       <div class={'flex flex-row py-1'}>
         <a
           target={'_blank'}
           class={
-            'transition-all bg-youtube-100/50 hover:bg-youtube-100 flex flex-row items-center gap-1 rounded-full px-2 py-0.5 text-black no-underline hover:cursor-pointer'
+            'flex flex-row items-center gap-1 rounded-full bg-youtube-100/50 px-2 py-0.5 text-black no-underline transition-all hover:cursor-pointer hover:bg-youtube-100'
           }
           href={props.vod.link}
         >
-          <FaBrandsYoutube/> {props.vod.label}
+          <FaBrandsYoutube /> {props.vod.label}
         </a>
       </div>
     )
@@ -175,11 +208,11 @@ const VodComponent: Component<VodProps> = (props) => {
         <a
           target={'_blank'}
           class={
-            'transition-all bg-twitch-200/50 hover:bg-twitch-200 flex flex-row items-center gap-1 rounded-full px-2 py-0.5 text-black no-underline hover:cursor-pointer'
+            'flex flex-row items-center gap-1 rounded-full bg-twitch-200/50 px-2 py-0.5 text-black no-underline transition-all hover:cursor-pointer hover:bg-twitch-200'
           }
           href={props.vod.link}
         >
-          <FaBrandsTwitch/> {props.vod.label}
+          <FaBrandsTwitch /> {props.vod.label}
         </a>
       </div>
     )
@@ -189,43 +222,40 @@ const VodComponent: Component<VodProps> = (props) => {
         <a
           target={'_blank'}
           class={
-            'transition-all bg-twitch-200 hover:bg-twitch-200 hover:text-twitch flex flex-row items-center gap-1 rounded-full px-2 py-0.5 text-black no-underline hover:cursor-pointer'
+            'flex flex-row items-center gap-1 rounded-full bg-twitch-200 px-2 py-0.5 text-black no-underline transition-all hover:cursor-pointer hover:bg-twitch-200 hover:text-twitch'
           }
           href={props.vod.link}
         >
-          <FaBrandsTwitch/> {props.vod.label}
+          <FaBrandsTwitch /> {props.vod.label}
         </a>
       </div>
     )
   }
 }
 
-
 interface CreatorComponentProps {
-  creator: FullCreator
-  stream: FullStream
+  creator: YogsCreator
+  stream: YogsStream
   modalSignal: ModalSignal
 }
 
 const CreatorComponent: Component<CreatorComponentProps> = (props) => {
   const creator = props.creator
-  const image = creator?.profileImage
-  const twitchUser = creator.twitchUser
-  const bg = creator?.style?.primaryColor ?? '#1E95EF'
+  const imageUrl = creator?.imageUrl
+  const bg = creator?.color
   const textColor = getTextColor(bg)
 
   const label = creator.name
-  const imageUrl = image?.small ?? image?.medium ?? image?.large ?? twitchUser?.profile_image_url
 
   const modal = createModalSignal()
 
-  const {getCreatorStreams} = useYogsSchedule()
+  const { getCreatorStreams } = useYogsSchedule()
 
   const streams = getCreatorStreams(creator.id)
 
   const shouldShowJJStreams = streams.length > 1
 
-  const {reset, addFilter} = useCreatorFilter()
+  const { reset, addFilter } = useCreatorFilter()
 
   const onJJStreamsClick = () => {
     reset()
@@ -238,33 +268,29 @@ const CreatorComponent: Component<CreatorComponentProps> = (props) => {
   return (
     <>
       <button
-        class="~text-xs/base cursor-pointer p-2 rounded-full flex flex-row gap-2 items-center hover:scale-105 hover:brightness-105 transition-all duration-200"
+        class="flex cursor-pointer flex-row items-center gap-2 rounded-full p-2 transition-all duration-200 ~text-xs/base hover:scale-105 hover:brightness-105"
         style={{
           'background-color': bg,
-          'color': textColor,
+          color: textColor,
         }}
         onclick={() => {
           modal.open()
           logCreatorFromSlotClick(creator, props.stream)
         }}
       >
-        {
-          imageUrl &&
-            <img
-                src={imageUrl}
-                alt={label}
-                class="rounded-full ~w-5/8 ~h-5/8"
-            />
-        }
+        {imageUrl && (
+          <img src={imageUrl} alt={label} class="rounded-full ~h-5/8 ~w-5/8" />
+        )}
         <span>{label}</span>
       </button>
-      <YogsCreatorDialog creator={creator} modalSignal={modal}
-                     onJJStreamsClick={shouldShowJJStreams ? onJJStreamsClick : undefined}/>
+      <YogsCreatorDialog
+        creator={creator}
+        modalSignal={modal}
+        onJJStreamsClick={shouldShowJJStreams ? onJJStreamsClick : undefined}
+      />
     </>
   )
-
 }
-
 
 const LiveButton = () => {
   return (
@@ -272,18 +298,25 @@ const LiveButton = () => {
       <a
         target={'_blank'}
         class={
-          'transition-all bg-twitch-200/50 hover:bg-twitch-200 flex flex-row items-center gap-1 rounded-full px-2 py-0.5 text-black no-underline hover:cursor-pointer'
+          'flex flex-row items-center gap-1 rounded-full bg-twitch-200/50 px-2 py-0.5 text-black no-underline transition-all hover:cursor-pointer hover:bg-twitch-200'
         }
         href={'https://twitch.tv/yogscast'}
       >
-        <FaBrandsTwitch/> Watch Live <div class={'h-2 w-2'}>
-                  <span class="relative flex h-2 w-2">
-                    <span
-                      class={'absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75 duration-700'}
-                    />
-                    <span class={'relative inline-flex h-full w-full rounded-full bg-red-500'}/>
-                  </span>
-      </div>
+        <FaBrandsTwitch /> Watch Live{' '}
+        <div class={'h-2 w-2'}>
+          <span class="relative flex h-2 w-2">
+            <span
+              class={
+                'absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75 duration-700'
+              }
+            />
+            <span
+              class={
+                'relative inline-flex h-full w-full rounded-full bg-red-500'
+              }
+            />
+          </span>
+        </div>
       </a>
     </div>
   )

@@ -1,5 +1,5 @@
-import type {FullCreator, FullStream} from "./model/ContentTypes.ts";
-import {DateTime} from "luxon";
+import { DateTime } from 'luxon'
+import type { YogsCreator, YogsStream } from './orpc/private/yogs/contract.ts'
 
 export const log = (eventName: string, data: { [key: string]: any }) => {
   try {
@@ -10,7 +10,7 @@ export const log = (eventName: string, data: { [key: string]: any }) => {
   }
 }
 
-export const logSlotClick = (slot: FullStream) => {
+export const logSlotClick = (slot: YogsStream) => {
   const start = DateTime.fromJSDate(slot.start)
   const data = {
     slot_title: slot.title,
@@ -19,7 +19,10 @@ export const logSlotClick = (slot: FullStream) => {
   }
   log('click_slot', data)
 }
-export const logCreatorFromSlotClick = (creator: FullCreator, slot: FullStream) => {
+export const logCreatorFromSlotClick = (
+  creator: YogsCreator,
+  slot: YogsStream,
+) => {
   const start = DateTime.fromJSDate(slot.start)
   const data = {
     slot_title: slot.title,
@@ -29,7 +32,10 @@ export const logCreatorFromSlotClick = (creator: FullCreator, slot: FullStream) 
   }
   log('click_creator_slot', data)
 }
-export const logCreatorSlotFilterClick = (creator: FullCreator, slot: FullStream) => {
+export const logCreatorSlotFilterClick = (
+  creator: YogsCreator,
+  slot: YogsStream,
+) => {
   const start = DateTime.fromJSDate(slot.start)
   const data = {
     slot_title: slot.title,
@@ -40,7 +46,7 @@ export const logCreatorSlotFilterClick = (creator: FullCreator, slot: FullStream
   log('creator_slot_filter', data)
 }
 
-export const logCreator = (creator: FullCreator) => {
+export const logCreator = (creator: YogsCreator) => {
   log('click_creator', {
     name: creator.name,
   })

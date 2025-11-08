@@ -1,4 +1,3 @@
-import type {FullCreator} from "../../../lib/model/ContentTypes.ts";
 import type {ModalSignal} from "../../../lib/createModalSignal.ts";
 import {type Component, For, Match, Show, Switch} from "solid-js";
 import {Dialog} from "@kobalte/core/dialog";
@@ -17,9 +16,10 @@ import {
   FaSolidLink
 } from "solid-icons/fa";
 import {BskyIcon, JJIcon} from "../common/YogsJJIcons.tsx";
+import type { YogsCreator } from '../../../lib/orpc/private/yogs/contract.ts'
 
 interface CreatorDialogProps {
-  creator: FullCreator,
+  creator: YogsCreator,
   modalSignal: ModalSignal,
   onJJStreamsClick?: () => void
 }
@@ -34,8 +34,8 @@ export const YogsCreatorDialog: Component<CreatorDialogProps> = (props) => {
           <Dialog.Title
             class="p-2 flex flex-row gap-4 rounded-t-2xl"
             style={{
-              background: props.creator.style?.primaryColor ?? '#1E95EF',
-              color: getTextColor(props.creator.style?.primaryColor ?? '#1E95EF')
+              background: props.creator.color?? '#1E95EF',
+              color: getTextColor(props.creator.color ?? '#1E95EF')
             }}
           >
             <button class={'rounded-full hover:bg-accent-200/10 aspect-square'}
@@ -63,7 +63,7 @@ export const YogsCreatorDialog: Component<CreatorDialogProps> = (props) => {
 }
 
 interface LinksProps {
-  creator: FullCreator,
+  creator: YogsCreator,
   onJJStreamsClick?: () => void
 }
 
