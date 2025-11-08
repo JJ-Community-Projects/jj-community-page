@@ -12,12 +12,13 @@ import type {
 import type { BatchItem } from 'drizzle-orm/batch'
 import { TwitchAPI } from '../lib/twitchAPI.ts'
 import type {
-  CausesDisplayType,
-  Currencies,
-  JJCampaignsType,
-  JJCampaignType,
-  JJCauseType,
+  CausesDisplayTVType,
+  CurrenciesTV,
+  JJCampaignsTVType,
+  JJCampaignTVType,
+  JJCauseTVType,
 } from '../lib/orpc/public/twitchExtension/contract.ts'
+import type { JJCampaignType } from '../lib/orpc/private/jjData/contract.ts'
 
 export class JingleJamData extends DurableObject<Env> {
   replaceMap: Map<string, string> = new Map([
@@ -30,7 +31,7 @@ export class JingleJamData extends DurableObject<Env> {
   }
 
   // Causes
-  public async setCause(cause: JJCauseType) {
+  public async setCause(cause: JJCauseTVType) {
     await this.storage.put(this.causeKey(cause.id), cause)
   }
 
@@ -42,7 +43,7 @@ export class JingleJamData extends DurableObject<Env> {
 
   public getCause(causeId: number) {
     return this.storage.get(this.causeKey(causeId)) as Promise<
-      JJCauseType | undefined
+      JJCauseTVType | undefined
     >
   }
 
@@ -51,7 +52,7 @@ export class JingleJamData extends DurableObject<Env> {
       string,
       unknown
     >
-    return Array.from(map.values()) as JJCauseType[]
+    return Array.from(map.values()) as JJCauseTVType[]
   }
 
   // Campaigns
@@ -236,6 +237,9 @@ export class JingleJamData extends DurableObject<Env> {
 
     // Build and store display projections for causes
     await this.buildAndStoreCausesDisplay(data)
+
+    // Build and store display projections for community campaigns
+    await this.buildAndStoreCommunityCampaignsDisplay(data)
   }
 
   public async getAvgConversionRate() {
@@ -270,12 +274,12 @@ export class JingleJamData extends DurableObject<Env> {
     return donations ?? new Date().toISOString()
   }
 
-  public getCampaignsDisplay(): Promise<JJCampaignsType | undefined> {
-    return this.storage.get<JJCampaignsType>('campaigns:display')
+  public getCampaignsDisplay(): Promise<JJCampaignsTVType | undefined> {
+    return this.storage.get<JJCampaignsTVType>('campaigns:display')
   }
 
-  public getCausesDisplay(): Promise<CausesDisplayType | undefined> {
-    return this.storage.get<CausesDisplayType>('causes:display')
+  public getCausesDisplay(): Promise<CausesDisplayTVType | undefined> {
+    return this.storage.get<CausesDisplayTVType>('causes:display')
   }
 
   public async getLiveLogins() {
@@ -297,8 +301,6 @@ export class JingleJamData extends DurableObject<Env> {
 
     const logins = await this.getTwitchLoginsFromCampaigns()
 
-    console.log('validateTwitchChannels', 'logins', logins)
-
     const accessToken = await api.getAppToken()
     const validLogins: string[] = []
     const invalidLogins: string[] = []
@@ -307,27 +309,11 @@ export class JingleJamData extends DurableObject<Env> {
       'twitch:invalidLogins',
     )
     // Normalize previously stored invalid logins for proper comparison
-    const storedInvalidSet = new Set(
-      storedInvalidLogins,
-    )
-
-    console.log(
-      'validateTwitchChannels',
-      'storedInvalidLogins',
-      storedInvalidLogins,
-    )
+    const storedInvalidSet = new Set(storedInvalidLogins)
 
     for (const login of logins) {
       const normalized = this.normalizeTwitchLogin(login)
       if (!normalized) continue
-
-      console.log(
-        'validateTwitchChannels',
-        'processing',
-        login,
-        '->',
-        normalized,
-      )
 
       if (storedInvalidSet.has(normalized)) {
         invalidLogins.push(normalized)
@@ -336,12 +322,6 @@ export class JingleJamData extends DurableObject<Env> {
       }
 
       const channel = await api.fetchUsersByLogin(normalized, accessToken)
-      console.log(
-        'validateTwitchChannels',
-        'processTwitchChannels',
-        normalized,
-        channel,
-      )
 
       if (channel.data && !channel.error) {
         validLogins.push(normalized)
@@ -374,23 +354,18 @@ export class JingleJamData extends DurableObject<Env> {
       }
     }
 
-    console.log('validLogins', validLogins)
-    console.log('invalidLogins', invalidLogins)
-
     await this.setStringArray('twitch:validLogins', validLogins)
     await this.setStringArray('twitch:invalidLogins', invalidLogins)
   }
 
   public async checkLiveStreams() {
     const logins = await this.getStringArray('twitch:validLogins')
-    console.log('checkLiveStreams', logins)
     const api = new TwitchAPI(this.env)
     const accessToken = await api.getAppToken()
     const liveStreamsIds: string[] = []
     const liveStreamsLogins: string[] = []
     for (const login of logins) {
       const stream = await api.fetchStreamsByLogin(login, accessToken)
-      console.log('checkLiveStreams', login, stream)
       if (stream.data && !stream.error) {
         liveStreamsIds.push(stream.data.user_id)
         liveStreamsLogins.push(stream.data.user_login)
@@ -418,7 +393,7 @@ export class JingleJamData extends DurableObject<Env> {
   }
 
   async getCampaignDisplay(channelId: string) {
-    return this.storage.get<JJCampaignType>(
+    return this.storage.get<JJCampaignTVType>(
       `campaign:display:twitchId:${channelId}`,
     )
   }
@@ -438,6 +413,10 @@ export class JingleJamData extends DurableObject<Env> {
   // Returns all Twitch channels (logins) referenced by current campaigns
   public async getAllTwitchLogins() {
     return this.getTwitchLoginsFromCampaigns()
+  }
+
+  public async getAllYoutubeLogins() {
+    return this.getYoutubeLoginsFromCampaigns()
   }
 
   // GBP->EUR conversion via Google Finance
@@ -482,6 +461,14 @@ export class JingleJamData extends DurableObject<Env> {
     return this.storage.deleteAll()
   }
 
+  public getCommunityCampaignsDisplay(): Promise<
+    { count: number; list: JJCampaignType[] } | undefined
+  > {
+    return this.storage.get<{ count: number; list: JJCampaignType[] }>(
+      'community:campaigns:display',
+    )
+  }
+
   private normalizeTwitchLogin(input: string | undefined | null) {
     if (!input) return ''
     let s = String(input).trim()
@@ -496,38 +483,39 @@ export class JingleJamData extends DurableObject<Env> {
     return s
   }
 
+  private toCurrencies(
+    gbp: number,
+    usdRateIn: number,
+    eurRateIn: number,
+  ): CurrenciesTV {
+    const usd = Math.round(gbp * usdRateIn * 100) / 100
+    const euro = Math.round(gbp * eurRateIn * 100) / 100
+    return {
+      gbp,
+      usd,
+      euro,
+      gbpFormatted: new Intl.NumberFormat('en-GB', {
+        style: 'currency',
+        currency: 'GBP',
+      }).format(gbp),
+      usdFormatted: new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+      }).format(usd),
+      euroFormatted: new Intl.NumberFormat('de-DE', {
+        style: 'currency',
+        currency: 'EUR',
+      }).format(euro),
+    }
+  }
+
   // Extracted from refresh: builds and stores display projections matching JJCampaignsSchema
   private async buildAndStoreCampaignsDisplay(data: JingleJamResponse) {
     try {
       const usdRate = data.avgConversionRate
       const eurRate = await this.getGbpToEurRate()
-      const toCurrencies = (
-        gbp: number,
-        usdRateIn: number,
-        eurRateIn: number,
-      ): Currencies => {
-        const usd = Math.round(gbp * usdRateIn * 100) / 100
-        const euro = Math.round(gbp * eurRateIn * 100) / 100
-        return {
-          gbp,
-          usd,
-          euro,
-          gbpFormatted: new Intl.NumberFormat('en-GB', {
-            style: 'currency',
-            currency: 'GBP',
-          }).format(gbp),
-          usdFormatted: new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'USD',
-          }).format(usd),
-          euroFormatted: new Intl.NumberFormat('de-DE', {
-            style: 'currency',
-            currency: 'EUR',
-          }).format(euro),
-        }
-      }
 
-      const displayList: JJCampaignType[] = []
+      const displayList: JJCampaignTVType[] = []
       for (const c of data.campaigns.list) {
         const userId = c.user.id
         let isLive = false
@@ -536,10 +524,12 @@ export class JingleJamData extends DurableObject<Env> {
           isLive = !!val
         } catch {}
 
-        let twitch: JJCampaignType['twitch'] | undefined = undefined
+        let twitch: JJCampaignTVType['twitch'] | undefined = undefined
         let login =
           c.livestream?.type === 'twitch' && c.livestream?.channel
-            ? this.normalizeTwitchLogin(String(c.livestream.channel).toLowerCase())
+            ? this.normalizeTwitchLogin(
+                String(c.livestream.channel).toLowerCase(),
+              )
             : ''
 
         let twitchId = ''
@@ -563,15 +553,15 @@ export class JingleJamData extends DurableObject<Env> {
           }
         }
 
-        const display: JJCampaignType = {
+        const display: JJCampaignTVType = {
           campaignName: c.name,
           tiltifyUrl: c.url,
           tiltifyName: c.user.name,
           tiltifyDescription: c.description,
           tiltifyCauseId: c.causeId ?? undefined,
           avatar: c.user.avatar ?? '',
-          raised: toCurrencies(c.raised, usdRate, eurRate),
-          goal: toCurrencies(c.goal, usdRate, eurRate),
+          raised: this.toCurrencies(c.raised, usdRate, eurRate),
+          goal: this.toCurrencies(c.goal, usdRate, eurRate),
           twitch,
         }
         displayList.push(display)
@@ -586,7 +576,7 @@ export class JingleJamData extends DurableObject<Env> {
         } catch {}
       }
 
-      const campaignsDisplay: JJCampaignsType = {
+      const campaignsDisplay: JJCampaignsTVType = {
         count: displayList.length,
         campaigns: displayList,
         date: new Date(),
@@ -606,7 +596,7 @@ export class JingleJamData extends DurableObject<Env> {
         gbp: number,
         usdRateIn: number,
         eurRateIn: number,
-      ): Currencies => {
+      ): CurrenciesTV => {
         const usd = Math.round(gbp * usdRateIn * 100) / 100
         const euro = Math.round(gbp * eurRateIn * 100) / 100
         return {
@@ -628,7 +618,7 @@ export class JingleJamData extends DurableObject<Env> {
         }
       }
 
-      const causes: JJCauseType[] = data.causes.map((c) => {
+      const causes: JJCauseTVType[] = data.causes.map((c) => {
         const yog = toCurrencies(c.raised.yogscast, usdRate, eurRate)
         const fund = toCurrencies(c.raised.fundraisers, usdRate, eurRate)
         const total = toCurrencies(
@@ -674,7 +664,7 @@ export class JingleJamData extends DurableObject<Env> {
       }
       */
 
-      const output: CausesDisplayType = {
+      const output: CausesDisplayTVType = {
         count: causes.length,
         causes,
         // overview,
@@ -684,6 +674,100 @@ export class JingleJamData extends DurableObject<Env> {
     } catch (e) {
       console.error('build display causes', e)
     }
+  }
+
+  private async buildAndStoreCommunityCampaignsDisplay(
+    data: JingleJamResponse,
+  ) {
+    try {
+      const usdRate = data.avgConversionRate
+      const eurRate = await this.getGbpToEurRate()
+
+      const list = await Promise.all(
+        data.campaigns.list.map(async (c) => {
+          const login =
+            c.livestream?.type === 'twitch'
+              ? this.normalizeTwitchLogin(c.livestream?.channel)
+              : undefined
+
+          let tuser = undefined
+
+          if (login) {
+            tuser =           await this.storage.get<any>(`twitch:login:${login}`)
+
+          }
+
+          const twitchAvatar = (tuser as any)?.profile_image_url
+          const twitch =
+            c.livestream?.type === 'twitch'
+              ? this.toTwitchUrl(c.livestream?.channel)
+              : undefined
+
+          const youtube = c.livestream?.type?.includes('youtube')
+            ? this.toYouTubeUrl(c.livestream?.type, c.livestream?.channel)
+            : undefined
+          const val = await this.storage.get<boolean>(
+            `campaign:live:${c.user.id}`,
+          )
+
+          const display: JJCampaignType = {
+            campaignName: c.name,
+            tiltifyUrl: c.url,
+            tiltifyName: c.user.name,
+            tiltifyDescription: c.description || undefined,
+            tiltifyCauseId: c.causeId ?? undefined,
+            avatar: twitchAvatar ?? c.user.avatar ?? '',
+            raised: this.toCurrencies(c.raised, usdRate, eurRate),
+            twitch,
+            youtube,
+            isTwitchLive: val ?? false,
+          }
+          return display
+        }),
+      )
+
+      await this.storage.put('community:campaigns:display', {
+        count: list.length,
+        list,
+      })
+    } catch (e) {
+      console.error('build display community campaigns', e)
+    }
+  }
+
+  // Helper: fully-qualified Twitch URL from any incoming channel value
+  private toTwitchUrl(input: string | null | undefined): string | undefined {
+    if (!input) return undefined
+    const login = this.normalizeTwitchLogin(String(input).toLowerCase())
+    return login ? `https://twitch.tv/${login}` : undefined
+  }
+
+  // Helper: fully-qualified YouTube URL based on livestream type and channel value
+  private toYouTubeUrl(
+    type: string | undefined,
+    channel: string | null | undefined,
+  ): string | undefined {
+    if (!channel) return undefined
+    const c = String(channel).trim()
+    // If already a URL, return as-is (basic sanity check)
+    if (/^https?:\/\//i.test(c)) return c
+
+    if (!type) return undefined
+    if (type === 'youtube_live') {
+      // We receive a channel id (often starting with UC...) or a handle; prefer channel URL
+      // UC* indicates channel id; otherwise treat as handle or custom id
+      if (/^UC[a-zA-Z0-9_-]{22}$/i.test(c)) {
+        return `https://www.youtube.com/channel/${c}`
+      }
+      // Handles or custom channel names
+      if (c.startsWith('@')) return `https://www.youtube.com/${c}`
+      return `https://www.youtube.com/@${c}`
+    }
+    if (type === 'youtube_video') {
+      // Channel field contains a video id; form a watch URL
+      return `https://www.youtube.com/watch?v=${c}`
+    }
+    return undefined
   }
 
   // Key helpers
@@ -705,6 +789,15 @@ export class JingleJamData extends DurableObject<Env> {
       .filter((c) => c.livestream?.type === 'twitch')
       .map((c) => c.livestream?.channel)
       .filter((c) => c !== null)
-      .filter(c => this.normalizeTwitchLogin(c)) as string[]
+      .filter((c) => this.normalizeTwitchLogin(c)) as string[]
+  }
+
+  private async getYoutubeLoginsFromCampaigns() {
+    const campaigns = await this.getCampaigns()
+    return campaigns
+      .filter((c) => c.livestream?.type.includes('youtube'))
+      .map((c) => c.livestream?.channel)
+      .filter((c) => c !== null)
+      .filter((c) => c) as string[]
   }
 }

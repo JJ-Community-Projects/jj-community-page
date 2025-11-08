@@ -12,7 +12,7 @@ export const CurrenciesSchema = z.object({
   euroFormatted: z.string(),
 })
 
-export type Currencies = z.infer<typeof CurrenciesSchema>
+export type CurrenciesTV = z.infer<typeof CurrenciesSchema>
 
 export const JJRaisedSchema = z.object({
   yogscast: CurrenciesSchema,
@@ -74,9 +74,9 @@ export const JJCampaignsSchema = z.object({
 })
 
 // --- Inferred TS types (optional, matches your interfaces) ---
-export type JJCauseType = z.infer<typeof JJCauseSchema>
-export type JJCampaignType = z.infer<typeof JJCampaignSchema>
-export type JJCampaignsType = z.infer<typeof JJCampaignsSchema>
+export type JJCauseTVType = z.infer<typeof JJCauseSchema>
+export type JJCampaignTVType = z.infer<typeof JJCampaignSchema>
+export type JJCampaignsTVType = z.infer<typeof JJCampaignsSchema>
 
 export const CreatorSchema = z.object({
   id: z.string(),
@@ -153,7 +153,7 @@ export const CausesDisplaySchema = z.object({
   causes: z.array(JJCauseSchema),
 })
 
-export type CausesDisplayType = z.infer<typeof CausesDisplaySchema>
+export type CausesDisplayTVType = z.infer<typeof CausesDisplaySchema>
 
 export const YogsScheduleSchema = z.object({
   title: z.string(),
@@ -203,10 +203,9 @@ export const UserScheduleSchema = z.object({
   streams: z.array(StreamSchema),
 })
 
-
 export const UserDataSchema = z.object({
   campaign: JJCampaignSchema,
-  cause: JJCauseSchema.optional()
+  cause: JJCauseSchema.optional(),
 })
 
 export type UserDataType = z.infer<typeof UserDataSchema>

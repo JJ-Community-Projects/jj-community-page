@@ -64,6 +64,7 @@ const clearJingleJamDataContract = oc.input(z.void()).output(z.void())
 
 // New admin procedures for Twitch/channel data
 const getAllTwitchChannelsContract = oc.output(z.array(z.string()))
+const getAllYoutubeChannelsContract = oc.output(z.array(z.string()))
 const getAllLiveChannelsContract = oc.output(z.array(z.string()))
 const validateTwitchChannelsContract = oc.input(z.void()).output(z.void())
 const checkLiveStreamsContract = oc.input(z.void()).output(z.void())
@@ -103,6 +104,7 @@ export const contracts = {
   // new exports
   clearJingleJamDataContract,
   getAllTwitchChannelsContract,
+  getAllYoutubeChannelsContract,
   getAllLiveChannelsContract,
   validateTwitchChannelsContract,
   checkLiveStreamsContract,

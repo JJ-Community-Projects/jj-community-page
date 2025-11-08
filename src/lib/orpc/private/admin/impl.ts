@@ -331,6 +331,22 @@ const getAllTwitchChannels = os.getAllTwitchChannelsContract.handler(
   },
 )
 
+// Mirror of getAllTwitchChannels but for YouTube
+const getAllYoutubeChannels = os.getAllYoutubeChannelsContract.handler(
+  async ({ context }) => {
+    const DO = context.env.JingleJamData
+    const stubID = DO.idFromName('JJ_API_CACHE')
+    const stub = DO.get(stubID)
+    try {
+      const channels = await stub.getAllYoutubeLogins()
+      return channels
+    } catch (e) {
+      console.error('getAllYoutubeChannels', e)
+      throw new ORPCError('INTERNAL_SERVER_ERROR')
+    }
+  },
+)
+
 const getAllLiveChannels = os.getAllLiveChannelsContract.handler(
   async ({ context }) => {
     const DO = context.env.JingleJamData
@@ -422,6 +438,7 @@ export const adminRouter = {
   // new
   clearJingleJamData,
   getAllTwitchChannels,
+  getAllYoutubeChannels,
   getAllLiveChannels,
   validateTwitchChannels,
   checkLiveStreams,

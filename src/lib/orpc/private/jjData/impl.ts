@@ -1,11 +1,8 @@
 import { contracts } from './contract.ts'
 import { dbMiddleware } from '../../middleware/dbMiddleware.ts'
 import { implement } from '@orpc/server'
-import { and, eq } from 'drizzle-orm'
-import { jjCampaign } from '../../../db/schema/jj-api-schema.ts'
 import { cacheMiddleware } from '../../middleware/cacheControl.ts'
 // New: get campaign by Twitch id
-import { twitchChannelSchema } from '../../../db/schema/twitch-channel-schema.ts'
 
 const jjDataCacheMiddleware = cacheMiddleware({
   maxAge: 30,
@@ -21,19 +18,14 @@ const campaigns = os.campaignsContract.handler(async ({ context }) => {
   const stubID = DO.idFromName('JJ_API_CACHE')
   const stub = DO.get(stubID)
   try {
-    const list = await stub.getCampaigns()
-    console.log('campaigns', list)
-    if (!list) {
+    const data = await stub.getCommunityCampaignsDisplay()
+    if (!data) {
       return {
         count: 0,
         list: [],
       }
     }
-
-    return {
-      list,
-      count: list.length,
-    }
+    return data
   } catch (e) {
     console.log(JSON.stringify(e, null, 2))
     throw e
@@ -47,17 +39,17 @@ const causes = os.causesContract.handler(async ({ context }) => {
   const stub = DO.get(stubID)
 
   const causes = await stub.getCauses()
-  console.log('causes', causes)
   if (!causes) {
     return { count: 0, list: [] }
   }
 
   return {
     count: causes.length,
-    list: causes  ,
+    list: causes,
   }
 })
 
+/*
 // Get a single cause by id from DO cache (current year)
 const causeById = os.causeByIdContract.handler(async ({ input, context }) => {
   const DO = context.env.JingleJamData
@@ -275,14 +267,16 @@ const campaignByTwitchId = os.campaignByTwitchIdContract.handler(
     }
   },
 )
+*/
 
 export const jjRouter = {
   campaigns,
   causes,
+  /*
   causeById,
   campaignLookup,
   campaignPastLookup,
   campaignByUserSlug,
   campaignByUserId,
-  campaignByTwitchId,
+  campaignByTwitchId,*/
 }

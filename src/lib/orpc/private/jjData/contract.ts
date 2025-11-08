@@ -7,6 +7,8 @@ const CurrenciesSchema = z.object({
   gbpFormatted: z.string(),
   usd: z.number(),
   usdFormatted: z.string(),
+  euro: z.number(),
+  euroFormatted: z.string(),
 })
 
 const JJRaisedSchema = z.object({
@@ -26,36 +28,19 @@ export const JJCauseSchema = z.object({
   raised: JJRaisedSchema,
 })
 
-// JJLivestream schema (used inside JJCampaign)
-export const JJLivestreamSchema = z.object({
-  channel: z.string().nullable(),
-  type: z.string(),
+const JJCampaignSchema = z.object({
+  campaignName: z.string(),
+  tiltifyUrl: z.string(),
+  tiltifyName: z.string(),
+  tiltifyDescription: z.string().optional(),
+  tiltifyCauseId: z.number().optional(),
+  avatar: z.string(), // twitch image if available or tiltify image
+  raised: CurrenciesSchema,
+  twitch: z.string().optional(),
+  isTwitchLive: z.boolean(),
+  youtube: z.string().optional(),
 })
 
-// JJUser schema (used inside JJCampaign)
-export const JJUserSchema = z.object({
-  id: z.number(),
-  name: z.string(),
-  slug: z.string(),
-  avatar: z.string(),
-  url: z.string(),
-})
-
-// JJCampaign schema
-export const JJCampaignSchema = z.object({
-  causeId: z.number().nullable(),
-  name: z.string(),
-  description: z.string(),
-  slug: z.string(),
-  url: z.string(),
-  startTime: z.string(), // ISO datetime
-  raised: z.number(),
-  goal: z.number(),
-  livestream: JJLivestreamSchema,
-  user: JJUserSchema,
-})
-
-// JJCampaigns schema
 export const JJCampaignsSchema = z.object({
   count: z.number(),
   list: z.array(JJCampaignSchema),
@@ -76,54 +61,7 @@ const causesContract = oc.output(
   }),
 )
 
-// New: Get single cause by path parameter
-const causeByIdContract = oc
-  .input(z.object({ id: z.coerce.number().int().nonnegative() }))
-  .output(JJCauseSchema.nullable())
-
-// New: Current-year campaign lookup via DO (single result)
-const campaignLookupInput = z.object({
-  userId: z.coerce.number().int().optional(),
-  userSlug: z.string().optional(),
-  campaignId: z.string().optional(), // treated as slug identifier
-})
-
-const campaignLookupContract = oc
-  .input(campaignLookupInput)
-  .output(JJCampaignSchema.nullable())
-
-// New: Past campaign lookup via DB (array result)
-const campaignPastLookupInput = z.object({
-  year: z.coerce.number().int().optional(),
-  userId: z.coerce.number().int().optional(),
-  userSlug: z.string().optional(),
-  campaignId: z.string().optional(), // treated as slug identifier
-})
-
-const campaignPastLookupContract = oc
-  .input(campaignPastLookupInput)
-  .output(z.array(JJCampaignSchema))
-
-// New specific lookups (private)
-const campaignByUserSlugContract = oc
-  .input(z.object({ slug: z.string() }))
-  .output(JJCampaignSchema.nullable())
-
-const campaignByUserIdContract = oc
-  .input(z.object({ userId: z.coerce.number().int() }))
-  .output(JJCampaignSchema.nullable())
-
-const campaignByTwitchIdContract = oc
-  .input(z.object({ twitchId: z.string() }))
-  .output(JJCampaignSchema.nullable())
-
 export const contracts = {
   campaignsContract,
   causesContract,
-  causeByIdContract,
-  campaignLookupContract,
-  campaignPastLookupContract,
-  campaignByUserSlugContract,
-  campaignByUserIdContract,
-  campaignByTwitchIdContract,
 }

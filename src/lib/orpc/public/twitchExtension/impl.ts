@@ -1,5 +1,5 @@
 import { implement, ORPCError, os as server } from '@orpc/server'
-import { contracts, type JJCampaignsType } from './contract.ts'
+import { contracts, type JJCampaignsTVType } from './contract.ts'
 import { getEntry } from 'astro:content'
 import { hasAstroContext } from '../../middleware/hasAstroContext.ts'
 import { getStreamColors } from '../../../../functions/jjDatesToColors.ts'
@@ -160,8 +160,6 @@ const extensionConfig = os.extensionConfigContract
     const donationTrackerUrl = await stub.getStringConfig?.(
       'twitch-extension:config.donationTrackerUrl',
     )
-
-
 
     const config = {
       year: year ?? 2024,
@@ -369,7 +367,7 @@ const campaigns = os.campaignsContract
     const stubID = DO.idFromName('JJ_API_CACHE')
     const stub = DO.get(stubID)
     try {
-      const campaignsDisplay: JJCampaignsType | undefined =
+      const campaignsDisplay: JJCampaignsTVType | undefined =
         await stub.getCampaignsDisplay()
       const liveLogins = await stub.getLiveLogins()
       const liveSet = new Set(
@@ -481,7 +479,6 @@ const causes = os.causesContract
         causes: [],
       }
     }
-
 
     if (campaign) {
       const causeId = campaign.tiltifyCauseId
@@ -646,7 +643,7 @@ const yogsSchedule = os.yogsScheduleContract
                 cd?.profileImage?.large ||
                 cd?.profileImage?.small
               const links = cd.links?.filter((c) => c.type === 'twitch').at(0)
-              const url: string = links?.url ?? ''  // cd?.link || (Array.isArray(cd?.links) && cd.links[0]?.url) || ''
+              const url: string = links?.url ?? '' // cd?.link || (Array.isArray(cd?.links) && cd.links[0]?.url) || ''
               const color: string = cd?.style?.primaryColor || '#000000'
               list.push({
                 id: cEntry.id,

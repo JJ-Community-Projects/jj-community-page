@@ -15,6 +15,9 @@ export const JJData: Component = () => {
           queryKey: admin.getAllTwitchChannels.queryKey(),
         })
         await client.invalidateQueries({
+          queryKey: admin.getAllYoutubeChannels.queryKey(),
+        })
+        await client.invalidateQueries({
           queryKey: admin.getAllLiveChannels.queryKey(),
         })
         await client.invalidateQueries({
@@ -28,6 +31,9 @@ export const JJData: Component = () => {
   const causes = useQuery(() => jjData.causes.queryOptions())
   const allTwitchChannels = useQuery(() =>
     admin.getAllTwitchChannels.queryOptions(),
+  )
+  const allYoutubeChannels = useQuery(() =>
+    admin.getAllYoutubeChannels.queryOptions(),
   )
   const allLiveChannels = useQuery(() =>
     admin.getAllLiveChannels.queryOptions(),
@@ -76,6 +82,9 @@ export const JJData: Component = () => {
         await client.invalidateQueries({ queryKey: jjData.causes.queryKey() })
         await client.invalidateQueries({
           queryKey: admin.getAllTwitchChannels.queryKey(),
+        })
+        await client.invalidateQueries({
+          queryKey: admin.getAllYoutubeChannels.queryKey(),
         })
         await client.invalidateQueries({
           queryKey: admin.getAllLiveChannels.queryKey(),
@@ -168,6 +177,37 @@ export const JJData: Component = () => {
                       <a
                         class="text-accent underline"
                         href={`https://twitch.tv/${login}`}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        {login}
+                      </a>
+                    </li>
+                  )}
+                </For>
+              </ul>
+            )}
+          </Show>
+        </div>
+
+        <div class="rounded border border-gray-200 bg-white p-4 shadow-sm">
+          <h3 class="mb-2 font-semibold">All YouTube Channels</h3>
+          <Show
+            when={allYoutubeChannels.data}
+            fallback={<p class="text-sm text-gray-500">Loading…</p>}
+          >
+            {(d) => (
+              <ul class="list-disc space-y-1 pl-5">
+                <For each={d()}>
+                  {(login) => (
+                    <li class="text-sm">
+                      <a
+                        class="text-accent underline"
+                        href={
+                          String(login).startsWith('http')
+                            ? String(login)
+                            : `https://youtube.com/@${login}`
+                        }
                         target="_blank"
                         rel="noreferrer"
                       >

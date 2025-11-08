@@ -1,7 +1,11 @@
 import type { JJDrizzleDatabase } from '../../../db/db.ts'
 import { twitchChannelSchema } from '../../../db/schema/twitch-channel-schema.ts'
 import { and, eq, sql } from 'drizzle-orm'
-import type { Currencies, JJCampaignType, JJCauseType } from './contract.ts'
+import type {
+  CurrenciesTV,
+  JJCampaignTVType,
+  JJCauseTVType,
+} from './contract.ts'
 import type { UserDisplay } from '../schemas/UserDisplaySchema.ts'
 import { jjCampaign } from '../../../db/schema/jj-api-schema.ts'
 import { ORPCError } from '@orpc/server'
@@ -99,8 +103,8 @@ export type YogsScheduleOutput = {
   streams: StreamType[]
 }
 
-export type CampaignsOutput = { count: number; list: JJCampaignType[] }
-export type CausesOutput = { count: number; list: JJCauseType[] }
+export type CampaignsOutput = { count: number; list: JJCampaignTVType[] }
+export type CausesOutput = { count: number; list: JJCauseTVType[] }
 export type UserScheduleOutput = {
   title: string
   start: Date
@@ -112,9 +116,9 @@ export type UserRelatedScheduleOutput = { teams: { streams: StreamType[] } }
 
 export type OverviewOutput = {
   raised: {
-    yogscast: Currencies
-    fundraisers: Currencies
-    total: Currencies
+    yogscast: CurrenciesTV
+    fundraisers: CurrenciesTV
+    total: CurrenciesTV
   }
   // Type of collections comes from DO; keep it generic to avoid tight coupling
   collections: any
@@ -163,7 +167,7 @@ export async function storeCauses(
 
 export async function storeCause(
   kv: KVNamespace,
-  data: JJCauseType,
+  data: JJCauseTVType,
   ttlSeconds: number = 60,
 ) {
   return putJSON(kv, makeKey(`${data.id}`, 'causes'), data, ttlSeconds)
@@ -188,7 +192,7 @@ export async function storeYogsSchedule(
 export async function storeUserData(
   kv: KVNamespace,
   channelId: string,
-  data: JJCampaignType,
+  data: JJCampaignTVType,
   ttlSeconds: number = 60,
 ) {
   return putJSON(kv, makeKey(channelId, 'user-data'), data, ttlSeconds)
@@ -288,8 +292,8 @@ export async function loadCauses(
 export async function loadCause(
   kv: KVNamespace,
   causeId: number,
-): Promise<JJCauseType | null> {
-  return getJSON<JJCauseType>(kv, makeKey(`${causeId}`, 'causes'))
+): Promise<JJCauseTVType | null> {
+  return getJSON<JJCauseTVType>(kv, makeKey(`${causeId}`, 'causes'))
 }
 
 export async function loadOverview(
@@ -332,9 +336,9 @@ export async function loadYogsSchedule(
 export async function loadUserData(
   kv: KVNamespace,
   channelId: string,
-): Promise<JJCampaignType | null> {
+): Promise<JJCampaignTVType | null> {
   // JJCampaignType.startTime is a string per contract; do not convert
-  return getJSON<JJCampaignType>(kv, makeKey(channelId, 'user-data'))
+  return getJSON<JJCampaignTVType>(kv, makeKey(channelId, 'user-data'))
 }
 
 export async function loadUserSchedule(
@@ -465,7 +469,7 @@ export function valueToCurrencies(
   value: number,
   usdConversionRate: number,
   eurConversionRate: number,
-): Currencies {
+): CurrenciesTV {
   const GBP = Intl.NumberFormat('en-GB', {
     style: 'currency',
     currency: 'GBP',
