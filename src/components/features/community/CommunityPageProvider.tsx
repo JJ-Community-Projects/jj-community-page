@@ -5,14 +5,24 @@ import { makePersisted } from '@solid-primitives/storage'
 
 const useCommunityPageHook = () => {
   const communityQuery = useQuery(() =>
-    orpcPrivate.jj.campaigns.queryOptions({}),
+    orpcPrivate.jj.campaigns.queryOptions({
+      staleTime: 60_000 * 4,
+      refetchInterval: 60_000 * 5,
+    }),
   )
 
-  const causeQuery = useQuery(() => orpcPrivate.jj.causes.queryOptions({}))
+  const causeQuery = useQuery(() =>
+    orpcPrivate.jj.causes.queryOptions({
+      staleTime: 60_000 * 4,
+      refetchInterval: 60_000 * 5,
+    }),
+  )
 
-  // New: upcoming streams across visible schedules (current year)
   const upcomingStreamsQuery = useQuery(() =>
-    orpcPrivate.jj.upcomingStreams.queryOptions({}),
+    orpcPrivate.jj.upcomingStreams.queryOptions({
+      staleTime: 60_000 * 8,
+      refetchInterval: 60_000 * 10,
+    }),
   )
 
   const [sortBy, setSortBy] = makePersisted(
