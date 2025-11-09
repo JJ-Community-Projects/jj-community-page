@@ -84,7 +84,7 @@ export const YogsStreamTile: Component<YogsStreamTileProps> = (props) => {
           <button
             class={twMerge(
               'flex h-full w-full flex-col items-center justify-center rounded-2xl p-1 text-center transition-all',
-              enable() ? 'hover:scale-105 hover:brightness-105' : '',
+              enable() ? 'hover:scale-101 hover:brightness-105' : '',
             )}
             style={buttonStyle()}
             disabled={!enable()}
