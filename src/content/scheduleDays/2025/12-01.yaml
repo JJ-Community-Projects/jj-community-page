@@ -13,8 +13,8 @@ streams:
       tileSize: 1
     #subtitle: Tree Decorating
     #title: Office Cam
-    subtitle: Title 1
-    title: Some subtitle
+    subtitle: Some subtitle
+    title: Title 1
     vods: []
   - creators: []
     duration_hours: 3
@@ -27,8 +27,8 @@ streams:
           - '#3484bf'
         orientation: TD
       tileSize: 1
-    subtitle: Title 2
-    title: Another subtitle
+    subtitle: Another subtitle
+    title: Title 2
     vods: []
   - creators: [lewis, simon]
     duration_hours: 3
@@ -55,6 +55,6 @@ streams:
           - '#3484bf'
         orientation: TD
       tileSize: 1
-    subtitle: Maybe trains?
-    title: Title 4
+    subtitle: Title 4
+    title: Maybe trains?
     vods: []
