@@ -1,15 +1,14 @@
-import {type Component, createSignal, For, Show} from 'solid-js'
-import {Dialog} from '@kobalte/core'
-import {FaSolidInfo, FaSolidXmark} from 'solid-icons/fa'
-import {FaRegularCalendar, FaRegularSquare, FaSolidSquareCheck} from 'solid-icons/fa'
-import {DateTime, Duration} from 'luxon'
-import ical, {ICalAlarmType} from 'ical-generator'
-import {createModalSignal, type ModalSignal} from "../../../../lib/createModalSignal.ts";
-import {useCreatorFilter} from "./CreatorFilterProvider.tsx";
-import {useYogsSchedule} from "./YogsScheduleProvider.tsx";
-import {rangeFromData} from "../../../../lib/utils/rangeFromData.ts";
-import type { YogsStream } from "../../../../lib/orpc/private/yogs/contract.ts";
-import {log} from "../../../../lib/analytics.ts";
+import { type Component, createSignal, For, Show } from 'solid-js'
+import { Dialog } from '@kobalte/core'
+import { FaRegularCalendar, FaRegularSquare, FaSolidInfo, FaSolidSquareCheck, FaSolidXmark } from 'solid-icons/fa'
+import { DateTime, Duration } from 'luxon'
+import ical, { ICalAlarmType } from 'ical-generator'
+import { createModalSignal, type ModalSignal } from '../../../../lib/createModalSignal.ts'
+import { useCreatorFilter } from './CreatorFilterProvider.tsx'
+import { useYogsSchedule } from './YogsScheduleProvider.tsx'
+import { rangeFromData } from '../../../../lib/utils/rangeFromData.ts'
+import type { YogsStream } from '../../../../lib/orpc/private/yogs/contract.ts'
+import { log } from '../../../../lib/analytics.ts'
 
 type FullStream = YogsStream & { creators: Array<{ id: string }>; style?: any };
 
@@ -67,7 +66,7 @@ const CalendarDialogDialogBody: Component<CalendarDialogDialogBodyProps> = props
   const {onClose} = props
   const {schedule, streams, days} = useYogsSchedule()
   const {filteredStreams, isSlotPartOfFilter} = useCreatorFilter()
-  const [selectedSlots, setSelectedSlots] = createSignal<FullStream[]>([])
+  const [selectedSlots, setSelectedSlots] = createSignal<YogsStream[]>([])
   const [search, setSearch] = createSignal('')
 
   const download = () => {
@@ -97,10 +96,10 @@ const CalendarDialogDialogBody: Component<CalendarDialogDialogBodyProps> = props
     document.body.removeChild(element)
   }
 
-  const includes = (slot: FullStream) => {
+  const includes = (slot: YogsStream) => {
     return selectedSlots().find(s => s.start == slot.start) !== undefined
   }
-  const toggle = (slot: FullStream) => {
+  const toggle = (slot: YogsStream) => {
     if (includes(slot)) {
       setSelectedSlots([...selectedSlots().filter(s => s.start != slot.start)])
     } else {
@@ -130,14 +129,14 @@ const CalendarDialogDialogBody: Component<CalendarDialogDialogBodyProps> = props
     return calendar.toString()
   }
 
-  const isInSearch = (slot: FullStream) => {
+  const isInSearch = (slot: YogsStream) => {
     if (!isSlotPartOfFilter(slot)) {
       return false
     }
     if (search() == '') {
       return true
     }
-    const names = slot.creators.map(c => c.name)
+    const names = slot.creators?.map(c => c.name) ?? []
     return (
       slot.title.toLowerCase().includes(search().toLowerCase()) ||
       names.some(n => n.toLowerCase().includes(search().toLowerCase()))
@@ -191,7 +190,7 @@ const CalendarDialogDialogBody: Component<CalendarDialogDialogBodyProps> = props
               if (range) {
                 return DateTime.fromJSDate(range.start)
               }
-              return DateTime.fromJSDate(day.date)
+              return DateTime.fromJSDate(day.start)
             }
 
             const start = s()
