@@ -1,4 +1,4 @@
-import { type Component, Match, Show, Switch } from 'solid-js'
+import { type Component, For, Match, Show, Switch } from 'solid-js'
 import { YogsScheduleComponent } from './YogsScheduleComponent.tsx'
 import type {
   YogsCreator,
@@ -24,6 +24,7 @@ import {
   TiktokIcon,
 } from '../../common/icons/JJIcons.tsx'
 import { DateTime } from 'luxon'
+import { YogsCreatorPill } from '../creators/YogsCreatorPill.tsx'
 
 interface ConfigLoaderProps {
   creators: YogsCreator[]
@@ -116,8 +117,6 @@ const ConfigLoader: Component<ConfigLoaderProps> = (props) => {
                 <TiktokIcon class={'size-4'} />
               </a>
             </div>
-
-            <PlaceholderSchedule schedule={props.fallbackSchedule} />
           </div>
         </Show>
       </Match>
@@ -212,7 +211,6 @@ const Body: Component<BodyProps> = (props) => {
             </Show>
             <YogsScheduleDisclaimer />
           </div>
-
           <div
             class={
               'flex flex-col items-center justify-center gap-1 text-pretty text-center text-white'
@@ -287,6 +285,7 @@ const Body: Component<BodyProps> = (props) => {
               with the Jingle Jam, the Yogscast or their partners.
             </p>
           </div>
+          <Creators creators={props.creators} />
         </>
       </Match>
       <Match when={schedule.isPending}>
@@ -298,5 +297,47 @@ const Body: Component<BodyProps> = (props) => {
         <p>{schedule.error?.message}</p>
       </Match>
     </Switch>
+  )
+}
+
+const Creators: Component<{
+  creators: YogsCreator[]
+}> = (props) => {
+  const yogs = props.creators.filter(
+    (creator) => creator.type === 'yogs' || creator.type === 'staff',
+  )
+  const bestOf = props.creators.filter((creator) => creator.type === 'best_of')
+  const friends = props.creators.filter((creator) => creator.type === 'friend')
+
+  return (
+    <Show when={props.creators.length > 0}>
+      <div class="flex flex-col items-center justify-center gap-2 p-4">
+        <p class="text-center text-2xl text-white">Yogs & Friends</p>
+        <Show when={yogs.length > 0}>
+          <p class="mb-1 text-xl text-white">Yogs</p>
+          <div class="flex flex-wrap items-center justify-center gap-2">
+            <For each={yogs}>
+              {(creator) => <YogsCreatorPill creator={creator} />}
+            </For>
+          </div>
+        </Show>
+        <Show when={yogs.length > 0}>
+          <p class="mb-1 text-xl text-white">Best of</p>
+          <div class="flex flex-wrap items-center justify-center gap-2">
+            <For each={bestOf}>
+              {(creator) => <YogsCreatorPill creator={creator} />}
+            </For>
+          </div>
+        </Show>
+        <Show when={friends.length > 0}>
+          <p class="mb-1 text-xl text-white">Friends</p>
+          <div class="flex flex-wrap items-center justify-center gap-2">
+            <For each={friends}>
+              {(creator) => <YogsCreatorPill creator={creator} />}
+            </For>
+          </div>
+        </Show>
+      </div>
+    </Show>
   )
 }
