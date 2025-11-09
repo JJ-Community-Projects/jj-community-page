@@ -92,6 +92,8 @@ export const YogsScheduleSchema = z.object({
   ),
 
   creators: z.array(CreatorSchema),
+
+  updatedAt: z.date().optional(),
 })
 
 export type YogsConfig = z.infer<typeof ConfigSchema>

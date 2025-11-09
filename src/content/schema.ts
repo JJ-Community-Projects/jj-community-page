@@ -1,11 +1,20 @@
-import {reference, z} from "astro:content";
-import {IANAZone} from "luxon";
+import { reference, z } from 'astro:content'
+import { IANAZone } from 'luxon'
 
-const DateSchema = z.coerce.date().or(z.string().transform(v => (new Date(v))))
+const DateSchema = z.coerce.date().or(z.string().transform((v) => new Date(v)))
 
 export const StreamBackgroundSchema = z.object({
-  colors: z.array(z.string().regex(new RegExp('#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{8}|[A-Fa-f0-9]{3})'), 'Must be a hex color')).optional(),
-  orientation: z.enum(['TD', 'LR', 'RL', 'DT', 'TLBR', 'TRBL',]).default('TD'),
+  colors: z
+    .array(
+      z
+        .string()
+        .regex(
+          new RegExp('#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{8}|[A-Fa-f0-9]{3})'),
+          'Must be a hex color',
+        ),
+    )
+    .optional(),
+  orientation: z.enum(['TD', 'LR', 'RL', 'DT', 'TLBR', 'TRBL']).default('TD'),
 })
 
 export const VodSchema = z.object({
@@ -26,10 +35,10 @@ export const StreamSchema = z.object({
   style: z.object({
     background: StreamBackgroundSchema.default({
       colors: ['#000000', '#ffffff'],
-      orientation: 'TD'
+      orientation: 'TD',
     }),
     tileSize: z.number().default(1),
-  })
+  }),
 })
 
 export const ScheduleDaySchema = z.object({
@@ -44,22 +53,42 @@ export const CreatorSchema = z.object({
   twitchUser: reference('twitchUser').optional(),
   birthdate: DateSchema.optional(),
   bio: z.string().optional(),
-  links: z.array(z.object({
-    name: z.string(),
-    url: z.string().url(),
-    type: z.string().optional(),
-    avatar: z.string().optional(),
-  })).optional(),
+  links: z
+    .array(
+      z.object({
+        name: z.string(),
+        url: z.string().url(),
+        type: z.string().optional(),
+        avatar: z.string().optional(),
+      }),
+    )
+    .optional(),
   related: z.array(reference('creators')).optional(),
-  profileImage: z.object({
-    small: z.string().optional(),
-    medium: z.string().optional(),
-    large: z.string().optional(),
-  }).optional(),
-  style: z.object({
-    primaryColor: z.string().regex(new RegExp('#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{8}|[A-Fa-f0-9]{3})'), 'Must be a hex color').optional(),
-    secondaryColor: z.string().regex(new RegExp('#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{8}|[A-Fa-f0-9]{3})'), 'Must be a hex color').optional(),
-  }).optional()
+  profileImage: z
+    .object({
+      small: z.string().optional(),
+      medium: z.string().optional(),
+      large: z.string().optional(),
+    })
+    .optional(),
+  style: z
+    .object({
+      primaryColor: z
+        .string()
+        .regex(
+          new RegExp('#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{8}|[A-Fa-f0-9]{3})'),
+          'Must be a hex color',
+        )
+        .optional(),
+      secondaryColor: z
+        .string()
+        .regex(
+          new RegExp('#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{8}|[A-Fa-f0-9]{3})'),
+          'Must be a hex color',
+        )
+        .optional(),
+    })
+    .optional(),
 })
 
 export const TwitchUserSchema = z.object({
@@ -78,13 +107,18 @@ export const ScheduleWeekSchema = z.object({
 export const ScheduleSchema = z.object({
   title: z.string().default('Schedule'),
   visible: z.boolean().default(true),
-  timezone: z.string().default('Europe/London')
-    .refine(v => {
+  timezone: z
+    .string()
+    .default('Europe/London')
+    .refine((v) => {
       return IANAZone.isValidZone(v)
     }, 'Must be a valid IANA timezone. See https://en.wikipedia.org/wiki/List_of_tz_database_time_zones for a list of valid timezones'),
-  times: z.array(z.object({
-    start: DateSchema,
-    end: DateSchema,
-  })),
-  weeks: z.array(ScheduleWeekSchema)
+  times: z.array(
+    z.object({
+      start: DateSchema,
+      end: DateSchema,
+    }),
+  ),
+  weeks: z.array(ScheduleWeekSchema),
+  updatedAt: z.date().optional(),
 })

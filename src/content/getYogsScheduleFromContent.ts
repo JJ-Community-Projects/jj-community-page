@@ -160,6 +160,7 @@ export async function getYogsScheduleFromContent(
 
   return {
     title: `Yogscast Jingle Jam ${year ?? 2024}`,
+    updatedAt: schedule.data.updatedAt,
     start: range.start,
     end: range.end,
     initialDayIndex,
