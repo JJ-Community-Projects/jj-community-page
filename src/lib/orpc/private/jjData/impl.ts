@@ -102,9 +102,23 @@ const upcomingStreams = os.upcomingStreamsContract.handler(
       return { count: 0, streams: [] }
     }
 
+    // Limit to next 2 streams per schedule (based on ascending start order)
+    const limitedPairs = (() => {
+      const counts = new Map<number, number>()
+      const acc: typeof basePairs = []
+      for (const p of basePairs) {
+        const c = counts.get(p.scheduleId) ?? 0
+        if (c < 2) {
+          acc.push(p)
+          counts.set(p.scheduleId, c + 1)
+        }
+      }
+      return acc
+    })()
+
     // Build OR of composite keys for subsequent queries
     const pairConditionStreams = or(
-      ...basePairs.map((p) =>
+      ...limitedPairs.map((p) =>
         and(
           eq(streamsTable.scheduleId, p.scheduleId),
           eq(streamsTable.id, p.streamId),
@@ -138,7 +152,7 @@ const upcomingStreams = os.upcomingStreamsContract.handler(
 
     // 4) Load tags for selected streams
     const pairConditionTags = or(
-      ...basePairs.map((p) =>
+      ...limitedPairs.map((p) =>
         and(
           eq(streamTagsTable.scheduleId, p.scheduleId),
           eq(streamTagsTable.streamId, p.streamId),
@@ -171,7 +185,7 @@ const upcomingStreams = os.upcomingStreamsContract.handler(
 
     // 5) Load participants for selected streams
     const pairConditionParticipants = or(
-      ...basePairs.map((p) =>
+      ...limitedPairs.map((p) =>
         and(
           eq(streamParticipantsTable.scheduleId, p.scheduleId),
           eq(streamParticipantsTable.streamId, p.streamId),
@@ -261,7 +275,7 @@ const upcomingStreams = os.upcomingStreamsContract.handler(
     }
 
     // 7) Compose final user streams preserving chronological order
-    const composed = basePairs
+    const composed = limitedPairs
       .map((pair) => {
         const key = `${pair.scheduleId}:${pair.streamId}`
         const core = detailMap.get(key)
