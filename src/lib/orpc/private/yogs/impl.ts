@@ -1,7 +1,7 @@
 import { implement } from '@orpc/server'
 import { contracts } from './contract'
 import { hasAstroContext } from '../../middleware/hasAstroContext.ts'
-import { storeYogsSchedule } from './util.ts'
+import { loadYogsSchedule, storeYogsSchedule } from './util.ts'
 import { getEntry } from 'astro:content'
 import { getYogsScheduleFromContent } from '../../../../content/getYogsScheduleFromContent.ts'
 import { cacheMiddleware } from '../../middleware/cacheControl.ts'
@@ -35,12 +35,11 @@ export const schedule = os.schedule
     }),
   )
   .handler(async ({ context }) => {
-  /*const yogsSchedule = await loadYogsSchedule(context.env.KV)
+  const yogsSchedule = await loadYogsSchedule(context.env.KV)
 
   if (yogsSchedule) {
     return yogsSchedule
-  }*/
-
+  }
   // Resolve the current schedule year from the Config Durable Object
   const ConfigDO = context.env.ConfigDO
   const stubId = ConfigDO.idFromName('ConfigDO')
@@ -64,7 +63,7 @@ export const schedule = os.schedule
     }
   }
   const result = await getYogsScheduleFromContent(year ?? 2024)
-  await storeYogsSchedule(context.env.KV, result, 600)
+  await storeYogsSchedule(context.env.KV, result, 300)
   return result
 })
 
