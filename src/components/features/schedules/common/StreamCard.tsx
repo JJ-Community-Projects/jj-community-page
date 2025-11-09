@@ -3,14 +3,12 @@ import type { Stream } from '../../../../lib/orpc/public/schemas/schedules.ts'
 import { DateTime } from 'luxon'
 import { useNow } from '../../../../lib/utils/useNow.ts'
 import { createModalSignal } from '../../../../lib/createModalSignal.ts'
-import {
-  getStreamColor,
-  getStreamColors,
-} from '../../../../functions/jjDatesToColors.ts'
+import { getStreamColor, getStreamColors, } from '../../../../functions/jjDatesToColors.ts'
 import { getTextColor } from '../../../../lib/utils/textColors.ts'
 import { ScheduleStreamDetailDialog } from './ScheduleStreamDetailDialog.tsx'
 import { twMerge } from 'tailwind-merge'
 import { FaBrandsTwitch, FaBrandsYoutube, FaSolidUsers } from 'solid-icons/fa'
+import type { UserDisplay } from '../../../../lib/orpc/public/schemas/UserDisplaySchema.ts'
 
 /**
  * Custom hook that manages state for schedule stream cards
@@ -104,31 +102,32 @@ interface Props {
   stream: Stream
   type: 'filled' | 'top-bar' | 'bottom-bar' | 'left-bar'
   hover: boolean
+  user?: UserDisplay
 }
 
 export const ScheduleStreamCard: Component<Props> = (props) => {
   return (
     <Switch>
       <Match when={props.type === 'filled'}>
-        <ScheduleStreamCardColored stream={props.stream} />
+        <ScheduleStreamCardColored stream={props.stream} user={props.user} />
       </Match>
       <Match when={props.type === 'top-bar' && !props.hover}>
-        <ScheduleStreamCardTopBar stream={props.stream} />
+        <ScheduleStreamCardTopBar stream={props.stream} user={props.user} />
       </Match>
       <Match when={props.type === 'top-bar' && props.hover}>
-        <ScheduleStreamCardTopBarHover stream={props.stream} />
+        <ScheduleStreamCardTopBarHover stream={props.stream} user={props.user} />
       </Match>
       <Match when={props.type === 'bottom-bar' && !props.hover}>
-        <ScheduleStreamCardBottomBar stream={props.stream} />
+        <ScheduleStreamCardBottomBar stream={props.stream} user={props.user} />
       </Match>
       <Match when={props.type === 'bottom-bar' && props.hover}>
-        <ScheduleStreamCardBottomBarHover stream={props.stream} />
+        <ScheduleStreamCardBottomBarHover stream={props.stream} user={props.user} />
       </Match>
       <Match when={props.type === 'left-bar' && !props.hover}>
-        <ScheduleStreamCardSidebar stream={props.stream} />
+        <ScheduleStreamCardSidebar stream={props.stream} user={props.user} />
       </Match>
       <Match when={props.type === 'left-bar' && props.hover}>
-        <ScheduleStreamCardSidebarHover stream={props.stream} />
+        <ScheduleStreamCardSidebarHover stream={props.stream} user={props.user} />
       </Match>
     </Switch>
   )
@@ -136,6 +135,7 @@ export const ScheduleStreamCard: Component<Props> = (props) => {
 
 interface ScheduleStreamCardProps {
   stream: Stream
+  user?: UserDisplay
 }
 
 /**
@@ -186,10 +186,11 @@ const ScheduleStreamCardColored: Component<ScheduleStreamCardProps> = (
             <Show when={!showCountdown() && isLive()}>
               <p class="text-md font-bold tracking-wide text-white">LIVE</p>
             </Show>
+            <UserInfo user={props.user}/>
           </div>
         </button>
       </LiveStreamPulseWrapper>
-      <ScheduleStreamDetailDialog stream={props.stream} modalSignal={modal} />
+      <ScheduleStreamDetailDialog stream={props.stream} modalSignal={modal} user={props.user} />
     </div>
   )
 }
@@ -246,10 +247,11 @@ const ScheduleStreamCardSidebar: Component<ScheduleStreamCardProps> = (
             <Show when={!showCountdown() && isLive()}>
               <p class="text-md font-bold tracking-wide text-accent">LIVE</p>
             </Show>
+            <UserInfo user={props.user}/>
           </div>
         </div>
       </button>
-      <ScheduleStreamDetailDialog stream={props.stream} modalSignal={modal} />
+      <ScheduleStreamDetailDialog stream={props.stream} modalSignal={modal} user={props.user} />
     </>
   )
 }
@@ -315,10 +317,11 @@ const ScheduleStreamCardSidebarHover: Component<ScheduleStreamCardProps> = (
                 LIVE
               </p>
             </Show>
+            <UserInfo user={props.user}/>
           </div>
         </div>
       </button>
-      <ScheduleStreamDetailDialog stream={props.stream} modalSignal={modal} />
+      <ScheduleStreamDetailDialog stream={props.stream} modalSignal={modal} user={props.user} />
     </>
   )
 }
@@ -369,6 +372,7 @@ const ScheduleStreamCardBottomBar: Component<ScheduleStreamCardProps> = (
               <p class="text-md font-bold tracking-wide text-accent">LIVE</p>
             </Show>
           </div>
+          <UserInfo user={props.user}/>
         </div>
 
         {/* colored stripe at bottom */}
@@ -380,7 +384,7 @@ const ScheduleStreamCardBottomBar: Component<ScheduleStreamCardProps> = (
           style={{ 'background-color': highlightColor }}
         />
       </button>
-      <ScheduleStreamDetailDialog stream={props.stream} modalSignal={modal} />
+      <ScheduleStreamDetailDialog stream={props.stream} modalSignal={modal} user={props.user} />
     </>
   )
 }
@@ -439,6 +443,7 @@ const ScheduleStreamCardBottomBarHover: Component<ScheduleStreamCardProps> = (
                 LIVE
               </p>
             </Show>
+            <UserInfo user={props.user}/>
           </div>
         </div>
 
@@ -451,7 +456,7 @@ const ScheduleStreamCardBottomBarHover: Component<ScheduleStreamCardProps> = (
           style={{ 'background-color': highlightColor }}
         />
       </button>
-      <ScheduleStreamDetailDialog stream={props.stream} modalSignal={modal} />
+      <ScheduleStreamDetailDialog stream={props.stream} modalSignal={modal} user={props.user} />
     </>
   )
 }
@@ -524,10 +529,11 @@ const ScheduleStreamCardTopBar: Component<ScheduleStreamCardProps> = (
             <Show when={!showCountdown() && isLive()}>
               <p class="text-md font-bold tracking-wide text-accent">LIVE</p>
             </Show>
+            <UserInfo user={props.user}/>
           </div>
         </div>
       </button>
-      <ScheduleStreamDetailDialog stream={props.stream} modalSignal={modal} />
+      <ScheduleStreamDetailDialog stream={props.stream} modalSignal={modal} user={props.user} />
     </>
   )
 }
@@ -623,10 +629,11 @@ const ScheduleStreamCardTopBarHover: Component<ScheduleStreamCardProps> = (
                 {countdown()}
               </p>
             </Show>
+            <UserInfo user={props.user}/>
           </div>
         </div>
       </button>
-      <ScheduleStreamDetailDialog stream={props.stream} modalSignal={modal} />
+      <ScheduleStreamDetailDialog stream={props.stream} modalSignal={modal} user={props.user} />
     </>
   )
 }
@@ -679,5 +686,31 @@ const LiveStreamPulseWrapper: Component<LiveStreamPulseWrapperProps> = (
         <div class="h-full w-full p-1">{props.children}</div>
       </Match>
     </Switch>
+  )
+}
+
+const UserInfo: Component<{user?: UserDisplay}> = (props) => {
+  return (
+    <Show when={props.user}>
+      {
+        (user) => {
+          return (
+            <div class="flex items-center gap-2 px-1 pt-1">
+              <img
+                class="size-8 shrink-0 rounded-lg ring-1 ring-black/10"
+                alt={user().username}
+                src={user().profileImage}
+                loading="lazy"
+              />
+              <div class="min-w-0">
+                <p class="truncate text-ellipsis text-sm font-semibold">
+                  {user().username}
+                </p>
+              </div>
+            </div>
+          )
+        }
+      }
+    </Show>
   )
 }

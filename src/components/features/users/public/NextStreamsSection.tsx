@@ -1,24 +1,19 @@
 import { type Component, For, Show } from 'solid-js'
-import type {
-  ScheduleInfo,
-  Stream,
-} from '../../../../lib/orpc/public/schemas/schedules'
+import type { ScheduleInfo, Stream, } from '../../../../lib/orpc/public/schemas/schedules'
 import { ScheduleStreamCard } from '../../schedules/common/StreamCard'
 import { FaSolidCalendarDays, FaSolidPlay } from 'solid-icons/fa'
+import type { UserDisplay } from '../../../../lib/orpc/public/schemas/UserDisplaySchema.ts'
 
 interface StreamsPreviewProps {
   streams: Stream[]
   primarySchedule: ScheduleInfo
-  userColors: {
-    primaryColor: string | null
-    accentColor: string | null
-  }
+  user: UserDisplay
 }
 
 export const NextStreamsSection: Component<StreamsPreviewProps> = (props) => {
   // Get user colors with fallbacks to design system colors
-  const primaryColor = props.userColors.primaryColor || '#E30E50'
-  const accentColor = props.userColors.accentColor || '#3584BF'
+  const primaryColor = props.user.primaryColor || '#E30E50'
+  const accentColor = props.user.accentColor || '#3584BF'
 
   return (
     <div
@@ -63,6 +58,7 @@ export const NextStreamsSection: Component<StreamsPreviewProps> = (props) => {
                     stream={stream}
                     type="top-bar"
                     hover={true}
+                    user={props.user}
                   />
                 </div>
               )}

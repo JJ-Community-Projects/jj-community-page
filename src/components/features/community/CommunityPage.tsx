@@ -1,17 +1,27 @@
 import { type Component, createSignal, For, Show } from 'solid-js'
-import type { JJCampaignType, JJCauseType, } from '../../../lib/orpc/private/jjData/contract.ts'
+import type {
+  JJCampaignType,
+  JJCauseType,
+} from '../../../lib/orpc/private/jjData/contract.ts'
 import { twMerge } from 'tailwind-merge'
 import { createI18n, I18nProvider, Numeric } from 'solid-i18n'
 import { useLocale } from '@kobalte/core'
-import { TiltifyIcon, TwitchIcon, YoutubeIcon, } from '../../common/icons/JJIcons.tsx'
+import {
+  TiltifyIcon,
+  TwitchIcon,
+  YoutubeIcon,
+} from '../../common/icons/JJIcons.tsx'
 import { Countdown } from '../../common/ui/Countdown.tsx'
 import { useIsBeforeJJ, useIsJJ } from '../../../lib/utils/jjDates.ts'
 import { QueryClientProvider } from '@tanstack/solid-query'
 import { QueryClient } from '@tanstack/query-core'
 import { RadioGroup } from '@kobalte/core/radio-group'
-import { CommunityPageProvider, useCommunityPage, } from './CommunityPageProvider.tsx'
+import {
+  CommunityPageProvider,
+  useCommunityPage,
+} from './CommunityPageProvider.tsx'
 import { FaSolidHeart } from 'solid-icons/fa'
-import { UserStreamCard } from './UserStreamCard'
+import { ScheduleStreamCard } from '../schedules/common/StreamCard.tsx'
 
 export const CommunityPage: Component = () => {
   const i18n = createI18n({ language: useLocale().locale() })
@@ -77,7 +87,9 @@ const SortSelection: Component = () => {
         class={twMerge('flex flex-col items-end gap-1')}
       >
         <RadioGroup.Label
-          class={twMerge('text-xxs font-semibold uppercase tracking-wide text-white')}
+          class={twMerge(
+            'text-xxs font-semibold uppercase tracking-wide text-white',
+          )}
         >
           Sort by
         </RadioGroup.Label>
@@ -145,7 +157,9 @@ const CurrencySelection: Component = () => {
         class={twMerge('flex flex-col items-end gap-1')}
       >
         <RadioGroup.Label
-          class={twMerge('text-xxs font-semibold uppercase tracking-wide text-white')}
+          class={twMerge(
+            'text-xxs font-semibold uppercase tracking-wide text-white',
+          )}
         >
           Currency
         </RadioGroup.Label>
@@ -236,9 +250,17 @@ const CampaignGrid: Component = () => {
 
   return (
     <div class={twMerge('w-full')}>
-      <div class={twMerge('mt-6 mb-2 flex w-full flex-wrap items-end justify-between gap-x-4 gap-y-2')}>
+      <div
+        class={twMerge(
+          'mb-2 mt-6 flex w-full flex-wrap items-end justify-between gap-x-4 gap-y-2',
+        )}
+      >
         <h2 class={twMerge('text-lg font-semibold text-white')}>Fundraisers</h2>
-        <div class={twMerge('flex w-full flex-wrap items-center justify-end gap-x-4 gap-y-2 sm:w-auto')}>
+        <div
+          class={twMerge(
+            'flex w-full flex-wrap items-center justify-end gap-x-4 gap-y-2 sm:w-auto',
+          )}
+        >
           <SortSelection />
           <CurrencySelection />
         </div>
@@ -348,9 +370,17 @@ const CampaignGridByCause: Component = () => {
 
   return (
     <div class={twMerge('w-full')}>
-      <div class={twMerge('mt-6 mb-2 flex w-full flex-wrap items-end justify-between gap-x-4 gap-y-2')}>
+      <div
+        class={twMerge(
+          'mb-2 mt-6 flex w-full flex-wrap items-end justify-between gap-x-4 gap-y-2',
+        )}
+      >
         <h2 class={twMerge('text-lg font-semibold text-white')}>Fundraisers</h2>
-        <div class={twMerge('flex w-full flex-wrap items-center justify-end gap-x-4 gap-y-2 sm:w-auto')}>
+        <div
+          class={twMerge(
+            'flex w-full flex-wrap items-center justify-end gap-x-4 gap-y-2 sm:w-auto',
+          )}
+        >
           <SortSelection />
           <CurrencySelection />
         </div>
@@ -552,9 +582,17 @@ const UpcomingStreams: Component = () => {
       <Show when={upcomingStreams.isSuccess && items().length > 0}>
         <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <For each={visibleItems()}>
-            {(item: any) => (
-              <UserStreamCard stream={item.stream as any} owner={item.owner} />
-            )}
+            {(item) => {
+              const { stream, owner } = item
+              return (
+                <ScheduleStreamCard
+                  stream={stream}
+                  user={owner}
+                  type={'top-bar'}
+                  hover={true}
+                />
+              )
+            }}
           </For>
         </div>
         <Show when={remainingCount() > 0}>
