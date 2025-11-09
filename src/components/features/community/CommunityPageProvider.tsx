@@ -1,10 +1,4 @@
-import {
-  createContext,
-  createMemo,
-  createSignal,
-  type ParentComponent,
-  useContext,
-} from 'solid-js'
+import { createContext, createMemo, createSignal, type ParentComponent, useContext, } from 'solid-js'
 import { useQuery } from '@tanstack/solid-query'
 import { orpcPrivate } from '../../../lib/orpc/client.ts'
 import { makePersisted } from '@solid-primitives/storage'
@@ -16,8 +10,13 @@ const useCommunityPageHook = () => {
 
   const causeQuery = useQuery(() => orpcPrivate.jj.causes.queryOptions({}))
 
+  // New: upcoming streams across visible schedules (current year)
+  const upcomingStreamsQuery = useQuery(() =>
+    orpcPrivate.jj.upcomingStreams.queryOptions({}),
+  )
+
   const [sortBy, setSortBy] = makePersisted(
-    createSignal<'raised' | 'live' | 'cause'>('raised'),
+    createSignal<'raised' | 'live' | 'cause'>('live'),
   )
 
   const [currency, setCurrency] = makePersisted(
@@ -65,6 +64,7 @@ const useCommunityPageHook = () => {
   return {
     community: communityQuery,
     cause: causeQuery,
+    upcomingStreams: upcomingStreamsQuery,
     sortBy,
     setSortBy,
     currency,

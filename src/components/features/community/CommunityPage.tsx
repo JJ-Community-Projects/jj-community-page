@@ -1,4 +1,4 @@
-import { type Component, For, Show } from 'solid-js'
+import { type Component, createSignal, For, Show } from 'solid-js'
 import type { JJCampaignType, JJCauseType, } from '../../../lib/orpc/private/jjData/contract.ts'
 import { twMerge } from 'tailwind-merge'
 import { createI18n, I18nProvider, Numeric } from 'solid-i18n'
@@ -11,6 +11,7 @@ import { QueryClient } from '@tanstack/query-core'
 import { RadioGroup } from '@kobalte/core/radio-group'
 import { CommunityPageProvider, useCommunityPage, } from './CommunityPageProvider.tsx'
 import { FaSolidHeart } from 'solid-icons/fa'
+import { UserStreamCard } from './UserStreamCard'
 
 export const CommunityPage: Component = () => {
   const i18n = createI18n({ language: useLocale().locale() })
@@ -73,12 +74,10 @@ const SortSelection: Component = () => {
       <RadioGroup
         value={sortBy()}
         onChange={setSortBy}
-        class={twMerge('flex flex-col gap-1 items-end')}
+        class={twMerge('flex flex-col items-end gap-1')}
       >
         <RadioGroup.Label
-          class={twMerge(
-            'text-xxs font-semibold uppercase tracking-wide',
-          )}
+          class={twMerge('text-xxs font-semibold uppercase tracking-wide text-white')}
         >
           Sort by
         </RadioGroup.Label>
@@ -146,9 +145,7 @@ const CurrencySelection: Component = () => {
         class={twMerge('flex flex-col items-end gap-1')}
       >
         <RadioGroup.Label
-          class={twMerge(
-            'text-xxs font-semibold uppercase tracking-wide',
-          )}
+          class={twMerge('text-xxs font-semibold uppercase tracking-wide text-white')}
         >
           Currency
         </RadioGroup.Label>
@@ -206,24 +203,16 @@ const CurrencySelection: Component = () => {
 }
 
 const Header: Component = () => {
-
   return (
-    <div
-      class="bg-white rounded-xl shadow-md border-2 hover:shadow-lg transition-all duration-300 p-2"
-    >
+    <div class="rounded-xl border-2 bg-white p-2 shadow-md transition-all duration-300 hover:shadow-lg">
       <div class="p-4 md:p-4 lg:p-6">
         <div class="flex flex-col items-center text-center">
-          <div class="flex items-center gap-2 mb-4">
-            <FaSolidHeart class="w-8 h-8 text-neutral-600" />
-            <h1 class="~text-2xl/4xl font-babas text-black">Fundraisers</h1>
+          <div class="mb-4 flex items-center gap-2">
+            <FaSolidHeart class="h-8 w-8 text-neutral-600" />
+            <h1 class="font-babas text-black ~text-2xl/4xl">Fundraisers</h1>
           </div>
         </div>
       </div>
-      <div class={'flex w-full items-center justify-end flex-wrap gap-x-4 gap-y-2'}>
-        <SortSelection />
-        <CurrencySelection />
-      </div>
-
     </div>
   )
 }
@@ -233,7 +222,8 @@ const Body: Component = () => {
   const isSortByCause = () => sortBy() === 'cause'
   return (
     <>
-      <Header/>
+      <Header />
+      <UpcomingStreams />
       <Show when={isSortByCause()} fallback={<CampaignGrid />}>
         <CampaignGridByCause />
       </Show>
@@ -245,16 +235,25 @@ const CampaignGrid: Component = () => {
   const { campaignsSorted } = useCommunityPage()
 
   return (
-    <div
-      class={
-        'grid w-full grid-cols-[repeat(auto-fit,_minmax(300px,_1fr))] content-center gap-4'
-      }
-    >
-      <For each={campaignsSorted()}>
-        {(campaign: JJCampaignType) => {
-          return <Child campaign={campaign} />
-        }}
-      </For>
+    <div class={twMerge('w-full')}>
+      <div class={twMerge('mt-6 mb-2 flex w-full flex-wrap items-end justify-between gap-x-4 gap-y-2')}>
+        <h2 class={twMerge('text-lg font-semibold text-white')}>Fundraisers</h2>
+        <div class={twMerge('flex w-full flex-wrap items-center justify-end gap-x-4 gap-y-2 sm:w-auto')}>
+          <SortSelection />
+          <CurrencySelection />
+        </div>
+      </div>
+      <div
+        class={
+          'grid w-full grid-cols-[repeat(auto-fit,_minmax(300px,_1fr))] content-center gap-4'
+        }
+      >
+        <For each={campaignsSorted()}>
+          {(campaign: JJCampaignType) => {
+            return <Child campaign={campaign} />
+          }}
+        </For>
+      </div>
     </div>
   )
 }
@@ -276,7 +275,7 @@ const CauseCard: Component<{ cause: JJCauseType }> = (props) => {
   return (
     <div
       class={twMerge(
-        'w-full max-w-[520px] mx-auto rounded-2xl shadow-sm transition-all duration-200 hover:shadow-md',
+        'mx-auto w-full max-w-[520px] rounded-2xl shadow-sm transition-all duration-200 hover:shadow-md',
         'hover:scale-101 hover:brightness-105',
         'bg-gradient-to-b from-neutral-50 to-neutral-100 ring-1 ring-black/5',
       )}
@@ -289,18 +288,22 @@ const CauseCard: Component<{ cause: JJCauseType }> = (props) => {
             src={img()}
             loading={'lazy'}
           />
-          <div class={'min-w-0 w-full'}>
+          <div class={'w-full min-w-0'}>
             <div class={'flex flex-col items-center gap-1'}>
-              <p class={'text-sm font-semibold text-center'}>
-                {title()}
-              </p>
+              <p class={'text-center text-sm font-semibold'}>{title()}</p>
             </div>
             <Show when={cause.description}>
-              {(d) => <p class={'line-clamp-2 text-xxs opacity-90 text-center'}>{d()}</p>}
+              {(d) => (
+                <p class={'line-clamp-2 text-center text-xxs opacity-90'}>
+                  {d()}
+                </p>
+              )}
             </Show>
           </div>
           <div
-            class={'flex flex-col items-center text-xs font-bold text-primary-600'}
+            class={
+              'flex flex-col items-center text-xs font-bold text-primary-600'
+            }
           >
             <p>Raised</p>
             <Numeric
@@ -344,26 +347,35 @@ const CampaignGridByCause: Component = () => {
   const { campaignsByCause } = useCommunityPage()
 
   return (
-    <div class={'flex w-full flex-col items-center gap-6 text-center'}>
-      <For each={campaignsByCause()}>
-        {(o) => {
-          const { cause, campaigns } = o
-          return (
-            <div class={'flex w-full max-w-6xl flex-col items-center gap-8'}>
-              <CauseCard cause={cause} />
-              <div
-                class={
-                  'grid w-full grid-cols-[repeat(auto-fit,_minmax(300px,_1fr))] content-center gap-4'
-                }
-              >
-                <For each={campaigns}>
-                  {(campaign) => <Child campaign={campaign} />}
-                </For>
+    <div class={twMerge('w-full')}>
+      <div class={twMerge('mt-6 mb-2 flex w-full flex-wrap items-end justify-between gap-x-4 gap-y-2')}>
+        <h2 class={twMerge('text-lg font-semibold text-white')}>Fundraisers</h2>
+        <div class={twMerge('flex w-full flex-wrap items-center justify-end gap-x-4 gap-y-2 sm:w-auto')}>
+          <SortSelection />
+          <CurrencySelection />
+        </div>
+      </div>
+      <div class={'flex w-full flex-col items-center gap-6 text-center'}>
+        <For each={campaignsByCause()}>
+          {(o) => {
+            const { cause, campaigns } = o
+            return (
+              <div class={'flex w-full max-w-6xl flex-col items-center gap-8'}>
+                <CauseCard cause={cause} />
+                <div
+                  class={
+                    'grid w-full grid-cols-[repeat(auto-fit,_minmax(300px,_1fr))] content-center gap-4'
+                  }
+                >
+                  <For each={campaigns}>
+                    {(campaign) => <Child campaign={campaign} />}
+                  </For>
+                </div>
               </div>
-            </div>
-          )
-        }}
-      </For>
+            )
+          }}
+        </For>
+      </div>
     </div>
   )
 }
@@ -516,5 +528,46 @@ const Live = () => {
         />
       </span>
     </>
+  )
+}
+
+const UpcomingStreams: Component = () => {
+  const { upcomingStreams } = useCommunityPage()
+  const [showAll, setShowAll] = createSignal(false)
+
+  const items = () => upcomingStreams.data?.streams ?? []
+  const firstFour = () => items().slice(0, 4)
+  const remainingCount = () => Math.max(items().length - 4, 0)
+  const visibleItems = () => (showAll() ? items() : firstFour())
+
+  return (
+    <div class="mt-6">
+      <h2 class="mb-3 text-lg font-semibold text-white">Upcoming streams</h2>
+      <Show when={upcomingStreams.isLoading}>
+        <p class="text-white/80">Loading upcoming streams…</p>
+      </Show>
+      <Show when={upcomingStreams.isError}>
+        <p class="text-red-400">Failed to load upcoming streams.</p>
+      </Show>
+      <Show when={upcomingStreams.isSuccess && items().length > 0}>
+        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <For each={visibleItems()}>
+            {(item: any) => (
+              <UserStreamCard stream={item.stream as any} owner={item.owner} />
+            )}
+          </For>
+        </div>
+        <Show when={remainingCount() > 0}>
+          <div class="mt-3 flex justify-center">
+            <button
+              class="rounded-lg bg-white/10 px-4 py-2 text-sm font-semibold text-white backdrop-blur transition-colors hover:bg-white/20"
+              onClick={() => setShowAll((v) => !v)}
+            >
+              {showAll() ? 'Show less' : `Show ${remainingCount()} more`}
+            </button>
+          </div>
+        </Show>
+      </Show>
+    </div>
   )
 }

@@ -50,6 +50,74 @@ export const JJCampaignsSchema = z.object({
 export type JJCauseType = z.infer<typeof JJCauseSchema>
 export type JJCampaignType = z.infer<typeof JJCampaignSchema>
 export type JJCampaignsType = z.infer<typeof JJCampaignsSchema>
+const UserDisplaySchema = z.object({
+  /** Unique identifier from the users table */
+  userId: z.number(),
+  /** Primary streaming platform preference (twitch, youtube, tiktok) */
+  primaryLiveStream: z.string(),
+  /** Account creation timestamp */
+  createdAt: z.date(),
+  /** Display name, typically from the primary streaming platform */
+  username: z.string(),
+  /** Profile image URL from the streaming platform */
+  profileImage: z.string(),
+  /** Twitch login username, null if no Twitch account linked */
+  twitchLogin: z.string().nullable(),
+  /** Tiltify fundraising profile slug */
+  tiltifySlug: z.string(),
+  /** Full Tiltify profile URL for fundraising campaigns */
+  tiltifyUrl: z.string(),
+  /** Custom primary brand color from userStyles table */
+  primaryColor: z.string().nullable(),
+  /** Custom accent color from userStyles table */
+  accentColor: z.string().nullable(),
+})
+const StreamTagSchema = z.object({
+  /** Tag display name */
+  name: z.string(),
+  /** URL-friendly tag identifier */
+  slug: z.string(),
+  /** Hex color code for tag display */
+  color: z.string(),
+})
+export const StreamSchema = z.object({
+  /** Unique identifier for the stream */
+  id: z.number().int().nonnegative(),
+  /** ID of the schedule this stream belongs to */
+  scheduleId: z.number().int().nonnegative(),
+  /** ID of the user who created this stream */
+  createdBy: z.number().int().nonnegative(),
+  /** Display title of the stream */
+  title: z.string(),
+  /** Whether this stream is publicly visible */
+  visible: z.boolean(),
+  /** Optional subtitle for additional context */
+  subtitle: z.string().nullable(),
+  /** Optional detailed description of the stream content */
+  description: z.string().nullable(),
+  /** Optional YouTube VOD URL for recorded content */
+  youtubeVodUrl: z.string().nullable(),
+  /** Optional Twitch VOD URL for recorded content */
+  twitchVodUrl: z.string().nullable(),
+  /** Stream start timestamp */
+  start: z.date(),
+  /** Stream end timestamp */
+  end: z.date(),
+  /** Array of tags associated with this stream */
+  tags: z.array(StreamTagSchema),
+  /** Array of users participating in this stream */
+  participants: z.array(UserDisplaySchema),
+})
+
+export const UserStreamSchema = z.object({
+  stream: StreamSchema,
+  owner: UserDisplaySchema,
+})
+
+export const UserStreamsSchema = z.object({
+  count: z.number(),
+  streams: z.array(UserStreamSchema),
+})
 
 // List endpoints (existing)
 const campaignsContract = oc.output(JJCampaignsSchema)
@@ -61,7 +129,10 @@ const causesContract = oc.output(
   }),
 )
 
+const upcomingStreamsContract = oc.output(UserStreamsSchema)
+
 export const contracts = {
   campaignsContract,
   causesContract,
+  upcomingStreamsContract,
 }
