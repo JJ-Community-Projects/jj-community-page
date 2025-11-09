@@ -1,6 +1,5 @@
-import {type Component} from "solid-js";
-import type { YogsStream } from "../../../../lib/orpc/private/yogs/contract.ts";
-import {getTextColor} from "../../../../lib/utils/textColors.ts";
+import { type Component } from 'solid-js'
+import type { YogsStream } from '../../../../lib/orpc/private/yogs/contract.ts'
 
 
 interface StreamPlaceholderProps {
@@ -10,8 +9,6 @@ interface StreamPlaceholderProps {
 export const StreamPlaceholder: Component<StreamPlaceholderProps> = (props) => {
   const stream = props.stream
   const tileSize = stream.size
-
-
 
   return (
     <div
@@ -26,6 +23,7 @@ export const StreamPlaceholder: Component<StreamPlaceholderProps> = (props) => {
         class={"w-full h-full rounded-2xl p-1 flex flex-col text-center items-center justify-center"}
         style={{
           color: stream.color,
+          'background-color': stream.color
         }}
       />
 
