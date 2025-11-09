@@ -224,7 +224,7 @@ const userExtensionConfig = os.userExtensionConfigContract
       return {
         hasCampaign: true,
         hasSchedule: true,
-        tabs: ['user-schedule', 'charities', 'fundraisers'],
+        tabs: ['user-schedule', 'charities', 'fundraisers', 'yogs'],
       }
     }
 
