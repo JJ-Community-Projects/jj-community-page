@@ -50,7 +50,7 @@ const showDonationLink = now > jjStart && now < jjEnd
   <div
     class="hidden md:flex w-[50%] flex-row gap-4 text-white items-center justify-center"
   >
-    <a href="/">Home</a>
+    <a href="/" class="hover:underline">Home</a>
     <div class="group relative">
       <button
         type="button"
@@ -69,13 +69,13 @@ const showDonationLink = now > jjStart && now < jjEnd
       </a>
       <YogsScheduleNavigation />
     </div>
-    <a href="/stream-resources">Stream Resources</a>
-    <a href="/faq">FAQ</a>
-    {!session && <a href="/login">Login</a>}
+    <a href="/stream-resources" class="hover:underline">Stream Resources</a>
+    <a href="/faq" class="hover:underline">FAQ</a>
+    {!session && <a href="/login" class="hover:underline">Login</a>}
     {
       showDonationLink && (
         <a
-          class="flex flex-row gap-2 items-center"
+          class="flex flex-row gap-2 items-center hover:underline"
           href="http://jinglejam.tiltify.com"
           target="_blank"
         >

@@ -9,12 +9,12 @@ const paths = schedules
 
 ---
 
-<div class="md:hidden absolute z-50 hidden w-30 group-hover:block">
-    <div class="bg-accent w-full rounded px-2 pb-4 pt-2 shadow-lg">
-        <div class="flex flex-col gap-4 text-center md:grid-cols-2">
-            <a class="nav" href={`/yogs`}>Yogs</a>
-          {paths.map(path => (<a class="nav" href={`/yogs/archive/${path}`}>{path}</a>))}
-            <a class="nav" href={`/yogs/stats`}>Statistics</a>
+<div class="hidden md:absolute md:z-50 md:group-hover:block">
+    <div class="min-w-48 bg-accent/95 text-white rounded-xl shadow-2xl ring-1 ring-white/10 backdrop-blur-sm">
+        <div class="flex flex-col text-center">
+            <a class="nav bg-accent/95 hover:brightness-105 rounded-full p-1" href={`/yogs`}>Yogs</a>
+          {paths.map(path => (<a class="nav bg-accent/95 hover:brightness-105 rounded-full p-1" href={`/yogs/archive/${path}`}>{path}</a>))}
+            <a class="nav bg-accent/95 hover:brightness-105 rounded-full p-1" href={`/yogs/stats`}>Statistics</a>
         </div>
     </div>
 </div>
