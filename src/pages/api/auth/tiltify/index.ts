@@ -28,5 +28,8 @@ export const GET: APIRoute = (ctx) => {
   })
 
   const authUrlStr = authUrl.toString()
+
+  console.log('authUrlStr', authUrlStr)
+
   return ctx.redirect(authUrlStr)
 }
