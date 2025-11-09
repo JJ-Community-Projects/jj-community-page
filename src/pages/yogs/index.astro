@@ -8,8 +8,9 @@ import BaseLayout from '../../layouts/BaseLayout.astro'
 import { YogsCreatorPill } from '../../components/yogs-pages/creators/YogsCreatorPill.tsx'
 import { InstagramIcon, TiktokIcon, TwitchIcon, TwitterIcon, YoutubeIcon } from '../../components/yogs-pages/common/YogsJJIcons.tsx'
 
-const fallbackSchedule = await getYogsScheduleFromContent(2025)
-const creators = fallbackSchedule.creators
+const fallbackSchedule = await getYogsScheduleFromContent(2023)
+const currentSchedule = await getYogsScheduleFromContent(2025)
+const creators = currentSchedule.creators
 
 const yogs = creators.filter(
   (creator) => creator.type === 'yogs' || creator.type === 'staff',
@@ -77,6 +78,31 @@ if (filteredCreators) {
       var(--jj-schedule-h-size)
     );
     --jj-schedule-slot-size: calc(var(--jj-schedule-data-size) * 3);
+
+    /* Placeholder-prefixed variables mirroring the schedule sizing */
+    --placeholder-jj-schedule-available-height: 400px;
+    --placeholder-jj-schedule-available-width: 400px;
+    --placeholder-jj-schedule-w-size: calc(
+      var(--placeholder-jj-schedule-available-width) / (7 * 3 + 1)
+    );
+    --placeholder-jj-schedule-h-size: calc(
+      var(--placeholder-jj-schedule-available-height) / (5 * 3 + 2)
+    );
+    --placeholder-jj-schedule-data-size: max(
+      var(--placeholder-jj-schedule-w-size),
+      var(--placeholder-jj-schedule-h-size)
+    );
+    --placeholder-jj-schedule-slot-size: calc(var(--placeholder-jj-schedule-data-size) * 3);
+  }
+
+  /* Scope overrides: inside .jj-placeholder use the placeholder-* values */
+  .jj-placeholder {
+    --jj-schedule-available-height: var(--placeholder-jj-schedule-available-height);
+    --jj-schedule-available-width: var(--placeholder-jj-schedule-available-width);
+    --jj-schedule-w-size: var(--placeholder-jj-schedule-w-size);
+    --jj-schedule-h-size: var(--placeholder-jj-schedule-h-size);
+    --jj-schedule-data-size: var(--placeholder-jj-schedule-data-size);
+    --jj-schedule-slot-size: var(--placeholder-jj-schedule-slot-size);
   }
 
   .timezone {
@@ -164,58 +190,6 @@ if (filteredCreators) {
       creators={creators}
       fallbackSchedule={fallbackSchedule!}
     />
-  </div>
-  <div class={'text-white text-center text-pretty flex flex-col justify-center items-center gap-1'}>
-    <p>
-      The schedule is subject to change and not all participants are confirmed. For more information visit the Yogscast's social media.
-    </p>
-
-    <div class={'w-full flex flex-row gap-4 items-center justify-center p-2'}>
-      <a
-        class={'hover:scale-110 transition-all'}
-        href={'https://www.youtube.com/yogscast'}
-        target={'_blank'}
-        aria-label={'Yogscast Youtube channel'}>
-        <YoutubeIcon class={'size-4'}/>
-      </a>
-      <a
-        class={'hover:scale-110 transition-all'}
-        href={'https://twitch.tv/yogscast'}
-        target={'_blank'}
-        aria-label={'Yogscast Twitch channel'}>
-        <TwitchIcon class={'size-4'}/>
-      </a>
-      <a
-        class={'hover:scale-110 transition-all'}
-        target={'_blank'}
-        href={'https://x.com/yogscast'}
-        aria-label={'Yogscast Twitter'}>
-        <TwitterIcon class={'size-4'}/>
-      </a>
-      <a
-        class={'hover:scale-110 transition-all'}
-        target={'_blank'}
-        href={'https://www.instagram.com/officialyogscast/'}
-        aria-label={'Yogscast Instagram'}>
-        <InstagramIcon class={'size-4'}/>
-      </a>
-      <a
-        class={'hover:scale-110 transition-all'}
-        target={'_blank'}
-        href={'https://www.tiktok.com/@yogscastofficial'}
-        aria-label={'Jingle Jam Tiktok'}>
-        <TiktokIcon class={'size-4'}/>
-      </a>
-    </div>
-
-    <p>
-      This Yogscast Jingle Jam schedule is maintained by the community. If you
-      find errors or see that a stream is missing use the contact info below.
-      Streams that appear here are not guaranteed to happen or might be delayed.
-      For more information visit the Jingle Jam Twitter page. This schedule is a
-      fan Project and not associated with the Jingle Jam, the Yogscast or their
-      partners.
-    </p>
   </div>
 
 {creators.length > 0 && (  <div class="flex flex-col justify-center items-center p-4 gap-2">
