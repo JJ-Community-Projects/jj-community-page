@@ -12,7 +12,7 @@ export const PlaceholderSchedule: Component<PlaceholderScheduleProps> = (
   const schedule = props.schedule
   const week = schedule.weeks[0]
   return (
-    <div class={'jj-placeholder flex flex-col blur'}>
+    <div class={'jj-placeholder flex flex-col blur-sm'}>
       <div class={'data-height flex w-full flex-row'}>
         <div class={'data-height data-width'} />
         <div class={'header-title-card-width p-2'}>
