@@ -85,8 +85,8 @@ interface BodyProps {
 const Body: Component<BodyProps> = (props) => {
   const schedule = useQuery(() =>
     orpcPrivate.yogs.schedule.queryOptions({
-      staleTime: 60_000,
-      refetchInterval: 60_000 * 5,
+      staleTime: 60_000 * 5,
+      refetchInterval: 60_000 * 10,
       refetchOnMount: true,
       refetchOnReconnect: true,
       refetchIntervalInBackground: true,

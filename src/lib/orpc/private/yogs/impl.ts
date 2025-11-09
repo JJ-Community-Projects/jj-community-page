@@ -4,10 +4,19 @@ import { hasAstroContext } from '../../middleware/hasAstroContext.ts'
 import { storeYogsSchedule } from './util.ts'
 import { getEntry } from 'astro:content'
 import { getYogsScheduleFromContent } from '../../../../content/getYogsScheduleFromContent.ts'
+import { cacheMiddleware } from '../../middleware/cacheControl.ts'
 
 const os = implement(contracts).use(hasAstroContext)
 
-export const config = os.config.handler(async ({ context }) => {
+export const config = os.config
+  .use(
+    cacheMiddleware({
+      maxAge: 60,
+      sMaxAge: 60,
+      staleWhileRevalidate: 30,
+    }),
+  )
+  .handler(async ({ context }) => {
   const ConfigDO = context.env.ConfigDO
   const stubId = ConfigDO.idFromName('ConfigDO')
   const stub = ConfigDO.get(stubId)
@@ -17,7 +26,15 @@ export const config = os.config.handler(async ({ context }) => {
   return { showSchedule: showUserFundraiser ?? true }
 })
 
-export const schedule = os.schedule.handler(async ({ context }) => {
+export const schedule = os.schedule
+  .use(
+    cacheMiddleware({
+      maxAge: 300,
+      sMaxAge: 300,
+      staleWhileRevalidate: 150,
+    }),
+  )
+  .handler(async ({ context }) => {
   /*const yogsSchedule = await loadYogsSchedule(context.env.KV)
 
   if (yogsSchedule) {
