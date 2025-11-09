@@ -17,44 +17,67 @@ const jjDataCacheMiddleware = cacheMiddleware({
 const os = implement(contracts).use(dbMiddleware).use(jjDataCacheMiddleware)
 
 // List all campaigns from DO cache
-const campaigns = os.campaignsContract.handler(async ({ context }) => {
-  const DO = context.env.JingleJamData
-  const stubID = DO.idFromName('JJ_API_CACHE')
-  const stub = DO.get(stubID)
-  try {
-    const data = await stub.getCommunityCampaignsDisplay()
-    if (!data) {
-      return {
-        count: 0,
-        list: [],
+const campaigns = os.campaignsContract
+  .use(
+    cacheMiddleware({
+      maxAge: 60,
+      sMaxAge: 60,
+      staleWhileRevalidate: 30,
+    }),
+  )
+  .handler(async ({ context }) => {
+    const DO = context.env.JingleJamData
+    const stubID = DO.idFromName('JJ_API_CACHE')
+    const stub = DO.get(stubID)
+    try {
+      const data = await stub.getCommunityCampaignsDisplay()
+      if (!data) {
+        return {
+          count: 0,
+          list: [],
+        }
       }
+      return data
+    } catch (e) {
+      console.log(JSON.stringify(e, null, 2))
+      throw e
     }
-    return data
-  } catch (e) {
-    console.log(JSON.stringify(e, null, 2))
-    throw e
-  }
-})
+  })
 
 // List all causes from DO cache
-const causes = os.causesContract.handler(async ({ context }) => {
-  const DO = context.env.JingleJamData
-  const stubID = DO.idFromName('JJ_API_CACHE')
-  const stub = DO.get(stubID)
+const causes = os.causesContract
+  .use(
+    cacheMiddleware({
+      maxAge: 60,
+      sMaxAge: 60,
+      staleWhileRevalidate: 30,
+    }),
+  )
+  .handler(async ({ context }) => {
+    const DO = context.env.JingleJamData
+    const stubID = DO.idFromName('JJ_API_CACHE')
+    const stub = DO.get(stubID)
 
-  const causes = await stub.getCauses()
-  if (!causes) {
-    return { count: 0, list: [] }
-  }
+    const causes = await stub.getCauses()
+    if (!causes) {
+      return { count: 0, list: [] }
+    }
 
-  return {
-    count: causes.length,
-    list: causes,
-  }
-})
+    return {
+      count: causes.length,
+      list: causes,
+    }
+  })
 
-const upcomingStreams = os.upcomingStreamsContract.handler(
-  async ({ context }) => {
+const upcomingStreams = os.upcomingStreamsContract
+  .use(
+    cacheMiddleware({
+      maxAge: 300,
+      sMaxAge: 300,
+      staleWhileRevalidate: 150,
+    }),
+  )
+  .handler(async ({ context }) => {
     const db = context.db
     const nowSec = Math.floor(Date.now() / 1000)
     const year = new Date().getUTCFullYear()
@@ -73,7 +96,9 @@ const upcomingStreams = os.upcomingStreamsContract.handler(
       .all()
 
     const scheduleIds = scheduleRows.map((s) => s.id)
-    const scheduleOwnerMap = new Map<number, number>(scheduleRows.map(r => [r.id, r.ownerId]))
+    const scheduleOwnerMap = new Map<number, number>(
+      scheduleRows.map((r) => [r.id, r.ownerId]),
+    )
     if (scheduleIds.length === 0) {
       return { count: 0, streams: [] }
     }
@@ -251,10 +276,12 @@ const upcomingStreams = os.upcomingStreamsContract.handler(
     }
 
     // 6) Load owners for the schedules
-    const ownerIds = Array.from(new Set(scheduleRows.map(r => r.ownerId)))
+    const ownerIds = Array.from(new Set(scheduleRows.map((r) => r.ownerId)))
     let ownersMap = new Map<number, any>()
     if (ownerIds.length > 0) {
-      const ownerConds = or(...ownerIds.map(id => eq(userDisplayView.userId, id)))
+      const ownerConds = or(
+        ...ownerIds.map((id) => eq(userDisplayView.userId, id)),
+      )
       const owners = await db
         .select({
           userId: userDisplayView.userId,
@@ -271,7 +298,7 @@ const upcomingStreams = os.upcomingStreamsContract.handler(
         .from(userDisplayView)
         .where(ownerConds)
         .all()
-      ownersMap = new Map(owners.map(o => [o.userId, o]))
+      ownersMap = new Map(owners.map((o) => [o.userId, o]))
     }
 
     // 7) Compose final user streams preserving chronological order
@@ -295,8 +322,7 @@ const upcomingStreams = os.upcomingStreamsContract.handler(
     composed.sort((a, b) => a.stream.start.getTime() - b.stream.start.getTime())
 
     return { count: composed.length, streams: composed }
-  },
-)
+  })
 
 /*
 // Get a single cause by id from DO cache (current year)
