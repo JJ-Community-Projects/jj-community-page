@@ -6,7 +6,6 @@ import { YogsCurrentScheduleLoader } from '../../components/yogs-pages/schedule/
 
 import BaseLayout from '../../layouts/BaseLayout.astro'
 import { YogsCreatorPill } from '../../components/yogs-pages/creators/YogsCreatorPill.tsx'
-import { InstagramIcon, TiktokIcon, TwitchIcon, TwitterIcon, YoutubeIcon } from '../../components/yogs-pages/common/YogsJJIcons.tsx'
 
 const fallbackSchedule = await getYogsScheduleFromContent(2023)
 const currentSchedule = await getYogsScheduleFromContent(2025)
@@ -191,47 +190,4 @@ if (filteredCreators) {
       fallbackSchedule={fallbackSchedule!}
     />
   </div>
-
-{creators.length > 0 && (  <div class="flex flex-col justify-center items-center p-4 gap-2">
-    <p class="text-2xl text-white text-center">Yogs & Friends</p>
-    <div class="flex flex-col items-center gap-2">
-      {
-        yogs.length > 0 && (
-          <p class="text-xl text-white mb-1">Yogs</p>
-          <div class="flex flex-wrap gap-2 items-center justify-center">
-            {
-              yogs &&
-              yogs.map((creator) => (
-                <YogsCreatorPill creator={creator} client:only="solid-js" />
-              ))
-            }
-          </div>
-        )
-      }
-      {
-        bestOf.length > 0 && (
-          <p class="text-xl text-white mb-1">Best Of</p>
-          <div class="flex flex-wrap gap-2 items-center justify-center">
-            {bestOf &&
-              bestOf.map((creator) => (
-                <YogsCreatorPill creator={creator} client:only="solid-js" />
-              ))}
-          </div>
-        )
-      }
-      {
-        friends.length > 0 && (
-            <p class="text-xl text-white mb-1">Friends</p>
-            <div class="flex flex-wrap gap-2 items-center justify-center">
-              {friends &&
-                friends.map((creator) => (
-                  <YogsCreatorPill creator={creator} client:only="solid-js" />
-                ))}
-            </div>
-        )
-      }
-    </div>
-  </div>
-  )}
-
 </BaseLayout>
