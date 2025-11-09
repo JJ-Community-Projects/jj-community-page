@@ -20,7 +20,8 @@ export const LoginPage: Component = () => {
         <div class="space-y-4 text-center">
           <h1 class="font-babas font-bold text-white ~text-2xl/4xl">Login</h1>
           <p class="font-poppins text-white/80 ~text-base/lg">
-            Join the community fundraising effort
+            Join the JJ community page to access more community features. Accounts are <b>not required</b> to use the JJ community page. Your fundraiser will automatically
+            appear on the <a class={'underline'} href={'/fundraisers'}> community fundraiser page</a>. Accounts are only needed if you want to create your own schedule.
           </p>
         </div>
 
@@ -93,10 +94,6 @@ export const LoginPage: Component = () => {
                     <li class="flex items-start gap-2">
                       <span class="mt-1 text-accent">•</span>
                       Community collaboration tools
-                    </li>
-                    <li class="flex items-start gap-2">
-                      <span class="mt-1 text-accent">•</span>
-                      Access to OBS overlays
                     </li>
                   </ul>
                 </section>

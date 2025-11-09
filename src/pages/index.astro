@@ -49,7 +49,8 @@ import BaseLayout4xl from '../layouts/BaseLayout4xl.astro'
         </li>
       </ul>
       <p class="mt-4 text-xs sm:text-sm text-white/60">
-        Disclaimer: This is a community‑run project and is not affiliated with, endorsed by, or sponsored by Jingle Jam or any associated organizations.
+        Disclaimer: This is a community‑run project and is not affiliated with,
+        endorsed by, or sponsored by Jingle Jam or any associated organizations.
       </p>
     </section>
 
@@ -58,24 +59,42 @@ import BaseLayout4xl from '../layouts/BaseLayout4xl.astro'
       class="text-white/90 bg-white/5 border border-white/10 rounded-xl p-4 sm:p-6"
     >
       <h2 class="text-xl sm:text-2xl font-semibold text-white">
-        For Streamers
+        For Fundraisers/Streamers without an account
       </h2>
-      <p class="mt-2">
-        Tools to help you participate and share your Jingle Jam efforts:
+      <p>Tools available without an account:</p>
+      <ul class="mt-3 grid gap-x-4 gap-2 sm:grid-cols-2 list-disc pl-5">
+        <li>
+          <b>Fundraiser overview page</b> - If you have a <a class="underline" href="https://jinglejam.tiltify.com">Jingle Jam Fundraiser</a> your fundraiser will automatically appear on the <a class="underline" href="/fundraisers">Fundraisers page</a> and <a class="underline" href="/stream-resources">Twitch extension</a> once the Jingle Jam has started.</li>
+        <li>
+          <b>OBS Overlays</b> - drop-in overlays for donations and schedules.
+        </li>
+        <li>
+          <b>Twitch Extension</b> - Much of this data is also available via the Jingle
+          Jam Community Twitch Extension
+        </li>
+      </ul>
+      <a class="underline pt-2" href="/stream-resources"
+        >Visit the stream resources page to access these tools</a
+      >
+
+    </section>
+
+    <!-- Streamer with account features section -->
+    <section
+      class="text-white/90 bg-white/5 border border-white/10 rounded-xl p-4 sm:p-6"
+    >
+      <h2 class="text-xl sm:text-2xl font-semibold text-white">
+        For Fundraisers/Streamers with an account
+      </h2>
+      <p>
+        Tools available with an account:
       </p>
       <ul class="mt-3 grid gap-x-4 gap-2 sm:grid-cols-2 list-disc pl-5">
         <li><b>User profile</b> — showcase your links and fundraising info.</li>
         <li><b>Friends</b> — highlight and collaborate with other creators.</li>
         <li><b>Teams</b> — group up for joint schedules.</li>
         <li>
-          <b>OBS Overlays</b> — drop-in overlays for donations and schedules.
-        </li>
-        <li>
-          <b>Twitch Extension</b> — Much of this data is also available via the <a
-            href="/twitch-extension"
-            class="cursor-pointer underline hover:text-accent-50 transition-all"
-            >Jingle Jam Community Twitch Extension</a
-          >.
+          <b>More OBS Overlays</b> — drop-in overlays for donations and schedules.
         </li>
       </ul>
       <div class="mt-4 flex justify-center">
