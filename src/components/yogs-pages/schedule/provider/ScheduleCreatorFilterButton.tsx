@@ -6,7 +6,11 @@ import {BiRegularReset, BiRegularShare} from "solid-icons/bi";
 import {createModalSignal, type ModalSignal} from "../../../../lib/createModalSignal.ts";
 import {BsPeopleFill} from "solid-icons/bs";
 import {CgClose} from "solid-icons/cg";
-import {FaRegularSquare, FaSolidSquareCheck} from "solid-icons/fa";
+import {
+  FaRegularSquare,
+  FaSolidShare,
+  FaSolidSquareCheck,
+} from 'solid-icons/fa'
 import {useYogsSchedule} from "./YogsScheduleProvider.tsx";
 
 export const FilterResetButton: Component = () => {

@@ -1,5 +1,5 @@
-import type {Component} from "solid-js";
-import {InstagramIcon, TiktokIcon, TwitchIcon, TwitterIcon, YoutubeIcon} from "../common/YogsJJIcons.tsx";
+import type { Component } from 'solid-js'
+import { InstagramIcon, TiktokIcon, TwitchIcon, TwitterIcon, YoutubeIcon } from '../../common/icons/JJIcons.tsx'
 
 export const ScheduleDisclaimer: Component = () => {
   return (

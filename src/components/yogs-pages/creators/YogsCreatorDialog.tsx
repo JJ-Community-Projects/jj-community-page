@@ -15,7 +15,7 @@ import {
   FaBrandsYoutube,
   FaSolidLink
 } from "solid-icons/fa";
-import {BskyIcon, JJIcon} from "../common/YogsJJIcons.tsx";
+import {BskyIcon, JJIcon} from "../../common/icons/JJIcons.tsx";
 import type { YogsCreator } from '../../../lib/orpc/private/yogs/contract.ts'
 
 interface CreatorDialogProps {

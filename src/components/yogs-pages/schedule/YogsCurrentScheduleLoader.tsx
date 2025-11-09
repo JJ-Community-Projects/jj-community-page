@@ -15,6 +15,15 @@ import {
   MainCountdownSimple,
   MainJJStartTimes,
 } from '../../common/ui/MainHeader.tsx'
+import {
+  YoutubeIcon,
+  TwitchIcon,
+  BskyIcon,
+  TwitterIcon,
+  InstagramIcon,
+  TiktokIcon,
+} from '../../common/icons/JJIcons.tsx'
+import { DateTime } from 'luxon'
 
 interface ConfigLoaderProps {
   creators: YogsCreator[]
@@ -49,7 +58,66 @@ const ConfigLoader: Component<ConfigLoaderProps> = (props) => {
           >
             <MainCountdownSimple />
             <MainJJStartTimes />
-            <p>The <span class={'font-bold'}>Yogscast Jingle Jam Schedule</span> will be shown once it was announced on Social Media.</p>
+            <p>
+              The <span class={'font-bold'}>Yogscast Jingle Jam Schedule</span>{' '}
+              will be shown once it was announced on Social Media.
+            </p>
+            <div
+              class={
+                'flex w-full flex-row items-center justify-center gap-4 p-2'
+              }
+            >
+              <a
+                class={'transition-all hover:scale-110'}
+                href={'https://www.youtube.com/yogscast'}
+                target={'_blank'}
+                aria-label={'Yogscast Youtube channel'}
+              >
+                <YoutubeIcon class={'size-4'} />
+              </a>
+              <a
+                class={'transition-all hover:scale-110'}
+                href={'https://twitch.tv/yogscast'}
+                target={'_blank'}
+                aria-label={'Yogscast Twitch channel'}
+              >
+                <TwitchIcon class={'size-4'} />
+              </a>
+              <a
+                class={'transition-all hover:scale-110'}
+                target={'_blank'}
+                href={'https://bsky.app/profile/yogscast.com'}
+                aria-label={'Yogscast Blue sky'}
+              >
+                <BskyIcon class={'size-4'} />
+              </a>
+              <a
+                class={'transition-all hover:scale-110'}
+                target={'_blank'}
+                href={'https://x.com/yogscast'}
+                aria-label={'Yogscast Twitter'}
+              >
+                <TwitterIcon class={'size-4'} />
+              </a>
+              <a
+                class={'transition-all hover:scale-110'}
+                target={'_blank'}
+                href={'https://www.instagram.com/officialyogscast/'}
+                aria-label={'Yogscast Instagram'}
+              >
+                <InstagramIcon class={'size-4'} />
+              </a>
+              <a
+                class={'transition-all hover:scale-110'}
+                target={'_blank'}
+                href={'https://www.tiktok.com/@yogscastofficial'}
+                aria-label={'Jingle Jam Tiktok'}
+              >
+                <TiktokIcon class={'size-4'} />
+              </a>
+            </div>
+
+            <PlaceholderSchedule schedule={props.fallbackSchedule} />
           </div>
         </Show>
       </Match>
@@ -103,34 +171,121 @@ const Body: Component<BodyProps> = (props) => {
               schedule={schedule.data!}
               creators={props.creators}
             ></YogsScheduleComponent>
-            <p class={'pb-4 text-center text-white'}>
-              Last Updated TODO
-              {/**schedule.data!.updatedAt.toLocaleString({
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
-                hour: 'numeric',
-                minute: 'numeric',
-                timeZoneName: 'short',
-              })**/}
-            </p>
+            <Show when={schedule.data?.updatedAt}>
+              {(updatedAt) => {
+                return (
+                  <p class={'pb-4 text-center text-white'}>
+                    Last Updated{' '}
+                    {DateTime.fromJSDate(updatedAt()).toLocaleString({
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric',
+                      hour: 'numeric',
+                      minute: 'numeric',
+                      timeZoneName: 'short',
+                    })}
+                  </p>
+                )
+              }}
+            </Show>
           </div>
           <div class="mobile-schedule flex w-full flex-col items-center justify-center">
             <MobileYogsScheduleComponent
               schedule={schedule.data!}
               creators={props.creators}
             ></MobileYogsScheduleComponent>
-            <p class={'pb-4 text-center text-white'}>
-              Last Updated TODO
-              {/**schedule.data!.updatedAt.toLocaleString({
-                month: 'short',
-                day: 'numeric',
-                hour: 'numeric',
-                minute: 'numeric',
-                timeZoneName: 'short',
-              })**/}
-            </p>
+            <Show when={schedule.data?.updatedAt}>
+              {(updatedAt) => {
+                return (
+                  <p class={'pb-4 text-center text-white'}>
+                    Last Updated{' '}
+                    {DateTime.fromJSDate(updatedAt()).toLocaleString({
+                      month: 'short',
+                      day: 'numeric',
+                      hour: 'numeric',
+                      minute: 'numeric',
+                      timeZoneName: 'short',
+                    })}
+                  </p>
+                )
+              }}
+            </Show>
             <YogsScheduleDisclaimer />
+          </div>
+
+          <div
+            class={
+              'flex flex-col items-center justify-center gap-1 text-pretty text-center text-white'
+            }
+          >
+            <p>
+              The schedule is subject to change and not all participants are
+              confirmed. For more information visit the Yogscast's social media.
+            </p>
+
+            <div
+              class={
+                'flex w-full flex-row items-center justify-center gap-4 p-2'
+              }
+            >
+              <a
+                class={'transition-all hover:scale-110'}
+                href={'https://www.youtube.com/yogscast'}
+                target={'_blank'}
+                aria-label={'Yogscast Youtube channel'}
+              >
+                <YoutubeIcon class={'size-4'} />
+              </a>
+              <a
+                class={'transition-all hover:scale-110'}
+                href={'https://twitch.tv/yogscast'}
+                target={'_blank'}
+                aria-label={'Yogscast Twitch channel'}
+              >
+                <TwitchIcon class={'size-4'} />
+              </a>
+              <a
+                class={'transition-all hover:scale-110'}
+                target={'_blank'}
+                href={'https://bsky.app/profile/yogscast.com'}
+                aria-label={'Yogscast Blue sky'}
+              >
+                <BskyIcon class={'size-4'} />
+              </a>
+              <a
+                class={'transition-all hover:scale-110'}
+                target={'_blank'}
+                href={'https://x.com/yogscast'}
+                aria-label={'Yogscast Twitter'}
+              >
+                <TwitterIcon class={'size-4'} />
+              </a>
+              <a
+                class={'transition-all hover:scale-110'}
+                target={'_blank'}
+                href={'https://www.instagram.com/officialyogscast/'}
+                aria-label={'Yogscast Instagram'}
+              >
+                <InstagramIcon class={'size-4'} />
+              </a>
+              <a
+                class={'transition-all hover:scale-110'}
+                target={'_blank'}
+                href={'https://www.tiktok.com/@yogscastofficial'}
+                aria-label={'Jingle Jam Tiktok'}
+              >
+                <TiktokIcon class={'size-4'} />
+              </a>
+            </div>
+
+            <p>
+              This Yogscast Jingle Jam schedule is maintained by the community.
+              If you find errors or see that a stream is missing use the contact
+              info below. Streams that appear here are not guaranteed to happen
+              or might be delayed. For more information visit the Jingle Jam
+              Twitter page. This schedule is a fan Project and not associated
+              with the Jingle Jam, the Yogscast or their partners.
+            </p>
           </div>
         </>
       </Match>

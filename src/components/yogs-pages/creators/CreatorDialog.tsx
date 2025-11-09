@@ -1,10 +1,10 @@
-import type {FullCreator} from "../../../lib/model/ContentTypes.ts";
-import type {ModalSignal} from "../../../lib/createModalSignal.ts";
-import {type Component, For, Match, Show, Switch} from "solid-js";
-import {Dialog} from "@kobalte/core/dialog";
-import {getTextColor} from "../../../lib/utils/textColors.ts";
-import {AiOutlineClose} from "solid-icons/ai";
-import {twMerge} from "tailwind-merge";
+import type { FullCreator } from '../../../lib/model/ContentTypes.ts'
+import type { ModalSignal } from '../../../lib/createModalSignal.ts'
+import { type Component, For, Match, Show, Switch } from 'solid-js'
+import { Dialog } from '@kobalte/core/dialog'
+import { getTextColor } from '../../../lib/utils/textColors.ts'
+import { AiOutlineClose } from 'solid-icons/ai'
+import { twMerge } from 'tailwind-merge'
 import {
   FaBrandsDiscord,
   FaBrandsInstagram,
@@ -15,8 +15,8 @@ import {
   FaBrandsTwitter,
   FaBrandsYoutube,
   FaSolidLink
-} from "solid-icons/fa";
-import {BskyIcon, JJIcon} from "../common/YogsJJIcons.tsx";
+} from 'solid-icons/fa'
+import { BskyIcon, JJIcon } from '../../common/icons/JJIcons.tsx'
 
 interface CreatorDialogProps {
   creator: FullCreator,
