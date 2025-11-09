@@ -1,5 +1,5 @@
 import { implement, ORPCError, os as server } from '@orpc/server'
-import { contracts, type JJCampaignsTVType } from './contract.ts'
+import { contracts, type ExtensionConfigTVType, type JJCampaignsTVType, } from './contract.ts'
 import { getEntry } from 'astro:content'
 import { hasAstroContext } from '../../middleware/hasAstroContext.ts'
 import { getStreamColors } from '../../../../functions/jjDatesToColors.ts'
@@ -135,6 +135,9 @@ const extensionConfig = os.extensionConfigContract
     const showUserFundraiser = await stub.getBooleanConfig(
       'twitch-extension:config.showUserFundraiser',
     )
+    const showUserSchedule = await stub.getBooleanConfig(
+      'twitch-extension:config.showUserSchedule',
+    )
 
     // Refresh intervals
     const refreshIntervalYogsSchedule = await stub.getNumberConfig(
@@ -161,12 +164,13 @@ const extensionConfig = os.extensionConfigContract
       'twitch-extension:config.donationTrackerUrl',
     )
 
-    const config = {
+    const config: ExtensionConfigTVType = {
       year: year ?? 2024,
       showYogsSchedule: showYogsSchedule ?? false,
       showCharities: showCharities ?? false,
       showFundraisers: showFundraisers ?? false,
       showUserFundraiser: showUserFundraiser ?? false,
+      showUserSchedule: showUserSchedule ?? false,
       refreshInterval: {
         yogsSchedule: refreshIntervalYogsSchedule ?? 1000 * 60 * 10,
         charities: refreshIntervalCharities ?? 1000 * 60,

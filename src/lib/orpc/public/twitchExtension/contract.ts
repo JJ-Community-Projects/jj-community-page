@@ -111,6 +111,7 @@ export const ExtensionConfigSchema = z.object({
   showCharities: z.boolean(),
   showFundraisers: z.boolean(),
   showUserFundraiser: z.boolean(),
+  showUserSchedule: z.boolean(),
   refreshInterval: z.object({
     yogsSchedule: z.number(),
     charities: z.number(),
@@ -124,6 +125,8 @@ export const ExtensionConfigSchema = z.object({
   donationTrackerUrl: z.string(),
   timestamp: z.string(),
 })
+
+export type ExtensionConfigTVType = z.infer<typeof ExtensionConfigSchema>
 
 export const TabSchema = z.enum([
   'user-schedule',
