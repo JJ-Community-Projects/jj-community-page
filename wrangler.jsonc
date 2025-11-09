@@ -179,8 +179,12 @@
   },
   "triggers": {
     "crons": [
-      "*/2 * * * *"
-      // every 2 minutes
+      // every 5 minutes
+      "*/5 * * * *",
+      // every minute from december 1-15
+      "*/1 * 1-15 12 *",
+      // every hour
+      "0 */1 * * *"
     ]
   },
   "env": {
@@ -206,8 +210,6 @@
         {
           "tag": "v1",
           "new_sqlite_classes": [
-            "UserDO",
-            "TeamDO",
             "JingleJamData",
             "UserRateLimiter",
 
