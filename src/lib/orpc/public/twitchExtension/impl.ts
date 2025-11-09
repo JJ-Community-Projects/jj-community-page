@@ -189,7 +189,7 @@ const extensionConfig = os.extensionConfigContract
       'twitch-extension:config',
       JSON.stringify(config),
       {
-        expirationTtl: 600,
+        expirationTtl: 300,
       },
     )
 
