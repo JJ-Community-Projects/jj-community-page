@@ -1,6 +1,13 @@
-import { createContext, createSignal, type ParentComponent, useContext, } from 'solid-js'
+import {
+  createContext,
+  createMemo,
+  createSignal,
+  type ParentComponent,
+  useContext,
+} from 'solid-js'
 import { useQuery } from '@tanstack/solid-query'
 import { orpcPrivate } from '../../../lib/orpc/client.ts'
+import { makePersisted } from '@solid-primitives/storage'
 
 const useCommunityPageHook = () => {
   const communityQuery = useQuery(() =>
@@ -9,15 +16,61 @@ const useCommunityPageHook = () => {
 
   const causeQuery = useQuery(() => orpcPrivate.jj.causes.queryOptions({}))
 
-  const [sortBy, setSortBy] = createSignal<'raised' | 'live' | 'cause'>(
-    'raised',
+  const [sortBy, setSortBy] = makePersisted(
+    createSignal<'raised' | 'live' | 'cause'>('raised'),
   )
+
+  const [currency, setCurrency] = makePersisted(
+    createSignal<'GBP' | 'USD' | 'EUR'>('GBP'),
+  )
+
+  const campaignsByCause = () => {
+    if (!causeQuery.data) return []
+    if (!communityQuery.data) return []
+    return causeQuery.data!.list.map((cause) => {
+      return {
+        cause: cause,
+        campaigns: communityQuery.data!.list.filter(
+          (campaign) => campaign.tiltifyCauseId === cause.id,
+        ),
+      }
+    })
+  }
+
+  const campaignsSortedByLiveFirst = () => {
+    if (!communityQuery.data) return []
+    return communityQuery.data!.list.toSorted((a, b) => {
+      if (a.isTwitchLive && !b.isTwitchLive) return -1
+      if (!a.isTwitchLive && b.isTwitchLive) return 1
+      return 0
+    })
+  }
+
+  const campaignsSortedByRaised = () => {
+    if (!communityQuery.data) return []
+    return communityQuery.data!.list.toSorted((a, b) => {
+      if (a.raised.gbp < b.raised.gbp) return 1
+      if (a.raised.gbp > b.raised.gbp) return -1
+      return 0
+    })
+  }
+
+  const campaignsSorted = createMemo(() => {
+    if (sortBy() === 'live') {
+      return campaignsSortedByLiveFirst()
+    }
+    return campaignsSortedByRaised()
+  })
 
   return {
     community: communityQuery,
     cause: causeQuery,
     sortBy,
     setSortBy,
+    currency,
+    setCurrency,
+    campaignsSorted,
+    campaignsByCause,
   }
 }
 
