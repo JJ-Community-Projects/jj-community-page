@@ -1,15 +1,30 @@
 import { type Component, createSignal, For, Show } from 'solid-js'
-import type { JJCampaignType, JJCauseType, } from '../../../lib/orpc/private/jjData/contract.ts'
+import type {
+  JJCampaignType,
+  JJCauseType,
+} from '../../../lib/orpc/private/jjData/contract.ts'
 import { twMerge } from 'tailwind-merge'
 import { createI18n, I18nProvider, Numeric } from 'solid-i18n'
 import { useLocale } from '@kobalte/core'
-import { TiltifyIcon, TwitchIcon, YoutubeIcon, } from '../../common/icons/JJIcons.tsx'
+import {
+  TiltifyIcon,
+  TwitchIcon,
+  YoutubeIcon,
+} from '../../common/icons/JJIcons.tsx'
 import { Countdown } from '../../common/ui/Countdown.tsx'
-import { useIsBeforeJJ, useIsJJ, useJJStartCountdown, useNextJJStartDate, } from '../../../lib/utils/jjDates.ts'
+import {
+  useIsBeforeJJ,
+  useIsJJ,
+  useJJStartCountdown,
+  useNextJJStartDate,
+} from '../../../lib/utils/jjDates.ts'
 import { QueryClientProvider } from '@tanstack/solid-query'
 import { QueryClient } from '@tanstack/query-core'
 import { RadioGroup } from '@kobalte/core/radio-group'
-import { CommunityPageProvider, useCommunityPage, } from './CommunityPageProvider.tsx'
+import {
+  CommunityPageProvider,
+  useCommunityPage,
+} from './CommunityPageProvider.tsx'
 import { FaSolidHeart } from 'solid-icons/fa'
 import { ScheduleStreamCard } from '../schedules/common/StreamCard.tsx'
 
