@@ -305,6 +305,39 @@
           "id": "f4c82b0129aa45afb5fc16535c11a916"
         }
       ],
+      "queues": {
+        "producers": [
+          {
+            "queue": "twitch-live-check-prod",
+            "binding": "TWITCH_LIVE_CHECK"
+          },
+          {
+            "queue": "youtube-live-check-prod",
+            "binding": "YOUTUBE_LIVE_CHECK"
+          },
+          {
+            "queue": "twitch-live-notifier-prod",
+            "binding": "TWITCH_LIVE_NOTIFIER"
+          }
+        ],
+        "consumers": [
+          {
+            "queue": "twitch-live-check",
+            "max_batch_size": 100,
+            "max_batch_timeout": 30
+          },
+          {
+            "queue": "youtube-live-check",
+            "max_batch_size": 5,
+            "max_batch_timeout": 30
+          },
+          {
+            "queue": "twitch-live-notifier",
+            "max_batch_size": 10,
+            "max_batch_timeout": 5
+          }
+        ]
+      },
       "vars": {
         "ENVIRONMENT": "PRDD"
       }
