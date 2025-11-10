@@ -322,17 +322,17 @@
         ],
         "consumers": [
           {
-            "queue": "twitch-live-check",
+            "queue": "twitch-live-check-prod",
             "max_batch_size": 100,
             "max_batch_timeout": 30
           },
           {
-            "queue": "youtube-live-check",
+            "queue": "youtube-live-check-prod",
             "max_batch_size": 5,
             "max_batch_timeout": 30
           },
           {
-            "queue": "twitch-live-notifier",
+            "queue": "twitch-live-notifier-prod",
             "max_batch_size": 10,
             "max_batch_timeout": 5
           }
