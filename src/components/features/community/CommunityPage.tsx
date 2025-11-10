@@ -5,7 +5,7 @@ import { createI18n, I18nProvider, Numeric } from 'solid-i18n'
 import { useLocale } from '@kobalte/core'
 import { TiltifyIcon, TwitchIcon, YoutubeIcon, } from '../../common/icons/JJIcons.tsx'
 import { Countdown } from '../../common/ui/Countdown.tsx'
-import { useIsBeforeJJ, useIsJJ } from '../../../lib/utils/jjDates.ts'
+import { useIsBeforeJJ, useIsJJ, useJJStartCountdown, useNextJJStartDate, } from '../../../lib/utils/jjDates.ts'
 import { QueryClientProvider } from '@tanstack/solid-query'
 import { QueryClient } from '@tanstack/query-core'
 import { RadioGroup } from '@kobalte/core/radio-group'
@@ -207,17 +207,29 @@ const CurrencySelection: Component = () => {
 }
 
 const Header: Component = () => {
+  const nextJJStartDate = useNextJJStartDate()
+  const jjStartCountdown = useJJStartCountdown()
+  const isJJ = useIsJJ()
   return (
-    <div class="rounded-xl border-2 bg-white p-2 shadow-md transition-all duration-300 hover:shadow-lg">
+    <div class="flex flex-col items-center rounded-xl border-2 bg-white p-2 shadow-md transition-all duration-300 hover:shadow-lg">
       <div class="p-4 md:p-4 lg:p-6">
-        <div class="flex flex-col items-center text-center">
-          <div class="mb-4 flex items-center gap-2">
+        <div class="flex flex-col items-center justify-center text-center">
+          <div class="flex items-center gap-2">
             <FaSolidHeart class="h-8 w-8 text-neutral-600" />
             <h1 class="font-babas text-black ~text-2xl/4xl">Fundraisers</h1>
           </div>
           <p class={'text-black'}>Fundraisers and upcoming streams</p>
         </div>
       </div>
+
+      <Show when={!isJJ()}>
+        <p class={'text-lg font-semibold sm:text-xl'}>
+          Jingle Jam {nextJJStartDate().year} starts in
+        </p>
+        <p class={'font-mono text-2xl tabular-nums tracking-tight sm:text-3xl'}>
+          {jjStartCountdown().toFormat("dd'd' hh'h' mm'm' ss's'")}
+        </p>
+      </Show>
     </div>
   )
 }
@@ -240,15 +252,19 @@ const CampaignGrid: Component = () => {
   const { campaignsSorted } = useCommunityPage()
 
   return (
-    <div class={twMerge('w-full mx-auto')}>
+    <div class={twMerge('mx-auto w-full')}>
       <div
         class={twMerge(
           'mb-2 mt-6 flex w-full flex-wrap items-end justify-between gap-x-4 gap-y-2',
         )}
       >
         <div class={'flex flex-col'}>
-          <h2 class={twMerge('text-lg font-semibold text-white')}>Fundraisers (2024)</h2>
-          <p class={twMerge('text-white')}>2025 Fundraisers will be shown after the Jingle Jam has started.</p>
+          <h2 class={twMerge('text-lg font-semibold text-white')}>
+            Fundraisers (2024)
+          </h2>
+          <p class={twMerge('text-white')}>
+            2025 Fundraisers will be shown after the Jingle Jam has started.
+          </p>
         </div>
         <div
           class={twMerge(
