@@ -338,6 +338,16 @@
           }
         ]
       },
+      "triggers": {
+        "crons": [
+          // every 10 minutes
+          "*/10 * * * *",
+          // every minute from december 1-15
+          "*/1 * 1-15 12 *",
+          // every 2 hour
+          "0 */2 * * *"
+        ]
+      },
       "vars": {
         "ENVIRONMENT": "PRDD"
       }

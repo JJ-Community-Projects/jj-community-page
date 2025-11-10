@@ -7,13 +7,13 @@ export async function scheduled(
   ctx: ExecutionContext,
 ) {
   switch (controller.cron) {
-    case '*/5 * * * *':
+    case '*/10 * * * *':
       await scheduledTwitch(controller, env, ctx)
       break
     case '*/1 * 1-15 12 *':
       await scheduledYogsJJAP(controller, env, ctx)
       break
-    case '0 */1 * * *':
+    case '0 */2 * * *':
       const DO = env.JingleJamData
       const stubID = DO.idFromName('JJ_API_CACHE')
       const stub = DO.get(stubID)
