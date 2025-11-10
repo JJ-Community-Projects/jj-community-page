@@ -1,25 +1,15 @@
 import { type Component, createSignal, For, Show } from 'solid-js'
-import type {
-  JJCampaignType,
-  JJCauseType,
-} from '../../../lib/orpc/private/jjData/contract.ts'
+import type { JJCampaignType, JJCauseType, } from '../../../lib/orpc/private/jjData/contract.ts'
 import { twMerge } from 'tailwind-merge'
 import { createI18n, I18nProvider, Numeric } from 'solid-i18n'
 import { useLocale } from '@kobalte/core'
-import {
-  TiltifyIcon,
-  TwitchIcon,
-  YoutubeIcon,
-} from '../../common/icons/JJIcons.tsx'
+import { TiltifyIcon, TwitchIcon, YoutubeIcon, } from '../../common/icons/JJIcons.tsx'
 import { Countdown } from '../../common/ui/Countdown.tsx'
 import { useIsBeforeJJ, useIsJJ } from '../../../lib/utils/jjDates.ts'
 import { QueryClientProvider } from '@tanstack/solid-query'
 import { QueryClient } from '@tanstack/query-core'
 import { RadioGroup } from '@kobalte/core/radio-group'
-import {
-  CommunityPageProvider,
-  useCommunityPage,
-} from './CommunityPageProvider.tsx'
+import { CommunityPageProvider, useCommunityPage, } from './CommunityPageProvider.tsx'
 import { FaSolidHeart } from 'solid-icons/fa'
 import { ScheduleStreamCard } from '../schedules/common/StreamCard.tsx'
 
@@ -225,6 +215,7 @@ const Header: Component = () => {
             <FaSolidHeart class="h-8 w-8 text-neutral-600" />
             <h1 class="font-babas text-black ~text-2xl/4xl">Fundraisers</h1>
           </div>
+          <p class={'text-black'}>Fundraisers and upcoming streams</p>
         </div>
       </div>
     </div>
@@ -249,13 +240,16 @@ const CampaignGrid: Component = () => {
   const { campaignsSorted } = useCommunityPage()
 
   return (
-    <div class={twMerge('w-full')}>
+    <div class={twMerge('w-full mx-auto')}>
       <div
         class={twMerge(
           'mb-2 mt-6 flex w-full flex-wrap items-end justify-between gap-x-4 gap-y-2',
         )}
       >
-        <h2 class={twMerge('text-lg font-semibold text-white')}>Fundraisers</h2>
+        <div class={'flex flex-col'}>
+          <h2 class={twMerge('text-lg font-semibold text-white')}>Fundraisers (2024)</h2>
+          <p class={twMerge('text-white')}>2025 Fundraisers will be shown after the Jingle Jam has started.</p>
+        </div>
         <div
           class={twMerge(
             'flex w-full flex-wrap items-center justify-end gap-x-4 gap-y-2 sm:w-auto',
@@ -267,7 +261,7 @@ const CampaignGrid: Component = () => {
       </div>
       <div
         class={
-          'grid w-full grid-cols-[repeat(auto-fit,_minmax(300px,_1fr))] content-center gap-4'
+          'grid w-full grid-cols-[repeat(auto-fit,_minmax(250px,_1fr))] content-center gap-4'
         }
       >
         <For each={campaignsSorted()}>
@@ -512,7 +506,7 @@ const Child: Component<{
               )}
             >
               <span class={'text-xxs'}>Twitch</span>
-              <TwitchIcon />
+              <TwitchIcon class={'size-3'} />
             </a>
           </Show>
           <Show when={youtubeUrl()}>
@@ -526,7 +520,7 @@ const Child: Component<{
               )}
             >
               <span class={'text-xxs'}>Youtube</span>
-              <YoutubeIcon />
+              <YoutubeIcon class={'size-3'} />
             </a>
           </Show>
         </div>
