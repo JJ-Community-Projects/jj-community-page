@@ -22,9 +22,13 @@ import BaseLayout4xl from '../layouts/BaseLayout4xl.astro'
       </p>
     </div>
 
-    <MainCountdownSimple client:only="solid-js" />
+    <div class="w-full">
+      <MainCountdownSimple client:only="solid-js" />
+    </div>
 
-    <MainJJStartTimes client:only="solid-js" />
+    <div class="w-full">
+      <MainJJStartTimes client:only="solid-js" />
+    </div>
   </div>
   <div class="flex flex-col gap-6 pt-4">
     <!-- Summary section -->

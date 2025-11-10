@@ -1,30 +1,15 @@
 import { type Component, createSignal, For, Show } from 'solid-js'
-import type {
-  JJCampaignType,
-  JJCauseType,
-} from '../../../lib/orpc/private/jjData/contract.ts'
+import type { JJCampaignType, JJCauseType, } from '../../../lib/orpc/private/jjData/contract.ts'
 import { twMerge } from 'tailwind-merge'
 import { createI18n, I18nProvider, Numeric } from 'solid-i18n'
 import { useLocale } from '@kobalte/core'
-import {
-  TiltifyIcon,
-  TwitchIcon,
-  YoutubeIcon,
-} from '../../common/icons/JJIcons.tsx'
+import { TiltifyIcon, TwitchIcon, YoutubeIcon, } from '../../common/icons/JJIcons.tsx'
 import { Countdown } from '../../common/ui/Countdown.tsx'
-import {
-  useIsBeforeJJ,
-  useIsJJ,
-  useJJStartCountdown,
-  useNextJJStartDate,
-} from '../../../lib/utils/jjDates.ts'
+import { useIsBeforeJJ, useIsJJ, useJJStartCountdown, useNextJJStartDate, } from '../../../lib/utils/jjDates.ts'
 import { QueryClientProvider } from '@tanstack/solid-query'
 import { QueryClient } from '@tanstack/query-core'
 import { RadioGroup } from '@kobalte/core/radio-group'
-import {
-  CommunityPageProvider,
-  useCommunityPage,
-} from './CommunityPageProvider.tsx'
+import { CommunityPageProvider, useCommunityPage, } from './CommunityPageProvider.tsx'
 import { FaSolidHeart } from 'solid-icons/fa'
 import { ScheduleStreamCard } from '../schedules/common/StreamCard.tsx'
 
@@ -226,25 +211,33 @@ const Header: Component = () => {
   const jjStartCountdown = useJJStartCountdown()
   const isJJ = useIsJJ()
   return (
-    <div class="flex flex-col items-center rounded-xl border-2 bg-white p-2 shadow-md transition-all duration-300 hover:shadow-lg">
-      <div class="p-4 md:p-4 lg:p-6">
-        <div class="flex flex-col items-center justify-center text-center">
+    <div class="rounded-xl border-2 bg-gradient-to-b from-neutral-50 to-neutral-100 p-2 shadow-md transition-all duration-300 hover:shadow-lg">
+      <div class="flex w-full flex-col gap-2 p-4 md:flex-row md:items-center md:justify-between md:p-2 lg:p-4">
+        {/* Left: Title, icon, subtitle (left-aligned) */}
+        <div class="flex flex-col items-center text-center md:items-start md:text-left">
           <div class="flex items-center gap-2">
             <FaSolidHeart class="h-8 w-8 text-neutral-600" />
-            <h1 class="font-babas text-black ~text-2xl/4xl">Fundraisers</h1>
+            <h1 class="font-bold text-black ~text-2xl/4xl">Fundraisers</h1>
           </div>
-          <p class={'text-black'}>Fundraisers and upcoming streams</p>
+          <h2 class={'font-semibold text-black'}>Fundraisers and upcoming streams</h2>
         </div>
-      </div>
 
-      <Show when={!isJJ()}>
-        <p class={'text-lg font-semibold sm:text-xl'}>
-          Jingle Jam {nextJJStartDate().year} starts in
-        </p>
-        <p class={'font-mono text-2xl tabular-nums tracking-tight sm:text-3xl'}>
-          {jjStartCountdown().toFormat("dd'd' hh'h' mm'm' ss's'")}
-        </p>
-      </Show>
+        {/* Right: Countdown (right-aligned, moves below on small screens) */}
+        <Show when={!isJJ()}>
+          <div class="flex flex-col items-center text-center md:items-end md:text-right">
+            <p class={'text-lg font-semibold'}>
+              Jingle Jam {nextJJStartDate().year} starts in
+            </p>
+            <p
+              class={
+                'font-mono text-xl tabular-nums tracking-tight'
+              }
+            >
+              {jjStartCountdown().toFormat("dd'd' hh'h' mm'm' ss's'")}
+            </p>
+          </div>
+        </Show>
+      </div>
     </div>
   )
 }
@@ -253,13 +246,13 @@ const Body: Component = () => {
   const { sortBy } = useCommunityPage()
   const isSortByCause = () => sortBy() === 'cause'
   return (
-    <>
+    <div class={'w-full flex flex-col gap-4 items-stretch justify-center'}>
       <Header />
       <UpcomingStreams />
       <Show when={isSortByCause()} fallback={<CampaignGrid />}>
         <CampaignGridByCause />
       </Show>
-    </>
+    </div>
   )
 }
 
@@ -267,7 +260,7 @@ const CampaignGrid: Component = () => {
   const { campaignsSorted } = useCommunityPage()
 
   return (
-    <div class={twMerge('mx-auto w-full')}>
+    <div class={twMerge("gap-4 mx-auto flex w-full flex-col")}>
       <div
         class={twMerge(
           'mb-2 mt-6 flex w-full flex-wrap items-end justify-between gap-x-4 gap-y-2',
@@ -394,7 +387,7 @@ const CampaignGridByCause: Component = () => {
   const { campaignsByCause } = useCommunityPage()
 
   return (
-    <div class={twMerge('w-full')}>
+    <div class={twMerge('w-full flex flex-col gap-4')}>
       <div
         class={twMerge(
           'mb-2 mt-6 flex w-full flex-wrap items-end justify-between gap-x-4 gap-y-2',
