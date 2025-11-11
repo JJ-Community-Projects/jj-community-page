@@ -219,7 +219,7 @@ const save = os.save.use(authMiddleware).handler(async ({ context, input }) => {
       .where(eq(users.id, user.id))
       .get()
 
-    if (schedule.ownerId !== user.id || admin?.role === 'admin') {
+    if (schedule.ownerId !== user.id || admin?.role !== 'admin') {
       throw new ORPCError('FORBIDDEN', {
         message: 'You do not have permission to edit this schedule',
       })
@@ -271,7 +271,8 @@ const deleteSchedule = os.delete
         .where(eq(users.id, user.id))
         .get()
       console.log('role', admin)
-      if (schedule.ownerId !== user.id || admin?.role === 'admin') {
+
+      if (schedule.ownerId !== user.id || admin?.role !== 'admin') {
         throw new ORPCError('FORBIDDEN', {
           message: 'You do not have permission to edit this schedule',
         })
