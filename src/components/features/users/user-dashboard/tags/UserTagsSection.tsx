@@ -1,8 +1,8 @@
 import { type Component } from 'solid-js'
-import { TagCategorySelection } from './TagCategorySelection.tsx'
 import { TagSearchInput } from './TagSearchInput.tsx'
 import { AvailableTagsList } from './AvailableTagsList.tsx'
 import { UserTagsList } from './UserTagsList.tsx'
+import { CategoryTagsList } from './CategoryTagsList.tsx'
 
 export const UserTagsSection: Component = () => {
   return (
@@ -41,17 +41,18 @@ export const UserTagsSection: Component = () => {
           </div>
         </div>
 
-        {/* Category Selection with modern pills */}
-        <TagCategorySelection />
-
+        {/* Enhanced user tags list */}
+        <UserTagsList />
+        
         {/* Enhanced search input */}
         <TagSearchInput />
 
         {/* Enhanced available tags list */}
         <AvailableTagsList />
 
-        {/* Enhanced user tags list */}
-        <UserTagsList />
+        {/* Category selection and tags list (merged component) */}
+        <CategoryTagsList />
+
       </div>
     </div>
   )

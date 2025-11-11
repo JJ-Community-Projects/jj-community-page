@@ -3,32 +3,16 @@ import { useTags } from './UserTagsProvider.tsx'
 import { FaSolidCircleExclamation, FaSolidTag, FaSolidUser, FaSolidXmark, } from 'solid-icons/fa'
 
 const EmptyState = () => (
-  <div class="flex flex-col items-center justify-center px-4 py-12">
-    <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-primary-500 to-primary-600 shadow-lg">
-      <FaSolidTag class="h-8 w-8 text-white" />
+  <div class="flex flex-col items-center justify-center px-4 py-6">
+    <div class="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-primary-500 to-primary-600 shadow">
+      <FaSolidTag class="h-6 w-6 text-white" />
     </div>
-    <h3 class="mb-2 text-xl font-semibold text-gray-800">No tags added yet</h3>
-    <p class="mb-4 max-w-md text-center leading-relaxed text-gray-600">
+    <h3 class="mb-1 text-lg font-semibold text-gray-800">No tags added yet</h3>
+    <p class="max-w-md text-center text-sm leading-relaxed text-gray-600">
       Start building your profile by selecting tags that represent your
       interests, games, or causes. This helps viewers discover and connect with
       your content.
     </p>
-    <div class="flex items-center gap-2 font-medium text-accent">
-      <span class="text-sm">Browse available tags above</span>
-      <svg
-        class="h-4 w-4 animate-bounce"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M5 10l7-7m0 0l7 7m-7-7v18"
-        />
-      </svg>
-    </div>
   </div>
 )
 

@@ -5,8 +5,8 @@ import {FaSolidTag, FaSolidCircleExclamation, FaSolidCircleInfo} from "solid-ico
 /**
  * TagCategorySelection Component
  *
- * Displays available tag categories with selection functionality for filtering.
- * Enhanced with modern pill design, improved status indicators, and better interactions.
+ * Displays available tag categories for browsing.
+ * Selecting a category only shows all tags in that category; it does not filter search results.
  */
 export const TagCategorySelection: Component = () => {
   const {
@@ -44,7 +44,7 @@ export const TagCategorySelection: Component = () => {
       <div class="flex items-center gap-3 mb-4">
         <h3 class="text-sm font-semibold text-gray-800 flex items-center gap-2">
           <FaSolidTag class="w-4 h-4 text-accent-600" />
-          Filter by Category
+          Browse by Category
         </h3>
         <StatusIndicator />
       </div>
@@ -110,7 +110,7 @@ export const TagCategorySelection: Component = () => {
       {/* Helper text */}
       <p class="text-xs text-gray-500 mt-3 flex items-center gap-1">
         <FaSolidCircleInfo class="w-3 h-3" />
-        Select categories to filter available tags. Leave all unselected to see all tags.
+        Select a category to view all tags in that category below. This does not affect search results.
       </p>
     </div>
   );

@@ -52,7 +52,6 @@ export function useTagSearch(opts: UseTagSearchOptions = {}) {
       input: {
         query: debouncedInput(),
         limit,
-        categoryIds: selectedCategoryIds(),
       },
       enabled: () => debouncedInput().length > 0,
       staleTime: searchStaleTime,

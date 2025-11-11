@@ -61,8 +61,41 @@ const useUserTagsHook = () => {
     return tagSearch.popularTagsQuery.data?.tags || []
   }
 
-  const userTags = () => getUserTagsQuery.data || []
-  const categories = () => getTagCategoriesQuery.data || []
+  // Popular tags only (no search fallback)
+  const popularTags = () => tagSearch.popularTagsQuery.data?.tags || []
+
+  const userTags = () => getUserTagsQuery.data ?? []
+  const categories = ():  {
+    id: number
+    slug: string
+    name: string
+    description: string | null
+    color: string
+    icon: string | null
+    sortOrder: number
+    visible: boolean
+    tagCount: number
+    usageCount: number
+  }[] => getTagCategoriesQuery.data ?? []
+
+  // Category tags when a single category is selected
+  const singleSelectedCategoryId = () =>
+    tagSearch.selectedCategoryIds().length === 1
+      ? tagSearch.selectedCategoryIds()[0]
+      : undefined
+
+  const listCategoryTagsQuery = useQuery(() =>
+    t.listAvailableTags.queryOptions({
+      input: {
+        categoryId: singleSelectedCategoryId(),
+        limit: 100,
+      },
+      enabled: () => singleSelectedCategoryId() !== undefined,
+      staleTime: 2 * 60 * 1000,
+    }),
+  )
+
+  const categoryTags = () => listCategoryTagsQuery.data || []
 
   // Loading states
   const isLoadingTags = () =>
@@ -76,6 +109,8 @@ const useUserTagsHook = () => {
     getUserTagsQuery.isLoading ||
     addTagMutation.isPending ||
     removeTagMutation.isPending
+
+  const isLoadingCategoryTags = () => listCategoryTagsQuery.isLoading
 
   // Error states
   const hasTagsError = () =>
@@ -91,6 +126,7 @@ const useUserTagsHook = () => {
       addTagMutation.error ||
       removeTagMutation.error
     )
+  const hasCategoryTagsError = () => !!listCategoryTagsQuery.error
 
   const canAddTag = () => canAddTagToUser.data?.canAdd || false
 
@@ -122,13 +158,15 @@ const useUserTagsHook = () => {
   }
 
   const handleToggleCategory = (categoryId: number) => {
+    tagSearch.setSelectedCategoryIds([categoryId])
+    /*
     tagSearch.setSelectedCategoryIds((prev) => {
       if (prev.includes(categoryId)) {
         return prev.filter((id) => id !== categoryId)
       } else {
         return [...prev, categoryId]
       }
-    })
+    })*/
   }
 
   // Error messages
@@ -152,6 +190,10 @@ const useUserTagsHook = () => {
     return getTagCategoriesQuery.error?.message || 'Unknown error'
   }
 
+  const categoryTagsError = () => {
+    return listCategoryTagsQuery.error?.message || 'Unknown error'
+  }
+
   return {
     // State
     searchInput: tagSearch.searchInput,
@@ -161,23 +203,30 @@ const useUserTagsHook = () => {
 
     // Computed data
     availableTags,
+    popularTags,
     userTags,
     categories,
+    categoryTags,
+    selectedCategory: () =>
+      categories().find((c) => c.id === singleSelectedCategoryId()),
 
     // Loading states
     isLoadingTags,
     isLoadingCategories,
     isLoadingUserTags,
+    isLoadingCategoryTags,
 
     // Error states
     hasTagsError,
     hasCategoriesError,
     hasUserTagsError,
+    hasCategoryTagsError,
 
     // Error messages
     availableTagsError,
     userTagsError,
     categoriesError,
+    categoryTagsError,
 
     // Event handlers
     handleRemoveTag,

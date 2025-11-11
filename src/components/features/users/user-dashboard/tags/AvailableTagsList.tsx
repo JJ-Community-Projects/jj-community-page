@@ -15,18 +15,17 @@ import {
  */
 export const AvailableTagsList: Component = () => {
   const {
-    availableTags,
+    popularTags,
     userTags,
     isLoadingTags,
     hasTagsError,
-    debouncedInput,
     handleSelectTag,
     availableTagsError,
     canAddTag,
     canAddTagToUser,
   } = useTags()
 
-  const hasTags = () => availableTags().length > 0
+  const hasTags = () => popularTags().length > 0
 
   const StatusIndicator = () => (
     <div class="flex items-center gap-1">
@@ -56,15 +55,9 @@ export const AvailableTagsList: Component = () => {
       <div class="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-accent-500 to-accent-600">
         <FaSolidMagnifyingGlass class="h-6 w-6 text-white" />
       </div>
-      <h4 class="mb-1 text-sm font-semibold text-gray-700">
-        {debouncedInput().length > 0
-          ? 'No matching tags found'
-          : 'No tags available'}
-      </h4>
+      <h4 class="mb-1 text-sm font-semibold text-gray-700">No tags available</h4>
       <p class="max-w-sm text-center text-xs text-gray-500">
-        {debouncedInput().length > 0
-          ? `Try adjusting your search term or browse categories above.`
-          : 'Check back later for available tags to add to your profile.'}
+        Check back later for available tags to add to your profile.
       </p>
     </div>
   )
@@ -74,7 +67,7 @@ export const AvailableTagsList: Component = () => {
       <div class="mb-4 flex items-center gap-3">
         <h3 class="flex items-center gap-2 text-sm font-semibold text-gray-800">
           <FaSolidTag class="h-4 w-4 text-accent-600" />
-          {debouncedInput().length > 0 ? 'Search Results' : 'Popular Tags'}
+          Popular Tags
         </h3>
         <StatusIndicator />
         {/* Tag limit indicator similar to OwnedTeamsList header */}
@@ -134,7 +127,7 @@ export const AvailableTagsList: Component = () => {
 
         <Match when={hasTags()}>
           <div class="grid grid-cols-1 ~gap-3/4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            <For each={availableTags()}>
+            <For each={popularTags()}>
               {(tag) => {
                 const userHasTag = () =>
                   userTags().some((ut) => ut.tagId === tag.id)

@@ -1,6 +1,6 @@
-import {type Component} from "solid-js";
-import {useTags} from "./UserTagsProvider.tsx";
-import {FaSolidMagnifyingGlass, FaSolidXmark, FaSolidCircleInfo} from "solid-icons/fa";
+import { type Component, For, Match, Show, Switch } from "solid-js";
+import { useTags } from "./UserTagsProvider.tsx";
+import { FaSolidMagnifyingGlass, FaSolidXmark, FaSolidCircleInfo, FaSolidUsers } from "solid-icons/fa";
 
 /**
  * TagSearchInput Component
@@ -11,7 +11,15 @@ import {FaSolidMagnifyingGlass, FaSolidXmark, FaSolidCircleInfo} from "solid-ico
 export const TagSearchInput: Component = () => {
   const {
     searchInput,
-    handleSearchInput
+    debouncedInput,
+    availableTags,
+    isLoadingTags,
+    hasTagsError,
+    availableTagsError,
+    userTags,
+    canAddTag,
+    handleSelectTag,
+    handleSearchInput,
   } = useTags();
 
   const handleInput = (e: Event) => {
@@ -23,6 +31,8 @@ export const TagSearchInput: Component = () => {
     handleSearchInput("");
   };
 
+  const showSuggestions = () => searchInput().length > 0;
+
   return (
     <div class="mb-6">
       <div class="flex items-center gap-2 mb-3">
@@ -30,6 +40,12 @@ export const TagSearchInput: Component = () => {
           <FaSolidMagnifyingGlass class="w-4 h-4 text-accent-600" />
           Search Tags
         </h3>
+        <Show when={isLoadingTags() && searchInput().length > 0}>
+          <span class="flex items-center gap-2 rounded-full bg-accent/10 px-2 py-1">
+            <span class="h-2 w-2 animate-pulse rounded-full bg-accent" aria-hidden="true"></span>
+            <span class="sr-only">Searching…</span>
+          </span>
+        </Show>
       </div>
 
       <div class="relative">
@@ -71,6 +87,55 @@ export const TagSearchInput: Component = () => {
             <FaSolidXmark class="w-5 h-5" />
           </button>
         )}
+
+        {/* Suggestions dropdown */}
+        <Show when={showSuggestions()}>
+          <div class="absolute left-0 right-0 mt-2 z-20 rounded-xl border border-gray-200 bg-white shadow-xl overflow-hidden">
+            <div class="max-h-64 overflow-y-auto">
+              <Switch>
+                <Match when={hasTagsError()}>
+                  <div class="p-3 text-sm text-danger-600">
+                    {availableTagsError() || 'Error loading suggestions'}
+                  </div>
+                </Match>
+                <Match when={isLoadingTags()}>
+                  <div class="p-3 text-sm text-gray-500">Searching…</div>
+                </Match>
+                <Match when={(availableTags()?.length ?? 0) === 0 && debouncedInput().length > 0}>
+                  <div class="p-3 text-sm text-gray-500">No results for "{debouncedInput()}"</div>
+                </Match>
+                <Match when={(availableTags()?.length ?? 0) > 0}>
+                  <ul class="py-1">
+                    <For each={availableTags().slice(0, 8)}>{(tag) => {
+                      const userHasTag = () => userTags().some((ut) => ut.tagId === tag.id);
+                      const disabled = () => userHasTag() || !canAddTag();
+                      return (
+                        <li>
+                          <button
+                            type="button"
+                            // onMouseDown to avoid input blur preventing click in some browsers
+                            onMouseDown={(e) => handleSelectTag(e as unknown as Event, tag.id)}
+                            disabled={disabled()}
+                            class={`w-full text-left px-4 py-2 flex items-center justify-between gap-3 hover:bg-gray-50 transition-colors ${disabled() ? 'cursor-not-allowed text-gray-400' : 'text-gray-800'}`}
+                            aria-disabled={disabled()}
+                            aria-label={`${userHasTag() ? 'Already added:' : !canAddTag() ? 'Tag limit reached:' : 'Add tag:'} ${tag.name}`}
+                            style={!disabled() ? { color: tag.color } : {}}
+                          >
+                            <span class="font-medium truncate">{tag.name}</span>
+                            <span class="flex items-center gap-1 text-xs text-gray-500">
+                              <FaSolidUsers class="h-3 w-3" />
+                              {tag.totalUsage}
+                            </span>
+                          </button>
+                        </li>
+                      );
+                    }}</For>
+                  </ul>
+                </Match>
+              </Switch>
+            </div>
+          </div>
+        </Show>
 
         {/* Focus ring enhancement */}
         <div class="absolute inset-0 rounded-xl bg-gradient-to-r from-accent/5 to-accent/10 opacity-0 transition-opacity duration-300 pointer-events-none peer-focus:opacity-100"></div>
