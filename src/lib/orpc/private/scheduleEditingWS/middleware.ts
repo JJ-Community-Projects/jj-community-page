@@ -1,8 +1,9 @@
-import {authMiddleware} from '../../middleware/authMiddleware.ts';
-import {dbMiddleware} from '../../middleware/dbMiddleware.ts';
-import {ORPCError} from '@orpc/server';
-import {editorsTable, schedulesTable} from '../../../db/schema/jj-schema.ts';
-import {and, eq} from 'drizzle-orm';
+import { authMiddleware } from '../../middleware/authMiddleware.ts'
+import { dbMiddleware } from '../../middleware/dbMiddleware.ts'
+import { ORPCError } from '@orpc/server'
+import { editorsTable, schedulesTable } from '../../../db/schema/jj-schema.ts'
+import { and, eq } from 'drizzle-orm'
+import { users } from '../../../db/schema/auth-schema.ts'
 
 /**
  * Middleware that ensures the authenticated user can edit a schedule.
@@ -14,13 +15,28 @@ export const scheduleOwnerOrEditorMiddleware = authMiddleware
   .concat(async ({ context, next }, input: { scheduleId: number }) => {
     const db = context.db;
     const userId = context.userId;
-    const { scheduleId } = input;
 
+
+    const { scheduleId } = input;
     // Load schedule
     const schedule = await db.select()
       .from(schedulesTable)
       .where(eq(schedulesTable.id, scheduleId))
       .get();
+
+    const result = await db
+      .select({
+        role: users.role,
+      })
+      .from(users)
+      .where(eq(users.id, userId))
+      .get()
+
+    if (result) {
+      if (result.role === 'admin') {
+        return next({ context: { ...context, schedule } });
+      }
+    }
 
     if (!schedule) {
       throw new ORPCError('NOT_FOUND', { message: 'Schedule not found' });

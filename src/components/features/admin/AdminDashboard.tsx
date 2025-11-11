@@ -7,6 +7,8 @@ import { AdminConfigSection } from './config/AdminConfigSection'
 import { AdminKVConfigSection } from './config/AdminKVConfigSection'
 import { AdminTwitchSection } from './AdminTwitchSection'
 import { AdminFXRateSection } from './AdminFXRateSection'
+import { AdminScheduleList } from './AdminScheduleList.tsx'
+import { AdminScheduleImportPanel } from './AdminScheduleImportPanel'
 
 export const AdminDashboard: Component = () => {
   return (
@@ -18,6 +20,8 @@ export const AdminDashboard: Component = () => {
         <AdminTwitchSection />
         <TagsCategoriesSection />
         <JJData />
+        <AdminScheduleList/>
+        <AdminScheduleImportPanel />
       </div>
     </QueryClientProvider>
   )

@@ -5,9 +5,11 @@ import { getDB } from '../../../db/db.ts'
 import { twitchChannelSchema, twitchStreamSchema, } from '../../../db/schema/twitch-channel-schema.ts'
 import { TwitchLiveCheckQueue } from '../../../../queues/TwitchLiveCheckQueue.ts'
 import { getToken, getTwitchDataByLogins } from '../../../twitchAPIFuncs.ts'
-import { eq } from 'drizzle-orm'
+import { and, eq, inArray } from 'drizzle-orm'
 import type { TwitchUser } from '../../../model/TwitchAPIModel.ts'
-import { userSocials } from '../../../db/schema/auth-schema.ts'
+import { accounts, userSocials } from '../../../db/schema/auth-schema.ts'
+import { schedulesTable, streamParticipantsTable, streamsTable, } from '../../../db/schema/jj-schema.ts'
+import { streamTagsTable, tags } from '../../../db/schema/tags-schema.ts'
 
 const os = implement(contracts).use(adminAuthMiddleware)
 
@@ -204,7 +206,7 @@ const getGBPToEURRate = os.getGBPToEURRateContract.handler(
     const stubID = DO.idFromName('JJ_API_CACHE')
     const stub = DO.get(stubID)
     try {
-      const value = await stub.fetchGBPToEURConversionRate()
+      const value = await stub.getGbpToEurRate()
       return value
     } catch (e: any) {
       console.error('getGBPToEURRate', e)
@@ -222,7 +224,11 @@ const syncTwitchChannelsFromSocials =
 
     // 1) Get all socials with provider = 'twitch' and extract logins via the view
     const socials = await db
-      .select({ userId: userSocials.userId, provider: userSocials.provider, url: userSocials.url })
+      .select({
+        userId: userSocials.userId,
+        provider: userSocials.provider,
+        url: userSocials.url,
+      })
       .from(userSocials)
       .where(eq(userSocials.provider, 'twitch'))
       .all()
@@ -242,10 +248,12 @@ const syncTwitchChannelsFromSocials =
 
     // 3) Build list of missing [userId, login]
     const missing = socials
-      .filter((s) =>  !existingUserIds.has(s.userId))
+      .filter((s) => !existingUserIds.has(s.userId))
       .map((s) => ({
         userId: s.userId,
-        login: s.url.startsWith('http') ? s.url.split('/').toReversed()[0]: s.url,
+        login: s.url.startsWith('http')
+          ? s.url.split('/').toReversed()[0]
+          : s.url,
       }))
 
     console.log('missing', missing)
@@ -406,8 +414,8 @@ const getInvalidTwitchChannels = os.getInvalidTwitchChannelsContract.handler(
   },
 )
 
-const clearInvalidTwitchChannels = os.clearInvalidTwitchChannelsContract.handler(
-  async ({ context }) => {
+const clearInvalidTwitchChannels =
+  os.clearInvalidTwitchChannelsContract.handler(async ({ context }) => {
     const DO = context.env.JingleJamData
     const stubID = DO.idFromName('JJ_API_CACHE')
     const stub = DO.get(stubID)
@@ -417,6 +425,304 @@ const clearInvalidTwitchChannels = os.clearInvalidTwitchChannelsContract.handler
       console.error('clearInvalidTwitchChannels', e)
       throw new ORPCError('INTERNAL_SERVER_ERROR')
     }
+  })
+
+const getAllSchedules = os.getAllSchedulesContract.handler(
+  async ({ context }) => {
+    const db = context.db
+    try {
+      const rows = await db
+        .select({
+          scheduleId: schedulesTable.id,
+          year: schedulesTable.year,
+          visible: schedulesTable.visible,
+          primary: schedulesTable.primary,
+          ownerId: schedulesTable.ownerId,
+          ownerName: accounts.providerUsername,
+        })
+        .from(schedulesTable)
+        .leftJoin(
+          accounts,
+          and(
+            eq(accounts.userId, schedulesTable.ownerId),
+            eq(accounts.provider, 'tiltify'),
+          ),
+        )
+        .all()
+
+      return rows.map((r) => ({
+        scheduleId: r.scheduleId,
+        year: r.year,
+        visible: r.visible,
+        primary: r.primary,
+        ownerId: r.ownerId,
+        ownerName: r.ownerName ?? '',
+      }))
+    } catch (e) {
+      console.error('getAllSchedules', e)
+      throw new ORPCError('INTERNAL_SERVER_ERROR')
+    }
+  },
+)
+
+// Export schedule as JSON
+const exportSchedule = os.exportScheduleContract.handler(
+  async ({ context, input }) => {
+    const db = context.db
+    const { scheduleId } = input
+
+    // 1) Load schedule meta
+    const schedule = await db
+      .select({
+        id: schedulesTable.id,
+        title: schedulesTable.title,
+        slug: schedulesTable.slug,
+        year: schedulesTable.year,
+        visible: schedulesTable.visible,
+        primary: schedulesTable.primary,
+        ownerId: schedulesTable.ownerId,
+        createdAt: schedulesTable.createdAt,
+        updatedAt: schedulesTable.updatedAt,
+      })
+      .from(schedulesTable)
+      .where(eq(schedulesTable.id, scheduleId))
+      .get()
+
+    if (!schedule) {
+      throw new ORPCError('NOT_FOUND', { message: 'Schedule not found' })
+    }
+
+    // 2) Load streams
+    const streams = await db
+      .select()
+      .from(streamsTable)
+      .where(eq(streamsTable.scheduleId, scheduleId))
+      .all()
+
+    const streamIds = streams.map((s) => s.id)
+
+    // 3) Load participants per stream
+    const participants =
+      streamIds.length > 0
+        ? await db
+            .select({
+              streamId: streamParticipantsTable.streamId,
+              userId: streamParticipantsTable.userId,
+            })
+            .from(streamParticipantsTable)
+            .where(
+              and(
+                eq(streamParticipantsTable.scheduleId, scheduleId),
+                inArray(streamParticipantsTable.streamId, streamIds),
+              ),
+            )
+            .all()
+        : []
+
+    const participantsByStream: Record<number, number[]> = {}
+    for (const p of participants) {
+      participantsByStream[p.streamId] = participantsByStream[p.streamId] || []
+      participantsByStream[p.streamId].push(p.userId)
+    }
+
+    // 4) Load tags per stream (export by slug for portability)
+    const tagRows =
+      streamIds.length > 0
+        ? await db
+            .select({
+              streamId: streamTagsTable.streamId,
+              tagId: streamTagsTable.tagId,
+              slug: tags.slug,
+            })
+            .from(streamTagsTable)
+            .innerJoin(tags, eq(streamTagsTable.tagId, (tags as any).id))
+            .where(
+              and(
+                eq(streamTagsTable.scheduleId, scheduleId),
+                inArray(streamTagsTable.streamId, streamIds),
+              ),
+            )
+            .all()
+        : []
+
+    const tagsByStream: Record<number, string[]> = {}
+    for (const t of tagRows) {
+      tagsByStream[t.streamId] = tagsByStream[t.streamId] || []
+      tagsByStream[t.streamId].push(t.slug)
+    }
+
+    // 5) Build export structure
+    const payload = {
+      version: 1,
+      schedule,
+      streams: streams.map((s) => ({
+        ...s,
+        participants: participantsByStream[s.id] ?? [],
+        tags: tagsByStream[s.id] ?? [],
+      })),
+    }
+
+    return JSON.stringify(payload)
+  },
+)
+
+// Import schedule from JSON
+const importSchedule = os.importScheduleContract.handler(
+  async ({ context, input }) => {
+    const db = context.db
+    let parsed: any
+    try {
+      parsed = JSON.parse(input.json)
+    } catch (e) {
+      throw new ORPCError('BAD_REQUEST', { message: 'Invalid JSON' })
+    }
+
+    // Minimal validation
+    if (
+      !parsed ||
+      typeof parsed !== 'object' ||
+      !parsed.schedule ||
+      !Array.isArray(parsed.streams)
+    ) {
+      throw new ORPCError('BAD_REQUEST', { message: 'Invalid export format' })
+    }
+
+    const schedule = parsed.schedule as {
+      id: number
+      title: string
+      slug: string
+      year: number
+      visible: boolean
+      primary: boolean
+      ownerId: number
+    }
+    const streams = parsed.streams as Array<any>
+
+    // 1) Check if schedule with same id exists
+    const existing = await db
+      .select({ id: schedulesTable.id })
+      .from(schedulesTable)
+      .where(eq(schedulesTable.id, schedule.id))
+      .get()
+    if (existing) {
+      // requirement: check if exists. We'll throw conflict
+      throw new ORPCError('CONFLICT', {
+        message: `Schedule with id ${schedule.id} already exists`,
+      })
+    }
+
+    // 2) Insert schedule with explicit id
+    try {
+      await db
+        .insert(schedulesTable)
+        .values({
+          id: schedule.id,
+          title: schedule.title,
+          slug: schedule.slug,
+          year: schedule.year,
+          visible: schedule.visible,
+          primary: schedule.primary,
+          ownerId: schedule.ownerId,
+        })
+        .run()
+    } catch (e) {
+      console.error(e)
+      throw new ORPCError('INTERNAL_SERVER_ERROR', {
+        message: 'Failed to insert schedule',
+      })
+    }
+
+    try {
+      // 3) Insert streams
+      if (streams.length > 0) {
+        for (const s of streams) {
+          // Coerce start/end to Date objects to accept ISO strings or epoch numbers
+          let startVal: Date
+          let endVal: Date
+          try {
+            const toDate = (v: any): Date => {
+              if (v instanceof Date) return v
+              if (typeof v === 'number') {
+                const d = new Date(v)
+                if (isNaN(d.getTime())) throw new Error('Invalid date number')
+                return d
+              }
+              if (typeof v === 'string') {
+                const d = new Date(v)
+                if (isNaN(d.getTime())) throw new Error('Invalid date string')
+                return d
+              }
+              throw new Error('Unsupported date type')
+            }
+            startVal = toDate(s.start)
+            endVal = toDate(s.end)
+          } catch (e) {
+            throw new ORPCError('BAD_REQUEST', { message: 'Invalid stream start/end in import JSON' })
+          }
+
+          await db
+            .insert(streamsTable)
+            .values({
+              id: s.id,
+              scheduleId: schedule.id,
+              createdBy: s.createdBy,
+              title: s.title,
+              visible: s.visible ?? false,
+              subtitle: s.subtitle ?? null,
+              description: s.description ?? null,
+              youtubeVodUrl: s.youtubeVodUrl ?? null,
+              twitchVodUrl: s.twitchVodUrl ?? null,
+              start: startVal,
+              end: endVal,
+            })
+            .run()
+
+          // participants
+          if (Array.isArray(s.participants) && s.participants.length > 0) {
+            for (const userId of s.participants) {
+              await db
+                .insert(streamParticipantsTable)
+                .values({
+                  scheduleId: schedule.id,
+                  streamId: s.id,
+                  userId,
+                })
+                .run()
+            }
+          }
+
+          // tags: resolve slugs to IDs
+          if (Array.isArray(s.tags) && s.tags.length > 0) {
+            const uniqueSlugs = [...new Set(s.tags as string[])]
+            const tagRows = await db
+              .select({ id: tags.id, slug: tags.slug })
+              .from(tags)
+              .where(inArray(tags.slug, uniqueSlugs))
+              .all()
+            const slugToId = new Map(tagRows.map((r) => [r.slug, r.id]))
+            for (const slug of uniqueSlugs) {
+              const tagId = slugToId.get(slug)
+              if (!tagId) continue
+              await db
+                .insert(streamTagsTable)
+                .values({
+                  scheduleId: schedule.id,
+                  streamId: s.id,
+                  tagId,
+                })
+                .run()
+            }
+          }
+        }
+      }
+    } catch (e) {
+      console.error(e)
+      throw new ORPCError('INTERNAL_SERVER_ERROR', {
+        message: 'Failed to insert stream',
+      })
+    }
+
+    return { scheduleId: schedule.id }
   },
 )
 
@@ -444,4 +750,7 @@ export const adminRouter = {
   checkLiveStreams,
   getInvalidTwitchChannels,
   clearInvalidTwitchChannels,
+  getAllSchedules,
+  exportSchedule,
+  importSchedule,
 }

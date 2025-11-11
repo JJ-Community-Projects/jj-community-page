@@ -89,6 +89,29 @@ const getGBPToEURRateContract = oc.output(z.number())
 
 const syncTwitchChannelsFromSocialsContract = oc.input(z.void()).output(z.void())
 
+// Schedules admin contract: list all schedules with owner name
+const scheduleListItemSchema = z.object({
+  scheduleId: z.number(),
+  year: z.number(),
+  visible: z.boolean(),
+  primary: z.boolean(),
+  ownerId: z.number(),
+  ownerName: z.string().nullable().default('')
+})
+
+export type AdminScheduleListItem = z.infer<typeof scheduleListItemSchema>
+
+const getAllSchedulesContract = oc.output(z.array(scheduleListItemSchema))
+
+// Schedule export/import
+const exportScheduleContract = oc
+  .input(z.object({ scheduleId: z.number().int().positive() }))
+  .output(z.string())
+
+const importScheduleContract = oc
+  .input(z.object({ json: z.string() }))
+  .output(z.object({ scheduleId: z.number().int().positive() }))
+
 export const contracts = {
   refreshJJAPIDataContract,
   addStringConfigContract,
@@ -113,4 +136,8 @@ export const contracts = {
   syncTwitchChannelsFromSocialsContract,
   getInvalidTwitchChannelsContract,
   clearInvalidTwitchChannelsContract,
+  // schedules
+  getAllSchedulesContract,
+  exportScheduleContract,
+  importScheduleContract,
 }

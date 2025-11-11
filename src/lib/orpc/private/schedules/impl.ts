@@ -7,10 +7,7 @@ import { editSchedulesTable } from '../../../db/schema/edit-schedules-schema.ts'
 import { accounts, users } from '../../../db/schema/auth-schema.ts'
 import { and, eq, not } from 'drizzle-orm'
 import { DateTime } from 'luxon'
-import {
-  createSlug,
-  generateScheduleSlugAlternativesLocals,
-} from '../../../../functions/slug.ts'
+import { createSlug, generateScheduleSlugAlternativesLocals, } from '../../../../functions/slug.ts'
 import { checkCanCreateSchedule } from '../util/limits.ts'
 
 const os = implement(privateSchedulesContract).use(dbMiddleware)
@@ -214,7 +211,15 @@ const save = os.save.use(authMiddleware).handler(async ({ context, input }) => {
       throw new ORPCError('NOT_FOUND', { message: 'Schedule not found' })
     }
 
-    if (schedule.ownerId !== user.id) {
+    const admin = await db
+      .select({
+        role: users.role,
+      })
+      .from(users)
+      .where(eq(users.id, user.id))
+      .get()
+
+    if (schedule.ownerId !== user.id || admin?.role === 'admin') {
       throw new ORPCError('FORBIDDEN', {
         message: 'You do not have permission to edit this schedule',
       })
@@ -258,7 +263,15 @@ const deleteSchedule = os.delete
         throw new ORPCError('NOT_FOUND', { message: 'Schedule not found' })
       }
 
-      if (schedule.ownerId !== user.id) {
+      const admin = await db
+        .select({
+          role: users.role,
+        })
+        .from(users)
+        .where(eq(users.id, user.id))
+        .get()
+      console.log('role', admin)
+      if (schedule.ownerId !== user.id || admin?.role === 'admin') {
         throw new ORPCError('FORBIDDEN', {
           message: 'You do not have permission to edit this schedule',
         })
@@ -324,6 +337,13 @@ const toggleVisibility = os.toggleVisibility
           visible: !schedule.visible,
         })
         .where(eq(schedulesTable.id, scheduleId))
+
+      await db
+        .update(editSchedulesTable)
+        .set({
+          visible: !schedule.visible,
+        })
+        .where(eq(editSchedulesTable.scheduleId, scheduleId))
 
       return { message: 'Schedule visibility toggled successfully' }
     } catch (error) {
