@@ -13,13 +13,16 @@ export default {
     return scheduled(controller, env, ctx)
   },
   async queue(batch, env, ctx) {
+    const twitchLiveCheckQueue = new TwitchLiveCheckQueue()
+    const notifier = new TwitchLiveNotifierQueue()
     switch (batch.queue) {
       case 'twitch-live-notifier':
-        const notifier = new TwitchLiveNotifierQueue()
         await notifier.handle(batch, env, ctx)
         break
       case 'twitch-live-check':
-        const twitchLiveCheckQueue = new TwitchLiveCheckQueue()
+        await twitchLiveCheckQueue.handle(batch, env, ctx)
+        break
+      case 'twitch-live-check-prod':
         await twitchLiveCheckQueue.handle(batch, env, ctx)
         break
       case 'youtube-live-check':
