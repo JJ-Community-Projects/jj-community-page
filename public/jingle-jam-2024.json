@@ -1,0 +1,2337 @@
+{
+  "date": "2024-12-19T21:15:56.812Z",
+  "event": {
+    "year": 2024,
+    "start": "2024-12-01T17:00:00.000Z",
+    "end": "2024-12-15T00:00:00.000Z"
+  },
+  "avgConversionRate": 1.2709324852,
+  "raised": {
+    "yogscast": 1907685.93,
+    "fundraisers": 766366.13
+  },
+  "collections": {
+    "redeemed": 53346,
+    "total": 99000
+  },
+  "donations": {
+    "count": 62615
+  },
+  "history": [
+    {
+      "year": 2011,
+      "total": {
+        "dollars": 102514.55,
+        "pounds": 65655.44
+      },
+      "donations": 3615
+    },
+    {
+      "year": 2012,
+      "total": {
+        "dollars": 391145.7,
+        "pounds": 242557.27
+      },
+      "donations": 13389
+    },
+    {
+      "year": 2013,
+      "total": {
+        "dollars": 1159813.34,
+        "pounds": 708587.96
+      },
+      "donations": 47885
+    },
+    {
+      "year": 2014,
+      "total": {
+        "dollars": 1104882.09,
+        "pounds": 702925.99
+      },
+      "donations": 40277
+    },
+    {
+      "year": 2015,
+      "total": {
+        "dollars": 1052881.48,
+        "pounds": 691616.79
+      },
+      "donations": 40201
+    },
+    {
+      "year": 2016,
+      "total": {
+        "dollars": 2578201.7,
+        "pounds": 2049000.02
+      },
+      "donations": 86589
+    },
+    {
+      "year": 2017,
+      "total": {
+        "dollars": 5245772,
+        "pounds": 3894251.3
+      },
+      "donations": 148853
+    },
+    {
+      "year": 2018,
+      "total": {
+        "dollars": 3307959.36,
+        "pounds": 2594961.8
+      },
+      "donations": 88139
+    },
+    {
+      "year": 2019,
+      "total": {
+        "dollars": 2739251.08,
+        "pounds": 2111250.38
+      },
+      "donations": 81719
+    },
+    {
+      "year": 2020,
+      "total": {
+        "dollars": 2827226.07,
+        "pounds": 2120590
+      },
+      "donations": 73395
+    },
+    {
+      "year": 2021,
+      "total": {
+        "dollars": 4435933.89,
+        "pounds": 3345156
+      },
+      "donations": 84974
+    },
+    {
+      "year": 2022,
+      "total": {
+        "dollars": 4203531.65,
+        "pounds": 3448752.4
+      },
+      "donations": 86589
+    },
+    {
+      "year": 2023,
+      "total": {
+        "dollars": 3422130.97,
+        "pounds": 2702088
+      },
+      "donations": 64374
+    }
+  ],
+  "causes": [
+    {
+      "id": 582,
+      "name": "Autistica",
+      "logo": "https://assets.jinglejam.no1mann.com/jingle-jam-2024/causes/autistica.png",
+      "description": "Building evidence-based solutions for young autistic people to make society more inclusive by 2030.",
+      "color": "#00a691",
+      "url": "https://www.autistica.org.uk/",
+      "donateUrl": "https://jinglejam.tiltify.com/campaigns?regionId=582",
+      "raised": {
+        "yogscast": 238460.74,
+        "fundraisers": 76040.22
+      }
+    },
+    {
+      "id": 575,
+      "name": "CALM",
+      "logo": "https://assets.jinglejam.no1mann.com/jingle-jam-2024/causes/calm.png",
+      "description": "Running a life-saving suicide prevention helpline and providing mental health resources for all who need them.",
+      "color": "#cbf900",
+      "url": "https://www.thecalmzone.net/",
+      "donateUrl": "https://jinglejam.tiltify.com/campaigns?regionId=575",
+      "raised": {
+        "yogscast": 238460.74,
+        "fundraisers": 231667.27
+      }
+    },
+    {
+      "id": 1227,
+      "name": "Cool Earth",
+      "logo": "https://assets.jinglejam.no1mann.com/jingle-jam-2024/causes/cool-earth.png",
+      "description": "A new approach to fighting climate change - back Indigenous peoples and protect the rainforest.",
+      "color": "#2b423a",
+      "url": "https://www.coolearth.org/",
+      "donateUrl": "https://jinglejam.tiltify.com/campaigns?regionId=1227",
+      "raised": {
+        "yogscast": 238460.74,
+        "fundraisers": 41104.95
+      }
+    },
+    {
+      "id": 1228,
+      "name": "Sarcoma UK",
+      "logo": "https://assets.jinglejam.no1mann.com/jingle-jam-2024/causes/sarcoma-uk.png",
+      "description": "Funding research, supporting those affected by sarcoma cancer, and campaigning for better treatments.",
+      "color": "#0386a4",
+      "url": "https://sarcoma.org.uk/",
+      "donateUrl": "https://jinglejam.tiltify.com/campaigns?regionId=1228",
+      "raised": {
+        "yogscast": 238460.74,
+        "fundraisers": 30587.35
+      }
+    },
+    {
+      "id": 1229,
+      "name": "The Trevor Project",
+      "logo": "https://assets.jinglejam.no1mann.com/jingle-jam-2024/causes/the-trevor-project.png",
+      "description": "Working to end suicide among LGBTQ+ young people through suicide prevention and crisis intervention.",
+      "color": "#ef5b41",
+      "url": "https://www.thetrevorproject.org/",
+      "donateUrl": "https://jinglejam.tiltify.com/campaigns?regionId=1229",
+      "raised": {
+        "yogscast": 238460.74,
+        "fundraisers": 66647.03
+      }
+    },
+    {
+      "id": 565,
+      "name": "Wallace & Gromit's Grand Appeal",
+      "logo": "https://assets.jinglejam.no1mann.com/jingle-jam-2024/causes/the-grand-appeal.png",
+      "description": "Creating the 'Jingle Jam Building', a unique facility that will help sick children and their families at Bristol Children's Hospital.",
+      "color": "#3e9cd8",
+      "url": "https://www.grandappeal.org.uk/",
+      "donateUrl": "https://jinglejam.tiltify.com/campaigns?regionId=565",
+      "raised": {
+        "yogscast": 238460.74,
+        "fundraisers": 157717.79
+      }
+    },
+    {
+      "id": 588,
+      "name": "War Child",
+      "logo": "https://assets.jinglejam.no1mann.com/jingle-jam-2024/causes/war-child.png",
+      "description": "Protecting, educating, and advocating for the rights of children impacted by the ongoing conflicts in Gaza and worldwide.",
+      "color": "#cc232a",
+      "url": "https://www.warchild.org.uk/",
+      "donateUrl": "https://jinglejam.tiltify.com/campaigns?regionId=588",
+      "raised": {
+        "yogscast": 238460.74,
+        "fundraisers": 61610.99
+      }
+    },
+    {
+      "id": 574,
+      "name": "Whale and Dolphin Conservation",
+      "logo": "https://assets.jinglejam.no1mann.com/jingle-jam-2024/causes/wdc.png",
+      "description": "Helping to protect the endangered Amazon River dolphin, and launching a global education programme for schools.",
+      "color": "#00a691",
+      "url": "https://uk.whales.org/",
+      "donateUrl": "https://jinglejam.tiltify.com/campaigns?regionId=574",
+      "raised": {
+        "yogscast": 238460.74,
+        "fundraisers": 100994.56
+      }
+    }
+  ],
+  "campaigns": {
+    "count": 787,
+    "list": [
+      {
+        "causeId": 566,
+        "name": "Jingle Jam 2024",
+        "description": "From the 1st - 14th of December, we'll be streaming all day, every day to raise as much money as we can for the 8 fantastic Jingle Jam 2024 charities. So far, Jingle Jam has raised just shy of £25 million for 37 charities and we can wait to kick off this year's festive fundraiser!\n\nThe best part is, if you donate £35 or more, you'll receive a super collection of games for your generosity! \n\nJoin us as we kick it all off at 5pm GMT on December 1st at Twitch.tv/yogscast.",
+        "slug": "jingle-jam-2024",
+        "url": "https://tiltify.com/@yogscast/jingle-jam-2024",
+        "startTime": "2024-12-01T17:00:21Z",
+        "raised": 1907685.93,
+        "goal": 100,
+        "livestream": {
+          "channel": null,
+          "type": "twitch"
+        },
+        "user": {
+          "id": 124525,
+          "name": "yogscast",
+          "slug": "yogscast",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/124525/f9a6e2eb-81ae-4248-8df6-561c6d3d6584.jpeg",
+          "url": "https://tiltify.com/@yogscast"
+        }
+      },
+      {
+        "causeId": 565,
+        "name": "Skyrimathon",
+        "description": "I will be using the gate to sovingarde mod pack that I made popular with my skyrim 100 Days series. It patches many skyrim exploits but also adds a huge amount of new broken mechanics to the game. If you want to play along you can find the modpack here: https://next.nexusmods.com/skyrimspecialedition/collections/qdurkx?tab=about",
+        "slug": "skyrimathon",
+        "url": "https://tiltify.com/@thespiffingbrit/skyrimathon",
+        "startTime": "2024-12-01T17:21:06Z",
+        "raised": 114249.6,
+        "goal": 500000000,
+        "livestream": {
+          "channel": "thespiffingbrit",
+          "type": "youtube_live"
+        },
+        "user": {
+          "id": 94395,
+          "name": "TheSpiffingBrit",
+          "slug": "thespiffingbrit",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/94395/blob-2719482b-f2ca-45cd-adef-024254813e39.png",
+          "url": "https://tiltify.com/@thespiffingbrit"
+        }
+      },
+      {
+        "causeId": 574,
+        "name": "RTGame Jingles Dolphins 2024",
+        "description": "We are back to support Whale and Dolphin Conservation as part of the Jingle Jam in 2024! Donate at least £35 and select the reward to receive the games collection as thanks for supporting charity. Please make sure you select the reward on donating, as there is otherwise no way to send the games collection to you! And learn more about Whale and Dolphin Conservation here: https://uk.whales.org/",
+        "slug": "rtgame-jingles-dolphins-2024",
+        "url": "https://tiltify.com/@rtgamecrowd/rtgame-jingles-dolphins-2024",
+        "startTime": "2024-12-02T13:28:05Z",
+        "raised": 63343.6,
+        "goal": 10000,
+        "livestream": {
+          "channel": "https://assets.tiltify.com/uploads/media_type/image/289640/blob-acc22b4d-19ca-4028-94df-18775f332572.jpeg",
+          "type": "image"
+        },
+        "user": {
+          "id": 95507,
+          "name": "rtgamecrowd",
+          "slug": "rtgamecrowd",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/95507/blob-b13bc679-2370-41b5-a6bc-1ff7a98c66b2.png",
+          "url": "https://tiltify.com/@rtgamecrowd"
+        }
+      },
+      {
+        "causeId": 575,
+        "name": "High Rollers Against Living Miserably",
+        "description": "Please join us in raising money for the incredible CALM charity this year. Mental health matters and you are never alone.",
+        "slug": "high-rollers-against-living-miserably",
+        "url": "https://tiltify.com/@highrollersdnd/high-rollers-against-living-miserably",
+        "startTime": "2024-12-01T17:00:18Z",
+        "raised": 31503,
+        "goal": 30000,
+        "livestream": {
+          "channel": null,
+          "type": "twitch"
+        },
+        "user": {
+          "id": 482422,
+          "name": "highrollersdnd",
+          "slug": "highrollersdnd",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/482422/blob-4cea84ec-89ad-4994-a4ce-6ed9cc3c6c26.png",
+          "url": "https://tiltify.com/@highrollersdnd"
+        }
+      },
+      {
+        "causeId": 582,
+        "name": "Boba for Autistica 2024",
+        "description": "I'm fundraising for Jingle Jam. <3",
+        "slug": "boba-for-autistica-2024",
+        "url": "https://tiltify.com/@bobawitch/boba-for-autistica-2024",
+        "startTime": "2024-12-01T17:15:14Z",
+        "raised": 30664.03,
+        "goal": 30000,
+        "livestream": {
+          "channel": null,
+          "type": "twitch"
+        },
+        "user": {
+          "id": 73376,
+          "name": "bobawitch",
+          "slug": "bobawitch",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/73376/blob-f3732a67-212f-4629-929c-3f6907647b5d.jpeg",
+          "url": "https://tiltify.com/@bobawitch"
+        }
+      },
+      {
+        "causeId": 1229,
+        "name": "Smosh x Jingle Jam",
+        "description": "I'm fundraising for Jingle Jam.",
+        "slug": "smosh-x-jingle-jam",
+        "url": "https://tiltify.com/@smoshgames/smosh-x-jingle-jam",
+        "startTime": "2024-12-03T19:49:11Z",
+        "raised": 23767.6,
+        "goal": 10000,
+        "livestream": {
+          "channel": null,
+          "type": "twitch"
+        },
+        "user": {
+          "id": 170994,
+          "name": "smoshgames",
+          "slug": "smoshgames",
+          "avatar": "https://assets.tiltify.com/assets/default-avatar.png",
+          "url": "https://tiltify.com/@smoshgames"
+        }
+      },
+      {
+        "causeId": 575,
+        "name": "SMEG",
+        "description": "We're fundraising for Jingle Jam.",
+        "slug": "calm-jj24",
+        "url": "https://tiltify.com/@sam-eklls-and-meg-h/calm-jj24",
+        "startTime": "2024-12-01T17:11:15Z",
+        "raised": 22307,
+        "goal": 22500,
+        "livestream": {
+          "channel": "sam_eklls",
+          "type": "twitch"
+        },
+        "user": {
+          "id": 753008,
+          "name": "sam_eklls & meg__h",
+          "slug": "sam-eklls-and-meg-h",
+          "avatar": "https://assets.tiltify.com/assets/default-avatar.png",
+          "url": "https://tiltify.com/@sam-eklls-and-meg-h"
+        }
+      },
+      {
+        "causeId": 566,
+        "name": "InTheLittleWood JJ2024",
+        "description": "Hello Everybody! As always we're spending the month of December raising money for a wonderfully collection of charities that make real impact and differences on people's lives. Anything you can contribute from a penny, to a pound, to a tenner, is all HUGELY appreciated <3",
+        "slug": "inthelittlewood-jj2024",
+        "url": "https://tiltify.com/@inthelittlewood/inthelittlewood-jj2024",
+        "startTime": "2024-12-01T17:00:12Z",
+        "raised": 17262.83,
+        "goal": 17000,
+        "livestream": {
+          "channel": "inthelittlewood",
+          "type": "twitch"
+        },
+        "user": {
+          "id": 178431,
+          "name": "InTheLittleWood",
+          "slug": "inthelittlewood",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/178431/blob-993807dd-d98c-45a0-abb7-2273a3d0dd0f.jpeg",
+          "url": "https://tiltify.com/@inthelittlewood"
+        }
+      },
+      {
+        "causeId": 588,
+        "name": "Jingle Jam 3: Jingle Harder",
+        "description": "It's Jingle Jam, again!\n\nRaising money for War Child this year - War Child and its partners help children and families survive by providing life-saving essentials such as food, clean water, shelter, warm clothing, blankets, and hygiene kits. With Russian aggression in Ukraine continuing to disrupt schooling for Ukrainian children, your support means everything in giving them the best chance at life in the after that comes.",
+        "slug": "jingle-jam-3-jingle-harder",
+        "url": "https://tiltify.com/@digbytathamwarter/jingle-jam-3-jingle-harder",
+        "startTime": "2024-12-01T17:13:53Z",
+        "raised": 15409.69,
+        "goal": 15375.2,
+        "livestream": {
+          "channel": "https://assets.tiltify.com/uploads/media_type/image/289316/blob-360d6350-3c5f-4c16-a864-7b8800cbc18e.png",
+          "type": "image"
+        },
+        "user": {
+          "id": 473694,
+          "name": "digbytathamwarter",
+          "slug": "digbytathamwarter",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/473694/blob-6e7b6274-372a-4535-8ab0-4733e75e84f5.png",
+          "url": "https://tiltify.com/@digbytathamwarter"
+        }
+      },
+      {
+        "causeId": 575,
+        "name": "Blebs Against Living Miserably - Jingle Jam",
+        "description": "LETS DO THIS.",
+        "slug": "blebs-against-living-miserably-jingle-jam",
+        "url": "https://tiltify.com/@hrry/blebs-against-living-miserably-jingle-jam",
+        "startTime": "2024-12-01T17:25:14Z",
+        "raised": 15375.15,
+        "goal": 15151.51,
+        "livestream": {
+          "channel": "hrry",
+          "type": "twitch"
+        },
+        "user": {
+          "id": 176284,
+          "name": "hrry",
+          "slug": "hrry",
+          "avatar": "https://assets.tiltify.com/assets/default-avatar.png",
+          "url": "https://tiltify.com/@hrry"
+        }
+      },
+      {
+        "causeId": 565,
+        "name": "Wallace & Gromit's Grand Appeal x Jingle Jam 2024",
+        "description": "We're excited to be raising funds for Jingle Jam Building!",
+        "slug": "wallace-gromits-grand-appeal-x-jingle-jam-2024",
+        "url": "https://tiltify.com/@wallace-and-gromits-grand-appeal/wallace-gromits-grand-appeal-x-jingle-jam-2024",
+        "startTime": "2024-12-01T17:16:51Z",
+        "raised": 15156.22,
+        "goal": 15000,
+        "livestream": {
+          "channel": "yogscast",
+          "type": "twitch"
+        },
+        "user": {
+          "id": 574943,
+          "name": "Wallace & Gromit's Grand Appeal",
+          "slug": "wallace-and-gromits-grand-appeal",
+          "avatar": "https://assets.tiltify.com/assets/default-avatar.png",
+          "url": "https://tiltify.com/@wallace-and-gromits-grand-appeal"
+        }
+      },
+      {
+        "causeId": 588,
+        "name": "War Child X Jingle Jam 2024",
+        "description": "Welcome to the War Child X Jingle Jam fundraising page.\n\n\nAll donations to this page will help fund our vital work supporting children affected by war in Gaza, Lebanon and across the world.",
+        "slug": "war-child-x-jingle-jam-2024",
+        "url": "https://tiltify.com/@war-child/war-child-x-jingle-jam-2024",
+        "startTime": "2024-12-01T17:17:45Z",
+        "raised": 14360.69,
+        "goal": 6000,
+        "livestream": {
+          "channel": "https://assets.tiltify.com/uploads/media_type/image/289405/blob-42562262-36ef-4916-a127-b17062c2bfc9.png",
+          "type": "image"
+        },
+        "user": {
+          "id": 568351,
+          "name": "War Child",
+          "slug": "war-child",
+          "avatar": "https://assets.tiltify.com/assets/default-avatar.png",
+          "url": "https://tiltify.com/@war-child"
+        }
+      },
+      {
+        "causeId": 566,
+        "name": "Jingle Jam 2024",
+        "description": "This year I am fundraising for all 8 of the amazing Jingle Jam charities! Through a variety of fun streams, featuring guests from across the world and Twitch I hope to provide support to this great cause while having an amazing two weeks full of fun streams!",
+        "slug": "jingle-jam-2024",
+        "url": "https://tiltify.com/@shadowatnoon/jingle-jam-2024",
+        "startTime": "2024-12-01T17:17:16Z",
+        "raised": 13505.01,
+        "goal": 14411.69,
+        "livestream": {
+          "channel": "shadowatnoon",
+          "type": "twitch"
+        },
+        "user": {
+          "id": 374974,
+          "name": "shadowatnoon",
+          "slug": "shadowatnoon",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/374974/blob-f6d4ec7d-d6dc-4903-9f8d-f82f1afccdb7.png",
+          "url": "https://tiltify.com/@shadowatnoon"
+        }
+      },
+      {
+        "causeId": 575,
+        "name": "The BIG CALM 24hr Stream",
+        "description": "I'll be live for a 24hr stream extravaganza to try and raise as much money as possible for CALM!",
+        "slug": "the-big-calm-24hr-stream",
+        "url": "https://tiltify.com/@jackmanifoldtv/the-big-calm-24hr-stream",
+        "startTime": "2024-12-02T15:18:16Z",
+        "raised": 13134,
+        "goal": 13000,
+        "livestream": {
+          "channel": "jackmanifoldtv",
+          "type": "twitch"
+        },
+        "user": {
+          "id": 555931,
+          "name": "JackManifoldTV",
+          "slug": "jackmanifoldtv",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/555931/blob-0cdb85b3-89a1-4a72-a457-fd8ad4630e14.jpeg",
+          "url": "https://tiltify.com/@jackmanifoldtv"
+        }
+      },
+      {
+        "causeId": 1227,
+        "name": "cooly cooly earth",
+        "description": "I'm fundraising for Jingle Jam by streaming all by myself AGAIN!\n\nThe best way to fight climate change is to protect the rainforest. And the best way to do that? Back, support and listen to the Indigenous peoples living there.\n\nDonate now, support Cool Earth, and help us combat climate change!",
+        "slug": "cooly-cooly-earth",
+        "url": "https://tiltify.com/@sarahsera/cooly-cooly-earth",
+        "startTime": "2024-12-01T18:51:24Z",
+        "raised": 11579,
+        "goal": 11000,
+        "livestream": {
+          "channel": "sarahsera_",
+          "type": "twitch"
+        },
+        "user": {
+          "id": 574978,
+          "name": "sarahsera",
+          "slug": "sarahsera",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/574978/blob-06c2c60d-ec2b-4a34-a2a6-a682a020780f.png",
+          "url": "https://tiltify.com/@sarahsera"
+        }
+      },
+      {
+        "causeId": 574,
+        "name": "Jingle Beans '24",
+        "description": "I'm fundraising for WDC as part of Jingle Jam '24!\nJoin my streams, enjoy some charitable goodness and chaos!",
+        "slug": "jingle-beans-24",
+        "url": "https://tiltify.com/@imseanbean/jingle-beans-24",
+        "startTime": "2024-12-01T17:07:31Z",
+        "raised": 9152.69,
+        "goal": 10000,
+        "livestream": {
+          "channel": "ImSeanBean",
+          "type": "twitch"
+        },
+        "user": {
+          "id": 183365,
+          "name": "ImSeanBean",
+          "slug": "imseanbean",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/183365/blob-ef7c5041-d15e-47eb-b1c3-330eeb0a6343.png",
+          "url": "https://tiltify.com/@imseanbean"
+        }
+      },
+      {
+        "causeId": 575,
+        "name": "Talia Mar - Jingle Jam 2024",
+        "description": "Jingle Jam 2024 - I'm raising for Campaign Against Living Miserably (CALM) - A few years ago I unfortunately lost a friend to suicide, and I often think about how life could've potentially been different for her if she knew CALM had existed. I know so many people who have been saved by phoning for help and I rally hope we can make some what of a difference with this stream! no matter how big or small, every donation counts <3",
+        "slug": "talia-mar-jingle-jam-2024",
+        "url": "https://tiltify.com/@taliamar1/talia-mar-jingle-jam-2024",
+        "startTime": "2024-12-02T10:23:25Z",
+        "raised": 8886.1,
+        "goal": 10000,
+        "livestream": {
+          "channel": "taliamar",
+          "type": "twitch"
+        },
+        "user": {
+          "id": 752443,
+          "name": "taliamar1",
+          "slug": "taliamar1",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/752443/blob-75b1fb2a-4253-4c90-b440-e3b094dd05fe.jpeg",
+          "url": "https://tiltify.com/@taliamar1"
+        }
+      },
+      {
+        "causeId": 566,
+        "name": "No Rolls Barred & Jingle Jam",
+        "description": "We're once again joining in for the fun of Jingle Jam! You can donate to our page to earn the amazing collection of video games, and we have special rewards including posters and Blood on the Clocktower scripts.\n\nCatch us on the Yogscast livestreams for Mystery Quest (Weds 11th) and Blood on the Clocktower (Thurs 12th).",
+        "slug": "no-rolls-barred-jingle-jam",
+        "url": "https://tiltify.com/@no-rolls-barred/no-rolls-barred-jingle-jam",
+        "startTime": "2024-12-02T13:47:56Z",
+        "raised": 8540,
+        "goal": 10000,
+        "livestream": {
+          "channel": "https://assets.tiltify.com/uploads/media_type/image/287857/blob-4471330b-5b4d-40a6-97c7-23c9e4b4d781.png",
+          "type": "image"
+        },
+        "user": {
+          "id": 591884,
+          "name": "No Rolls Barred",
+          "slug": "no-rolls-barred",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/591884/blob-7553654f-06ad-4130-8375-fc60fa0d7799.jpeg",
+          "url": "https://tiltify.com/@no-rolls-barred"
+        }
+      },
+      {
+        "causeId": 575,
+        "name": "AnnaDemetriou X CALM",
+        "description": "I am fundraising today for CALM (Campaign Against Living Miserably) as part of Jingle Jam 2024! A huge reason that streaming/building this community matters so much to me is that we form togetherness here for people that may not have it elsewhere. \n\nEvery day in the UK we lose 18 people to suicide. These are mums and dads, brothers, sisters, sons, daughters, partners and friends. They are there to help anyone struggling with life and provide everyone with the skills to help prevent suicide.",
+        "slug": "anna-x-calm",
+        "url": "https://tiltify.com/@annademetriou/anna-x-calm",
+        "startTime": "2024-12-06T01:23:27Z",
+        "raised": 7069.69,
+        "goal": 7000,
+        "livestream": {
+          "channel": "annademetriou",
+          "type": "twitch"
+        },
+        "user": {
+          "id": 461635,
+          "name": "annademetriou",
+          "slug": "annademetriou",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/461635/blob-89bdf668-0387-419a-8f70-795fc1a5bdc9.png",
+          "url": "https://tiltify.com/@annademetriou"
+        }
+      },
+      {
+        "causeId": 566,
+        "name": "JAMS: AKA Just Another Minecraft Server",
+        "description": "Welcome to JAMS, where 100 Creators will try to complete a series of challenges against the clock and the chaos brought by your donations!\n\nWith a limited lifepool, players will need to be careful, but every £150 will gift them a Jam of Life - an item that can add lives and revive ghostly players!\n\nFrom spawning mobs, gifting loot boxes and testing the luck of your creators with “Lucky Jam”, there are plenty of ways that you can get involved in the fun whilst raising money for a fantastic cause!",
+        "slug": "jams",
+        "url": "https://tiltify.com/@minecraftjams/jams",
+        "startTime": "2024-12-01T17:00:23Z",
+        "raised": 7010,
+        "goal": 7000,
+        "livestream": {
+          "channel": null,
+          "type": "twitch"
+        },
+        "user": {
+          "id": 752579,
+          "name": "MinecraftJAMS",
+          "slug": "minecraftjams",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/752579/blob-0506bdd7-ea1c-4b55-8b37-cd3c13b735b1.jpeg",
+          "url": "https://tiltify.com/@minecraftjams"
+        }
+      },
+      {
+        "causeId": 1229,
+        "name": "Kirsty jingly jangly",
+        "description": "I'm fundraising for Jingle Jam <3",
+        "slug": "kirsty-jingly-jangly",
+        "url": "https://tiltify.com/@crustydoggo/kirsty-jingly-jangly",
+        "startTime": "2024-12-01T19:23:21Z",
+        "raised": 6986.32,
+        "goal": 500,
+        "livestream": {
+          "channel": "crustydoggo",
+          "type": "twitch"
+        },
+        "user": {
+          "id": 132386,
+          "name": "crustydoggo",
+          "slug": "crustydoggo",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/132386/blob-785b1a8c-2bdf-49f7-aa24-63d0035ddb4f.png",
+          "url": "https://tiltify.com/@crustydoggo"
+        }
+      },
+      {
+        "causeId": 575,
+        "name": "JingleJam2024",
+        "description": "I'm fundraising with CALM for Jingle Jam.",
+        "slug": "jinglejam2024",
+        "url": "https://tiltify.com/@potatomcwhiskey/jinglejam2024",
+        "startTime": "2024-12-01T17:29:41Z",
+        "raised": 6767,
+        "goal": 5000,
+        "livestream": {
+          "channel": "potatomcwhiskey",
+          "type": "twitch"
+        },
+        "user": {
+          "id": 54829,
+          "name": "PotatoMcWhiskey",
+          "slug": "potatomcwhiskey",
+          "avatar": "https://assets.tiltify.com/assets/default-avatar.png",
+          "url": "https://tiltify.com/@potatomcwhiskey"
+        }
+      },
+      {
+        "causeId": 575,
+        "name": "HobbyingforCALM",
+        "description": "Let's build a monster Baneblade for CALM. Here is the...\n\nkitbash menu\n\nCandles: £1 per |\nPlanks: £5 |\nSmall gun: £10 |\nMedium gun: £20 |\nSponson: £50* |\nSponson guns: £20* |\nSmall turret: £25** |\nBig gun: £100 |\nLarge turret: £200 |\n\nDrive me closer: £150*** |\n\n*6 available\n**9 available\n***4 available",
+        "slug": "hobbyingforcalm",
+        "url": "https://tiltify.com/@kirioth/hobbyingforcalm",
+        "startTime": "2024-12-04T13:02:17Z",
+        "raised": 6100,
+        "goal": 6000,
+        "livestream": {
+          "channel": "UCG15DOaAVIpl13UqPP1mTRg",
+          "type": "youtube_live"
+        },
+        "user": {
+          "id": 765076,
+          "name": "Kirioth",
+          "slug": "kirioth",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/765076/blob-6ad8b3da-6f0f-41dd-9d87-e77bbed7831b.jpeg",
+          "url": "https://tiltify.com/@kirioth"
+        }
+      },
+      {
+        "causeId": 1228,
+        "name": "TommyInnit x Sarcoma UK",
+        "description": "I'm fundraising for Jingle Jam.",
+        "slug": "tommyinnit-x-sarcoma-uk",
+        "url": "https://tiltify.com/@tommyinnit/tommyinnit-x-sarcoma-uk",
+        "startTime": "2024-12-02T15:05:58Z",
+        "raised": 6037.23,
+        "goal": 15000,
+        "livestream": {
+          "channel": "tommyinnit",
+          "type": "twitch"
+        },
+        "user": {
+          "id": 773983,
+          "name": "tommyinnit",
+          "slug": "tommyinnit",
+          "avatar": "https://assets.tiltify.com/assets/default-avatar.png",
+          "url": "https://tiltify.com/@tommyinnit"
+        }
+      },
+      {
+        "causeId": 575,
+        "name": "cake's Jingle Jam fundraiser for CALM",
+        "description": "I'm fundraising for Jingle Jam! Let's raise great funds for CALM - Campaign Against Living Miserably.",
+        "slug": "cakes-jingle-jam-fundraiser-for-calm",
+        "url": "https://tiltify.com/@cakejumper/cakes-jingle-jam-fundraiser-for-calm",
+        "startTime": "2024-12-05T11:52:15Z",
+        "raised": 5525.25,
+        "goal": 5000,
+        "livestream": {
+          "channel": "cakejumper",
+          "type": "twitch"
+        },
+        "user": {
+          "id": 133845,
+          "name": "cakejumper",
+          "slug": "cakejumper",
+          "avatar": "https://assets.tiltify.com/assets/default-avatar.png",
+          "url": "https://tiltify.com/@cakejumper"
+        }
+      },
+      {
+        "causeId": 575,
+        "name": "Chillin' for CALM (Jingle Jam 2024)",
+        "description": "We are Straight Chillin' to raise money for the Campaign Against Living Miserably (CALM), a suicide prevention charity whose aim is to help people end their misery, not their lives.\n\nLearn more about CALM here: https://www.thecalmzone.net/what-we-do",
+        "slug": "chillin-for-calm-jingle-jam-2024",
+        "url": "https://tiltify.com/@rinpenrose/chillin-for-calm-jingle-jam-2024",
+        "startTime": "2024-12-04T18:31:45Z",
+        "raised": 5476.38,
+        "goal": 5000,
+        "livestream": {
+          "channel": null,
+          "type": "twitch"
+        },
+        "user": {
+          "id": 767306,
+          "name": "rinpenrose",
+          "slug": "rinpenrose",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/767306/blob-e0d91f6b-810f-4ae9-8dee-76406ffbbf98.png",
+          "url": "https://tiltify.com/@rinpenrose"
+        }
+      },
+      {
+        "causeId": 575,
+        "name": "Kip & Ivy's Jingle Jam!",
+        "description": "Kip and Ivy's contribution to the wholesome chaos that is the best charity event of the year! Lots of fun traditions, great streamers, and all going to an amazing cause!",
+        "slug": "kip-ivys-jingle-jam",
+        "url": "https://tiltify.com/@mudkipninja/kip-ivys-jingle-jam",
+        "startTime": "2024-12-01T20:17:18Z",
+        "raised": 5469.69,
+        "goal": 5400,
+        "livestream": {
+          "channel": "mudkipninja",
+          "type": "twitch"
+        },
+        "user": {
+          "id": 488675,
+          "name": "Mudkipninja",
+          "slug": "mudkipninja",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/488675/blob-8ae3794a-1737-44be-8961-c9936e1c44e2.png",
+          "url": "https://tiltify.com/@mudkipninja"
+        }
+      },
+      {
+        "causeId": 566,
+        "name": "Rust Community for Jingle Jam",
+        "description": "The Rust community banding together to raise money for Jingle Jam Charities!",
+        "slug": "rust-community-for-jingle-jam",
+        "url": "https://tiltify.com/@beccasomething/rust-community-for-jingle-jam",
+        "startTime": "2024-12-01T18:39:02Z",
+        "raised": 5375.34,
+        "goal": 5000,
+        "livestream": {
+          "channel": "beccasomething",
+          "type": "twitch"
+        },
+        "user": {
+          "id": 468087,
+          "name": "beccasomething",
+          "slug": "beccasomething",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/468087/blob-fa27cc59-435b-42b0-be72-68927bb55e03.png",
+          "url": "https://tiltify.com/@beccasomething"
+        }
+      },
+      {
+        "causeId": 574,
+        "name": "Whale and Dolphin Conservation",
+        "description": "Jingle Jam 2024 will fund two vital education programmes this year: funding conservation workshops for children and young people in Colombia, Peru and Bolivia to protect the endangered Amazon River dolphin, and funding a digital online learning resource called WDC Dolphin Defenders to teach children and young people about dolphins and how we can work togetehr to protect them. Learn more about these projects here: https://games.whales.org/jingle-jam-2024/",
+        "slug": "whale-and-dolphin-conservation",
+        "url": "https://tiltify.com/@wdc-whale-and-dolphin-conservation/whale-and-dolphin-conservation",
+        "startTime": "2024-12-01T17:14:07Z",
+        "raised": 5345,
+        "goal": 5000,
+        "livestream": {
+          "channel": "watch",
+          "type": "youtube_video"
+        },
+        "user": {
+          "id": 31666,
+          "name": "WDC, Whale and Dolphin Conservation",
+          "slug": "wdc-whale-and-dolphin-conservation",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/31666/ea59703d-1589-4eb7-ac5f-005ebbc76020.jpeg",
+          "url": "https://tiltify.com/@wdc-whale-and-dolphin-conservation"
+        }
+      },
+      {
+        "causeId": 1227,
+        "name": "Cool Earth",
+        "description": "We’re Cool Earth and we work with rainforest communities to end deforestation and fight the climate crisis 🌳\n\nEvery donation you make this Jingle Jam will go directly to Indigenous Peoples and the fight to protect their rainforest homes.",
+        "slug": "cool-earth",
+        "url": "https://tiltify.com/@coolearth-er/cool-earth",
+        "startTime": "2024-12-02T15:09:42Z",
+        "raised": 5029,
+        "goal": 500,
+        "livestream": {
+          "channel": null,
+          "type": "twitch"
+        },
+        "user": {
+          "id": 682947,
+          "name": "coolearth-er",
+          "slug": "coolearth-er",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/682947/blob-dca2e3be-0ba5-4031-bd42-f81f09a484dd.png",
+          "url": "https://tiltify.com/@coolearth-er"
+        }
+      },
+      {
+        "causeId": 1228,
+        "name": "Sarcoma UK",
+        "description": "Sarcoma UK is a national charity that funds vital research, offers support for anyone affected by sarcoma cancer, and campaigns for better treatments.\n\nIt is the only cancer charity in the UK focusing on all types of sarcoma. It is now one of the biggest funders of sarcoma research in the UK, having invested £8 million across 98 pioneering sarcoma research projects to date.",
+        "slug": "sarcoma-uk",
+        "url": "https://tiltify.com/@sarcomauk/sarcoma-uk",
+        "startTime": "2024-12-09T08:34:12Z",
+        "raised": 4703,
+        "goal": 5000,
+        "livestream": {
+          "channel": null,
+          "type": "twitch"
+        },
+        "user": {
+          "id": 745613,
+          "name": "SarcomaUK",
+          "slug": "sarcomauk",
+          "avatar": "https://assets.tiltify.com/assets/default-avatar.png",
+          "url": "https://tiltify.com/@sarcomauk"
+        }
+      },
+      {
+        "causeId": 575,
+        "name": "Jingle Jam - CALM X Soupforeloise",
+        "description": "I'm fundraising for Jingle Jam!",
+        "slug": "jingle-jam-calm",
+        "url": "https://tiltify.com/@soupforeloise/jingle-jam-calm",
+        "startTime": "2024-12-04T19:30:36Z",
+        "raised": 4631,
+        "goal": 3350,
+        "livestream": {
+          "channel": null,
+          "type": "twitch"
+        },
+        "user": {
+          "id": 281341,
+          "name": "soupforeloise",
+          "slug": "soupforeloise",
+          "avatar": "https://assets.tiltify.com/assets/default-avatar.png",
+          "url": "https://tiltify.com/@soupforeloise"
+        }
+      },
+      {
+        "causeId": 582,
+        "name": "Jingle Dotes for Autistica",
+        "description": "12 Hours + of Dota madness",
+        "slug": "jingle-dotes-2024",
+        "url": "https://tiltify.com/@joehickson/jingle-dotes-2024",
+        "startTime": "2024-12-06T11:02:49Z",
+        "raised": 4288.85,
+        "goal": 500,
+        "livestream": {
+          "channel": null,
+          "type": "twitch"
+        },
+        "user": {
+          "id": 581674,
+          "name": "JoeHickson",
+          "slug": "joehickson",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/581674/blob-7fcdfc9f-c0d4-487e-a8ea-3ba04ea08e73.jpeg",
+          "url": "https://tiltify.com/@joehickson"
+        }
+      },
+      {
+        "causeId": 575,
+        "name": "Jingle Calm",
+        "description": "This year I'm fundraising for CALM & I've never been more glad to know them than I do now - last year I was at possibly the lowest point I've ever been at in my life & I made use of the fantastic services that CALM provide - I am truly greatful to them for their fantastic work and I would love to use any spare time I have to raise as much money as we can for them to continue their work & help as many people as they can!",
+        "slug": "jingle-calm",
+        "url": "https://tiltify.com/@ravs/jingle-calm",
+        "startTime": "2024-12-01T17:18:01Z",
+        "raised": 4105,
+        "goal": 4000,
+        "livestream": {
+          "channel": "https://assets.tiltify.com/uploads/media_type/image/287285/blob-e5293e23-319b-4cb9-abbc-246d81f49538.png",
+          "type": "image"
+        },
+        "user": {
+          "id": 41934,
+          "name": "Ravs",
+          "slug": "ravs",
+          "avatar": "https://assets.tiltify.com/assets/default-avatar.png",
+          "url": "https://tiltify.com/@ravs"
+        }
+      },
+      {
+        "causeId": 566,
+        "name": "Jingle Bales & Trails",
+        "description": "I'm fundraising for Jingle Jam, in Farming Simulator 25!",
+        "slug": "jingle-bales-trails",
+        "url": "https://tiltify.com/@howtobequiet/jingle-bales-trails",
+        "startTime": "2024-12-02T18:42:47Z",
+        "raised": 4062.69,
+        "goal": 6000,
+        "livestream": {
+          "channel": "howtobequiet",
+          "type": "twitch"
+        },
+        "user": {
+          "id": 457119,
+          "name": "howtobequiet",
+          "slug": "howtobequiet",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/457119/blob-70e26ce9-e0ad-4c08-9b07-f34e639bf5fc.png",
+          "url": "https://tiltify.com/@howtobequiet"
+        }
+      },
+      {
+        "causeId": 1229,
+        "name": "Champ's Campaign",
+        "description": "I'm fundraising for Jingle Jam with the rest of the Gobs and Grems.",
+        "slug": "champs-campaign",
+        "url": "https://tiltify.com/@rechampj/champs-campaign",
+        "startTime": "2024-12-03T23:15:09Z",
+        "raised": 4020,
+        "goal": 4100,
+        "livestream": {
+          "channel": null,
+          "type": "twitch"
+        },
+        "user": {
+          "id": 196671,
+          "name": "rechampj",
+          "slug": "rechampj",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/196671/blob-1b6f7121-76e9-4871-a71c-2e9a49aac491.png",
+          "url": "https://tiltify.com/@rechampj"
+        }
+      },
+      {
+        "causeId": 565,
+        "name": "LydiasGrandAppeal",
+        "description": "I'm fundraising for Jingle Jam",
+        "slug": "lydiasgrandappeal",
+        "url": "https://tiltify.com/@lydiayogscast/lydiasgrandappeal",
+        "startTime": "2024-12-09T11:51:29Z",
+        "raised": 3975,
+        "goal": 5000,
+        "livestream": {
+          "channel": null,
+          "type": "twitch"
+        },
+        "user": {
+          "id": 783967,
+          "name": "LydiaYogscast",
+          "slug": "lydiayogscast",
+          "avatar": "https://assets.tiltify.com/assets/default-avatar.png",
+          "url": "https://tiltify.com/@lydiayogscast"
+        }
+      },
+      {
+        "causeId": 582,
+        "name": "Jingle Jam",
+        "description": "I'm fundraising for Autistica with Jingle Jam!",
+        "slug": "jingle-jam",
+        "url": "https://tiltify.com/@pedguin/jingle-jam",
+        "startTime": "2024-12-01T17:17:48Z",
+        "raised": 3797.69,
+        "goal": 3000,
+        "livestream": {
+          "channel": "pedguin",
+          "type": "twitch"
+        },
+        "user": {
+          "id": 34608,
+          "name": "Pedguin",
+          "slug": "pedguin",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/34608/blob-64aef6af-af91-469f-bedc-15cf8ab38e6b.jpeg",
+          "url": "https://tiltify.com/@pedguin"
+        }
+      },
+      {
+        "causeId": 575,
+        "name": "CALM Wargaming Prize Draw",
+        "description": "A prize draw supported by Hoplite Game Studios, in order to raise money for CALM's lifesaving services.\n\nEntry to the draw is FREE, with more prizes added as we hit fundraising goals up to £5000!\n\nLink to the full prize list - https://shorturl.at/QMUAf -\n\nLink to the entry form - https://forms.gle/Zxj3uiV5U6CstB6e9 -\n\nLink to the terms and conditions - https://shorturl.at/UgD8f",
+        "slug": "calm-warhammer-prize-draw",
+        "url": "https://tiltify.com/@charlie-or-calm/calm-warhammer-prize-draw",
+        "startTime": "2024-12-02T14:46:56Z",
+        "raised": 3745,
+        "goal": 5000,
+        "livestream": {
+          "channel": "pg1_nalMNx8",
+          "type": "youtube_video"
+        },
+        "user": {
+          "id": 643859,
+          "name": "Charlie | CALM",
+          "slug": "charlie-or-calm",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/643859/blob-05c911d0-b2b7-4dc1-a110-2c57a8cca19a.png",
+          "url": "https://tiltify.com/@charlie-or-calm"
+        }
+      },
+      {
+        "causeId": 575,
+        "name": "Keep CALM and Carry On!",
+        "description": "I'm fundraising for Jingle Jam!",
+        "slug": "calm",
+        "url": "https://tiltify.com/@dnd-shorts/calm",
+        "startTime": "2024-12-09T04:16:36Z",
+        "raised": 3490,
+        "goal": 500,
+        "livestream": {
+          "channel": "https://assets.tiltify.com/uploads/fundraising_event/image/260175/blob-ab1a3dee-326c-41f9-8501-cc97c41da363.png",
+          "type": "fundraising_event_image"
+        },
+        "user": {
+          "id": 783874,
+          "name": "DnD Shorts",
+          "slug": "dnd-shorts",
+          "avatar": "https://assets.tiltify.com/assets/default-avatar.png",
+          "url": "https://tiltify.com/@dnd-shorts"
+        }
+      },
+      {
+        "causeId": 566,
+        "name": "Lolip's Jingle Jam 2024 Fundraiser!",
+        "description": "I'm fundraising for Jingle Jam with the Yogscast!",
+        "slug": "lolipjj24",
+        "url": "https://tiltify.com/@lolipopgi/lolipjj24",
+        "startTime": "2024-12-01T17:25:06Z",
+        "raised": 3450,
+        "goal": 3000,
+        "livestream": {
+          "channel": "lolipopgi",
+          "type": "twitch"
+        },
+        "user": {
+          "id": 477112,
+          "name": "lolipopgi",
+          "slug": "lolipopgi",
+          "avatar": "https://assets.tiltify.com/assets/default-avatar.png",
+          "url": "https://tiltify.com/@lolipopgi"
+        }
+      },
+      {
+        "causeId": 575,
+        "name": "mscupcakes JINGLE JAM 2024",
+        "description": "I'm fundraising for Campaign Against Living Miserably (CALM) for Jingle Jam.\n\nCALM is a suicide prevention charity that runs a free, confidential and anonymous helpline as well as a web chat service, offering help, advice and information to anyone who is struggling or in crisis.\nYou can learn more about CALM here: https://www.thecalmzone.net/what-we-do",
+        "slug": "mscupcakes-jingle-jam-2024",
+        "url": "https://tiltify.com/@mscupcakes/mscupcakes-jingle-jam-2024",
+        "startTime": "2024-12-02T13:21:13Z",
+        "raised": 3411,
+        "goal": 3000,
+        "livestream": {
+          "channel": "mscupcakes",
+          "type": "twitch"
+        },
+        "user": {
+          "id": 414709,
+          "name": "mscupcakes",
+          "slug": "mscupcakes",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/414709/blob-fca83cb7-9abf-46bb-b4e8-18a0ca229620.png",
+          "url": "https://tiltify.com/@mscupcakes"
+        }
+      },
+      {
+        "causeId": 575,
+        "name": "Breehth CALM",
+        "description": "I'm fundraising for CALM through Jingle Jam",
+        "slug": "jingling-and-jamming-for-calm",
+        "url": "https://tiltify.com/@breeh/jingling-and-jamming-for-calm",
+        "startTime": "2024-12-01T18:46:00Z",
+        "raised": 3250,
+        "goal": 3000,
+        "livestream": {
+          "channel": "breeh",
+          "type": "twitch"
+        },
+        "user": {
+          "id": 64084,
+          "name": "Breeh",
+          "slug": "breeh",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/64084/blob-a20ae6c9-4e56-4db5-917e-64d0ffadad53.png",
+          "url": "https://tiltify.com/@breeh"
+        }
+      },
+      {
+        "causeId": 575,
+        "name": "MrB Jingle Jam CALM",
+        "description": "I'm fundraising for Jingle Jam on behalf of CALM!\n\nCome join us for a livestream at 3pm on Friday December 6th as we decorate a GIANT christmas tree with YOUR donations!",
+        "slug": "mrb-jingle-jam-calm",
+        "url": "https://tiltify.com/@mrbeardstone/mrb-jingle-jam-calm",
+        "startTime": "2024-12-02T11:20:17Z",
+        "raised": 3140,
+        "goal": 3000,
+        "livestream": {
+          "channel": "twitch.tv/mrbeardstone",
+          "type": "twitch"
+        },
+        "user": {
+          "id": 333931,
+          "name": "MrBeardstone",
+          "slug": "mrbeardstone",
+          "avatar": "https://assets.tiltify.com/assets/default-avatar.png",
+          "url": "https://tiltify.com/@mrbeardstone"
+        }
+      },
+      {
+        "causeId": 566,
+        "name": "FRIENDSMAS with Tubbo, Tommy, Jack Manifold, Bekyamon and Badlinu (for Autistica, CALM & Sarcoma UK)",
+        "description": "Join Tubbo, Tommy, Jack Manifold, Bekyamon, and Badlinu as they celebrate Christmas-to-come with a bunch of holiday-themed activities IRL! All donations will be split equally between Autistica, Campaign Against Living Miserably, and Sarcoma UK.",
+        "slug": "friendsmas-with-tommy-innit-tubbo-jack-manifold-bekyamon-and-badlinu",
+        "url": "https://tiltify.com/@friendsmas/friendsmas-with-tommy-innit-tubbo-jack-manifold-bekyamon-and-badlinu",
+        "startTime": "2024-12-10T15:38:32Z",
+        "raised": 3022.99,
+        "goal": 3000,
+        "livestream": {
+          "channel": "tubbo",
+          "type": "twitch"
+        },
+        "user": {
+          "id": 784557,
+          "name": "friendsmas",
+          "slug": "friendsmas",
+          "avatar": "https://assets.tiltify.com/assets/default-avatar.png",
+          "url": "https://tiltify.com/@friendsmas"
+        }
+      },
+      {
+        "causeId": 588,
+        "name": "Mousie's Community for War Child 2024",
+        "description": "We are coming together and fundraising for War Child this year! There are a lot of wonderful charities this year in Jingle Jam. Be sure to check all of them out as well as the collection!",
+        "slug": "mousies-community-for-war-child-2024",
+        "url": "https://tiltify.com/@mousie/mousies-community-for-war-child-2024",
+        "startTime": "2024-12-01T17:00:05Z",
+        "raised": 3000,
+        "goal": 3000,
+        "livestream": {
+          "channel": "mousie",
+          "type": "twitch"
+        },
+        "user": {
+          "id": 62690,
+          "name": "mousie",
+          "slug": "mousie",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/62690/fcf27ca3-150e-44af-afc6-1af6c7af365f.jpeg",
+          "url": "https://tiltify.com/@mousie"
+        }
+      },
+      {
+        "causeId": 582,
+        "name": "Jingle Jam 2024 for Autistica",
+        "description": "This is Autistica's own page for anyone who would like an easy way to donate to this year's Jingle Jam 💗\n\nAutistica is the UK’s leading autism research and campaigning charity. Our vision is a world where every autistic person lives a happy, healthy, long life. Our mission is to enable breakthroughs by working with autistic people, funding research and shaping policy to make more of a difference. \n\nLearn more about us and connect with us:\n\nhttps://www.autistica.org.uk",
+        "slug": "jingle-jam-2024-for-autistica",
+        "url": "https://tiltify.com/@autistica/jingle-jam-2024-for-autistica",
+        "startTime": "2024-12-01T17:00:21Z",
+        "raised": 2739,
+        "goal": 3000,
+        "livestream": {
+          "channel": null,
+          "type": "fundraising_event_video"
+        },
+        "user": {
+          "id": 60157,
+          "name": "Autistica",
+          "slug": "autistica",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/60157/blob-b59e6651-2900-4c87-adee-818b42e25ed2.png",
+          "url": "https://tiltify.com/@autistica"
+        }
+      },
+      {
+        "causeId": 575,
+        "name": "The BIG Christmas Giving Stream 2024",
+        "description": "In this year's BIG Christmas Giving Stream, I'm raising money for CALM. This year has been another challenging year for many. Day-to-day challenges, deep rooted problems, and with the unexpected flipping peoples mental health stability upside down with no warning, your mental health can be impacted in so many ways. Even though 1 in 4 people have mental health problems, most of us don’t get the help we need. This has to change. To find out more about CALM, please visit: https://irl.yt/calm",
+        "slug": "the-big-christmas-giving-stream-2024",
+        "url": "https://tiltify.com/@fraserirl/the-big-christmas-giving-stream-2024",
+        "startTime": "2024-12-01T17:11:53Z",
+        "raised": 2601.69,
+        "goal": 2300,
+        "livestream": {
+          "channel": "FraserIRL",
+          "type": "twitch"
+        },
+        "user": {
+          "id": 335076,
+          "name": "FraserIRL",
+          "slug": "fraserirl",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/335076/blob-94fb38cd-96b9-481f-97d1-a377454b9d6b.jpeg",
+          "url": "https://tiltify.com/@fraserirl"
+        }
+      },
+      {
+        "causeId": 575,
+        "name": "laur",
+        "description": "I'm fundraising for CALM during JingleJam. It's a charity I wish I knew more about in the past, and am so grateful there's something out there for people who need it.",
+        "slug": "laur",
+        "url": "https://tiltify.com/@laurperham/laur",
+        "startTime": "2024-12-04T12:01:04Z",
+        "raised": 2600,
+        "goal": 2750,
+        "livestream": {
+          "channel": null,
+          "type": "twitch"
+        },
+        "user": {
+          "id": 560568,
+          "name": "laurperham",
+          "slug": "laurperham",
+          "avatar": "https://assets.tiltify.com/assets/default-avatar.png",
+          "url": "https://tiltify.com/@laurperham"
+        }
+      },
+      {
+        "causeId": 1227,
+        "name": "Cool Jorts",
+        "description": "Hello! I'm Lucie, aka jortsmima, and I’m fundraising for Cool Earth as part of Jingle Jam 2024. If you know me or have caught any of my streams before, you may know that nature, wildlife, gardening and plants are a huge part of my life and are all things that I am massively passionate about. Raising money for a cause close to my heart while having lots of fun with my community is about as good as it gets! Last year, my community managed to raise around £1,500, but this year I'd love to beat it!",
+        "slug": "cooljorts",
+        "url": "https://tiltify.com/@jortsmima/cooljorts",
+        "startTime": "2024-12-01T17:09:01Z",
+        "raised": 2250,
+        "goal": 2250,
+        "livestream": {
+          "channel": "jortsmima",
+          "type": "twitch"
+        },
+        "user": {
+          "id": 574786,
+          "name": "jortsmima",
+          "slug": "jortsmima",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/574786/blob-c948ce17-4f13-46aa-ad69-cae00e8a699b.png",
+          "url": "https://tiltify.com/@jortsmima"
+        }
+      },
+      {
+        "causeId": 575,
+        "name": "XP to Level 3 Jingle Jam 2024",
+        "description": "Fundraising for Jingle Jam!",
+        "slug": "xptolevel3jinglejam2024",
+        "url": "https://tiltify.com/@xptolevel3/xptolevel3jinglejam2024",
+        "startTime": "2024-12-12T06:01:30Z",
+        "raised": 2215,
+        "goal": 1000,
+        "livestream": {
+          "channel": "UC1YDVwTL5M_TVivEdTbfKrA",
+          "type": "youtube_live"
+        },
+        "user": {
+          "id": 785587,
+          "name": "XPtoLevel3",
+          "slug": "xptolevel3",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/785587/blob-6c51598f-58a8-4b7a-ad8e-e8e8d2651043.png",
+          "url": "https://tiltify.com/@xptolevel3"
+        }
+      },
+      {
+        "causeId": 575,
+        "name": "Jingle Jam 2024.|",
+        "description": "I will be taking part in Jingle Jam raising money for CALM [Campaign Against Living Miserably] , all money raised will go towards CALM to help them continue to be such a tremendous help and crucial source for all struggling with Mental Health. By donating £35 you will have access to a SICK collection of games while also benefiting CALM providing them with the ability to answer potentially life-saving calls, providing support to people who have lost someone to suicide and more.",
+        "slug": "jingle-jam-2024",
+        "url": "https://tiltify.com/@diabetus/jingle-jam-2024",
+        "startTime": "2024-12-01T19:09:41Z",
+        "raised": 2124.4,
+        "goal": 1800,
+        "livestream": {
+          "channel": "diabetus__",
+          "type": "twitch"
+        },
+        "user": {
+          "id": 256432,
+          "name": "diabetus__",
+          "slug": "diabetus",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/256432/blob-8e748284-6487-4a18-86bf-53e139eae13f.jpeg",
+          "url": "https://tiltify.com/@diabetus"
+        }
+      },
+      {
+        "causeId": 575,
+        "name": "CALM Jingle Jam 2024",
+        "description": "I'm fundraising for CALM - the Campaign Against Living Miserably - as part of Jingle Jam 2024!\n\nALL donations of £35+ will be eligible for the Jingle Jam Games Collection as a reward - a collection of developer-donated, critically-acclaimed independent PC video games.\n\nYour donations will all go towards helping people to end their misery, not their lives, by helping to fun the amazing resources CALM offers to people in crisis <3",
+        "slug": "calm-jingle-jam-2024",
+        "url": "https://tiltify.com/@kellston/calm-jingle-jam-2024",
+        "startTime": "2024-12-01T17:36:20Z",
+        "raised": 2115,
+        "goal": 1000,
+        "livestream": {
+          "channel": "kellston",
+          "type": "twitch"
+        },
+        "user": {
+          "id": 342448,
+          "name": "kellston",
+          "slug": "kellston",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/342448/blob-97c1930f-5ce8-4b12-8626-51ee2945e1d4.jpeg",
+          "url": "https://tiltify.com/@kellston"
+        }
+      },
+      {
+        "causeId": 575,
+        "name": "Stand Against Suicide",
+        "description": "I'm fundraising for Jingle Jam.",
+        "slug": "stand-against-suicide",
+        "url": "https://tiltify.com/@badlinu/stand-against-suicide",
+        "startTime": "2024-12-11T15:08:30Z",
+        "raised": 2114,
+        "goal": 2000,
+        "livestream": {
+          "channel": null,
+          "type": "twitch"
+        },
+        "user": {
+          "id": 403231,
+          "name": "badlinu",
+          "slug": "badlinu",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/403231/blob-31d9b0c8-9ed8-48dd-b69c-939f2eb217d4.png",
+          "url": "https://tiltify.com/@badlinu"
+        }
+      },
+      {
+        "causeId": 566,
+        "name": "Insanity's Jingle Jam 2024",
+        "description": "Insanity Radio is Royal Holloway University's Student Radio Station. You can listen to us online, on your phone, and on 103.2FM. \n\nOur presenters are doing a 72 hour livestream & radiothon from the 6th-8th December, raising money for the Jingle Jam and the amazing charities they support!",
+        "slug": "insanityjinglejam",
+        "url": "https://tiltify.com/@insanity-radio/insanityjinglejam",
+        "startTime": "2024-12-01T21:04:24Z",
+        "raised": 2110.05,
+        "goal": 5000,
+        "livestream": {
+          "channel": "wylAKpeq1Rg",
+          "type": "youtube_video"
+        },
+        "user": {
+          "id": 766602,
+          "name": "Insanity Radio",
+          "slug": "insanity-radio",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/766602/blob-c8719d82-6098-4612-8106-1fa63914d34e.jpeg",
+          "url": "https://tiltify.com/@insanity-radio"
+        }
+      },
+      {
+        "causeId": 575,
+        "name": "Knight Jingle Jam",
+        "description": "I'm fundraising for Jingle Jam to raise money for CALM (Campaign Against Living Miserably) who do incredible work to change the conversation around Mental Health and Suicide. They have resources and tools, an invaluable helpline and a fantastic community. \n\nFor more information check out: https://www.thecalmzone.net/what-we-do",
+        "slug": "knight-jingle-jam",
+        "url": "https://tiltify.com/@knightenator/knight-jingle-jam",
+        "startTime": "2024-12-04T12:45:28Z",
+        "raised": 2065.5,
+        "goal": 1500,
+        "livestream": {
+          "channel": "knightenator",
+          "type": "twitch"
+        },
+        "user": {
+          "id": 102645,
+          "name": "knightenator",
+          "slug": "knightenator",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/102645/fa3cb01e-2e4b-43aa-b8a0-90c664d4e063.jpeg",
+          "url": "https://tiltify.com/@knightenator"
+        }
+      },
+      {
+        "causeId": 582,
+        "name": "Tubbo",
+        "description": "I'm fundraising for Jingle Jam.",
+        "slug": "tubbo",
+        "url": "https://tiltify.com/@atubbo/tubbo",
+        "startTime": "2024-12-02T16:45:09Z",
+        "raised": 2054.32,
+        "goal": 100,
+        "livestream": {
+          "channel": null,
+          "type": "twitch"
+        },
+        "user": {
+          "id": 576133,
+          "name": "ATubbo",
+          "slug": "atubbo",
+          "avatar": "https://assets.tiltify.com/assets/default-avatar.png",
+          "url": "https://tiltify.com/@atubbo"
+        }
+      },
+      {
+        "causeId": 566,
+        "name": "Duncan’s Jingle Jam Fundraiser",
+        "description": "I'm fundraising for Jingle Jam. Donate now to help amazing charities and receive and collection of great games!",
+        "slug": "duncans-jingle-jam-fundraiser",
+        "url": "https://tiltify.com/@lalna/duncans-jingle-jam-fundraiser",
+        "startTime": "2024-12-01T17:17:05Z",
+        "raised": 2052,
+        "goal": 1000,
+        "livestream": {
+          "channel": null,
+          "type": "twitch"
+        },
+        "user": {
+          "id": 770927,
+          "name": "lalna",
+          "slug": "lalna",
+          "avatar": "https://assets.tiltify.com/assets/default-avatar.png",
+          "url": "https://tiltify.com/@lalna"
+        }
+      },
+      {
+        "causeId": 575,
+        "name": "Muds CALM 2024",
+        "description": "I'm fundraising for Jingle Jam.",
+        "slug": "calm2024",
+        "url": "https://tiltify.com/@mudlit/calm2024",
+        "startTime": "2024-12-01T17:34:08Z",
+        "raised": 2000.01,
+        "goal": 720,
+        "livestream": {
+          "channel": "mudlit",
+          "type": "twitch"
+        },
+        "user": {
+          "id": 358137,
+          "name": "mudlit",
+          "slug": "mudlit",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/358137/blob-7b05443a-185b-4258-b252-1a4f1b2d3932.png",
+          "url": "https://tiltify.com/@mudlit"
+        }
+      },
+      {
+        "causeId": 588,
+        "name": "Gathering for Good: Jingle Jam Edition",
+        "description": "Join the amazing Kiwo, RT Game, The Spiffing Brit and M4NG0 for a special chat-controlled game of Magic: The Gathering.\nDonate now to influence the game, support your favourite creator and cause chaos each round.",
+        "slug": "gathering-for-good-jingle-jam-edition",
+        "url": "https://tiltify.com/@war-child/gathering-for-good-jingle-jam-edition",
+        "startTime": "2024-12-01T17:17:36Z",
+        "raised": 1780,
+        "goal": 1500,
+        "livestream": {
+          "channel": "warchildukgaming",
+          "type": "twitch"
+        },
+        "user": {
+          "id": 568351,
+          "name": "War Child",
+          "slug": "war-child",
+          "avatar": "https://assets.tiltify.com/assets/default-avatar.png",
+          "url": "https://tiltify.com/@war-child"
+        }
+      },
+      {
+        "causeId": 582,
+        "name": "Classed x Autistica - Jingle Jam 2024",
+        "description": "I'm fundraising for the UK Charity Autistica! They're a charity dedicated to creating breakthroughs that enable all autistic people to live happier, healthier and longer lives.",
+        "slug": "classed-x-jingle-jam-2024",
+        "url": "https://tiltify.com/@classed/classed-x-jingle-jam-2024",
+        "startTime": "2024-12-07T22:24:46Z",
+        "raised": 1715,
+        "goal": 2000,
+        "livestream": {
+          "channel": "classed",
+          "type": "twitch"
+        },
+        "user": {
+          "id": 615968,
+          "name": "Classed",
+          "slug": "classed",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/615968/blob-27a75d9d-6072-4144-89df-35f288462cb9.png",
+          "url": "https://tiltify.com/@classed"
+        }
+      },
+      {
+        "causeId": 588,
+        "name": "Big Taffs Jingle Jam",
+        "description": "I'm fundraising for War Child as part of Jingle Jam 2024.",
+        "slug": "big-taffs-jingle-jam",
+        "url": "https://tiltify.com/@bigtaffman/big-taffs-jingle-jam",
+        "startTime": "2024-12-02T11:22:41Z",
+        "raised": 1670,
+        "goal": 1500,
+        "livestream": {
+          "channel": "bigtaffman",
+          "type": "twitch"
+        },
+        "user": {
+          "id": 380206,
+          "name": "bigtaffman",
+          "slug": "bigtaffman",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/380206/blob-b49444a5-9b97-4cc0-87e9-c9039f619129.png",
+          "url": "https://tiltify.com/@bigtaffman"
+        }
+      },
+      {
+        "causeId": 582,
+        "name": "Sam's Jingle Jam House of Madness",
+        "description": "I have joined in this year to raise money for the jingle jam! If you would like to contribute then that would be very poggers thank you!! (yes i slightly regret writing poggers but it's too late now)",
+        "slug": "sams-jingle-jam-house-of-madness",
+        "url": "https://tiltify.com/@sr-sam/sams-jingle-jam-house-of-madness",
+        "startTime": "2024-12-04T13:20:33Z",
+        "raised": 1555,
+        "goal": 1250,
+        "livestream": {
+          "channel": "sr_sam",
+          "type": "twitch"
+        },
+        "user": {
+          "id": 766471,
+          "name": "sr_sam",
+          "slug": "sr-sam",
+          "avatar": "https://assets.tiltify.com/assets/default-avatar.png",
+          "url": "https://tiltify.com/@sr-sam"
+        }
+      },
+      {
+        "causeId": 582,
+        "name": "lily likes jingle jam",
+        "description": "I'm fundraising for Autistica for this year's Jingle Jam >:)",
+        "slug": "lily-likes-jingle-jam",
+        "url": "https://tiltify.com/@lilylikesrocks/lily-likes-jingle-jam",
+        "startTime": "2024-12-01T17:24:15Z",
+        "raised": 1536,
+        "goal": 1500,
+        "livestream": {
+          "channel": "lilylikesrocks",
+          "type": "twitch"
+        },
+        "user": {
+          "id": 230016,
+          "name": "lilylikesrocks",
+          "slug": "lilylikesrocks",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/230016/blob-2467aaaf-5f3d-4c1b-8a0e-2d62ea13627b.png",
+          "url": "https://tiltify.com/@lilylikesrocks"
+        }
+      },
+      {
+        "causeId": 575,
+        "name": "CALM x Jingle Jam",
+        "description": "I'm fundraising for CALM to help raise awareness in suicide prevention for young people. I will be streaming for 24 hours straight playing different games, to have fun with people in chat and to have the conversations that sometimes can be scary to have.",
+        "slug": "jingle-jam",
+        "url": "https://tiltify.com/@jackariah/jingle-jam",
+        "startTime": "2024-12-01T17:00:11Z",
+        "raised": 1525,
+        "goal": 1600,
+        "livestream": {
+          "channel": "jackariah",
+          "type": "twitch"
+        },
+        "user": {
+          "id": 401529,
+          "name": "jackariah",
+          "slug": "jackariah",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/401529/blob-987793c4-0047-41bc-9fc2-a15d0b66ddac.jpeg",
+          "url": "https://tiltify.com/@jackariah"
+        }
+      },
+      {
+        "causeId": 588,
+        "name": "Zerps Jingle Jam Spectacular X3",
+        "description": "Nyahallo~~!!! We're fundraising for War Child again this year! \nSo excited for this AaaaAA\n\nObviously don't donate if you're not able to! (*´▽`*)",
+        "slug": "zerps-jingle-jam-spectacular-x3",
+        "url": "https://tiltify.com/@zerpherz/zerps-jingle-jam-spectacular-x3",
+        "startTime": "2024-12-01T17:13:14Z",
+        "raised": 1500,
+        "goal": 500,
+        "livestream": {
+          "channel": "zerpherz",
+          "type": "twitch"
+        },
+        "user": {
+          "id": 577985,
+          "name": "zerpherz",
+          "slug": "zerpherz",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/577985/blob-7a8c9c95-da7d-4bdb-bb42-b3583bc2ae89.png",
+          "url": "https://tiltify.com/@zerpherz"
+        }
+      },
+      {
+        "causeId": 566,
+        "name": "Pot Punk's Jingle Jam",
+        "description": "I'm fundraising for the Jingle Jam!! Huzzah!",
+        "slug": "pot-punks-jingle-jam",
+        "url": "https://tiltify.com/@pot-punk-476c6a/pot-punks-jingle-jam",
+        "startTime": "2024-12-03T11:58:49Z",
+        "raised": 1460.2,
+        "goal": 175,
+        "livestream": {
+          "channel": "Pot_punk",
+          "type": "twitch"
+        },
+        "user": {
+          "id": 770202,
+          "name": "Pot-Punk",
+          "slug": "pot-punk-476c6a",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/770202/blob-1768daeb-107a-493d-8dd9-b80b8a2a61f8.jpeg",
+          "url": "https://tiltify.com/@pot-punk-476c6a"
+        }
+      },
+      {
+        "causeId": 575,
+        "name": "Donate Here to Save Lives",
+        "description": "Suicide is the biggest killer of young people under 35 in the UK. Do something about it by donating to CALM at Jingle Jam 2024.\n\nGive £35 and you can get the Jingle Jam Games Collection in return. Epic value.\n\nPlus every penny you donate will help us be there for young people struggling with life.",
+        "slug": "campaign-against-living-miserably",
+        "url": "https://tiltify.com/@campaign-against-living-miserably/campaign-against-living-miserably",
+        "startTime": "2024-12-01T17:13:55Z",
+        "raised": 1449,
+        "goal": 1220,
+        "livestream": {
+          "channel": "https://assets.tiltify.com/uploads/media_type/image/288914/blob-733f7aa6-99fc-4401-8b1f-9c2091ae8108.png",
+          "type": "image"
+        },
+        "user": {
+          "id": 438716,
+          "name": "Campaign Against Living Miserably",
+          "slug": "campaign-against-living-miserably",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/438716/blob-aec2affe-2723-4a72-8642-a1979b25c52a.jpeg",
+          "url": "https://tiltify.com/@campaign-against-living-miserably"
+        }
+      },
+      {
+        "causeId": 575,
+        "name": "Jingle Jam: The Return of The Jam",
+        "description": "This year I am fundraising for CALM through the Jingle Jam. Suicide is something that has affected most of us in some aspect, and its not fair that people should feal that the only way out is to take their own life. Lets be a part of changing that!",
+        "slug": "jingle-jam-the-return-of-the-jam",
+        "url": "https://tiltify.com/@someblokenamedross/jingle-jam-the-return-of-the-jam",
+        "startTime": "2024-12-01T17:13:41Z",
+        "raised": 1400,
+        "goal": 1500,
+        "livestream": {
+          "channel": "some_bloke_named_ross",
+          "type": "twitch"
+        },
+        "user": {
+          "id": 479906,
+          "name": "SomeBlokeNamedRoss",
+          "slug": "someblokenamedross",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/479906/blob-a07a5476-a35a-442a-8883-4d7d973f4088.png",
+          "url": "https://tiltify.com/@someblokenamedross"
+        }
+      },
+      {
+        "causeId": 575,
+        "name": "CALM Jingle Jam 2024",
+        "description": "Jingle Jam is an annual charity event through streams and a game bundle. It’s one of gaming’s biggest charity drives, supporting causes worldwide! \n\nThis year we are supporting CALM a UK-based charity dedicated to preventing suicide and supporting mental health. They provide a free, confidential helpline and webchat, offering support to anyone in crisis or feeling overwhelmed.",
+        "slug": "calmjinglejam2024",
+        "url": "https://tiltify.com/@ninu-vt/calmjinglejam2024",
+        "startTime": "2024-12-01T17:13:42Z",
+        "raised": 1400,
+        "goal": 1500,
+        "livestream": {
+          "channel": "Ninu_VT",
+          "type": "twitch"
+        },
+        "user": {
+          "id": 540759,
+          "name": "Ninu_VT",
+          "slug": "ninu-vt",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/540759/blob-f5b6b81e-8ff1-4d52-85fe-d04703c1e2f1.png",
+          "url": "https://tiltify.com/@ninu-vt"
+        }
+      },
+      {
+        "causeId": 575,
+        "name": "OkarooneJingleJam2024",
+        "description": "I'm fundraising for Jingle Jam.",
+        "slug": "okaroonejinglejam2024",
+        "url": "https://tiltify.com/@okaroone/okaroonejinglejam2024",
+        "startTime": "2024-12-01T17:00:05Z",
+        "raised": 1350,
+        "goal": 1250,
+        "livestream": {
+          "channel": "okaroone",
+          "type": "twitch"
+        },
+        "user": {
+          "id": 121506,
+          "name": "okaroone",
+          "slug": "okaroone",
+          "avatar": "https://assets.tiltify.com/assets/default-avatar.png",
+          "url": "https://tiltify.com/@okaroone"
+        }
+      },
+      {
+        "causeId": 574,
+        "name": "poopernoodle",
+        "description": "I'm fundraising for Jingle Jam!! I have a very personal reason as to why I want to fundraise for the whales and dolphins. But I think they are very important and cool and also cute. The amazon river dolphin is also very cute and pink which is one of my favourite colours and they are pretty endangered rn so I'd like to protect them. Also, it's Christmas!! I'm fairly certain you haven't given a Christmas gift to the dolphins and whales yet, so here's your chance! MERRY CHRISTMAS",
+        "slug": "poopernoodle",
+        "url": "https://tiltify.com/@poopernoodle/poopernoodle",
+        "startTime": "2024-12-04T18:59:05Z",
+        "raised": 1350,
+        "goal": 2000,
+        "livestream": {
+          "channel": "https://assets.tiltify.com/uploads/media_type/image/290155/blob-c5f528a7-b5ae-451c-b359-a22ad71df5a6.png",
+          "type": "image"
+        },
+        "user": {
+          "id": 531741,
+          "name": "poopernoodle",
+          "slug": "poopernoodle",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/531741/blob-1541ddbf-1d1e-4713-a45a-aa9f029f051c.jpeg",
+          "url": "https://tiltify.com/@poopernoodle"
+        }
+      },
+      {
+        "causeId": 1229,
+        "name": "New World supports the Jingle Jam",
+        "description": "I'm fundraising for Jingle Jam.",
+        "slug": "new-world-supports-the-jingle-jam",
+        "url": "https://tiltify.com/@new-world-sim-racing/new-world-supports-the-jingle-jam",
+        "startTime": "2024-12-01T17:15:05Z",
+        "raised": 1345,
+        "goal": 1500,
+        "livestream": {
+          "channel": "NewWorldSimRacing",
+          "type": "twitch"
+        },
+        "user": {
+          "id": 578969,
+          "name": "New World Sim Racing",
+          "slug": "new-world-sim-racing",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/578969/blob-3b313e76-6e5b-47bd-a69a-3430ca9f40a4.png",
+          "url": "https://tiltify.com/@new-world-sim-racing"
+        }
+      },
+      {
+        "causeId": 575,
+        "name": "CALM",
+        "description": "I'm fundraising for CALM!",
+        "slug": "calm2024",
+        "url": "https://tiltify.com/@osie/calm2024",
+        "startTime": "2024-12-01T17:26:10Z",
+        "raised": 1338,
+        "goal": 1000,
+        "livestream": {
+          "channel": null,
+          "type": "twitch"
+        },
+        "user": {
+          "id": 597429,
+          "name": "osie",
+          "slug": "osie",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/597429/blob-c440e172-f09b-4468-9809-09c2409bc39e.jpeg",
+          "url": "https://tiltify.com/@osie"
+        }
+      },
+      {
+        "causeId": 575,
+        "name": "jinglejam2024",
+        "description": "I'm raising money for Jingle Jam 2024!! :D",
+        "slug": "jinglejam2024",
+        "url": "https://tiltify.com/@brionykay/jinglejam2024",
+        "startTime": "2024-12-01T17:35:41Z",
+        "raised": 1280,
+        "goal": 500,
+        "livestream": {
+          "channel": "brionykay",
+          "type": "twitch"
+        },
+        "user": {
+          "id": 69300,
+          "name": "brionykay",
+          "slug": "brionykay",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/69300/blob-5e7c8baf-8f5c-4d0f-97ce-a8bd866ed5cb.jpeg",
+          "url": "https://tiltify.com/@brionykay"
+        }
+      },
+      {
+        "causeId": 575,
+        "name": "CBV Screaming Against Suicide",
+        "description": "We're back fundraising for Jingle Jam! This year we're Screaming Against Suicide; whether we're playing/creating music or playing games there's always Screaming Involved. Donate Now",
+        "slug": "screaming-against-suicide",
+        "url": "https://tiltify.com/@chasedbyvoices/screaming-against-suicide",
+        "startTime": "2024-12-01T17:13:44Z",
+        "raised": 1250,
+        "goal": 1220,
+        "livestream": {
+          "channel": "chasedbyvoices",
+          "type": "twitch"
+        },
+        "user": {
+          "id": 371499,
+          "name": "ChasedByVoices",
+          "slug": "chasedbyvoices",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/371499/blob-9f248513-7a43-4929-b6d2-9f9faed2f5a9.png",
+          "url": "https://tiltify.com/@chasedbyvoices"
+        }
+      },
+      {
+        "causeId": 575,
+        "name": "Sips Jingle Jam Fundraising Jamboree",
+        "description": "I'm fundraising for Jingle Jam 2024.",
+        "slug": "sips-jingle-jam-fundraising-jamboree",
+        "url": "https://tiltify.com/@sips-yogscast/sips-jingle-jam-fundraising-jamboree",
+        "startTime": "2024-12-04T10:31:52Z",
+        "raised": 1234.2,
+        "goal": 100,
+        "livestream": {
+          "channel": null,
+          "type": "twitch"
+        },
+        "user": {
+          "id": 776465,
+          "name": "sips_yogscast",
+          "slug": "sips-yogscast",
+          "avatar": "https://assets.tiltify.com/assets/default-avatar.png",
+          "url": "https://tiltify.com/@sips-yogscast"
+        }
+      },
+      {
+        "causeId": 575,
+        "name": "CALM x JingleJam",
+        "description": "I'm fundraising for CALM (Campaign Against Living Miserably) for Jingle Jam 2024! I'll be doing a charity livestream on December 5th :)",
+        "slug": "jinglejam",
+        "url": "https://tiltify.com/@bekyamon/jinglejam",
+        "startTime": "2024-12-04T15:53:31Z",
+        "raised": 1200,
+        "goal": 1100,
+        "livestream": {
+          "channel": "bekyamon",
+          "type": "twitch"
+        },
+        "user": {
+          "id": 759678,
+          "name": "bekyamon",
+          "slug": "bekyamon",
+          "avatar": "https://assets.tiltify.com/assets/default-avatar.png",
+          "url": "https://tiltify.com/@bekyamon"
+        }
+      },
+      {
+        "causeId": 575,
+        "name": "Jinglejam",
+        "description": "I'm fundraising for Jingle Jam.\nOne in five of us will have suicidal thoughts in our life.\nCALM’s vision is that no one feels like suicide is their only option. But right now, too many people are struggling to see a way forward.",
+        "slug": "jinglejam",
+        "url": "https://tiltify.com/@alyska/jinglejam",
+        "startTime": "2024-12-02T19:41:01Z",
+        "raised": 1200,
+        "goal": 1500,
+        "livestream": {
+          "channel": "alyska",
+          "type": "twitch"
+        },
+        "user": {
+          "id": 447658,
+          "name": "Alyska",
+          "slug": "alyska",
+          "avatar": "https://assets.tiltify.com/assets/default-avatar.png",
+          "url": "https://tiltify.com/@alyska"
+        }
+      },
+      {
+        "causeId": 565,
+        "name": "Jingle Jam 2024 x Wallace & Gromit's Grand Appeal",
+        "description": "This year we're raising money for The Grand Appeal, they're an amazing charity that provide care and support to children and families at Bristol Children's Hospital. The money donated will go towards building the Jingle Jam Building - The UK's first ever patient holtel. It will provide therapy, rehabilitation and family accomodation for the long term patients of the hospital.",
+        "slug": "jj2024grandappeal",
+        "url": "https://tiltify.com/@thedementedsalad/jj2024grandappeal",
+        "startTime": "2024-12-01T17:11:35Z",
+        "raised": 1155,
+        "goal": 2000,
+        "livestream": {
+          "channel": "thedementedsalad",
+          "type": "twitch"
+        },
+        "user": {
+          "id": 172884,
+          "name": "TheDementedSalad",
+          "slug": "thedementedsalad",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/172884/blob-c3c8f96e-0630-4ef6-bfbc-1fdd80e21272.jpeg",
+          "url": "https://tiltify.com/@thedementedsalad"
+        }
+      },
+      {
+        "causeId": 566,
+        "name": "Local's Jingle Jam Extravaganza!",
+        "description": "I'm fundraising for Jingle Jam.",
+        "slug": "jingle-jam",
+        "url": "https://tiltify.com/@thelocalbrickshop/jingle-jam",
+        "startTime": "2024-12-01T22:29:10Z",
+        "raised": 1130,
+        "goal": 1500,
+        "livestream": {
+          "channel": "twitch.tv/thelocalbrickshop",
+          "type": "twitch"
+        },
+        "user": {
+          "id": 381982,
+          "name": "thelocalbrickshop",
+          "slug": "thelocalbrickshop",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/381982/blob-fd16bfe4-b902-49cc-b85d-4a7bd34305dd.png",
+          "url": "https://tiltify.com/@thelocalbrickshop"
+        }
+      },
+      {
+        "causeId": 566,
+        "name": "Viztee for Jingle Jam 24",
+        "description": "I'm fundraising for all 8 charities in the Jingle Jam! If you donate £35 or more you can grab a collection of awesome games!",
+        "slug": "vizjj24",
+        "url": "https://tiltify.com/@viztee/vizjj24",
+        "startTime": "2024-12-01T17:20:21Z",
+        "raised": 1121,
+        "goal": 1200,
+        "livestream": {
+          "channel": "viztee",
+          "type": "twitch"
+        },
+        "user": {
+          "id": 348512,
+          "name": "viztee",
+          "slug": "viztee",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/348512/blob-83fb2a10-65af-48c3-8e1a-a070e3f5b562.png",
+          "url": "https://tiltify.com/@viztee"
+        }
+      },
+      {
+        "causeId": 582,
+        "name": "M4NG0's for Good",
+        "description": "This years Jingle Jam is very special to me; after much deliberation I have decided that 2024 will be my final year taking part in Jingle Jam as a streamer/content creator following my retirement from my twitch channel M4NG0. With that in mind, I want to leave with big thanks for my community and the Yogs by raising money for Autistica; a charity committed to making the world more accessible for people with autism or neurodivergence. M4NG0 x",
+        "slug": "m4ng0s-for-good",
+        "url": "https://tiltify.com/@m4ng0/m4ng0s-for-good",
+        "startTime": "2024-12-01T17:18:29Z",
+        "raised": 1080,
+        "goal": 1000,
+        "livestream": {
+          "channel": null,
+          "type": "twitch"
+        },
+        "user": {
+          "id": 143998,
+          "name": "M4NG0",
+          "slug": "m4ng0",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/143998/blob-2e07a7af-1ae0-41d9-9134-7962b3f91651.png",
+          "url": "https://tiltify.com/@m4ng0"
+        }
+      },
+      {
+        "causeId": 582,
+        "name": "Hoxie's First Jingle Jam",
+        "description": "I'm fundraising for Autistica as part of Jingle Jam this year! They approached me directly and I've been able to look into the work that they do with the autistic community, such as funding mental health research and improving the criminal justice system for autistic people. I invite you to do your own research, and please donate to a good cause <3",
+        "slug": "jingle-jam",
+        "url": "https://tiltify.com/@hoxieloxie/jingle-jam",
+        "startTime": "2024-12-08T19:28:03Z",
+        "raised": 1060,
+        "goal": 1000,
+        "livestream": {
+          "channel": "hoxieloxie",
+          "type": "twitch"
+        },
+        "user": {
+          "id": 753418,
+          "name": "hoxieloxie",
+          "slug": "hoxieloxie",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/753418/blob-ea6a697f-6a55-4bef-b347-d79b97d111c5.png",
+          "url": "https://tiltify.com/@hoxieloxie"
+        }
+      },
+      {
+        "causeId": 574,
+        "name": "Secret Mode for WDC 2024",
+        "description": "We're fundraising for Whale and Dolphin Conservation as a part of Jingle Jam 2024!",
+        "slug": "secret-mode-jingle-jam-2024",
+        "url": "https://tiltify.com/@secret-mode/secret-mode-jingle-jam-2024",
+        "startTime": "2024-12-01T17:13:32Z",
+        "raised": 1059.61,
+        "goal": 1100,
+        "livestream": {
+          "channel": "wearesecretmode",
+          "type": "twitch"
+        },
+        "user": {
+          "id": 481725,
+          "name": "Secret Mode",
+          "slug": "secret-mode",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/481725/blob-9730b72c-b939-4019-9e04-2f1c3c951b83.png",
+          "url": "https://tiltify.com/@secret-mode"
+        }
+      },
+      {
+        "causeId": 575,
+        "name": "Pennyfeathers Jingle Jam",
+        "description": "I'm fundraising for Campaign Against Living Miserably (CALM). As someone who has recently lost their mother to suicide this cause means a lot to me and If I raise even enough money to help one person avoid going through what I am, that will be worth it.",
+        "slug": "pennyfeathers-jingle-jam",
+        "url": "https://tiltify.com/@ignatiouspennyfeather/pennyfeathers-jingle-jam",
+        "startTime": "2024-12-01T17:11:49Z",
+        "raised": 1035.69,
+        "goal": 1000,
+        "livestream": {
+          "channel": "ignatiouspennyfeather",
+          "type": "twitch"
+        },
+        "user": {
+          "id": 763131,
+          "name": "ignatiouspennyfeather",
+          "slug": "ignatiouspennyfeather",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/763131/blob-d71285d5-4b53-4376-b08a-e422c6db13c3.png",
+          "url": "https://tiltify.com/@ignatiouspennyfeather"
+        }
+      },
+      {
+        "causeId": 575,
+        "name": "Sands of Hope",
+        "description": "Fundraising for the Jingle Jam 2024, prepare for a night of chaos and fun as we run through the Sands of Hope in new 2024 D&D!",
+        "slug": "sands-of-hope",
+        "url": "https://tiltify.com/@northumbriagrp/sands-of-hope",
+        "startTime": "2024-12-04T15:10:25Z",
+        "raised": 1035,
+        "goal": 1000,
+        "livestream": {
+          "channel": "northumbriagrp",
+          "type": "twitch"
+        },
+        "user": {
+          "id": 196224,
+          "name": "NorthumbriaGRP",
+          "slug": "northumbriagrp",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/196224/blob-26ca051a-d2e3-4be0-a21a-26bfb4c35e08.png",
+          "url": "https://tiltify.com/@northumbriagrp"
+        }
+      },
+      {
+        "causeId": 1229,
+        "name": "Jingle Nyan",
+        "description": "I'm fundraising for Jingle Jam 2024 for the Trevor Project!",
+        "slug": "jinglenyan",
+        "url": "https://tiltify.com/@thenyanpocalypse/jinglenyan",
+        "startTime": "2024-12-02T04:43:58Z",
+        "raised": 1025,
+        "goal": 2000,
+        "livestream": {
+          "channel": "thenyanpocalypse",
+          "type": "twitch"
+        },
+        "user": {
+          "id": 175394,
+          "name": "TheNyanpocalypse",
+          "slug": "thenyanpocalypse",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/175394/blob-31e3b5af-4c1d-4c48-8728-42306db99834.png",
+          "url": "https://tiltify.com/@thenyanpocalypse"
+        }
+      },
+      {
+        "causeId": 575,
+        "name": "Meg & Gem's fundraiser for CALM",
+        "description": "Gem & Meg are fundraising for CALM for Jingle Jam.",
+        "slug": "meg-gems-fundraiser-for-calm",
+        "url": "https://tiltify.com/@gemothy/meg-gems-fundraiser-for-calm",
+        "startTime": "2024-12-03T11:27:58Z",
+        "raised": 1009,
+        "goal": 1000,
+        "livestream": {
+          "channel": "https://assets.tiltify.com/uploads/media_type/image/289836/blob-ef39e8a1-27b8-4225-bc57-6e1758898cf2.jpeg",
+          "type": "image"
+        },
+        "user": {
+          "id": 769170,
+          "name": "gemothy",
+          "slug": "gemothy",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/769170/blob-e14d719c-9242-4cdf-b2e2-2437ec487b2c.png",
+          "url": "https://tiltify.com/@gemothy"
+        }
+      },
+      {
+        "causeId": 1227,
+        "name": "notbella x Cool Earth",
+        "description": "This year I am so excited to be joining in the Jingle Jam fundraising and supporting Cool Earth, a charity that backs people to protect the rainforest and fight climate change!",
+        "slug": "coolearth24",
+        "url": "https://tiltify.com/@notbella/coolearth24",
+        "startTime": "2024-12-01T22:39:40Z",
+        "raised": 1000,
+        "goal": 1000,
+        "livestream": {
+          "channel": "notbella",
+          "type": "twitch"
+        },
+        "user": {
+          "id": 260839,
+          "name": "notbella",
+          "slug": "notbella",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/260839/blob-97eb57e5-a3ba-4b18-9130-cb7ad31226d4.jpeg",
+          "url": "https://tiltify.com/@notbella"
+        }
+      },
+      {
+        "causeId": null,
+        "name": "Jingle Jam Down Under 2024",
+        "description": "Some crazy person got us to 1000 already, now I don't know what to do, send help",
+        "slug": "jingle-jam-down-under-2024",
+        "url": "https://tiltify.com/@justwrightgaming/jingle-jam-down-under-2024",
+        "startTime": "2024-12-02T08:47:53Z",
+        "raised": 1000,
+        "goal": 1200,
+        "livestream": {
+          "channel": "justwrightgaming",
+          "type": "twitch"
+        },
+        "user": {
+          "id": 465529,
+          "name": "JustWrightGaming",
+          "slug": "justwrightgaming",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/465529/blob-e716471c-357f-4b20-b69d-ec2171638284.jpeg",
+          "url": "https://tiltify.com/@justwrightgaming"
+        }
+      },
+      {
+        "causeId": 566,
+        "name": "Chrunchy Christmas 2024",
+        "description": "A Minecraft minigame charity event for streamers, created by CrunchMunch Creations and WraithStation Productions.",
+        "slug": "chrunchy-christmas-2024",
+        "url": "https://tiltify.com/@crunchmunch/chrunchy-christmas-2024",
+        "startTime": "2024-12-11T08:48:46Z",
+        "raised": 1000,
+        "goal": 1000,
+        "livestream": {
+          "channel": null,
+          "type": "twitch"
+        },
+        "user": {
+          "id": 769016,
+          "name": "CrunchMunch",
+          "slug": "crunchmunch",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/769016/blob-6440c9cb-6d38-4433-a3c4-ccd043ad095f.png",
+          "url": "https://tiltify.com/@crunchmunch"
+        }
+      },
+      {
+        "causeId": 566,
+        "name": "Jingle Jam",
+        "description": "I'm fundraising for Jingle Jam.",
+        "slug": "jingle-jam",
+        "url": "https://tiltify.com/@moleman-74/jingle-jam",
+        "startTime": "2024-12-01T19:05:26Z",
+        "raised": 958,
+        "goal": 1000,
+        "livestream": {
+          "channel": "moleman_74",
+          "type": "twitch"
+        },
+        "user": {
+          "id": 340419,
+          "name": "Moleman_74",
+          "slug": "moleman-74",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/340419/blob-1be1bc83-be54-4897-9786-ca3b58570c8d.jpeg",
+          "url": "https://tiltify.com/@moleman-74"
+        }
+      },
+      {
+        "causeId": 565,
+        "name": "TC Jingle Jame 2024",
+        "description": "I'm fundraising for Jingle Jam.",
+        "slug": "tc-jingle-jame-2024",
+        "url": "https://tiltify.com/@tcfreer/tc-jingle-jame-2024",
+        "startTime": "2024-12-01T17:06:28Z",
+        "raised": 905,
+        "goal": 1000,
+        "livestream": {
+          "channel": "https://assets.tiltify.com/uploads/media_type/image/287748/blob-77ec785e-620f-423b-85fe-5a0da43740ad.jpeg",
+          "type": "image"
+        },
+        "user": {
+          "id": 168356,
+          "name": "tcfreer",
+          "slug": "tcfreer",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/168356/blob-ecdea017-c2ad-4176-95c3-eebe5d61a1ed.jpeg",
+          "url": "https://tiltify.com/@tcfreer"
+        }
+      },
+      {
+        "causeId": 588,
+        "name": "Build a Terrible Dungeon for a Good Cause!",
+        "description": "Children have been a vital part of Dungeons & Dragons from the game's very inception. Right now, many children around the world are impacted by ongoing conflicts. Let's take after the adventuring heroes we often play as, and donate what we can for War Child.",
+        "slug": "build-a-terrible-dungeon-for-a-good-cause",
+        "url": "https://tiltify.com/@bluoenix/build-a-terrible-dungeon-for-a-good-cause",
+        "startTime": "2024-12-04T17:53:01Z",
+        "raised": 905,
+        "goal": 1000,
+        "livestream": {
+          "channel": "Worldbuilding_of_Blu",
+          "type": "twitch"
+        },
+        "user": {
+          "id": 350580,
+          "name": "Bluoenix",
+          "slug": "bluoenix",
+          "avatar": "https://assets.tiltify.com/assets/default-avatar.png",
+          "url": "https://tiltify.com/@bluoenix"
+        }
+      },
+      {
+        "causeId": 588,
+        "name": "War Child Charity Drive",
+        "description": "I'm raising money for War Child through Jingle Jam as the Yogscast have ran this amazing charity drive for years and I thought it was a great opportunity for us to do some good as a community!\n\nNo living person needs to go through the horrors of war and carry the trauma for the rest of their life. In an ideal world, children would not be exposed to the violence and distress of conflict but they are. For this reason, I'm looking to raise some money to help people heal.",
+        "slug": "jingle-jam-war-child-charity-drive",
+        "url": "https://tiltify.com/@muffo99/jingle-jam-war-child-charity-drive",
+        "startTime": "2024-12-05T19:07:13Z",
+        "raised": 895,
+        "goal": 1000,
+        "livestream": {
+          "channel": "muffo99",
+          "type": "twitch"
+        },
+        "user": {
+          "id": 349776,
+          "name": "muffo99",
+          "slug": "muffo99",
+          "avatar": "https://assets.tiltify.com/assets/default-avatar.png",
+          "url": "https://tiltify.com/@muffo99"
+        }
+      },
+      {
+        "causeId": 1229,
+        "name": "Waffles Jingle Jam 2024",
+        "description": "Jingle Jam is back! I'm supporting The Trevor Project this year, an organization that provides crisis support for LGBTQ+ youth.",
+        "slug": "waffles-jingle-jam-2024",
+        "url": "https://tiltify.com/@icaruswaffles/waffles-jingle-jam-2024",
+        "startTime": "2024-12-01T20:49:51Z",
+        "raised": 892.29,
+        "goal": 1000,
+        "livestream": {
+          "channel": "icaruswaffles",
+          "type": "twitch"
+        },
+        "user": {
+          "id": 362976,
+          "name": "IcarusWaffles",
+          "slug": "icaruswaffles",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/362976/blob-9c22e23a-d3c5-468c-9166-a2bd362321d3.png",
+          "url": "https://tiltify.com/@icaruswaffles"
+        }
+      },
+      {
+        "causeId": 566,
+        "name": "HALF PEEPS Jingle Jam 2024",
+        "description": "It's that time of year again! We are raising money for the 2024 Yogscast Jingle Jam! Donate £35 or more and get access to a bunch of games!  To get the Jingle Jam games collection, make sure to select it when donating!",
+        "slug": "jinglejam2024",
+        "url": "https://tiltify.com/@half-peeps/jinglejam2024",
+        "startTime": "2024-12-01T17:14:15Z",
+        "raised": 885,
+        "goal": 850,
+        "livestream": {
+          "channel": "-G5jBYG6Ad4",
+          "type": "youtube_video"
+        },
+        "user": {
+          "id": 470250,
+          "name": "HALF PEEPS",
+          "slug": "half-peeps",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/470250/blob-ea0d7a7f-fd60-4772-9a0f-0d7cc0b335f3.png",
+          "url": "https://tiltify.com/@half-peeps"
+        }
+      },
+      {
+        "causeId": 575,
+        "name": "CALM x lossayyy",
+        "description": "I'm fundraising for Jingle Jam.",
+        "slug": "calm-x-lossayyy",
+        "url": "https://tiltify.com/@lossayyy/calm-x-lossayyy",
+        "startTime": "2024-12-01T20:19:40Z",
+        "raised": 879.69,
+        "goal": 969.69,
+        "livestream": {
+          "channel": "lossayyy",
+          "type": "twitch"
+        },
+        "user": {
+          "id": 418803,
+          "name": "lossayyy",
+          "slug": "lossayyy",
+          "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/418803/blob-fb48948f-a28d-4dd1-ba00-b792ea6bb1af.jpeg",
+          "url": "https://tiltify.com/@lossayyy"
+        }
+      },
+      {
+        "causeId": 566,
+        "name": "Sweetvillain's Jingle Jamboree",
+        "description": "I'm fundraising for Jingle Jam.",
+        "slug": "sweetvillains-jingle-jamboree",
+        "url": "https://tiltify.com/@sweetvillain/sweetvillains-jingle-jamboree",
+        "startTime": "2024-12-01T17:15:24Z",
+        "raised": 865,
+        "goal": 850,
+        "livestream": {
+          "channel": "sweetvillain",
+          "type": "twitch"
+        },
+        "user": {
+          "id": 583174,
+          "name": "SweetVillain",
+          "slug": "sweetvillain",
+          "avatar": "https://assets.tiltify.com/assets/default-avatar.png",
+          "url": "https://tiltify.com/@sweetvillain"
+        }
+      }
+    ]
+  }
+}
