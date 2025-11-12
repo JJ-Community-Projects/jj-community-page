@@ -36,7 +36,7 @@ const useCommunityPageHook = () => {
   const campaignsByCause = () => {
     if (!causeQuery.data) return []
     if (!communityQuery.data) return []
-    return causeQuery.data!.list.map((cause) => {
+    return causeQuery.data!.causes.map((cause) => {
       return {
         cause: cause,
         campaigns: communityQuery.data!.list.filter(
