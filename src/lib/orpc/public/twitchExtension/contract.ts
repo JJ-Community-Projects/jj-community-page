@@ -26,6 +26,7 @@ export const JJCauseSchema = z.object({
   name: z.string(),
   logo: z.string().url(), // logo is always a URL
   description: z.string(),
+  color: z.string().optional(),
   url: z.string().url(),
   donateUrl: z.string().url(),
   raised: JJRaisedSchema,

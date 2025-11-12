@@ -23,10 +23,19 @@ export const JJCauseSchema = z.object({
   name: z.string(),
   logo: z.string().url(), // logo is always a URL
   description: z.string(),
+  color: z.string().optional(),
   url: z.string().url(),
   donateUrl: z.string().url(),
   raised: JJRaisedSchema,
 })
+
+export const SimpleCampaignTag = z.object({
+  name: z.string(),
+  slug: z.string(),
+  color: z.string(),
+})
+
+export type SimpleCampaignTag = z.infer<typeof SimpleCampaignTag>
 
 const JJCampaignSchema = z.object({
   campaignName: z.string(),
@@ -39,6 +48,9 @@ const JJCampaignSchema = z.object({
   twitch: z.string().optional(),
   isTwitchLive: z.boolean(),
   youtube: z.string().optional(),
+  scheduleUrl: z.string().optional(),
+  // NEW tags for the user
+  tags: z.array(SimpleCampaignTag).default([]),
 })
 
 export const JJCampaignsSchema = z.object({
@@ -125,7 +137,7 @@ const campaignsContract = oc.output(JJCampaignsSchema)
 const causesContract = oc.output(
   z.object({
     count: z.number(),
-    list: z.array(JJCauseSchema),
+    causes: z.array(JJCauseSchema),
   }),
 )
 

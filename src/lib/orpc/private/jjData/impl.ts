@@ -1,6 +1,6 @@
 import { contracts } from './contract.ts'
 import { dbMiddleware } from '../../middleware/dbMiddleware.ts'
-import { implement } from '@orpc/server'
+import { implement, ORPCError } from '@orpc/server'
 import { cacheMiddleware } from '../../middleware/cacheControl.ts'
 import { and, asc, eq, or, sql } from 'drizzle-orm'
 import {
@@ -41,9 +41,10 @@ const campaigns = os.campaignsContract
           list: [],
         }
       }
+      console.log(data.list[0])
       return data
     } catch (e) {
-      console.log(JSON.stringify(e, null, 2))
+      console.error(e)
       throw e
     }
   })
@@ -62,14 +63,16 @@ const causes = os.causesContract
     const stubID = DO.idFromName('JJ_API_CACHE')
     const stub = DO.get(stubID)
 
-    const causes = await stub.getCauses()
-    if (!causes) {
-      return { count: 0, list: [] }
-    }
+    try {
+      const causes = await stub.getCausesDisplay()
+      if (!causes) {
+        return { count: 0, causes: [] }
+      }
 
-    return {
-      count: causes.length,
-      list: causes,
+      return causes
+    } catch (e) {
+      console.error(e)
+      throw new ORPCError('INTERNAL_SERVER_ERROR')
     }
   })
 

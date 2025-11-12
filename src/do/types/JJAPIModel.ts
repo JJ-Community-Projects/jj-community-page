@@ -31,7 +31,7 @@ export interface JJHistoryItem {
 }
 
 export interface JJCause {
-  id: number;
+  id: number | string;
   name: string;
   logo: string;
   description: string;
@@ -46,7 +46,7 @@ export interface JJLivestream {
 }
 
 export interface JJUser {
-  id: number;
+  id: number | string;
   name: string;
   slug: string;
   avatar: string;
@@ -54,7 +54,7 @@ export interface JJUser {
 }
 
 export interface JJCampaign {
-  causeId: number | null;
+  causeId: number | string | null;
   name: string;
   description: string;
   slug: string;

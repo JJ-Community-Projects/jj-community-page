@@ -18,7 +18,12 @@ import type {
   JJCampaignTVType,
   JJCauseTVType,
 } from '../lib/orpc/public/twitchExtension/contract.ts'
-import type { JJCampaignType } from '../lib/orpc/private/jjData/contract.ts'
+import type { JJCampaignType, SimpleCampaignTag, } from '../lib/orpc/private/jjData/contract.ts'
+import { and, eq, or } from 'drizzle-orm'
+import { schedulesTable } from '../lib/db/schema/jj-schema.ts'
+import { userDisplayView } from '../lib/db/schema/views-schema.ts'
+import { stringToNumber } from '../lib/utils/stringToNumber.ts'
+import { tags, userTagsTable } from '../lib/db/schema/tags-schema.ts'
 
 export class JingleJamData extends DurableObject<Env> {
   replaceMap: Map<string, string> = new Map([
@@ -57,12 +62,16 @@ export class JingleJamData extends DurableObject<Env> {
 
   // Campaigns
   public async setCampaign(campaign: JJCampaign) {
-    await this.storage.put(this.campaignKey(campaign.user.id), campaign)
+    const id = await stringToNumber(campaign.user.id)
+    await this.storage.put(this.campaignKey(id), campaign)
   }
 
   public async setCampaigns(campaigns: JJCampaign[]) {
     const entries: Record<string, JJCampaign> = {}
-    for (const c of campaigns) entries[this.campaignKey(c.user.id)] = c
+    for (const c of campaigns) {
+      const id = await stringToNumber(c.user.id)
+      entries[this.campaignKey(id)] = c
+    }
     await this.storage.put(entries)
   }
 
@@ -94,7 +103,37 @@ export class JingleJamData extends DurableObject<Env> {
       )
     }
 
-    const data = (await res.json()) as JingleJamResponse
+    let data = (await res.json()) as JingleJamResponse
+    const newCauseIds = new Map<string | number, number>()
+
+    for (let i = 0; i < data.causes.length; i++) {
+      const cause = data.causes[i]
+      newCauseIds.set(cause.id, i)
+    }
+
+    data = {
+      ...data,
+      causes: data.causes.map((c, i) => {
+        return {
+          ...c,
+          id: newCauseIds.get(c.id) ?? i,
+        }
+      }),
+      campaigns: {
+        count: data.campaigns.count,
+        list: data.campaigns.list.map((c, i) => {
+          const causeId = c.causeId ? (newCauseIds.get(c.causeId) ?? i) : null
+          return {
+            ...c,
+            causeId: causeId,
+            user: {
+              ...c.user,
+              id: i,
+            },
+          }
+        }),
+      },
+    }
 
     // Update DO storage (granular)
     try {
@@ -162,41 +201,45 @@ export class JingleJamData extends DurableObject<Env> {
       }
 
       // Prepare rows
-      const causeRows = data.causes.map((cause) => ({
-        id: cause.id,
-        year: data.event.year,
-        name: cause.name,
-        logo: cause.logo,
-        description: cause.description,
-        url: cause.url,
-        donateUrl: cause.donateUrl,
-        raised: cause.raised,
-      }))
+      const causeRows = await Promise.all(
+        data.causes.map(async (cause) => ({
+          id: await stringToNumber(cause.id),
+          year: data.event.year,
+          name: cause.name,
+          logo: cause.logo,
+          description: cause.description,
+          url: cause.url,
+          donateUrl: cause.donateUrl,
+          raised: cause.raised,
+        })),
+      )
 
-      const campaignRows = data.campaigns.list.map((c) => ({
-        year: data.event.year,
-        causeId: c.causeId,
-        name: c.name,
-        description: c.description,
-        slug: c.slug,
-        url: c.url,
-        startTime: c.startTime,
-        raised: c.raised,
-        goal: c.goal,
-        livestream: {
-          channel: c.livestream?.channel ?? '',
-          type: c.livestream?.type ?? '',
-        },
-        userId: c.user.id,
-        userName: c.user.name,
-        userSlug: c.user.slug,
-        userAvatar: c.user.avatar,
-        userUrl: c.user.url,
-      }))
+      const campaignRows = await Promise.all(
+        data.campaigns.list.map(async (c) => ({
+          year: data.event.year,
+          causeId: c.causeId ? await stringToNumber(c.causeId!) : null,
+          name: c.name,
+          description: c.description,
+          slug: c.slug,
+          url: c.url,
+          startTime: c.startTime,
+          raised: c.raised,
+          goal: c.goal,
+          livestream: {
+            channel: c.livestream?.channel ?? '',
+            type: c.livestream?.type ?? '',
+          },
+          userId: await stringToNumber(c.user.id),
+          userName: c.user.name,
+          userSlug: c.user.slug,
+          userAvatar: c.user.avatar,
+          userUrl: c.user.url,
+        })),
+      )
 
       // Estimate columns per row (must match the values object shape)
-      const CAUSE_COLS = 8
-      const CAMPAIGN_COLS = 16 // adjust to exact count if different
+      const CAUSE_COLS = 4
+      const CAMPAIGN_COLS = 4 // adjust to exact count if different
 
       const causeChunkSize = Math.max(1, Math.floor(VARS_LIMIT / CAUSE_COLS))
       const campaignChunkSize = Math.max(
@@ -563,7 +606,9 @@ export class JingleJamData extends DurableObject<Env> {
           tiltifyUrl: c.url,
           tiltifyName: c.user.name,
           tiltifyDescription: c.description,
-          tiltifyCauseId: c.causeId ?? undefined,
+          tiltifyCauseId: c.causeId
+            ? await stringToNumber(c.causeId)
+            : undefined,
           avatar: c.user.avatar ?? '',
           raised: this.toCurrencies(c.raised, usdRate, eurRate),
           goal: this.toCurrencies(c.goal, usdRate, eurRate),
@@ -623,28 +668,30 @@ export class JingleJamData extends DurableObject<Env> {
         }
       }
 
-      const causes: JJCauseTVType[] = data.causes.map((c) => {
-        const yog = toCurrencies(c.raised.yogscast, usdRate, eurRate)
-        const fund = toCurrencies(c.raised.fundraisers, usdRate, eurRate)
-        const total = toCurrencies(
-          parseFloat((c.raised.fundraisers + c.raised.yogscast).toFixed(2)),
-          usdRate,
-          eurRate,
-        )
-        return {
-          id: c.id,
-          name: c.name,
-          logo: c.logo,
-          description: c.description,
-          url: c.url,
-          donateUrl: c.donateUrl,
-          raised: {
-            yogscast: yog,
-            fundraisers: fund,
-            total,
-          },
-        }
-      })
+      const causes: JJCauseTVType[] = await Promise.all(
+        data.causes.map(async (c) => {
+          const yog = toCurrencies(c.raised.yogscast, usdRate, eurRate)
+          const fund = toCurrencies(c.raised.fundraisers, usdRate, eurRate)
+          const total = toCurrencies(
+            parseFloat((c.raised.fundraisers + c.raised.yogscast).toFixed(2)),
+            usdRate,
+            eurRate,
+          )
+          return {
+            id: await stringToNumber(c.id),
+            name: c.name,
+            logo: c.logo,
+            description: c.description,
+            url: c.url,
+            donateUrl: c.donateUrl,
+            raised: {
+              yogscast: yog,
+              fundraisers: fund,
+              total,
+            },
+          }
+        }),
+      )
 
       await Promise.all(causes.map((c) => this.setCause(c)))
 
@@ -687,6 +734,83 @@ export class JingleJamData extends DurableObject<Env> {
     try {
       const usdRate = data.avgConversionRate
       const eurRate = await this.getGbpToEurRate()
+      const slugs = Array.from(
+        new Set(
+          data.campaigns.list
+            .map((c) => c.user?.slug)
+            .filter((s): s is string => Boolean(s)),
+        ),
+      )
+
+      let scheduleByTiltify = new Map<string, string>()
+      const year = new Date().getFullYear()
+      if (slugs.length > 0) {
+        try {
+          const db = getDB(this.env)
+          const slugPred = or(
+            ...slugs.map((s) => eq(userDisplayView.tiltifySlug, s)),
+          )
+          const rows = await db
+            .select({
+              tiltifySlug: userDisplayView.tiltifySlug,
+              scheduleSlug: schedulesTable.slug,
+            })
+            .from(schedulesTable)
+            .innerJoin(
+              userDisplayView,
+              eq(userDisplayView.userId, schedulesTable.ownerId),
+            )
+            .where(
+              and(
+                eq(schedulesTable.year, year),
+                eq(schedulesTable.visible, true),
+                // If you only want to expose primary schedules uncomment:
+                eq(schedulesTable.primary, true),
+                slugPred,
+              ),
+            )
+            .all()
+          scheduleByTiltify = new Map(
+            rows.map((r) => [r.tiltifySlug, r.scheduleSlug]),
+          )
+        } catch (e) {
+          console.error('schedule lookup failed', e)
+        }
+      }
+
+      // Build a map: tiltifySlug -> Tag[]
+      let tagsByTiltify = new Map<string, SimpleCampaignTag[]>()
+      if (slugs.length > 0) {
+        try {
+          const db = getDB(this.env)
+          const slugPred = or(
+            ...slugs.map((s) => eq(userDisplayView.tiltifySlug, s)),
+          )
+          const tagRows = await db
+            .select({
+              tiltifySlug: userDisplayView.tiltifySlug,
+              name: tags.name,
+              slug: tags.slug,
+              color: tags.color,
+            })
+            .from(userDisplayView)
+            .innerJoin(
+              userTagsTable,
+              eq(userTagsTable.userId, userDisplayView.userId),
+            )
+            .innerJoin(tags, eq(tags.id, userTagsTable.tagId))
+            .where(slugPred)
+            .all()
+
+          for (const r of tagRows) {
+            const list = tagsByTiltify.get(r.tiltifySlug) ?? []
+            list.push({ name: r.name, slug: r.slug, color: r.color })
+            tagsByTiltify.set(r.tiltifySlug, list)
+          }
+        } catch (e) {
+          console.error('tags lookup failed', e)
+        }
+      }
 
       const list = await Promise.all(
         data.campaigns.list.map(async (c) => {
@@ -713,19 +837,27 @@ export class JingleJamData extends DurableObject<Env> {
           const val = await this.storage.get<boolean>(
             `campaign:live:${c.user.id}`,
           )
+          const sSlug = c.user?.slug
+            ? scheduleByTiltify.get(c.user.slug)
+            : undefined
 
           const display: JJCampaignType = {
             campaignName: c.name,
             tiltifyUrl: c.url,
             tiltifyName: c.user.name,
             tiltifyDescription: c.description || undefined,
-            tiltifyCauseId: c.causeId ?? undefined,
+            tiltifyCauseId: c.causeId
+              ? await stringToNumber(c.causeId)
+              : undefined,
             avatar: twitchAvatar ?? c.user.avatar ?? '',
             raised: this.toCurrencies(c.raised, usdRate, eurRate),
             twitch,
             youtube,
             isTwitchLive: val ?? false,
+            scheduleUrl: sSlug ? `/schedules/${sSlug}` : undefined,
+            tags: tagsByTiltify.get(c.user.slug) ?? [],
           }
+
           return display
         }),
       )
@@ -775,11 +907,11 @@ export class JingleJamData extends DurableObject<Env> {
   }
 
   // Key helpers
-  private campaignKey(userId: number) {
+  private campaignKey(userId: number | string) {
     return `campaign:api:${userId}`
   }
 
-  private causeKey(causeId: number) {
+  private causeKey(causeId: number | string) {
     return `cause:${causeId}`
   }
 
