@@ -27,6 +27,11 @@ export async function scheduled(
       } catch (e) {
         console.error(e)
       }
+      try {
+        await stub.buildAndStoreUserTags()
+      } catch (e) {
+        console.error(e)
+      }
       break
   }
 }
