@@ -1,5 +1,6 @@
 import z from 'zod/v4'
 import { oc } from '@orpc/contract'
+import { SimplePublicTagSchema } from '../../public/schemas/tags.ts'
 
 // JJRaised schema (used inside JJCause)
 const CurrenciesSchema = z.object({
@@ -144,9 +145,19 @@ const causesContract = oc.output(
 )
 
 const upcomingStreamsContract = oc.output(UserStreamsSchema)
+export const UserWithInfoTags = SimplePublicTagSchema.extend({ usage: z.number() })
+export type UserWithInfoTags = z.infer<typeof UserWithInfoTags>
+export const UserWithInfo  = UserDisplaySchema.extend({
+  tags: z.array(UserWithInfoTags),
+  scheduleUrl: z.string().optional(),
+})
+export type UserWithInfo = z.infer<typeof UserWithInfo>
+
+const getAllUsersWithInfoContract = oc.output(z.array(UserWithInfo))
 
 export const contracts = {
   campaignsContract,
   causesContract,
   upcomingStreamsContract,
+  getAllUsersWithInfoContract
 }
