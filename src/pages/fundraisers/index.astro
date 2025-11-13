@@ -1,14 +1,3 @@
 ---
-import BaseLayout from '../../layouts/BaseLayout.astro'
-import { CommunityPage } from '../../components/features/community/CommunityPage.tsx'
+return Astro.redirect('/community')
 ---
-
-<BaseLayout
-  title="The Jingle Jam Community"
-  description="A central place to showcase the streams of the Jingle Jam!"
-  canonical="https://jinglejam.ostof.dev/community"
->
-  <div class="w-full flex flex-col justify-center items-stretch gap-4">
-    <CommunityPage client:only="solid-js" />
-  </div>
-</BaseLayout>

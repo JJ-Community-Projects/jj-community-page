@@ -46,8 +46,7 @@ export const MobileNav: Component<MobileNavProps> = (props) => {
         ref={setRef}
       >
         <a href="/">Home</a>
-        <a href="/fundraisers">Fundraisers</a>
-        <a href="/users">Users</a>
+        <a href="/community">Community</a>
         <a href="/teams">Teams</a>
         <div class="group relative">
           <a

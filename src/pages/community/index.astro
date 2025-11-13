@@ -1,13 +1,14 @@
 ---
-import BaseLayout from "../../layouts/BaseLayout.astro";
-import {CommunityPage} from "../../components/features/community/CommunityPage.tsx";
-
+import BaseLayout from '../../layouts/BaseLayout.astro'
+import { CommunityPage } from '../../components/features/community/CommunityPage.tsx'
 ---
+
 <BaseLayout
   title="The Jingle Jam Community"
   description="A central place to showcase the streams of the Jingle Jam!"
   canonical="https://jinglejam.ostof.dev/community"
 >
-    <p class="text-white ~text-2xl/4xl">Community</p>
-    <CommunityPage client:only="solid-js"/>
+  <div class="w-full flex flex-col justify-center items-stretch gap-4">
+    <CommunityPage client:only="solid-js" />
+  </div>
 </BaseLayout>

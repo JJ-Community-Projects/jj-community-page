@@ -219,7 +219,7 @@ const Header: Component = () => {
         <div class="flex flex-col items-center text-center md:items-start md:text-left">
           <div class="flex items-center gap-2">
             <FaSolidHeart class="h-8 w-8 text-neutral-600" />
-            <h1 class="font-bold text-black ~text-2xl/4xl">Fundraisers</h1>
+            <h1 class="font-bold text-black ~text-2xl/4xl">Community</h1>
           </div>
           <h2 class={'font-semibold text-black'}>
             Fundraisers and upcoming streams
