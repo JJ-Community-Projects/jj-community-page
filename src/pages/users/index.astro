@@ -1,7 +1,7 @@
 ---
 import { serverClientPublic } from '../../lib/orpc/serverClient'
 import UsersPage from '../../components/features/users/public/UsersPage'
-import BaseLayout4xl from '../../layouts/BaseLayout4xl.astro'
+import BaseLayout from '../../layouts/BaseLayout.astro'
 import UsersIndexHeader from '../../components/features/users/public/UsersIndexHeader'
 
 // Get all users in UserPageUI format
@@ -16,7 +16,7 @@ const { data, error } = await serverClientPublic.users.getAllUsersWithTags(
 )
 ---
 
-<BaseLayout4xl title="Users - Jingle Jam Community">
+<BaseLayout title="Users - Jingle Jam Community">
   {
     error && (
       <div class="bg-red-500 bg-opacity-20 p-4 rounded-lg text-white mb-6">
@@ -36,4 +36,4 @@ const { data, error } = await serverClientPublic.users.getAllUsersWithTags(
       </div>
     )
   }
-</BaseLayout4xl>
+</BaseLayout>
