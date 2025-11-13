@@ -30,9 +30,11 @@ export const JJCauseSchema = z.object({
 })
 
 export const SimpleCampaignTag = z.object({
+  id: z.number(),
   name: z.string(),
   slug: z.string(),
   color: z.string(),
+  usage: z.number(),
 })
 
 export type SimpleCampaignTag = z.infer<typeof SimpleCampaignTag>
