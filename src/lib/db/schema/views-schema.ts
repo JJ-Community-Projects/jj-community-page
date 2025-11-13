@@ -4,6 +4,7 @@ import { streamParticipantsTable } from './jj-schema'
 import { accounts, users, userSocials, userStyles } from './auth-schema'
 import { and, eq, sql } from 'drizzle-orm'
 import { twitchChannelSchema } from './twitch-channel-schema.ts'
+import { tags, userTagsTable } from './tags-schema.ts'
 
 
 /**
@@ -79,7 +80,7 @@ export const userDisplayView = sqliteView('user_display_view').as((qb) => {
         ELSE ${tiltifyMetadataView.avatarSrc} 
       END`.as('profile_image'),
       twitchLogin: twitchChannelSchema.login,
-      tiltifySlug: tiltifyMetadataView.slug,
+      tiltifySlug: sql<string>`${tiltifyMetadataView.slug}`.as('tiltify_slug'),
       tiltifyUrl: tiltifyMetadataView.url,
       primaryColor: userStyles.primaryColor,
       accentColor: userStyles.accentColor,
@@ -175,4 +176,19 @@ export const streamParticipantsDisplayView = sqliteView(
       userDisplayView,
       eq(streamParticipantsTable.userId, userDisplayView.userId)
     )
+})
+
+
+export const tagUserCountsView = sqliteView('tag_user_counts_view').as((qb) => {
+  return qb
+    .select({
+      tagId: tags.id,
+      tagSlug: sql<string>`${tags.slug}`.as('tag_slug'),
+      tagName: tags.name,
+      tagVisible: tags.visible,
+      userCount: sql<number>`COUNT(${userTagsTable.userId})`.as('user_count'),
+    })
+    .from(tags)
+    .leftJoin(userTagsTable, eq(userTagsTable.tagId, tags.id))
+    .groupBy(tags.id, tags.slug, tags.name, tags.visible)
 })

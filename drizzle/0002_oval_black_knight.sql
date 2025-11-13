@@ -1,0 +1,1 @@
+CREATE VIEW `tag_user_counts_view` AS select "tags"."id", "tags"."slug", "tags"."name", "tags"."visible", COUNT("user_tags"."user_id") as "user_count" from "tags" left join "user_tags" on "user_tags"."tag_id" = "tags"."id" group by "tags"."id", "tags"."slug", "tags"."name", "tags"."visible";

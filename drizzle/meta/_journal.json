@@ -8,6 +8,27 @@
       "when": 1761043280713,
       "tag": "0000_fresh_barracuda",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1763044066475,
+      "tag": "0001_bumpy_falcon",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1763050699643,
+      "tag": "0002_oval_black_knight",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1763050752471,
+      "tag": "0003_tiny_phantom_reporter",
+      "breakpoints": true
     }
   ]
 }
