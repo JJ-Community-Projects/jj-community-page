@@ -20,6 +20,7 @@ const refreshJJAPIData = os.refreshJJAPIDataContract.handler(
     const stub = DO.get(stubID)
     try {
       await stub.refresh()
+      await stub.buildAndStoreUserTags()
       await stub.validateTwitchChannels()
       await stub.checkLiveStreams()
       await stub.refresh()
