@@ -13,6 +13,7 @@ import { FaSolidHeart } from 'solid-icons/fa'
 import { UpcomingStreams } from './UpcomingStreams.tsx'
 import { CommunityItem } from './CommunityItem.tsx'
 import { CommunityCauseCard } from './CommunityCauseCard.tsx'
+import { CommunityUsers } from './CommunityUsers.tsx'
 
 export const CommunityPage: Component = () => {
   const i18n = createI18n({ language: useLocale().locale() })
@@ -293,6 +294,7 @@ const CampaignGrid: Component = () => {
           }}
         </For>
       </div>
+      <CommunityUsers />
     </div>
   )
 }

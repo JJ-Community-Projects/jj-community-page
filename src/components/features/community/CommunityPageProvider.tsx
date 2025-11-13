@@ -24,6 +24,12 @@ const useCommunityPageHook = () => {
       refetchInterval: 60_000 * 10,
     }),
   )
+  const users = useQuery(() =>
+    orpcPrivate.jj.getAllUsersWithInfo.queryOptions({
+      staleTime: 60_000 * 8,
+      refetchInterval: 60_000 * 10,
+    }),
+  )
 
   const [sortBy, setSortBy] = makePersisted(
     createSignal<'raised' | 'live' | 'cause'>('live'),
@@ -81,6 +87,7 @@ const useCommunityPageHook = () => {
     setCurrency,
     campaignsSorted,
     campaignsByCause,
+    users,
   }
 }
 
