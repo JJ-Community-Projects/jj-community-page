@@ -41,3 +41,4 @@ http/http-client.private.env.json
 /.junie/
 /.tmp/
 /.tmp
+/http/
