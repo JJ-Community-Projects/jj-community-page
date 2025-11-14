@@ -52,6 +52,9 @@ export class JingleJamData extends DurableObject<Env> {
     ['inthelittlewood', 'inthelittlewood'],
     ['ravs', 'ravs_'],
     ['sips-yogscast', 'sips_'],
+    ['pedguin', 'pedguin'],
+    ['highrollersdnd', 'highrollersdnd'],
+    ['jackmanifoldtv', 'jackmanifoldtv'],
   ])
 
   private get storage() {
