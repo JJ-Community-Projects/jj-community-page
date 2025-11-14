@@ -1,4 +1,4 @@
-import {z} from "zod/v4";
+import { z } from 'zod/v4'
 
 /**
  * Schedule management schemas for private oRPC procedures.
@@ -40,6 +40,8 @@ export const ScheduleSchema = z.object({
   /** When the schedule was last updated */
   updatedAt: z.date()
 });
+
+export type Schedule = z.infer<typeof ScheduleSchema>;
 
 /**
  * Schema for schedule creation response.
