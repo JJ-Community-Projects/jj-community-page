@@ -39,6 +39,17 @@ const useCommunityPageHook = () => {
     createSignal<'GBP' | 'USD' | 'EUR'>('GBP'),
   )
 
+  // Selected tags for community page filtering/searching
+  const [selectedTagIds, setSelectedTagIds] = createSignal<number[]>([])
+
+  const addSelectedTag = (id: number) => {
+    setSelectedTagIds((prev) => (prev.includes(id) ? prev : [...prev, id]))
+  }
+  const removeSelectedTag = (id: number) => {
+    setSelectedTagIds((prev) => prev.filter((x) => x !== id))
+  }
+  const clearSelectedTags = () => setSelectedTagIds([])
+
   const campaignsByCause = () => {
     if (!causeQuery.data) return []
     if (!communityQuery.data) return []
@@ -70,11 +81,62 @@ const useCommunityPageHook = () => {
     })
   }
 
-  const campaignsSorted = createMemo(() => {
-    if (sortBy() === 'live') {
-      return campaignsSortedByLiveFirst()
+  // Helper: compute match count of an entity's tags vs selectedTagIds
+  const matchCount = (tagIds: number[]) => {
+    const selected = selectedTagIds()
+    if (selected.length === 0) return 0
+    let c = 0
+    for (let i = 0; i < tagIds.length; i++) {
+      if (selected.includes(tagIds[i])) c++
     }
-    return campaignsSortedByRaised()
+    return c
+  }
+
+  const baseSortedCampaigns = () => (sortBy() === 'live' ? campaignsSortedByLiveFirst() : campaignsSortedByRaised())
+
+  // Sorted campaigns with optional tag filtering and prioritization
+  const campaignsSorted = createMemo(() => {
+    const base = baseSortedCampaigns()
+    const selected = selectedTagIds()
+    if (selected.length === 0) return base
+    return base
+      .map((c, i) => ({ c, i, mc: matchCount(c.tags.map((t) => t.id)) }))
+      .filter((x) => x.mc > 0)
+      .toSorted((a, b) => {
+        if (a.mc !== b.mc) return b.mc - a.mc
+        return a.i - b.i
+      })
+      .map((x) => x.c)
+  })
+
+  // filtered/prioritized users by selected tags
+  const usersFiltered = createMemo(() => {
+    const selected = selectedTagIds()
+    const list = users.data ? users.data : []
+    if (selected.length === 0) return list
+    return list
+      .map((u, i) => ({ u, i, mc: matchCount(u.tags.map((t) => t.tagId)) }))
+      .filter((x) => x.mc > 0)
+      .toSorted((a, b) => (a.mc !== b.mc ? b.mc - a.mc : a.i - b.i))
+      .map((x) => x.u)
+  })
+
+  // campaigns by cause with tag filtering/prioritization
+  const campaignsByCauseFiltered = createMemo(() => {
+    const selected = selectedTagIds()
+    if (!causeQuery.data || !communityQuery.data) return [] as ReturnType<typeof campaignsByCause>
+    const allByCause = campaignsByCause()
+    if (selected.length === 0) return allByCause
+    return allByCause
+      .map((entry) => {
+        const enriched = entry.campaigns
+          .map((c, i) => ({ c, i, mc: matchCount(c.tags.map((t) => t.id)) }))
+          .filter((x) => x.mc > 0)
+          .toSorted((a, b) => (a.mc !== b.mc ? b.mc - a.mc : a.i - b.i))
+          .map((x) => x.c)
+        return { cause: entry.cause, campaigns: enriched }
+      })
+      .filter((e) => e.campaigns.length > 0)
   })
 
   return {
@@ -88,6 +150,13 @@ const useCommunityPageHook = () => {
     campaignsSorted,
     campaignsByCause,
     users,
+    // tag selection state (community page)
+    selectedTagIds,
+    addSelectedTag,
+    removeSelectedTag,
+    clearSelectedTags,
+    usersFiltered,
+    campaignsByCauseFiltered,
   }
 }
 

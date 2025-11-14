@@ -145,9 +145,13 @@ const causesContract = oc.output(
 )
 
 const upcomingStreamsContract = oc.output(UserStreamsSchema)
-export const UserWithInfoTags = SimplePublicTagSchema.extend({ usage: z.number() })
+export const UserWithInfoTags = SimplePublicTagSchema.extend({
+  tagId: z.number(),
+  usage: z.number(),
+})
+
 export type UserWithInfoTags = z.infer<typeof UserWithInfoTags>
-export const UserWithInfo  = UserDisplaySchema.extend({
+export const UserWithInfo = UserDisplaySchema.extend({
   tags: z.array(UserWithInfoTags),
   scheduleUrl: z.string().optional(),
 })
@@ -159,5 +163,5 @@ export const contracts = {
   campaignsContract,
   causesContract,
   upcomingStreamsContract,
-  getAllUsersWithInfoContract
+  getAllUsersWithInfoContract,
 }

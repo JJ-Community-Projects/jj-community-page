@@ -338,6 +338,7 @@ const getAllUsersWithInfo = os.getAllUsersWithInfoContract.handler(
       const topTagsPerUser = db
         .select({
           userId: userTagsTable.userId,
+          tagId: tagUserCountsView.tagId,
           tagName: tagUserCountsView.tagName,
           tagSlug: tagUserCountsView.tagSlug,
           color: tags.color,
@@ -359,6 +360,7 @@ const getAllUsersWithInfo = os.getAllUsersWithInfoContract.handler(
         .select({
           userId: topTagsPerUser.userId,
           tagsJson: sql<string>`json_group_array(json_object(
+      'tagId', ${topTagsPerUser.tagId},
       'name', ${topTagsPerUser.tagName},
       'slug', ${topTagsPerUser.tagSlug},
       'color', ${topTagsPerUser.color},

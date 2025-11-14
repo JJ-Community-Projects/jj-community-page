@@ -4,8 +4,9 @@ import { CommunityUserItem } from './CommunityUserItem.tsx'
 import { twMerge } from 'tailwind-merge'
 
 export const CommunityUsers: Component = (props) => {
-  const { users } = useCommunityPage()
-  const list = () => (users.data ? users.data : [])
+  const { users, selectedTagIds, clearSelectedTags, usersFiltered } = useCommunityPage()
+  const anyTagsSelected = () => selectedTagIds().length > 0
+  const list = () => (anyTagsSelected() ? usersFiltered() : users.data ? users.data : [])
   return (
     <>
       <Show when={users.isLoading}>
@@ -43,7 +44,21 @@ export const CommunityUsers: Component = (props) => {
         </div>
       </Show>
       <Show when={users.isSuccess && list().length === 0}>
-        <p class={'text-white/80'}>No users found.</p>
+        <div class={'flex flex-col items-center gap-2 text-white/90'}>
+          <p>
+            {anyTagsSelected()
+              ? 'No users match the selected tags.'
+              : 'No users found.'}
+          </p>
+          <Show when={anyTagsSelected()}>
+            <button
+              class={'rounded-lg bg-white/10 px-3 py-1 text-sm font-semibold text-white hover:bg-white/20'}
+              onClick={() => clearSelectedTags()}
+            >
+              Clear selected tags
+            </button>
+          </Show>
+        </div>
       </Show>
     </>
   )

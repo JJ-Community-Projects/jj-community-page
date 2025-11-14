@@ -14,6 +14,7 @@ import { UpcomingStreams } from './UpcomingStreams.tsx'
 import { CommunityItem } from './CommunityItem.tsx'
 import { CommunityCauseCard } from './CommunityCauseCard.tsx'
 import { CommunityUsers } from './CommunityUsers.tsx'
+import { CommunityTagSearch } from './CommunityTagSearch.tsx'
 
 export const CommunityPage: Component = () => {
   const i18n = createI18n({ language: useLocale().locale() })
@@ -39,10 +40,10 @@ const _CommunityPage: Component = () => {
   return (
     <I18nProvider i18n={i18n}>
       <Show when={community.isSuccess}>
-        <Show when={campaignsSorted().length > 0}>
+        <Show when={community.data!.list.length > 0}>
           <Body />
         </Show>
-        <Show when={campaignsSorted().length === 0}>
+        <Show when={community.data!.list.length === 0}>
           <Show when={!isBefore()}>
             <p class={'text-center text-white'}>No Fundraisers found.</p>
           </Show>
@@ -249,6 +250,7 @@ const Body: Component = () => {
     <div class={'flex w-full flex-col items-stretch justify-center gap-4'}>
       <Header />
       <UpcomingStreams />
+      <CommunityTagSearch />
       <Show when={isSortByCause()} fallback={<CampaignGrid />}>
         <CampaignGridByCause />
       </Show>
@@ -300,7 +302,9 @@ const CampaignGrid: Component = () => {
 }
 
 const CampaignGridByCause: Component = () => {
-  const { campaignsByCause } = useCommunityPage()
+  const { campaignsByCause, campaignsByCauseFiltered, selectedTagIds } = useCommunityPage()
+  const anyTagsSelected = () => selectedTagIds().length > 0
+  const groups = () => (anyTagsSelected() ? campaignsByCauseFiltered() : campaignsByCause())
 
   return (
     <div class={twMerge('flex w-full flex-col gap-4')}>
@@ -320,7 +324,7 @@ const CampaignGridByCause: Component = () => {
         </div>
       </div>
       <div class={'flex w-full flex-col items-center gap-6 text-center'}>
-        <For each={campaignsByCause()}>
+        <For each={groups()}>
           {(o) => {
             const { cause, campaigns } = o
             return (
