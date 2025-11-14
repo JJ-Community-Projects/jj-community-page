@@ -20,14 +20,14 @@ const JJRaisedSchema = z.object({
 
 // JJCause schema
 export const JJCauseSchema = z.object({
-  id: z.number(),
+  id: z.string(),
   name: z.string(),
   logo: z.string().url(), // logo is always a URL
   description: z.string(),
   color: z.string().optional(),
   url: z.string().url(),
   donateUrl: z.string().url(),
-  raised: JJRaisedSchema,
+  raised: CurrenciesSchema,
 })
 
 export const SimpleCampaignTag = z.object({
