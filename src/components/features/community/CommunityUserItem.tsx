@@ -41,7 +41,7 @@ export const CommunityUserItem: Component<CommunityUserItemProps> = (props) => {
           </div>
         </div>
         <div class={'mt-1 flex flex-wrap gap-1'}>
-          <For each={user().tags}>
+          <For each={user().tags.slice(0,3)}>
             {(tag) => (
               <span
                 class={
