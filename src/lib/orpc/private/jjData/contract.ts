@@ -45,7 +45,7 @@ const JJCampaignSchema = z.object({
   tiltifyUrl: z.string(),
   tiltifyName: z.string(),
   tiltifyDescription: z.string().optional(),
-  tiltifyCauseId: z.number().optional(),
+  tiltifyCauseId: z.string().nullable(),
   avatar: z.string(), // twitch image if available or tiltify image
   raised: CurrenciesSchema,
   twitch: z.string().optional(),

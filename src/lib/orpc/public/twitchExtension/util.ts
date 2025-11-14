@@ -291,7 +291,7 @@ export async function loadCauses(
 }
 export async function loadCause(
   kv: KVNamespace,
-  causeId: number,
+  causeId: string,
 ): Promise<JJCauseTVType | null> {
   return getJSON<JJCauseTVType>(kv, makeKey(`${causeId}`, 'causes'))
 }

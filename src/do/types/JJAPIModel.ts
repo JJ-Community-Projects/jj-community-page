@@ -31,22 +31,17 @@ export interface JJHistoryItem {
 }
 
 export interface JJCause {
-  id: number | string;
+  id: string;
   name: string;
   logo: string;
   description: string;
   url: string;
   donateUrl: string;
-  raised: JJRaised;
-}
-
-export interface JJLivestream {
-  channel: string | null;
-  type: string;
+  raised: number;
+  campaigns: number;
 }
 
 export interface JJUser {
-  id: number | string;
   name: string;
   slug: string;
   avatar: string;
@@ -54,15 +49,15 @@ export interface JJUser {
 }
 
 export interface JJCampaign {
-  causeId: number | string | null;
+  id: string;
+  causeId: string | null;
   name: string;
   description: string;
   slug: string;
   url: string;
-  startTime: string;
+  startTime: string | null;
   raised: number;
   goal: number;
-  livestream: JJLivestream;
   user: JJUser;
 }
 
@@ -75,19 +70,10 @@ export interface JingleJamResponse {
   date: string;
   event: JJEvent;
   avgConversionRate: number;
-  raised: JJRaised;
+  raised: number;
   collections: JJCollections;
-  donations: JJDonations;
+  donations: number;
   history: JJHistoryItem[];
   causes: JJCause[];
   campaigns: JJCampaigns;
-}
-
-export interface JJData {
-  date: string;
-  event: JJEvent;
-  avgConversionRate: number;
-  raised: JJRaised;
-  collections: JJCollections;
-  donations: JJDonations;
 }

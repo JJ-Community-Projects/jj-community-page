@@ -319,6 +319,30 @@ export class TiltifyAPI {
     }
   }
 
+
+  async getUserBySlug(slug: string, token?: string | null): Promise<TiltifyUserResponse | null> {
+    if (!token) {
+      token = await this.getAppToken()
+    }
+    if (!token) {
+      return null
+    }
+    const resp = await fetch(
+      `https://v5api.tiltify.com/api/public/users/by/slug/${slug}`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      },
+    )
+    if (!resp.ok) {
+      return null
+    }
+    return resp.json() as Promise<TiltifyUserResponse>
+  }
+
   async getAppToken() {
     const tokenFromCache = await this.tokenCache.getToken('APP_TOKEN')
     if (tokenFromCache) {

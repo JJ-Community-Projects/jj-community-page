@@ -1,13 +1,16 @@
 import { implement, ORPCError } from '@orpc/server'
 import { contracts, type FundraiserItem } from './contract'
 import { dbMiddleware } from '../../middleware/dbMiddleware'
-import { schedulesTable, streamsTable, teamMembersTable, teamsTable, } from '../../../db/schema/jj-schema'
+import {
+  schedulesTable,
+  streamsTable,
+  teamMembersTable,
+  teamsTable,
+} from '../../../db/schema/jj-schema'
 import { and, eq, gte, inArray } from 'drizzle-orm'
 import { getScheduleStreams } from '../../public/schedules/util'
 import { accounts } from '../../../db/schema/auth-schema'
 import type { JJCampaign } from '../../../../do/types/JJAPIModel.ts'
-import { jjCampaign } from '../../../db/schema/jj-api-schema.ts'
-import type { JJDrizzleDatabase } from '../../../db/db.ts'
 import { userDisplayView } from '../../../db/schema/views-schema.ts'
 import { DateTime, IANAZone } from 'luxon'
 import { getStreamColors } from '../../../../functions/jjDatesToColors.ts'
@@ -27,7 +30,12 @@ function campaignMapper(
   const cur = currency === 'USD' ? 'USD' : currency === 'EUR' ? 'EUR' : 'GBP'
   const locale = cur === 'USD' ? 'en-US' : cur === 'EUR' ? 'de-DE' : 'en-GB'
   const raisedGBP = c.raised
-  const raised = cur === 'USD' ? raisedGBP * usdRate : cur === 'EUR' ? raisedGBP * eurRate : raisedGBP
+  const raised =
+    cur === 'USD'
+      ? raisedGBP * usdRate
+      : cur === 'EUR'
+        ? raisedGBP * eurRate
+        : raisedGBP
 
   const raisedFormatted = Intl.NumberFormat(locale, {
     style: 'currency',
@@ -43,6 +51,7 @@ function campaignMapper(
   }
 }
 
+/*
 async function campaignBySlug(
   db: JJDrizzleDatabase,
   slug: string,
@@ -57,8 +66,8 @@ async function campaignBySlug(
     .get()
   let jjC: JJCampaign | null = null
   if (userCampaign) {
-    jjC = {
-      causeId: userCampaign.causeId ?? 0,
+    return {
+      causeId: userCampaign.causeId,
       name: userCampaign.name,
       description: userCampaign.description ?? '',
       slug: userCampaign.slug,
@@ -71,7 +80,6 @@ async function campaignBySlug(
         type: userCampaign.livestream?.type ?? '',
       },
       user: {
-        id: userCampaign.userId ?? 0,
         name: userCampaign.userName ?? '',
         slug: userCampaign.userSlug ?? '',
         avatar: userCampaign.userAvatar ?? '',
@@ -80,7 +88,7 @@ async function campaignBySlug(
     }
   }
   return jjC ? campaignMapper(jjC, currency, usdRate, eurRate) : null
-}
+}*/
 
 // ----------------------
 // Charities
@@ -91,32 +99,34 @@ const charities = os.charitiesContract.handler(async ({ input, context }) => {
   const DO = context.env.JingleJamData
   const stubID = DO.idFromName('JJ_API_CACHE')
   const stub = DO.get(stubID)
-  const causes = await stub.getCauses()
+  const causes = await stub.getCausesTV()
   const avgConversionRate = await stub.getAvgConversionRate()
   const eurRate = await stub.getGbpToEurRate()
-
-  const userFundraiser = await campaignBySlug(
-    context.db,
-    input.user ?? '',
-    currency,
-    avgConversionRate,
-    eurRate,
-  )
+  const c = await stub.getCampaign(input.user ?? '')
+  const userFundraiser = c
+    ? campaignMapper(c!, currency, avgConversionRate, eurRate)
+    : null
 
   if (!causes?.length) {
     return { userFundraiser, charities: [] }
   }
 
-  const locale = currency === 'USD' ? 'en-US' : currency === 'EUR' ? 'de-DE' : 'en-GB'
+  const locale =
+    currency === 'USD' ? 'en-US' : currency === 'EUR' ? 'de-DE' : 'en-GB'
   const formatter = Intl.NumberFormat(locale, {
     style: 'currency',
     currency: currency,
   })
   const items = causes.map((cause) => {
-    const raisedGBP = cause?.raised?.total.gbp ?? 0
-    const raisedUSD = cause?.raised?.total.usd ?? 0
-    const raisedEUR = cause?.raised?.total.euro ?? 0
-    const convertedRaised = currency === 'USD' ? raisedUSD : currency === 'EUR' ? raisedEUR : raisedGBP
+    const raisedGBP = cause?.raised?.gbp ?? 0
+    const raisedUSD = cause?.raised?.usd ?? 0
+    const raisedEUR = cause?.raised?.euro ?? 0
+    const convertedRaised =
+      currency === 'USD'
+        ? raisedUSD
+        : currency === 'EUR'
+          ? raisedEUR
+          : raisedGBP
     const raisedFormatted = formatter.format(convertedRaised)
     return {
       id: Number(cause.id),
@@ -140,13 +150,13 @@ const causeById = os.causeByIdContract.handler(async ({ input, context }) => {
   const DO = context.env.JingleJamData
   const stubID = DO.idFromName('JJ_API_CACHE')
   const stub = DO.get(stubID)
-  const causes = await stub.getCauses()
+  const causes = await stub.getCausesTV()
   if (!causes?.length) return null
 
   const id = Math.floor(input.causeId)
   if (!Number.isFinite(id) || id < 0) return null
 
-  const cause = causes.find((c ) => Number(c?.id) === id)
+  const cause = causes.find((c) => Number(c?.id) === id)
   if (!cause) return null
 
   const r = new Date().getUTCSeconds()
@@ -156,11 +166,7 @@ const causeById = os.causeByIdContract.handler(async ({ input, context }) => {
     name: String(cause.name ?? ''),
     logoUrl: cause.logo || undefined,
     websiteUrl: cause.url || undefined,
-    raised: includeTotals
-      ? Number(
-          (cause?.raised?.total.gbp ?? 0),
-        ) + r
-      : undefined,
+    raised: includeTotals ? Number(cause?.raised?.gbp ?? 0) + r : undefined,
     currency: includeTotals ? 'GBP' : undefined,
     description: cause.description,
   }
@@ -186,14 +192,10 @@ const fundraisers = os.fundraisersContract.handler(
     const avgConversionRate = await stub.getAvgConversionRate()
     const eurRate = await stub.getGbpToEurRate()
 
-    const userFundraiser = await campaignBySlug(
-      context.db,
-      input.user ?? '',
-      currency,
-      avgConversionRate,
-      eurRate,
-    )
-
+    const c = await stub.getCampaign(input.user ?? '')
+    const userFundraiser = c
+      ? campaignMapper(c!, currency, avgConversionRate, eurRate)
+      : null
     // console.log('userFundraiser', userFundraiser)
 
     if (!list?.length) {
@@ -321,13 +323,11 @@ const teamFundraisers = os.teamFundraisersContract.handler(
         // recent: keep order from source
         break
     }
-    const userFundraiser = await campaignBySlug(
-      context.db,
-      input.user ?? '',
-      currency,
-      avgConversionRate,
-      eurRate,
-    )
+
+    const c = await stub.getCampaign(input.user ?? '')
+    const userFundraiser = c
+      ? campaignMapper(c!, currency, avgConversionRate, eurRate)
+      : null
     return {
       teamName: team.name,
       fundraisers: mapped,
@@ -345,11 +345,6 @@ const causeFundraisers = os.causeFundraisersContract.handler(
     const orderBy = input.orderBy
     const currency = input.currency
     const user = input.user ?? ''
-    if (!Number.isFinite(causeId) || causeId < 0) {
-      throw new ORPCError('BAD_REQUEST', {
-        message: 'Valid causeId is required',
-      })
-    }
 
     // Fetch campaigns from DO and filter
     const DO = context.env.JingleJamData
@@ -359,13 +354,10 @@ const causeFundraisers = os.causeFundraisersContract.handler(
     const avgConversionRate = await stub.getAvgConversionRate()
     const eurRate = await stub.getGbpToEurRate()
 
-    const userFundraiser = await campaignBySlug(
-      context.db,
-      input.user ?? '',
-      currency,
-      avgConversionRate,
-      eurRate,
-    )
+    const c = await stub.getCampaign(input.user ?? '')
+    const userFundraiser = c
+      ? campaignMapper(c!, currency, avgConversionRate, eurRate)
+      : null
 
     if (!list?.length) {
       return {

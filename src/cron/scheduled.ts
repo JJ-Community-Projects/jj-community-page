@@ -23,6 +23,11 @@ export async function scheduled(
         console.error(e)
       }
       try {
+        await stub.loadAllTiltifySocials()
+      } catch (e) {
+        console.error(e)
+      }
+      try {
         await stub.validateTwitchChannels()
       } catch (e) {
         console.error(e)

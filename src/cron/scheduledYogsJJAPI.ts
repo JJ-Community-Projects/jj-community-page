@@ -6,4 +6,5 @@ export async function scheduledYogsJJAP(
   const DO = env.JingleJamData
   const stub = DO.get(DO.idFromName('JJ_API_CACHE'))
   await stub.refresh()
+  await stub.insertIntoDB()
 }

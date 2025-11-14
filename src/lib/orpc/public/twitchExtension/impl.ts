@@ -474,7 +474,7 @@ const causes = os.causesContract
     }
 
     // Fallback: compute from raw data if precomputed display is unavailable
-    const causes = await stub.getCauses()
+    const causes = await stub.getCausesTV()
     const usdRate = await stub.getAvgConversionRate()
     const eurRate = await stub.getGbpToEurRate()
     if (!causes) {
@@ -736,6 +736,7 @@ const userData = os.userDataContract
     if (input.channelId === ostofbot) {
       return {
         campaign: {
+          tiltifySlug: 'test',
           campaignName: 'Test Campaign',
           tiltifyUrl: 'https://jinglejam.tiltify.com',
           tiltifyName: 'ostofbot',
@@ -784,7 +785,7 @@ const userData = os.userDataContract
             cause: cachedCause,
           }
         }
-        const cause = await stub.getCause(userData.tiltifyCauseId)
+        const cause = await stub.getTVCause(userData.tiltifySlug)
         if (cause) {
           await storeCause(context.env.KV, cause)
         }
@@ -827,7 +828,7 @@ const userData = os.userDataContract
           cause: cachedCause,
         }
       }
-      const cause = await stub.getCause(causeId)
+      const cause = await stub.getTVCause(causeId)
       if (cause) {
         await storeCause(context.env.KV, cause)
       }

@@ -1,10 +1,10 @@
-import { integer, primaryKey, real, sqliteTable, text, } from 'drizzle-orm/sqlite-core'
+import { integer, primaryKey, real, sqliteTable, text, numeric} from 'drizzle-orm/sqlite-core'
 
 export const jjCampaign = sqliteTable(
   'jj_campaign',
   {
     year: integer().notNull(),
-    causeId: integer('cause_id'),
+    causeId: text('cause_id'),
     name: text('name').notNull(),
     description: text('description'),
     slug: text('slug').notNull(),
@@ -16,8 +16,6 @@ export const jjCampaign = sqliteTable(
       channel: string
       type: string
     }>(),
-
-    userId: integer('user_id'),
     userName: text('user_name'),
     userSlug: text('user_slug'),
     userAvatar: text('user_avatar'),
@@ -32,17 +30,16 @@ export const jjCauses = sqliteTable(
   'jj_causes',
   {
     year: integer('year').notNull(),
-    id: integer('id'), // 1227
+    id: text('id'), // 1227
     name: text('name').notNull(),
     logo: text('logo'),
     description: text('description'),
     url: text('url'),
     donateUrl: text('donate_url'),
     // raised: json<{ yogscast: number; fundraisers: number }>()('raised').notNull(),
-    raised: text('raised', { mode: 'json' }).$type<{
-      yogscast: number
-      fundraisers: number
-    }>(),
+    raised: numeric('raised', {
+      mode: 'number'
+    }),
   },
   (table) => [primaryKey({ name: 'pk', columns: [table.id, table.year] })],
 )

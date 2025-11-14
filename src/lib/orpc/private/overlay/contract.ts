@@ -109,7 +109,7 @@ const teamFundraisersContract = oc
 const causeFundraisersContract = oc
   .input(
     z.object({
-      causeId: z.number().int().nonnegative(),
+      causeId: z.string(),
       orderBy: z.enum(['recent', 'top', 'alphabetical']).optional(),
       currency: Currency,
       user: z.string().optional(),

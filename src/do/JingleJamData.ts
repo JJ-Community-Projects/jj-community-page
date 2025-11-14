@@ -1,6 +1,5 @@
 import { DurableObject } from 'cloudflare:workers'
 import { getDB } from '../lib/db/db.ts'
-import { jjCampaign, jjCauses } from '../lib/db/schema/jj-api-schema.ts'
 import type {
   JingleJamResponse,
   JJCampaign,
@@ -9,7 +8,6 @@ import type {
   JJDonations,
   JJRaised,
 } from './types/JJAPIModel.ts'
-import type { BatchItem } from 'drizzle-orm/batch'
 import { TwitchAPI } from '../lib/twitchAPI.ts'
 import type {
   CausesDisplayTVType,
@@ -18,12 +16,14 @@ import type {
   JJCampaignTVType,
   JJCauseTVType,
 } from '../lib/orpc/public/twitchExtension/contract.ts'
-import type { JJCampaignType, SimpleCampaignTag, } from '../lib/orpc/private/jjData/contract.ts'
+import type { JJCampaignType, } from '../lib/orpc/private/jjData/contract.ts'
 import { and, desc, eq, or, sql } from 'drizzle-orm'
 import { schedulesTable } from '../lib/db/schema/jj-schema.ts'
 import { userDisplayView } from '../lib/db/schema/views-schema.ts'
-import { stringToNumber } from '../lib/utils/stringToNumber.ts'
 import { tags, userTagsTable } from '../lib/db/schema/tags-schema.ts'
+import { TiltifyAPI, type TiltifyUserData } from '../lib/TiltifyAPI.ts'
+import { jjCampaign, jjCauses } from '../lib/db/schema/jj-api-schema.ts'
+import type { BatchItem } from 'drizzle-orm/batch'
 
 type UserWithTags = {
   userId: number
@@ -42,8 +42,8 @@ export class JingleJamData extends DurableObject<Env> {
   }
 
   // Causes
-  public async setCause(cause: JJCauseTVType) {
-    await this.storage.put(this.causeKey(cause.id), cause)
+  public async setTVCause(cause: JJCauseTVType) {
+    await this.storage.put(this.causeKeyTV(cause.id), cause)
   }
 
   public async setCauses(causes: JJCause[]) {
@@ -52,37 +52,47 @@ export class JingleJamData extends DurableObject<Env> {
     await this.storage.put(entries)
   }
 
-  public getCause(causeId: number) {
-    return this.storage.get(this.causeKey(causeId)) as Promise<
+  public getTVCause(causeId: string) {
+    return this.storage.get(this.causeKeyTV(causeId)) as Promise<
       JJCauseTVType | undefined
     >
   }
+  public getCause(causeId: string) {
+    return this.storage.get(this.causeKey(causeId)) as Promise<
+      JJCause | undefined
+    >
+  }
 
-  public async getCauses() {
-    const map = (await this.storage.list({ prefix: 'cause:' })) as Map<
+  public async getCausesTV() {
+    const map = (await this.storage.list({ prefix: 'cause:tv:' })) as Map<
       string,
       unknown
     >
     return Array.from(map.values()) as JJCauseTVType[]
   }
+  public async getCauses() {
+    const map = (await this.storage.list({ prefix: 'cause:raw:' })) as Map<
+      string,
+      unknown
+    >
+    return Array.from(map.values()) as JJCause[]
+  }
 
   // Campaigns
   public async setCampaign(campaign: JJCampaign) {
-    const id = await stringToNumber(campaign.user.id)
-    await this.storage.put(this.campaignKey(id), campaign)
+    await this.storage.put(this.campaignKey(campaign.id), campaign)
   }
 
   public async setCampaigns(campaigns: JJCampaign[]) {
     const entries: Record<string, JJCampaign> = {}
     for (const c of campaigns) {
-      const id = await stringToNumber(c.user.id)
-      entries[this.campaignKey(id)] = c
+      entries[this.campaignKey(c.id)] = c
     }
     await this.storage.put(entries)
   }
 
-  public getCampaign(userId: number) {
-    return this.storage.get(this.campaignKey(userId)) as Promise<
+  public getCampaign(userRef: string) {
+    return this.storage.get(this.campaignKey(userRef)) as Promise<
       JJCampaign | undefined
     >
   }
@@ -95,7 +105,7 @@ export class JingleJamData extends DurableObject<Env> {
     return Array.from(map.values()) as JJCampaign[]
   }
 
-  public async getCampaignsForCause(causeId: number) {
+  public async getCampaignsForCause(causeId: string) {
     const campaigns = await this.getCampaigns()
     return campaigns.filter((c) => c.causeId === causeId)
   }
@@ -109,37 +119,7 @@ export class JingleJamData extends DurableObject<Env> {
       )
     }
 
-    let data = (await res.json()) as JingleJamResponse
-    const newCauseIds = new Map<string | number, number>()
-
-    for (let i = 0; i < data.causes.length; i++) {
-      const cause = data.causes[i]
-      newCauseIds.set(cause.id, i)
-    }
-
-    data = {
-      ...data,
-      causes: data.causes.map((c, i) => {
-        return {
-          ...c,
-          id: newCauseIds.get(c.id) ?? i,
-        }
-      }),
-      campaigns: {
-        count: data.campaigns.count,
-        list: data.campaigns.list.map((c, i) => {
-          const causeId = c.causeId ? (newCauseIds.get(c.causeId) ?? i) : null
-          return {
-            ...c,
-            causeId: causeId,
-            user: {
-              ...c.user,
-              id: i,
-            },
-          }
-        }),
-      },
-    }
+    const data = (await res.json()) as JingleJamResponse
 
     // Update DO storage (granular)
     try {
@@ -191,7 +171,24 @@ export class JingleJamData extends DurableObject<Env> {
     }
 
     await this.buildDisplayData(data)
+  }
 
+  public async buildDisplayData(data: JingleJamResponse) {
+    // Build and store display projections matching JJCampaignsSchema
+    await this.buildAndStoreCampaignsDisplay(data)
+
+    // Build and store display projections for causes
+    await this.buildAndStoreCausesDisplay(data)
+
+    // Build and store display projections for community campaigns
+    await this.buildAndStoreCommunityCampaignsDisplay(data)
+  }
+
+  public async insertIntoDB() {
+
+    const causes = await this.getCauses()
+    const campaigns = await this.getCampaigns()
+    const year = await this.storage.get<number>('event:year')
     try {
       const db = getDB(this.env)
 
@@ -208,9 +205,9 @@ export class JingleJamData extends DurableObject<Env> {
 
       // Prepare rows
       const causeRows = await Promise.all(
-        data.causes.map(async (cause) => ({
-          id: await stringToNumber(cause.id),
-          year: data.event.year,
+        causes.map(async (cause) => ({
+          id: cause.id,
+          year: year!,
           name: cause.name,
           logo: cause.logo,
           description: cause.description,
@@ -220,22 +217,40 @@ export class JingleJamData extends DurableObject<Env> {
         })),
       )
 
+      const tiltifyUsers = await this.getTiltifyUsersMap()
+
+      const getLivestream = (slug: string) => {
+        const user = tiltifyUsers.get(slug)
+        if (!user) return {
+          channel: '',
+          type: '',
+        }
+        if (user.social.twitch) {
+          return {
+            channel: this.normalizeTwitchLogin(user.social.twitch),
+            type: 'twitch',
+          }
+        }
+        if (user.social.youtube) {
+          return {
+            channel: user.social.youtube,
+            type: 'youtube',
+          }
+        }
+      }
+
       const campaignRows = await Promise.all(
-        data.campaigns.list.map(async (c) => ({
-          year: data.event.year,
-          causeId: c.causeId ? await stringToNumber(c.causeId!) : null,
+        campaigns.map(async (c) => ({
+          year: year!,
+          causeId: c.causeId ? await c.causeId! : null,
           name: c.name,
           description: c.description,
           slug: c.slug,
           url: c.url,
-          startTime: c.startTime,
+          startTime: c.startTime ?? '',
           raised: c.raised,
           goal: c.goal,
-          livestream: {
-            channel: c.livestream?.channel ?? '',
-            type: c.livestream?.type ?? '',
-          },
-          userId: await stringToNumber(c.user.id),
+          livestream: getLivestream(c.user.slug),
           userName: c.user.name,
           userSlug: c.user.slug,
           userAvatar: c.user.avatar,
@@ -278,17 +293,6 @@ export class JingleJamData extends DurableObject<Env> {
     } catch (e) {
       console.error('db.batch persist JJ data', e)
     }
-  }
-
-  public async buildDisplayData(data: JingleJamResponse) {
-    // Build and store display projections matching JJCampaignsSchema
-    await this.buildAndStoreCampaignsDisplay(data)
-
-    // Build and store display projections for causes
-    await this.buildAndStoreCausesDisplay(data)
-
-    // Build and store display projections for community campaigns
-    await this.buildAndStoreCommunityCampaignsDisplay(data)
   }
 
   public async getAvgConversionRate() {
@@ -379,23 +383,6 @@ export class JingleJamData extends DurableObject<Env> {
           `twitch:login:${channel.data.login}`,
           channel.data,
         )
-        // maintain idx mapping login -> userId from raw campaigns
-        try {
-          const campaigns = await this.getCampaigns()
-          const camp = campaigns.find((c) => {
-            if (c.livestream?.type !== 'twitch') return false
-            const chan = this.normalizeTwitchLogin(c.livestream?.channel ?? '')
-            return chan.toLowerCase() === normalized.toLowerCase()
-          })
-          if (camp) {
-            await this.storage.put(
-              `idx:twitch:login:${normalized.toLowerCase()}`,
-              {
-                userId: camp.user.id,
-              },
-            )
-          }
-        } catch {}
       } else {
         if (channel.error.status !== 401) {
           invalidLogins.push(normalized)
@@ -427,14 +414,16 @@ export class JingleJamData extends DurableObject<Env> {
     try {
       const liveSet = new Set(liveStreamsLogins.map((l) => l.toLowerCase()))
       const campaigns = await this.getCampaigns()
+
+      const users = await this.getTiltifyUsersMap()
       for (const c of campaigns) {
-        const login =
-          c.livestream?.type === 'twitch' && c.livestream?.channel
-            ? String(c.livestream.channel).toLowerCase()
-            : ''
+        const userSlug = c.user.slug
+        const user = users.get(userSlug)
+        if (!user) continue
+        const login = user.social.twitch
         if (!login) continue
-        const isLive = liveSet.has(login)
-        await this.storage.put(`campaign:live:${c.user.id}`, isLive)
+        const isLive = liveSet.has(this.normalizeTwitchLogin(login))
+        await this.storage.put(`campaign:live:${c.user.slug}`, isLive)
       }
     } catch (e) {
       console.error('update campaign live flags', e)
@@ -526,11 +515,10 @@ export class JingleJamData extends DurableObject<Env> {
   public async buildAndStoreUserTags() {
     const db = getDB(this.env)
 
-
     // 1) Global usage per tag
     const tagUsageRows = await this.getUsedTagsWithUserCounts()
     const usageMap = new Map<number, number>(
-      tagUsageRows.map((r) => [r.tagId, r.usage])
+      tagUsageRows.map((r) => [r.tagId, r.usage]),
     )
 
     // 2) Pull all users and their tags
@@ -548,13 +536,16 @@ export class JingleJamData extends DurableObject<Env> {
       .leftJoin(tags, eq(userTagsTable.tagId, tags.id))
       .all()
 
-
     const byUser = new Map<number, UserWithTags>()
 
     for (const r of rows) {
       let entry = byUser.get(r.userId)
       if (!entry) {
-        entry = { userId: r.userId, tiltifySlug: r.tiltifySlug ?? null, tags: [] }
+        entry = {
+          userId: r.userId,
+          tiltifySlug: r.tiltifySlug ?? null,
+          tags: [],
+        }
         byUser.set(r.userId, entry)
       }
 
@@ -573,24 +564,47 @@ export class JingleJamData extends DurableObject<Env> {
 
     // Sort by usage desc, then slug; then keep only top 3 per user
     for (const u of result) {
-      u.tags.sort((a, b) => (b.usage - a.usage) || a.slug.localeCompare(b.slug))
+      u.tags.sort((a, b) => b.usage - a.usage || a.slug.localeCompare(b.slug))
       if (u.tags.length > 3) u.tags = u.tags.slice(0, 3)
     }
 
     const userMap = new Map<string, UserWithTags>(
-      result.map((r) => [r.tiltifySlug, r])
+      result.map((r) => [r.tiltifySlug, r]),
     )
 
     await this.storage.put('user:tags:display', userMap)
   }
 
   public getUserTagsDisplay() {
-    return this.storage.get<{ [slug: string]: UserWithTags }>('user:tags:display')
+    return this.storage.get<{ [slug: string]: UserWithTags }>(
+      'user:tags:display',
+    )
+  }
+
+  public async loadAllTiltifySocials() {
+    const campaigns = await this.getCampaigns()
+    const api = new TiltifyAPI(this.env)
+    const token = await api.getAppToken()
+    const users = await Promise.all(
+      campaigns.map((c) => {
+        return api.getUserBySlug(c.user.slug, token)
+      }),
+    )
+      .then((r) => r.filter((u) => u !== null))
+      .then((r) => r.map((u) => u.data))
+    await this.storage.put('socials:tiltify', users)
+  }
+
+  public async getTiltifyUsersMap() {
+    const users = await this.getTiltifyUsers()
+    return new Map(users?.map((u) => [u.slug, u]) ?? [])
   }
 
   private async getUsedTagsWithUserCounts() {
     const db = getDB(this.env)
-    const usage = sql<number>`count(distinct ${userTagsTable.userId})`.as('usage')
+    const usage = sql<number>`count(distinct ${userTagsTable.userId})`.as(
+      'usage',
+    )
     return db
       .select({
         tagId: tags.id,
@@ -649,22 +663,21 @@ export class JingleJamData extends DurableObject<Env> {
     try {
       const usdRate = data.avgConversionRate
       const eurRate = await this.getGbpToEurRate()
+      const tiltifyUsers = await this.getTiltifyUsersMap()
 
       const displayList: JJCampaignTVType[] = []
       for (const c of data.campaigns.list) {
-        const userId = c.user.id
+        const userSlug = c.user.slug
         let isLive = false
         try {
-          const val = await this.storage.get<boolean>(`campaign:live:${userId}`)
+          const val = await this.storage.get<boolean>(`campaign:live:${userSlug}`)
           isLive = !!val
         } catch {}
 
+        const user = tiltifyUsers.get(userSlug)
+
         let twitch: JJCampaignTVType['twitch'] | undefined = undefined
-        let login =
-          c.livestream?.type === 'twitch' && c.livestream?.channel
-            ? this.normalizeTwitchLogin(
-                String(c.livestream.channel).toLowerCase(),
-              )
+        let login = user?.social.twitch ? this.normalizeTwitchLogin(user!.social.twitch)
             : ''
 
         let twitchId = ''
@@ -681,20 +694,17 @@ export class JingleJamData extends DurableObject<Env> {
               isLive,
               url: `https://twitch.tv/${login}`,
             }
-            // maintain index for login -> userId
-            try {
-              await this.storage.put(`idx:twitch:login:${login}`, { userId })
-            } catch {}
           }
         }
 
         const display: JJCampaignTVType = {
+          tiltifySlug: c.user.slug,
           campaignName: c.name,
           tiltifyUrl: c.url,
           tiltifyName: c.user.name,
           tiltifyDescription: c.description,
           tiltifyCauseId: c.causeId
-            ? await stringToNumber(c.causeId)
+            ? (c.causeId)
             : undefined,
           avatar: c.user.avatar ?? '',
           raised: this.toCurrencies(c.raised, usdRate, eurRate),
@@ -703,7 +713,7 @@ export class JingleJamData extends DurableObject<Env> {
         }
         displayList.push(display)
         try {
-          await this.storage.put(`campaign:display:${userId}`, display)
+          await this.storage.put(`campaign:display:${userSlug}`, display)
           if (twitchId !== '') {
             await this.storage.put(
               `campaign:display:twitchId:${twitchId}`,
@@ -757,30 +767,20 @@ export class JingleJamData extends DurableObject<Env> {
 
       const causes: JJCauseTVType[] = await Promise.all(
         data.causes.map(async (c) => {
-          const yog = toCurrencies(c.raised.yogscast, usdRate, eurRate)
-          const fund = toCurrencies(c.raised.fundraisers, usdRate, eurRate)
-          const total = toCurrencies(
-            parseFloat((c.raised.fundraisers + c.raised.yogscast).toFixed(2)),
-            usdRate,
-            eurRate,
-          )
+          const raised = toCurrencies(c.raised, usdRate, eurRate)
           return {
-            id: await stringToNumber(c.id),
+            id: c.id,
             name: c.name,
             logo: c.logo,
             description: c.description,
             url: c.url,
             donateUrl: c.donateUrl,
-            raised: {
-              yogscast: yog,
-              fundraisers: fund,
-              total,
-            },
+            raised: raised,
           }
         }),
       )
 
-      await Promise.all(causes.map((c) => this.setCause(c)))
+      await Promise.all(causes.map((c) => this.setTVCause(c)))
 
       /*
       const overview: CausesDisplayType['overview'] = {
@@ -814,6 +814,9 @@ export class JingleJamData extends DurableObject<Env> {
       console.error('build display causes', e)
     }
   }
+
+  // Helper: fully-qualified YouTube URL from any incoming value (channel/video URL, id, or handle)
+  // Automatically detects whether the input represents a video, channel, or handle and returns
 
   private async buildAndStoreCommunityCampaignsDisplay(
     data: JingleJamResponse,
@@ -865,20 +868,24 @@ export class JingleJamData extends DurableObject<Env> {
         }
       }
 
-
       const userTags = await this.getUserTagsDisplay()
       let userTagsMap = new Map<string, UserWithTags>()
       if (userTags) {
-        userTagsMap = new Map<string, UserWithTags>(
-          Object.entries(userTags)
-        );
+        userTagsMap = new Map<string, UserWithTags>(Object.entries(userTags))
       }
+
+      const rawCampaigns = data.campaigns.list
+      const tiltifyUsers = await this.getTiltifyUsersMap()
 
       const list = await Promise.all(
         data.campaigns.list.map(async (c) => {
-          const login =
-            c.livestream?.type === 'twitch'
-              ? this.normalizeTwitchLogin(c.livestream?.channel)
+          const userSlug = c.user.slug
+          const user = tiltifyUsers.get(userSlug)
+          const userTwitch = user?.social.twitch
+          const userYoutube = user?.social.youtube
+
+          const login =userTwitch
+              ? this.normalizeTwitchLogin(userTwitch)
               : undefined
 
           let tuser = undefined
@@ -889,18 +896,17 @@ export class JingleJamData extends DurableObject<Env> {
 
           const twitchAvatar = (tuser as any)?.profile_image_url
           const twitch =
-            c.livestream?.type === 'twitch'
-              ? this.toTwitchUrl(c.livestream?.channel)
+            userTwitch
+              ? this.toTwitchUrl(userTwitch)
               : undefined
 
-          const youtube = c.livestream?.type?.includes('youtube')
-            ? this.toYouTubeUrl(c.livestream?.type, c.livestream?.channel)
-            : undefined
+          const youtube =userYoutube? this.toYouTubeUrl(userYoutube): undefined
+
           const val = await this.storage.get<boolean>(
-            `campaign:live:${c.user.id}`,
+            `campaign:live:${c.user.slug}`,
           )
-          const sSlug = c.user?.slug
-            ? scheduleByTiltify.get(c.user.slug)
+          const sSlug = userSlug
+            ? scheduleByTiltify.get(userSlug)
             : undefined
 
           const display: JJCampaignType = {
@@ -908,9 +914,7 @@ export class JingleJamData extends DurableObject<Env> {
             tiltifyUrl: c.url,
             tiltifyName: c.user.name,
             tiltifyDescription: c.description || undefined,
-            tiltifyCauseId: c.causeId
-              ? await stringToNumber(c.causeId)
-              : undefined,
+            tiltifyCauseId: c.causeId,
             avatar: twitchAvatar ?? c.user.avatar ?? '',
             raised: this.toCurrencies(c.raised, usdRate, eurRate),
             twitch,
@@ -940,41 +944,57 @@ export class JingleJamData extends DurableObject<Env> {
     return login ? `https://twitch.tv/${login}` : undefined
   }
 
-  // Helper: fully-qualified YouTube URL based on livestream type and channel value
-  private toYouTubeUrl(
-    type: string | undefined,
-    channel: string | null | undefined,
-  ): string | undefined {
-    if (!channel) return undefined
-    const c = String(channel).trim()
-    // If already a URL, return as-is (basic sanity check)
-    if (/^https?:\/\//i.test(c)) return c
+  // the appropriate canonical YouTube URL. The "type" parameter was removed; detection is inferred.
+  private toYouTubeUrl(input: string | null | undefined): string | undefined {
+    if (!input) return undefined
+    let s = String(input).trim()
+    if (!s) return undefined
 
-    if (!type) return undefined
-    if (type === 'youtube_live') {
-      // We receive a channel id (often starting with UC...) or a handle; prefer channel URL
-      // UC* indicates channel id; otherwise treat as handle or custom id
-      if (/^UC[a-zA-Z0-9_-]{22}$/i.test(c)) {
-        return `https://www.youtube.com/channel/${c}`
+    // If it's already a URL, normalize common short links and otherwise return as-is
+    if (/^https?:\/\//i.test(s)) {
+      try {
+        const url = new URL(s)
+        const host = url.hostname.toLowerCase()
+        const path = url.pathname
+        if (host === 'youtu.be') {
+          // Short link: https://youtu.be/<videoId>
+          const id = path.replace(/^\//, '').split('/')[0]
+          if (/^[a-zA-Z0-9_-]{11}$/.test(id)) return `https://www.youtube.com/watch?v=${id}`
+        }
+        // For other youtube.com URLs, return as-is
+        return s
+      } catch {
+        // fall-through to ID/handle detection if URL parsing fails
       }
-      // Handles or custom channel names
-      if (c.startsWith('@')) return `https://www.youtube.com/${c}`
-      return `https://www.youtube.com/@${c}`
     }
-    if (type === 'youtube_video') {
-      // Channel field contains a video id; form a watch URL
-      return `https://www.youtube.com/watch?v=${c}`
+
+    // Detect a YouTube video id (11 chars)
+    if (/^[a-zA-Z0-9_-]{11}$/.test(s)) {
+      return `https://www.youtube.com/watch?v=${s}`
     }
-    return undefined
+
+    // Detect a channel id starting with UC and length 24 (UC + 22)
+    if (/^UC[a-zA-Z0-9_-]{22}$/i.test(s)) {
+      return `https://www.youtube.com/channel/${s}`
+    }
+
+    // Detect a handle (with @) or treat as handle if not having @ but looks like a name
+    if (s.startsWith('@')) return `https://www.youtube.com/${s}`
+    // As a sane default, treat as a handle-style channel name
+    return `https://www.youtube.com/@${s}`
   }
 
   // Key helpers
-  private campaignKey(userId: number | string) {
-    return `campaign:api:${userId}`
+  private campaignKey(userRef: string) {
+    return `campaign:api:${userRef}`
   }
 
-  private causeKey(causeId: number | string) {
-    return `cause:${causeId}`
+  private causeKey(causeId: string) {
+    return `cause:raw:${causeId}`
+  }
+
+  private causeKeyTV(causeId: string) {
+    return `cause:tv:${causeId}`
   }
 
   private stringArrayKey(name: string) {
@@ -982,20 +1002,22 @@ export class JingleJamData extends DurableObject<Env> {
   }
 
   private async getTwitchLoginsFromCampaigns() {
-    const campaigns = await this.getCampaigns()
-    return campaigns
-      .filter((c) => c.livestream?.type === 'twitch')
-      .map((c) => c.livestream?.channel)
-      .filter((c) => c !== null)
-      .filter((c) => this.normalizeTwitchLogin(c)) as string[]
+    const users = await this.getTiltifyUsers()
+    return (users
+      ?.map((c) => c.social.twitch)
+      .filter((c) => c !== undefined)
+      .filter((c) => this.normalizeTwitchLogin(c)) ?? []) as string[]
   }
 
   private async getYoutubeLoginsFromCampaigns() {
-    const campaigns = await this.getCampaigns()
-    return campaigns
-      .filter((c) => c.livestream?.type.includes('youtube'))
-      .map((c) => c.livestream?.channel)
-      .filter((c) => c !== null)
-      .filter((c) => c) as string[]
+    const users = await this.getTiltifyUsers()
+    return (users
+      ?.map((c) => c.social.twitch)
+      .filter((c) => c !== undefined)
+      .filter((c) => c) ?? []) as string[]
+  }
+
+  private getTiltifyUsers() {
+    return this.storage.get<TiltifyUserData[]>('socials:tiltify')
   }
 }
