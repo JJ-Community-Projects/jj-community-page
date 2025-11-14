@@ -165,9 +165,9 @@ export class JingleJamData extends DurableObject<Env> {
     }
 
     try {
-      await this.storage.put('avgConversionRate', data.avgConversionRate)
+      await this.storage.put('dollarConversionRate', data.dollarConversionRate)
     } catch (e) {
-      console.error('put avgConversionRate', e)
+      console.error('put dollarConversionRate', e)
     }
 
     await this.buildDisplayData(data)
@@ -193,7 +193,7 @@ export class JingleJamData extends DurableObject<Env> {
       const db = getDB(this.env)
 
       // Conservative variable ceiling (SQLite default is 999). Leave some safety headroom.
-      const VARS_LIMIT = 50
+      const VARS_LIMIT = 5
 
       // Helper to chunk an array
       const chunk = <T>(arr: T[], size: number) => {
@@ -295,10 +295,10 @@ export class JingleJamData extends DurableObject<Env> {
     }
   }
 
-  public async getAvgConversionRate() {
-    const avgConversionRate =
-      await this.storage.get<number>('avgConversionRate')
-    return avgConversionRate ?? 1
+  public async getdollarConversionRate() {
+    const dollarConversionRate =
+      await this.storage.get<number>('dollarConversionRate')
+    return dollarConversionRate ?? 1
   }
 
   // Returns the cached GBP->EUR rate or 1 if not available
@@ -661,7 +661,7 @@ export class JingleJamData extends DurableObject<Env> {
   // Extracted from refresh: builds and stores display projections matching JJCampaignsSchema
   private async buildAndStoreCampaignsDisplay(data: JingleJamResponse) {
     try {
-      const usdRate = data.avgConversionRate
+      const usdRate = data.dollarConversionRate
       const eurRate = await this.getGbpToEurRate()
       const tiltifyUsers = await this.getTiltifyUsersMap()
 
@@ -737,7 +737,7 @@ export class JingleJamData extends DurableObject<Env> {
   // Build and store display projections for causes matching causesContract output
   private async buildAndStoreCausesDisplay(data: JingleJamResponse) {
     try {
-      const usdRate = data.avgConversionRate
+      const usdRate = data.dollarConversionRate
       const eurRate = await this.getGbpToEurRate()
       const toCurrencies = (
         gbp: number,
@@ -785,16 +785,16 @@ export class JingleJamData extends DurableObject<Env> {
       /*
       const overview: CausesDisplayType['overview'] = {
         raised: {
-          yogscast: toCurrencies(data.raised.yogscast, data.avgConversionRate),
+          yogscast: toCurrencies(data.raised.yogscast, data.dollarConversionRate),
           fundraisers: toCurrencies(
             data.raised.fundraisers,
-            data.avgConversionRate,
+            data.dollarConversionRate,
           ),
           total: toCurrencies(
             parseFloat(
               (data.raised.fundraisers + data.raised.yogscast).toFixed(2),
             ),
-            data.avgConversionRate,
+            data.dollarConversionRate,
           ),
         },
         collections: data.collections,
@@ -817,12 +817,11 @@ export class JingleJamData extends DurableObject<Env> {
 
   // Helper: fully-qualified YouTube URL from any incoming value (channel/video URL, id, or handle)
   // Automatically detects whether the input represents a video, channel, or handle and returns
-
   private async buildAndStoreCommunityCampaignsDisplay(
     data: JingleJamResponse,
   ) {
     try {
-      const usdRate = data.avgConversionRate
+      const usdRate = data.dollarConversionRate
       const eurRate = await this.getGbpToEurRate()
       const slugs = Array.from(
         new Set(
@@ -835,6 +834,8 @@ export class JingleJamData extends DurableObject<Env> {
       let scheduleByTiltify = new Map<string, string>()
       const year = new Date().getFullYear()
       if (slugs.length > 0) {
+        console.log('fetching schedules for', slugs.length)
+        console.log('fetching schedules for', slugs)
         try {
           const db = getDB(this.env)
           const slugPred = or(
@@ -856,7 +857,7 @@ export class JingleJamData extends DurableObject<Env> {
                 eq(schedulesTable.visible, true),
                 // If you only want to expose primary schedules uncomment:
                 eq(schedulesTable.primary, true),
-                slugPred,
+                // slugPred,
               ),
             )
             .all()
