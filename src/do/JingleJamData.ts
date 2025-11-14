@@ -41,6 +41,17 @@ export class JingleJamData extends DurableObject<Env> {
   replaceMap: Map<string, string> = new Map([
     ['crustydoggo', 'kirsty'],
     ['bobawitch', 'boba'],
+    ['boba_witch', 'boba'],
+  ])
+
+  tiltifySlugToTwitchLoginMap: Map<string, string> = new Map([
+    ['hrry', 'hrry'],
+    ['rtgamecrowd', 'rtgame'],
+    ['bobawitch', 'boba'],
+    ['crustydoggo', 'kirsty'],
+    ['inthelittlewood', 'inthelittlewood'],
+    ['ravs', 'ravs_'],
+    ['sips-yogscast', 'sips_'],
   ])
 
   private get storage() {
@@ -231,9 +242,11 @@ export class JingleJamData extends DurableObject<Env> {
             channel: '',
             type: '',
           }
-        if (user.social.twitch) {
+        const twitch =
+          this.tiltifySlugToTwitchLoginMap.get(slug) ?? user.social.twitch
+        if (twitch) {
           return {
-            channel: this.normalizeTwitchLogin(user.social.twitch),
+            channel: this.normalizeTwitchLogin(twitch),
             type: 'twitch',
           }
         }
@@ -427,7 +440,8 @@ export class JingleJamData extends DurableObject<Env> {
         const userSlug = c.user.slug
         const user = users.get(userSlug)
         if (!user) continue
-        const login = user.social.twitch
+        const login =
+          this.tiltifySlugToTwitchLoginMap.get(userSlug) ?? user.social.twitch
         if (!login) continue
         const isLive = liveSet.has(this.normalizeTwitchLogin(login))
         await this.storage.put(`campaign:live:${c.user.slug}`, isLive)
@@ -689,9 +703,9 @@ export class JingleJamData extends DurableObject<Env> {
         const user = tiltifyUsers.get(userSlug)
 
         let twitch: JJCampaignTVType['twitch'] | undefined = undefined
-        let login = user?.social.twitch
-          ? this.normalizeTwitchLogin(user!.social.twitch)
-          : ''
+        const twitchSocial =
+          this.tiltifySlugToTwitchLoginMap.get(userSlug) ?? user?.social.twitch
+        let login = twitchSocial ? this.normalizeTwitchLogin(twitchSocial) : ''
 
         let twitchId = ''
         if (login) {
@@ -893,9 +907,10 @@ export class JingleJamData extends DurableObject<Env> {
         rawCampaigns.map(async (c) => {
           const userSlug = c.user.slug
           const user = tiltifyUsers.get(userSlug)
-          const userTwitch = user?.social.twitch
+          const userTwitch =
+            this.tiltifySlugToTwitchLoginMap.get(userSlug) ??
+            user?.social.twitch
           const userYoutube = user?.social.youtube
-
           const login = userTwitch
             ? this.normalizeTwitchLogin(userTwitch)
             : undefined
@@ -932,6 +947,22 @@ export class JingleJamData extends DurableObject<Env> {
             scheduleUrl: sSlug ? `/schedules/${sSlug}` : undefined,
             tags: userTagsMap.get(c.user.slug)?.tags ?? [],
           }
+
+          console.log(
+            'buildAndStoreCommunityCampaignsDisplay',
+            'user',
+            userSlug,
+            'twitch',
+            userTwitch,
+            'login',
+            login,
+            'youtube',
+            userYoutube,
+            'user',
+            user,
+            'display',
+            display,
+          )
 
           return display
         }),
@@ -1014,7 +1045,9 @@ export class JingleJamData extends DurableObject<Env> {
   private async getTwitchLoginsFromCampaigns() {
     const users = await this.getTiltifyUsers()
     return (users
-      ?.map((c) => c.social.twitch)
+      ?.map(
+        (c) => this.tiltifySlugToTwitchLoginMap.get(c.slug) ?? c.social.twitch,
+      )
       .filter((c) => c !== undefined)
       .filter((c) => this.normalizeTwitchLogin(c)) ?? []) as string[]
   }
@@ -1022,7 +1055,7 @@ export class JingleJamData extends DurableObject<Env> {
   private async getYoutubeLoginsFromCampaigns() {
     const users = await this.getTiltifyUsers()
     return (users
-      ?.map((c) => c.social.twitch)
+      ?.map((c) => c.social.youtube)
       .filter((c) => c !== undefined)
       .filter((c) => c) ?? []) as string[]
   }
