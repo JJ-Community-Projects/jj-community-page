@@ -879,7 +879,7 @@ export class JingleJamData extends DurableObject<Env> {
       const tiltifyUsers = await this.getTiltifyUsersMap()
 
       const list = await Promise.all(
-        data.campaigns.list.map(async (c) => {
+        rawCampaigns.map(async (c) => {
           const userSlug = c.user.slug
           const user = tiltifyUsers.get(userSlug)
           const userTwitch = user?.social.twitch
