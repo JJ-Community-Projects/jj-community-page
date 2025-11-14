@@ -15,8 +15,8 @@ export const CurrenciesSchema = z.object({
 export type CurrenciesTV = z.infer<typeof CurrenciesSchema>
 
 export const JJRaisedSchema = z.object({
-  yogscast: CurrenciesSchema,
-  fundraisers: CurrenciesSchema,
+  yogscast: CurrenciesSchema.optional(),
+  fundraisers: CurrenciesSchema.optional(),
   total: CurrenciesSchema,
 })
 

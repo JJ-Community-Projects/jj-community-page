@@ -100,7 +100,7 @@ const charities = os.charitiesContract.handler(async ({ input, context }) => {
   const stubID = DO.idFromName('JJ_API_CACHE')
   const stub = DO.get(stubID)
   const causes = await stub.getCausesTV()
-  const avgConversionRate = await stub.getAvgConversionRate()
+  const avgConversionRate = await stub.getDollarConversionRate()
   const eurRate = await stub.getGbpToEurRate()
   const c = await stub.getCampaign(input.user ?? '')
   const userFundraiser = c
@@ -189,7 +189,7 @@ const fundraisers = os.fundraisersContract.handler(
     const stubID = DO.idFromName('JJ_API_CACHE')
     const stub = DO.get(stubID)
     const list = await stub.getCampaigns()
-    const avgConversionRate = await stub.getAvgConversionRate()
+    const avgConversionRate = await stub.getDollarConversionRate()
     const eurRate = await stub.getGbpToEurRate()
 
     const c = await stub.getCampaign(input.user ?? '')
@@ -296,7 +296,7 @@ const teamFundraisers = os.teamFundraisersContract.handler(
     const stubID = DO.idFromName('JJ_API_CACHE')
     const stub = DO.get(stubID)
     const list = await stub.getCampaigns()
-    const avgConversionRate = await stub.getAvgConversionRate()
+    const avgConversionRate = await stub.getDollarConversionRate()
     const eurRate = await stub.getGbpToEurRate()
     if (!list?.length) {
       throw new ORPCError('BAD_REQUEST')
@@ -351,7 +351,7 @@ const causeFundraisers = os.causeFundraisersContract.handler(
     const stubID = DO.idFromName('JJ_API_CACHE')
     const stub = DO.get(stubID)
     const list = await stub.getCampaignsForCause(causeId)
-    const avgConversionRate = await stub.getAvgConversionRate()
+    const avgConversionRate = await stub.getDollarConversionRate()
     const eurRate = await stub.getGbpToEurRate()
 
     const c = await stub.getCampaign(input.user ?? '')

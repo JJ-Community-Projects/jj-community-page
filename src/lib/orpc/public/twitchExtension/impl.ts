@@ -475,7 +475,7 @@ const causes = os.causesContract
 
     // Fallback: compute from raw data if precomputed display is unavailable
     const causes = await stub.getCausesTV()
-    const usdRate = await stub.getAvgConversionRate()
+    const usdRate = await stub.getDollarConversionRate()
     const eurRate = await stub.getGbpToEurRate()
     if (!causes) {
       return {
@@ -525,22 +525,23 @@ const overview = os.overviewContract
     const stubID = DO.idFromName('JJ_API_CACHE')
     const stub = DO.get(stubID)
 
-    const usdRate = await stub.getAvgConversionRate()
+    const usdRate = await stub.getDollarConversionRate()
     const eurRate = await stub.getGbpToEurRate()
     const raised = await stub.getRaised()
     const collections = await stub.getCollections()
     const donations = await stub.getDonations()
     const dateStr = await stub.getDate()
+    const yogs = await stub.getCampaignBySlug('yogscast')
 
     const overview = {
       raised: {
-        yogscast: valueToCurrencies(raised.yogscast, usdRate, eurRate),
-        fundraisers: valueToCurrencies(raised.fundraisers, usdRate, eurRate),
-        total: valueToCurrencies(
-          parseFloat((raised.fundraisers + raised.yogscast).toFixed(2)),
-          usdRate,
-          eurRate,
-        ),
+        yogscast: yogs
+          ? valueToCurrencies(yogs!.raised, usdRate, eurRate)
+          : undefined,
+        fundraisers: yogs
+          ? valueToCurrencies(raised - yogs!.raised, usdRate, eurRate)
+          : undefined,
+        total: valueToCurrencies(raised, usdRate, eurRate),
       },
       collections: collections,
       donations: donations.count,

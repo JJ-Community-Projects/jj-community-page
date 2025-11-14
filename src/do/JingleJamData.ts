@@ -117,6 +117,12 @@ export class JingleJamData extends DurableObject<Env> {
     >
   }
 
+  public getCampaignBySlug(slug: string) {
+    return this.storage.get(`campaign:by-slug:${slug}`, c)as Promise<
+      JJCampaign | undefined
+    >
+  }
+
   public async getCampaigns() {
     const map = (await this.storage.list({ prefix: 'campaign:api:' })) as Map<
       string,
@@ -150,6 +156,9 @@ export class JingleJamData extends DurableObject<Env> {
 
     try {
       await this.setCampaigns(data.campaigns.list)
+      for (const c of data.campaigns.list) {
+        await this.storage.put(`campaign:by-slug:${c.user.slug}`, c)
+      }
     } catch (e) {
       console.error('setCampaigns', e)
     }
@@ -317,7 +326,7 @@ export class JingleJamData extends DurableObject<Env> {
     }
   }
 
-  public async getdollarConversionRate() {
+  public async getDollarConversionRate() {
     const dollarConversionRate = await this.storage.get<number>(
       'dollarConversionRate',
     )
@@ -331,8 +340,8 @@ export class JingleJamData extends DurableObject<Env> {
   }
 
   public async getRaised() {
-    const raised = await this.storage.get<JJRaised>('raised')
-    return raised ?? { yogscast: 0, fundraisers: 0 }
+    const raised = await this.storage.get<number>('raised')
+    return raised ?? 0
   }
 
   public async getCollections() {

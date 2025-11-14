@@ -10,6 +10,7 @@ import type { UserDisplay } from '../schemas/UserDisplaySchema.ts'
 import { jjCampaign } from '../../../db/schema/jj-api-schema.ts'
 import { ORPCError } from '@orpc/server'
 import { TwitchAPI } from '../../../twitchAPI.ts'
+import { tiltifyMetadataView } from '../../../db/schema/views-schema.ts'
 
 export async function getUserIdByTwitchChannelId(
   db: JJDrizzleDatabase,
@@ -21,6 +22,26 @@ export async function getUserIdByTwitchChannelId(
     .where(eq(twitchChannelSchema.id, channelId))
     .get()
   return channel?.userId
+}
+export async function getTiltifySlugByTwitchChannelId(
+  db: JJDrizzleDatabase,
+  channelId: string,
+) {
+  const userId = await getUserIdByTwitchChannelId(db, channelId)
+  if (!userId)
+    return {
+      slug: undefined,
+      userId: undefined,
+    }
+  const tiltify = await db
+    .select({ slug: tiltifyMetadataView.slug })
+    .from(tiltifyMetadataView)
+    .where(eq(tiltifyMetadataView.userId, userId))
+    .get()
+  return {
+    slug: tiltify?.slug,
+    userId: userId,
+  }
 }
 
 // JSON stringify that preserves Date fields by converting them to ISO strings
@@ -116,8 +137,8 @@ export type UserRelatedScheduleOutput = { teams: { streams: StreamType[] } }
 
 export type OverviewOutput = {
   raised: {
-    yogscast: CurrenciesTV
-    fundraisers: CurrenciesTV
+    yogscast?: CurrenciesTV
+    fundraisers?: CurrenciesTV
     total: CurrenciesTV
   }
   // Type of collections comes from DO; keep it generic to avoid tight coupling
@@ -396,7 +417,7 @@ export async function getCampaignByTwitchChannelId(
   db: JJDrizzleDatabase,
 ) {
   // find twitch channel
-  const userId = await getUserIdByTwitchChannelId(db, channelId)
+  const { slug, userId } = await getTiltifySlugByTwitchChannelId(db, channelId)
 
   const ConfigDO = env!.ConfigDO
   const stub = ConfigDO.get(ConfigDO.idFromName('ConfigDO'))
@@ -404,13 +425,11 @@ export async function getCampaignByTwitchChannelId(
     (await stub.getNumberConfig('twitch-extension:config.year')) ??
     new Date().getUTCFullYear()
 
-  console.log('user id', userId, 'year', year, 'channel id', channelId)
-
-  if (userId) {
+  if (slug) {
     const camp = await db
       .select()
       .from(jjCampaign)
-      .where(and(eq(jjCampaign.userId, userId), eq(jjCampaign.year, year)))
+      .where(and(eq(jjCampaign.slug, slug), eq(jjCampaign.year, year)))
       .get()
 
     return {
