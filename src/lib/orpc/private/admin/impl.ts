@@ -24,6 +24,7 @@ const refreshJJAPIData = os.refreshJJAPIDataContract.handler(
       await stub.validateTwitchChannels()
       await stub.checkLiveStreams()
       await stub.refresh()
+      await stub.insertIntoDB()
     } catch (e: any) {
       throw new ORPCError('INTERNAL_SERVER_ERROR', {
         message: e?.message ?? 'Failed to refresh',
