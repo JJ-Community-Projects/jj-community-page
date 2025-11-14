@@ -11,7 +11,7 @@ interface CommunityUserItemProps {
 export const CommunityUserItem: Component<CommunityUserItemProps> = (props) => {
   const user = () => props.user
 
-  const profileUrl = () => `/users/${user().tiltifySlug}`
+  const profileUrl = () => `/${user().tiltifySlug}`
   const twitchUrl = () =>
     user().twitchLogin
       ? `https://www.twitch.tv/${user().twitchLogin}`
