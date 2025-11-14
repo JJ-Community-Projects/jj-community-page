@@ -16,7 +16,7 @@ import type {
   JJCampaignTVType,
   JJCauseTVType,
 } from '../lib/orpc/public/twitchExtension/contract.ts'
-import type { JJCampaignType, } from '../lib/orpc/private/jjData/contract.ts'
+import type { JJCampaignType } from '../lib/orpc/private/jjData/contract.ts'
 import { and, desc, eq, or, sql } from 'drizzle-orm'
 import { schedulesTable } from '../lib/db/schema/jj-schema.ts'
 import { userDisplayView } from '../lib/db/schema/views-schema.ts'
@@ -28,7 +28,13 @@ import type { BatchItem } from 'drizzle-orm/batch'
 type UserWithTags = {
   userId: number
   tiltifySlug: string
-  tags: Array<{ name:string, id: number; slug: string; color: string; usage: number }>
+  tags: Array<{
+    name: string
+    id: number
+    slug: string
+    color: string
+    usage: number
+  }>
 }
 
 export class JingleJamData extends DurableObject<Env> {
@@ -185,7 +191,6 @@ export class JingleJamData extends DurableObject<Env> {
   }
 
   public async insertIntoDB() {
-
     const causes = await this.getCauses()
     const campaigns = await this.getCampaigns()
     const year = await this.storage.get<number>('event:year')
@@ -221,10 +226,11 @@ export class JingleJamData extends DurableObject<Env> {
 
       const getLivestream = (slug: string) => {
         const user = tiltifyUsers.get(slug)
-        if (!user) return {
-          channel: '',
-          type: '',
-        }
+        if (!user)
+          return {
+            channel: '',
+            type: '',
+          }
         if (user.social.twitch) {
           return {
             channel: this.normalizeTwitchLogin(user.social.twitch),
@@ -296,8 +302,9 @@ export class JingleJamData extends DurableObject<Env> {
   }
 
   public async getdollarConversionRate() {
-    const dollarConversionRate =
-      await this.storage.get<number>('dollarConversionRate')
+    const dollarConversionRate = await this.storage.get<number>(
+      'dollarConversionRate',
+    )
     return dollarConversionRate ?? 1
   }
 
@@ -583,8 +590,10 @@ export class JingleJamData extends DurableObject<Env> {
 
   public async loadAllTiltifySocials() {
     const campaigns = await this.getCampaigns()
+    console.log('loadAllTiltifySocials', 'campaigns', campaigns.length)
     const api = new TiltifyAPI(this.env)
     const token = await api.getAppToken()
+    console.log('loadAllTiltifySocials', 'token', token)
     const users = await Promise.all(
       campaigns.map((c) => {
         return api.getUserBySlug(c.user.slug, token)
@@ -592,6 +601,7 @@ export class JingleJamData extends DurableObject<Env> {
     )
       .then((r) => r.filter((u) => u !== null))
       .then((r) => r.map((u) => u.data))
+    console.log('loadAllTiltifySocials', 'users', users.length)
     await this.storage.put('socials:tiltify', users)
   }
 
@@ -670,15 +680,18 @@ export class JingleJamData extends DurableObject<Env> {
         const userSlug = c.user.slug
         let isLive = false
         try {
-          const val = await this.storage.get<boolean>(`campaign:live:${userSlug}`)
+          const val = await this.storage.get<boolean>(
+            `campaign:live:${userSlug}`,
+          )
           isLive = !!val
         } catch {}
 
         const user = tiltifyUsers.get(userSlug)
 
         let twitch: JJCampaignTVType['twitch'] | undefined = undefined
-        let login = user?.social.twitch ? this.normalizeTwitchLogin(user!.social.twitch)
-            : ''
+        let login = user?.social.twitch
+          ? this.normalizeTwitchLogin(user!.social.twitch)
+          : ''
 
         let twitchId = ''
         if (login) {
@@ -703,9 +716,7 @@ export class JingleJamData extends DurableObject<Env> {
           tiltifyUrl: c.url,
           tiltifyName: c.user.name,
           tiltifyDescription: c.description,
-          tiltifyCauseId: c.causeId
-            ? (c.causeId)
-            : undefined,
+          tiltifyCauseId: c.causeId ? c.causeId : undefined,
           avatar: c.user.avatar ?? '',
           raised: this.toCurrencies(c.raised, usdRate, eurRate),
           goal: this.toCurrencies(c.goal, usdRate, eurRate),
@@ -885,9 +896,9 @@ export class JingleJamData extends DurableObject<Env> {
           const userTwitch = user?.social.twitch
           const userYoutube = user?.social.youtube
 
-          const login =userTwitch
-              ? this.normalizeTwitchLogin(userTwitch)
-              : undefined
+          const login = userTwitch
+            ? this.normalizeTwitchLogin(userTwitch)
+            : undefined
 
           let tuser = undefined
 
@@ -896,19 +907,16 @@ export class JingleJamData extends DurableObject<Env> {
           }
 
           const twitchAvatar = (tuser as any)?.profile_image_url
-          const twitch =
-            userTwitch
-              ? this.toTwitchUrl(userTwitch)
-              : undefined
+          const twitch = userTwitch ? this.toTwitchUrl(userTwitch) : undefined
 
-          const youtube =userYoutube? this.toYouTubeUrl(userYoutube): undefined
+          const youtube = userYoutube
+            ? this.toYouTubeUrl(userYoutube)
+            : undefined
 
           const val = await this.storage.get<boolean>(
             `campaign:live:${c.user.slug}`,
           )
-          const sSlug = userSlug
-            ? scheduleByTiltify.get(userSlug)
-            : undefined
+          const sSlug = userSlug ? scheduleByTiltify.get(userSlug) : undefined
 
           const display: JJCampaignType = {
             campaignName: c.name,
@@ -960,7 +968,8 @@ export class JingleJamData extends DurableObject<Env> {
         if (host === 'youtu.be') {
           // Short link: https://youtu.be/<videoId>
           const id = path.replace(/^\//, '').split('/')[0]
-          if (/^[a-zA-Z0-9_-]{11}$/.test(id)) return `https://www.youtube.com/watch?v=${id}`
+          if (/^[a-zA-Z0-9_-]{11}$/.test(id))
+            return `https://www.youtube.com/watch?v=${id}`
         }
         // For other youtube.com URLs, return as-is
         return s

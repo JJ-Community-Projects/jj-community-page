@@ -20,6 +20,7 @@ const refreshJJAPIData = os.refreshJJAPIDataContract.handler(
     const stub = DO.get(stubID)
     try {
       await stub.refresh()
+      await stub.loadAllTiltifySocials()
       await stub.buildAndStoreUserTags()
       await stub.validateTwitchChannels()
       await stub.checkLiveStreams()
@@ -333,6 +334,7 @@ const getAllTwitchChannels = os.getAllTwitchChannelsContract.handler(
     const stub = DO.get(stubID)
     try {
       const channels = await stub.getAllTwitchLogins()
+      console.log('getAllTwitchChannels',channels)
       return channels
     } catch (e) {
       console.error('getAllTwitchChannels', e)

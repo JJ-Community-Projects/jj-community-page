@@ -282,7 +282,7 @@ export const JJData: Component = () => {
       <Show when={causes.data}>
         {(causes) => {
           return (
-            <For each={causes().list}>
+            <For each={causes().causes}>
               {(cause) => {
                 return (
                   <div class="my-4 rounded border border-gray-200 bg-white p-4 shadow-sm">
@@ -327,10 +327,10 @@ export const JJData: Component = () => {
                           Yogscast Raised
                         </p>
                         <p class="text-sm">
-                          GBP: {cause.raised.yogscast.gbpFormatted}
+                          GBP: {cause.raised.gbpFormatted}
                         </p>
                         <p class="text-sm">
-                          USD: {cause.raised.yogscast.usdFormatted}
+                          USD: {cause.raised.usdFormatted}
                         </p>
                       </div>
                       <div class="rounded border border-gray-100 p-3">
@@ -338,10 +338,10 @@ export const JJData: Component = () => {
                           Fundraisers Raised
                         </p>
                         <p class="text-sm">
-                          GBP: {cause.raised.fundraisers.gbpFormatted}
+                          GBP: {cause.raised.gbpFormatted}
                         </p>
                         <p class="text-sm">
-                          USD: {cause.raised.fundraisers.usdFormatted}
+                          USD: {cause.raised.usdFormatted}
                         </p>
                       </div>
                       <div class="rounded border border-gray-100 p-3">
@@ -349,10 +349,10 @@ export const JJData: Component = () => {
                           Total Raised
                         </p>
                         <p class="text-sm">
-                          GBP: {cause.raised.total.gbpFormatted}
+                          GBP: {cause.raised.gbpFormatted}
                         </p>
                         <p class="text-sm">
-                          USD: {cause.raised.total.usdFormatted}
+                          USD: {cause.raised.usdFormatted}
                         </p>
                       </div>
                     </div>

@@ -327,6 +327,8 @@ export class TiltifyAPI {
     if (!token) {
       return null
     }
+    console.log('getUserBySlug', slug,  token)
+    console.log('getUserBySlug', `https://v5api.tiltify.com/api/public/users/by/slug/${slug}`)
     const resp = await fetch(
       `https://v5api.tiltify.com/api/public/users/by/slug/${slug}`,
       {
@@ -418,14 +420,17 @@ export class TiltifyAPI {
   private async getNewAppToken(): Promise<TiltifyToken | null> {
     const TILTIFY_CLIENT_ID = this.env.TILTIFY_CLIENT_ID
     const TILTIFY_SECRET = this.env.TILTIFY_SECRET
+    console.log('getNewAppToken', TILTIFY_CLIENT_ID, TILTIFY_SECRET)
+    console.log('getNewAppToken', `https://v5api.tiltify.com/oauth/token&client_id=${TILTIFY_CLIENT_ID}&client_secret=${TILTIFY_SECRET}&grant_type=client_credentials`)
     const tokenRes = await fetch(
-      `https://v5api.tiltify.com/oauth/token&client_id=${TILTIFY_CLIENT_ID}&client_secret=${TILTIFY_SECRET}&grant_type=client_credentials`,
+      `https://v5api.tiltify.com/oauth/token?client_id=${TILTIFY_CLIENT_ID}&client_secret=${TILTIFY_SECRET}&grant_type=client_credentials`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
       },
     )
     if (!tokenRes.ok) {
+      console.error('tokenRes', tokenRes.status, await tokenRes.json())
       return null
     } else {
       const token: any = await tokenRes.json()

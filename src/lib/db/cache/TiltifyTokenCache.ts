@@ -15,7 +15,7 @@ export class TiltifyTokenCache extends Cache<string> {
 
   storeToken(userSessionId: string, token: TiltifyToken) {
     return this.putStr(`tiltify:${userSessionId}`, token.accessToken, {
-      expirationTtl: token.expiresIn / 1000,
+      expirationTtl: token.expiresIn,
     })
   }
 
