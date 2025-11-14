@@ -69,7 +69,7 @@ export interface JJCampaigns {
 export interface JingleJamResponse {
   date: string;
   event: JJEvent;
-  avgConversionRate: number;
+  dollarConversionRate: number;
   raised: number;
   collections: JJCollections;
   donations: number;
