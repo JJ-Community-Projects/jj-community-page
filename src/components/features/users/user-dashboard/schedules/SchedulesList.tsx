@@ -1,5 +1,5 @@
 import { type Component, createSignal, For, Show } from 'solid-js'
-import { QueryClientProvider, useMutation, useQuery, useQueryClient, } from '@tanstack/solid-query'
+import { QueryClientProvider, useMutation, useQueryClient, } from '@tanstack/solid-query'
 import { orpcPrivate } from '../../../../../lib/orpc/client.ts'
 import type { User } from '../../../../../lib/auth/User.ts'
 import { Dialog } from '@kobalte/core/dialog'
@@ -15,6 +15,7 @@ import {
   FaSolidTrash,
 } from 'solid-icons/fa'
 import { QueryClient } from '@tanstack/query-core'
+import { useSchedule } from '../teams/useSchedule.ts'
 
 interface SchedulesListProps {
   user: User
@@ -30,19 +31,15 @@ export const SchedulesList: Component<SchedulesListProps> = (props) => {
 
 const SchedulesListContent: Component<{ user: User }> = (props) => {
   const queryClient = useQueryClient()
-  const schedules = orpcPrivate.schedules
+  const { schedulesQuery } = useSchedule()
   const [isCreateDialogOpen, setIsCreateDialogOpen] = createSignal(false)
-
-  // Query for user schedules
-  const schedulesQuery = useQuery(() =>
-    schedules.getSchedules.queryOptions({
-      staleTime: 30 * 1000, // 30 seconds
-    }),
-  )
 
   return (
     <div class="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-8">
-      <ScheduleHeader onAddSchedule={() => setIsCreateDialogOpen(true)} />
+      <ScheduleHeader
+        schedules={schedulesQuery.data ?? []}
+        onAddSchedule={() => setIsCreateDialogOpen(true)}
+      />
 
       <Show
         when={schedulesQuery.data && schedulesQuery.data.length > 0}
@@ -105,7 +102,7 @@ const SchedulesListContent: Component<{ user: User }> = (props) => {
         onSuccess={async () => {
           // Invalidate schedules query to refresh the list
           await queryClient.invalidateQueries({
-            queryKey: schedules.getSchedules.queryKey(),
+            queryKey: orpcPrivate.schedules.getSchedules.queryKey(),
           })
         }}
       />

@@ -10,8 +10,14 @@ import {
   FaSolidUserGroup,
   FaSolidUserSlash,
 } from 'solid-icons/fa'
+import { useNow } from '../../../../lib/utils/useNow.ts'
+import { useSchedule } from './teams/useSchedule.ts'
 
 const ScheduleCard: Component = () => {
+  const now = useNow()
+  // Query for user schedules
+  const { showWarning } = useSchedule()
+
   return (
     <a
       href={`/dashboard/schedules`}
@@ -27,6 +33,16 @@ const ScheduleCard: Component = () => {
         <p class="mb-4 font-poppins text-neutral-600 ~text-sm/base">
           Manage your streaming schedules for JingleJam
         </p>
+        <Show when={showWarning()}>
+          <div class="mb-2 flex flex-col items-start justify-start gap-2">
+            <span class="rounded-full bg-warning px-2 py-1 text-sm font-medium text-white">
+              Warning
+            </span>
+            <p class="font-poppins text-warning-600 ~text-sm/base">
+              Please check if your schedule is setup correctly. If you have any issues, please contact @Ostof on Discord.
+            </p>
+          </div>
+        </Show>
         <div class="mt-auto">
           <span class="font-poppins font-medium text-accent-600">
             View Schedules →
