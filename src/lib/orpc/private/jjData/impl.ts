@@ -366,7 +366,7 @@ const getAllUsersWithInfo = os.getAllUsersWithInfoContract.handler(
     ))`.as('tags_json'),
         })
         .from(topTagsPerUser)
-        .where(sql`${topTagsPerUser.rn} <= 3`)
+        // .where(sql`${topTagsPerUser.rn} <= 3`)
         .groupBy(topTagsPerUser.userId)
         .as('tags_agg')
 
