@@ -29,6 +29,13 @@
       "when": 1763050752471,
       "tag": "0003_tiny_phantom_reporter",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1763153804967,
+      "tag": "0004_pale_the_phantom",
+      "breakpoints": true
     }
   ]
 }
