@@ -118,7 +118,7 @@ export class JingleJamData extends DurableObject<Env> {
   }
 
   public getCampaignBySlug(slug: string) {
-    return this.storage.get(`campaign:by-slug:${slug}`, c)as Promise<
+    return this.storage.get(`campaign:by-slug:${slug}`) as Promise<
       JJCampaign | undefined
     >
   }
@@ -350,8 +350,8 @@ export class JingleJamData extends DurableObject<Env> {
   }
 
   public async getDonations() {
-    const donations = await this.storage.get<JJDonations>('donations')
-    return donations ?? { count: 0 }
+    const donations = await this.storage.get<number>('donations')
+    return donations ?? 0
   }
 
   public async getDate() {
