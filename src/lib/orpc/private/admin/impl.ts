@@ -21,9 +21,9 @@ const refreshJJAPIData = os.refreshJJAPIDataContract.handler(
     try {
       await stub.refresh()
       await stub.loadAllTiltifySocials()
-      await stub.buildAndStoreUserTags()
       await stub.validateTwitchChannels()
       await stub.checkLiveStreams()
+      await stub.buildAndStoreUserTags()
       await stub.refresh()
       await stub.insertIntoDB()
     } catch (e: any) {
