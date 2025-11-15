@@ -18,7 +18,6 @@ import {
 import { userDisplayView } from '../../../db/schema/views-schema.ts'
 import { friendsTable } from '../../../db/schema/auth-schema.ts'
 import {
-  getCampaignByTwitchChannelId,
   getUserIdByTwitchChannelId,
   loadCause,
   loadOverview,
@@ -296,14 +295,16 @@ const userExtensionConfig = os.userExtensionConfigContract
       (await stub.getNumberConfig('twitch-extension:config.year')) ??
       new Date().getUTCFullYear()
 
-    // Check if JJ campaign exists for user/year
-    const { camp, userId } = await getCampaignByTwitchChannelId(
-      input.channelId,
-      context.env,
-      db,
-    )
+    const JJDO = context.env.JingleJamData
+    const jjStub = JJDO.get(JJDO.idFromName('JJ_API_CACHE'))
+    const campaignByTwitchId = await jjStub.getCampaignDisplay(input.channelId)
+    const userId = await getUserIdByTwitchChannelId(db, input.channelId)
 
-    console.log('camp', camp)
+    const x = await jjStub.getAllCampaignDisplay()
+    console.log('x', x)
+    // Check if JJ campaign exists for user/year
+
+    console.log('camp', campaignByTwitchId)
 
     let hasSchedule = false
     if (userId) {
@@ -323,7 +324,7 @@ const userExtensionConfig = os.userExtensionConfigContract
       hasSchedule = !!schedule
     }
 
-    const hasCampaign = !!camp
+    const hasCampaign = !!campaignByTwitchId
 
     let tabs: UserExtensionTab[] = []
 
@@ -389,7 +390,10 @@ const campaigns = os.campaignsContract
           const name = String(item.twitch.name).toLowerCase()
           return {
             ...item,
-            twitch: { ...item.twitch, isLive: liveSet.has(name) },
+            twitch: {
+              ...item.twitch,
+              isLive: true, // liveSet.has(name),
+            },
           }
         }
         return item
