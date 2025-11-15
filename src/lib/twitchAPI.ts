@@ -72,7 +72,7 @@ export class TwitchAPI {
     // Check if we have a valid token in KV
     const cachedToken = await this.getTokenFromKV()
     if (cachedToken) {
-      console.log('getAppToken', 'cachedToken', cachedToken)
+      // console.log('getAppToken', 'cachedToken', cachedToken)
       return cachedToken.access_token
     }
 
@@ -82,7 +82,7 @@ export class TwitchAPI {
       return undefined
     }
 
-    console.log('getAppToken', 'newToken', newToken)
+    // console.log('getAppToken', 'newToken', newToken)
 
     await this.storeToken(newToken)
     return newToken.access_token
