@@ -65,7 +65,7 @@ const useUserTagsHook = () => {
   const popularTags = () => tagSearch.popularTagsQuery.data?.tags || []
 
   const userTags = () => getUserTagsQuery.data ?? []
-  const categories = ():  {
+  const categories = (): {
     id: number
     slug: string
     name: string
@@ -158,7 +158,13 @@ const useUserTagsHook = () => {
   }
 
   const handleToggleCategory = (categoryId: number) => {
-    tagSearch.setSelectedCategoryIds([categoryId])
+    tagSearch.setSelectedCategoryIds((prev) => {
+      if (prev.includes(categoryId) && prev.length === 1) {
+        return []
+      } else {
+        return [categoryId]
+      }
+    })
     /*
     tagSearch.setSelectedCategoryIds((prev) => {
       if (prev.includes(categoryId)) {

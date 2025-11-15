@@ -6,7 +6,7 @@ import { CategoryTagsList } from './CategoryTagsList.tsx'
 
 export const UserTagsSection: Component = () => {
   return (
-    <div class="overflow-hidden rounded-2xl border border-white/20 bg-white/95 shadow-xl backdrop-blur-lg">
+    <div class="overflow-visible rounded-2xl border border-white/20 bg-white/95 shadow-xl backdrop-blur-lg">
       <div class="space-y-6 ~p-4/8">
         <div class="relative space-y-4 px-6 pb-6 leading-relaxed text-gray-700 ~text-sm/base">
           <div class="rounded-xl border border-accent/20 bg-gradient-to-br from-white to-accent/5 p-5 shadow-sm ring-1 ring-black/5">
@@ -43,16 +43,15 @@ export const UserTagsSection: Component = () => {
 
         {/* Enhanced user tags list */}
         <UserTagsList />
-        
-        {/* Enhanced search input */}
-        <TagSearchInput />
-
-        {/* Enhanced available tags list */}
-        <AvailableTagsList />
 
         {/* Category selection and tags list (merged component) */}
         <CategoryTagsList />
 
+        {/* Enhanced available tags list */}
+        <AvailableTagsList />
+
+        {/* Enhanced search input */}
+        <TagSearchInput />
       </div>
     </div>
   )
