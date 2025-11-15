@@ -532,7 +532,6 @@ const overview = os.overviewContract
     const donations = await stub.getDonations()
     const dateStr = await stub.getDate()
     const yogs = await stub.getCampaignBySlug('yogscast')
-
     const overview = {
       raised: {
         yogscast: yogs
@@ -544,7 +543,7 @@ const overview = os.overviewContract
         total: valueToCurrencies(raised, usdRate, eurRate),
       },
       collections: collections,
-      donations: donations.count,
+      donations: donations,
       date: new Date(dateStr),
     }
 
