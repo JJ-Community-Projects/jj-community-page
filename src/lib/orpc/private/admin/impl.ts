@@ -209,6 +209,11 @@ const getGBPToEURRate = os.getGBPToEURRateContract.handler(
     const stubID = DO.idFromName('JJ_API_CACHE')
     const stub = DO.get(stubID)
     try {
+      await stub.fetchGBPToEURConversionRate()
+    } catch (e) {
+      console.error(e)
+    }
+    try {
       const value = await stub.getGbpToEurRate()
       return value
     } catch (e: any) {
