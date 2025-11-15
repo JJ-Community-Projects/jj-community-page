@@ -56,6 +56,7 @@ export class JingleJamData extends DurableObject<Env> {
     ['pedguin', 'pedguin'],
     ['highrollersdnd', 'highrollersdnd'],
     ['jackmanifoldtv', 'jackmanifoldtv'],
+    ['mudkipninja', 'mudkipninja'],
   ])
 
   private get storage() {
@@ -727,7 +728,7 @@ export class JingleJamData extends DurableObject<Env> {
           }
 
           const user = tiltifyUsers.get(userSlug)
-
+          // console.log('buildAndStoreCampaignsDisplay', 'user', userSlug, 'user', user)
           let twitch: JJCampaignTVType['twitch'] | undefined = undefined
           const twitchSocial =
             this.tiltifySlugToTwitchLoginMap.get(userSlug) ?? user?.social.twitch
@@ -784,8 +785,7 @@ export class JingleJamData extends DurableObject<Env> {
                 login,
                 'display',
                 display,
-              )
-              */
+              )*/
             } else {
               /*
               console.log(
@@ -798,8 +798,7 @@ export class JingleJamData extends DurableObject<Env> {
                 login,
                 'display',
                 display
-              )
-               */
+              )*/
             }
           } catch (e) {
             console.error('buildAndStoreCampaignsDisplay', 'error storing', 'userSlug', userSlug, 'twitchSocial', twitchSocial, 'login', login, 'display', display, 'error', e)
