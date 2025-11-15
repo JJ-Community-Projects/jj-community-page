@@ -392,7 +392,7 @@ const campaigns = os.campaignsContract
             ...item,
             twitch: {
               ...item.twitch,
-              isLive: true, // liveSet.has(name),
+              isLive: liveSet.has(name),
             },
           }
         }
