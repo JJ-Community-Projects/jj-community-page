@@ -24,6 +24,7 @@ import { tags, userTagsTable } from '../lib/db/schema/tags-schema.ts'
 import { TiltifyAPI, type TiltifyUserData } from '../lib/TiltifyAPI.ts'
 import { jjCampaign, jjCauses } from '../lib/db/schema/jj-api-schema.ts'
 import type { BatchItem } from 'drizzle-orm/batch'
+import type { TwitchUser } from '../lib/model/TwitchUser.ts'
 
 type UserWithTags = {
   userId: number
@@ -402,7 +403,7 @@ export class JingleJamData extends DurableObject<Env> {
 
       if (storedInvalidSet.has(normalized)) {
         invalidLogins.push(normalized)
-        console.log('validateTwitchChannels', 'isInvalid', normalized)
+        // console.log('validateTwitchChannels', 'isInvalid', normalized)
         continue
       }
 
@@ -424,6 +425,10 @@ export class JingleJamData extends DurableObject<Env> {
 
     await this.setStringArray('twitch:validLogins', validLogins)
     await this.setStringArray('twitch:invalidLogins', invalidLogins)
+  }
+
+  public getTwitchChannelByChannelId(channelId: string) {
+    return this.storage.get<TwitchUser>(`twitch:id:${channelId}`)
   }
 
   public async checkLiveStreams() {
@@ -467,6 +472,12 @@ export class JingleJamData extends DurableObject<Env> {
     return this.storage.get<JJCampaignTVType>(
       `campaign:display:twitchId:${channelId}`,
     )
+  }
+  async getAllCampaignDisplay() {
+    const map = await this.storage.list({
+      prefix: `campaign:display:twitchId:`,
+    })
+    return Array.from(map.values()) as JJCampaignTVType[]
   }
 
   public getValidTwitchLogins() {
@@ -616,10 +627,10 @@ export class JingleJamData extends DurableObject<Env> {
 
   public async loadAllTiltifySocials() {
     const campaigns = await this.getCampaigns()
-    console.log('loadAllTiltifySocials', 'campaigns', campaigns.length)
+    // console.log('loadAllTiltifySocials', 'campaigns', campaigns.length)
     const api = new TiltifyAPI(this.env)
     const token = await api.getAppToken()
-    console.log('loadAllTiltifySocials', 'token', token)
+    // console.log('loadAllTiltifySocials', 'token', token)
     const users = await Promise.all(
       campaigns.map((c) => {
         return api.getUserBySlug(c.user.slug, token)
@@ -627,7 +638,7 @@ export class JingleJamData extends DurableObject<Env> {
     )
       .then((r) => r.filter((u) => u !== null))
       .then((r) => r.map((u) => u.data))
-    console.log('loadAllTiltifySocials', 'users', users.length)
+    // console.log('loadAllTiltifySocials', 'users', users.length)
     await this.storage.put('socials:tiltify', users)
   }
 
@@ -656,7 +667,7 @@ export class JingleJamData extends DurableObject<Env> {
 
   private normalizeTwitchLogin(input: string | undefined | null) {
     if (!input) return ''
-    let s = String(input).trim()
+    let s = String(input).trim().toLowerCase()
     // Remove protocol and domain prefixes
     s = s.replace(/^https?:\/\/(www\.)?twitch\.tv\//i, '')
     s = s.replace(/^(www\.)?twitch\.tv\//i, '')
@@ -701,64 +712,101 @@ export class JingleJamData extends DurableObject<Env> {
       const eurRate = await this.getGbpToEurRate()
       const tiltifyUsers = await this.getTiltifyUsersMap()
 
-      const displayList: JJCampaignTVType[] = []
-      for (const c of data.campaigns.list) {
-        const userSlug = c.user.slug
-        let isLive = false
-        try {
-          const val = await this.storage.get<boolean>(
-            `campaign:live:${userSlug}`,
-          )
-          isLive = !!val
-        } catch {}
+      const displayList: JJCampaignTVType[] = await Promise.all(
+        data.campaigns.list.map(async (c) => {
+          const userSlug = c.user.slug
+          // console.log('buildAndStoreCampaignsDisplay', 'processing', 'userSlug', userSlug)
+          let isLive = false
+          try {
+            const val = await this.storage.get<boolean>(
+              `campaign:live:${userSlug}`,
+            )
+            isLive = !!val
+          } catch (e) {
+            console.error('buildAndStoreCampaignsDisplay', 'error getting live flag', 'userSlug', userSlug, 'error', e)
+          }
 
-        const user = tiltifyUsers.get(userSlug)
+          const user = tiltifyUsers.get(userSlug)
 
-        let twitch: JJCampaignTVType['twitch'] | undefined = undefined
-        const twitchSocial =
-          this.tiltifySlugToTwitchLoginMap.get(userSlug) ?? user?.social.twitch
-        let login = twitchSocial ? this.normalizeTwitchLogin(twitchSocial) : ''
-
-        let twitchId = ''
-        if (login) {
-          let twitchAvatar: string | undefined
-          const tuser = await this.storage.get<any>(`twitch:login:${login}`)
-          if (tuser) {
-            twitchAvatar = (tuser as any)?.profile_image_url
-            twitchId = (tuser as any)?.id ?? ''
-            const displayName = (tuser as any)?.display_name
-            twitch = {
-              name: displayName ?? login,
-              avatar: twitchAvatar ?? c.user.avatar ?? '',
-              isLive,
-              url: `https://twitch.tv/${login}`,
+          let twitch: JJCampaignTVType['twitch'] | undefined = undefined
+          const twitchSocial =
+            this.tiltifySlugToTwitchLoginMap.get(userSlug) ?? user?.social.twitch
+          let login = twitchSocial ? this.normalizeTwitchLogin(twitchSocial) : ''
+          // console.log('buildAndStoreCampaignsDisplay', 'twitchSocial', twitchSocial, 'login', login)
+          let twitchId = ''
+          if (login) {
+            let twitchAvatar: string | undefined
+            const tuser = await this.storage.get<any>(`twitch:login:${login}`)
+            // console.log('buildAndStoreCampaignsDisplay', 'tuser', tuser)
+            if (tuser) {
+              twitchAvatar = (tuser as any)?.profile_image_url
+              twitchId = (tuser as any)?.id ?? ''
+              const displayName = (tuser as any)?.display_name
+              twitch = {
+                name: displayName ?? login,
+                avatar: twitchAvatar ?? c.user.avatar ?? '',
+                isLive,
+                url: `https://twitch.tv/${login}`,
+              }
             }
           }
-        }
 
-        const display: JJCampaignTVType = {
-          tiltifySlug: c.user.slug,
-          campaignName: c.name,
-          tiltifyUrl: c.url,
-          tiltifyName: c.user.name,
-          tiltifyDescription: c.description,
-          tiltifyCauseId: c.causeId ? c.causeId : undefined,
-          avatar: c.user.avatar ?? '',
-          raised: this.toCurrencies(c.raised, usdRate, eurRate),
-          goal: this.toCurrencies(c.goal, usdRate, eurRate),
-          twitch,
-        }
-        displayList.push(display)
-        try {
-          await this.storage.put(`campaign:display:${userSlug}`, display)
-          if (twitchId !== '') {
-            await this.storage.put(
-              `campaign:display:twitchId:${twitchId}`,
-              display,
-            )
+          const display: JJCampaignTVType = {
+            tiltifySlug: c.user.slug,
+            campaignName: c.name,
+            tiltifyUrl: c.url,
+            tiltifyName: c.user.name,
+            tiltifyDescription: c.description,
+            tiltifyCauseId: c.causeId ? c.causeId : undefined,
+            avatar: c.user.avatar ?? '',
+            raised: this.toCurrencies(c.raised, usdRate, eurRate),
+            goal: this.toCurrencies(c.goal, usdRate, eurRate),
+            twitch,
           }
-        } catch {}
-      }
+          try {
+            await this.storage.put(`campaign:display:${userSlug}`, display)
+            if (twitchId !== '') {
+              await this.storage.put(
+                `campaign:display:twitchId:${twitchId}`,
+                display,
+              )
+              /*
+              console.log(
+                'buildAndStoreCampaignsDisplay',
+                'storing twitchId',
+                'userSlug',
+                userSlug,
+                'twitchId',
+                twitchId,
+                'twitchSocial',
+                twitchSocial,
+                'login',
+                login,
+                'display',
+                display,
+              )
+              */
+            } else {
+              /*
+              console.log(
+                'buildAndStoreCampaignsDisplay',
+                'no twitchId for',
+                userSlug,
+                'twitchSocial',
+                twitchSocial,
+                'login',
+                login,
+                'display',
+                display
+              )
+               */
+            }
+          } catch (e) {
+            console.error('buildAndStoreCampaignsDisplay', 'error storing', 'userSlug', userSlug, 'twitchSocial', twitchSocial, 'login', login, 'display', display, 'error', e)
+          }
+          return display
+        })
+      )
 
       const campaignsDisplay: JJCampaignsTVType = {
         count: displayList.length,
@@ -871,8 +919,8 @@ export class JingleJamData extends DurableObject<Env> {
       let scheduleByTiltify = new Map<string, string>()
       const year = new Date().getFullYear()
       if (slugs.length > 0) {
-        console.log('fetching schedules for', slugs.length)
-        console.log('fetching schedules for', slugs)
+        // console.log('fetching schedules for', slugs.length)
+        // console.log('fetching schedules for', slugs)
         try {
           const db = getDB(this.env)
           const slugPred = or(
@@ -960,6 +1008,7 @@ export class JingleJamData extends DurableObject<Env> {
             tags: userTagsMap.get(c.user.slug)?.tags ?? [],
           }
 
+          /*
           console.log(
             'buildAndStoreCommunityCampaignsDisplay',
             'user',
@@ -974,7 +1023,7 @@ export class JingleJamData extends DurableObject<Env> {
             user,
             'display',
             display,
-          )
+          )*/
 
           return display
         }),
