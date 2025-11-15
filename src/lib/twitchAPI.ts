@@ -1,9 +1,4 @@
-import type {
-  TokenData,
-  TwitchAPIResult,
-  TwitchStream,
-  TwitchUser,
-} from './model/TwitchAPIModel.ts'
+import type { TokenData, TwitchAPIResult, TwitchStream, TwitchUser, } from './model/TwitchAPIModel.ts'
 
 export class TwitchAPI {
   private env: Env
@@ -286,7 +281,7 @@ export class TwitchAPI {
     try {
       const q = logins.join('&login=')
       const url = `https://api.twitch.tv/helix/users?login=${q}`
-      console.log('fetchUsersByLogins', 'url', url)
+      // console.log('fetchUsersByLogins', 'url', url)
       const response = await this.makeAuthenticatedRequest(url)
 
       if (!response.ok) {
@@ -332,7 +327,7 @@ export class TwitchAPI {
 
     try {
       const url = `https://api.twitch.tv/helix/users?login=${login}`
-      console.log('fetchUsersByLogins', 'url', url)
+      // console.log('fetchUsersByLogins', 'url', url)
       const response = await this.makeAuthenticatedRequest(url, accessToken)
 
       if (!response.ok) {

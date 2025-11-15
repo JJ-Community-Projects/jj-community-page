@@ -327,8 +327,8 @@ export class TiltifyAPI {
     if (!token) {
       return null
     }
-    console.log('getUserBySlug', slug,  token)
-    console.log('getUserBySlug', `https://v5api.tiltify.com/api/public/users/by/slug/${slug}`)
+    // console.log('getUserBySlug', slug,  token)
+    // console.log('getUserBySlug', `https://v5api.tiltify.com/api/public/users/by/slug/${slug}`)
     const resp = await fetch(
       `https://v5api.tiltify.com/api/public/users/by/slug/${slug}`,
       {
