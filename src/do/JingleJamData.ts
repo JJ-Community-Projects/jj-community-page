@@ -194,18 +194,18 @@ export class JingleJamData extends DurableObject<Env> {
       console.error('put dollarConversionRate', e)
     }
 
-    await this.buildDisplayData(data)
+    await this.buildDisplayData()
   }
 
-  public async buildDisplayData(data: JingleJamResponse) {
+  public async buildDisplayData() {
     // Build and store display projections matching JJCampaignsSchema
-    await this.buildAndStoreCampaignsDisplay(data)
+    await this.buildAndStoreCampaignsDisplay()
 
     // Build and store display projections for causes
-    await this.buildAndStoreCausesDisplay(data)
+    await this.buildAndStoreCausesDisplay()
 
     // Build and store display projections for community campaigns
-    await this.buildAndStoreCommunityCampaignsDisplay(data)
+    await this.buildAndStoreCommunityCampaignsDisplay()
   }
 
   public async insertIntoDB() {
@@ -690,14 +690,15 @@ export class JingleJamData extends DurableObject<Env> {
   }
 
   // Extracted from refresh: builds and stores display projections matching JJCampaignsSchema
-  private async buildAndStoreCampaignsDisplay(data: JingleJamResponse) {
+  private async buildAndStoreCampaignsDisplay() {
     try {
-      const usdRate = data.dollarConversionRate
+      const usdRate = await this.getDollarConversionRate()
       const eurRate = await this.getGbpToEurRate()
       const tiltifyUsers = await this.getTiltifyUsersMap()
+      const rawCampaigns = await this.getCampaigns()
 
       const displayList: JJCampaignTVType[] = await Promise.all(
-        data.campaigns.list.map(async (c) => {
+        rawCampaigns.map(async (c) => {
           const userSlug = c.user.slug
           // console.log('buildAndStoreCampaignsDisplay', 'processing', 'userSlug', userSlug)
           let isLive = false
@@ -825,9 +826,9 @@ export class JingleJamData extends DurableObject<Env> {
   }
 
   // Build and store display projections for causes matching causesContract output
-  private async buildAndStoreCausesDisplay(data: JingleJamResponse) {
+  private async buildAndStoreCausesDisplay() {
     try {
-      const usdRate = data.dollarConversionRate
+      const usdRate = await this.getDollarConversionRate()
       const eurRate = await this.getGbpToEurRate()
       const toCurrencies = (
         gbp: number,
@@ -855,8 +856,10 @@ export class JingleJamData extends DurableObject<Env> {
         }
       }
 
+      const rawCauses = await this.getCauses()
+
       const causes: JJCauseTVType[] = await Promise.all(
-        data.causes.map(async (c) => {
+        rawCauses.map(async (c) => {
           const raised = toCurrencies(c.raised, usdRate, eurRate)
           return {
             id: c.id,
@@ -908,14 +911,15 @@ export class JingleJamData extends DurableObject<Env> {
   // Helper: fully-qualified YouTube URL from any incoming value (channel/video URL, id, or handle)
   // Automatically detects whether the input represents a video, channel, or handle and returns
   private async buildAndStoreCommunityCampaignsDisplay(
-    data: JingleJamResponse,
   ) {
+    const rawCampaigns = await this.getCampaigns()
     try {
-      const usdRate = data.dollarConversionRate
+      const usdRate = await this.getDollarConversionRate()
       const eurRate = await this.getGbpToEurRate()
+
       const slugs = Array.from(
         new Set(
-          data.campaigns.list
+          rawCampaigns
             .map((c) => c.user?.slug)
             .filter((s): s is string => Boolean(s)),
         ),
@@ -967,7 +971,6 @@ export class JingleJamData extends DurableObject<Env> {
         )
       }
 
-      const rawCampaigns = data.campaigns.list
       const tiltifyUsers = await this.getTiltifyUsersMap()
 
       const list = await Promise.all(
