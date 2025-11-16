@@ -15,6 +15,7 @@ export async function scheduledTwitch(
   const DO = env.JingleJamData
   const stubID = DO.idFromName('JJ_API_CACHE')
   const stub = DO.get(stubID)
+  await stub.checkLiveStreams()
 
   const dbLogins = twitchChannels.map((channel) => channel.login)
   const validLogins = await stub.getValidTwitchLogins()
