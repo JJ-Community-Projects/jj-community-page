@@ -19,7 +19,7 @@ import type {
 import type { JJCampaignType } from '../lib/orpc/private/jjData/contract.ts'
 import { and, desc, eq, or, sql } from 'drizzle-orm'
 import { schedulesTable } from '../lib/db/schema/jj-schema.ts'
-import { userDisplayView } from '../lib/db/schema/views-schema.ts'
+import { userDisplayView, tagUserCountsView } from '../lib/db/schema/views-schema.ts'
 import { tags, userTagsTable } from '../lib/db/schema/tags-schema.ts'
 import { TiltifyAPI, type TiltifyUserData } from '../lib/TiltifyAPI.ts'
 import { jjCampaign, jjCauses } from '../lib/db/schema/jj-api-schema.ts'
@@ -610,7 +610,7 @@ export class JingleJamData extends DurableObject<Env> {
     // Sort by usage desc, then slug; then keep only top 3 per user
     for (const u of result) {
       u.tags.sort((a, b) => b.usage - a.usage || a.slug.localeCompare(b.slug))
-      if (u.tags.length > 3) u.tags = u.tags.slice(0, 3)
+      // if (u.tags.length > 3) u.tags = u.tags.slice(0, 3)
     }
 
     const userMap = new Map<string, UserWithTags>(
@@ -650,20 +650,16 @@ export class JingleJamData extends DurableObject<Env> {
 
   private async getUsedTagsWithUserCounts() {
     const db = getDB(this.env)
-    const usage = sql<number>`count(distinct ${userTagsTable.userId})`.as(
-      'usage',
-    )
     return db
       .select({
-        tagId: tags.id,
-        tagSlug: tags.slug,
+        tagId: tagUserCountsView.tagId,
+        tagSlug: tagUserCountsView.tagSlug,
         color: tags.color,
-        usage,
+        usage: tagUserCountsView.userCount,
       })
-      .from(userTagsTable)
-      .innerJoin(tags, eq(userTagsTable.tagId, tags.id))
-      .groupBy(tags.id)
-      .orderBy(desc(usage))
+      .from(tagUserCountsView)
+      .leftJoin(tags, eq(tags.id, tagUserCountsView.tagId))
+      .orderBy(desc(tagUserCountsView.userCount))
   }
 
   private normalizeTwitchLogin(input: string | undefined | null) {
