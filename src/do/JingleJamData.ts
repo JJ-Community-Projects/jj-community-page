@@ -1,13 +1,6 @@
 import { DurableObject } from 'cloudflare:workers'
 import { getDB } from '../lib/db/db.ts'
-import type {
-  JingleJamResponse,
-  JJCampaign,
-  JJCause,
-  JJCollections,
-  JJDonations,
-  JJRaised,
-} from './types/JJAPIModel.ts'
+import type { JingleJamResponse, JJCampaign, JJCause, JJCollections, } from './types/JJAPIModel.ts'
 import { TwitchAPI } from '../lib/twitchAPI.ts'
 import type {
   CausesDisplayTVType,
@@ -17,9 +10,9 @@ import type {
   JJCauseTVType,
 } from '../lib/orpc/public/twitchExtension/contract.ts'
 import type { JJCampaignType } from '../lib/orpc/private/jjData/contract.ts'
-import { and, desc, eq, or, sql } from 'drizzle-orm'
+import { and, desc, eq, or } from 'drizzle-orm'
 import { schedulesTable } from '../lib/db/schema/jj-schema.ts'
-import { userDisplayView, tagUserCountsView } from '../lib/db/schema/views-schema.ts'
+import { tagUserCountsView, userDisplayView, } from '../lib/db/schema/views-schema.ts'
 import { tags, userTagsTable } from '../lib/db/schema/tags-schema.ts'
 import { TiltifyAPI, type TiltifyUserData } from '../lib/TiltifyAPI.ts'
 import { jjCampaign, jjCauses } from '../lib/db/schema/jj-api-schema.ts'
@@ -613,17 +606,11 @@ export class JingleJamData extends DurableObject<Env> {
       // if (u.tags.length > 3) u.tags = u.tags.slice(0, 3)
     }
 
-    const userMap = new Map<string, UserWithTags>(
-      result.map((r) => [r.tiltifySlug, r]),
-    )
-
-    await this.storage.put('user:tags:display', userMap)
+    await this.storage.put('user:tags:display', result)
   }
 
   public getUserTagsDisplay() {
-    return this.storage.get<{ [slug: string]: UserWithTags }>(
-      'user:tags:display',
-    )
+    return this.storage.get<UserWithTags[]>('user:tags:display')
   }
 
   public async loadAllTiltifySocials() {
@@ -720,15 +707,25 @@ export class JingleJamData extends DurableObject<Env> {
             )
             isLive = !!val
           } catch (e) {
-            console.error('buildAndStoreCampaignsDisplay', 'error getting live flag', 'userSlug', userSlug, 'error', e)
+            console.error(
+              'buildAndStoreCampaignsDisplay',
+              'error getting live flag',
+              'userSlug',
+              userSlug,
+              'error',
+              e,
+            )
           }
 
           const user = tiltifyUsers.get(userSlug)
           // console.log('buildAndStoreCampaignsDisplay', 'user', userSlug, 'user', user)
           let twitch: JJCampaignTVType['twitch'] | undefined = undefined
           const twitchSocial =
-            this.tiltifySlugToTwitchLoginMap.get(userSlug) ?? user?.social.twitch
-          let login = twitchSocial ? this.normalizeTwitchLogin(twitchSocial) : ''
+            this.tiltifySlugToTwitchLoginMap.get(userSlug) ??
+            user?.social.twitch
+          let login = twitchSocial
+            ? this.normalizeTwitchLogin(twitchSocial)
+            : ''
           // console.log('buildAndStoreCampaignsDisplay', 'twitchSocial', twitchSocial, 'login', login)
           let twitchId = ''
           if (login) {
@@ -797,10 +794,23 @@ export class JingleJamData extends DurableObject<Env> {
               )*/
             }
           } catch (e) {
-            console.error('buildAndStoreCampaignsDisplay', 'error storing', 'userSlug', userSlug, 'twitchSocial', twitchSocial, 'login', login, 'display', display, 'error', e)
+            console.error(
+              'buildAndStoreCampaignsDisplay',
+              'error storing',
+              'userSlug',
+              userSlug,
+              'twitchSocial',
+              twitchSocial,
+              'login',
+              login,
+              'display',
+              display,
+              'error',
+              e,
+            )
           }
           return display
-        })
+        }),
       )
 
       const campaignsDisplay: JJCampaignsTVType = {
@@ -952,7 +962,9 @@ export class JingleJamData extends DurableObject<Env> {
       const userTags = await this.getUserTagsDisplay()
       let userTagsMap = new Map<string, UserWithTags>()
       if (userTags) {
-        userTagsMap = new Map<string, UserWithTags>(Object.entries(userTags))
+        userTagsMap = new Map<string, UserWithTags>(
+          userTags.map((u) => [u.tiltifySlug, u]),
+        )
       }
 
       const rawCampaigns = data.campaigns.list
