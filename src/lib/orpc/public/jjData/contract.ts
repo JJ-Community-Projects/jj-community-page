@@ -49,7 +49,7 @@ export const JJDataPropsOutputSchema = z.object({
   // user tags (shape is a map keyed by tiltify slug -> user data); keep loose
   getUserTagsDisplay: z.array(z.object({
     userId: z.number(),
-    tiltifySlug: z.number().nullable(),
+    tiltifySlug: z.string().nullable(),
     tags: z.array(
       z.object({
         name: z.string(),
@@ -58,7 +58,7 @@ export const JJDataPropsOutputSchema = z.object({
         color: z.string(),
         usage: z.number(),
       })
-    ),
+    ).optional().default([]),
   })).optional(),
 })
 export const getJJDataPropsContract = oc
