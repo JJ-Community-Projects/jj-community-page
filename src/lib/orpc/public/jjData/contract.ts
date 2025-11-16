@@ -6,10 +6,7 @@ import {
   JJCampaignsSchema as JJCampaignsTVSchema,
   JJCauseSchema,
 } from '../twitchExtension/contract.ts'
-import {
-  JJCampaignsSchema as CommunityJJCampaignsSchema,
-  SimpleCampaignTag as SimpleCampaignTagSchema,
-} from '../../private/jjData/contract.ts'
+import { JJCampaignsSchema as CommunityJJCampaignsSchema } from '../../private/jjData/contract.ts'
 
 // A generic contract that allows clients to request a selection of
 // cached JingleJam DO properties by name.
@@ -50,20 +47,23 @@ export const JJDataPropsOutputSchema = z.object({
   getAllYoutubeLogins: z.array(z.string()).optional(),
 
   // user tags (shape is a map keyed by tiltify slug -> user data); keep loose
-  getUserTagsDisplay: z
-    .object({})
-    .catchall(
+  getUserTagsDisplay: z.array(z.object({
+    userId: z.number(),
+    tiltifySlug: z.number().nullable(),
+    tags: z.array(
       z.object({
-        userId: z.number(),
-        tiltifySlug: z.string().nullable(),
-        tags: z.array(SimpleCampaignTagSchema).default([]),
-      }),
-    )
-    .optional(),
+        name: z.string(),
+        id: z.number(),
+        slug: z.string(),
+        color: z.string(),
+        usage: z.number(),
+      })
+    ),
+  })).optional(),
 })
 export const getJJDataPropsContract = oc
   // If no input provided, treat as an empty array (return all props)
-  .input(z.object({props: z.array(z.string()).default([])}))
+  .input(z.object({ props: z.array(z.string()).default([]) }))
   .output(JJDataPropsOutputSchema)
   .route({
     path: '/jj-data/props',
