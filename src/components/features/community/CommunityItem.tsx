@@ -1,4 +1,4 @@
-import { type Component, Show } from 'solid-js'
+import { type Component, For, Show } from 'solid-js'
 import type { JJCampaignType } from '../../../lib/orpc/private/jjData/contract.ts'
 import { useCommunityPage } from './CommunityPageProvider.tsx'
 import { twMerge } from 'tailwind-merge'
@@ -85,8 +85,28 @@ export const CommunityItem: Component<{
         <Show when={campaign.tiltifyDescription}>
           {(d) => <p class={'line-clamp-2 text-xxs opacity-90'}>{d()}</p>}
         </Show>
+        <Show when={campaign.tags.length > 0}>
+          <div class={'flex flex-wrap gap-1'}>
+            <For each={campaign.tags.slice(0, 3)}>
+              {(tag) => (
+                <span
+                  class={
+                    'inline-flex items-center rounded-full px-1.5 py-0.5 text-[8px] font-medium'
+                  }
+                  style={{
+                    border: `1px solid ${tag.color}`,
+                    color: tag.color,
+                    background: 'white',
+                  }}
+                  title={tag.slug}
+                >
+                  {tag.name}
+                </span>
+              )}
+            </For>
+          </div>
+        </Show>
         <div class={'flex-1'} />
-
         <div class={'flex gap-1'}>
           <a
             target={'_blank'}
