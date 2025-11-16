@@ -63,7 +63,7 @@ export const JJDataPropsOutputSchema = z.object({
 })
 export const getJJDataPropsContract = oc
   // If no input provided, treat as an empty array (return all props)
-  .input(z.array(z.string()).default([]))
+  .input(z.object({props: z.array(z.string()).default([])}))
   .output(JJDataPropsOutputSchema)
   .route({
     path: '/jj-data/props',

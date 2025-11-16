@@ -42,8 +42,9 @@ const getJJDataProps = os.getJJDataPropsContract.handler(
       getUserTagsDisplay: () => stub.getUserTagsDisplay(),
     }
 
+    const props = input.props
     // Determine which keys to resolve: if no input or empty array, return all
-    const requestedKeys = !input || input.length === 0 ? Object.keys(getters) : input
+    const requestedKeys = !props || props.length === 0 ? Object.keys(getters) : input.props
 
     // Build response only for requested keys that we know how to resolve
     const entries = await Promise.all(
