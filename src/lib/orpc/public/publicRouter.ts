@@ -6,6 +6,7 @@ import { hasAstroContext } from '../middleware/hasAstroContext.ts'
 import { dbMiddleware } from '../middleware/dbMiddleware.ts'
 import { overlaysScheduleRouter } from './overlays/schedule/impl.ts'
 import { twitchExtensionRouter } from './twitchExtension/impl.ts'
+import { publicJJDataRouter } from './jjData/impl.ts'
 
 export const publicRouter = os
   .use(hasAstroContext)
@@ -18,4 +19,5 @@ export const publicRouter = os
       schedule: overlaysScheduleRouter,
     },
     twitchExtension: twitchExtensionRouter,
+    jjData: publicJJDataRouter,
   })
