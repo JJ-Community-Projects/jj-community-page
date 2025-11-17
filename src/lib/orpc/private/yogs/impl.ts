@@ -38,6 +38,7 @@ export const schedule = os.schedule
   const yogsSchedule = await loadYogsSchedule(context.env.KV)
 
   if (yogsSchedule) {
+    console.log('yogs.schedule', 'cache', yogsSchedule)
     return yogsSchedule
   }
   // Resolve the current schedule year from the Config Durable Object
