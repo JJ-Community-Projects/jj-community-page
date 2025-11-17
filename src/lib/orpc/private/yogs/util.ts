@@ -1,4 +1,4 @@
-import type { YogsSchedule, YogsStream } from './contract.ts'
+import type { YogsSchedule, YogsScheduleDay, YogsScheduleWeek, YogsStream, } from './contract.ts'
 
 async function getJSON<T>(kv: KVNamespace, key: string): Promise<T | null> {
   const raw = await kv.get(key)
@@ -14,23 +14,35 @@ export async function loadYogsSchedule(
 ): Promise<YogsSchedule | null> {
   const data = await getJSON<any>(kv, 'web:yogs-schedule')
   if (!data) return null
-  const revivedDays = Array.isArray(data.days)
+  const revivedDays: YogsScheduleDay[] = Array.isArray(data.days)
     ? data.days.map((d: any) => ({
         start: new Date(d.start),
         end: new Date(d.end),
         streams: reviveStreams(d.streams),
       }))
     : []
-  const revivedWeeks = Array.isArray(data.days)
-    ? data.weeks.map((d: any) => ({
-        start: new Date(d.start),
-        end: new Date(d.end),
-        streams: reviveStreams(d.streams),
-        days: d.days.map((d: any) => ({
-          start: new Date(d.start),
-          end: new Date(d.end),
-          streams: reviveStreams(d.streams),
-        })),
+
+  // FIX: check data.weeks, not data.days
+  const revivedWeeks: YogsScheduleWeek[] = Array.isArray(data.weeks)
+    ? data.weeks.map((w: any) => ({
+        start: new Date(w.start),
+        end: new Date(w.end),
+        streams: reviveStreams(w.streams),
+        days: Array.isArray(w.days)
+          ? w.days.map((d: any) => ({
+              start: new Date(d.start),
+              end: new Date(d.end),
+              streams: reviveStreams(d.streams),
+            }))
+          : [],
+      }))
+    : []
+
+  // FIX: revive times[] to Date
+  const revivedTimes = Array.isArray(data.times)
+    ? data.times.map((t: any) => ({
+        start: new Date(t.start),
+        end: new Date(t.end),
       }))
     : []
   const revived: YogsSchedule = {
@@ -41,9 +53,10 @@ export async function loadYogsSchedule(
     days: revivedDays,
     streams: reviveStreams(data.streams),
     weeks: revivedWeeks,
-    times: data.times,
-    creators: data.creators,
-    updatedAt: new Date(data.updatedAt),
+    times: revivedTimes,
+    creators: Array.isArray(data.creators) ? data.creators : [],
+    // FIX: only set when present to avoid Invalid Date
+    ...(data.updatedAt ? { updatedAt: new Date(data.updatedAt) } : {}),
   }
   return revived
 }
