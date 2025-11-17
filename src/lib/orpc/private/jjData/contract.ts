@@ -43,6 +43,7 @@ export type SimpleCampaignTag = z.infer<typeof SimpleCampaignTag>
 const JJCampaignSchema = z.object({
   campaignName: z.string(),
   tiltifyUrl: z.string(),
+  tiltifySlug: z.string(),
   tiltifyName: z.string(),
   tiltifyDescription: z.string().optional(),
   tiltifyCauseId: z.string().nullable(),
@@ -158,10 +159,19 @@ export const UserWithInfo = UserDisplaySchema.extend({
 export type UserWithInfo = z.infer<typeof UserWithInfo>
 
 const getAllUsersWithInfoContract = oc.output(z.array(UserWithInfo))
+export const UserCampaignPairSchema = z.object({
+  user: UserWithInfo.optional(),
+  campaign: z.lazy(() => JJCampaignSchema).optional(),
+})
+
+export type UserCampaignPair = z.infer<typeof UserCampaignPairSchema>
+
+const getUserCampaignPairsContract = oc.output(z.array(UserCampaignPairSchema))
 
 export const contracts = {
   campaignsContract,
   causesContract,
   upcomingStreamsContract,
   getAllUsersWithInfoContract,
+  getUserCampaignPairsContract,
 }

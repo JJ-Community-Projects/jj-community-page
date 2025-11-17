@@ -1,12 +1,29 @@
-import { contracts, UserWithInfoTags } from './contract.ts'
+import {
+  contracts,
+  type JJCampaignType,
+  type UserWithInfo,
+  UserWithInfoTags,
+} from './contract.ts'
 import { dbMiddleware } from '../../middleware/dbMiddleware.ts'
 import { implement, ORPCError } from '@orpc/server'
 import { cacheMiddleware } from '../../middleware/cacheControl.ts'
 import { and, asc, eq, or, sql } from 'drizzle-orm'
-import { schedulesTable, streamParticipantsTable, streamsTable, } from '../../../db/schema/jj-schema.ts'
-import { streamTagsTable, tags, userTagsTable, } from '../../../db/schema/tags-schema.ts'
-import { tagUserCountsView, userDisplayView, } from '../../../db/schema/views-schema.ts'
+import {
+  schedulesTable,
+  streamParticipantsTable,
+  streamsTable,
+} from '../../../db/schema/jj-schema.ts'
+import {
+  streamTagsTable,
+  tags,
+  userTagsTable,
+} from '../../../db/schema/tags-schema.ts'
+import {
+  tagUserCountsView,
+  userDisplayView,
+} from '../../../db/schema/views-schema.ts'
 import { UserDisplaySchema } from '../../public/schemas/UserDisplaySchema.ts'
+import type { JJDrizzleDatabase } from '../../../db/db.ts'
 // New: get campaign by Twitch id
 
 const jjDataCacheMiddleware = cacheMiddleware({
@@ -328,96 +345,177 @@ const upcomingStreams = os.upcomingStreamsContract
     return { count: composed.length, streams: composed }
   })
 
-const getAllUsersWithInfo = os.getAllUsersWithInfoContract.handler(
-  async ({ context }) => {
-    try {
-      const db = context.db
-      const currentYear = new Date().getFullYear()
-      // Subquery: aggregate tags per user into JSON
-      // Step 1: Build a subquery that ranks tags per-user by global popularity
-      const topTagsPerUser = db
-        .select({
-          userId: userTagsTable.userId,
-          tagId: tagUserCountsView.tagId,
-          tagName: tagUserCountsView.tagName,
-          tagSlug: tagUserCountsView.tagSlug,
-          color: tags.color,
-          usage: tagUserCountsView.userCount,
-          rn: sql<number>`row_number() over (
+async function getUsers(db: JJDrizzleDatabase) {
+  try {
+    const currentYear = new Date().getFullYear()
+    // Subquery: aggregate tags per user into JSON
+    // Step 1: Build a subquery that ranks tags per-user by global popularity
+    const topTagsPerUser = db
+      .select({
+        userId: userTagsTable.userId,
+        tagId: tagUserCountsView.tagId,
+        tagName: tagUserCountsView.tagName,
+        tagSlug: tagUserCountsView.tagSlug,
+        color: tags.color,
+        usage: tagUserCountsView.userCount,
+        rn: sql<number>`row_number() over (
       partition by ${userTagsTable.userId}
       order by ${tagUserCountsView.userCount} desc, ${tagUserCountsView.tagName} asc
     )`.as('rn'),
-        })
-        .from(userTagsTable)
-        .leftJoin(tags, eq(userTagsTable.tagId, tags.id))
-        .leftJoin(tagUserCountsView, eq(tagUserCountsView.tagId, tags.id))
-        // Optional: only consider visible tags
-        .where(eq(tagUserCountsView.tagVisible, true))
-        .as('top_tags')
+      })
+      .from(userTagsTable)
+      .leftJoin(tags, eq(userTagsTable.tagId, tags.id))
+      .leftJoin(tagUserCountsView, eq(tagUserCountsView.tagId, tags.id))
+      // Optional: only consider visible tags
+      .where(eq(tagUserCountsView.tagVisible, true))
+      .as('top_tags')
 
-      // Step 2: Keep only the top 3 (rn <= 3) and aggregate to JSON per user
-      const tagsAgg = db
-        .select({
-          userId: topTagsPerUser.userId,
-          tagsJson: sql<string>`json_group_array(json_object(
+    // Step 2: Keep only the top 3 (rn <= 3) and aggregate to JSON per user
+    const tagsAgg = db
+      .select({
+        userId: topTagsPerUser.userId,
+        tagsJson: sql<string>`json_group_array(json_object(
       'tagId', ${topTagsPerUser.tagId},
       'name', ${topTagsPerUser.tagName},
       'slug', ${topTagsPerUser.tagSlug},
       'color', ${topTagsPerUser.color},
       'usage', ${topTagsPerUser.usage}
     ))`.as('tags_json'),
-        })
-        .from(topTagsPerUser)
-        // .where(sql`${topTagsPerUser.rn} <= 3`)
-        .groupBy(topTagsPerUser.userId)
-        .as('tags_agg')
+      })
+      .from(topTagsPerUser)
+      // .where(sql`${topTagsPerUser.rn} <= 3`)
+      .groupBy(topTagsPerUser.userId)
+      .as('tags_agg')
 
-      const rows = await db
-        .select({
-          userId: userDisplayView.userId,
-          primaryLiveStream: userDisplayView.primaryLiveStream,
-          createdAt: userDisplayView.createdAt,
-          username: userDisplayView.username,
-          profileImage: userDisplayView.profileImage,
-          twitchLogin: userDisplayView.twitchLogin,
-          tiltifySlug: userDisplayView.tiltifySlug,
-          tiltifyUrl: userDisplayView.tiltifyUrl,
-          primaryColor: userDisplayView.primaryColor,
-          accentColor: userDisplayView.accentColor,
-          // Use the pre-aggregated JSON; COALESCE to empty array when no tags
-          tags: sql<string>`COALESCE(${tagsAgg.tagsJson}, '[]')`,
-          // Select schedule slug if a primary current-year schedule exists; build URL in mapping to avoid SQL ambiguity
-          scheduleSlug: sql<string>`${schedulesTable.slug}`.as('schedule_slug'),
-        })
-        .from(userDisplayView)
-        .leftJoin(tagsAgg, eq(userDisplayView.userId, tagsAgg.userId))
-        .leftJoin(
-          schedulesTable,
-          and(
-            eq(userDisplayView.userId, schedulesTable.ownerId),
-            eq(schedulesTable.year, currentYear),
-            eq(schedulesTable.visible, true),
-            eq(schedulesTable.primary, true),
-          ),
-        )
-        .all()
+    const rows = await db
+      .select({
+        userId: userDisplayView.userId,
+        primaryLiveStream: userDisplayView.primaryLiveStream,
+        createdAt: userDisplayView.createdAt,
+        username: userDisplayView.username,
+        profileImage: userDisplayView.profileImage,
+        twitchLogin: userDisplayView.twitchLogin,
+        tiltifySlug: userDisplayView.tiltifySlug,
+        tiltifyUrl: userDisplayView.tiltifyUrl,
+        primaryColor: userDisplayView.primaryColor,
+        accentColor: userDisplayView.accentColor,
+        // Use the pre-aggregated JSON; COALESCE to empty array when no tags
+        tags: sql<string>`COALESCE(${tagsAgg.tagsJson}, '[]')`,
+        // Select schedule slug if a primary current-year schedule exists; build URL in mapping to avoid SQL ambiguity
+        scheduleSlug: sql<string>`${schedulesTable.slug}`.as('schedule_slug'),
+      })
+      .from(userDisplayView)
+      .leftJoin(tagsAgg, eq(userDisplayView.userId, tagsAgg.userId))
+      .leftJoin(
+        schedulesTable,
+        and(
+          eq(userDisplayView.userId, schedulesTable.ownerId),
+          eq(schedulesTable.year, currentYear),
+          eq(schedulesTable.visible, true),
+          eq(schedulesTable.primary, true),
+        ),
+      )
+      .all()
 
-      const result = rows.map((r) => ({
-        ...UserDisplaySchema.parse(r),
-        tags: JSON.parse(r.tags).map((t: unknown) =>
-          UserWithInfoTags.parse(t),
-        ) as UserWithInfoTags[],
-        scheduleUrl: (r as any).scheduleSlug
-          ? `/schedules/${(r as any).scheduleSlug}`
-          : undefined,
-      }))
+    const result: UserWithInfo[] = rows.map((r) => ({
+      ...UserDisplaySchema.parse(r),
+      tags: JSON.parse(r.tags).map((t: unknown) =>
+        UserWithInfoTags.parse(t),
+      ) as UserWithInfoTags[],
+      scheduleUrl: (r as any).scheduleSlug
+        ? `/schedules/${(r as any).scheduleSlug}`
+        : undefined,
+    }))
 
-      console.log(result)
-      return result
-    } catch (e) {
-      console.error(e)
-      throw new ORPCError('INTERNAL_SERVER_ERROR')
+    console.log(result)
+    return result
+  } catch (e) {
+    console.error(e)
+    throw new ORPCError('INTERNAL_SERVER_ERROR')
+  }
+}
+
+const getAllUsersWithInfo = os.getAllUsersWithInfoContract.handler(
+  async ({ context }) => {
+    return getUsers(context.db)
+  },
+)
+
+const getUserCampaignPairs = os.getUserCampaignPairsContract.handler(
+  async ({ context }) => {
+    const cache = await context.env.KV.get('getUserCampaignPairs')
+
+    if (cache) {
+      return JSON.parse(cache)
     }
+
+    const users: UserWithInfo[] = await getUsers(context.db)
+
+    const DO = context.env.JingleJamData
+    const stubID = DO.idFromName('JJ_API_CACHE')
+    const stub = DO.get(stubID)
+    const data = await stub.getCommunityCampaignsDisplay()
+    if (!data) {
+      throw new ORPCError('NOT_FOUND', {
+        message: 'No campaigns found',
+      })
+    }
+    const campaignList: JJCampaignType[] = data.list
+
+    const usersBySlug = new Map<string, UserWithInfo>()
+    for (const u of users) {
+      const slug = u.tiltifySlug
+      usersBySlug.set(slug, u)
+    }
+    const campaignsBySlug = new Map<string, JJCampaignType>()
+    for (const c of campaignList) {
+      const slug = c.tiltifySlug
+      campaignsBySlug.set(slug, c)
+    }
+
+    const slugs = new Set([...usersBySlug.keys(), ...campaignsBySlug.keys()])
+
+    const pairs: Array<{ user?: UserWithInfo; campaign?: JJCampaignType }> = []
+
+    for (const slug of slugs) {
+      const user = usersBySlug.get(slug)
+      const campaign = campaignsBySlug.get(slug)
+      pairs.push({ user, campaign })
+    }
+
+    // Sort pairs by priority:
+    // 1) live channel (campaign.isTwitchLive)
+    // 2) user is defined
+    // 3) campaign.twitch is defined
+    // 4) user.scheduleUrl is defined
+    // 5) campaign.raised.gbp (descending)
+    pairs.sort((a, b) => {
+      const aLive = a.campaign?.isTwitchLive === true
+      const bLive = b.campaign?.isTwitchLive === true
+      if (aLive !== bLive) return aLive ? -1 : 1
+
+      const aHasUser = !!a.user
+      const bHasUser = !!b.user
+      if (aHasUser !== bHasUser) return aHasUser ? -1 : 1
+
+      const aHasTwitch = !!a.campaign?.twitch
+      const bHasTwitch = !!b.campaign?.twitch
+      if (aHasTwitch !== bHasTwitch) return aHasTwitch ? -1 : 1
+
+      const aHasSchedule = !!a.user?.scheduleUrl
+      const bHasSchedule = !!b.user?.scheduleUrl
+      if (aHasSchedule !== bHasSchedule) return aHasSchedule ? -1 : 1
+
+      const aRaised = a.campaign?.raised?.gbp ?? 0
+      const bRaised = b.campaign?.raised?.gbp ?? 0
+      return bRaised - aRaised
+    })
+
+    await context.env.KV.put('getUserCampaignPairs', JSON.stringify(pairs), {
+      expirationTtl: 60,
+    })
+
+    return pairs
   },
 )
 
@@ -646,6 +744,7 @@ export const jjRouter = {
   causes,
   upcomingStreams,
   getAllUsersWithInfo,
+  getUserCampaignPairs,
   /*
   causeById,
   campaignLookup,
