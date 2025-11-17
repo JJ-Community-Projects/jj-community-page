@@ -1006,6 +1006,7 @@ export class JingleJamData extends DurableObject<Env> {
           const display: JJCampaignType = {
             campaignName: c.name,
             tiltifyUrl: c.url,
+            tiltifySlug: c.user.slug,
             tiltifyName: c.user.name,
             tiltifyDescription: c.description || undefined,
             tiltifyCauseId: c.causeId,
