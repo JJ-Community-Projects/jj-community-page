@@ -42,6 +42,8 @@ export async function loadYogsSchedule(
     streams: reviveStreams(data.streams),
     weeks: revivedWeeks,
     times: data.times,
+    creators: data.creators,
+    updatedAt: data.updatedAt,
   }
   return revived
 }
