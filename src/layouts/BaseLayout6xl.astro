@@ -8,10 +8,31 @@ interface Props {
   title?: string
   description?: string
   canonical?: string
+  og?: {
+    title?: string;
+    description?: string;
+    url?: string;
+    image?: string;
+    imageWidth?: string;
+    imageHeight?: string;
+  }
 }
 
-const { title, description, canonical } = Astro.props
+const { title, description, canonical, og: propOg } = Astro.props
 const t = title || 'Jingle Jam Community'
+
+const siteUrl = 'https://jinglejam.ostof.dev'
+const currentUrl = Astro.url.toString() // includes query params for OG url
+
+const og = {
+  title: propOg?.title ?? title,
+  description: propOg?.description ?? description,
+  url: propOg?.url ?? currentUrl,
+  image: propOg?.image ?? `${siteUrl}/jj-og.png`,
+  imageWidth: propOg?.imageWidth ?? '1200',
+  imageHeight: propOg?.imageHeight ?? '630',
+}
+
 ---
 
 <html lang="en">
@@ -52,6 +73,22 @@ const t = title || 'Jingle Jam Community'
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
     <link rel="manifest" href="/site.webmanifest" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Jingle Jam Community" />
+    <meta property="og:title" content={og.title} />
+    <meta property="og:description" content={og.description} />
+    <meta property="og:url" content={og.url} />
+    <meta property="og:image" content={og.image} />
+    <meta property="og:image:width" content={og.imageWidth} />
+    <meta property="og:image:height" content={og.imageHeight} />
+
+    {/* Twitter Card */}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={og.title} />
+    <meta name="twitter:description" content={og.description} />
+    <meta name="twitter:image" content={og.image} />
+
     <script is:inline src="/script.js"></script>
     {canonical && <link rel="canonical" href={canonical} />}
     <meta name="generator" content={Astro.generator} />

@@ -23,7 +23,7 @@ const og = {
   title,
   description,
   url: currentUrl,
-  image: `${siteUrl}/yogs-schedule-preview.jpeg`,
+  image: `${siteUrl}/jj-og-yogs.png`,
   imageWidth: '1200',
   imageHeight: '630',
 }
@@ -99,8 +99,9 @@ const eventSeriesJsonLdStr = JSON.stringify(eventSeriesJsonLd);
     <meta name="twitter:title" content={og.title} />
     <meta name="twitter:description" content={og.description} />
     <meta name="twitter:image" content={og.image} />
-  
+
     <script type="application/ld+json" set:html={eventSeriesJsonLdStr}></script>
+
     <script is:inline src="/script.js"/>
   {
     canonical &&

@@ -31,10 +31,6 @@ const joinNamesGrammatically = (names: string[], max = names.length) => {
 // Base values
 const baseTitle = 'Yogscast Jingle Jam 2025 Schedule'
 const baseDescription = 'Yogscast Jingle Jam 2025 interactive schedule in your timezone with links to participants, VODs, and more - maintained by the community.'
-const siteUrl = 'https://jinglejam.ostof.dev'
-const basePath = '/yogs'
-const baseCanonical = `${siteUrl}${basePath}`
-const currentUrl = Astro.url.toString() // includes query params for OG url
 
 // Build dynamic title/description when filtered
 let title = baseTitle
