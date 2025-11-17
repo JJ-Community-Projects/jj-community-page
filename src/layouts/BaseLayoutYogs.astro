@@ -99,24 +99,8 @@ const eventSeriesJsonLdStr = JSON.stringify(eventSeriesJsonLd);
     <meta name="twitter:title" content={og.title} />
     <meta name="twitter:description" content={og.description} />
     <meta name="twitter:image" content={og.image} />
-
-    {/* JSON-LD: EventSeries */}
-    <script type="application/ld+json">
-      {
-        '@context': 'https://schema.org',
-        '@type': 'EventSeries',
-        name: 'Yogscast Jingle Jam 2025',
-        url: 'https://jinglejam.ostof.dev/yogs',
-        startDate: '2025-12-01',
-        endDate: '2025-12-14',
-        eventAttendanceMode: 'https://schema.org/OnlineEventAttendanceMode',
-        organizer: {
-          '@type': 'Organization',
-          name: 'Jingle Jam Community',
-          url: 'https://jinglejam.ostof.dev',
-        },
-      }
-    </script>
+  
+    <script type="application/ld+json" set:html={eventSeriesJsonLdStr}></script>
     <script is:inline src="/script.js"/>
   {
     canonical &&
