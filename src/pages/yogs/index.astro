@@ -31,7 +31,10 @@ const joinNamesGrammatically = (names: string[], max = names.length) => {
   const slice = names.slice(0, max)
   if (slice.length === 1) return slice[0]
   if (slice.length === 2) return `${slice[0]} and ${slice[1]}`
-  return slice.map((n, i) => (i < slice.length - 1 ? `${n}` : `and ${n}`)).join(', ')
+  if (names.length <= max){
+    return slice.map((n, i) => (i < slice.length - 1 ? `${n}` : `and ${n}`)).join(', ')
+  }
+  return slice.join(', ') + ', and more'
 }
 
 // Base values
@@ -45,16 +48,16 @@ let description = baseDescription
 if (filteredCreators && filteredCreators.length > 0) {
   const names = filteredCreators.map((c) => c.name)
   if (names.length === 1) {
-    title = `Yogscast Jingle Jam 2025 Schedule - ${names[0]}`
-    description = `Schedule for ${names[0]} in the Yogscast Jingle Jam 2025 - times, creators, streams, and VODs.`
+    title = `Yogscast Jingle Jam ${year} Schedule - ${names[0]}`
+    description = `Schedule for ${names[0]} in the Yogscast Jingle Jam 2025 schedule with participants, streams, and VODs - maintained by the community.`
   } else if (names.length <= 3) {
     const list = joinNamesGrammatically(names)
-    title = `Yogscast Jingle Jam 2025 Schedule - ${list}`
-    description = `Schedules for ${list} in the Yogscast Jingle Jam 2025 - times, participants, and VODs.`
+    title = `Yogscast Jingle Jam ${year} Schedule - ${list}`
+    description = `Schedules for ${list} in the Yogscast Jingle Jam 2025 schedule with participants, streams, and VOD. - maintained by the community.`
   } else {
-    const list = joinNamesGrammatically(names, 3) + ' and more'
-    title = `Yogscast Jingle Jam 2025 Schedule - ${list}`
-    description = `Schedules for ${list} - Yogscast Jingle Jam 2025 times, participants, and VODs.`
+    const list = joinNamesGrammatically(names, 4)
+    title = `Yogscast Jingle Jam ${year} Schedule - ${list}`
+    description = `Schedules for ${list} - Yogscast Jingle Jam 2025 schedule with participants, streams, and VODs - maintained by the community.`
   }
 }
 
