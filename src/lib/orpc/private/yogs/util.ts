@@ -43,7 +43,7 @@ export async function loadYogsSchedule(
     weeks: revivedWeeks,
     times: data.times,
     creators: data.creators,
-    updatedAt: data.updatedAt,
+    updatedAt: new Date(data.updatedAt),
   }
   return revived
 }
