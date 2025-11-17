@@ -1,21 +1,13 @@
 ---
 export const prerender = false
+import BaseLayoutYogs from '../../layouts/BaseLayoutYogs.astro'
 import { getYogsScheduleFromContent } from '../../content/getYogsScheduleFromContent.ts'
 import YogsTVExtBanner from '../../components/yogs-pages/common/YogsTVExtBanner.astro'
 import { YogsCurrentScheduleLoader } from '../../components/yogs-pages/schedule/YogsCurrentScheduleLoader.tsx'
 
-import BaseLayout from '../../layouts/BaseLayout.astro'
-import { YogsCreatorPill } from '../../components/yogs-pages/creators/YogsCreatorPill.tsx'
-
 const fallbackSchedule = await getYogsScheduleFromContent(2023)
 const currentSchedule = await getYogsScheduleFromContent(2025)
 const creators = currentSchedule.creators
-
-const yogs = creators.filter(
-  (creator) => creator.type === 'yogs' || creator.type === 'staff',
-)
-const bestOf = creators.filter((creator) => creator.type === 'best_of')
-const friends = creators.filter((creator) => creator.type === 'friend')
 
 const filter = Astro.url.searchParams.get('filter') || ''
 console.log(filter)
@@ -29,37 +21,49 @@ const filterCreators = () => {
 
 const filteredCreators = filterCreators()
 
-let description =
-  'Yogscast Jingle Jam 2025 Interactive Schedule with additional information made by the Community.'
+const joinNamesGrammatically = (names: string[], max = names.length) => {
+  const slice = names.slice(0, max)
+  if (slice.length === 1) return slice[0]
+  if (slice.length === 2) return `${slice[0]} and ${slice[1]}`
+  return slice.map((n, i) => (i < slice.length - 1 ? `${n}` : `and ${n}`)).join(', ')
+}
 
-if (filteredCreators) {
-  if (filteredCreators.length === 1) {
-    description = `The Yogscast Jingle Jam 2025 Schedule for ${filteredCreators[0].name}`
-  } else if (filteredCreators.length <= 3) {
-    let nameStr = ''
-    const filteredCreatorsLastIndex = filteredCreators.length - 1
-    for (let i = 0; i < filteredCreators.length; i++) {
-      nameStr += filteredCreators[i].name
-      if (i < filteredCreatorsLastIndex - 1) {
-        nameStr += ', '
-      } else if (i === filteredCreatorsLastIndex - 1) {
-        nameStr += ' and '
-      }
-    }
-    description = `The Yogscast Jingle Jam 2025 Schedule for ${nameStr}`
+// Base values
+const baseTitle = 'Yogscast Jingle Jam 2025 Schedule'
+const baseDescription = 'Yogscast Jingle Jam 2025 interactive schedule in your timezone with links to participants, VODs, and more - maintained by the community.'
+const siteUrl = 'https://jinglejam.ostof.dev'
+const basePath = '/yogs'
+const baseCanonical = `${siteUrl}${basePath}`
+const currentUrl = Astro.url.toString() // includes query params for OG url
+
+// Build dynamic title/description when filtered
+let title = baseTitle
+let description = baseDescription
+
+if (filteredCreators && filteredCreators.length > 0) {
+  const names = filteredCreators.map((c) => c.name)
+  if (names.length === 1) {
+    title = `Yogscast Jingle Jam 2025 Schedule - ${names[0]}`
+    description = `Schedule for ${names[0]} in the Yogscast Jingle Jam 2025 - times, creators, streams, and VODs.`
+  } else if (names.length <= 3) {
+    const list = joinNamesGrammatically(names)
+    title = `Yogscast Jingle Jam 2025 Schedule - ${list}`
+    description = `Schedules for ${list} in the Yogscast Jingle Jam 2025 - times, participants, and VODs.`
   } else {
-    let nameStr = ''
-    for (let i = 0; i < 3; i++) {
-      nameStr += filteredCreators[i].name
-      if (i < 2) {
-        nameStr += ', '
-      } else {
-        nameStr += ' and more'
-      }
-    }
-    description = `The Yogscast Jingle Jam 2025 Schedule for ${nameStr}`
+    const list = joinNamesGrammatically(names, 3) + ' and more'
+    title = `Yogscast Jingle Jam 2025 Schedule - ${list}`
+    description = `Schedules for ${list} - Yogscast Jingle Jam 2025 times, participants, and VODs.`
   }
 }
+
+// Keep description roughly ≤160 chars for SERP
+const trim = (s: string, max = 160) => (s.length > max ? s.slice(0, max - 1) + '…' : s)
+description = trim(description)
+
+// Canonical/noindex policy for filtered pages
+const hasFilter = Boolean(filter)
+const robots = hasFilter ? 'noindex,follow' : 'index,follow'
+
 ---
 
 <style is:global>
@@ -176,9 +180,10 @@ if (filteredCreators) {
     }
   }
 </style>
-<BaseLayout
-  title="The Yogscast Jingle Jam 2025 Schedule"
+<BaseLayoutYogs
+  title={title}
   description={description}
+  robots={robots}
   canonical="https://jinglejam.ostof.dev/yogs"
 >
   <YogsTVExtBanner />
@@ -190,4 +195,4 @@ if (filteredCreators) {
       fallbackSchedule={fallbackSchedule!}
     />
   </div>
-</BaseLayout>
+</BaseLayoutYogs>

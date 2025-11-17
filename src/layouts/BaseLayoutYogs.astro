@@ -4,15 +4,48 @@ import Footer from "../components/layout/footer/Footer.astro";
 import FeedbackBanner from "../components/features/feedback/FeedbackBanner.astro";
 import AdminNavigation from "../components/layout/navigation/AdminNavigation.astro";
 
-
 interface Props {
   title?: string;
   description?: string;
   canonical?: string;
+  robots?: string;
 }
 
-const {title, description, canonical} = Astro.props;
+const {title, description, canonical, robots = 'index,follow'} = Astro.props;
 const t = title || 'Jingle Jam Community';
+const siteUrl = 'https://jinglejam.ostof.dev'
+const basePath = '/yogs'
+const baseCanonical = `${siteUrl}${basePath}`
+const currentUrl = Astro.url.toString() // includes query params for OG url
+
+
+const og = {
+  title,
+  description,
+  url: currentUrl,
+  image: `${siteUrl}/yogs-schedule-preview.jpg`,
+  imageWidth: '1200',
+  imageHeight: '630',
+}
+
+// Structured data: EventSeries for the Jingle Jam schedule
+const eventSeriesJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'EventSeries',
+  name: 'Yogscast Jingle Jam 2025',
+  url: baseCanonical,
+  startDate: '2025-12-01',
+  endDate: '2025-12-14',
+  eventAttendanceMode: 'https://schema.org/OnlineEventAttendanceMode',
+  organizer: {
+    '@type': 'Organization',
+    name: 'Jingle Jam Community',
+    url: siteUrl,
+  },
+}
+
+const eventSeriesJsonLdStr = JSON.stringify(eventSeriesJsonLd);
+
 ---
 <html lang="en">
 <head>
@@ -47,6 +80,43 @@ const t = title || 'Jingle Jam Community';
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="manifest" href="/site.webmanifest">
+
+    {/* Robots for filtered pages */}
+    <meta name="robots" content={robots} />
+
+    {/* Open Graph */}
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Jingle Jam Community" />
+    <meta property="og:title" content={og.title} />
+    <meta property="og:description" content={og.description} />
+    <meta property="og:url" content={og.url} />
+    <meta property="og:image" content={og.image} />
+    <meta property="og:image:width" content={og.imageWidth} />
+    <meta property="og:image:height" content={og.imageHeight} />
+
+    {/* Twitter Card */}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={og.title} />
+    <meta name="twitter:description" content={og.description} />
+    <meta name="twitter:image" content={og.image} />
+
+    {/* JSON-LD: EventSeries */}
+    <script type="application/ld+json">
+      {
+        '@context': 'https://schema.org',
+        '@type': 'EventSeries',
+        name: 'Yogscast Jingle Jam 2025',
+        url: 'https://jinglejam.ostof.dev/yogs',
+        startDate: '2025-12-01',
+        endDate: '2025-12-14',
+        eventAttendanceMode: 'https://schema.org/OnlineEventAttendanceMode',
+        organizer: {
+          '@type': 'Organization',
+          name: 'Jingle Jam Community',
+          url: 'https://jinglejam.ostof.dev',
+        },
+      }
+    </script>
     <script is:inline src="/script.js"/>
   {
     canonical &&

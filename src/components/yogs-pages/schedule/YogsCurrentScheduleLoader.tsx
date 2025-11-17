@@ -54,9 +54,13 @@ const ConfigLoader: Component<ConfigLoaderProps> = (props) => {
         <Show when={!config.data?.showSchedule}>
           <div
             class={
-              'flex w-full flex-col items-center justify-center gap-1 rounded-xl border border-white/10 bg-white/5 p-4 text-center text-white text-white/90 sm:p-4'
+              'flex w-full flex-col items-center justify-center gap-1 rounded-xl border border-white/10 bg-white/5 p-4 text-center text-white/90 sm:p-4'
             }
           >
+            <h1 class={'text-center ~text-2xl/4xl'}>Yogscast Jingle Jam Schedule 2025</h1>
+            <h2 class="text-center ~text-lg/xl">
+              The Yogscast Jingle Jam in your timezone with Links to participants, vods and more.
+            </h2>
             <MainCountdownSimple />
             <MainJJStartTimes />
             <p>

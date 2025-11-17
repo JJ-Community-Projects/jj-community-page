@@ -1,6 +1,6 @@
 ---
-import {loadScheduleFromContent} from "../../content/loadScheduleFromContent";
 import StreamPlaceholder from "./StreamPlaceholder.astro";
+import { loadScheduleFromContent } from '../../../../content/loadScheduleFromContent.ts'
 const schedule = await loadScheduleFromContent('2024')
 
 const week = schedule!.weeks[0]
