@@ -30,6 +30,7 @@
     "@astrojs/sitemap": "^3.4.0",
     "@astrojs/solid-js": "^5.1.0",
     "@astrojs/tailwind": "^5.1.5",
+    "@cf-wasm/photon": "^0.2.2",
     "@kobalte/core": "^0.13.10",
     "@orpc/client": "^1.9.2",
     "@orpc/contract": "^1.9.2",
@@ -40,6 +41,7 @@
     "@orpc/tanstack-query": "^1.9.2",
     "@orpc/zod": "^1.9.2",
     "@solid-primitives/scheduled": "^1.5.1",
+    "@solid-primitives/storage": "^4.3.3",
     "@solidjs/router": "^0.15.3",
     "@tailwindcss/container-queries": "^0.1.1",
     "@tailwindcss/typography": "^0.5.16",
@@ -72,8 +74,7 @@
     "tailwindcss": "^3.4.17",
     "tinybase": "^6.3.0",
     "yaml": "^2.8.0",
-    "yjs": "^13.6.27",
-    "@solid-primitives/storage": "^4.3.3"
+    "yjs": "^13.6.27"
   },
   "devDependencies": {
     "@drzl/cli": "^0.1.0",

@@ -47,19 +47,26 @@ export const JJDataPropsOutputSchema = z.object({
   getAllYoutubeLogins: z.array(z.string()).optional(),
 
   // user tags (shape is a map keyed by tiltify slug -> user data); keep loose
-  getUserTagsDisplay: z.array(z.object({
-    userId: z.number(),
-    tiltifySlug: z.string().nullable(),
-    tags: z.array(
+  getUserTagsDisplay: z
+    .array(
       z.object({
-        name: z.string(),
-        id: z.number(),
-        slug: z.string(),
-        color: z.string(),
-        usage: z.number(),
-      })
-    ).optional().default([]),
-  })).optional(),
+        userId: z.number(),
+        tiltifySlug: z.string().nullable(),
+        tags: z
+          .array(
+            z.object({
+              name: z.string(),
+              id: z.number(),
+              slug: z.string(),
+              color: z.string(),
+              usage: z.number(),
+            }),
+          )
+          .optional()
+          .default([]),
+      }),
+    )
+    .optional(),
 })
 export const getJJDataPropsContract = oc
   // If no input provided, treat as an empty array (return all props)
@@ -77,4 +84,39 @@ export const getJJDataPropsContract = oc
 
 export const jjDataContracts = {
   getJJDataPropsContract,
+  // Returns an image/png preview of the Yogs schedule with optional creator avatars overlay
+}
+
+// Expose the yogs schedule preview image (public)
+export const getYogsSchedulePreviewImageContract = oc
+  .input(
+    z.object({
+      filter: z
+        .string()
+        .optional()
+        .describe('Comma-separated creator slugs/ids'),
+      year: z
+        .union([z.string(), z.number()])
+        .optional()
+        .describe('Schedule year (defaults to 2025)')
+        .default('2025'),
+    }),
+  )
+  // We return a raw Response streaming image/png; keep schema loose
+  .output(z.file().mime('image/png'))
+  .route({
+    path: '/jj-data/yogs-schedule-preview-image',
+    method: 'GET',
+    operationId: 'getYogsSchedulePreviewImage',
+    summary: 'Generate Yogs schedule preview image',
+    description:
+      'Returns a PNG card. If filter is provided, overlays up to 5 creator avatars onto the base image.',
+    tags: ['jj-data'],
+    successStatus: 307,
+    outputStructure: 'detailed',
+  })
+
+// Re-export contracts object including the new route
+export const yogsImageContracts = {
+  getYogsSchedulePreviewImageContract,
 }

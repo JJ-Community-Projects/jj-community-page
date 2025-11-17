@@ -1,31 +1,45 @@
 ---
-import Navigation from '../components/layout/navigation/Navigation.astro';
-import Footer from "../components/layout/footer/Footer.astro";
-import FeedbackBanner from "../components/features/feedback/FeedbackBanner.astro";
-import AdminNavigation from "../components/layout/navigation/AdminNavigation.astro";
+import Navigation from '../components/layout/navigation/Navigation.astro'
+import Footer from '../components/layout/footer/Footer.astro'
+import FeedbackBanner from '../components/features/feedback/FeedbackBanner.astro'
+import AdminNavigation from '../components/layout/navigation/AdminNavigation.astro'
 
 interface Props {
-  title?: string;
-  description?: string;
-  canonical?: string;
-  robots?: string;
+  title?: string
+  description?: string
+  canonical?: string
+  robots?: string
+
+  og?: {
+    title?: string
+    description?: string
+    url?: string
+    image?: string
+    imageWidth?: string
+    imageHeight?: string
+  }
 }
 
-const {title, description, canonical, robots = 'index,follow'} = Astro.props;
-const t = title || 'Jingle Jam Community';
+const {
+  title,
+  description,
+  canonical,
+  robots = 'index,follow',
+  og: propOg,
+} = Astro.props
+const t = title || 'Jingle Jam Community'
 const siteUrl = 'https://jinglejam.ostof.dev'
 const basePath = '/yogs'
 const baseCanonical = `${siteUrl}${basePath}`
 const currentUrl = Astro.url.toString() // includes query params for OG url
 
-
 const og = {
-  title,
-  description,
-  url: currentUrl,
-  image: `${siteUrl}/jj-og-yogs.png`,
-  imageWidth: '1200',
-  imageHeight: '630',
+  title: propOg?.title ?? title,
+  description: propOg?.description ?? description,
+  url: propOg?.url ?? currentUrl,
+  image: propOg?.image ?? `${siteUrl}/jj-og-yogs.png`,
+  imageWidth: propOg?.imageWidth ?? '1200',
+  imageHeight: propOg?.imageHeight ?? '630',
 }
 
 // Structured data: EventSeries for the Jingle Jam schedule
@@ -44,42 +58,46 @@ const eventSeriesJsonLd = {
   },
 }
 
-const eventSeriesJsonLdStr = JSON.stringify(eventSeriesJsonLd);
-
+const eventSeriesJsonLdStr = JSON.stringify(eventSeriesJsonLd)
 ---
+
 <html lang="en">
-<head>
+  <head>
     <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-P6MYGN62FW"/>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-P6MYGN62FW"
+    ></script>
     <script is:inline>
-      window.dataLayer = window.dataLayer || [];
+      window.dataLayer = window.dataLayer || []
 
       function gtag() {
-        dataLayer.push(arguments);
+        dataLayer.push(arguments)
       }
 
-      gtag('js', new Date());
-      gtag("consent", "default", {
-        ad_storage: "denied",
-        ad_user_data: "denied",
-        ad_personalization: "denied",
-        analytics_storage: "granted",
-        functionality_storage: "granted",
-      });
-      gtag('config', 'G-P6MYGN62FW', {anonymize_ip: true, cookie_flags: 'max-age=7200;secure;samesite=none'});
-      window.gtag = gtag;
+      gtag('js', new Date())
+      gtag('consent', 'default', {
+        ad_storage: 'denied',
+        ad_user_data: 'denied',
+        ad_personalization: 'denied',
+        analytics_storage: 'granted',
+        functionality_storage: 'granted',
+      })
+      gtag('config', 'G-P6MYGN62FW', {
+        anonymize_ip: true,
+        cookie_flags: 'max-age=7200;secure;samesite=none',
+      })
+      window.gtag = gtag
     </script>
-    <link rel="sitemap" href="/sitemap-index.xml"/>
-    <meta charset="UTF-8"/>
-    <meta name="description" content=`${description || ''}`/>
-    <meta name="viewport" content="width=device-width"/>
-    <link rel="icon" type="image/svg+xml" href="/jj-favicon.svg"/>
-    <link rel="shortcut icon" href="/favicon.ico"/>
-    <meta name="apple-mobile-web-app-title" content="Jingle Jam"/>
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-    <link rel="manifest" href="/site.webmanifest">
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <meta charset="UTF-8" />
+    <meta name="description" content=`${description || ''}` />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/jj-favicon.svg" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <meta name="apple-mobile-web-app-title" content="Jingle Jam" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="manifest" href="/site.webmanifest" />
 
     {/* Robots for filtered pages */}
     <meta name="robots" content={robots} />
@@ -100,169 +118,169 @@ const eventSeriesJsonLdStr = JSON.stringify(eventSeriesJsonLd);
     <meta name="twitter:description" content={og.description} />
     <meta name="twitter:image" content={og.image} />
 
-    <script type="application/ld+json" set:html={eventSeriesJsonLdStr}></script>
+    <script type="application/ld+json" set:html={eventSeriesJsonLdStr} />
 
-    <script is:inline src="/script.js"/>
-  {
-    canonical &&
-          <link rel="canonical" href={canonical}/>
-  }
-    <meta name="generator" content={Astro.generator}/>
+    <script is:inline src="/script.js"></script>
+    {canonical && <link rel="canonical" href={canonical} />}
+    <meta name="generator" content={Astro.generator} />
     <title>{t}</title>
-</head>
-<body class="h-screen overflow-hidden font-poppins bg-gradient-to-br from-primary-shade via-primary to-primary-shade">
-<div class="h-full overflow-y-auto p-2">
-    <div class="flex flex-col justify-start min-h-screen">
+  </head>
+  <body
+    class="h-screen overflow-hidden font-poppins bg-gradient-to-br from-primary-shade via-primary to-primary-shade"
+  >
+    <div class="h-full overflow-y-auto p-2">
+      <div class="flex flex-col justify-start min-h-screen">
         <div class="flex flex-col gap-2 items-center">
-            <Navigation/>
-            <AdminNavigation/>
+          <Navigation />
+          <AdminNavigation />
         </div>
-        <FeedbackBanner/>
-        <div class="mt-4 mx-4 xl:mx-20 flex flex-col justify-start items-center">
-            <slot/>
+        <FeedbackBanner />
+        <div
+          class="mt-4 mx-4 xl:mx-20 flex flex-col justify-start items-center"
+        >
+          <slot />
         </div>
+      </div>
+      <Footer />
     </div>
-    <Footer/>
-</div>
-</body>
+  </body>
 </html>
 
-
 <style is:global>
-    @font-face {
-        font-family: 'Bebas';
-        src: url('../fonts/BebasNeues/BebasNeue-Regular.ttf');
-        font-style: normal;
-        font-weight: 400;
-    }
+  @font-face {
+    font-family: 'Bebas';
+    src: url('../fonts/BebasNeues/BebasNeue-Regular.ttf');
+    font-style: normal;
+    font-weight: 400;
+  }
 
-    @font-face {
-        font-family: 'Poppins';
-        src: url('../fonts/Poppins/Poppins-Bold.ttf');
-        font-style: normal;
-        font-weight: 700;
-    }
+  @font-face {
+    font-family: 'Poppins';
+    src: url('../fonts/Poppins/Poppins-Bold.ttf');
+    font-style: normal;
+    font-weight: 700;
+  }
 
-    @font-face {
-        font-family: 'Poppins';
-        src: url('../fonts/Poppins/Poppins-BoldItalic.ttf');
-        font-style: italic;
-        font-weight: 700;
-    }
+  @font-face {
+    font-family: 'Poppins';
+    src: url('../fonts/Poppins/Poppins-BoldItalic.ttf');
+    font-style: italic;
+    font-weight: 700;
+  }
 
-    @font-face {
-        font-family: 'Poppins';
-        src: url('../fonts/Poppins/Poppins-ExtraBold.ttf');
-        font-style: normal;
-        font-weight: 800;
-    }
+  @font-face {
+    font-family: 'Poppins';
+    src: url('../fonts/Poppins/Poppins-ExtraBold.ttf');
+    font-style: normal;
+    font-weight: 800;
+  }
 
-    @font-face {
-        font-family: 'Poppins';
-        src: url('../fonts/Poppins/Poppins-ExtraBoldItalic.ttf');
-        font-style: italic;
-        font-weight: 800;
-    }
+  @font-face {
+    font-family: 'Poppins';
+    src: url('../fonts/Poppins/Poppins-ExtraBoldItalic.ttf');
+    font-style: italic;
+    font-weight: 800;
+  }
 
-    @font-face {
-        font-family: 'Poppins';
-        src: url('../fonts/Poppins/Poppins-ExtraLight.ttf');
-        font-style: normal;
-        font-weight: 300;
-    }
+  @font-face {
+    font-family: 'Poppins';
+    src: url('../fonts/Poppins/Poppins-ExtraLight.ttf');
+    font-style: normal;
+    font-weight: 300;
+  }
 
-    @font-face {
-        font-family: 'Poppins';
-        src: url('../fonts/Poppins/Poppins-ExtraLightItalic.ttf');
-        font-style: italic;
-        font-weight: 300;
-    }
+  @font-face {
+    font-family: 'Poppins';
+    src: url('../fonts/Poppins/Poppins-ExtraLightItalic.ttf');
+    font-style: italic;
+    font-weight: 300;
+  }
 
-    @font-face {
-        font-family: 'Poppins';
-        src: url('../fonts/Poppins/Poppins-Italic.ttf');
-        font-style: italic;
-        font-weight: 400;
-    }
+  @font-face {
+    font-family: 'Poppins';
+    src: url('../fonts/Poppins/Poppins-Italic.ttf');
+    font-style: italic;
+    font-weight: 400;
+  }
 
-    @font-face {
-        font-family: 'Poppins';
-        src: url('../fonts/Poppins/Poppins-Light.ttf');
-        font-style: normal;
-        font-weight: 300;
-    }
+  @font-face {
+    font-family: 'Poppins';
+    src: url('../fonts/Poppins/Poppins-Light.ttf');
+    font-style: normal;
+    font-weight: 300;
+  }
 
-    @font-face {
-        font-family: 'Poppins';
-        src: url('../fonts/Poppins/Poppins-LightItalic.ttf');
-        font-style: italic;
-        font-weight: 300;
-    }
+  @font-face {
+    font-family: 'Poppins';
+    src: url('../fonts/Poppins/Poppins-LightItalic.ttf');
+    font-style: italic;
+    font-weight: 300;
+  }
 
-    @font-face {
-        font-family: 'Poppins';
-        src: url('../fonts/Poppins/Poppins-Medium.ttf');
-        font-style: normal;
-        font-weight: 500;
-    }
+  @font-face {
+    font-family: 'Poppins';
+    src: url('../fonts/Poppins/Poppins-Medium.ttf');
+    font-style: normal;
+    font-weight: 500;
+  }
 
-    @font-face {
-        font-family: 'Poppins';
-        src: url('../fonts/Poppins/Poppins-MediumItalic.ttf');
-        font-style: italic;
-        font-weight: 500;
-    }
+  @font-face {
+    font-family: 'Poppins';
+    src: url('../fonts/Poppins/Poppins-MediumItalic.ttf');
+    font-style: italic;
+    font-weight: 500;
+  }
 
-    @font-face {
-        font-family: 'Poppins';
-        src: url('../fonts/Poppins/Poppins-Regular.ttf');
-        font-style: normal;
-        font-weight: 400;
-    }
+  @font-face {
+    font-family: 'Poppins';
+    src: url('../fonts/Poppins/Poppins-Regular.ttf');
+    font-style: normal;
+    font-weight: 400;
+  }
 
-    @font-face {
-        font-family: 'Poppins';
-        src: url('../fonts/Poppins/Poppins-SemiBold.ttf');
-        font-style: normal;
-        font-weight: 700;
-    }
+  @font-face {
+    font-family: 'Poppins';
+    src: url('../fonts/Poppins/Poppins-SemiBold.ttf');
+    font-style: normal;
+    font-weight: 700;
+  }
 
-    @font-face {
-        font-family: 'Poppins';
-        src: url('../fonts/Poppins/Poppins-SemiBoldItalic.ttf');
-        font-style: italic;
-        font-weight: 700;
-    }
+  @font-face {
+    font-family: 'Poppins';
+    src: url('../fonts/Poppins/Poppins-SemiBoldItalic.ttf');
+    font-style: italic;
+    font-weight: 700;
+  }
 
-    @font-face {
-        font-family: 'Poppins';
-        src: url('../fonts/Poppins/Poppins-Thin.ttf');
-        font-style: normal;
-        font-weight: 100;
-    }
+  @font-face {
+    font-family: 'Poppins';
+    src: url('../fonts/Poppins/Poppins-Thin.ttf');
+    font-style: normal;
+    font-weight: 100;
+  }
 
-    @font-face {
-        font-family: 'Poppins';
-        src: url('../fonts/Poppins/Poppins-ThinItalic.ttf');
-        font-style: italic;
-        font-weight: 100;
-    }
+  @font-face {
+    font-family: 'Poppins';
+    src: url('../fonts/Poppins/Poppins-ThinItalic.ttf');
+    font-style: italic;
+    font-weight: 100;
+  }
 
-    @font-face {
-        font-family: 'Poppins';
-        src: url('../fonts/Poppins/Poppins-Black.ttf');
-        font-style: normal;
-        font-weight: 900;
-    }
+  @font-face {
+    font-family: 'Poppins';
+    src: url('../fonts/Poppins/Poppins-Black.ttf');
+    font-style: normal;
+    font-weight: 900;
+  }
 
-    @font-face {
-        font-family: 'Poppins';
-        src: url('../fonts/Poppins/Poppins-BlackItalic.ttf');
-        font-style: italic;
-        font-weight: 900;
-    }
+  @font-face {
+    font-family: 'Poppins';
+    src: url('../fonts/Poppins/Poppins-BlackItalic.ttf');
+    font-style: italic;
+    font-weight: 900;
+  }
 
-    body {
-        font-family: 'Poppins', sans-serif;
-    }
+  body {
+    font-family: 'Poppins', sans-serif;
+  }
 </style>

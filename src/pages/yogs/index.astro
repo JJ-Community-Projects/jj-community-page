@@ -5,12 +5,18 @@ import { getYogsScheduleFromContent } from '../../content/getYogsScheduleFromCon
 import YogsTVExtBanner from '../../components/yogs-pages/common/YogsTVExtBanner.astro'
 import { YogsCurrentScheduleLoader } from '../../components/yogs-pages/schedule/YogsCurrentScheduleLoader.tsx'
 
+const ConfigDO = Astro.locals.runtime.env.ConfigDO
+const stubId = ConfigDO.idFromName('ConfigDO')
+const stub = ConfigDO.get(stubId)
+
+const year = await stub.getNumberConfig('web:config.year') ?? 2025
+
 const fallbackSchedule = await getYogsScheduleFromContent(2023)
-const currentSchedule = await getYogsScheduleFromContent(2025)
+const currentSchedule = await getYogsScheduleFromContent(year)
 const creators = currentSchedule.creators
 
 const filter = Astro.url.searchParams.get('filter') || ''
-console.log(filter)
+
 const filterCreators = () => {
   if (filter === '') {
     return null
@@ -59,6 +65,12 @@ description = trim(description)
 // Canonical/noindex policy for filtered pages
 const hasFilter = Boolean(filter)
 const robots = hasFilter ? 'noindex,follow' : 'index,follow'
+
+
+const siteUrl = 'https://jinglejam.ostof.dev'
+const notFilterImage = `${siteUrl}/jj-og-yogs.png`
+const filterImage = `${siteUrl}/api/public/jj-data/yogs-schedule-preview-image?filter=${filter}&year=${year}`
+const ogImage = hasFilter ? filterImage : notFilterImage
 
 ---
 
@@ -181,6 +193,9 @@ const robots = hasFilter ? 'noindex,follow' : 'index,follow'
   description={description}
   robots={robots}
   canonical="https://jinglejam.ostof.dev/yogs"
+  og={{
+    image: ogImage,
+  }}
 >
   <YogsTVExtBanner />
 
