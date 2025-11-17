@@ -129,7 +129,6 @@ const getYogsSchedulePreviewImage = os.getYogsSchedulePreviewImageContract
             .filter(Boolean)
         : []
 
-      console.log('[orpc] /jj-data/yogs-schedule-preview-image', { filter })
 
       // Load base card from /public via same-origin fetch
       const baseRes = await fetch(new URL('/jj-og-yogs-filter.png', reqUrl))
@@ -138,11 +137,14 @@ const getYogsSchedulePreviewImage = os.getYogsSchedulePreviewImageContract
           message: 'Base image not found',
         })
       }
+
       const baseArrayBuffer = await baseRes.arrayBuffer()
       const baseUint8 = new Uint8Array(baseArrayBuffer)
 
       if (slugs.length === 0) {
         // Return a File to satisfy z.file().mime("image/png") schema
+        const baseRes = await fetch(new URL('/jj-og-yogs.png', reqUrl))
+        const baseArrayBuffer = await baseRes.arrayBuffer()
         return new File([baseArrayBuffer], 'yogs-schedule-preview.png', {
           type: 'image/png',
         })
@@ -165,6 +167,8 @@ const getYogsSchedulePreviewImage = os.getYogsSchedulePreviewImageContract
 
       if (avatars.length === 0) {
         // Return a File (no overlays) per schema
+        const baseRes = await fetch(new URL('/jj-og-yogs.png', reqUrl))
+        const baseArrayBuffer = await baseRes.arrayBuffer()
         return new File([baseArrayBuffer], 'yogs-schedule-preview.png', {
           type: 'image/png',
         })
@@ -194,8 +198,6 @@ const getYogsSchedulePreviewImage = os.getYogsSchedulePreviewImageContract
         avatarImg.free()
       }
 
-      // Load Poppins Regular TTF via same-origin fetch
-      const fontUrl = new URL('/fonts/Poppins/Poppins-Regular.ttf', reqUrl)
       // Draw labels centered under each avatar
       const estCharW = Math.round(0.55 * FONT_SIZE)
       for (let i = 0; i < total; i++) {
@@ -239,7 +241,7 @@ const getYogsSchedulePreviewImage = os.getYogsSchedulePreviewImageContract
       })
     } catch (err) {
       console.error('[orpc] yogs-schedule-preview-image error:', err)
-      const baseRes = await fetch(new URL('/jj-og-yogs-filter.png', reqUrl))
+      const baseRes = await fetch(new URL('/jj-og-yogs.png', reqUrl))
       const baseArrayBuffer = await baseRes.arrayBuffer()
       return new File([baseArrayBuffer], 'yogs-schedule-preview.png', {
         type: 'image/png',

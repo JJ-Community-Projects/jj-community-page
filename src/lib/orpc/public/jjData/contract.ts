@@ -112,8 +112,6 @@ export const getYogsSchedulePreviewImageContract = oc
     description:
       'Returns a PNG card. If filter is provided, overlays up to 5 creator avatars onto the base image.',
     tags: ['jj-data'],
-    successStatus: 307,
-    outputStructure: 'detailed',
   })
 
 // Re-export contracts object including the new route
