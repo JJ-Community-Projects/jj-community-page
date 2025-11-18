@@ -2,8 +2,8 @@ link: https://www.youtube.com/@thelongestjohns
 name: The Longest Johns
 type: friend
 profileImage:
-  large: https://yt3.ggpht.com/HI3MXlSOX8aFQEhdV2M6krRVUUmGrdwHsa_gkqQ_J3Hcg5uNi_fNyYu25W4-E830Kxae4E55=s88-c-k-c0x00ffffff-no-rj
-  small: https://yt3.ggpht.com/HI3MXlSOX8aFQEhdV2M6krRVUUmGrdwHsa_gkqQ_J3Hcg5uNi_fNyYu25W4-E830Kxae4E55=s88-c-k-c0x00ffffff-no-rj
+  large: https://yt3.googleusercontent.com/EkgcYfQRjZiBNJcRb0ymZMGZ0HaWAStzGbzFEYG6m1Y-b8eyhQ4xNi8F3UfPYrcN4syEe8HNvw=s300-c-k-c0x00ffffff-no-rj
+  small: https://yt3.googleusercontent.com/EkgcYfQRjZiBNJcRb0ymZMGZ0HaWAStzGbzFEYG6m1Y-b8eyhQ4xNi8F3UfPYrcN4syEe8HNvw=s70-c-k-c0x00ffffff-no-rj
 links:
   - name: Twitter
     type: twitter
@@ -14,3 +14,6 @@ links:
   - name: Twitch
     type: twitch
     url: https://www.twitch.tv/longestjohnsgaming
+  - name: YouTube
+    type: youtube
+    url: https://www.youtube.com/@thelongestjohns

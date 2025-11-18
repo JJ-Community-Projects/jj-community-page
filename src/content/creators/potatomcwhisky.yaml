@@ -1,6 +1,9 @@
 name: potatomcwhiskey
 link: https://www.twitch.tv/potatomcwhiskey
 twitchUser: potatomcwhiskey
+profileImage:
+  large: https://static-cdn.jtvnw.net/jtv_user_pictures/f61c5703-4774-44c7-8beb-55c7af05c34f-profile_image-300x300.png
+  small: https://static-cdn.jtvnw.net/jtv_user_pictures/f61c5703-4774-44c7-8beb-55c7af05c34f-profile_image-70x70.png
 type: friend
 links:
   - name: Twitter

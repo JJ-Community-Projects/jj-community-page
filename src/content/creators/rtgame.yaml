@@ -2,6 +2,9 @@ links:
   - name: Twitch
     type: twitch
     url: https://www.twitch.tv/rtgame
+  - name: Youtube
+    type: Youtube
+    url: https://www.youtube.com/@RTGame
 name: RTGame
 type: friend
 link: https://www.twitch.tv/rtgame

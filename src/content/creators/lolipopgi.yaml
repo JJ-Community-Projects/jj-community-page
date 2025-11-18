@@ -1,6 +1,10 @@
 name: Lolip
 link: https://www.twitch.tv/lolipopgi
 twitchUser: lolipopgi
+profileImage:
+  large: https://static-cdn.jtvnw.net/jtv_user_pictures/31f544e9-6e69-4962-ace1-c39b8e81920a-profile_image-300x300.png
+  small: https://static-cdn.jtvnw.net/jtv_user_pictures/31f544e9-6e69-4962-ace1-c39b8e81920a-profile_image-70x70.png
+
 style:
   primaryColor: '#129670'
   accentColor: '#d96260'

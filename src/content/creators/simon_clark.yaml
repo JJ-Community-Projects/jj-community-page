@@ -2,10 +2,17 @@ name: Dr. Simon Clark
 link: https://www.twitch.tv/drsimonclark
 twitchUser: drsimonclark
 type: friend
+profileImage:
+  large: https://yt3.googleusercontent.com/ytc/AIdro_me3fz_LIqw8IjHEy8lI6_cG9BIUsgQS9_J6mwcZ3KXxis=s300-c-k-c0x00ffffff-no-rj
+  small: https://yt3.googleusercontent.com/ytc/AIdro_me3fz_LIqw8IjHEy8lI6_cG9BIUsgQS9_J6mwcZ3KXxis=s70-c-k-c0x00ffffff-no-rj
+
 links:
   - name: Twitter
     type: twitter
     url: https://twitter.com/simonoxfphys
   - name: Twitch
     type: twitch
+    url: https://www.twitch.tv/drsimonclark
+  - name: Youtube
+    type: Youtube
     url: https://www.twitch.tv/drsimonclark
