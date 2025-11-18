@@ -8,7 +8,7 @@ import { useIsBeforeJJ, useIsJJ, useJJStartCountdown, useNextJJStartDate, } from
 import { QueryClientProvider } from '@tanstack/solid-query'
 import { QueryClient } from '@tanstack/query-core'
 import { RadioGroup } from '@kobalte/core/radio-group'
-import { CommunityPageProvider, useCommunityPage, } from './CommunityPageProvider.tsx'
+import { CommunityPageProvider, useCommunityPage, type CommunityInitialData, } from './CommunityPageProvider.tsx'
 import { FaSolidHeart } from 'solid-icons/fa'
 import { UpcomingStreams } from './UpcomingStreams.tsx'
 import { CommunityItem } from './CommunityItem.tsx'
@@ -16,12 +16,16 @@ import { CommunityCauseCard } from './CommunityCauseCard.tsx'
 import { CommunityUsers } from './CommunityUsers.tsx'
 import { CommunityTagSearch } from './CommunityTagSearch.tsx'
 
-export const CommunityPage: Component = () => {
+export interface CommunityPageProps {
+  initial?: CommunityInitialData
+}
+
+export const CommunityPage: Component<CommunityPageProps> = (props) => {
   const i18n = createI18n({ language: useLocale().locale() })
   return (
     <QueryClientProvider client={new QueryClient()}>
       <I18nProvider i18n={i18n}>
-        <CommunityPageProvider>
+        <CommunityPageProvider initial={props.initial}>
           <_CommunityPage />
         </CommunityPageProvider>
       </I18nProvider>

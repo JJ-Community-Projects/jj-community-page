@@ -9,7 +9,7 @@ import { JJLogo } from '../common/JJLogo.tsx'
 import { JJLink } from '../common/JJLinkCard.tsx'
 
 export type CauseFundraiserProps = {
-  causeId?: number
+  causeId?: string
   theme?: 'default' | 'red' | 'blue'
   speed?: number
   showRaised?: boolean
@@ -20,7 +20,7 @@ export type CauseFundraiserProps = {
 const Body: Component<CauseFundraiserProps> = (props) => {
   const showRaised = () => props.showRaised ?? true
 
-  const causeId = () => (props.causeId ?? 0) | 0
+  const causeId = () => props.causeId ?? ''
 
   const causeQ = useQuery(() =>
     orpcPrivate.overlay.causeFundraisers.queryOptions({

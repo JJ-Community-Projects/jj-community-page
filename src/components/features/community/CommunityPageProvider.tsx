@@ -1,13 +1,28 @@
-import { createContext, createMemo, createSignal, type ParentComponent, useContext, } from 'solid-js'
+import { createContext, createMemo, createSignal, onMount, type ParentComponent, useContext, } from 'solid-js'
 import { useQuery } from '@tanstack/solid-query'
 import { orpcPrivate } from '../../../lib/orpc/client.ts'
 import { makePersisted } from '@solid-primitives/storage'
+import type { JJCampaignsType, JJCauseType, } from '../../../lib/orpc/private/jjData/contract.ts'
 
-const useCommunityPageHook = () => {
+export interface CommunityInitialData {
+  community?: JJCampaignsType
+  causes?: { causes: JJCauseType[], count:number }
+  upcomingStreams?: any
+  users?: any[]
+}
+
+const useCommunityPageHook = (initial?: CommunityInitialData) => {
+  const [enable, setEnable] = createSignal<boolean>(false)
+
+  onMount(() => setEnable(true))
+
   const communityQuery = useQuery(() =>
     orpcPrivate.jj.campaigns.queryOptions({
       staleTime: 60_000 * 4,
       refetchInterval: 60_000 * 5,
+      enabled: enable(),
+      placeholderData: (prev) => prev ?? initial?.community,
+      experimental_prefetchInRender: true,
     }),
   )
 
@@ -15,6 +30,9 @@ const useCommunityPageHook = () => {
     orpcPrivate.jj.causes.queryOptions({
       staleTime: 60_000 * 4,
       refetchInterval: 60_000 * 5,
+      enabled: enable(),
+      placeholderData: (prev) => prev ?? initial?.causes,
+      experimental_prefetchInRender: true,
     }),
   )
 
@@ -22,12 +40,19 @@ const useCommunityPageHook = () => {
     orpcPrivate.jj.upcomingStreams.queryOptions({
       staleTime: 60_000 * 8,
       refetchInterval: 60_000 * 10,
+      enabled: enable(),
+      placeholderData: (prev) => prev ?? initial?.upcomingStreams,
+      experimental_prefetchInRender: true,
     }),
   )
+
   const users = useQuery(() =>
     orpcPrivate.jj.getAllUsersWithInfo.queryOptions({
       staleTime: 60_000 * 8,
       refetchInterval: 60_000 * 10,
+      enabled: enable(),
+      placeholderData: (prev) => prev ?? initial?.users,
+      experimental_prefetchInRender: true,
     }),
   )
 
@@ -92,7 +117,10 @@ const useCommunityPageHook = () => {
     return c
   }
 
-  const baseSortedCampaigns = () => (sortBy() === 'live' ? campaignsSortedByLiveFirst() : campaignsSortedByRaised())
+  const baseSortedCampaigns = () =>
+    sortBy() === 'live'
+      ? campaignsSortedByLiveFirst()
+      : campaignsSortedByRaised()
 
   // Sorted campaigns with optional tag filtering and prioritization
   const campaignsSorted = createMemo(() => {
@@ -124,7 +152,8 @@ const useCommunityPageHook = () => {
   // campaigns by cause with tag filtering/prioritization
   const campaignsByCauseFiltered = createMemo(() => {
     const selected = selectedTagIds()
-    if (!causeQuery.data || !communityQuery.data) return [] as ReturnType<typeof campaignsByCause>
+    if (!causeQuery.data || !communityQuery.data)
+      return [] as ReturnType<typeof campaignsByCause>
     const allByCause = campaignsByCause()
     if (selected.length === 0) return allByCause
     return allByCause
@@ -160,7 +189,9 @@ const useCommunityPageHook = () => {
   }
 }
 
-interface CommunityPageProps {}
+interface CommunityPageProps {
+  initial?: CommunityInitialData
+}
 
 const CommunityPageContext =
   createContext<ReturnType<typeof useCommunityPageHook>>()
@@ -168,7 +199,7 @@ const CommunityPageContext =
 export const CommunityPageProvider: ParentComponent<CommunityPageProps> = (
   props,
 ) => {
-  const hook = useCommunityPageHook()
+  const hook = useCommunityPageHook(props.initial)
   return (
     <CommunityPageContext.Provider value={hook}>
       {props.children}

@@ -1,5 +1,5 @@
 import { useJJStartCountdown, useNextJJStartDate, } from '../../../lib/utils/jjDates.ts'
-import { type Component, Show } from 'solid-js'
+import { type Component } from 'solid-js'
 
 export const MainCountdownSimple: Component = () => {
   const nextJJStartDate = useNextJJStartDate()
@@ -31,18 +31,7 @@ export const MainJJStartTimes: Component = () => {
         <p class={'text-lg sm:text-xl'}>
           {nextJJStartDate().toLocal().toFormat('ttt')}
         </p>
-      </div>
-      <Show when={!isLocalTimeZoneUK()}>
-        <div class={'flex-1'}>
-          <p class={'mt-2 text-white/60 sm:text-xs'}>UK time</p>
-          <p class={'text-lg sm:text-xl'}>
-            {nextJJStartDate().toFormat('DDDD')}
-          </p>
-          <p class={'text-lg sm:text-xl'}>
-            {nextJJStartDate().toFormat('ttt')}
-          </p>
-        </div>
-      </Show>
+      </div> 
     </div>
   )
 }

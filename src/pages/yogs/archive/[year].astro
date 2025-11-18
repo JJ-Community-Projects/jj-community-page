@@ -141,7 +141,7 @@ const friends = creators.filter((creator) => creator.type === 'friend')
     <YogsScheduleComponent
       schedule={schedule}
       creators={creators}
-      client:only="solid-js"
+      client:load
     />
   </div>
 

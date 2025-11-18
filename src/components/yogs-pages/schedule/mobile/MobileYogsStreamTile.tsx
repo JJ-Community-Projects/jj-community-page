@@ -104,12 +104,7 @@ export const MobileYogsStreamTile: Component<MobileScheduleBodyProps> = (
             class={
               'schedule-card flex flex-col items-center justify-center p-1 text-center transition-all'
             }
-            style={
-              {
-                //    ...background(),
-              }
-            }
-            onclick={() => {
+            onClick={() => {
               logSlotClick(stream)
               modal.open()
             }}

@@ -1,11 +1,20 @@
-import { type Component, For, Match, Show, Switch } from 'solid-js'
+import {
+  type Component,
+  createSignal,
+  For,
+  Match,
+  onMount,
+  Show,
+  Suspense,
+  Switch,
+} from 'solid-js'
 import { YogsScheduleComponent } from './YogsScheduleComponent.tsx'
 import type {
+  YogsConfig,
   YogsCreator,
   YogsSchedule,
 } from '../../../lib/orpc/private/yogs/contract.ts'
 import { PlaceholderSchedule } from './placeholder/PlaceholderSchedule.tsx'
-import { Countdown } from '../../common/ui/Countdown.tsx'
 import { MobileYogsScheduleComponent } from './mobile/MobileYogsScheduleComponent.tsx'
 import { YogsScheduleDisclaimer } from './YogsScheduleDisclaimer.tsx'
 import { QueryClientProvider, useQuery } from '@tanstack/solid-query'
@@ -29,19 +38,30 @@ import { YogsCreatorPill } from '../creators/YogsCreatorPill.tsx'
 interface ConfigLoaderProps {
   creators: YogsCreator[]
   fallbackSchedule: YogsSchedule
+  config: YogsConfig
 }
 
 const ConfigLoader: Component<ConfigLoaderProps> = (props) => {
+  const [enabled, setEnabled] = createSignal<boolean>(false)
+
   const config = useQuery(() =>
     orpcPrivate.yogs.config.queryOptions({
       staleTime: 60_000 * 5,
       refetchInterval: 60_000 * 10,
-      refetchOnMount: true,
+      refetchOnMount: false,
       refetchOnReconnect: true,
       refetchIntervalInBackground: true,
       refetchOnWindowFocus: false,
+      enabled: enabled(),
+      placeholderData: (prev) => prev ?? props.config,
+      experimental_prefetchInRender: true,
     }),
   )
+
+  onMount(() => {
+    setEnabled(true)
+  })
+
   return (
     <Switch>
       <Match when={config.data}>
@@ -52,76 +72,7 @@ const ConfigLoader: Component<ConfigLoaderProps> = (props) => {
           />
         </Show>
         <Show when={!config.data?.showSchedule}>
-          <div
-            class={
-              'flex w-full flex-col items-center justify-center gap-1 rounded-xl border border-white/10 bg-white/5 p-4 text-center text-white/90 sm:p-4'
-            }
-          >
-            <h1 class={'text-center ~text-2xl/4xl'}>Yogscast Jingle Jam Schedule 2025</h1>
-            <h2 class="text-center ~text-lg/xl">
-              The Yogscast Jingle Jam in your timezone with Links to participants, vods and more.
-            </h2>
-            <MainCountdownSimple />
-            <MainJJStartTimes />
-            <p>
-              The <span class={'font-bold'}>Yogscast Jingle Jam Schedule</span>{' '}
-              will be shown once it was announced on Social Media.
-            </p>
-            <div
-              class={
-                'flex w-full flex-row items-center justify-center gap-4 p-2'
-              }
-            >
-              <a
-                class={'transition-all hover:scale-110'}
-                href={'https://www.youtube.com/yogscast'}
-                target={'_blank'}
-                aria-label={'Yogscast Youtube channel'}
-              >
-                <YoutubeIcon class={'size-4'} />
-              </a>
-              <a
-                class={'transition-all hover:scale-110'}
-                href={'https://twitch.tv/yogscast'}
-                target={'_blank'}
-                aria-label={'Yogscast Twitch channel'}
-              >
-                <TwitchIcon class={'size-4'} />
-              </a>
-              <a
-                class={'transition-all hover:scale-110'}
-                target={'_blank'}
-                href={'https://bsky.app/profile/yogscast.com'}
-                aria-label={'Yogscast Blue sky'}
-              >
-                <BskyIcon class={'size-4'} />
-              </a>
-              <a
-                class={'transition-all hover:scale-110'}
-                target={'_blank'}
-                href={'https://x.com/yogscast'}
-                aria-label={'Yogscast Twitter'}
-              >
-                <TwitterIcon class={'size-4'} />
-              </a>
-              <a
-                class={'transition-all hover:scale-110'}
-                target={'_blank'}
-                href={'https://www.instagram.com/officialyogscast/'}
-                aria-label={'Yogscast Instagram'}
-              >
-                <InstagramIcon class={'size-4'} />
-              </a>
-              <a
-                class={'transition-all hover:scale-110'}
-                target={'_blank'}
-                href={'https://www.tiktok.com/@yogscastofficial'}
-                aria-label={'Jingle Jam Tiktok'}
-              >
-                <TiktokIcon class={'size-4'} />
-              </a>
-            </div>
-          </div>
+          <Countdown />
         </Show>
       </Match>
     </Switch>
@@ -131,20 +82,28 @@ const ConfigLoader: Component<ConfigLoaderProps> = (props) => {
 interface CurrentScheduleLoaderProps {
   creators: YogsCreator[]
   fallbackSchedule: YogsSchedule
+  config: YogsConfig
 }
 
 export const YogsCurrentScheduleLoader: Component<
   CurrentScheduleLoaderProps
 > = (props) => {
+  onMount(() => {
+    console.log('YogsCurrentScheduleLoader onMount')
+  })
+
   return (
-    <div class={'min-h-20'}>
-      <QueryClientProvider client={new QueryClient()}>
-        <ConfigLoader
-          creators={props.creators}
-          fallbackSchedule={props.fallbackSchedule}
-        />
-      </QueryClientProvider>
-    </div>
+    <Suspense>
+      <div class={'min-h-20'}>
+        <QueryClientProvider client={new QueryClient()}>
+          <ConfigLoader
+            creators={props.creators}
+            fallbackSchedule={props.fallbackSchedule}
+            config={props.config}
+          />
+        </QueryClientProvider>
+      </div>
+    </Suspense>
   )
 }
 
@@ -154,16 +113,25 @@ interface BodyProps {
 }
 
 const Body: Component<BodyProps> = (props) => {
+  const [enabled, setEnabled] = createSignal<boolean>(false)
+
   const schedule = useQuery(() =>
     orpcPrivate.yogs.schedule.queryOptions({
       staleTime: 60_000 * 5,
       refetchInterval: 60_000 * 10,
-      refetchOnMount: true,
+      refetchOnMount: false,
       refetchOnReconnect: true,
       refetchIntervalInBackground: true,
       refetchOnWindowFocus: false,
+      enabled: enabled(),
+      placeholderData: (prev) => prev ?? props.fallbackSchedule,
+      experimental_prefetchInRender: true,
     }),
   )
+
+  onMount(() => {
+    setEnabled(true)
+  })
 
   return (
     <Switch>
@@ -325,7 +293,7 @@ const Creators: Component<{
             </For>
           </div>
         </Show>
-        <Show when={yogs.length > 0}>
+        <Show when={bestOf.length > 0}>
           <p class="mb-1 text-xl text-white">Best of</p>
           <div class="flex flex-wrap items-center justify-center gap-2">
             <For each={bestOf}>
@@ -343,5 +311,79 @@ const Creators: Component<{
         </Show>
       </div>
     </Show>
+  )
+}
+
+const Countdown: Component = () => {
+  return (
+    <div
+      class={
+        'flex w-full flex-col items-center justify-center gap-1 rounded-xl border border-white/10 bg-white/5 p-4 text-center text-white/90 sm:p-4'
+      }
+    >
+      <h1 class={'text-center ~text-2xl/4xl'}>
+        Yogscast Jingle Jam Schedule 2025
+      </h1>
+      <h2 class="text-center ~text-lg/xl">
+        The Yogscast Jingle Jam in your timezone with Links to participants,
+        vods and more.
+      </h2>
+      <MainCountdownSimple />
+      <MainJJStartTimes />
+      <p>
+        The <span class={'font-bold'}>Yogscast Jingle Jam Schedule</span> will
+        be shown once it was announced on Social Media.
+      </p>
+      <div class={'flex w-full flex-row items-center justify-center gap-4 p-2'}>
+        <a
+          class={'transition-all hover:scale-110'}
+          href={'https://www.youtube.com/yogscast'}
+          target={'_blank'}
+          aria-label={'Yogscast Youtube channel'}
+        >
+          <YoutubeIcon class={'size-4'} />
+        </a>
+        <a
+          class={'transition-all hover:scale-110'}
+          href={'https://twitch.tv/yogscast'}
+          target={'_blank'}
+          aria-label={'Yogscast Twitch channel'}
+        >
+          <TwitchIcon class={'size-4'} />
+        </a>
+        <a
+          class={'transition-all hover:scale-110'}
+          target={'_blank'}
+          href={'https://bsky.app/profile/yogscast.com'}
+          aria-label={'Yogscast Blue sky'}
+        >
+          <BskyIcon class={'size-4'} />
+        </a>
+        <a
+          class={'transition-all hover:scale-110'}
+          target={'_blank'}
+          href={'https://x.com/yogscast'}
+          aria-label={'Yogscast Twitter'}
+        >
+          <TwitterIcon class={'size-4'} />
+        </a>
+        <a
+          class={'transition-all hover:scale-110'}
+          target={'_blank'}
+          href={'https://www.instagram.com/officialyogscast/'}
+          aria-label={'Yogscast Instagram'}
+        >
+          <InstagramIcon class={'size-4'} />
+        </a>
+        <a
+          class={'transition-all hover:scale-110'}
+          target={'_blank'}
+          href={'https://www.tiktok.com/@yogscastofficial'}
+          aria-label={'Jingle Jam Tiktok'}
+        >
+          <TiktokIcon class={'size-4'} />
+        </a>
+      </div>
+    </div>
   )
 }
