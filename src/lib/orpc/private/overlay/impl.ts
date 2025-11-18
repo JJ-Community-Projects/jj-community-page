@@ -1,17 +1,11 @@
 import { implement, ORPCError } from '@orpc/server'
 import { contracts, type FundraiserItem } from './contract'
 import { dbMiddleware } from '../../middleware/dbMiddleware'
-import {
-  schedulesTable,
-  streamsTable,
-  teamMembersTable,
-  teamsTable,
-} from '../../../db/schema/jj-schema'
+import { schedulesTable, streamsTable, teamMembersTable, teamsTable, } from '../../../db/schema/jj-schema'
 import { and, eq, gte, inArray } from 'drizzle-orm'
 import { getScheduleStreams } from '../../public/schedules/util'
-import { accounts } from '../../../db/schema/auth-schema'
 import type { JJCampaign } from '../../../../do/types/JJAPIModel.ts'
-import { userDisplayView } from '../../../db/schema/views-schema.ts'
+import { tiltifyMetadataView, userDisplayView, } from '../../../db/schema/views-schema.ts'
 import { DateTime, IANAZone } from 'luxon'
 import { getStreamColors } from '../../../../functions/jjDatesToColors.ts'
 
@@ -42,7 +36,7 @@ function campaignMapper(
     currency: cur,
   }).format(raised ?? 0)
   return {
-    id: String(c.slug ?? ''),
+    slug: String(c.slug ?? ''),
     title: String(c?.user?.name ?? c.name ?? ''),
     raisedFormatted,
     raised: raised ?? 0,
@@ -129,7 +123,7 @@ const charities = os.charitiesContract.handler(async ({ input, context }) => {
           : raisedGBP
     const raisedFormatted = formatter.format(convertedRaised)
     return {
-      id: Number(cause.id),
+      id: (cause.id),
       name: String(cause.name ?? ''),
       logoUrl: cause.logo || undefined,
       websiteUrl: cause.url || undefined,
@@ -153,16 +147,17 @@ const causeById = os.causeByIdContract.handler(async ({ input, context }) => {
   const causes = await stub.getCausesTV()
   if (!causes?.length) return null
 
-  const id = Math.floor(input.causeId)
-  if (!Number.isFinite(id) || id < 0) return null
+  const id = (input.causeId)
+  if (id === '') return null
 
-  const cause = causes.find((c) => Number(c?.id) === id)
+  const cause = causes.find((c) => (c?.id) === id)
+  console.log('cause', cause)
   if (!cause) return null
 
   const r = new Date().getUTCSeconds()
 
   return {
-    id: Number(cause.id),
+    id:  (cause.id),
     name: String(cause.name ?? ''),
     logoUrl: cause.logo || undefined,
     websiteUrl: cause.url || undefined,
@@ -267,14 +262,12 @@ const teamFundraisers = os.teamFundraisersContract.handler(
     // Get Tiltify accounts for these users
     const tiltifyAccounts = await db
       .select({
-        providerId: accounts.providerId,
-        providerUsername: accounts.providerUsername,
+        slug: tiltifyMetadataView.slug
       })
-      .from(accounts)
+      .from(tiltifyMetadataView)
       .where(
         and(
-          eq(accounts.provider, 'tiltify'),
-          inArray(accounts.userId, userIds),
+          inArray(tiltifyMetadataView.userId, userIds),
         ),
       )
       .all()
@@ -283,12 +276,9 @@ const teamFundraisers = os.teamFundraisersContract.handler(
       throw new ORPCError('BAD_REQUEST')
     }
 
-    const idSet = new Set<number>()
     const slugSet = new Set<string>()
     for (const a of tiltifyAccounts) {
-      const n = Number(a.providerId)
-      if (!Number.isNaN(n)) idSet.add(n)
-      if (a.providerUsername) slugSet.add(a.providerUsername.toLowerCase())
+      slugSet.add(a.slug)
     }
 
     // Fetch campaigns from DO and filter
@@ -302,10 +292,9 @@ const teamFundraisers = os.teamFundraisersContract.handler(
       throw new ORPCError('BAD_REQUEST')
     }
 
-    const filtered = list.filter((c: any) => {
-      const uid = Number(c?.user?.id ?? NaN)
+    const filtered = list.filter((c) => {
       const uslug = String(c?.user?.slug ?? '').toLowerCase()
-      return (uid && idSet.has(uid)) || (uslug && slugSet.has(uslug))
+      return  (uslug && slugSet.has(uslug))
     })
 
     const mapped = filtered.map((c) =>
@@ -351,6 +340,7 @@ const causeFundraisers = os.causeFundraisersContract.handler(
     const stubID = DO.idFromName('JJ_API_CACHE')
     const stub = DO.get(stubID)
     const list = await stub.getCampaignsForCause(causeId)
+    console.log(list)
     const avgConversionRate = await stub.getDollarConversionRate()
     const eurRate = await stub.getGbpToEurRate()
 
@@ -369,6 +359,7 @@ const causeFundraisers = os.causeFundraisersContract.handler(
     const mapped = list.map((c) =>
       campaignMapper(c, currency, avgConversionRate, eurRate),
     )
+    console.log('causeFundraisers','mapped', mapped)
 
     switch (orderBy) {
       case 'top':

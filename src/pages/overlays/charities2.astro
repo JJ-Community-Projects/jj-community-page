@@ -27,7 +27,7 @@ const currency = (() => {
 })()
 const showUrl = showUrlParam === undefined ? undefined : (showUrlParam === 'true' || showUrlParam === '1')
 const causes = causesParam
-  ? causesParam.split(',').map((s) => Number(s.trim())).filter((n) => !Number.isNaN(n))
+  ? causesParam.split(',').map((s) => (s.trim()))
   : undefined
 ---
   <div class="h-screen bg-transparent text-white">

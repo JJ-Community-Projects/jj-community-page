@@ -5,7 +5,7 @@ import { z } from 'zod/v4'
 // Shared overlay types
 // ----------------------
 export const CharityItemSchema = z.object({
-  id: z.number().int().nonnegative(),
+  id: z.string(),
   name: z.string(),
   description: z.string(),
   logoUrl: z.string().optional(),
@@ -18,7 +18,7 @@ export const CharityItemSchema = z.object({
 export type CharityItem = z.infer<typeof CharityItemSchema>
 
 export const FundraiserItemSchema = z.object({
-  id: z.string(),
+  slug: z.string(),
   title: z.string(),
   raisedFormatted: z.string(),
   raised: z.number(),
@@ -65,7 +65,7 @@ const charitiesContract = oc
 const causeByIdContract = oc
   .input(
     z.object({
-      causeId: z.number().int().nonnegative(),
+      causeId: z.string(),
       includeTotals: z.boolean().optional(),
       user: z.string().optional(),
     }),
