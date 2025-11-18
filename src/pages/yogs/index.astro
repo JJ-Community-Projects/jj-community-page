@@ -9,7 +9,7 @@ const ConfigDO = Astro.locals.runtime.env.ConfigDO
 const stubId = ConfigDO.idFromName('ConfigDO')
 const stub = ConfigDO.get(stubId)
 
-const year = await stub.getNumberConfig('web:config.year') ?? 2025
+const year = (await stub.getNumberConfig('web:config.year')) ?? 2025
 
 const fallbackSchedule = await getYogsScheduleFromContent(2023)
 const currentSchedule = await getYogsScheduleFromContent(year)
@@ -21,7 +21,7 @@ const filterCreators = () => {
   if (filter === '') {
     return null
   }
-  const ids = filter.split(',')
+  const ids = filter.split(',').sort((a, b) => a.localeCompare(b))
   return creators.filter((creator) => ids.includes(creator.id))
 }
 
@@ -41,7 +41,8 @@ const joinNamesGrammatically = (names: string[], max = names.length) => {
 
 // Base values
 const baseTitle = 'Yogscast Jingle Jam 2025 Schedule'
-const baseDescription = 'Yogscast Jingle Jam 2025 interactive schedule in your timezone with links to participants, VODs, and more - maintained by the community.'
+const baseDescription =
+  'Yogscast Jingle Jam 2025 interactive schedule in your timezone with links to participants, VODs, and more - maintained by the community.'
 
 // Build dynamic title/description when filtered
 let title = baseTitle
@@ -64,19 +65,77 @@ if (filteredCreators && filteredCreators.length > 0) {
 }
 
 // Keep description roughly ≤160 chars for SERP
-const trim = (s: string, max = 160) => (s.length > max ? s.slice(0, max - 1) + '…' : s)
+const trim = (s: string, max = 160) =>
+  s.length > max ? s.slice(0, max - 1) + '…' : s
 description = trim(description)
 
 // Canonical/noindex policy for filtered pages
 const hasFilter = Boolean(filter)
 const robots = hasFilter ? 'noindex,follow' : 'index,follow'
 
+function buildFilters() {
+  const ids = creators.map((c) => c.id)
+  const out = new Set<string>()
+  // one
+  for (const a of ids) out.add(a)
+
+  out.add('lewis,simon')
+  out.add('lewis,spiff')
+  out.add('lewis,lydia')
+  out.add('tom,lydia')
+  out.add('lewis,tom')
+  out.add('ben,tom')
+  out.add('ben,mousie')
+  out.add('ravs,sips')
+  out.add('bouphe,osie')
+  out.add('duncan,osie')
+  out.add('boba,pedguin')
+  out.add('briony,kirsty')
+  out.add('lewis,harry,simon,duncan')
+  out.add('nilesy,breeh,zylus')
+  out.add('nilesy,breeh,zylus,rythian')
+  out.add('nilesy,breeh,zylus,rythian,ravs')
+  out.add('tom,pyrion')
+  return Array.from(out).map((s) =>
+    s
+      .split(',')
+      .sort((a, b) => a.localeCompare(b))
+      .join(','),
+  )
+}
+
+const preRenderdFilters = buildFilters()
+console.log('preRenderdFilters', preRenderdFilters)
+
+const sortedFilter =
+  filteredCreators
+    ?.map((creator) => creator.id)
+    .sort((a, b) => a.localeCompare(b))
+    .join(',') ?? ''
+
+console.log('sortedFilter', sortedFilter)
+
+const preRenderedImgName = `${sortedFilter.replaceAll(',', '-')}.png`
+
+console.log('preRenderedImgName', preRenderedImgName)
+
+const hasPreRenderdImage = preRenderdFilters.includes(sortedFilter)
+
+console.log('hasPreRenderdImage', hasPreRenderdImage)
+
+const preRenderdImageExists =
+  (filteredCreators !== null && filteredCreators.length === 1) || hasPreRenderdImage
 
 const siteUrl = 'https://jinglejam.ostof.dev'
 const notFilterImage = `${siteUrl}/jj-og-yogs.png`
 const filterImage = `${siteUrl}/api/public/jj-data/yogs-schedule-preview-image?filter=${filter}&year=${year}`
-const ogImage = hasFilter ? filterImage : notFilterImage
+const preRenderedFilterImage = `${siteUrl}/yogs-schedule-preview/${preRenderedImgName}`
 
+const ogImage = preRenderdImageExists
+  ? preRenderedFilterImage
+  : hasFilter
+    ? filterImage
+    : notFilterImage
 ---
 
 <style is:global>
@@ -108,13 +167,19 @@ const ogImage = hasFilter ? filterImage : notFilterImage
       var(--placeholder-jj-schedule-w-size),
       var(--placeholder-jj-schedule-h-size)
     );
-    --placeholder-jj-schedule-slot-size: calc(var(--placeholder-jj-schedule-data-size) * 3);
+    --placeholder-jj-schedule-slot-size: calc(
+      var(--placeholder-jj-schedule-data-size) * 3
+    );
   }
 
   /* Scope overrides: inside .jj-placeholder use the placeholder-* values */
   .jj-placeholder {
-    --jj-schedule-available-height: var(--placeholder-jj-schedule-available-height);
-    --jj-schedule-available-width: var(--placeholder-jj-schedule-available-width);
+    --jj-schedule-available-height: var(
+      --placeholder-jj-schedule-available-height
+    );
+    --jj-schedule-available-width: var(
+      --placeholder-jj-schedule-available-width
+    );
     --jj-schedule-w-size: var(--placeholder-jj-schedule-w-size);
     --jj-schedule-h-size: var(--placeholder-jj-schedule-h-size);
     --jj-schedule-data-size: var(--placeholder-jj-schedule-data-size);

@@ -22,6 +22,7 @@
     "drizzle:d1": "bash ./run_migration.sh",
     "deployCurrentScheduletoFirestore": "node deployCurrentScheduleToFirestore.js",
     "updateTwitchUser": "node updateTwitchUser.js",
+    "generate:yogs-images": "node generateYogsSchedulePreview.js",
     "openapi-generator-cli:tiltify": "openapi-generator-cli generate -i ./src/lib/externalAPI/tiltify/spec.json -g typescript-fetch -o ./src/lib/externalAPI/tiltify/api/ --additional-properties=npmName=tiltify"
   },
   "dependencies": {
@@ -62,6 +63,7 @@
     "lodash": "^4.17.21",
     "luxon": "^3.6.1",
     "reconnecting-websocket": "^4.4.0",
+    "sharp": "^0.34.5",
     "solid-color": "^0.0.4",
     "solid-i18n": "^1.1.0",
     "solid-icons": "^1.1.0",

@@ -1,4 +1,9 @@
-import type { YogsSchedule, YogsScheduleDay, YogsScheduleWeek, YogsStream, } from './contract.ts'
+import type {
+  YogsSchedule,
+  YogsScheduleDay,
+  YogsScheduleWeek,
+  YogsStream,
+} from './contract.ts'
 
 async function getJSON<T>(kv: KVNamespace, key: string): Promise<T | null> {
   const raw = await kv.get(key)
