@@ -1,7 +1,7 @@
 import { type Component, Show } from 'solid-js'
 
 export type FundraiserItem = {
-  id: string
+  slug: string
   title: string
   raisedFormatted: string
   raised: number

@@ -1,7 +1,7 @@
 import { type Component, Show } from 'solid-js'
 
 export type CharityItem = {
-  id: number
+  id: string
   name: string
   description?: string
   logoUrl?: string

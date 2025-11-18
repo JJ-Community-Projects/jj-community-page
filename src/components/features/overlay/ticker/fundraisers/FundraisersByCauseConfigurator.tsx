@@ -1,10 +1,5 @@
 import { type Component, createMemo, createSignal, For } from 'solid-js'
-import {
-  buildUrl,
-  FieldRow,
-  LinkPreview,
-  PreviewFrame,
-} from '../../overview/Common.tsx'
+import { buildUrl, FieldRow, LinkPreview, PreviewFrame, } from '../../overview/Common.tsx'
 import { orpcPrivate } from '../../../../../lib/orpc/client.ts'
 import { useQuery } from '@tanstack/solid-query'
 
@@ -13,7 +8,7 @@ export const FundraisersByCauseConfigurator: Component<{
 }> = (p) => {
   const [theme, setTheme] = createSignal<'default' | 'red' | 'blue'>('default')
   const [showRaised, setShowRaised] = createSignal<boolean>(true)
-  const [causeId, setCauseId] = createSignal<number | ''>('')
+  const [causeId, setCauseId] = createSignal<string>('')
   const [currency, setCurrency] = createSignal<'GBP' | 'USD' | 'EUR'>('GBP')
 
   // Load causes to populate selector
@@ -49,7 +44,7 @@ export const FundraisersByCauseConfigurator: Component<{
           value={String(causeId())}
           onChange={(e) => {
             const v = e.currentTarget.value
-            setCauseId(v ? Number(v) : '')
+            setCauseId(v ? (v) : '')
           }}
         >
           <option value="">Select a causes</option>
