@@ -1,11 +1,4 @@
-import {
-  createContext,
-  createEffect,
-  createSignal,
-  onMount,
-  type ParentComponent,
-  useContext,
-} from 'solid-js'
+import { createContext, createEffect, createSignal, onMount, type ParentComponent, useContext, } from 'solid-js'
 import { useYogsSchedule } from './YogsScheduleProvider.tsx'
 import type { YogsStream } from '../../../../lib/orpc/private/yogs/contract.ts'
 import { log } from '../../../../lib/analytics.ts'
@@ -69,11 +62,15 @@ const useCreatorFilterHook = () => {
   const reset = () => {
     setFilter([])
   }
+
+
   const isSlotPartOfFilter = (stream: YogsStream) => {
     if (isEmpty()) {
       return true
     }
-    const streamIds: string[] = stream.creators?.map((c) => c.id) ?? []
+    const creators = stream.creators
+    const streamIds: string[] = creators?.map((c) => c.id) ?? []
+
     if (and()) {
       return filter().every((id) => streamIds.includes(id))
     } else {
@@ -113,12 +110,12 @@ const useCreatorFilterHook = () => {
         filter_url: url,
       })
     } catch (e: any) {
-      console.log(e.toString())
+      console.error(e.toString())
     }
     try {
       window.alert(`Copied ${url} to your clipboard`)
     } catch (e: any) {
-      console.log(e.toString())
+      console.error(e.toString())
     }
   }
   return {

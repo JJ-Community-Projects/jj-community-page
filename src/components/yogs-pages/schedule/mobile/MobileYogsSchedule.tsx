@@ -1,9 +1,9 @@
-import {type Component, For, Show} from "solid-js";
+import { type Component, For, Show } from 'solid-js'
 
-import {useCreatorFilter} from "../provider/CreatorFilterProvider.tsx";
-import {useYogsSchedule} from "../provider/YogsScheduleProvider.tsx";
-import {MobileYogsStreamTile} from "./MobileYogsStreamTile.tsx";
-import {MobileScheduleHeader} from "./MobileScheduleHeader.tsx";
+import { useCreatorFilter } from '../provider/CreatorFilterProvider.tsx'
+import { useYogsSchedule } from '../provider/YogsScheduleProvider.tsx'
+import { MobileYogsStreamTile } from './MobileYogsStreamTile.tsx'
+import { MobileScheduleHeader } from './MobileScheduleHeader.tsx'
 
 export const MobileYogsSchedule: Component = () => {
   return (
@@ -16,7 +16,7 @@ export const MobileYogsSchedule: Component = () => {
 
 const MobileScheduleBody: Component = () => {
   const {day, streams} = useYogsSchedule()
-  const { isEmpty, isSlotPartOfFilter } = useCreatorFilter()
+  const { isEmpty, isSlotPartOfFilter, filter } = useCreatorFilter()
   const slots = () => day().streams
   const filteredSlots = () => {
     return streams().filter(isSlotPartOfFilter)

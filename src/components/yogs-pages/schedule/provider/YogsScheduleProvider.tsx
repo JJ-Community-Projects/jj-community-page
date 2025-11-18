@@ -1,14 +1,5 @@
-import {
-  createContext,
-  createSignal,
-  onMount,
-  type ParentComponent,
-  useContext,
-} from 'solid-js'
-import type {
-  YogsCreator,
-  YogsSchedule,
-} from '../../../../lib/orpc/private/yogs/contract.ts'
+import { createContext, createSignal, onMount, type ParentComponent, useContext, } from 'solid-js'
+import type { YogsCreator, YogsSchedule, } from '../../../../lib/orpc/private/yogs/contract.ts'
 import { DateTime } from 'luxon'
 import { useNextJJEndDate } from '../../../../lib/utils/jjDates.ts'
 
@@ -38,11 +29,13 @@ const useYogsScheduleHook = (
   const lastDay = end()
   const now = DateTime.now().setZone('Europe/London')
 
+  /*
   console.log('numberOfDays', numberOfDays())
   console.log('date', days()[numberOfDays() - 1].start)
   console.log('firstDay', firstDay)
   console.log('lastDay', lastDay)
   console.log('now', now)
+  */
   const isNowBetween = now >= firstDay && now <= lastDay
 
   const jjEnd = useNextJJEndDate()
@@ -55,9 +48,11 @@ const useYogsScheduleHook = (
     const now = DateTime.now().setZone('Europe/London')
     const startWeek2 = DateTime.fromISO(now.year + '-12-08T01:00:00.000Z')
     const end = jjEnd()
+    /*
     console.log('dates', now, startWeek2, end)
     console.log('now >= startWeek2', now >= startWeek2)
     console.log('now <= end', now <= end)
+    */
 
     if (now >= startWeek2 && now <= end) {
       setWeekIndex(1)
