@@ -86,14 +86,14 @@ export const GET: APIRoute = async ({ request, redirect, locals }) => {
 
   const CARD_W = 1200
   const CARD_H = 630
-  const AVATAR_SIZE = 140
+  const AVATAR_SIZE = 180
   const AVATAR_BORDER = 6
   const MAX_AVATARS = 6
   const AVATAR_Y = 360
 
   const MAX_NAME_LEN = 18
-  const FONT_SIZE = 28
-  const LABEL_GAP_Y = 12
+  const FONT_SIZE = 36
+  const LABEL_GAP_Y = 8
   const TEXT_COLOR: [number, number, number, number] = [255, 255, 255, 255]
   const SHADOW_COLOR: [number, number, number, number] = [0, 0, 0, 128]
   const reqUrl = new URL(request.url)
@@ -148,8 +148,8 @@ export const GET: APIRoute = async ({ request, redirect, locals }) => {
     // Prepare composites: center the row of avatars
     const total = avatars.length
     // When there is only one avatar, make the image and font bigger
-    const avatarSize = total === 1 ? 180 : AVATAR_SIZE
-    const fontSize = total === 1 ? 40 : FONT_SIZE
+    const avatarSize = total === 1 ? 200 : AVATAR_SIZE
+    const fontSize = total === 1 ? 48 : FONT_SIZE
     const spacing = avatarSize + 24
     const rowWidth = spacing * (total - 1)
     const startX = Math.round(CARD_W / 2 - rowWidth / 2 - avatarSize / 2)
