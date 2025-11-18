@@ -44,7 +44,7 @@ streams:
 - creators:
   - kim
   - hat_films
-  - sherlock_hulmes
+  - markhulmes
   duration_hours: 3.0
   end: '2021-12-12T20:00:00Z'
   start: '2021-12-12T17:00:00Z'

@@ -1,0 +1,16 @@
+name: Mark Hulmes
+link: https://www.twitch.tv/markhulmes
+twitchUser: markhulmes
+profileImage:
+  large: https://cdn.bsky.app/img/avatar/plain/did:plc:6ewl5dtb2cydbceyxpvrpgpm/bafkreiakkh5b223b5evs3flsuie6aypreaxpdxr6e5oe7c7pb6tjjtho7e@jpeg
+  small: https://cdn.bsky.app/img/avatar/plain/did:plc:6ewl5dtb2cydbceyxpvrpgpm/bafkreiakkh5b223b5evs3flsuie6aypreaxpdxr6e5oe7c7pb6tjjtho7e@jpeg
+links:
+  - name: Twitter
+    type: twitter
+    url: https://twitter.com/markhulmes
+  - name: Twitch
+    type: twitch
+    url: https://www.twitch.tv/sherlockhulmes_
+  - name: BlueSky
+    type: bsky
+    url: https://bsky.app/profile/sherlockhulmes.bsky.social

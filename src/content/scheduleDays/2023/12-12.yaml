@@ -5,7 +5,7 @@ streams:
   - ravs
   - rythian
   - sips
-  - sherlock_hulmes
+  - markhulmes
   duration_hours: 3.0
   end: '2023-12-12T14:00:00Z'
   start: '2023-12-12T11:00:00Z'
