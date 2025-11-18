@@ -11,7 +11,6 @@ links:
 name: Simon
 link: https://www.twitch.tv/simonhoneydew
 profileImage:
-  #large: https://static-cdn.jtvnw.net/jtv_user_pictures/87636eaa-0ec3-4d53-9564-d3d1e350de84-profile_image-300x300.png
   large: https://cdn.bsky.app/img/avatar/plain/did:plc:3o5ipkxitj2s5zqu45omz4dp/bafkreid23ccvfatkid7dmwocs4qxgimbgspspn47t7qovm2nxj2ostya64@jpeg
   small: https://cdn.bsky.app/img/avatar/plain/did:plc:3o5ipkxitj2s5zqu45omz4dp/bafkreid23ccvfatkid7dmwocs4qxgimbgspspn47t7qovm2nxj2ostya64@jpeg
 style:
