@@ -1,19 +1,6 @@
-import type {
-  YogsSchedule,
-  YogsScheduleDay,
-  YogsScheduleWeek,
-  YogsStream,
-} from './contract.ts'
+import type { YogsSchedule, YogsScheduleDay, YogsScheduleWeek, YogsStream, } from './contract.ts'
+import { getJSON, putJSON } from '../util/cache.ts'
 
-async function getJSON<T>(kv: KVNamespace, key: string): Promise<T | null> {
-  const raw = await kv.get(key)
-  if (!raw) return null
-  try {
-    return JSON.parse(raw) as T
-  } catch {
-    return null
-  }
-}
 export async function loadYogsSchedule(
   kv: KVNamespace,
 ): Promise<YogsSchedule | null> {
@@ -90,22 +77,4 @@ export async function storeYogsSchedule(
   ttlSeconds: number = 60,
 ) {
   return putJSON(kv, 'web:yogs-schedule', data, ttlSeconds)
-}
-
-async function putJSON(
-  kv: KVNamespace,
-  key: string,
-  value: unknown,
-  ttlSeconds: number = 60,
-) {
-  await kv.put(key, stringifyWithDates(value), { expirationTtl: ttlSeconds })
-}
-
-function stringifyWithDates(value: unknown) {
-  return JSON.stringify(value, (_key, val) => {
-    if (val instanceof Date) {
-      return val.toISOString()
-    }
-    return val as any
-  })
 }

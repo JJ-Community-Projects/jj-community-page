@@ -1,27 +1,12 @@
-import {
-  contracts,
-  type JJCampaignType,
-  type UserWithInfo,
-  UserWithInfoTags,
-} from './contract.ts'
+import { contracts, type JJCampaignType, type UserWithInfo, UserWithInfoTags, } from './contract.ts'
+import { getJSON, putJSON } from '../util/cache.ts'
 import { dbMiddleware } from '../../middleware/dbMiddleware.ts'
 import { implement, ORPCError } from '@orpc/server'
 import { cacheMiddleware } from '../../middleware/cacheControl.ts'
 import { and, asc, eq, or, sql } from 'drizzle-orm'
-import {
-  schedulesTable,
-  streamParticipantsTable,
-  streamsTable,
-} from '../../../db/schema/jj-schema.ts'
-import {
-  streamTagsTable,
-  tags,
-  userTagsTable,
-} from '../../../db/schema/tags-schema.ts'
-import {
-  tagUserCountsView,
-  userDisplayView,
-} from '../../../db/schema/views-schema.ts'
+import { schedulesTable, streamParticipantsTable, streamsTable, } from '../../../db/schema/jj-schema.ts'
+import { streamTagsTable, tags, userTagsTable, } from '../../../db/schema/tags-schema.ts'
+import { tagUserCountsView, userDisplayView, } from '../../../db/schema/views-schema.ts'
 import { UserDisplaySchema } from '../../public/schemas/UserDisplaySchema.ts'
 import type { JJDrizzleDatabase } from '../../../db/db.ts'
 // New: get campaign by Twitch id
@@ -44,6 +29,12 @@ const campaigns = os.campaignsContract
     }),
   )
   .handler(async ({ context }) => {
+    // KV cache
+    const cached = await context.env.KV.get('campaigns')
+    if (cached) {
+      return JSON.parse(cached)
+    }
+
     const DO = context.env.JingleJamData
     const stubID = DO.idFromName('JJ_API_CACHE')
     const stub = DO.get(stubID)
@@ -55,8 +46,51 @@ const campaigns = os.campaignsContract
           list: [],
         }
       }
-      console.log(data.list[0])
-      return data
+      // Sort the campaigns list following the same pattern used in
+      // src/lib/orpc/public/twitchExtension/impl.ts campaigns procedure:
+      // 1) campaigns with twitch channel that are live
+      // 2) campaigns with twitch channel that are not live
+      // 3) all other campaigns
+      // Additionally, sort by raised.gbp (descending) within each group
+      const list = Array.isArray((data as any).list) ? (data as any).list : []
+      const getGroupRank = (it: any) => {
+        const hasTwitch = Boolean(it?.twitch?.name ?? it?.twitch)
+        const isLive = Boolean(it?.twitch?.isLive ?? it?.isTwitchLive)
+        if (hasTwitch) {
+          return isLive ? 0 : 1
+        }
+        return 2
+      }
+      const getRaisedGbp = (it: any) => {
+        const val = it?.raised?.gbp
+        return typeof val === 'number' ? val : 0
+      }
+      const sortedList = (list as any).toSorted
+        ? (list as any).toSorted((a: any, b: any) => {
+            const ga = getGroupRank(a)
+            const gb = getGroupRank(b)
+            if (ga !== gb) return ga - gb
+            const ra = getRaisedGbp(a)
+            const rb = getRaisedGbp(b)
+            if (ra !== rb) return rb - ra
+            return 0
+          })
+        : [...list].sort((a: any, b: any) => {
+            const ga = getGroupRank(a)
+            const gb = getGroupRank(b)
+            if (ga !== gb) return ga - gb
+            const ra = getRaisedGbp(a)
+            const rb = getRaisedGbp(b)
+            if (ra !== rb) return rb - ra
+            return 0
+          })
+
+      const sortedData = { ...(data as any), list: sortedList }
+      // store in KV for 60s
+      await context.env.KV.put('campaigns', JSON.stringify(sortedData), {
+        expirationTtl: 60,
+      })
+      return sortedData
     } catch (e) {
       console.error(e)
       throw e
@@ -73,6 +107,12 @@ const causes = os.causesContract
     }),
   )
   .handler(async ({ context }) => {
+    // KV cache
+    const cached = await context.env.KV.get('causes')
+    if (cached) {
+      return JSON.parse(cached)
+    }
+
     const DO = context.env.JingleJamData
     const stubID = DO.idFromName('JJ_API_CACHE')
     const stub = DO.get(stubID)
@@ -83,6 +123,9 @@ const causes = os.causesContract
         return { count: 0, causes: [] }
       }
 
+      await context.env.KV.put('causes', JSON.stringify(causes), {
+        expirationTtl: 60,
+      })
       return causes
     } catch (e) {
       console.error(e)
@@ -99,6 +142,12 @@ const upcomingStreams = os.upcomingStreamsContract
     }),
   )
   .handler(async ({ context }) => {
+    // KV cache (revive Date fields)
+    const cached = await getJSON<any>(context.env.KV, 'upcomingStreams')
+    if (cached) {
+      return reviveUpcomingStreamsResult(cached)
+    }
+
     const db = context.db
     const nowSec = Math.floor(Date.now() / 1000)
     const year = new Date().getUTCFullYear()
@@ -342,11 +391,60 @@ const upcomingStreams = os.upcomingStreamsContract
 
     composed.sort((a, b) => a.stream.start.getTime() - b.stream.start.getTime())
 
-    return { count: composed.length, streams: composed }
+    const result = { count: composed.length, streams: composed }
+
+    await putJSON(context.env.KV, 'upcomingStreams', result, 120)
+
+    return result
   })
 
-async function getUsers(db: JJDrizzleDatabase) {
+// Helpers to revive Dates for upcomingStreams cache
+function reviveUpcomingStreamsResult(data: any) {
+  const revived = {
+    count: Number(data?.count ?? 0),
+    streams: Array.isArray(data?.streams)
+      ? data.streams.map(reviveUserStream)
+      : [],
+  }
+  return revived
+}
+
+function reviveUserStream(item: any) {
+  const stream = item?.stream ?? {}
+  const owner = item?.owner ?? {}
+  const revived = {
+    stream: {
+      ...stream,
+      start: new Date(stream.start),
+      end: new Date(stream.end),
+      // tags/participants handled below
+      tags: Array.isArray(stream.tags) ? stream.tags : [],
+      participants: Array.isArray(stream.participants)
+        ? stream.participants.map(reviveUserDisplay)
+        : [],
+    },
+    owner: reviveUserDisplay(owner),
+  }
+  return revived
+}
+
+function reviveUserDisplay(u: any) {
+  if (!u || typeof u !== 'object') return u
+  return {
+    ...u,
+    createdAt: u.createdAt ? new Date(u.createdAt) : u?.createdAt,
+  }
+}
+
+async function getUsers(db: JJDrizzleDatabase, kv?: KVNamespace) {
   try {
+    // KV cache (optional)
+    if (kv) {
+      const cached = await kv.get('getUsers')
+      if (cached) {
+        return JSON.parse(cached)
+      }
+    }
     const currentYear = new Date().getFullYear()
     // Subquery: aggregate tags per user into JSON
     // Step 1: Build a subquery that ranks tags per-user by global popularity
@@ -427,7 +525,10 @@ async function getUsers(db: JJDrizzleDatabase) {
         : undefined,
     }))
 
-    console.log(result)
+    // Store in KV if available
+    if (kv) {
+      await kv.put('getUsers', JSON.stringify(result), { expirationTtl: 60 })
+    }
     return result
   } catch (e) {
     console.error(e)
@@ -437,7 +538,16 @@ async function getUsers(db: JJDrizzleDatabase) {
 
 const getAllUsersWithInfo = os.getAllUsersWithInfoContract.handler(
   async ({ context }) => {
-    return getUsers(context.db)
+    const cached = await context.env.KV.get('getAllUsersWithInfo')
+    if (cached) {
+      return JSON.parse(cached)
+    }
+
+    const users = await getUsers(context.db, context.env.KV)
+    await context.env.KV.put('getAllUsersWithInfo', JSON.stringify(users), {
+      expirationTtl: 60,
+    })
+    return users
   },
 )
 
@@ -449,7 +559,7 @@ const getUserCampaignPairs = os.getUserCampaignPairsContract.handler(
       return JSON.parse(cache)
     }
 
-    const users: UserWithInfo[] = await getUsers(context.db)
+    const users: UserWithInfo[] = await getUsers(context.db, context.env.KV)
 
     const DO = context.env.JingleJamData
     const stubID = DO.idFromName('JJ_API_CACHE')
@@ -518,226 +628,6 @@ const getUserCampaignPairs = os.getUserCampaignPairsContract.handler(
     return pairs
   },
 )
-
-/*
-// Get a single cause by id from DO cache (current year)
-const causeById = os.causeByIdContract.handler(async ({ input, context }) => {
-  const DO = context.env.JingleJamData
-  const stubID = DO.idFromName('JJ_API_CACHE')
-  const stub = DO.get(stubID)
-  const cause = await stub.getCause(input.id)
-  if (!cause) {
-    return null
-  }
-  return cause
-})
-
-// Current-year campaign lookup (DO only), returns a single campaign or null
-const campaignLookup = os.campaignLookupContract.handler(
-  async ({ input, context }) => {
-    const { userId, userSlug, campaignId } = input
-
-    const DO = context.env.JingleJamData
-    const stubID = DO.idFromName('JJ_API_CACHE')
-    const stub = DO.get(stubID)
-
-    if (userId !== undefined) {
-      const c = await stub.getCampaign(userId)
-      return c ?? null
-    }
-
-    const campaigns = await stub.getCampaigns()
-    if (!campaigns) return null
-
-    if (userSlug !== undefined) {
-      return campaigns.find((c: any) => c.user.slug === userSlug) ?? null
-    }
-    if (campaignId !== undefined) {
-      return campaigns.find((c: any) => c.slug === campaignId) ?? null
-    }
-
-    return null
-  },
-)
-
-// Past campaigns lookup (DB), returns array; if year omitted, returns all matching years
-const campaignPastLookup = os.campaignPastLookupContract.handler(
-  async ({ input, context }) => {
-    const { year, userId, userSlug, campaignId } = input as any
-
-    // Helper to map a DB row to JJCampaign shape
-    const mapRow = (row: any) => ({
-      causeId: row.causeId ?? null,
-      name: row.name ?? '',
-      description: row.description ?? '',
-      slug: row.slug ?? '',
-      url: row.url ?? '',
-      startTime: row.startTime,
-      raised: Number(row.raised ?? 0),
-      goal: Number(row.goal ?? 0),
-      livestream: row.livestream ?? { channel: null, type: '' },
-      user: {
-        id: row.userId ?? 0,
-        name: row.userName ?? '',
-        slug: row.userSlug ?? '',
-        avatar: row.userAvatar ?? '',
-        url: row.userUrl ?? '',
-      },
-    })
-
-    const db = context.db
-    const conds: any[] = []
-    if (year !== undefined) conds.push(eq(jjCampaign.year, year))
-
-    if (userId !== undefined) {
-      conds.push(eq(jjCampaign.userId, userId))
-    } else if (userSlug !== undefined) {
-      conds.push(eq(jjCampaign.userSlug, userSlug))
-    } else if (campaignId !== undefined) {
-      conds.push(eq(jjCampaign.slug, campaignId))
-    } else {
-      // No discriminator provided; return empty array
-      return []
-    }
-
-    const rows = conds.length
-      ? await db
-          .select()
-          .from(jjCampaign)
-          .where(and(...conds))
-      : await db.select().from(jjCampaign)
-
-    if (!rows?.length) return []
-    return rows.map(mapRow)
-  },
-) as any
-
-// New: get campaign by user slug
-const campaignByUserSlug = os.campaignByUserSlugContract.handler(
-  async ({ input, context }) => {
-    const { slug } = input
-    const DO = context.env.JingleJamData
-    const stubID = DO.idFromName('JJ_API_CACHE')
-    const stub = DO.get(stubID)
-
-    // Try DO campaigns first (current year)
-    const campaigns = await stub.getCampaigns()
-    const found = campaigns?.find((c: any) => c.user.slug === slug) || null
-    if (found) return found
-
-    // Fallback: query DB for latest by year
-    const db = context.db
-    const rows = await db
-      .select()
-      .from(jjCampaign)
-      .where(eq(jjCampaign.userSlug, slug))
-    if (!rows?.length) return null
-    const latest = rows.reduce((a: any, b: any) => (a.year > b.year ? a : b))
-    return {
-      causeId: latest.causeId ?? null,
-      name: latest.name ?? '',
-      description: latest.description ?? '',
-      slug: latest.slug ?? '',
-      url: latest.url ?? '',
-      startTime: latest.startTime,
-      raised: Number(latest.raised ?? 0),
-      goal: Number(latest.goal ?? 0),
-      livestream: latest.livestream ?? { channel: null, type: '' },
-      user: {
-        id: latest.userId ?? 0,
-        name: latest.userName ?? '',
-        slug: latest.userSlug ?? '',
-        avatar: latest.userAvatar ?? '',
-        url: latest.userUrl ?? '',
-      },
-    }
-  },
-)
-
-// New: get campaign by user id
-const campaignByUserId = os.campaignByUserIdContract.handler(
-  async ({ input, context }) => {
-    const { userId } = input
-    const DO = context.env.JingleJamData
-    const stubID = DO.idFromName('JJ_API_CACHE')
-    const stub = DO.get(stubID)
-
-    const current = await stub.getCampaign(userId)
-    if (current) return current
-
-    // Fallback to DB latest by year
-    const db = context.db
-    const rows = await db
-      .select()
-      .from(jjCampaign)
-      .where(eq(jjCampaign.userId, userId))
-    if (!rows?.length) return null
-    const latest = rows.reduce((a: any, b: any) => (a.year > b.year ? a : b))
-    return {
-      causeId: latest.causeId ?? null,
-      name: latest.name ?? '',
-      description: latest.description ?? '',
-      slug: latest.slug ?? '',
-      url: latest.url ?? '',
-      startTime: latest.startTime,
-      raised: Number(latest.raised ?? 0),
-      goal: Number(latest.goal ?? 0),
-      livestream: latest.livestream ?? { channel: null, type: '' },
-      user: {
-        id: latest.userId ?? 0,
-        name: latest.userName ?? '',
-        slug: latest.userSlug ?? '',
-        avatar: latest.userAvatar ?? '',
-        url: latest.userUrl ?? '',
-      },
-    }
-  },
-)
-
-const campaignByTwitchId = os.campaignByTwitchIdContract.handler(
-  async ({ input, context }) => {
-    const { twitchId } = input
-    const db = context.db
-    const rows = await db
-      .select({ userId: twitchChannelSchema.userId })
-      .from(twitchChannelSchema)
-      .where(eq(twitchChannelSchema.id, twitchId))
-    const userId = rows?.[0]?.userId
-    if (!userId) return null
-
-    const DO = context.env.JingleJamData
-    const stubID = DO.idFromName('JJ_API_CACHE')
-    const stub = DO.get(stubID)
-    const current = await stub.getCampaign(userId)
-    if (current) return current
-
-    const past = await db
-      .select()
-      .from(jjCampaign)
-      .where(eq(jjCampaign.userId, userId))
-    if (!past?.length) return null
-    const latest = past.reduce((a: any, b: any) => (a.year > b.year ? a : b))
-    return {
-      causeId: latest.causeId ?? null,
-      name: latest.name ?? '',
-      description: latest.description ?? '',
-      slug: latest.slug ?? '',
-      url: latest.url ?? '',
-      startTime: latest.startTime,
-      raised: Number(latest.raised ?? 0),
-      goal: Number(latest.goal ?? 0),
-      livestream: latest.livestream ?? { channel: null, type: '' },
-      user: {
-        id: latest.userId ?? 0,
-        name: latest.userName ?? '',
-        slug: latest.userSlug ?? '',
-        avatar: latest.userAvatar ?? '',
-        url: latest.userUrl ?? '',
-      },
-    }
-  },
-)
-*/
 
 export const jjRouter = {
   campaigns,
