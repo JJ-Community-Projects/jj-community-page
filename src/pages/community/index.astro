@@ -1,27 +1,8 @@
 ---
-import { serverClientPrivate } from '../../lib/orpc/serverClient.ts'
+export const prerender = false
 import BaseLayout from '../../layouts/BaseLayout.astro'
 import { CommunityPage } from '../../components/features/community/CommunityPage.tsx'
 
-export const prerender = false
-
-// Server-side load initial data via orpc server client
-const campaignsFn = serverClientPrivate.jj.campaigns
-const causesFn = serverClientPrivate.jj.causes
-const upcomingStreamsFn = serverClientPrivate.jj.upcomingStreams
-const usersFn = serverClientPrivate.jj.getAllUsersWithInfo
-
-const ctx = {
-  context: {
-    locals: Astro.locals,
-    request: Astro.request,
-  },
-}
-
-const { data: community } = await campaignsFn({}, ctx)
-const { data: causes } = await causesFn({}, ctx)
-const { data: upcomingStreams } = await upcomingStreamsFn({}, ctx)
-const { data: users } = await usersFn({}, ctx)
 ---
 
 <BaseLayout
@@ -30,6 +11,6 @@ const { data: users } = await usersFn({}, ctx)
   canonical="https://jinglejam.ostof.dev/community"
 >
   <div class="w-full flex flex-col justify-center items-stretch gap-4">
-    <CommunityPage initial={{ community, causes, upcomingStreams, users }} client:load />
+    <CommunityPage client:only="solid-js" />
   </div>
 </BaseLayout>
