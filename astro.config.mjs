@@ -25,6 +25,7 @@ export default defineConfig({
         page !== 'https://jinglejam.ostof.dev/admin/' &&
         page !== 'https://jinglejam.ostof.dev/faq/' &&
         page !== 'https://jinglejam.ostof.dev/about/' &&
+        page !== 'https://jinglejam.ostof.dev/community-ssr/' &&
         !page.includes('404') &&
         !page.includes('error') &&
         !page.includes('/overlays/') &&
@@ -34,6 +35,22 @@ export default defineConfig({
         !page.includes('embed') &&
         page !== 'https://jinglejam.ostof.dev/yogs/privacy/twitch-extension/' &&
         !page.includes('pwa'),
+      serialize: (item) => {
+        const url = item.url
+        if (url === 'https://jinglejam.ostof.dev/yogs/') {
+          item.changefreq = 'daily'
+          item.priority = 0.9
+        }
+        if (url === 'https://jinglejam.ostof.dev/community/') {
+          item.changefreq = 'daily'
+          item.priority = 0.9
+        }
+        if (url === 'https://jinglejam.ostof.dev/teams/') {
+          item.changefreq = 'weekly'
+          item.priority = 0.5
+        }
+        return item
+      },
     }),
   ],
   output: 'server',
