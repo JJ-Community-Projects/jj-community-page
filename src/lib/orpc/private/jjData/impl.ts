@@ -1,27 +1,11 @@
-import {
-  contracts,
-  type JJCampaignType,
-  type UserWithInfo,
-  UserWithInfoTags,
-} from './contract.ts'
+import { contracts, type JJCampaignType, type UserWithInfo, UserWithInfoTags, } from './contract.ts'
 import { dbMiddleware } from '../../middleware/dbMiddleware.ts'
 import { implement, ORPCError } from '@orpc/server'
 import { cacheMiddleware } from '../../middleware/cacheControl.ts'
 import { and, asc, eq, or, sql } from 'drizzle-orm'
-import {
-  schedulesTable,
-  streamParticipantsTable,
-  streamsTable,
-} from '../../../db/schema/jj-schema.ts'
-import {
-  streamTagsTable,
-  tags,
-  userTagsTable,
-} from '../../../db/schema/tags-schema.ts'
-import {
-  tagUserCountsView,
-  userDisplayView,
-} from '../../../db/schema/views-schema.ts'
+import { schedulesTable, streamParticipantsTable, streamsTable, } from '../../../db/schema/jj-schema.ts'
+import { streamTagsTable, tags, userTagsTable, } from '../../../db/schema/tags-schema.ts'
+import { tagUserCountsView, userDisplayView, } from '../../../db/schema/views-schema.ts'
 import { UserDisplaySchema } from '../../public/schemas/UserDisplaySchema.ts'
 import type { JJDrizzleDatabase } from '../../../db/db.ts'
 // New: get campaign by Twitch id
@@ -55,7 +39,6 @@ const campaigns = os.campaignsContract
           list: [],
         }
       }
-      console.log(data.list[0])
       return data
     } catch (e) {
       console.error(e)
@@ -426,8 +409,6 @@ async function getUsers(db: JJDrizzleDatabase) {
         ? `/schedules/${(r as any).scheduleSlug}`
         : undefined,
     }))
-
-    console.log(result)
     return result
   } catch (e) {
     console.error(e)
