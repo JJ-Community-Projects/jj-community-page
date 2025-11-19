@@ -209,7 +209,7 @@ export const CommunityCharitiesOverview: Component<
           {(it) => {
             const img = it.donationData?.logo || ''
             return (
-              <div class="inline-block h-[96px] w-[320px] px-3 py-2">
+              <div class="inline-block h-[96px] w-[240px] px-3 py-2">
                 <div class="flex h-full w-full items-center gap-3 rounded-md bg-white p-2 text-black shadow">
                   <img
                     src={img}
