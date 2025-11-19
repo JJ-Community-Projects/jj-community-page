@@ -1,4 +1,8 @@
 ---
+import {
+  serverClientPrivate,
+  serverClientPublic,
+} from '../../lib/orpc/serverClient.ts'
 export const prerender = false
 import BaseLayoutYogs from '../../layouts/BaseLayoutYogs.astro'
 import { getYogsScheduleFromContent } from '../../content/getYogsScheduleFromContent.ts'
@@ -11,7 +15,6 @@ const stub = ConfigDO.get(stubId)
 
 const year = (await stub.getNumberConfig('web:config.year')) ?? 2025
 
-const fallbackSchedule = await getYogsScheduleFromContent(2023)
 const currentSchedule = await getYogsScheduleFromContent(year)
 const creators = currentSchedule.creators
 
@@ -105,7 +108,6 @@ function buildFilters() {
 }
 
 const preRenderdFilters = buildFilters()
-console.log('preRenderdFilters', preRenderdFilters)
 
 const sortedFilter =
   filteredCreators
@@ -113,18 +115,24 @@ const sortedFilter =
     .sort((a, b) => a.localeCompare(b))
     .join(',') ?? ''
 
-console.log('sortedFilter', sortedFilter)
-
 const preRenderedImgName = `${sortedFilter.replaceAll(',', '-')}.png`
-
-console.log('preRenderedImgName', preRenderedImgName)
 
 const hasPreRenderdImage = preRenderdFilters.includes(sortedFilter)
 
-console.log('hasPreRenderdImage', hasPreRenderdImage)
+const configFunc = serverClientPrivate.yogs.config
+const { data: config, error } = await configFunc(
+  {},
+  {
+    context: {
+      locals: Astro.locals,
+      request: Astro.request,
+    },
+  },
+)
 
 const preRenderdImageExists =
-  (filteredCreators !== null && filteredCreators.length === 1) || hasPreRenderdImage
+  (filteredCreators !== null && filteredCreators.length === 1) ||
+  hasPreRenderdImage
 
 const siteUrl = 'https://jinglejam.ostof.dev'
 const notFilterImage = `${siteUrl}/jj-og-yogs.png`
@@ -136,6 +144,7 @@ const ogImage = preRenderdImageExists
   : hasFilter
     ? filterImage
     : notFilterImage
+
 ---
 
 <style is:global>
@@ -271,9 +280,10 @@ const ogImage = preRenderdImageExists
 
   <div class={'min-h-32'}>
     <YogsCurrentScheduleLoader
-      client:only="solid-js"
       creators={creators}
-      fallbackSchedule={fallbackSchedule!}
+      fallbackSchedule={currentSchedule!}
+      config={config ?? {showSchedule: false}}
+      client:load
     />
   </div>
 </BaseLayoutYogs>

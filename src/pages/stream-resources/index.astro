@@ -13,5 +13,5 @@ const user = Astro.locals.user
     image: 'https://jinglejam.ostof.dev/jj-og-stream.png',
   }}
 >
-  <StreamResources client:only="solid-js" user={user} />
+  <StreamResources client:only user={user} />
 </BaseLayout>

@@ -20,7 +20,7 @@ export type CauseFundraiserProps = {
 const Body: Component<CauseFundraiserProps> = (props) => {
   const showRaised = () => props.showRaised ?? true
 
-  const causeId = () => (props.causeId ?? '')
+  const causeId = () => props.causeId ?? ''
 
   const causeQ = useQuery(() =>
     orpcPrivate.overlay.causeFundraisers.queryOptions({

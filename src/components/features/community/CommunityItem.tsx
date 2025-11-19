@@ -1,10 +1,10 @@
-import { type Component, For, Show } from 'solid-js'
+import { type Component, createEffect, createSignal, For, on, onMount, Show, } from 'solid-js'
 import type { JJCampaignType } from '../../../lib/orpc/private/jjData/contract.ts'
 import { useCommunityPage } from './CommunityPageProvider.tsx'
 import { twMerge } from 'tailwind-merge'
-import { Numeric } from 'solid-i18n'
 import { TiltifyIcon, TwitchIcon, YoutubeIcon, } from '../../common/icons/JJIcons.tsx'
 import { FaSolidCalendarWeek } from 'solid-icons/fa'
+import { useLocale } from '@kobalte/core'
 
 export const CommunityItem: Component<{
   campaign: JJCampaignType
@@ -36,6 +36,35 @@ export const CommunityItem: Component<{
     }
     return campaign.raised.gbp
   }
+
+  const [formatedRaised, setFormatedRaised] = createSignal<string>(
+    Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: currency(),
+    }).format(raised())
+  )
+  const [isClient, setIsClient] = createSignal<boolean>(false)
+
+
+  onMount(() => {
+    const s = Intl.NumberFormat(useLocale().locale(), {
+      style: 'currency',
+      currency: currency(),
+    }).format(raised())
+    setFormatedRaised(s)
+    setIsClient(true)
+  })
+
+  createEffect(
+    on(currency, (c) => {
+      if (!isClient()) return
+      const s = Intl.NumberFormat(useLocale().locale(), {
+        style: 'currency',
+        currency: c,
+      }).format(raised())
+      setFormatedRaised(s)
+    }),
+  )
 
   return (
     <div
@@ -74,11 +103,7 @@ export const CommunityItem: Component<{
             class={'flex flex-col items-end text-xs font-bold text-primary-600'}
           >
             <p>Raised</p>
-            <Numeric
-              value={raised()}
-              numberStyle="currency"
-              currency={currency()}
-            />
+            <p>{formatedRaised()}</p>
           </div>
         </div>
 

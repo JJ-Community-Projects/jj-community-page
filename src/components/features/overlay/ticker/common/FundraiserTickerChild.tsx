@@ -48,7 +48,11 @@ const raisedColorByTheme = (theme: string | undefined) => {
 
 function formatGBP(n: number) {
   try {
-    return new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP', maximumFractionDigits: 0 }).format(n)
+    return new Intl.NumberFormat('en-GB', {
+      style: 'currency',
+      currency: 'GBP',
+      maximumFractionDigits: 0,
+    }).format(n)
   } catch {
     return `£${String(n)}`
   }
@@ -57,16 +61,29 @@ function formatGBP(n: number) {
 // Reusable ticker child for fundraiser items
 // Usage example in overlays:
 //   <FundraiserTickerChild item={d} theme={props.theme} showRaised={props.showRaised} />
-export const FundraiserTickerChild: Component<FundraiserTickerChildProps> = (p) => {
+export const FundraiserTickerChild: Component<FundraiserTickerChildProps> = (
+  p,
+) => {
   return (
-    <div class={`h-full w-full rounded-2xl ${bgByTheme(p.theme)} p-2 shadow-2xl`}>
+    <div
+      class={`h-full w-full rounded-2xl ${bgByTheme(p.theme)} p-2 shadow-2xl`}
+    >
       <div class={'flex h-full w-full flex-row items-center justify-start'}>
         <Show when={p.item.imageUrl}>
           {(url) => (
-            <img class={'h-12 w-12 rounded-lg'} alt={''} src={url()} loading={'eager'} />
+            <img
+              class={'h-12 w-12 rounded-lg'}
+              alt={''}
+              src={url()}
+              loading={'eager'}
+            />
           )}
         </Show>
-        <div class={'flex h-full flex-1 flex-col items-start justify-center overflow-hidden truncate pl-2'}>
+        <div
+          class={
+            'flex h-full flex-1 flex-col items-start justify-center overflow-hidden truncate pl-2'
+          }
+        >
           <p class={`${nameColorByTheme(p.theme)} font-bold`}>{p.item.title}</p>
           <Show when={p.showRaised}>
             <p class={`${raisedColorByTheme(p.theme)} font-bold`}>
