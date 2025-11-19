@@ -27,6 +27,8 @@ export default defineConfig({
         page !== 'https://jinglejam.ostof.dev/about/' &&
         page !== 'https://jinglejam.ostof.dev/community-ssr/' &&
         !page.includes('404') &&
+        !page.includes('/ssr') &&
+        !page.includes('/csr') &&
         !page.includes('error') &&
         !page.includes('/overlays/') &&
         !page.includes('/dashboard/') &&
