@@ -1,8 +1,9 @@
 ---
+import { getEntry } from 'astro:content'
 export const prerender = false
 import BaseLayout from '../../layouts/BaseLayout.astro'
 import { CommunityPage } from '../../components/features/community/CommunityPage.tsx'
-
+const charityData = await getEntry('charities', '2025')
 ---
 
 <BaseLayout
@@ -11,6 +12,8 @@ import { CommunityPage } from '../../components/features/community/CommunityPage
   canonical="https://jinglejam.ostof.dev/community"
 >
   <div class="w-full flex flex-col justify-center items-stretch gap-4">
-    <CommunityPage client:only="solid-js" />
+    <CommunityPage
+      charitiesData={charityData?.data}
+      client:only="solid-js" />
   </div>
 </BaseLayout>

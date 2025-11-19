@@ -1,0 +1,85 @@
+charities:
+  - name: CALM
+    description: Hosting a life-saving suicide prevention helpline and vital online mental health resources for anyone who needs them.
+    tiltify_id: 3d4fb356-891f-4f1e-9374-984aa5fdfdf5
+    website: https://www.thecalmzone.net/
+    websites:
+      discord: https://discord.gg/CALM
+      twitter: https://twitter.com/thecalmzone
+      instagram: https://instagram.com/thecalmzone
+      facebook: https://facebook.com/thecalmzone
+      youtube: https://www.youtube.com/@TheCALMzone
+      tiktok: https://www.tiktok.com/@thecalmzone
+      twitch: https://www.twitch.tv/thecalmzone
+  - name: War Child
+    description: Protecting, educating, and advocating for the rights of children impacted by the ongoing conflicts in Gaza, Ukraine and worldwide.
+    tiltify_id: 18cb6ffd-3067-4ca8-8414-74eb733d79fd
+    website: https://www.warchild.org.uk/
+    websites:
+      twitter: https://twitter.com/WarChildUK
+      instagram: https://www.instagram.com/warchilduk/
+      facebook: https://www.facebook.com/WarChildUK
+      youtube: https://www.youtube.com/@WarChildUK
+      tiktok: https://www.tiktok.com/@warchilduk
+      linkedin: https://www.linkedin.com/company/warchilduk
+  - name: Autistica
+    description: Building evidence-based solutions for young autistic people to make society more inclusive by 2030.
+    tiltify_id: 974be205-3c5f-4f8c-9dd4-892b6b1e53d2
+    website: https://www.autistica.org.uk/
+    websites:
+      twitter: https://x.com/autistica
+      facebook: http://www.facebook.com/Autisticacharity
+      instagram: https://www.instagram.com/autistica/
+      linkedin: https://www.linkedin.com/company/autistica
+      youtube: https://www.youtube.com/@Autistica
+  - name: Become
+    description: Helping young people with experience of foster and residential care get the guidance, support, and community that everyone needs.
+    tiltify_id: 1b61ce0a-d32c-4dde-bf0a-4849317cce65
+    website: https://becomecharity.org.uk/
+    websites:
+      twitter: https://twitter.com/BecomeCharity
+      instagram: https://www.instagram.com/becomecharity/
+      facebook: https://www.facebook.com/BecomeCharity
+      youtube: https://www.youtube.com/@BecomeCharity
+      linkedin: https://www.linkedin.com/company/become-charity
+  - name: The Grand Appeal
+    description: Creating 'Jingle Jam Building', a unique facility that will help sick children and their families at Bristol Children's Hospital.
+    tiltify_id: 5cff6632-f97a-4f6e-96f1-7cd1c3fdb259
+    website: https://www.grandappeal.org.uk/
+    websites:
+      twitter: https://twitter.com/TheGrandAppeal
+      instagram: https://www.instagram.com/thegrandappeal/
+      facebook: https://www.facebook.com/TheGrandAppeal
+      youtube: https://www.youtube.com/@TheGrandAppeal
+      linkedin: https://www.linkedin.com/company/thegrandappeal
+  - name: Make-A-Wish
+    description: Granting wishes to children with critical illnesses to inspire hope and celebrate culture and belonging.
+    tiltify_id: 5350a34a-8b94-4513-bb1d-22becc2df6e4
+    website: https://worldwish.org/
+    websites:
+      twitter: https://twitter.com/MakeAWish
+      instagram: https://www.instagram.com/makeawishamerica/
+      facebook: https://www.facebook.com/MakeAWish
+      youtube: https://www.youtube.com/makeawish
+      linkedin: https://www.linkedin.com/company/make-a-wish-foundation
+  - name: The Trevor Project
+    description: Providing 24/7 crisis intervention services to LGBTQ+ young people—backed by research, education, advocacy, and peer support.
+    tiltify_id: 809dfb7b-faef-4e2d-b78d-d5e197975dac
+    website: https://www.thetrevorproject.org/
+    websites:
+      twitter: https://twitter.com/TrevorProject
+      instagram: https://www.instagram.com/thetrevorproject/
+      facebook: https://www.facebook.com/TheTrevorProject
+      youtube: https://www.youtube.com/@thetrevorproject
+      linkedin: https://www.linkedin.com/company/the-trevor-project
+  - name: WWF
+    description: Leading the fight against climate change for a world where nature and wildlife can thrive for future generations.
+    tiltify_id: d02de896-6904-4f80-9755-253afddac343
+    website: https://www.wwf.org.uk/
+    websites:
+      twitter: https://twitter.com/WWF
+      instagram: https://www.instagram.com/wwf/
+      facebook: https://www.facebook.com/WWF
+      youtube: https://www.youtube.com/@WWF
+      tiktok: https://www.tiktok.com/@wwf
+      linkedin: https://www.linkedin.com/company/wwf

@@ -1,0 +1,49 @@
+.community-charities-overview {
+  position: relative;
+}
+
+.community-charities-overview .marquee-track {
+  will-change: transform;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-play-state: running;
+  /* Allow TS/JS to control speed without overriding play-state */
+  animation-duration: var(--marquee-duration, 60s);
+}
+
+/* Pause on hover */
+.community-charities-overview:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+/* Pause when JS sets the paused class (e.g., when any child receives focus or mouseenter) */
+.community-charities-overview.paused .marquee-track {
+  animation-play-state: paused;
+}
+
+/* Assign animation names via classes so play-state can be overridden */
+.community-charities-overview .marquee-track.marquee-1 {
+  animation-name: marquee;
+}
+
+.community-charities-overview .marquee-track.marquee-2 {
+  animation-name: marquee2;
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes marquee2 {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(0%);
+  }
+}

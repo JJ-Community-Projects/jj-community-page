@@ -15,21 +15,27 @@ import { CommunityItem } from './CommunityItem.tsx'
 import { CommunityCauseCard } from './CommunityCauseCard.tsx'
 import { CommunityUsers } from './CommunityUsers.tsx'
 import { CommunityTagSearch } from './CommunityTagSearch.tsx'
+import { CommunityCharitiesOverview } from './causes/CommunityCharitiesOverview.tsx'
+import type { CharitiesStatic } from '../../../content/schema.ts'
 
-export const CommunityPage: Component = () => {
+export const CommunityPage: Component<{
+  charitiesData?: CharitiesStatic
+}> = (props) => {
   const i18n = createI18n({ language: useLocale().locale() })
   return (
     <QueryClientProvider client={new QueryClient()}>
       <I18nProvider i18n={i18n}>
         <CommunityPageProvider>
-          <_CommunityPage />
+          <_CommunityPage charitiesData={props.charitiesData} />
         </CommunityPageProvider>
       </I18nProvider>
     </QueryClientProvider>
   )
 }
 
-const _CommunityPage: Component = () => {
+const _CommunityPage: Component<{
+  charitiesData?: CharitiesStatic
+}> = (props) => {
   const i18n = createI18n({ language: useLocale().locale() })
 
   const isJJ = useIsJJ()
@@ -41,7 +47,7 @@ const _CommunityPage: Component = () => {
     <I18nProvider i18n={i18n}>
       <Show when={community.isSuccess}>
         <Show when={community.data!.list.length > 0}>
-          <Body />
+          <Body charitiesData={props.charitiesData} />
         </Show>
         <Show when={community.data!.list.length === 0}>
           <Show when={!isBefore()}>
@@ -243,12 +249,15 @@ const Header: Component = () => {
   )
 }
 
-const Body: Component = () => {
+const Body: Component<{
+  charitiesData?: CharitiesStatic
+}> = (props) => {
   const { sortBy } = useCommunityPage()
   const isSortByCause = () => sortBy() === 'cause'
   return (
     <div class={'flex w-full flex-col items-stretch justify-center gap-4'}>
       <Header />
+      <CommunityCharitiesOverview charitiesData={props.charitiesData} />
       <UpcomingStreams />
       <CommunityTagSearch />
       <Show when={isSortByCause()} fallback={<CampaignGrid />}>
@@ -302,9 +311,11 @@ const CampaignGrid: Component = () => {
 }
 
 const CampaignGridByCause: Component = () => {
-  const { campaignsByCause, campaignsByCauseFiltered, selectedTagIds } = useCommunityPage()
+  const { campaignsByCause, campaignsByCauseFiltered, selectedTagIds } =
+    useCommunityPage()
   const anyTagsSelected = () => selectedTagIds().length > 0
-  const groups = () => (anyTagsSelected() ? campaignsByCauseFiltered() : campaignsByCause())
+  const groups = () =>
+    anyTagsSelected() ? campaignsByCauseFiltered() : campaignsByCause()
 
   return (
     <div class={twMerge('flex w-full flex-col gap-4')}>

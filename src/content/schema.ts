@@ -122,3 +122,25 @@ export const ScheduleSchema = z.object({
   weeks: z.array(ScheduleWeekSchema),
   updatedAt: z.date().optional(),
 })
+
+export const CharityStaticSchema = z.object({
+  tiltify_id: z.string(),
+  name: z.string(),
+  description: z.string(),
+  websites: z.object({
+    discord: z.string().optional(),
+    twitter: z.string().optional(),
+    instagram: z.string().optional(),
+    tiktok: z.string().optional(),
+    facebook: z.string().optional(),
+    youtube: z.string().optional(),
+    twitch: z.string().optional(),
+  }),
+})
+
+export const CharitiesStaticSchema = z.object({
+  charities: z.array(CharityStaticSchema),
+})
+
+export type CharityStatic = z.infer<typeof CharityStaticSchema>
+export type CharitiesStatic = z.infer<typeof CharitiesStaticSchema>

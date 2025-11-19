@@ -1,35 +1,30 @@
-import {defineCollection} from 'astro:content';
-import {CreatorSchema, ScheduleDaySchema, ScheduleSchema, TwitchUserSchema} from "./schema.ts";
-import {updateTwitchUser} from "./updateTwitchUser.ts";
-import {reference, z} from "astro:content";
+import { defineCollection, z } from 'astro:content'
+import { CharitiesStaticSchema, CreatorSchema, ScheduleDaySchema, ScheduleSchema, TwitchUserSchema, } from './schema.ts'
+import { updateTwitchUser } from './updateTwitchUser.ts'
 
 const schedules = defineCollection({
   type: 'data',
-  schema: ScheduleSchema
+  schema: ScheduleSchema,
 })
 
 const scheduleDays = defineCollection({
   type: 'data',
-  schema: ScheduleDaySchema
+  schema: ScheduleDaySchema,
 })
 
 const creators = defineCollection({
   type: 'data',
-  schema: CreatorSchema
+  schema: CreatorSchema,
 })
 
 const twitchUser = defineCollection({
   type: 'data',
-  schema: TwitchUserSchema
+  schema: TwitchUserSchema,
 })
 
-const jinglejam = defineCollection(
-  {}
-)
+const jinglejam = defineCollection({})
 
-const jinglejamCollection = defineCollection({
-
-})
+const jinglejamCollection = defineCollection({})
 
 const faqCollection = defineCollection({
   type: 'content',
@@ -39,12 +34,18 @@ const faqCollection = defineCollection({
   }),
 })
 
+const charitiesCollection = defineCollection({
+  type: 'data',
+  schema: CharitiesStaticSchema,
+})
+
 export const collections = {
-  'creators': creators,
-  'schedules': schedules,
-  'scheduleDays': scheduleDays,
-  'twitchUser': twitchUser,
-  'faq': faqCollection,
-};
+  creators: creators,
+  schedules: schedules,
+  scheduleDays: scheduleDays,
+  twitchUser: twitchUser,
+  faq: faqCollection,
+  charities: charitiesCollection,
+}
 
 await updateTwitchUser()
