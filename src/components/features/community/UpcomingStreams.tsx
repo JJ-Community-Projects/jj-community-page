@@ -11,6 +11,12 @@ export const UpcomingStreams: Component = () => {
   const remainingCount = () => Math.max(items().length - 4, 0)
   const visibleItems = () => (showAll() ? items() : firstFour())
 
+  const state = () => {
+    if (upcomingStreams.isError) return 'error'
+    if (upcomingStreams.isLoading) return 'loading'
+    return 'success'
+  }
+
   return (
     <div class="mt-6">
       <h2 class="mb-3 text-lg font-semibold text-white">Upcoming streams</h2>

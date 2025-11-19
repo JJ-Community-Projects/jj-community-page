@@ -1,20 +1,15 @@
-import { type Component, For, Show } from 'solid-js'
-import type { JJCampaignType } from '../../../lib/orpc/private/jjData/contract.ts'
-import { twMerge } from 'tailwind-merge'
+import { type Component, Show } from 'solid-js'
 import { createI18n, I18nProvider } from 'solid-i18n'
 import { useLocale } from '@kobalte/core'
 import { Countdown } from '../../common/ui/Countdown.tsx'
 import { useIsBeforeJJ, useIsJJ, useJJStartCountdown, useNextJJStartDate, } from '../../../lib/utils/jjDates.ts'
 import { QueryClientProvider } from '@tanstack/solid-query'
 import { QueryClient } from '@tanstack/query-core'
-import { RadioGroup } from '@kobalte/core/radio-group'
-import { CommunityPageProvider, useCommunityPage, type CommunityInitialData, } from './CommunityPageProvider.tsx'
+import { type CommunityInitialData, CommunityPageProvider, useCommunityPage, } from './CommunityPageProvider.tsx'
 import { FaSolidHeart } from 'solid-icons/fa'
 import { UpcomingStreams } from './UpcomingStreams.tsx'
-import { CommunityItem } from './CommunityItem.tsx'
-import { CommunityCauseCard } from './CommunityCauseCard.tsx'
-import { CommunityUsers } from './CommunityUsers.tsx'
-import { CommunityTagSearch } from './CommunityTagSearch.tsx'
+import CommunityTagSearch from './CommunityTagSearch.tsx'
+import { CommunityCampaignGrid } from './CommunityCampaignGrid.tsx'
 
 export interface CommunityPageProps {
   initial?: CommunityInitialData
@@ -73,146 +68,6 @@ const _CommunityPage: Component = () => {
   )
 }
 
-const SortSelection: Component = () => {
-  const { setSortBy, sortBy } = useCommunityPage()
-
-  return (
-    <div class={twMerge('flex items-center justify-between')}>
-      <RadioGroup
-        value={sortBy()}
-        onChange={setSortBy}
-        class={twMerge('flex flex-col items-end gap-1')}
-      >
-        <RadioGroup.Label
-          class={twMerge(
-            'text-xxs font-semibold uppercase tracking-wide text-white',
-          )}
-        >
-          Sort by
-        </RadioGroup.Label>
-        <div
-          class={twMerge(
-            'inline-flex w-fit items-center gap-1 rounded-xl p-1 shadow-sm',
-            'bg-gradient-to-b from-neutral-50 to-neutral-100 ring-1 ring-black/5',
-          )}
-        >
-          <RadioGroup.Item
-            value={'raised'}
-            class={twMerge(
-              'group relative inline-flex select-none items-center rounded-lg px-3 py-1.5 text-xs font-semibold text-neutral-700',
-              'transition-all duration-200 hover:brightness-105 focus-visible:outline-none',
-              'data-[checked]:bg-white data-[checked]:text-primary-500 data-[checked]:shadow',
-            )}
-          >
-            <RadioGroup.ItemInput class={'sr-only'} />
-            <RadioGroup.ItemLabel class={'hover:cursor-pointer'}>
-              Raised
-            </RadioGroup.ItemLabel>
-          </RadioGroup.Item>
-
-          <RadioGroup.Item
-            value={'live'}
-            class={twMerge(
-              'group relative inline-flex select-none items-center rounded-lg px-3 py-1.5 text-xs font-semibold text-neutral-700',
-              'transition-all duration-200 hover:brightness-105 focus-visible:outline-none',
-              'data-[checked]:bg-white data-[checked]:text-primary-500 data-[checked]:shadow',
-            )}
-          >
-            <RadioGroup.ItemInput class={'sr-only'} />
-            <RadioGroup.ItemLabel class={'hover:cursor-pointer'}>
-              Live
-            </RadioGroup.ItemLabel>
-          </RadioGroup.Item>
-
-          <RadioGroup.Item
-            value={'cause'}
-            class={twMerge(
-              'group relative inline-flex select-none items-center rounded-lg px-3 py-1.5 text-xs font-semibold text-neutral-700',
-              'transition-all duration-200 hover:brightness-105 focus-visible:outline-none',
-              'data-[checked]:bg-white data-[checked]:text-primary-500 data-[checked]:shadow',
-            )}
-          >
-            <RadioGroup.ItemInput class={'sr-only'} />
-            <RadioGroup.ItemLabel class={'hover:cursor-pointer'}>
-              Cause
-            </RadioGroup.ItemLabel>
-          </RadioGroup.Item>
-        </div>
-      </RadioGroup>
-    </div>
-  )
-}
-
-const CurrencySelection: Component = () => {
-  const { currency, setCurrency } = useCommunityPage()
-
-  return (
-    <div class={twMerge('flex items-center justify-between')}>
-      <RadioGroup
-        value={currency()}
-        onChange={setCurrency}
-        class={twMerge('flex flex-col items-end gap-1')}
-      >
-        <RadioGroup.Label
-          class={twMerge(
-            'text-xxs font-semibold uppercase tracking-wide text-white',
-          )}
-        >
-          Currency
-        </RadioGroup.Label>
-        <div
-          class={twMerge(
-            'inline-flex w-fit items-center gap-1 rounded-xl p-1 shadow-sm',
-            'bg-gradient-to-b from-neutral-50 to-neutral-100 ring-1 ring-black/5',
-          )}
-        >
-          <RadioGroup.Item
-            value={'GBP'}
-            class={twMerge(
-              'group relative inline-flex select-none items-center rounded-lg px-3 py-1.5 text-xs font-semibold text-neutral-700',
-              'transition-all duration-200 hover:brightness-105 focus-visible:outline-none',
-              'data-[checked]:bg-white data-[checked]:text-primary-500 data-[checked]:shadow',
-            )}
-          >
-            <RadioGroup.ItemInput class={'sr-only'} />
-            <RadioGroup.ItemLabel class={'hover:cursor-pointer'}>
-              GBP
-            </RadioGroup.ItemLabel>
-          </RadioGroup.Item>
-
-          <RadioGroup.Item
-            value={'USD'}
-            class={twMerge(
-              'group relative inline-flex select-none items-center rounded-lg px-3 py-1.5 text-xs font-semibold text-neutral-700',
-              'transition-all duration-200 hover:brightness-105 focus-visible:outline-none',
-              'data-[checked]:bg-white data-[checked]:text-primary-500 data-[checked]:shadow',
-            )}
-          >
-            <RadioGroup.ItemInput class={'sr-only'} />
-            <RadioGroup.ItemLabel class={'hover:cursor-pointer'}>
-              USD
-            </RadioGroup.ItemLabel>
-          </RadioGroup.Item>
-
-          <RadioGroup.Item
-            value={'EUR'}
-            class={twMerge(
-              'group relative inline-flex select-none items-center rounded-lg px-3 py-1.5 text-xs font-semibold text-neutral-700',
-              'transition-all duration-200 hover:brightness-105 focus-visible:outline-none',
-              'data-[checked]:bg-white data-[checked]:text-primary-500 data-[checked]:shadow',
-            )}
-          >
-            <RadioGroup.ItemInput class={'sr-only'} />
-            <RadioGroup.ItemLabel class={'hover:cursor-pointer'}>
-              EUR
-            </RadioGroup.ItemLabel>
-          </RadioGroup.Item>
-        </div>
-      </RadioGroup>
-    </div>
-  )
-}
-
 const Header: Component = () => {
   const nextJJStartDate = useNextJJStartDate()
   const jjStartCountdown = useJJStartCountdown()
@@ -248,106 +103,20 @@ const Header: Component = () => {
 }
 
 const Body: Component = () => {
-  const { sortBy } = useCommunityPage()
+  const { sortBy, campaignsSorted } = useCommunityPage()
   const isSortByCause = () => sortBy() === 'cause'
   return (
     <div class={'flex w-full flex-col items-stretch justify-center gap-4'}>
       <Header />
       <UpcomingStreams />
       <CommunityTagSearch />
-      <Show when={isSortByCause()} fallback={<CampaignGrid />}>
-        <CampaignGridByCause />
+      <CommunityCampaignGrid/>
+    </div>
+  )
+}
+/*
+
+      <Show when={isSortByCause()} fallback={<CommunityCampaignGrid />}>
+        <CommunityCampaignGridByCause />
       </Show>
-    </div>
-  )
-}
-
-const CampaignGrid: Component = () => {
-  const { campaignsSorted } = useCommunityPage()
-
-  return (
-    <div class={twMerge('mx-auto flex w-full flex-col gap-4')}>
-      <div
-        class={twMerge(
-          'mb-2 mt-6 flex w-full flex-wrap items-end justify-between gap-x-4 gap-y-2',
-        )}
-      >
-        <div class={'flex flex-col'}>
-          <h2 class={twMerge('text-lg font-semibold text-white')}>
-            Fundraisers (2024)
-          </h2>
-          <p class={twMerge('text-white')}>
-            2025 Fundraisers will be shown after the Jingle Jam has started.
-          </p>
-        </div>
-        <div
-          class={twMerge(
-            'flex w-full flex-wrap items-center justify-end gap-x-4 gap-y-2 sm:w-auto',
-          )}
-        >
-          <SortSelection />
-          <CurrencySelection />
-        </div>
-      </div>
-      <div
-        class={
-          'grid w-full grid-cols-[repeat(auto-fit,_minmax(250px,_1fr))] content-center gap-2'
-        }
-      >
-        <For each={campaignsSorted()}>
-          {(campaign: JJCampaignType) => {
-            return <CommunityItem campaign={campaign} />
-          }}
-        </For>
-      </div>
-      <CommunityUsers />
-    </div>
-  )
-}
-
-const CampaignGridByCause: Component = () => {
-  const { campaignsByCause, campaignsByCauseFiltered, selectedTagIds } = useCommunityPage()
-  const anyTagsSelected = () => selectedTagIds().length > 0
-  const groups = () => (anyTagsSelected() ? campaignsByCauseFiltered() : campaignsByCause())
-
-  return (
-    <div class={twMerge('flex w-full flex-col gap-4')}>
-      <div
-        class={twMerge(
-          'mb-2 mt-6 flex w-full flex-wrap items-end justify-between gap-x-4 gap-y-2',
-        )}
-      >
-        <h2 class={twMerge('text-lg font-semibold text-white')}>Fundraisers</h2>
-        <div
-          class={twMerge(
-            'flex w-full flex-wrap items-center justify-end gap-x-4 gap-y-2 sm:w-auto',
-          )}
-        >
-          <SortSelection />
-          <CurrencySelection />
-        </div>
-      </div>
-      <div class={'flex w-full flex-col items-center gap-6 text-center'}>
-        <For each={groups()}>
-          {(o) => {
-            const { cause, campaigns } = o
-            return (
-              <div class={'flex w-full max-w-6xl flex-col items-center gap-8'}>
-                <CommunityCauseCard cause={cause} />
-                <div
-                  class={
-                    'grid w-full grid-cols-[repeat(auto-fit,_minmax(300px,_1fr))] content-center gap-4'
-                  }
-                >
-                  <For each={campaigns}>
-                    {(campaign) => <CommunityItem campaign={campaign} />}
-                  </For>
-                </div>
-              </div>
-            )
-          }}
-        </For>
-      </div>
-    </div>
-  )
-}
+* */
