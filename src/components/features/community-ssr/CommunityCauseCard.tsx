@@ -13,12 +13,12 @@ export const CommunityCauseCard: Component<{ cause: JJCauseType }> = (
   const img = () => cause.logo
   const raised = () => {
     if (currency() === 'USD') {
-      return cause.raised.total.usd
+      return cause.raised.usd
     }
     if (currency() === 'EUR') {
-      return cause.raised.total.euro
+      return cause.raised.euro
     }
-    return cause.raised.total.gbp
+    return cause.raised.gbp
   }
   return (
     <div
