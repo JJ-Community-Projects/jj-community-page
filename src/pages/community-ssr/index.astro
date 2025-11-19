@@ -4,7 +4,10 @@ import BaseLayout from '../../layouts/BaseLayout.astro'
 import { CommunityPage } from '../../components/features/community-ssr/CommunityPage.tsx'
 
 export const prerender = false
-
+Astro.response.headers.set(
+  'Cache-Control',
+  'public, s-maxage=60, stale-while-revalidate=600'
+)
 // Server-side load initial data via orpc server client
 const campaignsFn = serverClientPrivate.jj.campaigns
 const causesFn = serverClientPrivate.jj.causes
@@ -18,10 +21,17 @@ const ctx = {
   },
 }
 
-const { data: community } = await campaignsFn({}, ctx)
-const { data: causes } = await causesFn({}, ctx)
-const { data: upcomingStreams } = await upcomingStreamsFn({}, ctx)
-const { data: users } = await usersFn({}, ctx)
+const [
+  { data: community },
+  { data: causes },
+  { data: upcomingStreams },
+  { data: users },
+] = await Promise.all([
+  campaignsFn({}, ctx),
+  causesFn({}, ctx),
+  upcomingStreamsFn({}, ctx),
+  usersFn({}, ctx),
+])
 ---
 
 <BaseLayout
@@ -30,6 +40,6 @@ const { data: users } = await usersFn({}, ctx)
   canonical="https://jinglejam.ostof.dev/community"
 >
   <div class="w-full flex flex-col justify-center items-stretch gap-4">
-    <CommunityPage initial={{ community, causes, upcomingStreams, users }} client:load />
+    <CommunityPage initial={{ community, causes, upcomingStreams, users }} client:idle />
   </div>
 </BaseLayout>
