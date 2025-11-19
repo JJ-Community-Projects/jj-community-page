@@ -20,30 +20,50 @@ export default defineConfig({
     tailwind(),
     sitemap({
       filenameBase: 'sitemap',
-      filter: (page) =>
-        page !== 'https://jinglejam.ostof.dev/login/' &&
-        page !== 'https://jinglejam.ostof.dev/admin/' &&
-        page !== 'https://jinglejam.ostof.dev/faq/' &&
-        page !== 'https://jinglejam.ostof.dev/about/' &&
-        page !== 'https://jinglejam.ostof.dev/community-ssr/' &&
-        !page.includes('404') &&
-        !page.includes('/ssr') &&
-        !page.includes('/csr') &&
-        !page.includes('error') &&
-        !page.includes('/overlays/') &&
-        !page.includes('/dashboard/') &&
-        !page.includes('not-found') &&
-        !page.includes('/api/') &&
-        !page.includes('embed') &&
-        page !== 'https://jinglejam.ostof.dev/yogs/privacy/twitch-extension/' &&
-        !page.includes('pwa'),
+      /*
+      customPages: [
+        'https://jinglejam.ostof.dev',
+        'https://jinglejam.ostof.dev/yogs',
+        'https://jinglejam.ostof.dev/community',
+        'https://jinglejam.ostof.dev/stream-resources',
+        'https://jinglejam.ostof.dev/teams',
+      ],*/
+      filter: (page) => {
+        return (
+          page !== 'https://jinglejam.ostof.dev/login/' &&
+          page !== 'https://jinglejam.ostof.dev/admin/' &&
+          page !== 'https://jinglejam.ostof.dev/faq' &&
+          page !== 'https://jinglejam.ostof.dev/about' &&
+          page !== 'https://jinglejam.ostof.dev/community-ssr/' &&
+          page !== 'https://jinglejam.ostof.dev/twitch-extension/' &&
+          page !== 'https://jinglejam.ostof.dev/fundraisers/' &&
+          page !== 'https://jinglejam.ostof.dev/users/' &&
+          page !== 'https://jinglejam.ostof.dev/yogs/placeholder/' &&
+          !page.includes('404') &&
+          !page.includes('/ssr') &&
+          !page.includes('/csr') &&
+          !page.includes('error') &&
+          !page.includes('/overlays/') &&
+          !page.includes('/dashboard/') &&
+          !page.includes('not-found') &&
+          !page.includes('/api/') &&
+          !page.includes('embed') &&
+          page !==
+            'https://jinglejam.ostof.dev/yogs/privacy/twitch-extension/' &&
+          !page.includes('pwa')
+        )
+      },
       serialize: (item) => {
-        const url = item.url
-        if (url === 'https://jinglejam.ostof.dev/yogs/') {
+        let url = item.url
+        if (url.endsWith("/")) {
+          url = url.slice(0, -1);
+          item.url = url
+        }
+        if (url === 'https://jinglejam.ostof.dev/yogs') {
           item.changefreq = 'daily'
           item.priority = 0.9
         }
-        if (url === 'https://jinglejam.ostof.dev/community/') {
+        if (url === 'https://jinglejam.ostof.dev/community') {
           item.changefreq = 'daily'
           item.priority = 0.9
         }
