@@ -61,6 +61,8 @@ export class TwitchLiveCheckQueue {
 
     const api = new TwitchAPI(env)
 
+    const token = await api.getAppToken()
+
     // Helper to chunk arrays to Twitch Helix limits (max 100)
     const chunk = <T>(arr: T[], size = 100) => {
       const out: T[][] = []
@@ -75,7 +77,7 @@ export class TwitchLiveCheckQueue {
 
       if (ids.length > 0) {
         for (const part of chunk(ids, 100)) {
-          const resp = await api.fetchStreamsByUserIds(part)
+          const resp = await api.fetchStreamsByUserIds(part, token)
           if (resp.data) {
             for (const s of resp.data) {
               // Only collect live streams
@@ -89,7 +91,7 @@ export class TwitchLiveCheckQueue {
 
       if (logins.length > 0) {
         for (const part of chunk(logins, 100)) {
-          const resp = await api.fetchStreamsByLogins(part)
+          const resp = await api.fetchStreamsByLogins(part, token)
           if (resp.data) {
             for (const s of resp.data) {
               if (s && s.type !== undefined) {
