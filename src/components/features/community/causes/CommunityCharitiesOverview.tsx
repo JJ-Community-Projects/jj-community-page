@@ -1,14 +1,9 @@
-import {
-  type Component,
-  createMemo,
-  createSignal,
-  For,
-  Match,
-  Switch,
-} from 'solid-js'
+import { type Component, For, Show } from 'solid-js'
 import { useCommunityPage } from '../CommunityPageProvider.tsx'
-import type { CharitiesStatic } from '../../../../content/schema.ts'
-import type { JJCauseType } from '../../../../lib/orpc/private/jjData/contract.ts'
+import type {
+  Currencies,
+  Overview,
+} from '../../../../lib/orpc/private/jjData/contract.ts'
 import './CommunityCharitiesOverview.css'
 import {
   DiscordIcon,
@@ -18,16 +13,43 @@ import {
   TwitterIcon,
   YoutubeIcon,
 } from '../../../common/icons/JJIcons.tsx'
+import { Numeric } from 'solid-i18n'
+import { DateTime } from 'luxon'
+import { FaSolidGlobe } from 'solid-icons/fa'
+import { useIsJJ } from '../../../../lib/utils/jjDates.ts' // Top-level subcomponents (do not define components inside other components)
 
 // Top-level subcomponents (do not define components inside other components)
-const Raised: Component<{ item?: JJCauseType }> = (p) => {
-  const f = p.item?.raised?.gbpFormatted
-  if (!f) return null as any
-  return <span class="text-sm text-black/80">{f}</span>
+const RaisedValue: Component<{ item?: Currencies; class?: string }> = (
+  props,
+) => {
+  const { currency } = useCommunityPage()
+  const isJJ = useIsJJ()
+
+  const value = () => {
+    if (!isJJ()) {
+      return 0
+    }
+    if (currency() === 'USD') {
+      return props.item?.usd ?? 0
+    }
+    if (currency() === 'EUR') {
+      return props.item?.euro ?? 0
+    }
+    return props.item?.gbp ?? 0
+  }
+  return (
+    <Numeric
+      class={props.class}
+      value={value()}
+      numberStyle="currency"
+      currency={currency()}
+    />
+  )
 }
 
 const Socials: Component<{
-  website?: {
+  website?: string
+  websites?: {
     discord?: string
     twitter?: string
     instagram?: string
@@ -37,151 +59,144 @@ const Socials: Component<{
     twitch?: string
   }
 }> = (p) => {
-  const w = p.website
+  const w = p.websites
   if (!w) return null as any
   const iconClass = 'h-4 w-4'
+  // Hover helpers (use CreatorDialog.tsx as reference for hex values)
+  const linkHoverColor = (type: string) => {
+    switch (type) {
+      case 'twitch':
+        return 'hover:text-[#6441A4]'
+      case 'youtube':
+        return 'hover:text-[#FF0000]'
+      case 'twitter':
+        return 'hover:text-[#1DA1F2]'
+      case 'tiktok':
+        return 'hover:text-[#69C9D0]'
+      case 'instagram':
+        return 'hover:text-[#E4405F]'
+      case 'discord':
+        return 'hover:text-[#5865F2]'
+      default:
+        return 'hover:text-[#000000]'
+    }
+  }
+  const linkBGHoverColor = (type: string) => {
+    switch (type) {
+      case 'twitch':
+        return 'hover:bg-[#6441A4]/10'
+      case 'youtube':
+        return 'hover:bg-[#FF0000]/10'
+      case 'twitter':
+        return 'hover:bg-[#1DA1F2]/10'
+      case 'tiktok':
+        return 'hover:bg-[#69C9D0]/10'
+      case 'instagram':
+        return 'hover:bg-[#E4405F]/10'
+      case 'discord':
+        return 'hover:bg-[#5865F2]/10'
+      default:
+        return 'hover:bg-[#000000]/10'
+    }
+  }
   return (
     <div class="mt-1 flex flex-row items-center gap-2 text-black/70">
-      <Switch>
-        <Match when={w.discord}>
-          <a
-            href={w.discord!}
-            target="_blank"
-            rel="noreferrer"
-            aria-label="Discord"
-          >
-            <DiscordIcon class={iconClass} />
-          </a>
-        </Match>
-      </Switch>
-      <Switch>
-        <Match when={w.twitter}>
-          <a
-            href={w.twitter!}
-            target="_blank"
-            rel="noreferrer"
-            aria-label="Twitter"
-          >
-            <TwitterIcon class={iconClass} />
-          </a>
-        </Match>
-      </Switch>
-      <Switch>
-        <Match when={w.instagram}>
-          <a
-            href={w.instagram!}
-            target="_blank"
-            rel="noreferrer"
-            aria-label="Instagram"
-          >
-            <InstagramIcon class={iconClass} />
-          </a>
-        </Match>
-      </Switch>
-      <Switch>
-        <Match when={w.tiktok}>
-          <a
-            href={w.tiktok!}
-            target="_blank"
-            rel="noreferrer"
-            aria-label="TikTok"
-          >
-            <TiktokIcon class={iconClass} />
-          </a>
-        </Match>
-      </Switch>
-      <Switch>
-        <Match when={w.youtube}>
-          <a
-            href={w.youtube!}
-            target="_blank"
-            rel="noreferrer"
-            aria-label="YouTube"
-          >
-            <YoutubeIcon class={iconClass} />
-          </a>
-        </Match>
-      </Switch>
-      <Switch>
-        <Match when={w.twitch}>
-          <a
-            href={w.twitch!}
-            target="_blank"
-            rel="noreferrer"
-            aria-label="Twitch"
-          >
-            <TwitchIcon class={iconClass} />
-          </a>
-        </Match>
-      </Switch>
+      <Show when={p.website}>
+        <a
+          href={p.website!}
+          target="_blank"
+          rel="noreferrer"
+          aria-label="Website"
+          class={`rounded-full p-1 transition-colors ${linkHoverColor('website')} ${linkBGHoverColor('website')}`}
+        >
+          <FaSolidGlobe class={iconClass} />
+        </a>
+      </Show>
+      <Show when={w.discord}>
+        <a
+          href={w.discord!}
+          target="_blank"
+          rel="noreferrer"
+          aria-label="Discord"
+          class={`rounded-full p-1 transition-colors ${linkHoverColor('discord')} ${linkBGHoverColor('discord')}`}
+        >
+          <DiscordIcon class={iconClass} />
+        </a>
+      </Show>
+      <Show when={w.twitter}>
+        <a
+          href={w.twitter!}
+          target="_blank"
+          rel="noreferrer"
+          aria-label="Twitter"
+          class={`rounded-full p-1 transition-colors ${linkHoverColor('twitter')} ${linkBGHoverColor('twitter')}`}
+        >
+          <TwitterIcon class={iconClass} />
+        </a>
+      </Show>
+      <Show when={w.instagram}>
+        <a
+          href={w.instagram!}
+          target="_blank"
+          rel="noreferrer"
+          aria-label="Instagram"
+          class={`rounded-full p-1 transition-colors ${linkHoverColor('instagram')} ${linkBGHoverColor('instagram')}`}
+        >
+          <InstagramIcon class={iconClass} />
+        </a>
+      </Show>
+      <Show when={w.tiktok}>
+        <a
+          href={w.tiktok!}
+          target="_blank"
+          rel="noreferrer"
+          aria-label="TikTok"
+          class={`rounded-full p-1 transition-colors ${linkHoverColor('tiktok')} ${linkBGHoverColor('tiktok')}`}
+        >
+          <TiktokIcon class={iconClass} />
+        </a>
+      </Show>
+      <Show when={w.youtube}>
+        <a
+          href={w.youtube!}
+          target="_blank"
+          rel="noreferrer"
+          aria-label="YouTube"
+          class={`rounded-full p-1 transition-colors ${linkHoverColor('youtube')} ${linkBGHoverColor('youtube')}`}
+        >
+          <YoutubeIcon class={iconClass} />
+        </a>
+      </Show>
+      <Show when={w.twitch}>
+        <a
+          href={w.twitch!}
+          target="_blank"
+          rel="noreferrer"
+          aria-label="Twitch"
+          class={`rounded-full p-1 transition-colors ${linkHoverColor('twitch')} ${linkBGHoverColor('twitch')}`}
+        >
+          <TwitchIcon class={iconClass} />
+        </a>
+      </Show>
     </div>
   )
 }
-
-interface CommunityCharitiesOverviewProps {
-  charitiesData?: CharitiesStatic
-}
-
-export const CommunityCharitiesOverview: Component<
-  CommunityCharitiesOverviewProps
-> = (props) => {
-  const [paused, setPaused] = createSignal(false)
-  const { cause } = useCommunityPage()
-
-  const mergedData = () => {
-    const c = cause.data
-    if (!c) {
-      return []
-    }
-    const map = new Map<string, JJCauseType>(c.causes.map((c) => [c.id, c]))
-    return (
-      props.charitiesData?.charities.map((c) => {
-        return {
-          donationData: map.get(c.tiltify_id),
-          staticData: c,
-        }
-      }) ?? []
-    )
-  }
-
-  const displayItems = createMemo(() => {
-    const list =
-      mergedData() ??
-      props.charitiesData?.charities?.map((c) => ({
-        donationData: undefined as JJCauseType | undefined,
-        staticData: c,
-      }))
-    if (!list || list.length === 0) return [] as typeof list
-    // Duplicate items to create a seamless marquee effect
-    const repeat = Math.max(2, Math.ceil(24 / list.length))
-    return Array.from({ length: repeat }, () => list).flat()
-  })
-
-  const speed = createMemo(() => Math.max(40, displayItems().length * 6))
+export const CommunityCharitiesOverview: Component = () => {
+  const { mergedCharityItems, overview } = useCommunityPage()
 
   return (
-    <div
-      class="community-charities-overview relative flex overflow-x-hidden"
-      classList={{ paused: paused() }}
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
-      onFocusIn={() => setPaused(true)}
-      onFocusOut={() => setPaused(false)}
-    >
-      <div
-        class="marquee-track marquee-1 flex flex-row whitespace-nowrap"
-        style={{
-          '--marquee-duration': `${speed()}s`,
-        }}
-      >
-        <For each={displayItems()}>
+    <Show when={mergedCharityItems().length > 0}>
+      <div class={'flex flex-col items-start justify-start gap-2'}>
+        <Show when={overview.data}>
+          {(overview) => <OverviewComponent overview={overview()} />}
+        </Show>
+        <For each={mergedCharityItems()}>
           {(it) => {
-            const img = it.donationData?.logo ?? ''
             return (
-              <div class="inline-block h-[96px] w-[240px] px-3 py-2">
-                <div class="hover:scale-101 flex h-full w-full items-center gap-3 rounded-md bg-gradient-to-b from-neutral-50 to-neutral-100 p-2 text-black shadow hover:brightness-105">
+              <div class="inline-block h-[96px] w-full">
+                <div class="hover:scale-101 flex h-full w-full items-center gap-3 rounded-2xl bg-gradient-to-b from-neutral-50 to-neutral-100 p-2 text-black shadow hover:brightness-105">
                   <img
-                    src={img}
+                    src={it.donationData?.logo}
                     alt={it.donationData?.name || it.staticData.name}
                     class="h-12 w-12 flex-shrink-0 rounded object-cover"
                     loading="lazy"
@@ -190,8 +205,14 @@ export const CommunityCharitiesOverview: Component<
                     <div class="truncate text-sm font-semibold text-black">
                       {it.donationData?.name || it.staticData.name}
                     </div>
-                    <Raised item={it.donationData} />
-                    <Socials website={it.staticData.websites} />
+                    <RaisedValue
+                      class={'font-bold text-primary-600'}
+                      item={it.donationData?.raised}
+                    />
+                    <Socials
+                      website={it.staticData.website}
+                      websites={it.staticData.websites}
+                    />
                   </div>
                 </div>
               </div>
@@ -199,37 +220,34 @@ export const CommunityCharitiesOverview: Component<
           }}
         </For>
       </div>
-      <div
-        class="marquee-track marquee-2 absolute top-0 flex flex-row whitespace-nowrap"
-        style={{
-          '--marquee-duration': `${speed()}s`,
-        }}
-      >
-        <For each={displayItems()}>
-          {(it) => {
-            const img = it.donationData?.logo || ''
-            return (
-              <div class="inline-block h-[96px] w-[240px] px-3 py-2">
-                <div class="flex h-full w-full items-center gap-3 rounded-md bg-white p-2 text-black shadow">
-                  <img
-                    src={img}
-                    alt={it.donationData?.name || it.staticData.name}
-                    class="h-12 w-12 flex-shrink-0 rounded object-cover"
-                    loading="lazy"
-                  />
-                  <div class="min-w-0 flex-1">
-                    <div class="truncate text-sm font-semibold text-black">
-                      {it.donationData?.name || it.staticData.name}
-                    </div>
-                    <Raised item={it.donationData} />
-                    <Socials website={it.staticData.websites} />
-                  </div>
-                </div>
-              </div>
-            )
-          }}
-        </For>
+    </Show>
+  )
+}
+
+const OverviewComponent: Component<{ overview: Overview }> = (props) => {
+  const isJJ = useIsJJ()
+  return (
+    <div class="flex w-full flex-col items-start justify-start gap-2 rounded-2xl bg-gradient-to-b from-neutral-50 to-neutral-100 p-2 text-primary-600 hover:brightness-105">
+      <div>
+        <RaisedValue class={'font-bold'} item={props.overview.raised.total} />
+        <p class={'text-xs text-black'}>Total</p>
       </div>
+      <div>
+        <p class={'font-bold'}>{isJJ() ? props.overview.donations : 0}</p>
+        <p class={'text-xs text-black'}>Donations</p>
+      </div>
+      <div>
+        <p class={'font-bold'}>
+          {isJJ() ? props.overview.collections.redeemed : 0}
+        </p>
+        <p class={'text-xs text-black'}>Collections Distributed</p>
+      </div>
+      <p class={'text-xs text-black'}>
+        Last update,{' '}
+        {DateTime.fromJSDate(props.overview.date).toLocaleString(
+          DateTime.DATETIME_MED,
+        )}
+      </p>
     </div>
   )
 }

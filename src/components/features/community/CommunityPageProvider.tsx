@@ -1,9 +1,24 @@
-import { createContext, createMemo, createSignal, type ParentComponent, useContext, } from 'solid-js'
+import {
+  createContext,
+  createMemo,
+  createSignal,
+  type ParentComponent,
+  useContext,
+} from 'solid-js'
 import { useQuery } from '@tanstack/solid-query'
 import { orpcPrivate } from '../../../lib/orpc/client.ts'
 import { makePersisted } from '@solid-primitives/storage'
+import type { CharitiesStatic } from '../../../content/schema.ts'
+import type { JJCauseType } from '../../../lib/orpc/private/jjData/contract.ts'
 
-const useCommunityPageHook = () => {
+const useCommunityPageHook = (charitiesData?: CharitiesStatic) => {
+  const overviewQuery = useQuery(() =>
+    orpcPrivate.jj.overview.queryOptions({
+      staleTime: 60_000,
+      refetchInterval: 60_000 * 2,
+    }),
+  )
+
   const communityQuery = useQuery(() =>
     orpcPrivate.jj.campaigns.queryOptions({
       staleTime: 60_000 * 4,
@@ -92,7 +107,10 @@ const useCommunityPageHook = () => {
     return c
   }
 
-  const baseSortedCampaigns = () => (sortBy() === 'live' ? campaignsSortedByLiveFirst() : campaignsSortedByRaised())
+  const baseSortedCampaigns = () =>
+    sortBy() === 'live'
+      ? campaignsSortedByLiveFirst()
+      : campaignsSortedByRaised()
 
   // Sorted campaigns with optional tag filtering and prioritization
   const campaignsSorted = createMemo(() => {
@@ -124,7 +142,8 @@ const useCommunityPageHook = () => {
   // campaigns by cause with tag filtering/prioritization
   const campaignsByCauseFiltered = createMemo(() => {
     const selected = selectedTagIds()
-    if (!causeQuery.data || !communityQuery.data) return [] as ReturnType<typeof campaignsByCause>
+    if (!causeQuery.data || !communityQuery.data)
+      return [] as ReturnType<typeof campaignsByCause>
     const allByCause = campaignsByCause()
     if (selected.length === 0) return allByCause
     return allByCause
@@ -139,10 +158,28 @@ const useCommunityPageHook = () => {
       .filter((e) => e.campaigns.length > 0)
   })
 
+  const mergedCharityItems = createMemo(() => {
+
+    const c = causeQuery.data
+    if (!c) {
+      return []
+    }
+    const map = new Map<string, JJCauseType>(c.causes.map((c) => [c.id, c]))
+    return (
+      charitiesData?.charities.map((c) => {
+        return {
+          donationData: map.get(c.tiltify_id),
+          staticData: c,
+        }
+      }) ?? []
+    )
+  })
+
   return {
     community: communityQuery,
     cause: causeQuery,
     upcomingStreams: upcomingStreamsQuery,
+    overview: overviewQuery,
     sortBy,
     setSortBy,
     currency,
@@ -157,10 +194,13 @@ const useCommunityPageHook = () => {
     clearSelectedTags,
     usersFiltered,
     campaignsByCauseFiltered,
+    mergedCharityItems,
   }
 }
 
-interface CommunityPageProps {}
+interface CommunityPageProps {
+  charitiesData?: CharitiesStatic
+}
 
 const CommunityPageContext =
   createContext<ReturnType<typeof useCommunityPageHook>>()
@@ -168,7 +208,7 @@ const CommunityPageContext =
 export const CommunityPageProvider: ParentComponent<CommunityPageProps> = (
   props,
 ) => {
-  const hook = useCommunityPageHook()
+  const hook = useCommunityPageHook(props.charitiesData)
   return (
     <CommunityPageContext.Provider value={hook}>
       {props.children}

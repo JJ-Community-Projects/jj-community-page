@@ -4,19 +4,27 @@ import { twMerge } from 'tailwind-merge'
 import { createI18n, I18nProvider } from 'solid-i18n'
 import { useLocale } from '@kobalte/core'
 import { Countdown } from '../../common/ui/Countdown.tsx'
-import { useIsBeforeJJ, useIsJJ, useJJStartCountdown, useNextJJStartDate, } from '../../../lib/utils/jjDates.ts'
+import {
+  useIsBeforeJJ,
+  useIsJJ,
+  useJJStartCountdown,
+  useNextJJStartDate,
+} from '../../../lib/utils/jjDates.ts'
 import { QueryClientProvider } from '@tanstack/solid-query'
 import { QueryClient } from '@tanstack/query-core'
 import { RadioGroup } from '@kobalte/core/radio-group'
-import { CommunityPageProvider, useCommunityPage, } from './CommunityPageProvider.tsx'
+import {
+  CommunityPageProvider,
+  useCommunityPage,
+} from './CommunityPageProvider.tsx'
 import { FaSolidHeart } from 'solid-icons/fa'
 import { UpcomingStreams } from './UpcomingStreams.tsx'
 import { CommunityItem } from './CommunityItem.tsx'
 import { CommunityCauseCard } from './CommunityCauseCard.tsx'
 import { CommunityUsers } from './CommunityUsers.tsx'
 import { CommunityTagSearch } from './CommunityTagSearch.tsx'
-import { CommunityCharitiesOverview } from './causes/CommunityCharitiesOverview.tsx'
 import type { CharitiesStatic } from '../../../content/schema.ts'
+import { CommunityCharitiesOverview } from './causes/CommunityCharitiesOverview.tsx'
 
 export const CommunityPage: Component<{
   charitiesData?: CharitiesStatic
@@ -25,17 +33,15 @@ export const CommunityPage: Component<{
   return (
     <QueryClientProvider client={new QueryClient()}>
       <I18nProvider i18n={i18n}>
-        <CommunityPageProvider>
-          <_CommunityPage charitiesData={props.charitiesData} />
+        <CommunityPageProvider charitiesData={props.charitiesData}>
+          <_CommunityPage />
         </CommunityPageProvider>
       </I18nProvider>
     </QueryClientProvider>
   )
 }
 
-const _CommunityPage: Component<{
-  charitiesData?: CharitiesStatic
-}> = (props) => {
+const _CommunityPage: Component = (props) => {
   const i18n = createI18n({ language: useLocale().locale() })
 
   const isJJ = useIsJJ()
@@ -47,7 +53,7 @@ const _CommunityPage: Component<{
     <I18nProvider i18n={i18n}>
       <Show when={community.isSuccess}>
         <Show when={community.data!.list.length > 0}>
-          <Body charitiesData={props.charitiesData} />
+          <Body />
         </Show>
         <Show when={community.data!.list.length === 0}>
           <Show when={!isBefore()}>
@@ -249,20 +255,24 @@ const Header: Component = () => {
   )
 }
 
-const Body: Component<{
-  charitiesData?: CharitiesStatic
-}> = (props) => {
+const Body: Component = () => {
   const { sortBy } = useCommunityPage()
   const isSortByCause = () => sortBy() === 'cause'
   return (
     <div class={'flex w-full flex-col items-stretch justify-center gap-4'}>
       <Header />
-      <CommunityCharitiesOverview charitiesData={props.charitiesData} />
-      <UpcomingStreams />
-      <CommunityTagSearch />
-      <Show when={isSortByCause()} fallback={<CampaignGrid />}>
-        <CampaignGridByCause />
-      </Show>
+      <div class={'flex w-full flex-row items-start justify-start gap-4'}>
+        <div>
+          <CommunityCharitiesOverview />
+        </div>
+        <div class={'flex flex-1 flex-col items-start justify-center gap-4'}>
+          <UpcomingStreams />
+          <CommunityTagSearch />
+          <Show when={isSortByCause()} fallback={<CampaignGrid />}>
+            <CampaignGridByCause />
+          </Show>
+        </div>
+      </div>
     </div>
   )
 }
