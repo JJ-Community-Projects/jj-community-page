@@ -75,6 +75,8 @@ const UserDisplaySchema = z.object({
   userId: z.number(),
   /** Primary streaming platform preference (twitch, youtube, tiktok) */
   primaryLiveStream: z.string(),
+  /** Account creation timestamp */
+  createdAt: z.date(),
   /** Display name, typically from the primary streaming platform */
   username: z.string(),
   /** Profile image URL from the streaming platform */
