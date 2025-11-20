@@ -127,6 +127,7 @@ export const CharityStaticSchema = z.object({
   tiltify_id: z.string(),
   name: z.string(),
   description: z.string(),
+  website: z.string().optional(),
   websites: z.object({
     discord: z.string().optional(),
     twitter: z.string().optional(),
