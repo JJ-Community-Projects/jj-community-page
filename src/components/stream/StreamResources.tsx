@@ -128,17 +128,6 @@ export const StreamResources: Component<{ user: User | null }> = (props) => {
 
               <Carousel />
 
-              <div class="mt-4 flex flex-col items-center gap-1">
-                <p class="~text-lg/xl">Twitch Overlay Extension</p>
-                <a
-                  class="p-1 text-lg underline hover:text-twitch-100"
-                  href="https://dashboard.twitch.tv/extensions/9urrg74yzq8di9hqr5prsto5lbmq3x"
-                  target="_blank"
-                >
-                  Get the Overlay Extension on Twitch
-                </a>
-              </div>
-
               <a class="underline text-white" href="/twitch-extension/privacy">Privacy Policy</a>
 
               <div class="mt-4 text-center text-sm text-white/80">
