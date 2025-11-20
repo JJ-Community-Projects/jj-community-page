@@ -2,6 +2,8 @@ import { type Component, For, Show } from 'solid-js'
 import type { UserProfileData } from '../../../../lib/orpc/public/schemas/users'
 import { TagChip } from './tags/TagChip'
 import { SocialLink } from './SocialLink.tsx'
+import { TiltifyIcon } from '../../../common/icons/JJIcons.tsx'
+import { BlueSky, Tiltify } from './social-links/Tiltify.tsx'
 
 interface UserHeaderProps {
   user: UserProfileData
@@ -59,19 +61,18 @@ export const UserHeader: Component<UserHeaderProps> = (props) => {
 
             {/* Social Links Section - Below Tags */}
             <div class="w-full">
-              <Show when={socials && socials.length > 0}>
-                <div class="flex flex-wrap justify-center gap-4">
-                  <For each={socials}>
-                    {(social) => (
-                      <SocialLink
-                        provider={social.provider}
-                        url={social.url}
-                        userId={userData.userId}
-                      />
-                    )}
-                  </For>
-                </div>
-              </Show>
+              <div class="flex flex-wrap justify-center gap-4">
+                <Tiltify url={`https://tiltify.com/@${props.user.user.tiltifySlug}`}/>
+                <For each={socials}>
+                  {(social) => (
+                    <SocialLink
+                      provider={social.provider}
+                      url={social.url}
+                      userId={userData.userId}
+                    />
+                  )}
+                </For>
+              </div>
             </div>
           </div>
         </div>
