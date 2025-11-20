@@ -33,7 +33,7 @@ const RaisedValue: Component<{ item?: Currencies; class?: string }> = (
 
   const value = () => {
     if (!isJJ()) {
-      return 3_400_000.77
+      return 0
     }
     if (currency() === 'USD') {
       return props.item?.usd ?? 0
