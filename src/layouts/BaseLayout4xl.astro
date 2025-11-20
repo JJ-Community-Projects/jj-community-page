@@ -4,6 +4,9 @@ import Footer from '../components/layout/footer/Footer.astro'
 import FeedbackBanner from '../components/features/feedback/FeedbackBanner.astro'
 import AdminNavigation from '../components/layout/navigation/AdminNavigation.astro'
 
+const env = Astro.locals.runtime.env.ENVIRONMENT
+const isProd = env === 'PROD'
+
 interface Props {
   title?: string
   description?: string
@@ -38,30 +41,29 @@ const og = {
   <head>
     <!-- Google tag (gtag.js) -->
     <!-- prettier-ignore -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-P6MYGN62FW"/>
+    {
+      isProd && (
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-P6MYGN62FW"/>
+        <script is:inline>
+          window.dataLayer = window.dataLayer || [];
 
-    <!-- prettier-ignore -->
-    <script is:inline>
-      window.dataLayer = window.dataLayer || []
+          function gtag() {
+            dataLayer.push(arguments);
+          }
 
-      function gtag() {
-        dataLayer.push(arguments)
-      }
-
-      gtag('js', new Date())
-      gtag('consent', 'default', {
-        ad_storage: 'denied',
-        ad_user_data: 'denied',
-        ad_personalization: 'denied',
-        analytics_storage: 'granted',
-        functionality_storage: 'granted',
-      })
-      gtag('config', 'G-P6MYGN62FW', {
-        anonymize_ip: true,
-        cookie_flags: 'max-age=7200;secure;samesite=none',
-      })
-      window.gtag = gtag
-    </script>
+          gtag('js', new Date());
+          gtag("consent", "default", {
+            ad_storage: "denied",
+            ad_user_data: "denied",
+            ad_personalization: "denied",
+            analytics_storage: "granted",
+            functionality_storage: "granted",
+          });
+          gtag('config', 'G-P6MYGN62FW', {anonymize_ip: true, cookie_flags: 'max-age=7200;secure;samesite=none'});
+          window.gtag = gtag;
+          </script>
+      )
+    }
     <link rel="sitemap" href="/sitemap-index.xml" />
     <meta charset="UTF-8" />
     <meta name="description" content=`${description || ''}` />
@@ -110,6 +112,7 @@ const og = {
   class="h-screen overflow-hidden font-poppins bg-gradient-to-br from-primary-shade via-primary to-primary-shade"
 >
   <div class="h-full overflow-y-auto p-2" style="overflow-anchor: none;">
+    <p>{env}</p>
     <div class="flex flex-col justify-start min-h-screen">
       <div class="flex flex-col gap-2 items-center mb-4">
         <Navigation />
