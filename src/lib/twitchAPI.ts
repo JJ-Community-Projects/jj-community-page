@@ -515,6 +515,7 @@ export class TwitchAPI {
 
   public async fetchStreamsByLogins(
     logins: string[],
+    accessToken?: string,
   ): Promise<TwitchAPIResult<TwitchStream[]>> {
     if (!logins || logins.length === 0) {
       return {
@@ -529,7 +530,7 @@ export class TwitchAPI {
     try {
       const q = logins.join('&user_login=')
       const url = `https://api.twitch.tv/helix/streams?user_login=${q}`
-      const response = await this.makeAuthenticatedRequest(url)
+      const response = await this.makeAuthenticatedRequest(url, accessToken)
 
       if (!response.ok) {
         return {
