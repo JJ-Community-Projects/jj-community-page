@@ -10,7 +10,7 @@ import { getJSON, putJSON } from '../util/cache.ts'
 import { dbMiddleware } from '../../middleware/dbMiddleware.ts'
 import { implement, ORPCError } from '@orpc/server'
 import { cacheMiddleware } from '../../middleware/cacheControl.ts'
-import { and, asc, eq, or, sql } from 'drizzle-orm'
+import { and, asc, eq, not, or, sql } from 'drizzle-orm'
 import { schedulesTable, streamParticipantsTable, streamsTable, } from '../../../db/schema/jj-schema.ts'
 import { streamTagsTable, tags, userTagsTable, } from '../../../db/schema/tags-schema.ts'
 import { tagUserCountsView, userDisplayView, } from '../../../db/schema/views-schema.ts'
@@ -169,6 +169,9 @@ const upcomingStreams = os.upcomingStreamsContract
           eq(schedulesTable.year, year),
           eq(schedulesTable.visible, true),
           eq(schedulesTable.primary, true),
+          not(eq(schedulesTable.ownerId, 0)),
+          not(eq(schedulesTable.ownerId, 1)),
+          not(eq(schedulesTable.ownerId, 2)),
         ),
       )
       .all()
