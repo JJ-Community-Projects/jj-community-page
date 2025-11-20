@@ -383,16 +383,20 @@ export class JingleJamData extends DurableObject<Env> {
     const logins = await this.getTwitchLoginsFromCampaigns()
 
     const accessToken = await api.getAppToken()
-    const validLogins: string[] = []
+
     const invalidLogins: string[] = []
 
     const storedInvalidLogins = await this.getStringArray(
       'twitch:invalidLogins',
     )
+    const storedValidLogins = await this.getStringArray('twitch:validLogins')
     // Normalize previously stored invalid logins for proper comparison
     const storedInvalidSet = new Set(storedInvalidLogins)
+    const storedValidSet = new Set(storedValidLogins)
 
-    for (const login of logins) {
+    const loginsToValidate = logins.filter(l => !storedValidSet.has(l))
+    const validLogins: string[] = [...storedValidSet]
+    for (const login of loginsToValidate) {
       const normalized = this.normalizeTwitchLogin(login)
       if (!normalized) continue
 
@@ -405,15 +409,18 @@ export class JingleJamData extends DurableObject<Env> {
       const channel = await api.fetchUsersByLogin(normalized, accessToken)
 
       if (channel.data && !channel.error) {
-        validLogins.push(normalized)
+
+        if (!validLogins.includes(normalized)) validLogins.push(normalized)
+
         await this.storage.put(`twitch:id:${channel.data.id}`, channel.data)
         await this.storage.put(
           `twitch:login:${channel.data.login}`,
           channel.data,
         )
+
       } else {
         if (channel.error.status !== 401) {
-          invalidLogins.push(normalized)
+          if (!invalidLogins.includes(normalized)) invalidLogins.push(normalized)
         }
       }
     }
