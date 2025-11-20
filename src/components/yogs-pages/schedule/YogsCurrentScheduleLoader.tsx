@@ -325,7 +325,7 @@ const Creators: Component<{
             </For>
           </div>
         </Show>
-        <Show when={yogs.length > 0}>
+        <Show when={bestOf.length > 0}>
           <p class="mb-1 text-xl text-white">Best of</p>
           <div class="flex flex-wrap items-center justify-center gap-2">
             <For each={bestOf}>

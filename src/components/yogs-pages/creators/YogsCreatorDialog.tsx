@@ -82,9 +82,9 @@ export const Links: Component<LinksProps> = (props) => {
     'youtube',
     'bsky',
     'discord',
-    'twitter',
     'tiktok',
     'instagram',
+    'twitter',
   ]
 
   const filteredLinks = links
@@ -94,6 +94,8 @@ export const Links: Component<LinksProps> = (props) => {
   filteredLinks.sort((a, b) => {
     return linkOrder.indexOf(a.type!) - linkOrder.indexOf(b.type!)
   })
+
+
 
   const linkHoverColor = (type: string) => {
     switch (type) {
@@ -109,6 +111,8 @@ export const Links: Component<LinksProps> = (props) => {
         return 'hover:text-[#69C9D0]'
       case 'instagram':
         return 'hover:text-[#E4405F]'
+      case 'discord':
+        return 'hover:text-[#5865F2]'
       default:
         return 'hover:text-[#000000]'
     }
@@ -116,19 +120,21 @@ export const Links: Component<LinksProps> = (props) => {
   const linkBGHoverColor = (type: string) => {
     switch (type) {
       case 'twitch':
-        return 'hover:bg-[#6441A4ee]'
+        return 'hover:bg-[#6441A4]/10'
       case 'youtube':
-        return 'hover:bg-[#FF0000ee]'
+        return 'hover:bg-[#FF0000]/10'
       case 'bsky':
-        return 'hover:bg-[#1E95EFee]'
+        return 'hover:bg-[#1E95EF]/10'
       case 'twitter':
-        return 'hover:bg-[#1DA1F2ee]'
+        return 'hover:bg-[#1DA1F2]/10'
       case 'tiktok':
-        return 'hover:bg-[#69C9D0ee]'
+        return 'hover:bg-[#69C9D0]/10'
       case 'instagram':
-        return 'hover:bg-[#E4405Fee]'
+        return 'hover:bg-[#E4405F]/10'
+      case 'discord':
+        return 'hover:bg-[#5865F2]/10'
       default:
-        return 'hover:bg-[#000000ee]'
+        return 'hover:bg-[#000000]/10'
     }
   }
 
@@ -170,6 +176,7 @@ export const Links: Component<LinksProps> = (props) => {
               class={twMerge(
                 'rounded-full p-2 transition-all',
                 linkHoverColor(link.type!),
+                linkBGHoverColor(link.type!),
               )}
               aria-label={`${props.creator.name} ${link.type}`}
             >

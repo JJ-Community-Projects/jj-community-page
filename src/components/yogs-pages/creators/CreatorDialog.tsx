@@ -102,6 +102,8 @@ export const Links: Component<LinksProps> = (props) => {
         return 'hover:text-[#69C9D0]'
       case 'instagram':
         return 'hover:text-[#E4405F]'
+      case 'discord':
+        return 'hover:text-[#5865F2]'
       default:
         return 'hover:text-[#000000]'
     }
@@ -120,6 +122,8 @@ export const Links: Component<LinksProps> = (props) => {
         return 'hover:bg-[#69C9D0]/10'
       case 'instagram':
         return 'hover:bg-[#E4405F]/10'
+      case 'discord':
+        return 'hover:text-[#5865F2]/10'
       default:
         return 'hover:bg-[#000000]/10'
     }
