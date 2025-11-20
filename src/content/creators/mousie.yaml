@@ -14,6 +14,9 @@ links:
   - name: BlueSky
     type: bsky
     url: https://bsky.app/profile/mousiexox.bsky.social
+  - name: Youtube
+    type: youtube
+    url: https://www.youtube.com/@Mousie
 name: Mousie
 link: https://www.twitch.tv/mousie
 profileImage:
