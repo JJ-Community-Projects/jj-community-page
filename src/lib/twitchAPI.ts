@@ -471,10 +471,12 @@ export class TwitchAPI {
   /**
    * Fetch streams for multiple users
    * @param userIds - Array of Twitch user IDs
+   * @param accessToken
    * @returns Promise with either the stream data or an error
    */
   public async fetchStreamsByUserIds(
     userIds: string[],
+    accessToken?: string,
   ): Promise<TwitchAPIResult<TwitchStream[]>> {
     if (!userIds || userIds.length === 0) {
       return {
@@ -489,7 +491,7 @@ export class TwitchAPI {
     try {
       const q = userIds.join('&user_id=')
       const url = `https://api.twitch.tv/helix/streams?user_id=${q}`
-      const response = await this.makeAuthenticatedRequest(url)
+      const response = await this.makeAuthenticatedRequest(url, accessToken)
 
       if (!response.ok) {
         return {
