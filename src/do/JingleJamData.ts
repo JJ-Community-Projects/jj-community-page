@@ -432,11 +432,14 @@ export class JingleJamData extends DurableObject<Env> {
     const accessToken = await api.getAppToken()
     const liveStreamsIds: string[] = []
     const liveStreamsLogins: string[] = []
-    for (const login of logins) {
-      const stream = await api.fetchStreamsByLogin(login, accessToken)
-      if (stream.data && !stream.error) {
-        liveStreamsIds.push(stream.data.user_id)
-        liveStreamsLogins.push(stream.data.user_login)
+    const loginChunks = this.chunk(logins, 50)
+    for (const logins of loginChunks){
+      const stream = await api.fetchStreamsByLogins(logins, accessToken)
+      if (stream.data && !stream.error){
+        for (const s of stream.data) {
+          liveStreamsIds.push(s.user_id)
+          liveStreamsLogins.push(s.user_login)
+        }
       }
     }
     await this.setStringArray('twitch:liveStreams:ids', liveStreamsIds)
@@ -468,6 +471,7 @@ export class JingleJamData extends DurableObject<Env> {
       `campaign:display:twitchId:${channelId}`,
     )
   }
+
   async getAllCampaignDisplay() {
     const map = await this.storage.list({
       prefix: `campaign:display:twitchId:`,
@@ -603,6 +607,12 @@ export class JingleJamData extends DurableObject<Env> {
   public async getTiltifyUsersMap() {
     const users = await this.getTiltifyUsers()
     return new Map(users?.map((u) => [u.slug, u]) ?? [])
+  }
+
+  private chunk<T>(arr: T[], size: number) {
+    const out: T[][] = []
+    for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size))
+    return out
   }
 
   private async fetchFromRateAPI() {
