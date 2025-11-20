@@ -32,26 +32,41 @@ export async function scheduled(
       const DO = env.JingleJamData
       const stubID = DO.idFromName('JJ_API_CACHE')
       const stub = DO.get(stubID)
-      try {
+      const startTimes = {
+        fx: Date.now(), tiltify: 0, twitch: 0, tags: 0,
+      }
+
+      const task1 = (async () => {
+        console.log('scheduled', 'fetchGBPToEURConversionRate')
         await stub.fetchGBPToEURConversionRate()
-      } catch (e) {
-        console.error(e)
-      }
-      try {
+        console.log('fetchGBPToEURConversionRate ms', Date.now() - startTimes.fx)
+      })
+
+      const task2 = (async () => {
+        startTimes.tiltify = Date.now()
+        console.log('scheduled', 'loadAllTiltifySocials')
         await stub.loadAllTiltifySocials()
-      } catch (e) {
-        console.error(e)
-      }
-      try {
+        console.log('loadAllTiltifySocials ms', Date.now() - startTimes.tiltify)
+      })
+
+      const task3 = (async () => {
+        startTimes.twitch = Date.now()
+        console.log('scheduled', 'validateTwitchChannels')
         await stub.validateTwitchChannels()
-      } catch (e) {
-        console.error(e)
-      }
-      try {
+        console.log('validateTwitchChannels ms', Date.now() - startTimes.twitch)
+      })
+
+      const task4 = (async () => {
+        startTimes.tags = Date.now()
+        console.log('scheduled', 'buildAndStoreUserTags')
         await stub.buildAndStoreUserTags()
-      } catch (e) {
-        console.error(e)
-      }
+        console.log('buildAndStoreUserTags ms', Date.now() - startTimes.tags)
+      })
+
+      const results = await Promise.allSettled([
+        task1(), task2(), task3(), task4()
+      ])
+      for (const r of results) if (r.status === 'rejected') console.error(r.reason)
       break
   }
 }
