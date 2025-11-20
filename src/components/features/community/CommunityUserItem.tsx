@@ -1,6 +1,6 @@
 import { type Component, For, Show } from 'solid-js'
 import { twMerge } from 'tailwind-merge'
-import { JJIcon, TwitchIcon } from '../../common/icons/JJIcons.tsx'
+import { JJIcon, TiltifyIcon, TwitchIcon } from '../../common/icons/JJIcons.tsx'
 import type { UserWithInfo } from '../../../lib/orpc/private/jjData/contract.ts'
 import { FaSolidCalendarWeek } from 'solid-icons/fa'
 
@@ -61,6 +61,17 @@ export const CommunityUserItem: Component<CommunityUserItemProps> = (props) => {
         </div>
         <div class={'flex-1'} />
         <div class={'flex gap-1'}>
+          <a
+            href={`https://tiltify.com/@${props.user.tiltifySlug}`}
+            class={twMerge(
+              'inline-flex flex-1 items-center justify-center gap-2 rounded-xl px-2 py-1',
+              'bg-tiltify-500 text-white',
+              'transition-all duration-200 hover:ring-2 hover:ring-black/5 hover:brightness-105',
+            )}
+          >
+            <span class={'text-xxs'}>Tiltify</span>
+            <TiltifyIcon class={'size-2'} />
+          </a>
           <a
             href={profileUrl()}
             class={twMerge(
