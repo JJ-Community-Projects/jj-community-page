@@ -12,11 +12,15 @@ const CurrenciesSchema = z.object({
   euroFormatted: z.string(),
 })
 
+export type Currencies = z.infer<typeof CurrenciesSchema>
+
 const JJRaisedSchema = z.object({
-  yogscast: CurrenciesSchema,
-  fundraisers: CurrenciesSchema,
-  total: CurrenciesSchema,
+  yogscast: CurrenciesSchema.optional(),
+  fundraisers: CurrenciesSchema.optional(),
+  total: CurrenciesSchema.optional(),
 })
+
+export type JJRaised = z.infer<typeof JJRaisedSchema>
 
 // JJCause schema
 export const JJCauseSchema = z.object({
@@ -166,10 +170,26 @@ export type UserCampaignPair = z.infer<typeof UserCampaignPairSchema>
 
 const getUserCampaignPairsContract = oc.output(z.array(UserCampaignPairSchema))
 
+const OverviewSchema = z.object({
+  raised: JJRaisedSchema,
+  collections: z.object({
+    redeemed: z.number(),
+    total: z.number(),
+  }),
+  donations: z.number(),
+  date: z.date(),
+})
+
+export type Overview = z.infer<typeof OverviewSchema>
+
+const overviewContract = oc
+  .output(OverviewSchema)
+
 export const contracts = {
   campaignsContract,
   causesContract,
   upcomingStreamsContract,
   getAllUsersWithInfoContract,
   getUserCampaignPairsContract,
+  overviewContract,
 }

@@ -1,4 +1,11 @@
-import { contracts, type JJCampaignType, type UserWithInfo, UserWithInfoTags, } from './contract.ts'
+import {
+  contracts,
+  type Currencies,
+  type JJCampaignType,
+  type Overview,
+  type UserWithInfo,
+  UserWithInfoTags,
+} from './contract.ts'
 import { getJSON, putJSON } from '../util/cache.ts'
 import { dbMiddleware } from '../../middleware/dbMiddleware.ts'
 import { implement, ORPCError } from '@orpc/server'
@@ -9,6 +16,7 @@ import { streamTagsTable, tags, userTagsTable, } from '../../../db/schema/tags-s
 import { tagUserCountsView, userDisplayView, } from '../../../db/schema/views-schema.ts'
 import { UserDisplaySchema } from '../../public/schemas/UserDisplaySchema.ts'
 import type { JJDrizzleDatabase } from '../../../db/db.ts'
+import type { CurrenciesTV } from '../../public/twitchExtension/contract.ts'
 // New: get campaign by Twitch id
 
 const jjDataCacheMiddleware = cacheMiddleware({
@@ -629,12 +637,103 @@ const getUserCampaignPairs = os.getUserCampaignPairsContract.handler(
   },
 )
 
+
+  async function loadOverview(
+  kv: KVNamespace,
+): Promise<Overview | null> {
+  const data = await getJSON<any>(kv, 'twitch-extension:overview')
+  if (!data) return null
+  const revived: Overview = {
+    raised: data.raised,
+    collections: data.collections,
+    donations: Number(data.donations ?? 0),
+    date: new Date(data.date),
+  }
+  return revived
+}
+  async function storeOverview(
+  kv: KVNamespace,
+  data: Overview,
+  ttlSeconds: number = 60,
+) {
+  return putJSON(kv, 'twitch-extension:overview', data, ttlSeconds)
+}
+
+function valueToCurrencies(
+  value: number,
+  usdConversionRate: number,
+  eurConversionRate: number,
+): Currencies {
+  const GBP = Intl.NumberFormat('en-GB', {
+    style: 'currency',
+    currency: 'GBP',
+  })
+  const USD = Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+  })
+  const EUR = Intl.NumberFormat('de-DE', {
+    style: 'currency',
+    currency: 'EUR',
+  })
+  const usd = parseFloat((value * usdConversionRate).toFixed(2))
+  const euro = parseFloat((value * eurConversionRate).toFixed(2))
+  return {
+    gbp: value,
+    usd: usd,
+    euro: euro,
+    gbpFormatted: GBP.format(value),
+    usdFormatted: USD.format(usd),
+    euroFormatted: EUR.format(euro),
+  }
+}
+
+const overview = os.overviewContract
+  .handler(async ({ context }) => {
+    // Try KV cache first
+    const cached = await loadOverview(context.env.KV)
+    if (cached) {
+      return cached
+    }
+
+    const DO = context.env.JingleJamData
+    const stubID = DO.idFromName('JJ_API_CACHE')
+    const stub = DO.get(stubID)
+
+    const usdRate = await stub.getDollarConversionRate()
+    const eurRate = await stub.getGbpToEurRate()
+    const raised = await stub.getRaised()
+    const collections = await stub.getCollections()
+    const donations = await stub.getDonations()
+    const dateStr = await stub.getDate()
+    const yogs = await stub.getCampaignBySlug('yogscast')
+    const overview: Overview = {
+      raised: {
+        yogscast: yogs
+          ? valueToCurrencies(yogs!.raised, usdRate, eurRate)
+          : undefined,
+        fundraisers: yogs
+          ? valueToCurrencies(raised - yogs!.raised, usdRate, eurRate)
+          : undefined,
+        total: valueToCurrencies(raised, usdRate, eurRate),
+      },
+      collections: collections,
+      donations: donations,
+      date: new Date(dateStr),
+    }
+
+    await storeOverview(context.env.KV, overview, 60)
+
+    return overview
+  })
+
 export const jjRouter = {
   campaigns,
   causes,
   upcomingStreams,
   getAllUsersWithInfo,
   getUserCampaignPairs,
+  overview,
   /*
   causeById,
   campaignLookup,
