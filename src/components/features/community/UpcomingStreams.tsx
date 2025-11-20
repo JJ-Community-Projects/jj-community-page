@@ -1,6 +1,8 @@
 import { type Component, createSignal, For, Show } from 'solid-js'
 import { useCommunityPage } from './CommunityPageProvider.tsx'
-import { ScheduleStreamCard } from '../schedules/common/StreamCard.tsx'
+import {
+  UpcomingStreamsStreamCard,
+} from '../schedules/common/StreamCard.tsx'
 
 export const UpcomingStreams: Component = () => {
   const { upcomingStreams } = useCommunityPage()
@@ -12,8 +14,8 @@ export const UpcomingStreams: Component = () => {
   const visibleItems = () => (showAll() ? items() : firstFour())
 
   return (
-    <div class="mt-6">
-      <h2 class="mb-3 text-lg font-semibold text-white">Upcoming streams</h2>
+    <div class="w-full flex flex-col gap-2">
+      <h2 class="w-full text-lg font-semibold text-white">Upcoming streams</h2>
       <Show when={upcomingStreams.isLoading}>
         <p class="text-white/80">Loading upcoming streams…</p>
       </Show>
@@ -21,16 +23,14 @@ export const UpcomingStreams: Component = () => {
         <p class="text-red-400">Failed to load upcoming streams.</p>
       </Show>
       <Show when={upcomingStreams.isSuccess && items().length > 0}>
-        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div class="w-full grid grid-cols-[repeat(auto-fit,_minmax(200px,_1fr))] gap-2 ">
           <For each={visibleItems()}>
             {(item) => {
               const { stream, owner } = item
               return (
-                <ScheduleStreamCard
+                <UpcomingStreamsStreamCard
                   stream={stream}
                   user={owner}
-                  type={'top-bar'}
-                  hover={true}
                 />
               )
             }}

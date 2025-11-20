@@ -175,6 +175,9 @@ const useCommunityPageHook = (charitiesData?: CharitiesStatic) => {
     )
   })
 
+  const [charityOpen, setCharityOpen] = makePersisted(createSignal<boolean>(true))
+
+
   return {
     community: communityQuery,
     cause: causeQuery,
@@ -195,6 +198,7 @@ const useCommunityPageHook = (charitiesData?: CharitiesStatic) => {
     usersFiltered,
     campaignsByCauseFiltered,
     mergedCharityItems,
+    charityOpen, setCharityOpen
   }
 }
 

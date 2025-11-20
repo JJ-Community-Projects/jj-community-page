@@ -24,7 +24,10 @@ import { CommunityCauseCard } from './CommunityCauseCard.tsx'
 import { CommunityUsers } from './CommunityUsers.tsx'
 import { CommunityTagSearch } from './CommunityTagSearch.tsx'
 import type { CharitiesStatic } from '../../../content/schema.ts'
-import { CommunityCharitiesOverview } from './causes/CommunityCharitiesOverview.tsx'
+import {
+  CommunityCharitiesOverview,
+  CommunityCharitiesOverviewMobile,
+} from './causes/CommunityCharitiesOverview.tsx'
 
 export const CommunityPage: Component<{
   charitiesData?: CharitiesStatic
@@ -227,7 +230,7 @@ const Header: Component = () => {
   const isJJ = useIsJJ()
   return (
     <div class="rounded-xl border-2 bg-gradient-to-b from-neutral-50 to-neutral-100 p-2 shadow-md transition-all duration-300 hover:shadow-lg">
-      <div class="flex w-full flex-col gap-2 p-4 md:flex-row md:items-center md:justify-between md:p-2 lg:p-4">
+      <div class="flex w-full flex-col gap-2 p-4 md:flex-row md:items-center md:justify-between">
         {/* Left: Title, icon, subtitle (left-aligned) */}
         <div class="flex flex-col items-center text-center md:items-start md:text-left">
           <div class="flex items-center gap-2">
@@ -259,19 +262,25 @@ const Body: Component = () => {
   const { sortBy } = useCommunityPage()
   const isSortByCause = () => sortBy() === 'cause'
   return (
-    <div class={'flex w-full flex-col items-stretch justify-center gap-4'}>
+    <div class={'flex w-full flex-col items-stretch justify-center gap-6'}>
       <Header />
-      <div class={'flex w-full flex-row items-start justify-start gap-4'}>
-        <div>
+      <div
+        class={
+          'flex w-full flex-row items-start justify-start gap-6'
+        }
+      >
+        <div class={'hidden lg:block'}>
           <CommunityCharitiesOverview />
         </div>
-        <div class={'flex flex-1 flex-col items-start justify-center gap-4'}>
+        <div class={'flex flex-1 flex-col items-start justify-center gap-6'}>
           <UpcomingStreams />
-          <CommunityTagSearch />
           <Show when={isSortByCause()} fallback={<CampaignGrid />}>
             <CampaignGridByCause />
           </Show>
         </div>
+      </div>
+      <div class={'block w-full lg:hidden'}>
+        <CommunityCharitiesOverviewMobile />
       </div>
     </div>
   )
@@ -281,12 +290,11 @@ const CampaignGrid: Component = () => {
   const { campaignsSorted } = useCommunityPage()
 
   return (
-    <div class={twMerge('mx-auto flex w-full flex-col gap-4')}>
+    <div class={twMerge('mx-auto flex w-full flex-col gap-2')}>
       <div
         class={twMerge(
-          'mb-2 mt-6 flex w-full flex-wrap items-end justify-between gap-x-4 gap-y-2',
-        )}
-      >
+          'flex w-full flex-wrap items-end justify-between gap-x-4 gap-y-2',
+        )}>
         <div class={'flex flex-col'}>
           <h2 class={twMerge('text-lg font-semibold text-white')}>
             Fundraisers (2024)
@@ -304,6 +312,7 @@ const CampaignGrid: Component = () => {
           <CurrencySelection />
         </div>
       </div>
+      <CommunityTagSearch />
       <div
         class={
           'grid w-full grid-cols-[repeat(auto-fit,_minmax(250px,_1fr))] content-center gap-2'
@@ -331,7 +340,7 @@ const CampaignGridByCause: Component = () => {
     <div class={twMerge('flex w-full flex-col gap-4')}>
       <div
         class={twMerge(
-          'mb-2 mt-6 flex w-full flex-wrap items-end justify-between gap-x-4 gap-y-2',
+          'flex w-full flex-wrap items-end justify-between gap-x-4 gap-y-2',
         )}
       >
         <h2 class={twMerge('text-lg font-semibold text-white')}>Fundraisers</h2>
@@ -344,6 +353,8 @@ const CampaignGridByCause: Component = () => {
           <CurrencySelection />
         </div>
       </div>
+
+      <CommunityTagSearch />
       <div class={'flex w-full flex-col items-center gap-6 text-center'}>
         <For each={groups()}>
           {(o) => {

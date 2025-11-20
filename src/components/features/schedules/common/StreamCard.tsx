@@ -9,6 +9,7 @@ import { ScheduleStreamDetailDialog } from './ScheduleStreamDetailDialog.tsx'
 import { twMerge } from 'tailwind-merge'
 import { FaBrandsTwitch, FaBrandsYoutube, FaSolidUsers } from 'solid-icons/fa'
 import type { UserDisplay } from '../../../../lib/orpc/public/schemas/UserDisplaySchema.ts'
+import { UpcomingStreams } from '../../community/UpcomingStreams.tsx'
 
 /**
  * Custom hook that manages state for schedule stream cards
@@ -712,5 +713,126 @@ const UserInfo: Component<{user?: UserDisplay}> = (props) => {
         }
       }
     </Show>
+  )
+}
+
+
+
+export const UpcomingStreamsStreamCard: Component<ScheduleStreamCardProps> = (
+  props,
+) => {
+  const {
+    modal,
+    now,
+    showCountdown,
+    isLive,
+    diff,
+    countdown,
+    formatDate,
+    highlightColor,
+    textColor,
+    pallet,
+  } = useScheduleStreamState(props.stream)
+  return (
+    <>
+      {/* white card with content */}
+      <button
+        class="flex-1 group relative flex w-full flex-col overflow-hidden rounded-2xl bg-white shadow-md transition-shadow duration-300 hover:shadow-lg"
+        onClick={modal.open}
+        style={{
+          '--highlight-color': highlightColor,
+          '--text-color': textColor,
+        }}
+      >
+        {/* Overlay that animates from top to bottom on hover */}
+        <div class="absolute inset-0 z-0 origin-top scale-y-0 transform rounded-2xl bg-gradient-to-b from-[var(--highlight-color)] to-[var(--highlight-color)] opacity-0 transition-all duration-500 ease-in-out group-hover:scale-y-100 group-hover:opacity-100" />
+
+        {/* colored stripe at top */}
+        <div
+          class={twMerge(
+            'z-10 h-6 w-full rounded-t-2xl px-4 py-2',
+            isLive() && 'animate-pulse',
+          )}
+          style={{ 'background-color': highlightColor }}
+        >
+          <div class="flex h-full w-full flex-row items-center gap-2 text-[var(--text-color)]">
+            <div class="flex flex-1 flex-row items-center gap-2">
+              <Show when={props.stream.twitchVodUrl}>
+                <FaBrandsTwitch />
+              </Show>
+              <Show when={props.stream.youtubeVodUrl}>
+                <FaBrandsYoutube />
+              </Show>
+            </div>
+            <Show when={props.stream.participants.length > 0}>
+              <FaSolidUsers />
+            </Show>
+            <Show when={isLive()}>
+              <div class="flex flex-row items-center gap-1">
+                <p class="text-xs">LIVE</p>
+                <div class={'h-2 w-2'}>
+                  <span class="relative flex h-2 w-2">
+                    <span
+                      class={
+                        'relative inline-flex h-full w-full rounded-full bg-red-500'
+                      }
+                    />
+                    <span
+                      class={
+                        'absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75 duration-700'
+                      }
+                    />
+                  </span>
+                </div>
+              </div>
+            </Show>
+          </div>
+        </div>
+
+        <div class="text-left relative z-10 flex flex-grow flex-col p-2 transition-colors delay-100 duration-300 group-hover:text-[var(--text-color)]">
+          <div class={'w-full h-full flex flex-row justify-start items-start gap-1'}>
+            <div class="flex-1 flex w-full flex-col items-start justify-start">
+              <p class="line-clamp-1 text-xs font-bold uppercase text-ellipsis">
+                {props.stream.title}
+              </p>
+              <Show when={props.stream.subtitle}>
+                <p class="line-clamp-1 text-xs uppercase text-ellipsis">
+                  {props.stream.subtitle}
+                </p>
+              </Show>
+              <p class="text-xs">{formatDate()}</p>
+              <Show when={showCountdown()}>
+                <p class="line-clamp-1 font-mono text-xxs font-bold lowercase tracking-wide">
+                  {countdown()}
+                </p>
+              </Show>
+            </div>
+
+            <Show when={props.user}>
+              {
+                (user) => {
+                  return (
+                    <div class="flex items-center gap-1">
+                      <img
+                        class="size-4 shrink-0 rounded-lg ring-1 ring-black/10"
+                        alt={user().username}
+                        src={user().profileImage}
+                        loading="lazy"
+                      />
+                      <div class="min-w-0">
+                        <p class="truncate text-ellipsis text-xs font-semibold">
+                          {user().username}
+                        </p>
+                      </div>
+                    </div>
+                  )
+                }
+              }
+            </Show>
+          </div>
+        </div>
+      </button>
+      <ScheduleStreamDetailDialog stream={props.stream} modalSignal={modal} user={props.user} />
+    </>
   )
 }
