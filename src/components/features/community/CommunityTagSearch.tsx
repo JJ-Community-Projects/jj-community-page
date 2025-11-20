@@ -45,7 +45,7 @@ export const CommunityTagSearch: Component = () => {
   const showSuggestions = () => searchInput().length > 0
 
   return (
-    <div class={twMerge('mt-2 rounded-xl border-2 bg-white/95 p-3 shadow-md')}
+    <div class={twMerge('w-full mt-2 rounded-xl border-2 bg-white/95 p-3 shadow-md')}
          role="search">
       <div class="relative">
         <input
