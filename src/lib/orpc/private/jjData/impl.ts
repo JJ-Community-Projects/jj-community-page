@@ -447,7 +447,7 @@ function reviveUserDisplay(u: any) {
   }
 }
 
-async function getUsers(db: JJDrizzleDatabase, kv?: KVNamespace) {
+async function getUsers(db: JJDrizzleDatabase, kv?: KVNamespace): Promise<UserWithInfo[]> {
   try {
     // KV cache (optional)
     if (kv) {
