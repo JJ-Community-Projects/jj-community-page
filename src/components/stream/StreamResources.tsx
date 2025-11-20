@@ -93,27 +93,27 @@ export const StreamResources: Component<{ user: User | null }> = (props) => {
       <div class="mx-auto flex w-fit flex-col items-center p-1 text-center text-base text-white md:w-[70%] md:text-2xl">
         <p class="p-2 text-2xl font-bold md:text-4xl">Stream Resources</p>
         <p class="text-white/90 text-base md:text-xl">
-          Everything you need to integrate Jingle Jam into your stream: Twitch Extensions and OBS Overlays.
+          Everything you need to integrate Jingle Jam into your stream: Twitch Extension and OBS Overlays.
         </p>
       </div>
 
       <Accordion.Root class="flex w-full flex-col text-white" collapsible>
-        {/* Twitch Extensions */}
+        {/* Twitch Extension */}
         <Accordion.Item value="twitch" class="w-full">
           <Accordion.Header class="w-full">
             <Accordion.Trigger
               class="hover:scale-102 hover:brightness-102 border-1 group m-2 flex w-full flex-row items-center rounded border-accent-500 bg-primary-200/50 p-2 text-xl text-white shadow"
             >
-              <p class="flex-1 text-left">Twitch Extensions</p>
+              <p class="flex-1 text-left">Twitch Extension</p>
               <FaSolidChevronDown class="transition-all group-data-[expanded]:rotate-180" />
             </Accordion.Trigger>
           </Accordion.Header>
           <Accordion.Content class="w-full p-2">
             <div class="flex flex-col items-center gap-4 text-white">
-              <p class="~text-2xl/3xl text-center font-semibold">Jingle Jam Community Twitch Extensions</p>
-              <p class="text-center">These Extensions are for everyone who participates in the Jingle Jam and streams on Twitch.</p>
+              <p class="~text-2xl/3xl text-center font-semibold">Jingle Jam Community Twitch Extension</p>
+              <p class="text-center">The Extension is for everyone who participates in the Jingle Jam and streams on Twitch.</p>
               <p class="text-center">They allow your viewers to see the charities and other community fundraisers.</p>
-              <p class="text-center">Feedback regarding the extensions is always welcome.</p>
+              <p class="text-center">Feedback regarding the extension is always welcome.</p>
 
               <div class="mt-2 flex flex-col items-center gap-1">
                 <p class="~text-lg/xl">Twitch Panel Extension</p>
