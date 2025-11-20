@@ -137,7 +137,7 @@ export type Props = {
   showDesc?: boolean
   qrCode?: 'none' | 'fundraiser' | 'charity'
   showUrl?: boolean
-  causes?: number[]
+  causes?: string[]
   user?: string
   currency?: 'GBP' | 'USD' | 'EUR'
 }
@@ -183,7 +183,7 @@ const Charities2OverlayBody: Component<Props> = (props) => {
   const filteredCharities = () =>
     causes().length === 0
       ? charities()
-      : charities().filter((c) => causes().includes(Number(c.id)))
+      : charities().filter((c) => causes().includes((c.id)))
 
   const [idx, setIdx] = createSignal(0)
   let timer: any

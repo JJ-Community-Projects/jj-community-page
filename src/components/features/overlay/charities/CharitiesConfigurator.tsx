@@ -25,7 +25,7 @@ type Currency = 'GBP' | 'USD' | 'EUR'
   )
   const [currency, setCurrency] = createSignal<Currency>('GBP')
   const [showUrl, setShowUrl] = createSignal<boolean>(true)
-  const [selectedIds, setSelectedIds] = createSignal<number[]>([])
+  const [selectedIds, setSelectedIds] = createSignal<string[]>([])
 
   // Fetch charities list via oRPC for checkbox selection
   const q = useQuery(() =>
@@ -37,8 +37,8 @@ type Currency = 'GBP' | 'USD' | 'EUR'
   const allSelected = () =>
     selectedIds().length > 0 && selectedIds().length === charities().length
   const toggleAll = (checked: boolean) =>
-    setSelectedIds(checked ? charities().map((c) => Number(c.id)) : [])
-  const toggleOne = (id: number, checked: boolean) => {
+    setSelectedIds(checked ? charities().map((c) => (c.id)) : [])
+  const toggleOne = (id: string, checked: boolean) => {
     const set = new Set(selectedIds())
     if (checked) set.add(id)
     else set.delete(id)
@@ -188,9 +188,9 @@ type Currency = 'GBP' | 'USD' | 'EUR'
                       <label class="flex cursor-pointer items-center gap-2 py-1 text-sm">
                         <input
                           type="checkbox"
-                          checked={selectedIds().includes(Number(c.id))}
+                          checked={selectedIds().includes((c.id))}
                           onChange={(e) =>
-                            toggleOne(Number(c.id), e.currentTarget.checked)
+                            toggleOne((c.id), e.currentTarget.checked)
                           }
                         />
                         <span class="line-clamp-1">{c.name}</span>
