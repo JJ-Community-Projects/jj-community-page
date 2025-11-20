@@ -18,6 +18,7 @@ import { TiltifyAPI, type TiltifyUserData } from '../lib/TiltifyAPI.ts'
 import { jjCampaign, jjCauses } from '../lib/db/schema/jj-api-schema.ts'
 import type { BatchItem } from 'drizzle-orm/batch'
 import type { TwitchUser } from '../lib/model/TwitchUser.ts'
+import { storage } from 'googleapis/build/src/apis/storage'
 
 type UserWithTags = {
   userId: number
@@ -497,44 +498,13 @@ export class JingleJamData extends DurableObject<Env> {
 
   // GBP->EUR conversion via Google Finance
   public async fetchGBPToEURConversionRate() {
-    try {
-      const url = 'https://www.google.com/finance/quote/GBP-EUR'
-      const res = await fetch(url, {
-        headers: {
-          // Some sites return different content for bots; set a common UA
-          'User-Agent':
-            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36',
-          'Accept-Language': 'en-US,en;q=0.9',
-        },
-      })
-      if (!res.ok) {
-        throw new Error(
-          `Failed to fetch GBP->EUR page: ${res.status} ${res.statusText}`,
-        )
+    const lastFetchedAt = await this.storage.get<number>('gbp:eur:lastFetchedAt')
+    if (!lastFetchedAt || Date.now() - lastFetchedAt > 12 * 60 * 60 * 1000) {
+      const value = await this.fetchFromRateAPI()
+      if (Number.isFinite(value)) {
+        await this.storage.put('gbp:eur:rate', value)
+        await this.storage.put('gbp:eur:lastFetchedAt', Date.now())
       }
-      const html = await res.text()
-
-      // Look for an element that contains both classes "YMlKec" and "fxKbKc"
-      const match = html.match(
-        /<[^>]*class=\"[^\"]*\bYMlKec\b[^\"]*\bfxKbKc\b[^\"]*\"[^>]*>([^<]+)<\/[^>]*>/i,
-      )
-      if (!match) {
-        throw new Error('GBP->EUR conversion rate element not found')
-      }
-      const rawText = match[1].trim()
-      const numericText = rawText.replace(/[^0-9.,-]/g, '').replace(/,/g, '')
-      const value = parseFloat(numericText)
-      if (!Number.isFinite(value)) {
-        throw new Error(
-          `Unable to parse GBP->EUR conversion rate from text: "${rawText}"`,
-        )
-      }
-
-      await this.storage.put('gbp:eur:rate', value)
-      return value
-    } catch (e) {
-      console.error(e)
-      return 1
     }
   }
 
@@ -633,6 +603,47 @@ export class JingleJamData extends DurableObject<Env> {
   public async getTiltifyUsersMap() {
     const users = await this.getTiltifyUsers()
     return new Map(users?.map((u) => [u.slug, u]) ?? [])
+  }
+
+  private async fetchFromRateAPI() {
+
+    try {
+      const url = 'https://www.google.com/finance/quote/GBP-EUR'
+      const res = await fetch(url, {
+        headers: {
+          // Some sites return different content for bots; set a common UA
+          'User-Agent':
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36',
+          'Accept-Language': 'en-US,en;q=0.9',
+        },
+      })
+      if (!res.ok) {
+        throw new Error(
+          `Failed to fetch GBP->EUR page: ${res.status} ${res.statusText}`,
+        )
+      }
+      const html = await res.text()
+
+      // Look for an element that contains both classes "YMlKec" and "fxKbKc"
+      const match = html.match(
+        /<[^>]*class=\"[^\"]*\bYMlKec\b[^\"]*\bfxKbKc\b[^\"]*\"[^>]*>([^<]+)<\/[^>]*>/i,
+      )
+      if (!match) {
+        throw new Error('GBP->EUR conversion rate element not found')
+      }
+      const rawText = match[1].trim()
+      const numericText = rawText.replace(/[^0-9.,-]/g, '').replace(/,/g, '')
+      const value = parseFloat(numericText)
+      if (!Number.isFinite(value)) {
+        throw new Error(
+          `Unable to parse GBP->EUR conversion rate from text: "${rawText}"`,
+        )
+      }
+      return value
+    } catch (e) {
+      console.error(e)
+      return 1
+    }
   }
 
   private async getUsedTagsWithUserCounts() {
