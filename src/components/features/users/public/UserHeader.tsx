@@ -2,8 +2,7 @@ import { type Component, For, Show } from 'solid-js'
 import type { UserProfileData } from '../../../../lib/orpc/public/schemas/users'
 import { TagChip } from './tags/TagChip'
 import { SocialLink } from './SocialLink.tsx'
-import { TiltifyIcon } from '../../../common/icons/JJIcons.tsx'
-import { BlueSky, Tiltify } from './social-links/Tiltify.tsx'
+import { Tiltify } from './social-links/Tiltify.tsx'
 
 interface UserHeaderProps {
   user: UserProfileData
