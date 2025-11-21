@@ -77,3 +77,10 @@ export interface JingleJamResponse {
   causes: JJCause[];
   campaigns: JJCampaigns;
 }
+
+export interface JingleJamCampaignsResponse {
+  campaigns: JJCampaigns;
+  total: number;
+  limit: number;
+  offset: number;
+}

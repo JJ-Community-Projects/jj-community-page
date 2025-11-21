@@ -9,9 +9,6 @@ export default {
     // console.log("fetch", request.url);
     return astroWorker.fetch(request, env, ctx)
   },
-  async scheduled(controller, env, ctx) {
-    return scheduled(controller, env, ctx)
-  },
   async queue(batch, env, ctx) {
     const twitchLiveCheckQueue = new TwitchLiveCheckQueue()
     const notifier = new TwitchLiveNotifierQueue()

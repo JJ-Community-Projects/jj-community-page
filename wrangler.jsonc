@@ -177,22 +177,6 @@
     "YOUTUBE_API_KEY": "<PLACEHOLDER>",
     "ORPC_DEI_SIGNING_KEY": "<SET_SECRET>"
   },
-  "triggers": {
-    "crons": [
-      // every 10 minutes
-      "*/10 * * * *",
-      // every minute
-      "*/1 * * * *",
-      // every 12 hour
-      "0 */12 * * *",
-      // every 6 hour
-      "0 */6 * * *",
-      // every 4 hour
-      "0 */4 * * *",
-      // every 2 hour
-      "0 */2 * * *"
-    ]
-  },
   "env": {
     "prod": {
       "compatibility_flags": [
@@ -342,22 +326,6 @@
             "max_batch_size": 10,
             "max_batch_timeout": 5
           }
-        ]
-      },
-      "triggers": {
-        "crons": [
-          // every 10 minutes
-          "*/10 * * * *",
-          // every minute
-          "*/1 * * * *",
-          // every 12 hour
-          "0 */12 * * *",
-          // every 6 hour
-          "0 */6 * * *",
-          // every 4 hour
-          "0 */4 * * *",
-          // every 2 hour
-          "0 */2 * * *"
         ]
       },
       "vars": {
@@ -529,22 +497,6 @@
             "max_batch_size": 10,
             "max_batch_timeout": 5
           }
-        ]
-      },
-      "triggers": {
-        "crons": [
-          // every 10 minutes
-          "*/10 * * * *",
-          // every minute
-          "*/1 * * * *",
-          // every 12 hour
-          "0 */12 * * *",
-          // every 6 hour
-          "0 */6 * * *",
-          // every 4 hour
-          "0 */4 * * *",
-          // every 2 hour
-          "0 */2 * * *"
         ]
       },
       "vars": {

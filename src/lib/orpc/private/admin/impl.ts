@@ -20,17 +20,55 @@ const refreshJJAPIData = os.refreshJJAPIDataContract.handler(
     const stub = DO.get(stubID)
     try {
       await stub.refresh()
+      await stub.refreshAllCampaigns()
       await stub.loadAllTiltifySocials()
       await stub.validateTwitchChannels()
       await stub.checkLiveStreams()
       await stub.buildAndStoreUserTags()
-      await stub.refresh()
       await stub.insertIntoDB()
     } catch (e: any) {
       throw new ORPCError('INTERNAL_SERVER_ERROR', {
         message: e?.message ?? 'Failed to refresh',
       })
     }
+  },
+)
+
+// --- Scheduler/task admin handlers ---
+
+const getSchedulerTasksStatus = os.getSchedulerTasksStatusContract.handler(
+  async ({ context }) => {
+    const DO = context.env.JingleJamData
+    const stubID = DO.idFromName('JJ_API_CACHE')
+    const stub = DO.get(stubID)
+    return await stub.getTasksStatus()
+  },
+)
+
+const setTaskEnabled = os.setTaskEnabledContract.handler(
+  async ({ context, input }) => {
+    const DO = context.env.JingleJamData
+    const stubID = DO.idFromName('JJ_API_CACHE')
+    const stub = DO.get(stubID)
+    await stub.setTaskEnabled(input.name, input.enabled)
+  },
+)
+
+const runSchedulerTask = os.runSchedulerTaskContract.handler(
+  async ({ context, input }) => {
+    const DO = context.env.JingleJamData
+    const stubID = DO.idFromName('JJ_API_CACHE')
+    const stub = DO.get(stubID)
+    await stub.runTask(input.name)
+  },
+)
+
+const runOverdueTasksNow = os.runOverdueTasksNowContract.handler(
+  async ({ context }) => {
+    const DO = context.env.JingleJamData
+    const stubID = DO.idFromName('JJ_API_CACHE')
+    const stub = DO.get(stubID)
+    await stub.runOverdueNow()
   },
 )
 
@@ -145,19 +183,15 @@ const triggerTwitchLiveCheck = os.triggerTwitchLiveCheckContract.handler(
       const db = getDB(context.env)
       const twitchChannels = await db.select().from(twitchChannelSchema).all()
 
-      console.log('twitchChannels', twitchChannels)
 
       const DO = context.env.JingleJamData
       const stubID = DO.idFromName('JJ_API_CACHE')
       const stub = DO.get(stubID)
 
       const dbLogins = twitchChannels.map((channel) => channel.login)
-      console.log('dbLogins', dbLogins)
       const validLogins = await stub.getValidTwitchLogins()
-      console.log('validLogins', validLogins)
       const logins = [...dbLogins, ...validLogins]
       const uniqueLogins = [...new Set(logins)]
-      console.log('uniqueLogins', uniqueLogins)
 
       const queue = new TwitchLiveCheckQueue()
       await queue.sendLogins(uniqueLogins, context.env)
@@ -180,7 +214,6 @@ const getTwitchStreams = os.getTwitchStreamsContract.handler(
       .from(twitchStreamSchema)
       .all()
 
-    console.log('rows', rows)
 
     const out = rows.map((r) => ({
       userLogin: r.login,
@@ -240,7 +273,6 @@ const syncTwitchChannelsFromSocials =
       .from(userSocials)
       .where(eq(userSocials.provider, 'twitch'))
       .all()
-    console.log('socials', socials)
 
     if (socials.length === 0) return
 
@@ -250,7 +282,6 @@ const syncTwitchChannelsFromSocials =
       .from(twitchChannelSchema)
       .all()
 
-    console.log('existing', existing)
 
     const existingUserIds = new Set(existing.map((e) => e.userId))
 
@@ -264,7 +295,6 @@ const syncTwitchChannelsFromSocials =
           : s.url,
       }))
 
-    console.log('missing', missing)
 
     if (missing.length === 0) return
 
@@ -276,8 +306,6 @@ const syncTwitchChannelsFromSocials =
     for (let i = 0; i < missing.length; i += 100) {
       chunks.push(missing.slice(i, i + 100))
     }
-
-    console.log('chunks', chunks)
 
     const userMap = new Map<string, TwitchUser>()
     for (const chunk of chunks) {
@@ -339,7 +367,6 @@ const getAllTwitchChannels = os.getAllTwitchChannelsContract.handler(
     const stub = DO.get(stubID)
     try {
       const channels = await stub.getAllTwitchLogins()
-      console.log('getAllTwitchChannels',channels)
       return channels
     } catch (e) {
       console.error('getAllTwitchChannels', e)
@@ -762,4 +789,9 @@ export const adminRouter = {
   getAllSchedules,
   exportSchedule,
   importSchedule,
+  // scheduler
+  getSchedulerTasksStatus,
+  setTaskEnabled,
+  runSchedulerTask,
+  runOverdueTasksNow
 }

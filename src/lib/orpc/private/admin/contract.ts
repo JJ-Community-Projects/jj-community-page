@@ -1,5 +1,6 @@
 import { oc } from '@orpc/contract'
 import { z } from 'zod/v4'
+import { JJCampaignSchema } from '../../public/twitchExtension/contract.ts'
 
 const refreshJJAPIDataContract = oc.output(z.void())
 
@@ -112,6 +113,50 @@ const importScheduleContract = oc
   .input(z.object({ json: z.string() }))
   .output(z.object({ scheduleId: z.number().int().positive() }))
 
+// --- Scheduler/task admin contracts ---
+const schedulerTaskSchema = z.object({
+  name: z.string(),
+  everyMs: z.number(),
+  enabled: z.boolean(),
+  lastRunMs: z.number().nullable(),
+  nextDueAtMs: z.number(),
+  dueNow: z.boolean(),
+})
+
+export type SchedulerTask = z.infer<typeof schedulerTaskSchema>
+
+const getSchedulerTasksStatusContract = oc.output(
+  z.array(schedulerTaskSchema),
+)
+
+const setTaskEnabledContract = oc
+  .input(z.object({ name: z.string(), enabled: z.boolean() }))
+  .output(z.void())
+
+const runSchedulerTaskContract = oc
+  .input(z.object({ name: z.string() }))
+  .output(z.void())
+
+const runOverdueTasksNowContract = oc.input(z.void()).output(z.void())
+
+// --- Campaigns (admin) ---
+// Return the exact data shape from DO: getCommunityCampaignsDisplayAll
+const getAllCampaignsContract = oc.output(
+  z.object({
+    count: z.number(),
+    list: z.array(
+      JJCampaignSchema.pick({
+        tiltifySlug: true,
+        campaignName: true,
+        tiltifyName: true,
+        tiltifyUrl: true,
+        avatar: true,
+        twitch: true,
+      }),
+    ),
+  }),
+)
+
 export const contracts = {
   refreshJJAPIDataContract,
   addStringConfigContract,
@@ -140,4 +185,11 @@ export const contracts = {
   getAllSchedulesContract,
   exportScheduleContract,
   importScheduleContract,
+  // scheduler tasks
+  getSchedulerTasksStatusContract,
+  setTaskEnabledContract,
+  runSchedulerTaskContract,
+  runOverdueTasksNowContract,
+  // campaigns
+  getAllCampaignsContract,
 }

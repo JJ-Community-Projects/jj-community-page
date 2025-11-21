@@ -1,6 +1,7 @@
 import { DurableObject } from 'cloudflare:workers'
 import { getDB } from '../lib/db/db.ts'
 import type {
+  JingleJamCampaignsResponse,
   JingleJamResponse,
   JJCampaign,
   JJCause,
@@ -59,6 +60,61 @@ export class JingleJamData extends DurableObject<Env> {
     ['jackmanifoldtv', 'jackmanifoldtv'],
     ['mudkipninja', 'mudkipninja'],
   ])
+  // Task definition
+  private tasks = [
+    {
+      name: 'checkLiveStreams', // previously every 10 minutes
+      everyMs: 10 * 60 * 1000,
+      run: async () => {
+        await this.checkLiveStreams()
+        await this.buildDisplayData() // keep display fresh when streams change
+      },
+    },
+    {
+      name: 'jjAPIRefresh', // previously */1 when NOT JJ season
+      everyMs: 60 * 1000,
+      run: async () => {
+        const now = new Date()
+        const isJJ =
+          now.getUTCMonth() === 11 &&
+          now.getUTCDate() >= 1 &&
+          now.getUTCDate() <= 15
+        if (!isJJ) {
+          await this.refresh()
+          await this.insertIntoDB()
+          await this.buildDisplayData()
+        }
+      },
+    },
+    {
+      name: 'validateTwitchChannels', // previously 0 */12 * * *
+      everyMs: 12 * 60 * 60 * 1000,
+      run: async () => {
+        await this.validateTwitchChannels()
+      },
+    },
+    {
+      name: 'fetchGBPToEURConversionRate', // previously 0 */6 * * *
+      everyMs: 6 * 60 * 60 * 1000,
+      run: async () => {
+        await this.fetchGBPToEURConversionRate()
+      },
+    },
+    {
+      name: 'loadAllTiltifySocials', // previously 0 */4 * * *
+      everyMs: 4 * 60 * 60 * 1000,
+      run: async () => {
+        await this.loadAllTiltifySocials()
+      },
+    },
+    {
+      name: 'buildAndStoreUserTags', // previously 0 */2 * * *
+      everyMs: 2 * 60 * 60 * 1000,
+      run: async () => {
+        await this.buildAndStoreUserTags()
+      },
+    },
+  ] as const
 
   private get storage() {
     return this.ctx.storage
@@ -80,6 +136,7 @@ export class JingleJamData extends DurableObject<Env> {
       JJCauseTVType | undefined
     >
   }
+
   public getCause(causeId: string) {
     return this.storage.get(this.causeKey(causeId)) as Promise<
       JJCause | undefined
@@ -93,6 +150,7 @@ export class JingleJamData extends DurableObject<Env> {
     >
     return Array.from(map.values()) as JJCauseTVType[]
   }
+
   public async getCauses() {
     const map = (await this.storage.list({ prefix: 'cause:raw:' })) as Map<
       string,
@@ -139,9 +197,67 @@ export class JingleJamData extends DurableObject<Env> {
     return campaigns.filter((c) => c.causeId === causeId)
   }
 
+  public async fetchCampaigns(
+    limit: number,
+    offset: number,
+  ): Promise<JingleJamCampaignsResponse> {
+    const res = await fetch(
+      this.env.JJ_DASHBOARD_URL +
+        '/api/campaigns?' +
+        'limit=' +
+        limit +
+        '&offset=' +
+        offset,
+    )
+    if (!res.ok) {
+      throw new Error(
+        `Failed to fetch JingleJam campaigns: ${res.status} ${res.statusText}`,
+      )
+    }
+
+    return (await res.json()) as JingleJamCampaignsResponse
+  }
+
+  public async refreshAllCampaigns() {
+    const limit = 100
+    let offset = 0
+    const all: JJCampaign[] = []
+
+    try {
+      while (true) {
+        const res = await this.fetchCampaigns(limit, offset)
+        // Try common shapes: list or campaigns
+        const batch: JJCampaign[] =
+          // @ts-ignore – tolerate different response shapes
+          (res as any)?.list ?? ((res as any)?.campaigns as JJCampaign[]) ?? []
+
+        if (!Array.isArray(batch) || batch.length === 0) break
+
+        all.push(...batch)
+
+        // If we received fewer than limit items, we've reached the end
+        if (batch.length < limit) break
+
+        offset += limit
+      }
+
+      await this.setCampaigns(all)
+    } catch (e) {
+      console.error('refreshAllCampaigns failed', e)
+      // Best-effort: still persist whatever we have
+      if (all.length > 0) {
+        try {
+          await this.setCampaigns(all)
+        } catch (e2) {
+          console.error('refreshAllCampaigns setCampaigns partial failed', e2)
+        }
+      }
+    }
+  }
+
   // Refresh from API and persist to storage and DB
   public async refresh() {
-    const res = await fetch(this.env.JJ_DASHBOARD_URL)
+    const res = await fetch(this.env.JJ_DASHBOARD_URL + '/api/tiltify')
     if (!res.ok) {
       throw new Error(
         `Failed to fetch JingleJam data: ${res.status} ${res.statusText}`,
@@ -157,6 +273,7 @@ export class JingleJamData extends DurableObject<Env> {
       console.error('setCauses', e)
     }
 
+    /*
     try {
       await this.setCampaigns(data.campaigns.list)
       for (const c of data.campaigns.list) {
@@ -164,7 +281,7 @@ export class JingleJamData extends DurableObject<Env> {
       }
     } catch (e) {
       console.error('setCampaigns', e)
-    }
+    }*/
 
     // Store event metadata as separate keys
     try {
@@ -201,8 +318,6 @@ export class JingleJamData extends DurableObject<Env> {
     } catch (e) {
       console.error('put dollarConversionRate', e)
     }
-
-    await this.buildDisplayData()
   }
 
   public async buildDisplayData() {
@@ -366,8 +481,18 @@ export class JingleJamData extends DurableObject<Env> {
     return this.storage.get<JJCampaignsTVType>('campaigns:display')
   }
 
+  // New: full list (ALL) campaigns display
+  public getCampaignsDisplayAll(): Promise<JJCampaignsTVType | undefined> {
+    return this.storage.get<JJCampaignsTVType>('campaigns:display:all')
+  }
+
   public getCausesDisplay(): Promise<CausesDisplayTVType | undefined> {
     return this.storage.get<CausesDisplayTVType>('causes:display')
+  }
+
+  // New: full list (ALL) causes display
+  public getCausesDisplayAll(): Promise<CausesDisplayTVType | undefined> {
+    return this.storage.get<CausesDisplayTVType>('causes:display:all')
   }
 
   public async getLiveLogins() {
@@ -557,6 +682,15 @@ export class JingleJamData extends DurableObject<Env> {
     )
   }
 
+  // New: full list (ALL) community campaigns display
+  public getCommunityCampaignsDisplayAll(): Promise<
+    { count: number; list: JJCampaignType[] } | undefined
+  > {
+    return this.storage.get<{ count: number; list: JJCampaignType[] }>(
+      'community:campaigns:display:all',
+    )
+  }
+
   public async buildAndStoreUserTags() {
     const db = getDB(this.env)
     const start = Date.now()
@@ -587,12 +721,7 @@ export class JingleJamData extends DurableObject<Env> {
       .leftJoin(userTagsTable, eq(userTagsTable.userId, userDisplayView.userId))
       .leftJoin(tags, eq(userTagsTable.tagId, tags.id))
       .all()
-    console.log(
-      'buildAndStoreUserTags',
-      'rows',
-      'ms',
-      Date.now() - start,
-    )
+    console.log('buildAndStoreUserTags', 'rows', 'ms', Date.now() - start)
 
     const byUser = new Map<number, UserWithTags>()
 
@@ -658,6 +787,95 @@ export class JingleJamData extends DurableObject<Env> {
     return new Map(users?.map((u) => [u.slug, u]) ?? [])
   }
 
+  async alarm(alarmInfo?: AlarmInvocationInfo) {
+    console.log('DO-scheduler', 'alarm', alarmInfo)
+    await this.runOverdueTasks(Date.now())
+    await this.scheduleNextAlarm()
+  }
+
+  public async setTaskEnabled(name: string, enabled: boolean) {
+    await this.storage.put(this.keyEnabled(name), enabled)
+    await this.ensureAlarm() // recompute next alarm in case enabling/disabling changes the schedule
+  }
+
+  // Expose scheduler state for admin UI
+  public async getTasksStatus() {
+    const now = Date.now()
+    const states = [] as Array<{
+      name: string
+      everyMs: number
+      enabled: boolean
+      lastRunMs: number | null
+      nextDueAtMs: number
+      dueNow: boolean
+    }>
+    for (const t of this.tasks) {
+      const [enabled, last] = await Promise.all([
+        this.isEnabled(t.name),
+        this.getLastRun(t.name),
+      ])
+      const next = (last ?? 0) + t.everyMs
+      states.push({
+        name: t.name,
+        everyMs: t.everyMs,
+        enabled,
+        lastRunMs: last ?? null,
+        nextDueAtMs: next,
+        dueNow: next <= now && enabled,
+      })
+    }
+    return states
+  }
+
+  // Manually run a single task by name (updates lastRun and reschedules)
+  public async runTask(name: string) {
+    const t = this.tasks.find((x) => x.name === name)
+    if (!t) throw new Error(`Unknown task: ${name}`)
+    const start = Date.now()
+    await t.run()
+    await this.setLastRun(name, Date.now())
+    console.log('DO-scheduler', 'manual-run', name, 'ms', Date.now() - start)
+    await this.scheduleNextAlarm()
+  }
+
+  // Run all overdue tasks now and reschedule
+  public async runOverdueNow() {
+    await this.runOverdueTasks(Date.now())
+    await this.scheduleNextAlarm()
+  }
+
+  // Returns [dueNow, nextDueAtMs]
+  public async getDueInfo(now: number) {
+    let anyDue = false
+    let nextDueAt = Number.POSITIVE_INFINITY
+    const dueNames: string[] = []
+
+    for (const t of this.tasks) {
+      if (!(await this.isEnabled(t.name))) continue
+      const last = await this.getLastRun(t.name)
+      const next = (last ?? 0) + t.everyMs
+      if (next <= now) {
+        anyDue = true
+        dueNames.push(t.name)
+      }
+      if (next < nextDueAt) nextDueAt = next
+    }
+
+    if (!Number.isFinite(nextDueAt)) {
+      // If everything was disabled, try again soon (safety)
+      nextDueAt = now + 60_000
+    }
+    return { anyDue, dueNames, nextDueAt }
+  }
+
+  // Call this once (manually or via any request) to bootstrap the first alarm
+  public async ensureAlarm() {
+    const existing = await this.storage.getAlarm()
+    if (!existing) {
+      await this.scheduleNextAlarm(1000 * 60) // start in ~1min
+    }
+  }
+
   private chunk<T>(arr: T[], size: number) {
     const out: T[][] = []
     for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size))
@@ -703,6 +921,8 @@ export class JingleJamData extends DurableObject<Env> {
       return 1
     }
   }
+
+  // Helper: fully-qualified YouTube URL from any incoming value (channel/video URL, id, or handle)
 
   private async getUsedTagsWithUserCounts() {
     const db = getDB(this.env)
@@ -766,7 +986,8 @@ export class JingleJamData extends DurableObject<Env> {
       const tiltifyUsers = await this.getTiltifyUsersMap()
       const rawCampaigns = await this.getCampaigns()
 
-      const displayList: JJCampaignTVType[] = await Promise.all(
+      // Build display items for ALL campaigns
+      const allDisplayList: JJCampaignTVType[] = await Promise.all(
         rawCampaigns.map(async (c) => {
           const userSlug = c.user.slug
           // console.log('buildAndStoreCampaignsDisplay', 'processing', 'userSlug', userSlug)
@@ -883,12 +1104,26 @@ export class JingleJamData extends DurableObject<Env> {
         }),
       )
 
-      const campaignsDisplay: JJCampaignsTVType = {
-        count: displayList.length,
-        campaigns: displayList,
+      // Create TOP 100 slice by raised GBP descending
+      const top100 = [...allDisplayList]
+        .sort((a, b) => b.raised.gbp - a.raised.gbp)
+        .slice(0, 100)
+
+      const campaignsDisplayTop: JJCampaignsTVType = {
+        count: top100.length,
+        campaigns: top100,
         date: new Date(),
       }
-      await this.storage.put('campaigns:display', campaignsDisplay)
+      const campaignsDisplayAll: JJCampaignsTVType = {
+        count: allDisplayList.length,
+        campaigns: allDisplayList,
+        date: new Date(),
+      }
+
+      // Backward compatibility: keep campaigns:display as TOP 100
+      await this.storage.put('campaigns:display', campaignsDisplayTop)
+      // New key with ALL campaigns
+      await this.storage.put('campaigns:display:all', campaignsDisplayAll)
     } catch (e) {
       console.error('build display campaigns', e)
     }
@@ -968,7 +1203,6 @@ export class JingleJamData extends DurableObject<Env> {
       const output: CausesDisplayTVType = {
         count: causes.length,
         causes,
-        // overview,
       }
 
       await this.storage.put('causes:display', output)
@@ -977,7 +1211,6 @@ export class JingleJamData extends DurableObject<Env> {
     }
   }
 
-  // Helper: fully-qualified YouTube URL from any incoming value (channel/video URL, id, or handle)
   // Automatically detects whether the input represents a video, channel, or handle and returns
   private async buildAndStoreCommunityCampaignsDisplay() {
     const rawCampaigns = await this.getCampaigns()
@@ -1041,7 +1274,7 @@ export class JingleJamData extends DurableObject<Env> {
 
       const tiltifyUsers = await this.getTiltifyUsersMap()
 
-      const list = await Promise.all(
+      const listAll = await Promise.all(
         rawCampaigns.map(async (c) => {
           const userSlug = c.user.slug
           const user = tiltifyUsers.get(userSlug)
@@ -1108,9 +1341,21 @@ export class JingleJamData extends DurableObject<Env> {
         }),
       )
 
+      // Create TOP 100 slice by raised GBP descending
+      const listTop = [...listAll]
+        .sort((a, b) => b.raised.gbp - a.raised.gbp)
+        .slice(0, 100)
+
+      // Backward compatibility: keep legacy key as TOP 100
       await this.storage.put('community:campaigns:display', {
-        count: list.length,
-        list,
+        count: listTop.length,
+        list: listTop,
+      })
+
+      // New key with ALL community campaigns
+      await this.storage.put('community:campaigns:display:all', {
+        count: listAll.length,
+        list: listAll,
       })
     } catch (e) {
       console.error('build display community campaigns', e)
@@ -1178,6 +1423,8 @@ export class JingleJamData extends DurableObject<Env> {
     return `cause:tv:${causeId}`
   }
 
+  // --- Start: lightweight DO scheduler ---
+
   private stringArrayKey(name: string) {
     return `strarr:${name}`
   }
@@ -1203,4 +1450,65 @@ export class JingleJamData extends DurableObject<Env> {
   private getTiltifyUsers() {
     return this.storage.get<TiltifyUserData[]>('socials:tiltify')
   }
+
+  // Storage keys
+  private keyLastRun(name: string) {
+    return `task:lastRun:${name}`
+  }
+
+  private keyEnabled(name: string) {
+    return `task:enabled:${name}`
+  }
+
+  // Read last run (ms since epoch), undefined if never
+  private async getLastRun(name: string) {
+    return (await this.storage.get<number>(this.keyLastRun(name))) ?? undefined
+  }
+
+  private async setLastRun(name: string, ts: number) {
+    await this.storage.put(this.keyLastRun(name), ts)
+  }
+
+  private async isEnabled(name: string) {
+    const val = await this.storage.get<boolean>(this.keyEnabled(name))
+    return val ?? true // default: enabled
+  }
+
+  // Run only the tasks that are currently overdue
+  private async runOverdueTasks(now: number) {
+    for (const t of this.tasks) {
+      if (!(await this.isEnabled(t.name))) continue
+      const last = await this.getLastRun(t.name)
+      const next = (last ?? 0) + t.everyMs
+      if (next <= now) {
+        const start = Date.now()
+        try {
+          console.log('DO-scheduler', 'run', t.name)
+          await t.run()
+          await this.setLastRun(t.name, now)
+          console.log('DO-scheduler', t.name, 'ms', Date.now() - start)
+        } catch (e) {
+          console.error('DO-scheduler', 'error', t.name, e)
+          // Do not update lastRun on failure; it will retry next alarm
+        }
+      }
+    }
+  }
+
+  // Compute and set the next alarm based on soonest next-due task
+  private async scheduleNextAlarm(afterNowMs?: number) {
+    const now = Date.now()
+    if (afterNowMs && afterNowMs > 0) {
+      await this.storage.setAlarm(now + afterNowMs)
+      console.log('DO-scheduler', 'scheduleNextAlarm', now + afterNowMs)
+      return
+    }
+    const { nextDueAt } = await this.getDueInfo(now)
+    // Clamp next alarm not earlier than now + 1s to avoid tight loops
+    const when = Math.max(nextDueAt, now + 1000)
+    await this.storage.setAlarm(when)
+    console.log('DO-scheduler', 'scheduleNextAlarm', when)
+  }
+
+  // --- End: lightweight DO scheduler ---
 }
