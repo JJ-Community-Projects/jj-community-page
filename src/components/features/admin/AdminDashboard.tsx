@@ -9,6 +9,8 @@ import { AdminTwitchSection } from './AdminTwitchSection'
 import { AdminFXRateSection } from './AdminFXRateSection'
 import { AdminScheduleList } from './AdminScheduleList.tsx'
 import { AdminScheduleImportPanel } from './AdminScheduleImportPanel'
+import { AdminSchedulerSection } from './AdminSchedulerSection'
+import { AdminCampaignsList } from './AdminCampaignsList'
 
 export const AdminDashboard: Component = () => {
   return (
@@ -19,7 +21,9 @@ export const AdminDashboard: Component = () => {
         <AdminConfigSection />
         <AdminTwitchSection />
         <TagsCategoriesSection />
+        <AdminSchedulerSection />
         <JJData />
+        <AdminCampaignsList />
         <AdminScheduleList/>
         <AdminScheduleImportPanel />
       </div>
