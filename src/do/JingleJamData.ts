@@ -63,55 +63,54 @@ export class JingleJamData extends DurableObject<Env> {
   // Task definition
   private tasks = [
     {
-      name: 'checkLiveStreams', // previously every 10 minutes
-      everyMs: 10 * 60 * 1000,
-      run: async () => {
-        await this.checkLiveStreams()
-        await this.buildDisplayData() // keep display fresh when streams change
-      },
-    },
-    {
-      name: 'jjAPIRefresh', // previously */1 when NOT JJ season
+      name: 'jjAPIRefresh',
       everyMs: 60 * 1000,
       run: async () => {
-        const now = new Date()
-        const isJJ =
-          now.getUTCMonth() === 11 &&
-          now.getUTCDate() >= 1 &&
-          now.getUTCDate() <= 15
-        if (!isJJ) {
-          await this.refresh()
-          await this.insertIntoDB()
-          await this.buildDisplayData()
-        }
+        await this.refresh()
+        await this.insertIntoDB()
+        await this.buildDisplayData()
       },
     },
     {
-      name: 'validateTwitchChannels', // previously 0 */12 * * *
-      everyMs: 12 * 60 * 60 * 1000,
+      name: 'validateTwitchChannels',
+      everyMs: 6 * 60 * 60 * 1000,
       run: async () => {
         await this.validateTwitchChannels()
       },
     },
     {
-      name: 'fetchGBPToEURConversionRate', // previously 0 */6 * * *
-      everyMs: 6 * 60 * 60 * 1000,
+      name: 'checkLiveStreams',
+      everyMs: 5 * 60 * 1000,
+      run: async () => {
+        await this.checkLiveStreams()
+      },
+    },
+    {
+      name: 'fetchGBPToEURConversionRate',
+      everyMs: 4 * 60 * 60 * 1000,
       run: async () => {
         await this.fetchGBPToEURConversionRate()
       },
     },
     {
-      name: 'loadAllTiltifySocials', // previously 0 */4 * * *
-      everyMs: 4 * 60 * 60 * 1000,
+      name: 'loadAllTiltifySocials',
+      everyMs: 2 * 60 * 60 * 1000,
       run: async () => {
         await this.loadAllTiltifySocials()
       },
     },
     {
-      name: 'buildAndStoreUserTags', // previously 0 */2 * * *
+      name: 'buildAndStoreUserTags',
       everyMs: 2 * 60 * 60 * 1000,
       run: async () => {
         await this.buildAndStoreUserTags()
+      },
+    },
+    {
+      name: 'buildDisplayData', // previously */1 when NOT JJ season
+      everyMs: 60 * 1000,
+      run: async () => {
+        await this.buildDisplayData()
       },
     },
   ] as const
@@ -574,6 +573,9 @@ export class JingleJamData extends DurableObject<Env> {
       }
     }
 
+    console.log('validateTwitchChannels', 'validLogins', validLogins.length)
+    console.log('validateTwitchChannels', 'invalidLogins', invalidLogins.length)
+
     await this.setStringArray('twitch:validLogins', validLogins)
     await this.setStringArray('twitch:invalidLogins', invalidLogins)
   }
@@ -603,7 +605,11 @@ export class JingleJamData extends DurableObject<Env> {
     await this.setStringArray('twitch:liveStreams:ids', liveStreamsIds)
     await this.setStringArray('twitch:liveStreams:logins', liveStreamsLogins)
     console.log('checkLiveStreams', 'liveStreamsLogins', liveStreamsLogins)
-    console.log('checkLiveStreams', 'liveStreamsLogins', liveStreamsLogins.length)
+    console.log(
+      'checkLiveStreams',
+      'liveStreamsLogins',
+      liveStreamsLogins.length,
+    )
 
     // Update per-campaign live flags based on current live logins
     try {
@@ -836,6 +842,7 @@ export class JingleJamData extends DurableObject<Env> {
     const t = this.tasks.find((x) => x.name === name)
     if (!t) throw new Error(`Unknown task: ${name}`)
     const start = Date.now()
+    console.log('DO-scheduler', 'manual-run', name)
     await t.run()
     await this.setLastRun(name, Date.now())
     console.log('DO-scheduler', 'manual-run', name, 'ms', Date.now() - start)
