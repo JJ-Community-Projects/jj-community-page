@@ -373,7 +373,7 @@ const campaigns = os.campaignsContract
     const stub = DO.get(stubID)
     try {
       const campaignsDisplay: JJCampaignsTVType | undefined =
-        await stub.getCampaignsDisplay()
+        await stub.getCampaignsDisplayAll()
       const liveLogins = await stub.getLiveLogins()
       const liveSet = new Set(
         (liveLogins ?? []).map((l: string) => l.toLowerCase()),
@@ -422,7 +422,7 @@ const campaigns = os.campaignsContract
         const rb = getRaisedGbp(b)
         if (ra !== rb) return rb - ra // higher raised first
         return 0
-      })
+      }).slice(0,100)
 
       return {
         count: campaignsDisplay.count ?? sortedList.length,
