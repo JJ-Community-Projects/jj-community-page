@@ -11,12 +11,10 @@ streams:
           - '#3484bf'
         orientation: TD
       tileSize: 1
-    #subtitle: Tree Decorating
-    #title: Office Cam
-    subtitle: Some subtitle
-    title: Title 1
+    title: Decorating the Tree
+    subtitle: Office Cam
     vods: []
-  - creators: []
+  - creators: [tom, ben]
     duration_hours: 3
     end: '2025-12-01T17:00:00Z'
     start: '2025-12-01T14:00:00Z'
@@ -28,7 +26,7 @@ streams:
         orientation: TD
       tileSize: 1
     subtitle: Another subtitle
-    title: Title 2
+    title: Tom & Ben
     vods: []
   - creators: [lewis, simon]
     duration_hours: 3
@@ -42,9 +40,9 @@ streams:
         orientation: TD
       tileSize: 1
     subtitle: Lewis & Simon
-    title: Jingle Cats (most likely)
+    title: Jingle Cats
     vods: []
-  - creators: []
+  - creators: [lewis, duncan, spiff]
     duration_hours: 3
     end: '2025-12-01T23:00:00Z'
     start: '2025-12-01T20:00:00Z'
@@ -55,6 +53,6 @@ streams:
           - '#3484bf'
         orientation: TD
       tileSize: 1
-    subtitle: Title 4
-    title: Maybe trains?
+    subtitle: Lewis, Duncan, Spiff & Friends
+    title: TRAINS AND GIN
     vods: []

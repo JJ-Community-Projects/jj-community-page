@@ -1,6 +1,6 @@
 date: '2025-12-03'
 streams:
-  - creators: []
+  - creators: [lydia, gee]
     duration_hours: 3
     end: '2025-12-03T14:00:00Z'
     start: '2025-12-03T11:00:00Z'
@@ -11,8 +11,8 @@ streams:
           - '#7aa70c'
         orientation: TD
       tileSize: 1
-    subtitle: Title 1
-    title: Title 1
+    subtitle: Lydia & Gee
+    title: CHILL ADVENTURES
     vods: []
   - creators: []
     duration_hours: 3
@@ -25,11 +25,10 @@ streams:
           - '#7aa70c'
         orientation: TD
       tileSize: 1
-    subtitle: Title 2
-    title: Title 2
-    description: And maybe a special guest...
+    subtitle: Games Night Special
+    title: FESTIVUS MAXIMUS
     vods: []
-  - creators: []
+  - creators: [hat_films]
     duration_hours: 3
     end: '2025-12-04T00:00:00Z'
     start: '2025-12-03T17:00:00Z'
@@ -40,6 +39,6 @@ streams:
           - '#7aa70c'
         orientation: TD
       tileSize: 2
-    subtitle: Title 3
-    title: Title 3
+    subtitle: ROSS, SMITH & TROTT
+    title: HAT FILMS MUSIC STREAM
     vods: []

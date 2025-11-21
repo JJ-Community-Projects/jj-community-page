@@ -1,6 +1,6 @@
 date: '2025-12-07'
 streams:
-  - creators: []
+  - creators: [fionn, mousie]
     duration_hours: 3
     end: '2025-12-07T14:00:00Z'
     start: '2025-12-07T11:00:00Z'
@@ -11,10 +11,10 @@ streams:
           - '#f07800'
         orientation: TD
       tileSize: 1
-    subtitle: Title 1
-    title: Title 1
+    subtitle: FIONN & MOUSIE
+    title: A ROYAL APPOINTMENT
     vods: []
-  - creators: []
+  - creators: [ravs, sarah, osie, gee]
     duration_hours: 3
     end: '2025-12-07T17:00:00Z'
     start: '2025-12-07T14:00:00Z'
@@ -25,10 +25,10 @@ streams:
           - '#f07800'
         orientation: TD
       tileSize: 1
-    subtitle: Title 2
-    title: Title 2
+    subtitle: RAVS, SARAH OSIE & GEESTAR
+    title: PRE-POKER PARTY
     vods: []
-  - creators: []
+  - creators: [tom, pyrion]
     duration_hours: 6
     end: '2025-12-07T23:00:00Z'
     start: '2025-12-07T17:00:00Z'
@@ -39,6 +39,6 @@ streams:
           - '#f07800'
         orientation: TD
       tileSize: 2
-    subtitle: Title 3
-    title: Title 3
+    subtitle: HOSTED BY PYRION & TOM
+    title: POKER REVAMPED
     vods: []
