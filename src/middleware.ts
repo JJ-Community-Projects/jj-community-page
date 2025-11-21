@@ -53,12 +53,13 @@ export const onRequest = defineMiddleware(async (context, next) => {
         const UserRateLimiter = context.locals.runtime.env.UserRateLimiter
         const id = UserRateLimiter.idFromName(ip);
         const stub = UserRateLimiter.get(id);
+        /*
         const milliseconds_to_next_request =
-          await stub.getMillisecondsToNextRequest();
+          await stub.attempt();
         if (milliseconds_to_next_request > 0) {
           // Alternatively one could sleep for the necessary length of time
           return new Response("Rate limit exceeded", {status: 429});
-        }
+        }*/
       } catch (error) {
         console.log(error);
         // TODO
