@@ -67,6 +67,7 @@ export class JingleJamData extends DurableObject<Env> {
       everyMs: 60 * 1000,
       run: async () => {
         await this.refresh()
+        await this.refreshAllCampaigns()
         await this.insertIntoDB()
         await this.buildDisplayData()
       },
