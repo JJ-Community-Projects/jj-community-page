@@ -1,6 +1,11 @@
 import { DurableObject } from 'cloudflare:workers'
 import { getDB } from '../lib/db/db.ts'
-import type { JingleJamResponse, JJCampaign, JJCause, JJCollections, } from './types/JJAPIModel.ts'
+import type {
+  JingleJamResponse,
+  JJCampaign,
+  JJCause,
+  JJCollections,
+} from './types/JJAPIModel.ts'
 import { TwitchAPI } from '../lib/twitchAPI.ts'
 import type {
   CausesDisplayTVType,
@@ -12,13 +17,15 @@ import type {
 import type { JJCampaignType } from '../lib/orpc/private/jjData/contract.ts'
 import { and, desc, eq, or } from 'drizzle-orm'
 import { schedulesTable } from '../lib/db/schema/jj-schema.ts'
-import { tagUserCountsView, userDisplayView, } from '../lib/db/schema/views-schema.ts'
+import {
+  tagUserCountsView,
+  userDisplayView,
+} from '../lib/db/schema/views-schema.ts'
 import { tags, userTagsTable } from '../lib/db/schema/tags-schema.ts'
 import { TiltifyAPI, type TiltifyUserData } from '../lib/TiltifyAPI.ts'
 import { jjCampaign, jjCauses } from '../lib/db/schema/jj-api-schema.ts'
 import type { BatchItem } from 'drizzle-orm/batch'
 import type { TwitchUser } from '../lib/model/TwitchUser.ts'
-import { storage } from 'googleapis/build/src/apis/storage'
 
 type UserWithTags = {
   userId: number
@@ -394,8 +401,26 @@ export class JingleJamData extends DurableObject<Env> {
     const storedInvalidSet = new Set(storedInvalidLogins)
     const storedValidSet = new Set(storedValidLogins)
 
-    const loginsToValidate = logins.filter(l => !storedValidSet.has(l))
+    const loginsToValidate = logins.filter((l) => !storedValidSet.has(l))
     const validLogins: string[] = [...storedValidSet]
+
+    console.log('validateTwitchChannels', 'campaignLogins', logins.length)
+    console.log(
+      'validateTwitchChannels',
+      'storedValidLogins',
+      storedValidLogins.length,
+    )
+    console.log(
+      'validateTwitchChannels',
+      'storedInvalidLogins',
+      storedInvalidLogins.length,
+    )
+    console.log(
+      'validateTwitchChannels',
+      'loginsToValidate',
+      loginsToValidate.length,
+    )
+
     for (const login of loginsToValidate) {
       const normalized = this.normalizeTwitchLogin(login)
       if (!normalized) continue
@@ -409,7 +434,6 @@ export class JingleJamData extends DurableObject<Env> {
       const channel = await api.fetchUsersByLogin(normalized, accessToken)
 
       if (channel.data && !channel.error) {
-
         if (!validLogins.includes(normalized)) validLogins.push(normalized)
 
         await this.storage.put(`twitch:id:${channel.data.id}`, channel.data)
@@ -417,10 +441,10 @@ export class JingleJamData extends DurableObject<Env> {
           `twitch:login:${channel.data.login}`,
           channel.data,
         )
-
       } else {
         if (channel.error.status !== 401) {
-          if (!invalidLogins.includes(normalized)) invalidLogins.push(normalized)
+          if (!invalidLogins.includes(normalized))
+            invalidLogins.push(normalized)
         }
       }
     }
@@ -440,9 +464,9 @@ export class JingleJamData extends DurableObject<Env> {
     const liveStreamsIds: string[] = []
     const liveStreamsLogins: string[] = []
     const loginChunks = this.chunk(logins, 50)
-    for (const logins of loginChunks){
+    for (const logins of loginChunks) {
       const stream = await api.fetchStreamsByLogins(logins, accessToken)
-      if (stream.data && !stream.error){
+      if (stream.data && !stream.error) {
         for (const s of stream.data) {
           liveStreamsIds.push(s.user_id)
           liveStreamsLogins.push(s.user_login)
@@ -509,8 +533,10 @@ export class JingleJamData extends DurableObject<Env> {
 
   // GBP->EUR conversion via Google Finance
   public async fetchGBPToEURConversionRate() {
-    const lastFetchedAt = await this.storage.get<number>('gbp:eur:lastFetchedAt')
-    if (!lastFetchedAt || Date.now() - lastFetchedAt > 12 * 60 * 60 * 1000) {
+    const lastFetchedAt = await this.storage.get<number>(
+      'gbp:eur:lastFetchedAt',
+    )
+    if (!lastFetchedAt || Date.now() - lastFetchedAt > 4 * 60 * 60 * 1000) {
       const value = await this.fetchFromRateAPI()
       if (Number.isFinite(value)) {
         await this.storage.put('gbp:eur:rate', value)
@@ -533,9 +559,16 @@ export class JingleJamData extends DurableObject<Env> {
 
   public async buildAndStoreUserTags() {
     const db = getDB(this.env)
+    const start = Date.now()
 
     // 1) Global usage per tag
     const tagUsageRows = await this.getUsedTagsWithUserCounts()
+    console.log(
+      'buildAndStoreUserTags',
+      'tagUsageRows',
+      'ms',
+      Date.now() - start,
+    )
     const usageMap = new Map<number, number>(
       tagUsageRows.map((r) => [r.tagId, r.usage]),
     )
@@ -554,6 +587,12 @@ export class JingleJamData extends DurableObject<Env> {
       .leftJoin(userTagsTable, eq(userTagsTable.userId, userDisplayView.userId))
       .leftJoin(tags, eq(userTagsTable.tagId, tags.id))
       .all()
+    console.log(
+      'buildAndStoreUserTags',
+      'rows',
+      'ms',
+      Date.now() - start,
+    )
 
     const byUser = new Map<number, UserWithTags>()
 
@@ -595,6 +634,8 @@ export class JingleJamData extends DurableObject<Env> {
   }
 
   public async loadAllTiltifySocials() {
+    const start = Date.now()
+    console.log('loadAllTiltifySocials')
     const campaigns = await this.getCampaigns()
     // console.log('loadAllTiltifySocials', 'campaigns', campaigns.length)
     const api = new TiltifyAPI(this.env)
@@ -609,6 +650,7 @@ export class JingleJamData extends DurableObject<Env> {
       .then((r) => r.map((u) => u.data))
     // console.log('loadAllTiltifySocials', 'users', users.length)
     await this.storage.put('socials:tiltify', users)
+    console.log('loadAllTiltifySocials', 'ms', Date.now() - start)
   }
 
   public async getTiltifyUsersMap() {
@@ -623,7 +665,6 @@ export class JingleJamData extends DurableObject<Env> {
   }
 
   private async fetchFromRateAPI() {
-
     try {
       const url = 'https://www.google.com/finance/quote/GBP-EUR'
       const res = await fetch(url, {
@@ -938,8 +979,7 @@ export class JingleJamData extends DurableObject<Env> {
 
   // Helper: fully-qualified YouTube URL from any incoming value (channel/video URL, id, or handle)
   // Automatically detects whether the input represents a video, channel, or handle and returns
-  private async buildAndStoreCommunityCampaignsDisplay(
-  ) {
+  private async buildAndStoreCommunityCampaignsDisplay() {
     const rawCampaigns = await this.getCampaigns()
     try {
       const usdRate = await this.getDollarConversionRate()

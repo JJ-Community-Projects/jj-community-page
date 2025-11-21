@@ -179,12 +179,18 @@
   },
   "triggers": {
     "crons": [
-      // every 5 minutes
-      "*/5 * * * *",
-      // every minute from december 1-15
-      "*/1 * 1-15 12 *",
-      // every hour
-      "0 */1 * * *"
+      // every 10 minutes
+      "*/10 * * * *",
+      // every minute
+      "*/1 * * * *",
+      // every 12 hour
+      "0 */12 * * *",
+      // every 6 hour
+      "0 */6 * * *",
+      // every 4 hour
+      "0 */4 * * *",
+      // every 2 hour
+      "0 */2 * * *"
     ]
   },
   "env": {
@@ -344,6 +350,12 @@
           "*/10 * * * *",
           // every minute
           "*/1 * * * *",
+          // every 12 hour
+          "0 */12 * * *",
+          // every 6 hour
+          "0 */6 * * *",
+          // every 4 hour
+          "0 */4 * * *",
           // every 2 hour
           "0 */2 * * *"
         ]
@@ -521,12 +533,18 @@
       },
       "triggers": {
         "crons": [
-          // every 5 minutes
-          "*/5 * * * *",
-          // every minute from december 1-15
-          "*/1 * 1-15 12 *",
-          // every hour
-          "0 */1 * * *"
+          // every 10 minutes
+          "*/10 * * * *",
+          // every minute
+          "*/1 * * * *",
+          // every 12 hour
+          "0 */12 * * *",
+          // every 6 hour
+          "0 */6 * * *",
+          // every 4 hour
+          "0 */4 * * *",
+          // every 2 hour
+          "0 */2 * * *"
         ]
       },
       "vars": {
