@@ -104,6 +104,83 @@ const campaigns = os.campaignsContract
       throw e
     }
   })
+// List all campaigns from DO cache
+const campaignsAll = os.campaignsContract
+  .use(
+    cacheMiddleware({
+      maxAge: 60,
+      sMaxAge: 60,
+      staleWhileRevalidate: 30,
+    }),
+  )
+  .handler(async ({ context }) => {
+    // KV cache
+    const cached = await context.env.KV.get('campaigns')
+    if (cached) {
+      return JSON.parse(cached)
+    }
+
+    const DO = context.env.JingleJamData
+    const stubID = DO.idFromName('JJ_API_CACHE')
+    const stub = DO.get(stubID)
+    try {
+      const data = await stub.getCommunityCampaignsDisplayAll()
+      if (!data) {
+        return {
+          count: 0,
+          list: [],
+        }
+      }
+      // Sort the campaigns list following the same pattern used in
+      // src/lib/orpc/public/twitchExtension/impl.ts campaigns procedure:
+      // 1) campaigns with twitch channel that are live
+      // 2) campaigns with twitch channel that are not live
+      // 3) all other campaigns
+      // Additionally, sort by raised.gbp (descending) within each group
+      const list = Array.isArray((data as any).list) ? (data as any).list : []
+      const getGroupRank = (it: any) => {
+        const hasTwitch = Boolean(it?.twitch?.name ?? it?.twitch)
+        const isLive = Boolean(it?.twitch?.isLive ?? it?.isTwitchLive)
+        if (hasTwitch) {
+          return isLive ? 0 : 1
+        }
+        return 2
+      }
+      const getRaisedGbp = (it: any) => {
+        const val = it?.raised?.gbp
+        return typeof val === 'number' ? val : 0
+      }
+      const sortedList = (list as any).toSorted
+        ? (list as any).toSorted((a: any, b: any) => {
+          const ga = getGroupRank(a)
+          const gb = getGroupRank(b)
+          if (ga !== gb) return ga - gb
+          const ra = getRaisedGbp(a)
+          const rb = getRaisedGbp(b)
+          if (ra !== rb) return rb - ra
+          return 0
+        })
+        : [...list].sort((a: any, b: any) => {
+          const ga = getGroupRank(a)
+          const gb = getGroupRank(b)
+          if (ga !== gb) return ga - gb
+          const ra = getRaisedGbp(a)
+          const rb = getRaisedGbp(b)
+          if (ra !== rb) return rb - ra
+          return 0
+        })
+
+      const sortedData = { ...(data as any), list: sortedList }
+      // store in KV for 60s
+      await context.env.KV.put('campaigns', JSON.stringify(sortedData), {
+        expirationTtl: 60,
+      })
+      return sortedData
+    } catch (e) {
+      console.error(e)
+      throw e
+    }
+  })
 
 // List all causes from DO cache
 const causes = os.causesContract
@@ -737,6 +814,7 @@ export const jjRouter = {
   getAllUsersWithInfo,
   getUserCampaignPairs,
   overview,
+  campaignsAll
   /*
   causeById,
   campaignLookup,
