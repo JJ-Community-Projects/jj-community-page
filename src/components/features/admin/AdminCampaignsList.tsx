@@ -7,7 +7,7 @@ export const AdminCampaignsList: Component = () => {
   return (
     <div class="rounded border border-gray-300 bg-white p-4">
       <h2 class="mb-2 text-lg font-semibold">All Campaigns</h2>
-      <QueryComponent queryOptions={() => orpcPrivate.jj.campaigns.queryOptions()}>
+      <QueryComponent queryOptions={() => orpcPrivate.jj.campaignsAll.queryOptions()}>
         {(campaigns) => (
           <Show
             when={campaigns.count > 0}
