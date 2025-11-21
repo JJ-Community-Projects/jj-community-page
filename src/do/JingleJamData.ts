@@ -589,6 +589,8 @@ export class JingleJamData extends DurableObject<Env> {
     const liveStreamsIds: string[] = []
     const liveStreamsLogins: string[] = []
     const loginChunks = this.chunk(logins, 50)
+    console.log('checkLiveStreams', 'logins', logins)
+    console.log('checkLiveStreams', 'logins', logins.length)
     for (const logins of loginChunks) {
       const stream = await api.fetchStreamsByLogins(logins, accessToken)
       if (stream.data && !stream.error) {
@@ -600,6 +602,8 @@ export class JingleJamData extends DurableObject<Env> {
     }
     await this.setStringArray('twitch:liveStreams:ids', liveStreamsIds)
     await this.setStringArray('twitch:liveStreams:logins', liveStreamsLogins)
+    console.log('checkLiveStreams', 'liveStreamsLogins', liveStreamsLogins)
+    console.log('checkLiveStreams', 'liveStreamsLogins', liveStreamsLogins.length)
 
     // Update per-campaign live flags based on current live logins
     try {
@@ -610,9 +614,9 @@ export class JingleJamData extends DurableObject<Env> {
       for (const c of campaigns) {
         const userSlug = c.user.slug
         const user = users.get(userSlug)
-        if (!user) continue
+        // if (!user) continue
         const login =
-          this.tiltifySlugToTwitchLoginMap.get(userSlug) ?? user.social.twitch
+          this.tiltifySlugToTwitchLoginMap.get(userSlug) ?? user?.social.twitch
         if (!login) continue
         const isLive = liveSet.has(this.normalizeTwitchLogin(login))
         await this.storage.put(`campaign:live:${c.user.slug}`, isLive)
