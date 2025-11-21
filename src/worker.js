@@ -1,5 +1,4 @@
 import astroWorker from '../dist/_worker.js/index.js'
-import { scheduled } from './cron/scheduled.js'
 import { TwitchLiveNotifierQueue } from './queues/TwitchLiveNotifierQueue.js'
 import { TwitchLiveCheckQueue } from './queues/TwitchLiveCheckQueue.js'
 // Export the main worker with a fetch handler.
