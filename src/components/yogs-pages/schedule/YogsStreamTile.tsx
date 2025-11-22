@@ -79,31 +79,41 @@ export const YogsStreamTile: Component<YogsStreamTileProps> = (props) => {
 
   const titleStyle = () => {
     if (tileSize() === 1) {
-      return 'line-clamp-1 text-pretty font-bold uppercase tracking-wide text-sm'
+      return 'line-clamp-1 text-pretty font-bold uppercase tracking-wide text-base'
     }
 
-    if (tileSize() === 2) {
-      return 'line-clamp-3 text-pretty font-bold uppercase tracking-wide text-base'
+   if (tileSize() === 2 && (subtitle() === undefined || subtitle() === '')) {
+      return 'line-clamp-2 text-pretty font-bold uppercase tracking-wide ~text-base/2xl'
+    } else if (tileSize() === 2 && !((subtitle() === undefined || subtitle() === ''))) {
+      return 'line-clamp-2 text-pretty font-bold uppercase tracking-wide ~text-xs/lg'
     }
 
-    return 'text-pretty font-bold uppercase tracking-widest ~text-sm/2xl'
+    if (tileSize() === 4) {
+      return 'line-clamp-2 text-pretty font-bold uppercase tracking-widest ~text-sm/2xl'
+    }
+
+    return 'text-pretty font-bold uppercase tracking-widest ~text-sm/3xl'
   }
 
   const subtitleStyle = () => {
 
     if (tileSize() === 1) {
-      return '~text-xxs/xs text-pretty uppercase tracking-widest'
+      return '~text-xxs/sm text-pretty uppercase tracking-wide'
     }
 
     if (tileSize() === 2) {
-      return '~text-xs/sm text-pretty uppercase tracking-widest'
+      return '~text-xxs/xs text-pretty uppercase tracking-wide'
     }
 
-    return '~text-sm/md text-pretty uppercase tracking-widest'
+    if (tileSize() === 4) {
+      return '~text-xs/base text-pretty uppercase tracking-widest'
+    }
+
+    return '~text-sm/lg text-pretty uppercase tracking-widest'
   }
 
   const countdownStyle = () => {
-    if (tileSize() <= 2) {
+    if (tileSize() <= 1) {
       return 'line-clamp-1 font-mono text-xxs font-bold lowercase'
     }
 
@@ -115,7 +125,7 @@ export const YogsStreamTile: Component<YogsStreamTileProps> = (props) => {
       return '~text-xxs font-bold tracking-wide'
     }
 
-    return '~text-md/lg font-bold tracking-wide'
+    return '~text-base/lg font-bold tracking-wide'
   }
 
   return (
