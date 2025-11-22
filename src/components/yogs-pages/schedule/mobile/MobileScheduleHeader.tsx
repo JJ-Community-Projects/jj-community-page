@@ -17,7 +17,6 @@ export const MobileScheduleHeader: Component<MobileScheduleHeaderProps> = (
   return (
     <div class={'schedule-header flex flex-col gap-2'}>
       <MobileTitle />
-      <ScheduleButtons />
     </div>
   )
 }
@@ -46,70 +45,5 @@ const MobileTitle: Component = () => {
         </p>
       </div>
     </div>
-  )
-}
-
-const ScheduleButtons: Component = () => {
-  const { schedule, day, nextDay, prevDay } = useYogsSchedule()
-  const filterModalSignal = createModalSignal()
-  const exportModalSignal = createModalSignal()
-  const { isEmpty, reset } = useCreatorFilter()
-
-  return (
-    <>
-      <div class={'h-data'}>
-        <Show when={isEmpty()}>
-          <div class={'flex flex-row items-center justify-between gap-4 px-2'}>
-            <button
-              class={
-                'ripple flex h-8 w-8 flex-col items-center justify-center rounded-2xl bg-accent-500 text-white shadow-xl'
-              }
-              onclick={prevDay}
-            >
-              <FaSolidChevronLeft />
-            </button>
-            <button
-              class={
-                'h-8 flex-1 rounded-2xl bg-accent-500 text-white shadow-xl'
-              }
-              onclick={filterModalSignal.open}
-            >
-              Filter
-            </button>
-            <button
-              class={
-                'h-8 flex-1 rounded-2xl bg-accent-500 text-white shadow-xl'
-              }
-              onclick={exportModalSignal.open}
-            >
-              Export
-            </button>
-            <button
-              class={
-                'ripple flex h-8 w-8 flex-col items-center justify-center rounded-2xl bg-accent-500 text-white shadow-xl'
-              }
-              onclick={nextDay}
-            >
-              <FaSolidChevronRight />
-            </button>
-          </div>
-        </Show>
-        <Show when={!isEmpty()}>
-          <div
-            class={
-              'flex flex-row items-center justify-around rounded-2xl bg-accent-500 text-white shadow-xl'
-            }
-          >
-            <button onclick={reset}>
-              <BiRegularReset />
-            </button>
-            <button onclick={filterModalSignal.open}>Filter</button>
-            <button onclick={exportModalSignal.open}>Export</button>
-          </div>
-        </Show>
-      </div>
-      <FilterDialog modalSignal={filterModalSignal} />
-      <CalendarDialog modalSignal={exportModalSignal} />
-    </>
   )
 }

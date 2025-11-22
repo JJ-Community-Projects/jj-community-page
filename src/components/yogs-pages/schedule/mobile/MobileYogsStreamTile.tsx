@@ -93,50 +93,36 @@ export const MobileYogsStreamTile: Component<MobileScheduleBodyProps> = (
   return (
     <>
       <div
-        class={'w-full rounded-2xl'}
+        class={
+          'flex min-h-24 w-full flex-col items-center justify-center rounded-2xl p-1 text-center transition-all'
+        }
         style={{
           'background-color': color(),
           color: getTextColor(color()),
         }}
+        onclick={() => {
+          logSlotClick(stream)
+          modal.open()
+        }}
       >
-        <div class={'p-schedule h-full transition-all'}>
-          <div
-            class={
-              'schedule-card flex flex-col items-center justify-center p-1 text-center transition-all'
-            }
-            style={
-              {
-                //    ...background(),
-              }
-            }
-            onclick={() => {
-              logSlotClick(stream)
-              modal.open()
-            }}
-          >
-            <p class={'text-md font-bold'}>{props.stream.title}</p>
-            <p class={'text-sm'}>{props.stream.subtitle}</p>
-            <Show when={showCountdown()}>
-              <p class={'font-mono text-xs'}>{countdown()}</p>
-            </Show>
-            <Show when={!showCountdown() && isLive()}>
-              <p class={'~text-md/lg font-bold tracking-wide text-white'}>
-                LIVE
-              </p>
-            </Show>
-            <div class={'flex w-full flex-row justify-around'}>
-              <Show when={hasTwitchVod()}>
-                <BiLogosTwitch size={18} />
-              </Show>
-
-              <Show when={hasYoutubeVod()}>
-                <BiLogosYoutube size={18} />
-              </Show>
-              <Show when={(props.stream.creators?.length ?? 0) > 0}>
-                <BsPeopleFill size={18} />
-              </Show>
-            </div>
-          </div>
+        <p class={'text-md font-bold'}>{props.stream.title}</p>
+        <p class={'text-sm'}>{props.stream.subtitle}</p>
+        <Show when={showCountdown()}>
+          <p class={'font-mono text-xs'}>{countdown()}</p>
+        </Show>
+        <Show when={!showCountdown() && isLive()}>
+          <p class={'~text-md/lg font-bold tracking-wide text-white'}>LIVE</p>
+        </Show>
+        <div class={'flex w-full flex-row justify-around'}>
+          <Show when={hasTwitchVod()}>
+            <BiLogosTwitch size={12} />
+          </Show>
+          <Show when={hasYoutubeVod()}>
+            <BiLogosYoutube size={12} />
+          </Show>
+          <Show when={(props.stream.creators?.length ?? 0) > 0}>
+            <BsPeopleFill size={12} />
+          </Show>
         </div>
       </div>
       <YogsScheduleDetailDialog stream={props.stream} modalSignal={modal} />

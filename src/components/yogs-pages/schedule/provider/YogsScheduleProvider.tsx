@@ -2,6 +2,7 @@ import { createContext, createSignal, onMount, type ParentComponent, useContext,
 import type { YogsCreator, YogsSchedule, } from '../../../../lib/orpc/private/yogs/contract.ts'
 import { DateTime } from 'luxon'
 import { useNextJJEndDate } from '../../../../lib/utils/jjDates.ts'
+import { createModalSignal } from '../../../../lib/createModalSignal.ts'
 
 const useYogsScheduleHook = (
   schedule: YogsSchedule,
@@ -94,6 +95,12 @@ const useYogsScheduleHook = (
     )
   }
 
+  const longestDayLength = () => {
+    return days().reduce((acc, day) => Math.max(acc, day.streams.length), 0)
+  }
+
+  const filterModalSignal = createModalSignal()
+  const exportModalSignal = createModalSignal()
   return {
     schedule,
     streams,
@@ -108,6 +115,9 @@ const useYogsScheduleHook = (
     prevDay,
     times,
     getCreatorStreams,
+    longestDayLength,
+    filterModalSignal,
+    exportModalSignal
   }
 }
 
