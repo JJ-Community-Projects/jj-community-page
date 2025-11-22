@@ -1,4 +1,10 @@
-import { type Component, Match, type ParentComponent, Show, Switch, } from 'solid-js'
+import {
+  type Component,
+  Match,
+  type ParentComponent,
+  Show,
+  Switch,
+} from 'solid-js'
 import { YogsScheduleDetailDialog } from './YogsScheduleDetailDialog.tsx'
 import { getTextColor } from '../../../lib/utils/textColors.ts'
 import { BiLogosTwitch, BiLogosYoutube } from 'solid-icons/bi'
@@ -71,6 +77,28 @@ export const YogsStreamTile: Component<YogsStreamTileProps> = (props) => {
     return d.toFormat("d'd' hh'h' mm'm' ss's'")
   }
 
+  const titleStyle = () => {
+    if (tileSize() === 1) {
+      return 'line-clamp-1 text-pretty font-bold uppercase tracking-wide text-sm'
+    }
+
+    return 'text-pretty font-bold uppercase tracking-widest ~text-sm/2xl'
+  }
+  const countdownStyle = () => {
+    if (tileSize() === 1) {
+      return 'line-clamp-1 font-mono text-xxs font-bold lowercase'
+    }
+
+    return 'line-clamp-1 font-mono text-xs font-bold lowercase tracking-wide'
+  }
+  const liveStyle = () => {
+    if (tileSize() === 1) {
+      return '~text-xxs font-bold tracking-wide'
+    }
+
+    return '~text-md/lg font-bold tracking-wide'
+  }
+
   return (
     <>
       <div
@@ -98,34 +126,24 @@ export const YogsStreamTile: Component<YogsStreamTileProps> = (props) => {
                 'flex h-full w-full flex-col items-center justify-center @container'
               }
             >
-              <p
-                class={
-                  'text-pretty font-bold uppercase tracking-widest ~text-sm/2xl'
-                }
-              >
-                {title()}
-              </p>
-              <Show when={subtitle()}>
+              <p class={titleStyle()}>{title()}</p>
+              <Show when={subtitle() && tileSize() > 1}>
                 <p class={'~text-xs/md text-pretty uppercase tracking-widest'}>
                   {subtitle()}
                 </p>
               </Show>
               <Show when={showCountdown()}>
-                <p
-                  class={
-                    'line-clamp-1 font-mono text-xs font-bold lowercase tracking-wide'
-                  }
-                >
-                  {countdown()}
-                </p>
+                <p class={countdownStyle()}>{countdown()}</p>
               </Show>
               <Show when={!showCountdown() && isLive()}>
-                <p class={'~text-md/lg font-bold tracking-wide text-white'}>
+                <p class={liveStyle()}>
                   LIVE
                 </p>
               </Show>
             </div>
-            <Indicator stream={props.stream} />
+            <Show when={tileSize() > 1}>
+              <Indicator stream={props.stream} />
+            </Show>
           </button>
         </LivePulse>
       </div>
@@ -153,25 +171,25 @@ export const Indicator: Component<IndicatorProps> = (props) => {
     <>
       <div class={'hidden w-full flex-row justify-around xl:flex'}>
         <Show when={hasTwitchVod()}>
-          <BiLogosTwitch size={18} />
+          <BiLogosTwitch size={14} />
         </Show>
         <Show when={hasYoutubeVod()}>
-          <BiLogosYoutube size={18} />
+          <BiLogosYoutube size={14} />
         </Show>
         <Show when={(props.stream.creators?.length ?? 0) > 0}>
-          <BsPeopleFill size={18} />
+          <BsPeopleFill size={14} />
         </Show>
       </div>
 
       <div class={'flex w-full flex-row justify-around xl:hidden'}>
         <Show when={hasTwitchVod()}>
-          <BiLogosTwitch size={12} />
+          <BiLogosTwitch size={10} />
         </Show>
         <Show when={hasYoutubeVod()}>
-          <BiLogosYoutube size={12} />
+          <BiLogosYoutube size={10} />
         </Show>
         <Show when={(props.stream.creators?.length ?? 0) > 0}>
-          <BsPeopleFill size={12} />
+          <BsPeopleFill size={0} />
         </Show>
       </div>
     </>
