@@ -88,7 +88,7 @@ export const YogsStreamTile: Component<YogsStreamTileProps> = (props) => {
       tileSize() === 2 &&
       !(subtitle() === undefined || subtitle() === '')
     ) {
-      return 'line-clamp-2 text-pretty font-bold uppercase tracking-wide ~text-xs/lg'
+      return 'line-clamp-2 text-pretty font-bold uppercase tracking-wide ~text-xs/base'
     }
 
     if (tileSize() === 3) {
@@ -104,11 +104,11 @@ export const YogsStreamTile: Component<YogsStreamTileProps> = (props) => {
 
   const subtitleStyle = () => {
     if (tileSize() === 1) {
-      return '~text-xxs/sm text-pretty uppercase tracking-wide'
+      return '~text-xs/sm text-pretty uppercase tracking-wide'
     }
 
     if (tileSize() === 2) {
-      return '~text-xxs/xs text-pretty uppercase tracking-wide'
+      return '~text-xs/sm text-pretty uppercase tracking-wide'
     }
 
     if (tileSize() === 4) {
@@ -131,7 +131,7 @@ export const YogsStreamTile: Component<YogsStreamTileProps> = (props) => {
 
   const liveStyle = () => {
     if (tileSize() === 1) {
-      return '~text-xxs font-bold tracking-wide'
+      return '~text-xxxs font-bold tracking-wide'
     }
 
     return '~text-base/lg font-bold tracking-wide'
