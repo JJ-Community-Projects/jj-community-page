@@ -99,7 +99,7 @@ export const FilterDialog: Component<FilterDialogProps> = props => {
       <Dialog.Portal>
         <Dialog.Overlay class={'fixed inset-0 z-50 bg-black bg-opacity-20'}/>
         <div class={'fixed inset-0 z-50 flex items-center justify-center'}>
-          <Dialog.Content class={'h-full w-full max-w-[500px] p-2 lg:w-[min(calc(100vw_-_16px),_500px)] lg:p-16'}>
+          <Dialog.Content class={'h-full max-sm:h-[70vh] w-full max-w-[500px] p-2 lg:w-[min(calc(100vw_-_16px),_500px)] lg:p-16'}>
             <FilterDialogBody onClose={modalSignal.close}/>
           </Dialog.Content>
         </div>
