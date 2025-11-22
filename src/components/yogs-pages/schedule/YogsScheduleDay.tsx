@@ -46,7 +46,7 @@ const ScheduleDayHeader: Component<ScheduleDayHeaderProps> = props => {
   return (
     <div class={'day p-1'}>
       <div class={'w-full h-full bg-white rounded-2xl flex flex-row items-center justify-center'}>
-        <p class={'text-xl xl:text-2xl'}>{dateString()}</p>
+        <p class={'text-xl xl:text-2xl tracking-wider'}>{dateString()}</p>
       </div>
     </div>
   )
