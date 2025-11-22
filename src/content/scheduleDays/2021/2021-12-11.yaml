@@ -12,7 +12,7 @@ streams:
       - '#fc7600ff'
       - '#f55e00ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Lewis Boba Becky
   title: I Love Eggs
   vods:
@@ -33,7 +33,7 @@ streams:
       - '#f55e00ff'
       - '#ed4300ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Briony Breeh Kim Kirsty
   title: Cooking Christmas Dinner
   vods:
@@ -52,7 +52,7 @@ streams:
       - '#ed4300ff'
       - '#e62e00ff'
       orientation: TD
-    tileSize: 2
+    tileSize: 6
   subtitle: Martyn & MiniMuka
   title: Minecraft MCC 19
   vods:

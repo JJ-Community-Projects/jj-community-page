@@ -12,7 +12,7 @@ streams:
       - '#ffa600ff'
       - '#ff8400ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Lewis & Ben
   title: Space wars
   vods:
@@ -32,7 +32,7 @@ streams:
       - '#ff8400ff'
       - '#ff6600ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Ben Harry & Lewis
   title: Tech 'em up
   vods:
@@ -53,7 +53,7 @@ streams:
       - '#ff6600ff'
       - '#ff4400ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Martyn Boba Ravs & Mango
   title: Martyn's Minecraft
   vods:
@@ -84,7 +84,7 @@ streams:
       - '#ff4400ff'
       - '#ff2200ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Rythian Nilesy Zylus & more
   title: Late Late Show
   vods:

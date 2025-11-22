@@ -10,7 +10,7 @@ streams:
           - '#fb9900'
           - '#fb9900'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: BRIONY & KIRSTY
     title: WIZARD WARRIORS
     vods: []
@@ -24,7 +24,7 @@ streams:
           - '#fb9900'
           - '#fb9900'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Tom & Friends
     title: Tabs
     vods: []
@@ -38,7 +38,7 @@ streams:
           - '#fb9900'
           - '#fb9900'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: MINECRAFT WITH MARTYN AND FRIENDS
     title: HEART SCRAMBLE
     vods: []
@@ -52,7 +52,7 @@ streams:
           - '#fb9900'
           - '#fb9900'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: FARMING SIM
     title: YE OLDE FEEDE A COWE FOR XMAS
     vods: []

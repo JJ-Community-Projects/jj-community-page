@@ -12,7 +12,7 @@ streams:
       - '#fc7600ff'
       - '#f76300ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Pedguin & Daf
   title: Cutesy Chums
   vods:
@@ -34,7 +34,7 @@ streams:
       - '#f76300ff'
       - '#f25500ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Bekki & Ped
   title: Friend Time
   vods:
@@ -59,7 +59,7 @@ streams:
       - '#f25500ff'
       - '#ed4300ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Christmas special
   title: High rollers
   vods:
@@ -83,7 +83,7 @@ streams:
       - '#ed4300ff'
       - '#e83600ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Lolipopg Ravs Shadow & Daltos
   title: Lolip's Satisfactory
   vods:
@@ -107,7 +107,7 @@ streams:
       - '#e83600ff'
       - '#e32a00ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Duncan Ravs & Friends
   title: Late Night Ranch Sim
   vods:

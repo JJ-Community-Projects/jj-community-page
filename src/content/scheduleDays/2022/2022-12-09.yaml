@@ -12,7 +12,7 @@ streams:
       - '#ffd900ff'
       - '#ffcc00ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Briony & Zylus
   title: Other Worlds
   vods:
@@ -34,7 +34,7 @@ streams:
       - '#ffcc00ff'
       - '#ffbf00ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Lewis Simon Nina & Jack
   title: Fighting Fantasy
   vods:
@@ -57,7 +57,7 @@ streams:
       - '#ffbf00ff'
       - '#ffb300ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: With AARDMAN
   title: Scultping the Yogscast
   vods:
@@ -90,7 +90,7 @@ streams:
       - '#ffb300ff'
       - '#ffa600ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Hosted by Spiff & Pyrion
   title: CSGO Scrub Major
   vods:

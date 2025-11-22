@@ -75,7 +75,7 @@ export const YogsStreamTile: Component<YogsStreamTileProps> = (props) => {
     <>
       <div
         style={{
-          height: `calc(${tileSize()} * var(--jj-schedule-slot-size))`,
+          height: `calc(${tileSize()} * var(--jj-schedule-data-size))`,
           width: '100%',
         }}
         class="p-0.5"

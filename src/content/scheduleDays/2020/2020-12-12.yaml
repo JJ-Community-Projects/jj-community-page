@@ -9,7 +9,7 @@ streams:
           - '#00e8c5ff'
           - '#00dbacff'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Lewis
     title: Stocking Stuffers
     creators:
@@ -27,7 +27,7 @@ streams:
           - '#00dbacff'
           - '#00cf94ff'
         orientation: TD
-      tileSize: 2
+      tileSize: 6
     subtitle: Spiff, Lewis & RTGame
     title: Minecraft Community Build
     creators:
@@ -48,7 +48,7 @@ streams:
           - '#00cf94ff'
           - '#00c27eff'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: ''
     title: PFlax Rust RP
     creators:

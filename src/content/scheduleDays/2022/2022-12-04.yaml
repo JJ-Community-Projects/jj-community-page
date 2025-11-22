@@ -12,7 +12,7 @@ streams:
       - '#fc7600ff'
       - '#f76300ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Mango & Daltos
   title: Game Hard
   vods:
@@ -34,7 +34,7 @@ streams:
       - '#f76300ff'
       - '#f25100ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Potato & Spiff
   title: Map Master
   vods:
@@ -73,7 +73,7 @@ streams:
       - '#f25100ff'
       - '#ed3b00ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: University Challenge Parody
   title: Simon Clark's Yogs Challenges
   vods:
@@ -95,7 +95,7 @@ streams:
       - '#ed3b00ff'
       - '#e82b00ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Shadow & Alex
   title: Canadian Evening
   vods:

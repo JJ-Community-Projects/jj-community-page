@@ -12,7 +12,7 @@ streams:
           - '#d23d99'
           - '#d23d99'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Ravs & Sips
     title: Big Rips
     vods:
@@ -35,7 +35,7 @@ streams:
           - '#d23d99'
           - '#d23d99'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: ''
     title: Civ 6 on the 6th
     vods:
@@ -60,7 +60,7 @@ streams:
           - '#d23d99'
           - '#d23d99'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Simon & Friends
     title: Important Videos
     vods:
@@ -88,7 +88,7 @@ streams:
           - '#d23d99'
           - '#d23d99'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Zylus, RTGame, Lydia, Ravs & More
     title: MARIO KART TOURNAMENT
     vods:

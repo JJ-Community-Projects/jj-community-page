@@ -12,7 +12,7 @@ streams:
       - '#ffd900ff'
       - '#ffcc00ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Lewis & Mousie
   title: Games for Ukraine
   vods:
@@ -34,7 +34,7 @@ streams:
       - '#ffcc00ff'
       - '#ffbf00ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Lots of Yogs
   title: Aardman Christmas Crafts
   vods:
@@ -57,7 +57,7 @@ streams:
       - '#ffbf00ff'
       - '#ffb300ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Spiff Mango RT & Kiwo
   title: Multiplayer Sillies
   vods:
@@ -84,7 +84,7 @@ streams:
       - '#ffb300ff'
       - '#ffa600ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Pyrion & Spiff
   title: Rust Roleplay
   vods:

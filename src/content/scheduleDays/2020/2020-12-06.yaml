@@ -9,7 +9,7 @@ streams:
           - '#f74accff'
           - '#eb36b1ff'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Leo & Spiff
     title: Stocking Stuffers
     creators:
@@ -27,7 +27,7 @@ streams:
           - '#eb36b1ff'
           - '#de2396ff'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Rythian vs Zylus vs Duncan
     title: Hades Challange
     creators:
@@ -49,7 +49,7 @@ streams:
           - '#de2396ff'
           - '#d1137bff'
         orientation: TD
-      tileSize: 2
+      tileSize: 6
     subtitle: Hosted by Pflax & Tom C
     title: Poker Tournament
     creators:

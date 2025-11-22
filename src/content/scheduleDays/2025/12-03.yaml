@@ -10,7 +10,7 @@ streams:
           - '#7aa70c'
           - '#7aa70c'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Lydia & Gee
     title: CHILL ADVENTURES
     vods: []
@@ -24,7 +24,7 @@ streams:
           - '#7aa70c'
           - '#7aa70c'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Games Night Special
     title: FESTIVUS MAXIMUS
     vods: []
@@ -38,7 +38,7 @@ streams:
           - '#7aa70c'
           - '#7aa70c'
         orientation: TD
-      tileSize: 2
+      tileSize: 6
     subtitle: ROSS, SMITH & TROTT
     title: HAT FILMS MUSIC STREAM
     vods: []

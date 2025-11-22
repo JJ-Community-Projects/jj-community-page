@@ -10,7 +10,7 @@ streams:
           - '#fb9900'
           - '#fb9900'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Title 1
     title: Title 1
     description: So Bold
@@ -27,7 +27,7 @@ streams:
           - '#fb9900'
           - '#fb9900'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Title 2
     title: Title 2
     vods: []
@@ -41,7 +41,7 @@ streams:
           - '#fb9900'
           - '#fb9900'
         orientation: TD
-      tileSize: 2
+      tileSize: 6
     subtitle: Title 3
     title: Title 3
     vods: []

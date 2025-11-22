@@ -12,7 +12,7 @@ streams:
       - '#ffd900ff'
       - '#ffcc00ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Bouphe & Osie
   title: Point & Click
   vods:
@@ -36,7 +36,7 @@ streams:
       - '#ffcc00ff'
       - '#ffbf00ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Hosted by Lydia & Shadow
   title: Multi-Game Bingo
   vods:
@@ -59,7 +59,7 @@ streams:
       - '#ffbf00ff'
       - '#ffb300ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Duncan & Chums
   title: Feed A Cow for X-Mas
   vods:
@@ -83,7 +83,7 @@ streams:
       - '#ffb300ff'
       - '#ffa600ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Nilesy Zylus & Panda
   title: Protessional Strem
   vods:

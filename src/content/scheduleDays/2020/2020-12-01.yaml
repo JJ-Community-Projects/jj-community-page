@@ -9,7 +9,7 @@ streams:
           - '#00bbe0ff'
           - '#009fd4ff'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: ''
     title: Office Cam
     vods:
@@ -27,7 +27,7 @@ streams:
           - '#009fd4ff'
           - '#0081c7ff'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Tom & Ben
     title: Pre Jingle Jangle
     vods:
@@ -46,7 +46,7 @@ streams:
           - '#0081c7ff'
           - '#0069baff'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Bundle Live
     title: Jingle Cats
     creators:
@@ -65,7 +65,7 @@ streams:
           - '#0069baff'
           - '#0054adff'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Lewis and Friends
     title: OpenTTD
     creators:

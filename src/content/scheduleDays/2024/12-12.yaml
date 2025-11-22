@@ -14,7 +14,7 @@ streams:
           - '#06b8aa'
           - '#06b8aa'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Mark, Duncan, Osie & Nina
     title: Four Player Fun Times
     vods:
@@ -38,7 +38,7 @@ streams:
           - '#06b8aa'
           - '#06b8aa'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: RTGame & Friends
     title: WII Shit
     vods:
@@ -70,7 +70,7 @@ streams:
           - '#06b8aa'
           - '#06b8aa'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: In Minecraft in Real Life feat NRB
     title: BOTC
     vods:
@@ -100,7 +100,7 @@ streams:
           - '#06b8aa'
           - '#06b8aa'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Feat Ben Burns
     title: BOTC Online
     vods:

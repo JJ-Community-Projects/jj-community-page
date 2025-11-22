@@ -12,7 +12,7 @@ streams:
           - '#f07800'
           - '#f07800'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Briony & Kirsty
     title: Stocking Stuffers
     vods:
@@ -36,7 +36,7 @@ streams:
           - '#f07800'
           - '#f07800'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Yogs & Friends
     title: MCC Island Bingo
     vods:
@@ -58,7 +58,7 @@ streams:
           - '#f07800'
           - '#f07800'
         orientation: TD
-      tileSize: 2
+      tileSize: 6
     subtitle: Hosted by Zylus
     title: Maraoke
     vods:

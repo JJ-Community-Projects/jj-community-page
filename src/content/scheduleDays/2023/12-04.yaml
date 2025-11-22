@@ -14,7 +14,7 @@ streams:
       - '#fc7600ff'
       - '#f76300ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Ben Boba Ped Sips
   title: PlateUp Modded Madness
   vods:
@@ -38,7 +38,7 @@ streams:
       - '#f76300ff'
       - '#f25100ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Gee Briony Lolip & Breeh
   title: 4-Player Collection Games
   vods:
@@ -60,7 +60,7 @@ streams:
       - '#f25100ff'
       - '#ed3b00ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Mousie & Ben
   title: Collection Games
   vods:
@@ -86,7 +86,7 @@ streams:
       - '#ed3b00ff'
       - '#e82b00ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: ''
   title: The Longest Johns
   vods:

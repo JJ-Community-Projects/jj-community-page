@@ -12,7 +12,7 @@ streams:
       - '#ffd900ff'
       - '#ffcc00ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Briony & Breeh
   title: Good Vibes
   vods:
@@ -31,7 +31,7 @@ streams:
       - '#ffcc00ff'
       - '#ffbf00ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Feat Lewis
   title: Hat Films Art Stream
   vods:
@@ -50,7 +50,7 @@ streams:
       - '#ffbf00ff'
       - '#ffb300ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Simon & Gee
   title: Cursedcraft
   vods:
@@ -71,7 +71,7 @@ streams:
       - '#ffb300ff'
       - '#ffa600ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Duncan Ravs Pedguin Boba
   title: Pub Pals in Space
   vods: []

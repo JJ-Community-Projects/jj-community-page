@@ -11,7 +11,7 @@ streams:
       - '#f74accff'
       - '#ed39b7ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: ''
   title: Retro Games with Bouphe
   vods:
@@ -32,7 +32,7 @@ streams:
       - '#ed39b7ff'
       - '#e329a2ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Sofa king fun
   title: Couch Co-op
   vods:
@@ -49,7 +49,7 @@ streams:
       - '#e329a2ff'
       - '#d91a89ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Music Stream
   title: The Longest Johns
   vods:
@@ -72,7 +72,7 @@ streams:
       - '#d91a89ff'
       - '#cf0c74ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Hosted by Pedguon
   title: Project Winter
   vods:

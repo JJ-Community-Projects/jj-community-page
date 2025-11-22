@@ -9,7 +9,7 @@ streams:
           - '#a7cc00ff'
           - '#7cba00ff'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Ped & Boba
     title: Stocking Stuffers
     creators:
@@ -28,7 +28,7 @@ streams:
           - '#7cba00ff'
           - '#5aa800ff'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Hat Films & Lewis
     title: Hat Films Art Stream
     creators:
@@ -47,7 +47,7 @@ streams:
           - '#5aa800ff'
           - '#3a9600ff'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: ISP & Bo
     title: ISP's Wheel of Sorrow
     vods:
@@ -63,7 +63,7 @@ streams:
           - '#3a9600ff'
           - '#218500ff'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Zoey & Fionn
     title: Fizone Christmas Special
     creators:

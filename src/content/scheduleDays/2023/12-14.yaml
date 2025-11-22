@@ -12,7 +12,7 @@ streams:
       - '#ffa600ff'
       - '#ff8400ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Ben & Daf
   title: Gearbox Games
   vods:
@@ -31,7 +31,7 @@ streams:
       - '#ff8400ff'
       - '#ff6600ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Lewis Simon Nina & Jack
   title: Fighting Fantasy
   vods:
@@ -53,7 +53,7 @@ streams:
       - '#ff6600ff'
       - '#ff4400ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Hosted by Tom
   title: Mystery Quest
   vods:
@@ -83,7 +83,7 @@ streams:
       - '#ff4400ff'
       - '#ff2200ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Yogs Discord Gang
   title: Late Late Crew
   vods:

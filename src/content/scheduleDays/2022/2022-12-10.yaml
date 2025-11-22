@@ -12,7 +12,7 @@ streams:
       - '#a7cc00ff'
       - '#81bd00ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Mousie & Breeh
   title: Breakfest Mixup
   vods:
@@ -35,7 +35,7 @@ streams:
       - '#81bd00ff'
       - '#62ad00ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Rythian Zylus & Kirsty
   title: Tactic games
   vods:
@@ -60,7 +60,7 @@ streams:
       - '#62ad00ff'
       - '#479e00ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Tom's Roleplay
   title: Everyone is santa
   vods:
@@ -83,7 +83,7 @@ streams:
       - '#479e00ff'
       - '#308f00ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Followd by Rust RP
   title: Longest John Singalong
   vods:
@@ -110,7 +110,7 @@ streams:
       - '#308f00ff'
       - '#1c8000ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Minecraft Madness
   title: Harry's Vault Hunters Marathon
   vods:

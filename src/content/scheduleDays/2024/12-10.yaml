@@ -14,7 +14,7 @@ streams:
           - '#7aa70c'
           - '#7aa70c'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Endless Challenge
     title: For the King II
     vods:
@@ -45,7 +45,7 @@ streams:
           - '#7aa70c'
           - '#7aa70c'
         orientation: TD
-      tileSize: 3
+      tileSize: 9
     subtitle: Loads of Yogs
     title: Yogsfast speedrun day
     vods:
@@ -66,7 +66,7 @@ streams:
           - '#7aa70c'
           - '#7aa70c'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: ''
     title: Pedguin's All Nighter
     vods:

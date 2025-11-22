@@ -12,7 +12,7 @@ streams:
       - '#fc7600ff'
       - '#f76300ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Briony & Boba
   title: Cute Games
   vods:
@@ -33,7 +33,7 @@ streams:
       - '#f76300ff'
       - '#f25100ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: RTGame Lewis Sarah & Boba
   title: WII Shit
   vods:
@@ -55,7 +55,7 @@ streams:
       - '#f25100ff'
       - '#ed3b00ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Gamesnight vs Midwinterminis
   title: Titan Battle
   vods:
@@ -76,7 +76,7 @@ streams:
       - '#ed3b00ff'
       - '#e82b00ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Hosted by Spiff & Pyrion
   title: CS 1.6
   vods:

@@ -12,7 +12,7 @@ streams:
       - '#fc7600ff'
       - '#f76300ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Tom & Ben
   title: Jerk Off
   vods:
@@ -34,7 +34,7 @@ streams:
       - '#f76300ff'
       - '#f25100ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Feat. RT
   title: Mario Kart Tournament
   vods:
@@ -56,7 +56,7 @@ streams:
       - '#f25100ff'
       - '#ed3b00ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Lews & Duncan
   title: Feed a Cow for Christmas
   vods:
@@ -75,7 +75,7 @@ streams:
       - '#ed3b00ff'
       - '#e82b00ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Breeh & Rythian
   title: Pixel Perfect
   vods:

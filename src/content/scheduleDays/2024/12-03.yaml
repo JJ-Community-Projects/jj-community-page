@@ -12,7 +12,7 @@ streams:
           - '#7aa70c'
           - '#7aa70c'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Pedguin & Boba
     title: Card Cats
     vods:
@@ -36,7 +36,7 @@ streams:
           - '#7aa70c'
           - '#7aa70c'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Lewis, Duncan & Harry
     title: Jaffa Factory
     description: And maybe a special guest...
@@ -58,7 +58,7 @@ streams:
           - '#7aa70c'
           - '#7aa70c'
         orientation: TD
-      tileSize: 2
+      tileSize: 6
     subtitle: Ross, Smith & Trott
     title: Hat Films Music Stream
     vods:

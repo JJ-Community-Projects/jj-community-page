@@ -12,7 +12,7 @@ streams:
       - '#f74accff'
       - '#eb36b1ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Sips & Lydia
   title: Dark Mysteries
   vods:
@@ -34,7 +34,7 @@ streams:
       - '#eb36b1ff'
       - '#de2396ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: The Boy Returns
   title: Tom & Wheelboy
   vods:
@@ -52,7 +52,7 @@ streams:
       - '#de2396ff'
       - '#d1137bff'
       orientation: TD
-    tileSize: 2
+    tileSize: 6
   subtitle: The boys spend six hours making 'music' for an 'album'
   title: Hat Films Christmas Album
   vods:

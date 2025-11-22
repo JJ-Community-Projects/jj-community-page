@@ -13,7 +13,7 @@ streams:
       - '#00e8c5ff'
       - '#00dbacff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Boba, Zylus & Mousie
   title: Jingle Jam Exclusives
   vods:
@@ -33,7 +33,7 @@ streams:
       - '#00dbacff'
       - '#00cf94ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Breeh, Briony & Kirsty
   title: Christmas Crafts
   vods:
@@ -56,7 +56,7 @@ streams:
       - '#00cf94ff'
       - '#00c27eff'
       orientation: TD
-    tileSize: 2
+    tileSize: 6
   subtitle: Lewis, Duncan, Spiff & MORE
   title: CIV SALT & STRATEGY
   vods:

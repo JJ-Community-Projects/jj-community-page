@@ -12,7 +12,7 @@ streams:
       - '#ffa600ff'
       - '#ff8400ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Ben & Ravs
   title: Trucking Tuesday
   vods:
@@ -33,7 +33,7 @@ streams:
       - '#ff8400ff'
       - '#ff6600ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: With Wheel boy & Special guests
   title: Tom Clark's Wheel of wonders
   vods:
@@ -54,7 +54,7 @@ streams:
       - '#ff6600ff'
       - '#ff4400ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Duncan Ravs Ped Boba
   title: Pub Pals Underwater
   vods:
@@ -77,7 +77,7 @@ streams:
       - '#a9d1f7ff'
       - '#cc99ffff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: ''
   title: FiZone After Dark
   vods:

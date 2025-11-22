@@ -10,7 +10,7 @@ streams:
           - '#dd5501'
           - '#dd5501'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Tom & Ben
     title: DOING A WARHAMMER
     vods: []
@@ -24,7 +24,7 @@ streams:
           - '#dd5501'
           - '#dd5501'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     title: SWEATY SHOOTERS
     vods: []
   - creators: [lewis, zylus]
@@ -37,7 +37,7 @@ streams:
           - '#dd5501'
           - '#dd5501'
         orientation: TD
-      tileSize: 2
+      tileSize: 6
     subtitle: LEWIS, ZYLUS & FRIENDS
     title: BLOOD ON THE CLOCKTOWER LIVE IN MINECRAFT
     vods: []

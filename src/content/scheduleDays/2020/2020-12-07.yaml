@@ -9,7 +9,7 @@ streams:
           - '#ffa600ff'
           - '#ff7b00ff'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Pflax & Sips
     title: Stocking Stuffers
     creators:
@@ -28,7 +28,7 @@ streams:
           - '#ff7b00ff'
           - '#ff5500ff'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Briony & Bekki
     title: Stocking Stuffers
     creators:
@@ -47,7 +47,7 @@ streams:
           - '#ff5500ff'
           - '#ff2a00ff'
         orientation: TD
-      tileSize: 2
+      tileSize: 6
     subtitle: Salt & 'Strategy'
     title: Civ 5
     creators:

@@ -12,7 +12,7 @@ streams:
       - '#a7cc00ff'
       - '#74b800ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Harry & Shadow
   title: Tryhard Games
   vods:
@@ -33,7 +33,7 @@ streams:
       - '#74b800ff'
       - '#49a300ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Sarah Briony Boba & Ped
   title: Pre-Poker Party
   vods:
@@ -71,7 +71,7 @@ streams:
       - '#49a300ff'
       - '#288f00ff'
       orientation: TD
-    tileSize: 2
+    tileSize: 6
   subtitle: Hosted by Tom & Pyrion
   title: Massive Poker
   vods:

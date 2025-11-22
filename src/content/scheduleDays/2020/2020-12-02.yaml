@@ -9,7 +9,7 @@ streams:
           - '#ffd900ff'
           - '#ffae00ff'
         orientation: TD
-      tileSize: 3
+      tileSize: 9
     subtitle: ''
     title: Christmas Colony
     creators:
@@ -33,7 +33,7 @@ streams:
           - '#ffa600ff'
           - '#ff9d00ff'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: 'Zylus & Mousie '
     title: Jackbox
     creators:

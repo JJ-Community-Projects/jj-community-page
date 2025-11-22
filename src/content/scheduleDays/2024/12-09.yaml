@@ -12,7 +12,7 @@ streams:
           - '#fb9900'
           - '#fb9900'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Ben & Mousie
     title: Sharky & Mouse
     description: So Bold
@@ -38,7 +38,7 @@ streams:
           - '#fb9900'
           - '#fb9900'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Briony, Kirsty & Rythian
     title: Kirby Fun
     vods:
@@ -79,7 +79,7 @@ streams:
           - '#fb9900'
           - '#fb9900'
         orientation: TD
-      tileSize: 2
+      tileSize: 6
     subtitle: The Pursuit
     title: Dr Simon Clark's Quiz Show
     vods:

@@ -12,7 +12,7 @@ streams:
       - '#a7cc00ff'
       - '#7cba00ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Ravs & Sips
   title: Big Rips
   vods:
@@ -31,7 +31,7 @@ streams:
       - '#7cba00ff'
       - '#5aa800ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Lewis, Ben & Olympians
   title: Gold Medal Games
   vods:
@@ -52,7 +52,7 @@ streams:
       - '#5aa800ff'
       - '#3a9600ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Meme Heaven
   title: Simon's Important Videos
   vods:
@@ -79,7 +79,7 @@ streams:
       - '#3a9600ff'
       - '#218500ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Boba Osie Ravs Pedguin
   title: B.O.R.P.
   vods:

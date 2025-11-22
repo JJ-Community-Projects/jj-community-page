@@ -12,7 +12,7 @@ streams:
       - '#f74accff'
       - '#f03cbaff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Lewis & Ben
   title: Save the world
   vods:
@@ -33,7 +33,7 @@ streams:
       - '#f03cbaff'
       - '#e82eaaff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Pedguin & Friends
   title: 4 Player co-op games
   vods:
@@ -54,7 +54,7 @@ streams:
       - '#e82eaaff'
       - '#e02297ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Hatfilms vs Lewis Lydia.& Ravs
   title: Hatfilms gameshow
   vods:
@@ -75,7 +75,7 @@ streams:
       - '#e02297ff'
       - '#d91684ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Pedguin & Friends
   title: Terraria Hangout
   vods:
@@ -94,7 +94,7 @@ streams:
       - '#d91684ff'
       - '#d10a71ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Shadow & Osie
   title: Elden Ring Co-op
   vods:

@@ -9,7 +9,7 @@ streams:
           - '#00e8c5ff'
           - '#00deb1ff'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Bouphe & Osie
     title: Stocking Stuffers
     creators:
@@ -28,7 +28,7 @@ streams:
           - '#00deb1ff'
           - '#00d49bff'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Tabs Tourny
     title: Tom Clark's Wheel of Wonder
     creators:
@@ -49,7 +49,7 @@ streams:
           - '#00d49bff'
           - '#00c98aff'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: ''
     title: MCC
     creators:
@@ -97,7 +97,7 @@ streams:
           - '#00c98aff'
           - '#00bf79ff'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: ''
     title: Armchair Admirals TD
     creators:

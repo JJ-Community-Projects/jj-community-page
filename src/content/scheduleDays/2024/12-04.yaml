@@ -12,7 +12,7 @@ streams:
           - '#dd5501'
           - '#dd5501'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Ben & Lolip
     title: Jingle Chums
     vods:
@@ -44,7 +44,7 @@ streams:
           - '#dd5501'
           - '#dd5501'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: With the Spiffing Brit
     title: Minecraft Jingle Walls
     description: >
@@ -87,7 +87,7 @@ streams:
           - '#dd5501'
           - '#dd5501'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Arcade Special
     title: Minecraft Game Show
     vods:
@@ -108,7 +108,7 @@ streams:
           - '#dd5501'
           - '#dd5501'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: The Longest Johns
     title: XMas Carols
     vods:

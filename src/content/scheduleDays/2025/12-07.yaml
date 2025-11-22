@@ -10,7 +10,7 @@ streams:
           - '#f07800'
           - '#f07800'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: FIONN & MOUSIE
     title: A ROYAL APPOINTMENT
     vods: []
@@ -24,7 +24,7 @@ streams:
           - '#f07800'
           - '#f07800'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: RAVS, SARAH OSIE & GEESTAR
     title: PRE-POKER PARTY
     vods: []
@@ -38,7 +38,7 @@ streams:
           - '#f07800'
           - '#f07800'
         orientation: TD
-      tileSize: 2
+      tileSize: 6
     subtitle: HOSTED BY PYRION & TOM
     title: POKER REVAMPED
     vods: []

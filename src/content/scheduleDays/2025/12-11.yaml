@@ -10,7 +10,7 @@ streams:
           - '#dd5501'
           - '#dd5501'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Title 1
     title: Title 1
     vods: []
@@ -24,7 +24,7 @@ streams:
           - '#dd5501'
           - '#dd5501'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Title 2
     title: Title 2
     vods: []
@@ -38,7 +38,7 @@ streams:
           - '#dd5501'
           - '#dd5501'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Title 3
     title: Title 3
     vods: []
@@ -52,7 +52,7 @@ streams:
           - '#dd5501'
           - '#dd5501'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Title 4
     title: Title 4
     vods: []

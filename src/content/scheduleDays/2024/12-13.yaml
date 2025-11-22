@@ -12,7 +12,7 @@ streams:
           - '#d23d99'
           - '#d23d99'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Daf & Pedguin
     title: Detective Duo
     vods:
@@ -34,7 +34,7 @@ streams:
           - '#d23d99'
           - '#d23d99'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Award Ceremony
     title: Community Game Jam
     vods:
@@ -62,7 +62,7 @@ streams:
           - '#d23d99'
           - '#d23d99'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Mark & Pals
     title: Shadow of Doubt Murder Mystery
     vods:
@@ -85,7 +85,7 @@ streams:
           - '#d23d99'
           - '#d23d99'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: ''
     title: Pedguin's Massive Multiplayer Madness
     vods:

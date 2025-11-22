@@ -12,7 +12,7 @@ streams:
       - '#f74accff'
       - '#eb36b1ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Boba & Ben
   title: Save the World
   vods:
@@ -35,7 +35,7 @@ streams:
       - '#eb36b1ff'
       - '#de2396ff'
       orientation: TD
-    tileSize: 2
+    tileSize: 6
   subtitle: Art & Auction
   title: Hat Films Pottery
   vods:
@@ -71,7 +71,7 @@ streams:
       - '#de2396ff'
       - '#d1137bff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: ''
   title: A Night in With Pedguin
   vods:

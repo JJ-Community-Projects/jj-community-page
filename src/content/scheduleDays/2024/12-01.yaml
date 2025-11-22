@@ -20,7 +20,7 @@ streams:
           - '#3484bf'
           - '#3484bf'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Tree Decorating
     title: Office Cam
     vods:
@@ -42,7 +42,7 @@ streams:
           - '#3484bf'
           - '#3484bf'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Tom & Ben
     title: Jingle Jam Hype Stream
     vods:
@@ -64,7 +64,7 @@ streams:
           - '#3484bf'
           - '#3484bf'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Lewis & Simon
     title: Jingle Cats
     vods:
@@ -91,7 +91,7 @@ streams:
           - '#3484bf'
           - '#3484bf'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Spiff, Lewis & Friends
     title: Christmas Trains
     vods:

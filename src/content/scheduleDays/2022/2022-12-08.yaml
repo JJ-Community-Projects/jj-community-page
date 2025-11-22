@@ -12,7 +12,7 @@ streams:
       - '#00bbe0ff'
       - '#0096d1ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Duncan & Osie
   title: Hangover Hangout
   vods:
@@ -35,7 +35,7 @@ streams:
       - '#0096d1ff'
       - '#0078c2ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Pedguin Plus Pals
   title: Pedguin's Pre Poker Party
   vods:
@@ -73,7 +73,7 @@ streams:
       - '#0078c2ff'
       - '#0059b3ff'
       orientation: TD
-    tileSize: 2
+    tileSize: 6
   subtitle: Pyrion Tom & many more Prize Pool by Displate
   title: Poker Night
   vods:

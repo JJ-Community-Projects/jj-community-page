@@ -14,7 +14,7 @@ streams:
       - '#ffd900ff'
       - '#ffcc00ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Ravs Sips Briony Breeh
   title: Extra Rips
   vods:
@@ -37,7 +37,7 @@ streams:
       - '#ffcc00ff'
       - '#ffbf00ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Hosted by Harry & Lydia
   title: Pokemon Tournament
   vods: []
@@ -53,7 +53,7 @@ streams:
       - '#ffbf00ff'
       - '#ffb300ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Oh No
   title: Spiff & RT break Minecraft
   vods:
@@ -73,7 +73,7 @@ streams:
       - '#ffb300ff'
       - '#ffa600ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Nilesy, Zylus & Rythian
   title: Protessional Stream
   vods: []

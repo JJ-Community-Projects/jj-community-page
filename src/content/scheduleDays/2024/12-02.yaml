@@ -12,7 +12,7 @@ streams:
           - '#fb9900'
           - '#fb9900'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Briony & Kirsty
     title: Cosy Games
     vods:
@@ -39,7 +39,7 @@ streams:
           - '#fb9900'
           - '#fb9900'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Wheelboy 2.0
     title: Tom's TABS
     vods:
@@ -72,7 +72,7 @@ streams:
           - '#fb9900'
           - '#fb9900'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Tournament Edition
     title: Feed A Cow for X-Mas
     description: |
@@ -109,7 +109,7 @@ streams:
           - '#fb9900'
           - '#fb9900'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Nilesy, Zylus, Breeh, Rythian
     title: Protessional Strem
     vods:

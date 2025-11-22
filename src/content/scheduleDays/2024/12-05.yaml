@@ -12,7 +12,7 @@ streams:
           - '#06b8aa'
           - '#06b8aa'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Spiff & Lewis
     title: Spiff U
     vods:
@@ -47,7 +47,7 @@ streams:
           - '#06b8aa'
           - '#06b8aa'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Jingle Joust
     title: Games Night Special
     description: Hosted by Ben & Alex
@@ -75,7 +75,7 @@ streams:
           - '#06b8aa'
           - '#06b8aa'
         orientation: TD
-      tileSize: 2
+      tileSize: 6
     subtitle: 11th Anniversary
     title: Civ 5
     description: >-

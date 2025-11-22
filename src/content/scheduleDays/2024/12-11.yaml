@@ -12,7 +12,7 @@ streams:
           - '#dd5501'
           - '#dd5501'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Pyrion & Ben
     title: Save the World
     vods:
@@ -36,7 +36,7 @@ streams:
           - '#dd5501'
           - '#dd5501'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Hat Films vs Zero Degree
     title: Hat Films Game Show
     vods:
@@ -58,7 +58,7 @@ streams:
           - '#dd5501'
           - '#dd5501'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Early Access
     title: Two Point Museum
     vods:
@@ -81,7 +81,7 @@ streams:
           - '#dd5501'
           - '#dd5501'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Hosted By Tom Clark Feat NRB
     title: Mystery Quest
     vods:

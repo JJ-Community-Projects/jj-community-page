@@ -12,7 +12,7 @@ streams:
       - '#00e8c5ff'
       - '#00e0b4ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Ben & Sips
   title: Dad Town
   vods:
@@ -34,7 +34,7 @@ streams:
       - '#00e0b4ff'
       - '#00d9a3ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Lewis & Zylus
   title: Chillout Clundle
   vods:
@@ -60,7 +60,7 @@ streams:
       - '#00d9a3ff'
       - '#00d196ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Hosted by Ben & Fionn
   title: IRL Plateup challenge
   vods:
@@ -83,7 +83,7 @@ streams:
       - '#00d196ff'
       - '#00c986ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Nilesy Rythian Breeh
   title: MSPaint Fighting Fantasy
   vods:
@@ -105,7 +105,7 @@ streams:
       - '#00c986ff'
       - '#00c278ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Shadow & Daltos
   title: Co-op Games
   vods:

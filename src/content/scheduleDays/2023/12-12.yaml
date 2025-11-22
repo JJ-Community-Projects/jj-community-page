@@ -15,7 +15,7 @@ streams:
       - '#00e8c5ff'
       - '#00dbacff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Ravs Sips Gee Rythian Mark
   title: Sweaty Shooters
   vods:
@@ -35,7 +35,7 @@ streams:
       - '#00dbacff'
       - '#00cf94ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Lewis Simon & Friends
   title: Pecular Portions
   vods:
@@ -53,7 +53,7 @@ streams:
       - '#00cf94ff'
       - '#00c27eff'
       orientation: TD
-    tileSize: 2
+    tileSize: 6
   subtitle: ''
   title: Hat Films Music Stream
   vods:

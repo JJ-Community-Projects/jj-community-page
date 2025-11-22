@@ -9,7 +9,7 @@ streams:
           - '#ffd900ff'
           - '#ffcc00ff'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Mousie & Zylus
     title: Stocking Stuffers
     creators:
@@ -28,7 +28,7 @@ streams:
           - '#ffcc00ff'
           - '#ffc400ff'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Sips Ravs Ped Glermz
     title: Don't Starve
     creators:
@@ -48,7 +48,7 @@ streams:
           - '#ffc400ff'
           - '#ffb700ff'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Bouphe Lydia Boba Gemma
     title: Slag Sleepover
     creators:
@@ -68,7 +68,7 @@ streams:
           - '#ffb700ff'
           - '#ffae00ff'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Nilsey, Zylus & Friends
     title: Protessional Strem
     creators:
@@ -89,7 +89,7 @@ streams:
           - '#ffae00ff'
           - '#ffa200ff'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: With Daltos
     title: PoxNora
     creators:

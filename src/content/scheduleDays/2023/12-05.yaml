@@ -11,7 +11,7 @@ streams:
       - '#00e8c5ff'
       - '#00deb1ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Martyn Solidarity Sparkles
   title: Chunklock Minecraft
   vods:
@@ -36,7 +36,7 @@ streams:
       - '#00deb1ff'
       - '#00d49bff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Simon Gee Tom Harry Sarah
   title: Simon's Important Videos
   vods:
@@ -64,7 +64,7 @@ streams:
       - '#00d49bff'
       - '#00c98aff'
       orientation: TD
-    tileSize: 2
+    tileSize: 6
   subtitle: ''
   title: Civ 5 on the 5th
   vods:

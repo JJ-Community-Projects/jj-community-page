@@ -12,7 +12,7 @@ streams:
       - '#f74accff'
       - '#ed39b7ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Fionn & Lolip
   title: 2-Player Coop
   vods:
@@ -32,7 +32,7 @@ streams:
       - '#ed39b7ff'
       - '#e329a2ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: ''
   title: Civ 6 on the 6th
   vods:
@@ -62,7 +62,7 @@ streams:
       - '#e329a2ff'
       - '#d91a89ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Hosted by Simon Clark
   title: Who wants to be a Millionaire
   vods:
@@ -84,7 +84,7 @@ streams:
       - '#d91a89ff'
       - '#cf0c74ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Rythian & Nilesy
   title: Cats & more
   vods:

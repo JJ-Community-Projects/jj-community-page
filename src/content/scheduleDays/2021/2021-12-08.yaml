@@ -12,7 +12,7 @@ streams:
       - '#00bbe0ff'
       - '#0096d1ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Briony & Rythian
   title: Hidden Gems
   vods:
@@ -36,7 +36,7 @@ streams:
       - '#0096d1ff'
       - '#0078c2ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: ''
   title: Main Channel Crew
   vods:
@@ -54,7 +54,7 @@ streams:
       - '#0078c2ff'
       - '#0059b3ff'
       orientation: TD
-    tileSize: 2
+    tileSize: 6
   subtitle: ''
   title: Hat Films Christmas Album
   vods:

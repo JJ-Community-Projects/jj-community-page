@@ -9,7 +9,7 @@ streams:
           - '#f74accff'
           - '#ed39b7ff'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Lewis & Spiff
     title: Stocking Stuffers
     creators:
@@ -28,7 +28,7 @@ streams:
           - '#ed39b7ff'
           - '#e329a2ff'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Ped, Ravs Boba & Leo
     title: Stocking Stuffers
     creators:
@@ -48,7 +48,7 @@ streams:
           - '#e329a2ff'
           - '#d91a89ff'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: ''
     title: High Rollers Christmas Special
     creators:
@@ -68,7 +68,7 @@ streams:
           - '#d91a89ff'
           - '#cf0c74ff'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Ravs, Sips, Gee Rythian & Mark Hulmes
     title: Sweaty Shooters
     creators:

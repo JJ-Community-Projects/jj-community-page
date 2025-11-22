@@ -13,7 +13,7 @@ streams:
       - '#f74accff'
       - '#ed39b7ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Lydia, Mousie & Zylus
   title: Games
   vods:
@@ -30,7 +30,7 @@ streams:
       - '#ed39b7ff'
       - '#e329a2ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: ''
   title: Game Jam Final
   vods:
@@ -55,7 +55,7 @@ streams:
       - '#e329a2ff'
       - '#d91a89ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: Hosted by Dr Simon Clark
   title: Big Fat Quiz
   vods:
@@ -75,7 +75,7 @@ streams:
       - '#d91a89ff'
       - '#cf0c74ff'
       orientation: TD
-    tileSize: 1
+    tileSize: 3
   subtitle: ''
   title: Terraria
   vods: []

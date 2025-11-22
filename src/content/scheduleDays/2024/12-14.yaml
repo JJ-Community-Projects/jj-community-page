@@ -12,7 +12,7 @@ streams:
           - '#f07800'
           - '#f07800'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Pyrion & Zylus
     title: Frosty Bros
     vods:
@@ -35,7 +35,7 @@ streams:
           - '#f07800'
           - '#f07800'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Simon, Lewis & Nina
     title: Fighting Fantasy
     vods:
@@ -58,7 +58,7 @@ streams:
           - '#f07800'
           - '#f07800'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Feat. Jack Manifold
     title: Coffee with Pyrion
     vods:
@@ -91,7 +91,7 @@ streams:
           - '#f07800'
           - '#f07800'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Hosted By Breeh
     title: Late Late Crew
     vods:

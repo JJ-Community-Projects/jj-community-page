@@ -9,7 +9,7 @@ streams:
           - '#fc7600ff'
           - '#f76300ff'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Kim, Tom H & Rhiannon
     title: Stocking Stuffers
     creators:
@@ -28,7 +28,7 @@ streams:
           - '#f76300ff'
           - '#f25100ff'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: ''
     title: Yogs Game Jam Finals
     creators:
@@ -47,7 +47,7 @@ streams:
           - '#f25100ff'
           - '#ed3b00ff'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: ''
     title: Simon's Important Videos
     creators:
@@ -67,7 +67,7 @@ streams:
           - '#ed3b00ff'
           - '#e82b00ff'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: subtitle
     title: Spiff & PFlax CSGO Scrub Tourny
     creators:

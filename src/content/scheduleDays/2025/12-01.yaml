@@ -10,7 +10,7 @@ streams:
           - '#3484bf'
           - '#3484bf'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     title: Decorating the Tree
     subtitle: Office Cam
     vods: []
@@ -24,7 +24,7 @@ streams:
           - '#3484bf'
           - '#3484bf'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Another subtitle
     title: Tom & Ben
     vods: []
@@ -38,7 +38,7 @@ streams:
           - '#3484bf'
           - '#3484bf'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Lewis & Simon
     title: Jingle Cats
     vods: []
@@ -52,7 +52,7 @@ streams:
           - '#3484bf'
           - '#3484bf'
         orientation: TD
-      tileSize: 1
+      tileSize: 3
     subtitle: Lewis, Duncan, Spiff & Friends
     title: TRAINS AND GIN
     vods: []
