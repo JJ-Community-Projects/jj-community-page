@@ -82,15 +82,34 @@ export const YogsStreamTile: Component<YogsStreamTileProps> = (props) => {
       return 'line-clamp-1 text-pretty font-bold uppercase tracking-wide text-sm'
     }
 
+    if (tileSize() === 2) {
+      return 'line-clamp-3 text-pretty font-bold uppercase tracking-wide text-base'
+    }
+
     return 'text-pretty font-bold uppercase tracking-widest ~text-sm/2xl'
   }
-  const countdownStyle = () => {
+
+  const subtitleStyle = () => {
+
     if (tileSize() === 1) {
+      return '~text-xxs/xs text-pretty uppercase tracking-widest'
+    }
+
+    if (tileSize() === 2) {
+      return '~text-xs/sm text-pretty uppercase tracking-widest'
+    }
+
+    return '~text-sm/md text-pretty uppercase tracking-widest'
+  }
+
+  const countdownStyle = () => {
+    if (tileSize() <= 2) {
       return 'line-clamp-1 font-mono text-xxs font-bold lowercase'
     }
 
     return 'line-clamp-1 font-mono text-xs font-bold lowercase tracking-wide'
   }
+
   const liveStyle = () => {
     if (tileSize() === 1) {
       return '~text-xxs font-bold tracking-wide'
@@ -128,7 +147,7 @@ export const YogsStreamTile: Component<YogsStreamTileProps> = (props) => {
             >
               <p class={titleStyle()}>{title()}</p>
               <Show when={subtitle() && tileSize() > 1}>
-                <p class={'~text-xs/md text-pretty uppercase tracking-widest'}>
+                <p class={subtitleStyle()}>
                   {subtitle()}
                 </p>
               </Show>
