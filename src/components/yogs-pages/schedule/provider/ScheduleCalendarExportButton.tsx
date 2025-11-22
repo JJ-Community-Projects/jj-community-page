@@ -143,15 +143,15 @@ const CalendarDialogDialogBody: Component<CalendarDialogDialogBodyProps> = props
     )
   }
   return (
-    <div class={'flex h-full w-full flex-col rounded-3xl bg-white'}>
-      <div class={`bg-primary flex h-[72px] items-center justify-center rounded-t-3xl p-2 text-white shadow-xl`}>
+    <div class={'flex h-full w-full flex-col rounded-2xl bg-white'}>
+      <div class={`bg-primary flex max-h-[72px] items-center justify-center rounded-t-2xl p-2 text-white shadow-xl`}>
         <button onClick={onClose}>
-          <FaSolidXmark size={24} class={''}/>
+          <FaSolidXmark size={20} class={''}/>
         </button>
         <div class={'flex-1'}></div>
-        <h3 class={'text-2xl'}>Calendar Export</h3>
+        <h3 class={'text-xl'}>Calendar Export</h3>
         <div class={'flex-1'}></div>
-        <div class={'w-[24px]'}></div>
+        <div class={'w-[20px]'}></div>
       </div>
 
       <a
