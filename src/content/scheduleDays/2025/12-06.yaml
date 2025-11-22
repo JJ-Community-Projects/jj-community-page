@@ -37,7 +37,7 @@ streams:
           - '#d23d99'
           - '#d23d99'
         orientation: TD
-      tileSize: 3
+      tileSize: 4
     subtitle: ANNUAL QUIZ SHOW
     title: DR SIMON CLARK'S COUNTJAM!
     description: Creators are added as soon as they are confirmed.
@@ -52,7 +52,7 @@ streams:
           - '#d23d99'
           - '#d23d99'
         orientation: TD
-      tileSize: 3
+      tileSize: 2
     subtitle: TIL LATE!
     title: THE PROTESSIONAL STREM
     vods: []
