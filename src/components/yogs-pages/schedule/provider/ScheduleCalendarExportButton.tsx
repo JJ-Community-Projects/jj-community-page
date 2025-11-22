@@ -49,7 +49,7 @@ export const CalendarDialog: Component<CalendarDialogDialogProps> = props => {
       <Dialog.Portal>
         <Dialog.Overlay class={'fixed inset-0 z-50 bg-black bg-opacity-20'}/>
         <div class={'fixed inset-0 z-50 flex items-center justify-center'}>
-          <Dialog.Content class={'h-full w-full max-w-[500px] p-2 lg:w-[min(calc(100vw_-_16px),_500px)] lg:p-16'}>
+          <Dialog.Content class={'h-full max-sm:h-[70vh] w-full max-w-[500px] p-2 lg:w-[min(calc(100vw_-_16px),_500px)] lg:p-16'}>
             <CalendarDialogDialogBody onClose={modalSignal.close}/>
           </Dialog.Content>
         </div>
@@ -153,35 +153,34 @@ const CalendarDialogDialogBody: Component<CalendarDialogDialogBodyProps> = props
         <div class={'flex-1'}></div>
         <div class={'w-[20px]'}></div>
       </div>
-
-      <a
-        class={'flex flex-row items-center justify-start gap-1 px-2 py-2 text-sm'}
-        href={'https://support.google.com/calendar/answer/37118?co=GENIE.Platform%3DDesktop'}
-        target={'_blank'}
-      >
-        <FaSolidInfo/> How to import an .ics (iCal) file into Google Calendar
-      </a>
-      <p class={'px-2 py-2'}>Filtered streams: {filteredStreams().length}</p>
-      <p class={'px-2 py-2'}>This list of streams takes the creator filter into account</p>
-      <div class="p-2">
-        <label class="mb-2 block text-sm font-bold text-gray-700" for="search">
-          Search
-        </label>
-        <input
-          class="focus:shadow-outline w-full appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow focus:outline-none"
-          id="search"
-          type="text"
-          placeholder="Search"
-          value={search()}
-          onInput={e => {
-            const target = e.target as HTMLInputElement
-            if (target) {
-              setSearch(target.value)
-            }
-          }}
-        />
-      </div>
       <div class={'flex w-full flex-1 flex-col gap-2 overflow-auto p-2'}>
+        <a
+          class={'flex flex-row items-center justify-start gap-1 px-2 py-2 text-sm'}
+          href={'https://support.google.com/calendar/answer/37118?co=GENIE.Platform%3DDesktop'}
+          target={'_blank'}
+        >
+          <FaSolidInfo/> How to import an .ics (iCal) file into Google Calendar
+        </a>
+        <p class={'px-2 py-2'}>Filtered streams: {filteredStreams().length}</p>
+        <p class={'px-2 py-2'}>This list of streams takes the creator filter into account</p>
+        <div class="p-2">
+          <label class="mb-2 block text-sm font-bold text-gray-700" for="search">
+            Search
+          </label>
+          <input
+            class="focus:shadow-outline w-full appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow focus:outline-none"
+            id="search"
+            type="text"
+            placeholder="Search"
+            value={search()}
+            onInput={e => {
+              const target = e.target as HTMLInputElement
+              if (target) {
+                setSearch(target.value)
+              }
+            }}
+          />
+        </div>
         <For each={days()}>
           {day => {
 
