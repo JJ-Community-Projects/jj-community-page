@@ -16,7 +16,7 @@ streams:
     vods: []
   - creators: [sips, ravs, gee, rythian]
     duration_hours: 3
-    end: '2025-12-04T17:00:00Z'
+    end: '2025-12-04T16:00:00Z'
     start: '2025-12-04T14:00:00Z'
     style:
       background:
@@ -24,10 +24,23 @@ streams:
           - '#dd5501'
           - '#dd5501'
         orientation: TD
-      tileSize: 3
+      tileSize: 2
     title: SWEATY SHOOTERS
     vods: []
-  - creators: [lewis, zylus, briony]
+  - creators: []
+    duration_hours: 3
+    end: '2025-12-04T17:00:00Z'
+    start: '2025-12-04T16:00:00Z'
+    style:
+      background:
+        colors:
+          - '#dd5501'
+          - '#dd5501'
+        orientation: TD
+      tileSize: 1
+    title: Core Keeper Relay Finish!
+    vods: []
+  - creators: [lewis, zylus, briony,boba]
     duration_hours: 6
     start: '2025-12-04T17:00:00Z'
     end: '2025-12-05T00:00:00Z'

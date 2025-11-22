@@ -14,7 +14,7 @@ streams:
     subtitle: Lydia & Gee
     title: CHILL ADVENTURES
     vods: []
-  - creators: [briony]
+  - creators: [briony,boba]
     duration_hours: 3
     end: '2025-12-03T17:00:00Z'
     start: '2025-12-03T14:00:00Z'
@@ -29,9 +29,9 @@ streams:
     title: FESTIVUS MAXIMUS
     description: Creators are added as soon as they are confirmed.
     vods: []
-  - creators: [hat_films]
+  - creators: []
     duration_hours: 3
-    end: '2025-12-04T00:00:00Z'
+    end: '2025-12-04T18:00:00Z'
     start: '2025-12-03T17:00:00Z'
     style:
       background:
@@ -39,7 +39,20 @@ streams:
           - '#7aa70c'
           - '#7aa70c'
         orientation: TD
-      tileSize: 6
+      tileSize: 1
+    title: Core Keeper Relay Start!
+    vods: []
+  - creators: [hat_films]
+    duration_hours: 3
+    end: '2025-12-04T00:00:00Z'
+    start: '2025-12-03T18:00:00Z'
+    style:
+      background:
+        colors:
+          - '#7aa70c'
+          - '#7aa70c'
+        orientation: TD
+      tileSize: 5
     subtitle: ROSS, SMITH & TROTT
     title: HAT FILMS MUSIC STREAM
     vods: []

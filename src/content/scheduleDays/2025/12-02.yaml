@@ -14,7 +14,7 @@ streams:
     subtitle: BRIONY & KIRSTY
     title: WIZARD WARRIORS
     vods: []
-  - creators: [tom]
+  - creators: [tom,boba]
     duration_hours: 3
     end: '2025-12-02T17:00:00Z'
     start: '2025-12-02T14:00:00Z'
