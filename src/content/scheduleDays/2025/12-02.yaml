@@ -27,6 +27,7 @@ streams:
       tileSize: 3
     subtitle: Tom & Friends
     title: Tabs
+    description: Creators are added as soon as they are confirmed.
     vods: []
   - creators: [martyn]
     duration_hours: 3
@@ -41,6 +42,7 @@ streams:
       tileSize: 3
     subtitle: MINECRAFT WITH MARTYN AND FRIENDS
     title: HEART SCRAMBLE
+    description: Creators are added as soon as they are confirmed.
     vods: []
   - creators: [lewis, duncan]
     duration_hours: 3
@@ -55,4 +57,5 @@ streams:
       tileSize: 3
     subtitle: FARMING SIM
     title: YE OLDE FEEDE A COWE FOR XMAS
+    description: Creators are added as soon as they are confirmed.
     vods: []

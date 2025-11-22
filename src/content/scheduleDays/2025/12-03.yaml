@@ -14,7 +14,7 @@ streams:
     subtitle: Lydia & Gee
     title: CHILL ADVENTURES
     vods: []
-  - creators: []
+  - creators: [briony]
     duration_hours: 3
     end: '2025-12-03T17:00:00Z'
     start: '2025-12-03T14:00:00Z'
@@ -27,6 +27,7 @@ streams:
       tileSize: 3
     subtitle: Games Night Special
     title: FESTIVUS MAXIMUS
+    description: Creators are added as soon as they are confirmed.
     vods: []
   - creators: [hat_films]
     duration_hours: 3

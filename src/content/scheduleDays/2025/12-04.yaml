@@ -27,7 +27,7 @@ streams:
       tileSize: 3
     title: SWEATY SHOOTERS
     vods: []
-  - creators: [lewis, zylus]
+  - creators: [lewis, zylus, briony]
     duration_hours: 6
     start: '2025-12-04T17:00:00Z'
     end: '2025-12-05T00:00:00Z'
@@ -40,4 +40,5 @@ streams:
       tileSize: 6
     subtitle: LEWIS, ZYLUS & FRIENDS
     title: BLOOD ON THE CLOCKTOWER LIVE IN MINECRAFT
+    description: Creators are added as soon as they are confirmed.
     vods: []

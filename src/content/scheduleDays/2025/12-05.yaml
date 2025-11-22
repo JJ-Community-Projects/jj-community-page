@@ -27,6 +27,7 @@ streams:
       tileSize: 3
     subtitle: SIMON AND FRIENDS
     title: IMPORTANT VIDEOS
+    description: Creators are added as soon as they are confirmed.
     vods: []
   - creators: [lewis, duncan, spiff, kirsty, rythian, alex_the_rambler, daltos]
     duration_hours: 9

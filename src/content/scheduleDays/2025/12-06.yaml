@@ -27,7 +27,7 @@ streams:
       tileSize: 3
     title: COLOURING WITH KIRBY CREW
     vods: []
-  - creators: [simon_clark]
+  - creators: [simon_clark,briony]
     duration_hours: 4.5
     end: '2025-12-06T21:00:00Z'
     start: '2025-12-06T17:00:00Z'
@@ -40,6 +40,7 @@ streams:
       tileSize: 3
     subtitle: ANNUAL QUIZ SHOW
     title: DR SIMON CLARK'S COUNTJAM!
+    description: Creators are added as soon as they are confirmed.
     vods: []
   - creators: [nilesy, breeh, zylus]
     duration_hours: 3
