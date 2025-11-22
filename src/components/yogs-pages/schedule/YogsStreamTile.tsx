@@ -82,21 +82,27 @@ export const YogsStreamTile: Component<YogsStreamTileProps> = (props) => {
       return 'line-clamp-1 text-pretty font-bold uppercase tracking-wide text-base'
     }
 
-   if (tileSize() === 2 && (subtitle() === undefined || subtitle() === '')) {
+    if (tileSize() === 2 && (subtitle() === undefined || subtitle() === '')) {
       return 'line-clamp-2 text-pretty font-bold uppercase tracking-wide ~text-base/2xl'
-    } else if (tileSize() === 2 && !((subtitle() === undefined || subtitle() === ''))) {
+    } else if (
+      tileSize() === 2 &&
+      !(subtitle() === undefined || subtitle() === '')
+    ) {
       return 'line-clamp-2 text-pretty font-bold uppercase tracking-wide ~text-xs/lg'
     }
 
-    if (tileSize() === 4) {
-      return 'line-clamp-2 text-pretty font-bold uppercase tracking-widest ~text-sm/2xl'
+    if (tileSize() === 3) {
+      return 'text-pretty font-bold uppercase tracking-wide ~text-sm/2xl'
     }
 
-    return 'text-pretty font-bold uppercase tracking-widest ~text-sm/3xl'
+    if (tileSize() === 4) {
+      return 'line-clamp-3 text-pretty font-bold uppercase tracking-wide ~text-sm/2xl'
+    }
+
+    return 'text-pretty font-bold uppercase tracking-wide ~text-sm/3xl'
   }
 
   const subtitleStyle = () => {
-
     if (tileSize() === 1) {
       return '~text-xxs/sm text-pretty uppercase tracking-wide'
     }
@@ -106,18 +112,21 @@ export const YogsStreamTile: Component<YogsStreamTileProps> = (props) => {
     }
 
     if (tileSize() === 4) {
-      return '~text-xs/base text-pretty uppercase tracking-widest'
+      return '~text-xs/base text-pretty uppercase tracking-wide'
     }
 
-    return '~text-sm/lg text-pretty uppercase tracking-widest'
+    return '~text-xs/base text-pretty uppercase tracking-wide'
   }
 
   const countdownStyle = () => {
     if (tileSize() <= 1) {
       return 'line-clamp-1 font-mono text-xxs font-bold lowercase'
     }
+    if (tileSize() <= 2) {
+      return 'line-clamp-1 font-mono text-xs font-bold lowercase'
+    }
 
-    return 'line-clamp-1 font-mono text-xs font-bold lowercase tracking-wide'
+    return 'line-clamp-1 font-mono text-sm font-bold lowercase tracking-wide'
   }
 
   const liveStyle = () => {
@@ -141,7 +150,7 @@ export const YogsStreamTile: Component<YogsStreamTileProps> = (props) => {
           <button
             class={twMerge(
               'flex h-full w-full flex-col items-center justify-center rounded-2xl p-1 text-center transition-all',
-              enable() ? 'hover:scale-101 hover:brightness-105' : '',
+              enable() ? 'hover:scale-101 hover:brightness-102' : '',
             )}
             style={buttonStyle()}
             disabled={!enable()}
@@ -157,17 +166,13 @@ export const YogsStreamTile: Component<YogsStreamTileProps> = (props) => {
             >
               <p class={titleStyle()}>{title()}</p>
               <Show when={subtitle() && tileSize() > 1}>
-                <p class={subtitleStyle()}>
-                  {subtitle()}
-                </p>
+                <p class={subtitleStyle()}>{subtitle()}</p>
               </Show>
               <Show when={showCountdown()}>
                 <p class={countdownStyle()}>{countdown()}</p>
               </Show>
               <Show when={!showCountdown() && isLive()}>
-                <p class={liveStyle()}>
-                  LIVE
-                </p>
+                <p class={liveStyle()}>LIVE</p>
               </Show>
             </div>
             <Show when={tileSize() > 1}>

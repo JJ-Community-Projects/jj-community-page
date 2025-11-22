@@ -7,8 +7,8 @@ streams:
     style:
       background:
         colors:
-          - '#f07800'
-          - '#f07800'
+          - '#F07700'
+          - '#F07700'
         orientation: TD
       tileSize: 3
     subtitle: FIONN & MOUSIE
@@ -21,8 +21,8 @@ streams:
     style:
       background:
         colors:
-          - '#f07800'
-          - '#f07800'
+          - '#F07700'
+          - '#F07700'
         orientation: TD
       tileSize: 3
     subtitle: RAVS, SARAH OSIE & GEESTAR
@@ -35,8 +35,8 @@ streams:
     style:
       background:
         colors:
-          - '#f07800'
-          - '#f07800'
+          - '#F07700'
+          - '#F07700'
         orientation: TD
       tileSize: 6
     subtitle: HOSTED BY PYRION & TOM

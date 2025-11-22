@@ -7,8 +7,8 @@ streams:
     style:
       background:
         colors:
-          - '#dd5501'
-          - '#dd5501'
+          - '#DD5502'
+          - '#DD5502'
         orientation: TD
       tileSize: 3
     subtitle: Tom & Ben
@@ -21,8 +21,8 @@ streams:
     style:
       background:
         colors:
-          - '#dd5501'
-          - '#dd5501'
+          - '#DD5502'
+          - '#DD5502'
         orientation: TD
       tileSize: 2
     title: SWEATY SHOOTERS
@@ -34,8 +34,8 @@ streams:
     style:
       background:
         colors:
-          - '#dd5501'
-          - '#dd5501'
+          - '#DD5502'
+          - '#DD5502'
         orientation: TD
       tileSize: 1
     title: Core Keeper Relay Finish!
@@ -47,8 +47,8 @@ streams:
     style:
       background:
         colors:
-          - '#dd5501'
-          - '#dd5501'
+          - '#DD5502'
+          - '#DD5502'
         orientation: TD
       tileSize: 6
     subtitle: LEWIS, ZYLUS & FRIENDS

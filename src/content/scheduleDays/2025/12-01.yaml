@@ -7,8 +7,8 @@ streams:
     style:
       background:
         colors:
-          - '#3484bf'
-          - '#3484bf'
+          - '#3485C0'
+          - '#3485C0'
         orientation: TD
       tileSize: 3
     title: Decorating the Tree
@@ -22,8 +22,8 @@ streams:
     style:
       background:
         colors:
-          - '#3484bf'
-          - '#3484bf'
+          - '#3485C0'
+          - '#3485C0'
         orientation: TD
       tileSize: 3
     subtitle: Another subtitle
@@ -36,8 +36,8 @@ streams:
     style:
       background:
         colors:
-          - '#3484bf'
-          - '#3484bf'
+          - '#3485C0'
+          - '#3485C0'
         orientation: TD
       tileSize: 3
     subtitle: Lewis & Simon
@@ -50,8 +50,8 @@ streams:
     style:
       background:
         colors:
-          - '#3484bf'
-          - '#3484bf'
+          - '#3485C0'
+          - '#3485C0'
         orientation: TD
       tileSize: 3
     subtitle: Lewis, Duncan, Spiff & Friends

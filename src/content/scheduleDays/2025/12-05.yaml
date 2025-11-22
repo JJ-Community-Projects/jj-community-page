@@ -7,8 +7,8 @@ streams:
     style:
       background:
         colors:
-          - '#06b8aa'
-          - '#06b8aa'
+          - '#05B8AA'
+          - '#05B8AA'
         orientation: TD
       tileSize: 3
     subtitle: Martyn & Boba
@@ -21,8 +21,8 @@ streams:
     style:
       background:
         colors:
-          - '#06b8aa'
-          - '#06b8aa'
+          - '#05B8AA'
+          - '#05B8AA'
         orientation: TD
       tileSize: 3
     subtitle: SIMON AND FRIENDS
@@ -36,8 +36,8 @@ streams:
     style:
       background:
         colors:
-          - '#06b8aa'
-          - '#06b8aa'
+          - '#05B8AA'
+          - '#05B8AA'
         orientation: TD
       tileSize: 6
     subtitle: LEWIS, DUNCAN, SPIFF, KIRSTY, RYTHIAN, RAMBLER, DALTOS

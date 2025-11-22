@@ -7,8 +7,8 @@ streams:
     style:
       background:
         colors:
-          - '#d23d99'
-          - '#d23d99'
+          - '#D23D99'
+          - '#D23D99'
         orientation: TD
       tileSize: 3
     subtitle: BOUPHE & GEE
@@ -21,8 +21,8 @@ streams:
     style:
       background:
         colors:
-          - '#d23d99'
-          - '#d23d99'
+          - '#D23D99'
+          - '#D23D99'
         orientation: TD
       tileSize: 3
     title: COLOURING WITH KIRBY CREW
@@ -34,8 +34,8 @@ streams:
     style:
       background:
         colors:
-          - '#d23d99'
-          - '#d23d99'
+          - '#D23D99'
+          - '#D23D99'
         orientation: TD
       tileSize: 4
     subtitle: ANNUAL QUIZ SHOW
@@ -49,8 +49,8 @@ streams:
     style:
       background:
         colors:
-          - '#d23d99'
-          - '#d23d99'
+          - '#D23D99'
+          - '#D23D99'
         orientation: TD
       tileSize: 2
     subtitle: TIL LATE!

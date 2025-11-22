@@ -7,8 +7,8 @@ streams:
     style:
       background:
         colors:
-          - '#7aa70c'
-          - '#7aa70c'
+          - '#7AA70E'
+          - '#7AA70E'
         orientation: TD
       tileSize: 3
     subtitle: Lydia & Gee
@@ -21,8 +21,8 @@ streams:
     style:
       background:
         colors:
-          - '#7aa70c'
-          - '#7aa70c'
+          - '#7AA70E'
+          - '#7AA70E'
         orientation: TD
       tileSize: 3
     subtitle: Games Night Special
@@ -36,8 +36,8 @@ streams:
     style:
       background:
         colors:
-          - '#7aa70c'
-          - '#7aa70c'
+          - '#7AA70E'
+          - '#7AA70E'
         orientation: TD
       tileSize: 1
     title: Core Keeper Relay Start!
@@ -49,8 +49,8 @@ streams:
     style:
       background:
         colors:
-          - '#7aa70c'
-          - '#7aa70c'
+          - '#7AA70E'
+          - '#7AA70E'
         orientation: TD
       tileSize: 5
     subtitle: ROSS, SMITH & TROTT

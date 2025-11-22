@@ -72,7 +72,7 @@ export function jjDatesToColors(jjStart: DateTime): Record<number, number> {
  * @param {string} shade - The color shade to use (default: '500')
  * @returns {string} The hex color code for the stream
  */
-export function getStreamColor(streamStart: DateTime, shade: string = '500'): string {
+export function getStreamColor(streamStart: DateTime, shade: number = 500): string {
   // Calculate December 1st of the same year (Jingle Jam start)
   const jjStart = DateTime.fromObject({ month: 12, day: 1, year: streamStart.year });
 

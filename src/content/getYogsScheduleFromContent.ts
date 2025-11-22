@@ -108,7 +108,7 @@ export async function getYogsScheduleFromContent(
           end: s.end,
           creators,
           vods,
-          color: colorMap['500'],
+          color: colorMap[500],
           size: s.style.tileSize,
         }
 
