@@ -92,14 +92,14 @@ export const YogsStreamTile: Component<YogsStreamTileProps> = (props) => {
     }
 
     if (tileSize() === 3) {
-      return 'text-pretty font-bold uppercase tracking-wide ~text-sm/2xl'
+      return 'text-pretty font-bold uppercase tracking-widest ~text-sm/2xl'
     }
 
     if (tileSize() === 4) {
-      return 'line-clamp-3 text-pretty font-bold uppercase tracking-wide ~text-sm/2xl'
+      return 'line-clamp-3 text-pretty font-bold uppercase tracking-widest ~text-sm/2xl'
     }
 
-    return 'text-pretty font-bold uppercase tracking-wide ~text-sm/3xl'
+    return 'text-pretty font-bold uppercase tracking-widest ~text-sm/3xl'
   }
 
   const subtitleStyle = () => {
@@ -112,10 +112,10 @@ export const YogsStreamTile: Component<YogsStreamTileProps> = (props) => {
     }
 
     if (tileSize() === 4) {
-      return '~text-xs/base text-pretty uppercase tracking-wide'
+      return '~text-xs/base text-pretty uppercase tracking-widest'
     }
 
-    return '~text-xs/base text-pretty uppercase tracking-wide'
+    return '~text-xs/base text-pretty uppercase tracking-widest'
   }
 
   const countdownStyle = () => {
