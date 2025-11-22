@@ -5,9 +5,7 @@ import type {
   YogsSchedule,
 } from '../../../lib/orpc/private/yogs/contract.ts'
 import { PlaceholderSchedule } from './placeholder/PlaceholderSchedule.tsx'
-import { Countdown } from '../../common/ui/Countdown.tsx'
 import { MobileYogsScheduleComponent } from './mobile/MobileYogsScheduleComponent.tsx'
-import { YogsScheduleDisclaimer } from './YogsScheduleDisclaimer.tsx'
 import { QueryClientProvider, useQuery } from '@tanstack/solid-query'
 import { orpcPrivate } from '../../../lib/orpc/client.ts'
 import { QueryClient } from '@tanstack/query-core'
@@ -169,11 +167,11 @@ const Body: Component<BodyProps> = (props) => {
     <Switch>
       <Match when={schedule.data}>
         <>
-          <div class="desktop-schedule flex w-full flex-col items-center justify-center">
+          <div class="desktop-schedule flex w-full flex-col items-center justify-center gap-2">
             <YogsScheduleComponent
               schedule={schedule.data!}
               creators={props.creators}
-            ></YogsScheduleComponent>
+            />
             <Show when={schedule.data?.updatedAt}>
               {(updatedAt) => {
                 return (
@@ -192,11 +190,11 @@ const Body: Component<BodyProps> = (props) => {
               }}
             </Show>
           </div>
-          <div class="mobile-schedule flex w-full flex-col items-center justify-center">
+          <div class="mobile-schedule flex w-full flex-col items-center justify-center gap-2">
             <MobileYogsScheduleComponent
               schedule={schedule.data!}
               creators={props.creators}
-            ></MobileYogsScheduleComponent>
+            />
             <Show when={schedule.data?.updatedAt}>
               {(updatedAt) => {
                 return (
@@ -213,7 +211,6 @@ const Body: Component<BodyProps> = (props) => {
                 )
               }}
             </Show>
-            <YogsScheduleDisclaimer />
           </div>
           <div
             class={
