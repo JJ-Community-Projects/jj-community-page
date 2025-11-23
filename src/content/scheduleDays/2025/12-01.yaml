@@ -43,7 +43,7 @@ streams:
     subtitle: Lewis & Simon
     title: Jingle Cats
     vods: []
-  - creators: [lewis, duncan, spiff]
+  - creators: [lewis, duncan, spiff, pedguin]
     duration_hours: 3
     end: '2025-12-01T23:00:00Z'
     start: '2025-12-01T20:00:00Z'

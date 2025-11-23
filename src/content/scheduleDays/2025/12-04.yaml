@@ -27,7 +27,7 @@ streams:
       tileSize: 2
     title: SWEATY SHOOTERS
     vods: []
-  - creators: []
+  - creators: [pedguin]
     duration_hours: 3
     end: '2025-12-04T17:00:00Z'
     start: '2025-12-04T16:00:00Z'

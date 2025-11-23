@@ -29,7 +29,7 @@ streams:
     title: FESTIVUS MAXIMUS
     description: Creators are added as soon as they are confirmed.
     vods: []
-  - creators: []
+  - creators: [pedguin]
     duration_hours: 3
     end: '2025-12-04T18:00:00Z'
     start: '2025-12-03T17:00:00Z'
