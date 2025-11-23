@@ -1,4 +1,5 @@
 import fluid, { extract, fontSize, screens } from 'fluid-tailwind'
+import { scheduleSlotContainerHeight } from './scheduleSlotContainerHeight.ts'
 
 const { fontFamily } = require('tailwindcss/defaultTheme')
 
@@ -398,6 +399,7 @@ export default {
   },
   plugins: [
     fluid,
+    scheduleSlotContainerHeight,
     require('@tailwindcss/container-queries'),
     require('tailwind-scrollbar'),
     require('@tailwindcss/typography'),

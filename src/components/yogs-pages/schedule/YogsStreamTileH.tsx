@@ -23,7 +23,7 @@ interface YogsStreamTileProps {
   stream: YogsStream
 }
 
-export const YogsStreamTile: Component<YogsStreamTileProps> = (props) => {
+export const YogsStreamTileH: Component<YogsStreamTileProps> = (props) => {
   const modal = createModalSignal()
 
   const { isSlotPartOfFilter } = useCreatorFilter()
@@ -39,12 +39,12 @@ export const YogsStreamTile: Component<YogsStreamTileProps> = (props) => {
     if (enable()) {
       return {
         'background-color': color(),
-        color: getTextColor(color()),
+        color: 'white',//getTextColor(color()),
       }
     } else {
       return {
         'background-color': color(),
-        color: getTextColor(color()),
+        color: 'white',//getTextColor(color()),
         filter: 'brightness(0.5)',
       }
     }
@@ -77,66 +77,6 @@ export const YogsStreamTile: Component<YogsStreamTileProps> = (props) => {
     return d.toFormat("d'd' hh'h' mm'm' ss's'")
   }
 
-  const titleStyle = () => {
-    if (tileSize() === 1) {
-      return 'line-clamp-1 text-pretty font-bold uppercase tracking-wide text-base'
-    }
-
-    if (tileSize() === 2 && (subtitle() === undefined || subtitle() === '')) {
-      return 'line-clamp-2 text-pretty font-bold uppercase tracking-wide ~text-base/2xl'
-    } else if (
-      tileSize() === 2 &&
-      !(subtitle() === undefined || subtitle() === '')
-    ) {
-      return 'line-clamp-2 text-pretty font-bold uppercase tracking-wide ~text-xs/base'
-    }
-
-    if (tileSize() === 3) {
-      return 'text-pretty font-bold uppercase tracking-widest ~text-sm/2xl'
-    }
-
-    if (tileSize() === 4) {
-      return 'line-clamp-3 text-pretty font-bold uppercase tracking-widest ~text-sm/2xl'
-    }
-
-    return 'text-pretty font-bold uppercase tracking-widest ~text-sm/3xl'
-  }
-
-  const subtitleStyle = () => {
-    if (tileSize() === 1) {
-      return '~text-xs/sm text-pretty uppercase tracking-wide'
-    }
-
-    if (tileSize() === 2) {
-      return '~text-xs/sm text-pretty uppercase tracking-wide'
-    }
-
-    if (tileSize() === 4) {
-      return '~text-xs/base text-pretty uppercase tracking-widest'
-    }
-
-    return '~text-xs/base text-pretty uppercase tracking-widest'
-  }
-
-  const countdownStyle = () => {
-    if (tileSize() <= 1) {
-      return 'line-clamp-1 font-mono text-xxs font-bold lowercase'
-    }
-    if (tileSize() <= 2) {
-      return 'line-clamp-1 font-mono text-xs font-bold lowercase'
-    }
-
-    return 'line-clamp-1 font-mono text-sm font-bold lowercase tracking-wide'
-  }
-
-  const liveStyle = () => {
-    if (tileSize() === 1) {
-      return '~text-xxxs font-bold tracking-wide'
-    }
-
-    return '~text-base/lg font-bold tracking-wide'
-  }
-
   return (
     <div
       style={{
@@ -161,25 +101,20 @@ export const YogsStreamTile: Component<YogsStreamTileProps> = (props) => {
               modal.open()
             }}
           >
+            {/* The outer div is the height-based container using your plugin */}
             <div
               class={
-                'flex h-full w-full flex-col items-center justify-center @container'
+                `schedule-slot flex h-full w-full flex-col items-center justify-center bg-yellow-700`
               }
             >
-              <p class={titleStyle()}>{title()}</p>
-              <Show when={subtitle() && tileSize() > 1}>
-                <p class={subtitleStyle()}>{subtitle()}</p>
-              </Show>
-              <Show when={showCountdown()}>
-                <p class={countdownStyle()}>{countdown()}</p>
-              </Show>
-              <Show when={!showCountdown() && isLive()}>
-                <p class={liveStyle()}>LIVE</p>
-              </Show>
+              {/* Apply responsive classes */}
+              <p class={'text-xs @xs:bg-red-500 @sm:bg-yellow-500 @md:bg-green-500 @lg:bg-blue-500'}>{title()}</p>
+
+
+              {/* Note: Removed the Show when={tileSize() > 1} around Indicator
+                   because the Indicator itself can now hide/show/scale based on
+                   container height using its own classes. */}
             </div>
-            <Show when={tileSize() > 1}>
-              <Indicator stream={props.stream} />
-            </Show>
           </button>
         </LivePulse>
       </div>
@@ -188,10 +123,11 @@ export const YogsStreamTile: Component<YogsStreamTileProps> = (props) => {
   )
 }
 
+// --- Minor Update to Indicator Component ---
+
 interface IndicatorProps {
   stream: YogsStream
 }
-
 export const Indicator: Component<IndicatorProps> = (props) => {
   const vodTypes = () => props.stream.vods?.map((vod) => vod.type) ?? []
 
@@ -203,34 +139,33 @@ export const Indicator: Component<IndicatorProps> = (props) => {
     return vodTypes().includes('twitch')
   }
 
-  return (
-    <>
-      <div class={'hidden w-full flex-row justify-around xl:flex'}>
-        <Show when={hasTwitchVod()}>
-          <BiLogosTwitch size={14} />
-        </Show>
-        <Show when={hasYoutubeVod()}>
-          <BiLogosYoutube size={14} />
-        </Show>
-        <Show when={(props.stream.creators?.length ?? 0) > 0}>
-          <BsPeopleFill size={14} />
-        </Show>
-      </div>
+  // New logic: Use container height queries to control icon size and visibility.
+  // We'll use the icons directly in one div and let the container height control their size.
 
-      <div class={'flex w-full flex-row justify-around xl:hidden'}>
-        <Show when={hasTwitchVod()}>
-          <BiLogosTwitch size={10} />
-        </Show>
-        <Show when={hasYoutubeVod()}>
-          <BiLogosYoutube size={10} />
-        </Show>
-        <Show when={(props.stream.creators?.length ?? 0) > 0}>
-          <BsPeopleFill size={0} />
-        </Show>
-      </div>
-    </>
+  return (
+    <div
+      class={twMerge(
+        // Hidden for extra-small containers
+        'hidden @2x:flex w-full flex-row justify-around mt-1',
+        // Control icon size with container queries and Fluid.tw
+      )}
+    >
+      <Show when={hasTwitchVod()}>
+        {/* These icons will scale with the parent div's font size (text-sm/text-base/lg) */}
+        <BiLogosTwitch size="1em" />
+      </Show>
+      <Show when={hasYoutubeVod()}>
+        <BiLogosYoutube size="1em" />
+      </Show>
+      <Show when={(props.stream.creators?.length ?? 0) > 0}>
+        <BsPeopleFill size="1em" />
+      </Show>
+    </div>
   )
 }
+
+// ... (LivePulse component remains unchanged)
+
 
 interface LivePulseProps {
   stream: YogsStream

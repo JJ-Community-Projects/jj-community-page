@@ -3,6 +3,7 @@ import { YogsStreamTile } from './YogsStreamTile.tsx'
 import { DateTime } from 'luxon'
 import type { YogsScheduleDay as Day } from '../../../lib/orpc/private/yogs/contract.ts'
 import { rangeFromData } from '../../../lib/utils/rangeFromData.ts'
+import { YogsStreamTileH } from './YogsStreamTileH.tsx'
 
 
 interface YogsScheduleDayProps {
@@ -24,7 +25,7 @@ interface ScheduleDayBodyProps {
 
 const ScheduleDayBody: Component<ScheduleDayBodyProps> = props => {
   return (
-    <For each={props.day.streams}>{stream => <YogsStreamTile stream={stream}/>}</For>
+    <For each={props.day.streams}>{stream => <YogsStreamTileH stream={stream}/>}</For>
   )
 }
 
