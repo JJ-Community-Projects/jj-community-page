@@ -1,0 +1,61 @@
+/* * Defines the custom container for height-based queries and applies styles
+ * based on the container's height (min-height).
+ */
+
+/* * 1. Container Definition
+ * Apply this class to the element whose height you want to measure.
+ * We use 'size' which enables querying both width and height.
+ */
+.schedule-slot-container {
+    container-type: size;
+    /* Optional: Set a specific name if you need to query nested containers,
+       but we will omit it here as we are using the default unnamed container */
+}
+
+/* * 2. Base Styles (Default/Fallback)
+ * Apply this to the title element inside the container.
+ */
+.schedule-slot-title {
+    @apply line-clamp-1 text-pretty font-semibold uppercase tracking-wide text-xs
+}
+
+/* * 3. Height-Based Breakpoints (using min-height queries)
+ * The syntax is: @container (min-height: [value]) { .class-to-style { ... } }
+ */
+
+
+
+@container (min-height: 50px) {
+    .schedule-slot-title {
+        @apply line-clamp-1 text-base
+    }
+}
+
+@container (min-height: 100px) {
+    .schedule-slot-title {
+        @apply tracking-wider line-clamp-2 ~text-xs/base
+    }
+}
+
+@container (min-height: 150px) {
+    .schedule-slot-title {
+        @apply tracking-widest ~text-sm/2xl line-clamp-3
+    }
+}
+
+
+@container (min-height: 250px) {
+    .schedule-slot-title {
+        @apply ~text-sm/3xl line-clamp-none
+    }
+}
+
+@container (min-height: 450px) {
+    .schedule-slot-title {
+    }
+}
+
+@container (min-height: 600px) {
+    .schedule-slot-title {
+    }
+}

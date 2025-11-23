@@ -18,6 +18,7 @@ import type { YogsStream } from '../../../lib/orpc/private/yogs/contract.ts'
 
 import { logSlotClick } from '../../../lib/analytics.ts'
 import { createModalSignal } from '../../../lib/createModalSignal.ts'
+import './YogsStreamTileH.css'
 
 interface YogsStreamTileProps {
   stream: YogsStream
@@ -39,12 +40,12 @@ export const YogsStreamTileH: Component<YogsStreamTileProps> = (props) => {
     if (enable()) {
       return {
         'background-color': color(),
-        color: 'white',//getTextColor(color()),
+        color: getTextColor(color()),
       }
     } else {
       return {
         'background-color': color(),
-        color: 'white',//getTextColor(color()),
+        color: getTextColor(color()),
         filter: 'brightness(0.5)',
       }
     }
@@ -85,7 +86,7 @@ export const YogsStreamTileH: Component<YogsStreamTileProps> = (props) => {
       }}
       class={'group'}
     >
-      <div class="h-full w-full">
+      <div class="schedule-slot-container h-full w-full">
         <LivePulse stream={stream()}>
           <button
             class={twMerge(
@@ -104,11 +105,11 @@ export const YogsStreamTileH: Component<YogsStreamTileProps> = (props) => {
             {/* The outer div is the height-based container using your plugin */}
             <div
               class={
-                `schedule-slot flex h-full w-full flex-col items-center justify-center bg-yellow-700`
+                `flex h-full w-full flex-col items-center justify-center`
               }
             >
               {/* Apply responsive classes */}
-              <p class={'text-xs @xs:bg-red-500 @sm:bg-yellow-500 @md:bg-green-500 @lg:bg-blue-500'}>{title()}</p>
+              <p class={'schedule-slot-title'}>{title()}</p>
 
 
               {/* Note: Removed the Show when={tileSize() > 1} around Indicator

@@ -399,7 +399,6 @@ export default {
   },
   plugins: [
     fluid,
-    scheduleSlotContainerHeight,
     require('@tailwindcss/container-queries'),
     require('tailwind-scrollbar'),
     require('@tailwindcss/typography'),
