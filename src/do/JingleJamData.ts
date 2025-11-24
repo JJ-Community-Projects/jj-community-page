@@ -214,8 +214,9 @@ export class JingleJamData extends DurableObject<Env> {
         `Failed to fetch JingleJam campaigns: ${res.status} ${res.statusText}`,
       )
     }
-
-    return (await res.json()) as JingleJamCampaignsResponse
+    const data = (await res.json()) as JingleJamCampaignsResponse
+    console.log('fetchCampaigns', data.campaigns.count)
+    return data
   }
 
   public async refreshAllCampaigns() {
@@ -240,7 +241,7 @@ export class JingleJamData extends DurableObject<Env> {
 
         offset += limit
       }
-
+      console.log('refreshAllCampaigns', 'all', all.length)
       await this.setCampaigns(all)
     } catch (e) {
       console.error('refreshAllCampaigns failed', e)
