@@ -60,6 +60,8 @@ const showBanner = now > showStart && now < showEnd;
   }
 
 <script is:inline>
+  const now = new Date();
+  const year = now.getFullYear();
   const feedbackLocalstorage = window.localStorage;
   const button = document.getElementById(`feedback-${year}-banner-banner-got-it`);
 
