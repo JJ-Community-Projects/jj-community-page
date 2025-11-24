@@ -2,15 +2,31 @@
 
 import TVExtBanner from '../../shared/TVExtBanner.astro'
 import ShareBanner from '../../shared/ShareBanner.astro'
+import CommunityBanner from '../../shared/CommunityBanner.astro'
 const now = new Date();
 const tvExtBannerId = `tv-ext-banner-${now.getFullYear()}`;
+const communityBannerId = `community-banner-${now.getFullYear()}`;
 const shareBannerId = `share-banner-${now.getFullYear()}`;
+
+const shareBannerShowFrom = `${now.getFullYear()}-11-28`
+const shareBannerShowUntil = `${now.getFullYear()}-12-14`
+
+const communityBannerShowFrom = `${now.getFullYear()}-12-01`
+const communityBannerShowUntil = `${now.getFullYear()}-12-14`
 ---
+<CommunityBanner
+  id={communityBannerId}
+  showFrom={communityBannerShowFrom}
+  showUntil={communityBannerShowUntil}
+/>
 <ShareBanner
   id={shareBannerId}
-  showFrom={`${now.getFullYear()}-11-28`}
+  showFrom={shareBannerShowFrom}
+  showUntil={shareBannerShowUntil}
+  dependenceOn={communityBannerId}
 />
+{/*
 <TVExtBanner
   id={tvExtBannerId}
   dependenceOn={shareBannerId}
-/>
+/>*/}

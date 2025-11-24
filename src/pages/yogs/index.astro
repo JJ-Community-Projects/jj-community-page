@@ -1,4 +1,5 @@
 ---
+import YogsBanner from '../../components/yogs-pages/common/YogsBanner.astro'
 export const prerender = false
 import BaseLayoutYogs from '../../layouts/BaseLayoutYogs.astro'
 import { getYogsScheduleFromContent } from '../../content/getYogsScheduleFromContent.ts'
@@ -268,7 +269,7 @@ const ogImage = preRenderdImageExists
   }}
   schedule={currentSchedule}
 >
-  <!-- TODO add new banners -->
+  <YogsBanner/>
 
   <div class={'min-h-32'}>
     <YogsCurrentScheduleLoader

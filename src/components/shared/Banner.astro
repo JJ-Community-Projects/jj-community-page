@@ -30,7 +30,7 @@ const withinWindow =
 
 // Compute a stable storage key
 const baseKey = props.id ?? props.title ?? 'banner'
-const storageKey = `generic-banner:${baseKey}`
+const storageKey = `${baseKey}`
 const elementId = storageKey.replace(/[^a-zA-Z0-9_-]/g, '_')
 ---
 {withinWindow && (
@@ -42,7 +42,7 @@ const elementId = storageKey.replace(/[^a-zA-Z0-9_-]/g, '_')
       }`}
       data-generic-banner
       data-storage-key={storageKey}
-      data-depence-on={props.dependenceOn}
+      data-dependence-on={props.dependenceOn}
     >
       {props.title && <p class="text-lg font-semibold">{props.title}</p>}
       <div class="flex flex-col items-center justify-center text-wrap text-center text-xs">
@@ -67,15 +67,15 @@ const elementId = storageKey.replace(/[^a-zA-Z0-9_-]/g, '_')
 
 {/** Client-side persistence + visibility toggling */}
 <script is:inline>
-  const ls = window.localStorage;
   document.querySelectorAll('[data-generic-banner]')
     .forEach((el) => {
       const key = el.getAttribute('data-storage-key') || 'generic-banner';
-      const shouldShow = ls.getItem(key) ?? 'true';
+      const shouldShow = window.localStorage.getItem(key) ?? 'true';
       // Optional dependency: only show if dependency flag in localStorage is also true
-      const depKey = el.getAttribute('data-depence-on');
-      const depOk = depKey ? (ls.getItem(depKey) ?? 'true') === 'true' : true;
-      if (shouldShow === 'true' && depOk) {
+      const depKey = el.getAttribute('data-dependence-on');
+      const depOk = depKey ? (window.localStorage.getItem(depKey) ?? 'true') === 'true' : true;
+      console.log('key', key,'depKey', depKey, 'shouldShow', shouldShow, 'depOk', depOk)
+      if (shouldShow === 'true' && !depOk) {
         el.classList.remove('hidden');
         el.classList.add('flex');
       }
@@ -83,7 +83,7 @@ const elementId = storageKey.replace(/[^a-zA-Z0-9_-]/g, '_')
       const btn = el.querySelector('[data-banner-dismiss]');
       if (btn) {
         btn.addEventListener('click', () => {
-          try { ls.setItem(key, 'false'); } catch (_) {}
+          try { window.localStorage.setItem(key, 'false'); } catch (_) {}
           el.remove();
           try {
             // @ts-ignore

@@ -22,8 +22,8 @@ interface Props {
 const props = Astro.props
 ---
 <Banner
-  id={props.id ?? "share-site-banner"}
-  title={ props.title ?? "Enjoying this site?" }
+  id={props.id ?? "community-site-banner"}
+  title={ props.title ?? "Community Streamer" }
   dismiss={props.dismiss ?? "Got it"}
   showFrom={props.showFrom}
   showUntil={props.showUntil}
@@ -31,7 +31,6 @@ const props = Astro.props
   dependenceOn={props.dependenceOn}
 >
   <p>
-    If you find this site useful, please share it with friends or on social
-    media.
+    Check out the <a href="/community">Community Page</a> for a list of some of the Jingle Jam community streams.
   </p>
 </Banner>
