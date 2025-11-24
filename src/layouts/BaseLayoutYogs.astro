@@ -4,6 +4,7 @@ import Footer from '../components/layout/footer/Footer.astro'
 import AdminNavigation from '../components/layout/navigation/AdminNavigation.astro'
 import type { YogsSchedule } from '../lib/orpc/private/yogs/contract.ts'
 import { getJingleJamEventSeries } from '../content/getJingleJamEventSeries.ts'
+import FeedbackBanner from "../components/features/feedback/FeedbackBanner.astro";
 
 const env = Astro.locals.runtime.env.ENVIRONMENT
 const isProd = env === 'PROD'
@@ -144,6 +145,7 @@ const eventSeriesJsonLdStr = JSON.stringify(eventsSeriesJsonLd)
           <Navigation />
           <AdminNavigation />
         </div>
+        <FeedbackBanner />
         <div
           class="mt-4 mx-4 xl:mx-20 flex flex-col justify-start items-center"
         >

@@ -1,14 +1,15 @@
 ---
 const now = new Date();
-const showStart = new Date('2024-12-10T00:00:00Z');
-const showEnd = new Date('2024-12-31T00:00:00Z');
+const year = now.getFullYear();
+const showStart = new Date(`${year}-12-10T00:00:00Z`);
+const showEnd = new Date(`${year}-12-31T00:00:00Z`);
 const showBanner = now > showStart && now < showEnd;
 ---
 {
   showBanner && (
   <div class="flex flex-col items-center">
       <div
-              id='feedback-2024-banner'
+              id={`feedback-${year}-banner`}
               class="md:max-w-[40%] m-2 hidden flex-col gap-2 justify-center items-center p-2 rounded-2xl shadow bg-white">
           <p class="text-lg">Feedback</p>
           <div class="flex flex-col justify-center items-center text-center text-xs text-wrap">
@@ -48,7 +49,7 @@ const showBanner = now > showStart && now < showEnd;
           </div>
 
           <button
-                  id={"feedback-2024-banner-banner-got-it"}
+                  id={`feedback-${year}-banner-banner-got-it`}
                   class="bg-accent p-2 rounded-full text-white transition-all hover:bg-accent-400"
           >
               Got it
@@ -59,22 +60,20 @@ const showBanner = now > showStart && now < showEnd;
   }
 
 <script is:inline>
-  console.log('init')
   const feedbackLocalstorage = window.localStorage;
-  const button = document.getElementById("feedback-2024-banner-banner-got-it");
+  const button = document.getElementById(`feedback-${year}-banner-banner-got-it`);
 
-  const shouldShow = feedbackLocalstorage.getItem('feedback-2024-banner') ?? 'true';
-  console.log('shouldShow', shouldShow);
+  const shouldShow = feedbackLocalstorage.getItem(`feedback-${year}-banner`) ?? 'true';
   if (shouldShow === 'true') {
-    const banner = document.getElementById('feedback-2024-banner')
+    const banner = document.getElementById(`feedback-${year}-banner`)
     if (banner) {
       banner.classList.remove('hidden');
       banner.classList.add('flex');
     }
     button.addEventListener('click', () => {
-      feedbackLocalstorage.setItem('feedback-2024-banner', 'false');
-      document.getElementById('feedback-2024-banner').remove();
-      window.gtag('event', 'dismiss_' + 'feedback-2024-banner');
+      feedbackLocalstorage.setItem(`feedback-${year}-banner`, 'false');
+      document.getElementById(`feedback-${year}-banner`).remove();
+      window.gtag('event', 'dismiss_' + `feedback-${year}-banner`);
     });
   }
 </script>
