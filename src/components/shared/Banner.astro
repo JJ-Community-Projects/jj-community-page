@@ -1,0 +1,98 @@
+---
+interface Props {
+  /** Optional unique id used for localStorage persistence; falls back to title */
+  id?: string
+  /** Optional title shown in bold above the text */
+  title?: string
+  /** Main banner text; optional if slot content is provided */
+  text?: string
+  /** Text for the dismiss button (defaults to "Dismiss") */
+  dismiss?: string
+  /** ISO date string or any parsable date string to start showing the banner (inclusive) */
+  showFrom?: string
+  /** ISO date string or any parsable date string to stop showing the banner (exclusive) */
+  showUntil?: string
+  /** Optional extra classes to style the banner container */
+  class?: string
+  /** Optional localStorage key this banner depends on; banner only shows if this key is 'true' */
+  dependenceOn?: string
+}
+
+const props = Astro.props as Props
+
+const now = new Date()
+const from = props.showFrom ? new Date(props.showFrom) : undefined
+const until = props.showUntil ? new Date(props.showUntil) : undefined
+
+// Server-side window gating (SSR-safe; for SSG this uses build time)
+const withinWindow =
+  (from ? now >= from : true) && (until ? now < until : true)
+
+// Compute a stable storage key
+const baseKey = props.id ?? props.title ?? 'banner'
+const storageKey = `generic-banner:${baseKey}`
+const elementId = storageKey.replace(/[^a-zA-Z0-9_-]/g, '_')
+---
+{withinWindow && (
+  <div class="flex flex-col items-center">
+    <div
+      id={elementId}
+      class={`m-2 hidden flex-col items-center justify-center gap-2 rounded-2xl bg-white p-2 text-black shadow w-full md:max-w-[40%] ${
+        props.class ?? ''
+      }`}
+      data-generic-banner
+      data-storage-key={storageKey}
+      data-depence-on={props.dependenceOn}
+    >
+      {props.title && <p class="text-lg font-semibold">{props.title}</p>}
+      <div class="flex flex-col items-center justify-center text-wrap text-center text-xs">
+        {Astro.slots.has('default') ? (
+          <slot />
+        ) : (
+          <p>{props.text}</p>
+        )}
+      </div>
+
+      <button
+        id={`${elementId}-dismiss`}
+        class="rounded-full bg-accent p-2 text-white transition-all hover:bg-accent-400"
+        aria-label={props.dismiss ?? 'Dismiss banner'}
+        data-banner-dismiss
+      >
+        {props.dismiss ?? 'Dismiss'}
+      </button>
+    </div>
+  </div>
+)}
+
+{/** Client-side persistence + visibility toggling */}
+<script is:inline>
+  const ls = window.localStorage;
+  document.querySelectorAll('[data-generic-banner]')
+    .forEach((el) => {
+      const key = el.getAttribute('data-storage-key') || 'generic-banner';
+      const shouldShow = ls.getItem(key) ?? 'true';
+      // Optional dependency: only show if dependency flag in localStorage is also true
+      const depKey = el.getAttribute('data-depence-on');
+      const depOk = depKey ? (ls.getItem(depKey) ?? 'true') === 'true' : true;
+      if (shouldShow === 'true' && depOk) {
+        el.classList.remove('hidden');
+        el.classList.add('flex');
+      }
+
+      const btn = el.querySelector('[data-banner-dismiss]');
+      if (btn) {
+        btn.addEventListener('click', () => {
+          try { ls.setItem(key, 'false'); } catch (_) {}
+          el.remove();
+          try {
+            // @ts-ignore
+            if (typeof window.gtag === 'function') {
+              // @ts-ignore
+              window.gtag('event', 'dismiss_' + key);
+            }
+          } catch (_) {}
+        });
+      }
+    });
+</script>

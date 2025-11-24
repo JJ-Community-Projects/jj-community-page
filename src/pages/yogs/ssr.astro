@@ -5,7 +5,6 @@ import {
 } from '../../lib/orpc/serverClient.ts'
 import BaseLayoutYogs from '../../layouts/BaseLayoutYogs.astro'
 import { getYogsScheduleFromContent } from '../../content/getYogsScheduleFromContent.ts'
-import YogsTVExtBanner from '../../components/yogs-pages/common/YogsTVExtBanner.astro'
 import { YogsCurrentScheduleLoader } from '../../components/yogs-pages/schedule-ssr/YogsCurrentScheduleLoader.tsx'
 
 const ConfigDO = Astro.locals.runtime.env.ConfigDO
@@ -275,7 +274,6 @@ const ogImage = preRenderdImageExists
     image: ogImage,
   }}
 >
-  <YogsTVExtBanner />
 
   <div class={'min-h-32'}>
     <YogsCurrentScheduleLoader

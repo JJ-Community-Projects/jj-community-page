@@ -2,9 +2,7 @@
 export const prerender = false
 import BaseLayoutYogs from '../../layouts/BaseLayoutYogs.astro'
 import { getYogsScheduleFromContent } from '../../content/getYogsScheduleFromContent.ts'
-import YogsTVExtBanner from '../../components/yogs-pages/common/YogsTVExtBanner.astro'
 import { YogsCurrentScheduleLoader } from '../../components/yogs-pages/schedule/YogsCurrentScheduleLoader.tsx'
-
 const ConfigDO = Astro.locals.runtime.env.ConfigDO
 const stubId = ConfigDO.idFromName('ConfigDO')
 const stub = ConfigDO.get(stubId)
@@ -124,7 +122,8 @@ const hasPreRenderdImage = preRenderdFilters.includes(sortedFilter)
 console.log('hasPreRenderdImage', hasPreRenderdImage)
 
 const preRenderdImageExists =
-  (filteredCreators !== null && filteredCreators.length === 1) || hasPreRenderdImage
+  (filteredCreators !== null && filteredCreators.length === 1) ||
+  hasPreRenderdImage
 
 const siteUrl = 'https://jinglejam.ostof.dev'
 const notFilterImage = `${siteUrl}/jj-og-yogs.png`
@@ -136,6 +135,7 @@ const ogImage = preRenderdImageExists
   : hasFilter
     ? filterImage
     : notFilterImage
+
 ---
 
 <style is:global>
@@ -266,8 +266,9 @@ const ogImage = preRenderdImageExists
   og={{
     image: ogImage,
   }}
+  schedule={currentSchedule}
 >
-  <YogsTVExtBanner />
+  <!-- TODO add new banners -->
 
   <div class={'min-h-32'}>
     <YogsCurrentScheduleLoader

@@ -1,0 +1,49 @@
+---
+import Banner from './Banner.astro'
+interface Props {
+  /** Optional unique id used for localStorage persistence; falls back to title */
+  id?: string
+  /** Optional title shown in bold above the text */
+  title?: string
+  /** Main banner text; optional if slot content is provided */
+  text?: string
+  /** Text for the dismiss button (defaults to "Dismiss") */
+  dismiss?: string
+  /** ISO date string or any parsable date string to start showing the banner (inclusive) */
+  showFrom?: string
+  /** ISO date string or any parsable date string to stop showing the banner (exclusive) */
+  showUntil?: string
+  /** Optional extra classes to style the banner container */
+  class?: string
+  /** Optional localStorage key this banner depends on; banner only shows if this key is 'true' */
+  dependenceOn?: string
+}
+const props = Astro.props
+---
+
+<Banner
+  id={props.id ?? 'tv-ext-banner'}
+  title={props.title ?? 'Twitch Extension'}
+  dismiss={props.dismiss ?? 'Got it'}
+  showFrom={props.showFrom}
+  showUntil={props.showUntil}
+  class={props.class}
+  dependenceOn={props.dependenceOn}
+>
+  <p>
+    The Jingle Jam Community Twitch Extension is <b>now Live</b> on the
+    <a
+      href="http://twitch.tv/yogscast"
+      target="_blank"
+      class="underline font-bold">Yogscast Twitch Channel!</a
+    >
+    On Desktop scroll down below the video player or on mobile click on the
+    <i>Jingle Jam Community Extension</i> button above the chat. If you have a Fundraiser,
+    you can
+    <a
+      href="https://dashboard.twitch.tv/extensions/7m5fitr4o8raxn6fv59lndv2iy0uuz"
+      target="_blank"
+      class="underline">add it to your stream as well</a
+    >.
+  </p>
+</Banner>

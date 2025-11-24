@@ -1,0 +1,38 @@
+---
+import Banner from './Banner.astro'
+
+interface Props {
+  /** Optional unique id used for localStorage persistence; falls back to title */
+  id?: string
+  /** Optional title shown in bold above the text */
+  title?: string
+  /** Main banner text; optional if slot content is provided */
+  text?: string
+  /** Text for the dismiss button (defaults to "Dismiss") */
+  dismiss?: string
+  /** ISO date string or any parsable date string to start showing the banner (inclusive) */
+  showFrom?: string
+  /** ISO date string or any parsable date string to stop showing the banner (exclusive) */
+  showUntil?: string
+  /** Optional extra classes to style the banner container */
+  class?: string
+  /** Optional localStorage key this banner depends on; banner only shows if this key is 'true' */
+  dependenceOn?: string
+}
+const props = Astro.props
+---
+<Banner
+  id={props.id ?? "share-site-banner"}
+  title={ props.title ?? "Enjoying this site?" }
+  dismiss={props.dismiss ?? "Got it"}
+  showFrom={props.showFrom}
+  showUntil={props.showUntil}
+  class={props.class}
+  dependenceOn={props.dependenceOn}
+>
+  <p>
+    If you find this site useful, please share it with friends or on social
+    media. Your support helps more fundraisers and viewers discover it. Thank
+    you!
+  </p>
+</Banner>

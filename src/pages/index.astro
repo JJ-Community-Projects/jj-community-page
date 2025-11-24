@@ -5,6 +5,7 @@ import {
 } from '../components/common/ui/MainHeader.tsx'
 const prerender = true
 import BaseLayout4xl from '../layouts/BaseLayout4xl.astro'
+import ShareBanner from '../components/shared/ShareBanner.astro'
 ---
 
 <BaseLayout4xl
@@ -30,6 +31,7 @@ import BaseLayout4xl from '../layouts/BaseLayout4xl.astro'
       <MainJJStartTimes client:only="solid-js" />
     </div>
   </div>
+  <ShareBanner />
   <div class="flex flex-col gap-6 pt-4">
     <!-- Summary section -->
     <section
