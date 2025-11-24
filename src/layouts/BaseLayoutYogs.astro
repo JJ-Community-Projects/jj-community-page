@@ -3,6 +3,8 @@ import Navigation from '../components/layout/navigation/Navigation.astro'
 import Footer from '../components/layout/footer/Footer.astro'
 import FeedbackBanner from '../components/features/feedback/FeedbackBanner.astro'
 import AdminNavigation from '../components/layout/navigation/AdminNavigation.astro'
+import type { YogsSchedule } from '../lib/orpc/private/yogs/contract.ts'
+import { getJingleJamEventSeries } from '../content/getJingleJamEventSeries.ts'
 
 const env = Astro.locals.runtime.env.ENVIRONMENT
 const isProd = env === 'PROD'
@@ -21,6 +23,8 @@ interface Props {
     imageWidth?: string
     imageHeight?: string
   }
+
+  schedule?: YogsSchedule
 }
 
 const {
@@ -29,6 +33,7 @@ const {
   canonical,
   robots = 'index,follow',
   og: propOg,
+  schedule,
 } = Astro.props
 const t = title || 'Jingle Jam Community'
 const siteUrl = 'https://jinglejam.ostof.dev'
@@ -45,6 +50,8 @@ const og = {
   imageHeight: propOg?.imageHeight ?? '630',
 }
 
+
+
 // Structured data: EventSeries for the Jingle Jam schedule
 const eventSeriesJsonLd = {
   '@context': 'https://schema.org',
@@ -56,12 +63,13 @@ const eventSeriesJsonLd = {
   eventAttendanceMode: 'https://schema.org/OnlineEventAttendanceMode',
   organizer: {
     '@type': 'Organization',
-    name: 'Jingle Jam Community',
-    url: siteUrl,
+    name: 'Yogscast',
+    url: 'https://twitch.tv/yogscast',
   },
 }
 
-const eventSeriesJsonLdStr = JSON.stringify(eventSeriesJsonLd)
+const eventsSeriesJsonLd = schedule ?getJingleJamEventSeries(schedule): undefined
+const eventSeriesJsonLdStr = JSON.stringify(eventsSeriesJsonLd)
 ---
 
 <html lang="en">
