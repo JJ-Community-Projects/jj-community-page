@@ -2,7 +2,7 @@
 const now = new Date();
 const showStart = new Date('2024-12-10T00:00:00Z');
 const showEnd = new Date('2024-12-31T00:00:00Z');
-const showBanner = true; // now > showStart && now < showEnd;
+const showBanner = now > showStart && now < showEnd;
 ---
 {
   showBanner && (
