@@ -481,7 +481,7 @@ const upcomingStreams = os.upcomingStreamsContract
 
     const result = { count: composed.length, streams: composed }
 
-    await putJSON(context.env.KV, 'upcomingStreams', result, 120)
+    await putJSON(context.env.KV, 'upcomingStreams', result, 300)
 
     return result
   })
