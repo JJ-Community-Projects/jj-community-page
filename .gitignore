@@ -42,3 +42,4 @@ http/http-client.private.env.json
 /.tmp/
 /.tmp
 /http/
+/scripts/
