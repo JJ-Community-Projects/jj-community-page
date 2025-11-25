@@ -1,7 +1,13 @@
 import { type Component, For, Show } from 'solid-js'
 import { Dialog } from '@kobalte/core'
-import { FaBrandsTwitch, FaBrandsYoutube, FaSolidXmark } from 'solid-icons/fa'
-import { DateTime } from 'luxon'
+import {
+  FaBrandsTwitch,
+  FaBrandsYoutube,
+  FaRegularCalendarPlus,
+  FaSolidXmark,
+} from 'solid-icons/fa'
+import { DateTime, Duration } from 'luxon'
+import ical, { ICalAlarmType } from 'ical-generator'
 import { getTextColor } from '../../../lib/utils/textColors.ts'
 import type {
   YogsCreator,
@@ -143,6 +149,12 @@ const Body: Component<BodyProps> = (props) => {
             </p>
             <Show when={isBefore()}>
               <p>{countdownFormat()}</p>
+            </Show>
+            <Show when={isBefore()}>
+              <div class="flex flex-row gap-2 py-1">
+                <AddToGoogleCalendarButton stream={props.stream} />
+                <DownloadIcsButton stream={props.stream} />
+              </div>
             </Show>
             <Show when={props.stream.vods && props.stream.vods.length > 0}>
               <p>Vods</p>
@@ -318,6 +330,133 @@ const LiveButton = () => {
           </span>
         </div>
       </a>
+    </div>
+  )
+}
+
+interface AddToGoogleCalendarButtonProps {
+  stream: YogsStream
+}
+
+const AddToGoogleCalendarButton: Component<AddToGoogleCalendarButtonProps> = (
+  props,
+) => {
+  const buildGoogleCalendarUrl = (stream: YogsStream) => {
+    const startUtc = DateTime.fromJSDate(stream.start)
+      .toUTC()
+      .toFormat("yyyyLLdd'T'HHmmss'Z'")
+    const endUtc = DateTime.fromJSDate(stream.end)
+      .toUTC()
+      .toFormat("yyyyLLdd'T'HHmmss'Z'")
+
+    const base = 'https://calendar.google.com/calendar/render?action=TEMPLATE'
+
+    const title = encodeURIComponent(
+      (stream.title ?? 'Jingle Jam Stream') +
+        ` - Yogscast JJ ${stream.start.getFullYear()}`,
+    )
+    const dates = `${startUtc}/${endUtc}`
+
+    // Build details as: [DESCRIPTION or SUBTITLE]\n[WEBSITE URL]
+    const descriptionText = stream.description || stream.subtitle || ''
+    const detailsText = descriptionText
+      ? `${descriptionText}\nhttps://twitch.tv/yogscast`
+      : 'https://twitch.tv/yogscast'
+    const details = `&details=${encodeURIComponent(detailsText)}`
+
+    // No explicit location is available on stream; omit when unknown
+    const url = `${base}&text=${title}&dates=${dates}${details}`
+    return url
+  }
+
+  const url = () => buildGoogleCalendarUrl(props.stream)
+
+  return (
+    <div class={'flex flex-row py-1'}>
+      <a
+        target={'_blank'}
+        rel={'noreferrer noopener'}
+        class={
+          'flex flex-row items-center gap-1 rounded-full bg-accent-200/50 px-2 py-1 text-xs text-black no-underline transition-all hover:cursor-pointer hover:bg-accent-200'
+        }
+        href={url()}
+      >
+        Google Calendar <FaRegularCalendarPlus />
+      </a>
+    </div>
+  )
+}
+
+interface DownloadIcsButtonProps {
+  stream: YogsStream
+}
+
+const DownloadIcsButton: Component<DownloadIcsButtonProps> = (props) => {
+  const buildIcs = (stream: YogsStream) => {
+    const cal = ical({ name: 'Jingle Jam Stream' })
+    const start = DateTime.fromJSDate(stream.start)
+    const end = DateTime.fromJSDate(stream.end)
+
+    const detailsParts: string[] = []
+    if (stream.subtitle) detailsParts.push(stream.subtitle)
+    if (stream.description) detailsParts.push(stream.description)
+    const description = detailsParts.join('\n\n')
+
+    cal.createEvent({
+      start,
+      end,
+      summary: stream.title ?? `Jingle Jam ${start.year} Stream`,
+      description: description || undefined,
+      url: 'https://twitch.tv/yogscast',
+      alarms: [
+        {
+          type: ICalAlarmType.display,
+          triggerBefore: start.minus(Duration.fromObject({ minutes: 15 })),
+        },
+      ],
+    })
+
+    return cal.toString()
+  }
+
+  const sanitize = (s: string) =>
+    s.replace(/[^A-Za-z0-9-_]+/g, '_').slice(0, 60)
+
+  const filename = () => {
+    const start = DateTime.fromJSDate(props.stream.start)
+    const date = start.toFormat('yyyy-LL-dd_HHmm')
+    const title = sanitize(
+      (props.stream.title ?? 'Jingle_Jam_Stream') +
+        ` - Yogscast JJ ${props.stream.start.getFullYear()}`,
+    )
+    return `${date}_${title}.ics`
+  }
+
+  const download = () => {
+    const data = buildIcs(props.stream)
+    const a = document.createElement('a')
+    a.setAttribute(
+      'href',
+      'data:text/calendar;charset=utf8,' + encodeURIComponent(data),
+    )
+    a.setAttribute('download', filename())
+    a.style.display = 'none'
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+  }
+
+  return (
+    <div class={'flex flex-row py-1'}>
+      <button
+        type="button"
+        class={
+          'flex flex-row items-center gap-1 rounded-full bg-accent-200/50 px-2 py-1 text-xs text-black transition-all hover:cursor-pointer hover:bg-accent-200'
+        }
+        onClick={download}
+      >
+        Download .ics <FaRegularCalendarPlus />
+      </button>
     </div>
   )
 }

@@ -1,6 +1,7 @@
 import { type Component, Show } from 'solid-js'
 import type { Stream } from '../../../../lib/orpc/public/schemas/schedules.ts'
-import { DateTime } from 'luxon'
+import { DateTime, Duration } from 'luxon'
+import ical, { ICalAlarmType } from 'ical-generator'
 import { useNow } from '../../../../lib/utils/useNow.ts'
 import { type ModalSignal } from '../../../../lib/createModalSignal.ts'
 import { getStreamColor } from '../../../../functions/jjDatesToColors.ts'
@@ -10,7 +11,7 @@ import { getTextColor } from '../../../../lib/utils/textColors.ts'
 import { StreamTags } from './StreamTags'
 import { StreamParticipants } from './StreamParticipants'
 import type { UserDisplay } from '../../../../lib/orpc/public/schemas/UserDisplaySchema.ts'
-import { FaBrandsTwitch } from 'solid-icons/fa'
+import { FaBrandsTwitch, FaRegularCalendarPlus } from 'solid-icons/fa'
 
 interface ScheduleStreamDetailDialogProps {
   stream: Stream
@@ -103,8 +104,6 @@ export const ScheduleStreamDetailDialog: Component<
             <div class="flex h-full flex-col overflow-auto overflow-x-hidden scrollbar-thin scrollbar-track-accent-100 scrollbar-thumb-accent-500 scrollbar-corner-primary-100">
               <div class="flex h-full flex-col justify-between px-2 pb-4 pt-2">
                 <div class="flex flex-col">
-
-
                   <Show when={stream().description}>
                     <Dialog.Description class="mb-6">
                       {stream().description}
@@ -124,7 +123,6 @@ export const ScheduleStreamDetailDialog: Component<
                       </div>
                     </div>
                   </Show>
-
                   <p>
                     {getStreamStartDateTime().toLocaleString({
                       weekday: 'short',
@@ -161,16 +159,24 @@ export const ScheduleStreamDetailDialog: Component<
                               href={`https://twitch.tv/${twitchLogin()}`}
                               target="_blank"
                               rel="noopener noreferrer"
-                              class="flex flex-row gap-2 justify-center items-center w-fit rounded-full bg-twitch-500 px-3 py-1 text-sm font-medium text-white transition-colors hover:brightness-105"
+                              class="flex w-fit flex-row items-center justify-center gap-2 rounded-full bg-twitch-500 px-3 py-1 text-sm font-medium text-white transition-colors hover:brightness-105"
                             >
-                              Open Twitch <FaBrandsTwitch/>
+                              Open Twitch <FaBrandsTwitch />
                             </a>
                           )
                         }}
                       </Show>
                     </div>
                   </Show>
-
+                  <Show when={showCountdown()}>
+                    <div class="flex flex-row gap-2 py-1">
+                      <AddToGoogleCalendarButton
+                        stream={stream()}
+                        user={props.user}
+                      />
+                      <DownloadIcsButton stream={stream()} user={props.user} />
+                    </div>
+                  </Show>
                   <StreamTags tags={stream().tags} />
                   <StreamParticipants participants={stream().participants} />
                 </div>
@@ -180,5 +186,145 @@ export const ScheduleStreamDetailDialog: Component<
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>
+  )
+}
+
+interface AddToGoogleCalendarButtonProps {
+  stream: Stream
+  user?: UserDisplay
+}
+
+const AddToGoogleCalendarButton: Component<AddToGoogleCalendarButtonProps> = (
+  props,
+) => {
+  const buildGoogleCalendarUrl = () => {
+    const stream = props.stream
+    const startUtc = DateTime.fromJSDate(stream.start)
+      .toUTC()
+      .toFormat("yyyyLLdd'T'HHmmss'Z'")
+    const endUtc = DateTime.fromJSDate(stream.end)
+      .toUTC()
+      .toFormat("yyyyLLdd'T'HHmmss'Z'")
+
+    const base = 'https://calendar.google.com/calendar/render?action=TEMPLATE'
+
+    const title = encodeURIComponent(
+      (stream.title ?? 'Jingle Jam Stream') +
+        ' - ' + `JJ ${props.stream.start.getFullYear()} - `+
+        (props.user?.username ?? ''),
+    )
+    const dates = `${startUtc}/${endUtc}`
+    const twitchUrl = props.user
+      ? `https://twitch.tv/${props.user?.twitchLogin}`
+      : ''
+    // Build details as: [DESCRIPTION or SUBTITLE]\n[WEBSITE URL]
+    const descriptionText = stream.description || stream.subtitle || ''
+    const detailsText = descriptionText
+      ? `${descriptionText}\n${twitchUrl}`
+      : `${twitchUrl}`
+    const details = `&details=${encodeURIComponent(detailsText)}`
+
+    const url = `${base}&text=${title}&dates=${dates}${details}`
+    return url
+  }
+
+  const url = () => buildGoogleCalendarUrl()
+
+  return (
+    <div class={'flex flex-row'}>
+      <a
+        target={'_blank'}
+        rel={'noreferrer noopener'}
+        class={
+          'flex flex-row items-center gap-1 rounded-full bg-accent-200/50 px-2 py-1 text-xs text-black no-underline transition-all hover:cursor-pointer hover:bg-accent-200'
+        }
+        href={url()}
+      >
+        Add to Google Calendar <FaRegularCalendarPlus />
+      </a>
+    </div>
+  )
+}
+
+interface DownloadIcsButtonProps {
+  stream: Stream
+  user?: UserDisplay
+}
+
+const DownloadIcsButton: Component<DownloadIcsButtonProps> = (props) => {
+  const buildIcs = (stream: Stream) => {
+    const cal = ical({ name: 'Jingle Jam Stream' })
+    const start = DateTime.fromJSDate(stream.start)
+    const end = DateTime.fromJSDate(stream.end)
+
+    const detailsParts: string[] = []
+    if (stream.subtitle) detailsParts.push(stream.subtitle)
+    if (stream.description) detailsParts.push(stream.description)
+    const description = detailsParts.join('\n\n')
+    const title = encodeURIComponent(
+      (stream.title ?? 'Jingle Jam Stream') +
+        ' ' +
+        (props.user?.username ?? ''),
+    )
+    const twitchUrl = props.user
+      ? `https://twitch.tv/${props.user?.twitchLogin}`
+      : ''
+    cal.createEvent({
+      start,
+      end,
+      summary: title,
+      description: description || undefined,
+      url: twitchUrl,
+      alarms: [
+        {
+          type: ICalAlarmType.display,
+          triggerBefore: start.minus(Duration.fromObject({ minutes: 15 })),
+        },
+      ],
+    })
+
+    return cal.toString()
+  }
+
+  const sanitize = (s: string) =>
+    s.replace(/[^A-Za-z0-9-_]+/g, '_').slice(0, 60)
+
+  const filename = () => {
+    const start = DateTime.fromJSDate(props.stream.start)
+    const date = start.toFormat('yyyy-LL-dd_HHmm')
+    const title = encodeURIComponent(
+      (props.stream.title ?? 'Jingle Jam Stream') +
+        ' ' + `- JJ ${start.year} - `+
+        (props.user?.username ?? ''),
+    )
+    return `${date}_${title}.ics`
+  }
+
+  const download = () => {
+    const data = buildIcs(props.stream)
+    const a = document.createElement('a')
+    a.setAttribute(
+      'href',
+      'data:text/calendar;charset=utf8,' + encodeURIComponent(data),
+    )
+    a.setAttribute('download', filename())
+    a.style.display = 'none'
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+  }
+
+  return (
+    <div class={'flex flex-row'}>
+      <button
+        type="button"
+        class={
+          'flex flex-row items-center gap-1 rounded-full bg-accent-200/50 px-2 py-1 text-xs text-black transition-all hover:cursor-pointer hover:bg-accent-200'
+        }
+        onClick={download}
+      >
+        Download .ics{''} <FaRegularCalendarPlus />
+      </button>
+    </div>
   )
 }
