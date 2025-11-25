@@ -1,4 +1,4 @@
-import { type Component, Show } from 'solid-js'
+import { type Component, JSX, Show } from 'solid-js'
 import type { Stream } from '../../../../lib/orpc/public/schemas/schedules.ts'
 import { DateTime, Duration } from 'luxon'
 import ical, { ICalAlarmType } from 'ical-generator'
@@ -28,6 +28,40 @@ export const ScheduleStreamDetailDialog: Component<
 > = (props) => {
   const stream = () => props.stream
   const now = useNow()
+
+  // Linkify Twitch URLs in the stream description
+  // Matches: https://twitch.tv/USERNAME or twitch.tv/USERNAME
+  const linkifyTwitch = (text: string) => {
+    const regex = /(?:https?:\/\/)?twitch\.tv\/([A-Za-z0-9_]+)/g
+    const parts: Array<string | JSX.Element> = []
+    let lastIndex = 0
+    let match: RegExpExecArray | null
+    while ((match = regex.exec(text)) !== null) {
+      const start = match.index
+      const end = regex.lastIndex
+      if (start > lastIndex) {
+        parts.push(text.slice(lastIndex, start))
+      }
+      const username = match[1]
+      const href = `https://twitch.tv/${username}`
+      const fullMatch = text.slice(start, end)
+      parts.push(
+        <a
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-twitch-500 underline hover:brightness-110"
+        >
+          {fullMatch}
+        </a>,
+      )
+      lastIndex = end
+    }
+    if (lastIndex < text.length) {
+      parts.push(text.slice(lastIndex))
+    }
+    return parts
+  }
 
   // Convert UTC dates from backend to DateTime objects
   const getStreamStartDateTime = () => {
@@ -106,7 +140,7 @@ export const ScheduleStreamDetailDialog: Component<
                 <div class="flex flex-col">
                   <Show when={stream().description}>
                     <Dialog.Description class="mb-6">
-                      {stream().description}
+                      {linkifyTwitch(stream().description as string)}
                     </Dialog.Description>
                   </Show>
 
