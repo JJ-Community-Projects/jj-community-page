@@ -18,12 +18,16 @@ const communityBannerShowUntil = `${now.getFullYear()}-12-14`
   id={communityBannerId}
   showFrom={communityBannerShowFrom}
   showUntil={communityBannerShowUntil}
+  showEveryXDay={4}
+  showAfterXVisits={3}
 />
 <ShareBanner
   id={shareBannerId}
   showFrom={shareBannerShowFrom}
   showUntil={shareBannerShowUntil}
   dependenceOn={communityBannerId}
+  showEveryXDay={5}
+  showAfterXVisits={3}
 />
 {/*
 <TVExtBanner

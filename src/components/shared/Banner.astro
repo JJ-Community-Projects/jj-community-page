@@ -16,6 +16,10 @@ interface Props {
   class?: string
   /** Optional localStorage key this banner depends on; banner only shows if this key is 'true' */
   dependenceOn?: string
+  /** If set (> 0), allow the banner to reappear after the user dismisses it, once every X days */
+  showEveryXDay?: number
+  /** If set (> 0), only show the banner after this many visits (per banner key) */
+  showAfterXVisits?: number
 }
 
 const props = Astro.props as Props
@@ -34,48 +38,86 @@ const storageKey = `${baseKey}`
 const elementId = storageKey.replace(/[^a-zA-Z0-9_-]/g, '_')
 ---
 {withinWindow && (
-  <div class="flex flex-col items-center">
-    <div
-      id={elementId}
-      class={`m-2 hidden flex-col items-center justify-center gap-2 rounded-2xl bg-white p-2 text-black shadow w-full md:max-w-[40%] ${
-        props.class ?? ''
-      }`}
-      data-generic-banner
-      data-storage-key={storageKey}
-      data-dependence-on={props.dependenceOn}
-    >
-      {props.title && <p class="text-lg font-semibold">{props.title}</p>}
-      <div class="flex flex-col items-center justify-center text-wrap text-center text-xs">
-        {Astro.slots.has('default') ? (
-          <slot />
-        ) : (
-          <p>{props.text}</p>
-        )}
-      </div>
-
-      <button
-        id={`${elementId}-dismiss`}
-        class="rounded-full bg-accent p-2 text-white transition-all hover:bg-accent-400"
-        aria-label={props.dismiss ?? 'Dismiss banner'}
-        data-banner-dismiss
-      >
-        {props.dismiss ?? 'Dismiss'}
-      </button>
+<div class="flex flex-col items-center">
+  <div
+    id={elementId}
+    class={`min-w-20 m-2 hidden flex-col items-center justify-center gap-2 rounded-2xl bg-white p-2 text-black shadow w-full ${
+      props.class ?? ''
+    }`}
+    data-generic-banner
+    data-storage-key={storageKey}
+    data-dependence-on={props.dependenceOn}
+    data-show-every-x-day={props.showEveryXDay}
+    data-show-after-x-visits={props.showAfterXVisits}
+  >
+    {props.title && <p class="text-lg font-semibold">{props.title}</p>}
+    <div class="flex flex-col items-center justify-center text-wrap text-center text-xs">
+      {Astro.slots.has('default') ? (
+        <slot />
+      ) : (
+        <p>{props.text}</p>
+      )}
     </div>
+
+    <button
+      id={`${elementId}-dismiss`}
+      class="rounded-full bg-accent p-2 text-white transition-all hover:bg-accent-400"
+      aria-label={props.dismiss ?? 'Dismiss banner'}
+      data-banner-dismiss
+    >
+      {props.dismiss ?? 'Dismiss'}
+    </button>
   </div>
-)}
+</div>
+  )}
 
 {/** Client-side persistence + visibility toggling */}
 <script is:inline>
   document.querySelectorAll('[data-generic-banner]')
     .forEach((el) => {
       const key = el.getAttribute('data-storage-key') || 'generic-banner';
-      const shouldShow = window.localStorage.getItem(key) ?? 'true';
-      // Optional dependency: only show if dependency flag in localStorage is also true
       const depKey = el.getAttribute('data-dependence-on');
+      const everyX = parseInt(el.getAttribute('data-show-every-x-day') || '');
+      const afterVisits = parseInt(el.getAttribute('data-show-after-x-visits') || '');
+
+      // Derived keys
+      const visitsKey = key + ':visits';
+      const lastDismissedKey = key + ':lastDismissedAt';
+
+      // Dependency gate (defaults to true if missing)
       const depOk = depKey ? (window.localStorage.getItem(depKey) ?? 'true') === 'true' : true;
-      console.log('key', key,'depKey', depKey, 'shouldShow', shouldShow, 'depOk', depOk)
-      if (shouldShow === 'true' && !depOk) {
+
+      // Visit counting: increment on each page load to this banner
+      let visits = 0;
+      try { visits = parseInt(window.localStorage.getItem(visitsKey) || '0') || 0; } catch(_) {}
+      visits += 1;
+      try { window.localStorage.setItem(visitsKey, String(visits)); } catch(_) {}
+
+      const meetsVisitThreshold = !(afterVisits > 0) || (visits >= afterVisits);
+
+      // Show gating: either old permanent flag OR time-based re-show if everyX > 0
+      const hasEveryX = Number.isFinite(everyX) && everyX > 0;
+      const msPerDay = 24 * 60 * 60 * 1000;
+
+      let canShowByDismissLogic = true;
+      if (hasEveryX) {
+        // time-windowed reappearance
+        const last = window.localStorage.getItem(lastDismissedKey);
+        if (last) {
+          const elapsed = Date.now() - new Date(last).getTime();
+          canShowByDismissLogic = elapsed >= (everyX * msPerDay);
+        } else {
+          canShowByDismissLogic = true; // never dismissed yet
+        }
+      } else {
+        // legacy: permanent dismissal flag
+        const shouldShowFlag = window.localStorage.getItem(key) ?? 'true';
+        canShowByDismissLogic = (shouldShowFlag === 'true');
+      }
+
+      const shouldDisplay = depOk && meetsVisitThreshold && canShowByDismissLogic;
+
+      if (shouldDisplay) {
         el.classList.remove('hidden');
         el.classList.add('flex');
       }
@@ -83,7 +125,17 @@ const elementId = storageKey.replace(/[^a-zA-Z0-9_-]/g, '_')
       const btn = el.querySelector('[data-banner-dismiss]');
       if (btn) {
         btn.addEventListener('click', () => {
-          try { window.localStorage.setItem(key, 'false'); } catch (_) {}
+          try {
+            if (hasEveryX) {
+              // store last dismissal timestamp; do NOT permanently disable
+              window.localStorage.setItem(lastDismissedKey, new Date().toISOString());
+              // keep the legacy flag enabled to allow future re-showing
+              window.localStorage.setItem(key, 'true');
+            } else {
+              // legacy behavior: permanently hide
+              window.localStorage.setItem(key, 'false');
+            }
+          } catch (_) {}
           el.remove();
           try {
             // @ts-ignore

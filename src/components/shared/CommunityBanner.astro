@@ -18,6 +18,10 @@ interface Props {
   class?: string
   /** Optional localStorage key this banner depends on; banner only shows if this key is 'true' */
   dependenceOn?: string
+  /** If set (> 0), allow the banner to reappear after the user dismisses it, once every X days */
+  showEveryXDay?: number
+  /** If set (> 0), only show the banner after this many visits (per banner key) */
+  showAfterXVisits?: number
 }
 const props = Astro.props
 ---
@@ -29,8 +33,10 @@ const props = Astro.props
   showUntil={props.showUntil}
   class={props.class}
   dependenceOn={props.dependenceOn}
+  showEveryXDay={props.showEveryXDay}
+  showAfterXVisits={props.showAfterXVisits}
 >
   <p>
-    Check out the <a href="/community">Community Page</a> for a list of some of the Jingle Jam community streams.
+    Check out the <a class="underline" href="/community">Community Page</a> for a list of some of the Jingle Jam community streams.
   </p>
 </Banner>

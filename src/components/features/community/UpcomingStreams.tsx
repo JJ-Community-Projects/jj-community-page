@@ -23,7 +23,7 @@ export const UpcomingStreams: Component = () => {
         <p class="text-red-400">Failed to load upcoming streams.</p>
       </Show>
       <Show when={upcomingStreams.isSuccess && items().length > 0}>
-        <div class="w-full grid grid-cols-[repeat(auto-fit,_minmax(200px,_1fr))] gap-2 ">
+        <div class="w-full grid grid-cols-[repeat(auto-fit,_minmax(250px,_1fr))] gap-2 ">
           <For each={visibleItems()}>
             {(item) => {
               const { stream, owner } = item

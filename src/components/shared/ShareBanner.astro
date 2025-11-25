@@ -18,6 +18,10 @@ interface Props {
   class?: string
   /** Optional localStorage key this banner depends on; banner only shows if this key is 'true' */
   dependenceOn?: string
+  /** If set (> 0), allow the banner to reappear after the user dismisses it, once every X days */
+  showEveryXDay?: number
+  /** If set (> 0), only show the banner after this many visits (per banner key) */
+  showAfterXVisits?: number
 }
 const props = Astro.props
 ---
@@ -29,6 +33,8 @@ const props = Astro.props
   showUntil={props.showUntil}
   class={props.class}
   dependenceOn={props.dependenceOn}
+  showEveryXDay={props.showEveryXDay}
+  showAfterXVisits={props.showAfterXVisits}
 >
   <p>
     If you find this site useful, please share it with friends or on social
