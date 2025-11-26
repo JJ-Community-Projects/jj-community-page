@@ -1,6 +1,7 @@
 import type { UserStream } from './contract.ts'
 
 export async function getHardCodedEvents(): Promise<UserStream[]> {
+  const currentDate = new Date()
   const ownerJJ = {
     userId: -1,
     primaryLiveStream: 'twitch',
@@ -568,5 +569,15 @@ export async function getHardCodedEvents(): Promise<UserStream[]> {
     },
   ]
 
-  return [...week1]
+  const allEvents = [...week1]
+
+  const upcomingEvents = allEvents.filter(
+    (event) => event.stream.start >= currentDate,
+  )
+
+  upcomingEvents.sort(
+    (a, b) => a.stream.start.getTime() - b.stream.start.getTime(),
+  )
+
+  return upcomingEvents.slice(0, 4)
 }
