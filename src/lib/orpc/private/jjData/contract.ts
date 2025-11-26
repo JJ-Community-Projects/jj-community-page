@@ -83,6 +83,8 @@ const UserDisplaySchema = z.object({
   profileImage: z.string(),
   /** Twitch login username, null if no Twitch account linked */
   twitchLogin: z.string().nullable(),
+  /** Youtube channel URL */
+  youtubeUrl: z.string().optional().nullable(),
   /** Tiltify fundraising profile slug */
   tiltifySlug: z.string(),
   /** Full Tiltify profile URL for fundraising campaigns */
@@ -92,6 +94,7 @@ const UserDisplaySchema = z.object({
   /** Custom accent color from userStyles table */
   accentColor: z.string().nullable(),
 })
+export type UserDisplay = z.infer<typeof UserDisplaySchema>
 const StreamTagSchema = z.object({
   /** Tag display name */
   name: z.string(),
@@ -102,7 +105,7 @@ const StreamTagSchema = z.object({
 })
 export const StreamSchema = z.object({
   /** Unique identifier for the stream */
-  id: z.number().int().nonnegative(),
+  id: z.number().int(),
   /** ID of the schedule this stream belongs to */
   scheduleId: z.number().int().nonnegative(),
   /** ID of the user who created this stream */
@@ -127,12 +130,18 @@ export const StreamSchema = z.object({
   tags: z.array(StreamTagSchema),
   /** Array of users participating in this stream */
   participants: z.array(UserDisplaySchema),
+  /** Is the time set for this stream TBD? (true if start or end is null) **/
+  isTimeTBD: z.boolean().optional().default(false),
 })
+
+export type Stream = z.infer<typeof StreamSchema>
 
 export const UserStreamSchema = z.object({
   stream: StreamSchema,
-  owner: UserDisplaySchema,
+  owner: UserDisplaySchema.optional(),
 })
+
+export type UserStream = z.infer<typeof UserStreamSchema>
 
 export const UserStreamsSchema = z.object({
   count: z.number(),

@@ -19,6 +19,8 @@ export const UserDisplaySchema = z.object({
   profileImage: z.string(),
   /** Twitch login username, null if no Twitch account linked */
   twitchLogin: z.string().nullable(),
+  /** Youtube channel URL */
+  youtubeUrl: z.string().optional().nullable(),
   /** Tiltify fundraising profile slug */
   tiltifySlug: z.string(),
   /** Full Tiltify profile URL for fundraising campaigns */

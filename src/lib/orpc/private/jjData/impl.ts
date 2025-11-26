@@ -3,6 +3,9 @@ import {
   type Currencies,
   type JJCampaignType,
   type Overview,
+  type Stream,
+  type UserDisplay,
+  type UserStream,
   type UserWithInfo,
   UserWithInfoTags,
 } from './contract.ts'
@@ -17,6 +20,7 @@ import { tagUserCountsView, userDisplayView, } from '../../../db/schema/views-sc
 import { UserDisplaySchema } from '../../public/schemas/UserDisplaySchema.ts'
 import type { JJDrizzleDatabase } from '../../../db/db.ts'
 import type { CurrenciesTV } from '../../public/twitchExtension/contract.ts'
+import { getHardCodedEvents } from './getHardCodedEvents.ts'
 // New: get campaign by Twitch id
 
 const jjDataCacheMiddleware = cacheMiddleware({
@@ -233,6 +237,7 @@ const upcomingStreams = os.upcomingStreamsContract
       return reviveUpcomingStreamsResult(cached)
     }
 
+    const hardcodedStreams = await getHardCodedEvents()
     const db = context.db
     const nowSec = Math.floor(Date.now() / 1000)
     const year = new Date().getUTCFullYear()
@@ -258,7 +263,9 @@ const upcomingStreams = os.upcomingStreamsContract
       scheduleRows.map((r) => [r.id, r.ownerId]),
     )
     if (scheduleIds.length === 0) {
-      return { count: 0, streams: [] }
+      return { count: hardcodedStreams.length, streams: [
+          ...hardcodedStreams
+        ] }
     }
 
     // 2) Identify upcoming or currently-live visible streams across those schedules
@@ -282,7 +289,9 @@ const upcomingStreams = os.upcomingStreamsContract
       .all()
 
     if (basePairs.length === 0) {
-      return { count: 0, streams: [] }
+      return { count: hardcodedStreams.length, streams: [
+          ...hardcodedStreams
+        ] }
     }
 
     // Limit to next 2 streams per schedule (based on ascending start order)
@@ -460,22 +469,31 @@ const upcomingStreams = os.upcomingStreamsContract
     }
 
     // 7) Compose final user streams preserving chronological order
-    const composed = limitedPairs
+    const userStreams: UserStream[] = limitedPairs
       .map((pair) => {
         const key = `${pair.scheduleId}:${pair.streamId}`
         const core = detailMap.get(key)
         if (!core) return null
-        const stream = {
+        const stream: Stream = {
           ...(core as any),
           tags: tagsMap.get(key) ?? [],
           participants: participantsMap.get(key) ?? [],
         }
         const ownerId = scheduleOwnerMap.get(pair.scheduleId)!
-        const owner = ownersMap.get(ownerId)
+        const owner: UserDisplay = ownersMap.get(ownerId)
         if (!owner) return null
         return { stream, owner }
       })
-      .filter(Boolean) as any[]
+      .filter(user => {
+        return user != null
+      })
+
+
+    const composed = [
+      ...userStreams,
+      ...hardcodedStreams,
+    ]
+
 
     composed.sort((a, b) => a.stream.start.getTime() - b.stream.start.getTime())
 

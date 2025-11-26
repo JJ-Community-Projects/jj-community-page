@@ -140,6 +140,8 @@ export const StreamSchema = z.object({
   tags: z.array(StreamTagSchema),
   /** Array of users participating in this stream */
   participants: z.array(UserDisplaySchema),
+  /** Is the time set for this stream TBD? (true if start or end is null) **/
+  isTimeTBD: z.boolean().optional().default(false),
 });
 
 /**

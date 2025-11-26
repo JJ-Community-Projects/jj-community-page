@@ -11,7 +11,11 @@ import { getTextColor } from '../../../../lib/utils/textColors.ts'
 import { StreamTags } from './StreamTags'
 import { StreamParticipants } from './StreamParticipants'
 import type { UserDisplay } from '../../../../lib/orpc/public/schemas/UserDisplaySchema.ts'
-import { FaBrandsTwitch, FaRegularCalendarPlus } from 'solid-icons/fa'
+import {
+  FaBrandsTwitch,
+  FaBrandsYoutube,
+  FaRegularCalendarPlus,
+} from 'solid-icons/fa'
 
 interface ScheduleStreamDetailDialogProps {
   stream: Stream
@@ -85,7 +89,7 @@ export const ScheduleStreamDetailDialog: Component<
   const textColor = getTextColor(highlightColor)
 
   const showCountdown = () => {
-    return getStreamStartDateTime() > now()
+    return getStreamStartDateTime() > now() && !stream().isTimeTBD
   }
 
   const isLive = () => {
@@ -157,22 +161,36 @@ export const ScheduleStreamDetailDialog: Component<
                       </div>
                     </div>
                   </Show>
-                  <p>
-                    {getStreamStartDateTime().toLocaleString({
-                      weekday: 'short',
-                      month: 'short',
-                      day: 'numeric',
-                      hour: 'numeric',
-                      minute: 'numeric',
-                      timeZoneName: 'short',
-                    })}
-                  </p>
+                  <Show
+                    when={!stream().isTimeTBD}
+                    fallback={
+                      <p>
+                        {getStreamStartDateTime().toLocaleString({
+                          weekday: 'short',
+                          month: 'short',
+                          day: 'numeric',
+                        })}{' '}
+                        TBD
+                      </p>
+                    }
+                  >
+                    <p>
+                      {getStreamStartDateTime().toLocaleString({
+                        weekday: 'short',
+                        month: 'short',
+                        day: 'numeric',
+                        hour: 'numeric',
+                        minute: 'numeric',
+                        timeZoneName: 'short',
+                      })}
+                    </p>
+                  </Show>
 
                   <Show when={showCountdown()}>
                     <p>{countdownFormat()}</p>
                   </Show>
 
-                  <Show when={props.user}>
+                  <Show when={props.user && props.user.userId < 0}>
                     <div class="flex flex-col gap-2 py-4">
                       <Show when={props.user?.tiltifySlug}>
                         {(tiltifySlug) => {
@@ -196,6 +214,20 @@ export const ScheduleStreamDetailDialog: Component<
                               class="flex w-fit flex-row items-center justify-center gap-2 rounded-full bg-twitch-500 px-3 py-1 text-sm font-medium text-white transition-colors hover:brightness-105"
                             >
                               Open Twitch <FaBrandsTwitch />
+                            </a>
+                          )
+                        }}
+                      </Show>
+                      <Show when={props.user?.youtubeUrl}>
+                        {(url) => {
+                          return (
+                            <a
+                              href={url()}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              class="flex w-fit flex-row items-center justify-center gap-2 rounded-full bg-youtube-500 px-3 py-1 text-sm font-medium text-white transition-colors hover:brightness-105"
+                            >
+                              Open Youtube <FaBrandsYoutube />
                             </a>
                           )
                         }}
@@ -244,7 +276,8 @@ const AddToGoogleCalendarButton: Component<AddToGoogleCalendarButtonProps> = (
 
     const title = encodeURIComponent(
       (stream.title ?? 'Jingle Jam Stream') +
-        ' - ' + `JJ ${props.stream.start.getFullYear()} - `+
+        ' - ' +
+        `JJ ${props.stream.start.getFullYear()} - ` +
         (props.user?.username ?? ''),
     )
     const dates = `${startUtc}/${endUtc}`
@@ -328,7 +361,8 @@ const DownloadIcsButton: Component<DownloadIcsButtonProps> = (props) => {
     const date = start.toFormat('yyyy-LL-dd_HHmm')
     const title = encodeURIComponent(
       (props.stream.title ?? 'Jingle Jam Stream') +
-        ' ' + `- JJ ${start.year} - `+
+        ' ' +
+        `- JJ ${start.year} - ` +
         (props.user?.username ?? ''),
     )
     return `${date}_${title}.ics`
