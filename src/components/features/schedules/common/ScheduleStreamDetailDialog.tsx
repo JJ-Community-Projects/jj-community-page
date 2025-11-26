@@ -190,7 +190,7 @@ export const ScheduleStreamDetailDialog: Component<
                     <p>{countdownFormat()}</p>
                   </Show>
 
-                  <Show when={props.user && props.user.userId < 0}>
+                  <Show when={props.user}>
                     <div class="flex flex-col gap-2 py-4">
                       <Show when={props.user?.tiltifySlug}>
                         {(tiltifySlug) => {
