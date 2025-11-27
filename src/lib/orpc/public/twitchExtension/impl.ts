@@ -322,6 +322,7 @@ const userExtensionConfig = os.userExtensionConfigContract
           ),
         )
         .get()
+      console.log('user-config', 'scheduleId', schedule?.id)
       hasSchedule = !!schedule
     }
 
@@ -350,6 +351,7 @@ const userExtensionConfig = os.userExtensionConfigContract
       console.log('user-config', 'schedule', 'no-campaign')
       tabs = ['user-schedule', 'charities', 'fundraisers']
     } else {
+      console.log('user-config', 'unexpected')
       tabs = ['charities', 'fundraisers']
     }
 
