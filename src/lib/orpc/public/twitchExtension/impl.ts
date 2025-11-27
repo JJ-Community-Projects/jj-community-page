@@ -295,16 +295,17 @@ const userExtensionConfig = os.userExtensionConfigContract
       (await stub.getNumberConfig('twitch-extension:config.year')) ??
       new Date().getUTCFullYear()
 
+    console.log('user-config', 'year', year)
+
     const JJDO = context.env.JingleJamData
     const jjStub = JJDO.get(JJDO.idFromName('JJ_API_CACHE'))
     const campaignByTwitchId = await jjStub.getCampaignDisplay(input.channelId)
     const userId = await getUserIdByTwitchChannelId(db, input.channelId)
 
-    const x = await jjStub.getAllCampaignDisplay()
-    console.log('x', x)
+    // const x = await jjStub.getAllCampaignDisplay()
     // Check if JJ campaign exists for user/year
 
-    console.log('camp', campaignByTwitchId)
+    console.log('user-config', 'userId', userId)
 
     let hasSchedule = false
     if (userId) {
@@ -330,21 +331,29 @@ const userExtensionConfig = os.userExtensionConfigContract
 
     if (yogsMembers.includes(input.channelId)) {
       if (hasSchedule) {
+        console.log('user-config', 'yogs-member', 'schedule')
         tabs = ['user-schedule', 'charities', 'fundraisers', 'yogs']
       } else {
+        console.log('user-config', 'yogs-member', 'no-schedule')
         tabs = ['charities', 'fundraisers', 'yogs']
       }
     } else if (!hasSchedule && !hasCampaign) {
+      console.log('user-config', 'no-schedule', 'no-campaign')
       tabs = ['charities', 'fundraisers']
     } else if (hasSchedule && hasCampaign) {
+      console.log('user-config', 'schedule', 'campaign')
       tabs = ['user-schedule', 'charities', 'fundraisers']
     } else if (!hasSchedule && hasCampaign) {
+      console.log('user-config', 'no-schedule', 'campaign')
       tabs = ['charities', 'fundraisers']
     } else if (hasSchedule && !hasCampaign) {
+      console.log('user-config', 'schedule', 'no-campaign')
       tabs = ['user-schedule', 'charities', 'fundraisers']
     } else {
       tabs = ['charities', 'fundraisers']
     }
+
+    console.log('user-config', 'tabs', tabs)
 
     const result = {
       hasCampaign,
