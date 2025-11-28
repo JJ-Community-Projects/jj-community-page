@@ -14,12 +14,22 @@ import { dbMiddleware } from '../../middleware/dbMiddleware.ts'
 import { implement, ORPCError } from '@orpc/server'
 import { cacheMiddleware } from '../../middleware/cacheControl.ts'
 import { and, asc, eq, not, or, sql } from 'drizzle-orm'
-import { schedulesTable, streamParticipantsTable, streamsTable, } from '../../../db/schema/jj-schema.ts'
-import { streamTagsTable, tags, userTagsTable, } from '../../../db/schema/tags-schema.ts'
-import { tagUserCountsView, userDisplayView, } from '../../../db/schema/views-schema.ts'
+import {
+  schedulesTable,
+  streamParticipantsTable,
+  streamsTable,
+} from '../../../db/schema/jj-schema.ts'
+import {
+  streamTagsTable,
+  tags,
+  userTagsTable,
+} from '../../../db/schema/tags-schema.ts'
+import {
+  tagUserCountsView,
+  userDisplayView,
+} from '../../../db/schema/views-schema.ts'
 import { UserDisplaySchema } from '../../public/schemas/UserDisplaySchema.ts'
 import type { JJDrizzleDatabase } from '../../../db/db.ts'
-import type { CurrenciesTV } from '../../public/twitchExtension/contract.ts'
 import {
   getHardCodedEvents,
   getHardCodedEventsJustYogs,
@@ -83,23 +93,23 @@ const campaigns = os.campaignsContract
       }
       const sortedList = (list as any).toSorted
         ? (list as any).toSorted((a: any, b: any) => {
-          const ga = getGroupRank(a)
-          const gb = getGroupRank(b)
-          if (ga !== gb) return ga - gb
-          const ra = getRaisedGbp(a)
-          const rb = getRaisedGbp(b)
-          if (ra !== rb) return rb - ra
-          return 0
-        })
+            const ga = getGroupRank(a)
+            const gb = getGroupRank(b)
+            if (ga !== gb) return ga - gb
+            const ra = getRaisedGbp(a)
+            const rb = getRaisedGbp(b)
+            if (ra !== rb) return rb - ra
+            return 0
+          })
         : [...list].sort((a: any, b: any) => {
-          const ga = getGroupRank(a)
-          const gb = getGroupRank(b)
-          if (ga !== gb) return ga - gb
-          const ra = getRaisedGbp(a)
-          const rb = getRaisedGbp(b)
-          if (ra !== rb) return rb - ra
-          return 0
-        })
+            const ga = getGroupRank(a)
+            const gb = getGroupRank(b)
+            if (ga !== gb) return ga - gb
+            const ra = getRaisedGbp(a)
+            const rb = getRaisedGbp(b)
+            if (ra !== rb) return rb - ra
+            return 0
+          })
 
       const sortedData = { ...(data as any), list: sortedList }
       // store in KV for 60s
@@ -160,23 +170,23 @@ const campaignsAll = os.campaignsContract
       }
       const sortedList = (list as any).toSorted
         ? (list as any).toSorted((a: any, b: any) => {
-          const ga = getGroupRank(a)
-          const gb = getGroupRank(b)
-          if (ga !== gb) return ga - gb
-          const ra = getRaisedGbp(a)
-          const rb = getRaisedGbp(b)
-          if (ra !== rb) return rb - ra
-          return 0
-        })
+            const ga = getGroupRank(a)
+            const gb = getGroupRank(b)
+            if (ga !== gb) return ga - gb
+            const ra = getRaisedGbp(a)
+            const rb = getRaisedGbp(b)
+            if (ra !== rb) return rb - ra
+            return 0
+          })
         : [...list].sort((a: any, b: any) => {
-          const ga = getGroupRank(a)
-          const gb = getGroupRank(b)
-          if (ga !== gb) return ga - gb
-          const ra = getRaisedGbp(a)
-          const rb = getRaisedGbp(b)
-          if (ra !== rb) return rb - ra
-          return 0
-        })
+            const ga = getGroupRank(a)
+            const gb = getGroupRank(b)
+            if (ga !== gb) return ga - gb
+            const ra = getRaisedGbp(a)
+            const rb = getRaisedGbp(b)
+            if (ra !== rb) return rb - ra
+            return 0
+          })
 
       const sortedData = { ...(data as any), list: sortedList }
       // store in KV for 60s
@@ -267,9 +277,7 @@ const upcomingStreams = os.upcomingStreamsContract
       scheduleRows.map((r) => [r.id, r.ownerId]),
     )
     if (scheduleIds.length === 0) {
-      return { count: hardcodedStreams.length, streams: [
-          ...hardcodedStreams
-        ] }
+      return { count: hardcodedStreams.length, streams: [...hardcodedStreams] }
     }
 
     // 2) Identify upcoming or currently-live visible streams across those schedules
@@ -293,9 +301,7 @@ const upcomingStreams = os.upcomingStreamsContract
       .all()
 
     if (basePairs.length === 0) {
-      return { count: hardcodedStreams.length, streams: [
-          ...hardcodedStreams
-        ] }
+      return { count: hardcodedStreams.length, streams: [...hardcodedStreams] }
     }
 
     // Limit to next 2 streams per schedule (based on ascending start order)
@@ -488,16 +494,11 @@ const upcomingStreams = os.upcomingStreamsContract
         if (!owner) return null
         return { stream, owner }
       })
-      .filter(user => {
+      .filter((user) => {
         return user != null
       })
 
-
-    const composed = [
-      ...userStreams,
-      ...hardcodedStreams,
-    ]
-
+    const composed = [...userStreams, ...hardcodedStreams]
 
     composed.sort((a, b) => a.stream.start.getTime() - b.stream.start.getTime())
 
@@ -546,7 +547,10 @@ function reviveUserDisplay(u: any) {
   }
 }
 
-async function getUsers(db: JJDrizzleDatabase, kv?: KVNamespace): Promise<UserWithInfo[]> {
+async function getUsers(
+  db: JJDrizzleDatabase,
+  kv?: KVNamespace,
+): Promise<UserWithInfo[]> {
   try {
     // KV cache (optional)
     if (kv) {
@@ -739,10 +743,7 @@ const getUserCampaignPairs = os.getUserCampaignPairsContract.handler(
   },
 )
 
-
-  async function loadOverview(
-  kv: KVNamespace,
-): Promise<Overview | null> {
+async function loadOverview(kv: KVNamespace): Promise<Overview | null> {
   const data = await getJSON<any>(kv, 'twitch-extension:overview')
   if (!data) return null
   const revived: Overview = {
@@ -753,7 +754,7 @@ const getUserCampaignPairs = os.getUserCampaignPairsContract.handler(
   }
   return revived
 }
-  async function storeOverview(
+async function storeOverview(
   kv: KVNamespace,
   data: Overview,
   ttlSeconds: number = 60,
@@ -790,48 +791,46 @@ function valueToCurrencies(
   }
 }
 
-const overview = os.overviewContract
-  .handler(async ({ context }) => {
-    // Try KV cache first
-    const cached = await loadOverview(context.env.KV)
-    if (cached) {
-      return cached
-    }
+const overview = os.overviewContract.handler(async ({ context }) => {
+  // Try KV cache first
+  const cached = await loadOverview(context.env.KV)
+  if (cached) {
+    return cached
+  }
 
-    const DO = context.env.JingleJamData
-    const stubID = DO.idFromName('JJ_API_CACHE')
-    const stub = DO.get(stubID)
+  const DO = context.env.JingleJamData
+  const stubID = DO.idFromName('JJ_API_CACHE')
+  const stub = DO.get(stubID)
 
-    const usdRate = await stub.getDollarConversionRate()
-    const eurRate = await stub.getGbpToEurRate()
-    const raised = await stub.getRaised()
-    const collections = await stub.getCollections()
-    const donations = await stub.getDonations()
-    const dateStr = await stub.getDate()
-    const yogs = await stub.getCampaignBySlug('yogscast')
-    const overview: Overview = {
-      raised: {
-        yogscast: yogs
-          ? valueToCurrencies(yogs!.raised, usdRate, eurRate)
-          : undefined,
-        fundraisers: yogs
-          ? valueToCurrencies(raised - yogs!.raised, usdRate, eurRate)
-          : undefined,
-        total: valueToCurrencies(raised, usdRate, eurRate),
-      },
-      collections: collections,
-      donations: donations,
-      date: new Date(dateStr),
-    }
+  const usdRate = await stub.getDollarConversionRate()
+  const eurRate = await stub.getGbpToEurRate()
+  const raised = await stub.getRaised()
+  const collections = await stub.getCollections()
+  const donations = await stub.getDonations()
+  const dateStr = await stub.getDate()
+  const yogs = await stub.getCampaignBySlug('yogscast')
+  const overview: Overview = {
+    raised: {
+      yogscast: yogs
+        ? valueToCurrencies(yogs!.raised, usdRate, eurRate)
+        : undefined,
+      fundraisers: yogs
+        ? valueToCurrencies(raised - yogs!.raised, usdRate, eurRate)
+        : undefined,
+      total: valueToCurrencies(raised, usdRate, eurRate),
+    },
+    collections: collections,
+    donations: donations,
+    date: new Date(dateStr),
+  }
 
-    await storeOverview(context.env.KV, overview, 60)
+  await storeOverview(context.env.KV, overview, 60)
 
-    return overview
-  })
+  return overview
+})
 
-
-const fullSchedule = os.fullScheduleContract
-  .handler(async ({ context})=>{
+const fullSchedule = os.fullScheduleContract.handler(async ({ context }) => {
+  try {
     const db = context.db
     const year = new Date().getUTCFullYear()
 
@@ -853,10 +852,7 @@ const fullSchedule = os.fullScheduleContract
     const hardcodedNonYogs = await getHardCodedEventsNoYogs()
     const hardcodedYogs = await getHardCodedEventsJustYogs()
 
-    const hardcoded = [
-      ...hardcodedNonYogs,
-      ...hardcodedYogs,
-    ]
+    const hardcoded = [...hardcodedNonYogs, ...hardcodedYogs]
 
     // 1) Find all visible & primary schedules for the current year
     const scheduleRows = await db
@@ -882,7 +878,13 @@ const fullSchedule = os.fullScheduleContract
       const groups = new Map<string, { day: Date; streams: UserStream[] }>()
       for (const us of hardcoded) {
         const s = us.stream
-        const d = new Date(Date.UTC(s.start.getUTCFullYear(), s.start.getUTCMonth(), s.start.getUTCDate()))
+        const d = new Date(
+          Date.UTC(
+            s.start.getUTCFullYear(),
+            s.start.getUTCMonth(),
+            s.start.getUTCDate(),
+          ),
+        )
         const key = d.toISOString()
         const g = groups.get(key) ?? { day: d, streams: [] }
         g.streams.push(us)
@@ -891,7 +893,9 @@ const fullSchedule = os.fullScheduleContract
       const days = Array.from(groups.values())
         .map(({ day, streams }) => ({
           day,
-          streams: streams.sort((a, b) => a.stream.start.getTime() - b.stream.start.getTime()),
+          streams: streams.sort(
+            (a, b) => a.stream.start.getTime() - b.stream.start.getTime(),
+          ),
         }))
         .sort((a, b) => a.day.getTime() - b.day.getTime())
       return { days }
@@ -918,7 +922,13 @@ const fullSchedule = os.fullScheduleContract
       const groups = new Map<string, { day: Date; streams: UserStream[] }>()
       for (const us of hardcoded) {
         const s = us.stream
-        const d = new Date(Date.UTC(s.start.getUTCFullYear(), s.start.getUTCMonth(), s.start.getUTCDate()))
+        const d = new Date(
+          Date.UTC(
+            s.start.getUTCFullYear(),
+            s.start.getUTCMonth(),
+            s.start.getUTCDate(),
+          ),
+        )
         const key = d.toISOString()
         const g = groups.get(key) ?? { day: d, streams: [] }
         g.streams.push(us)
@@ -927,7 +937,9 @@ const fullSchedule = os.fullScheduleContract
       const days = Array.from(groups.values())
         .map(({ day, streams }) => ({
           day,
-          streams: streams.sort((a, b) => a.stream.start.getTime() - b.stream.start.getTime()),
+          streams: streams.sort(
+            (a, b) => a.stream.start.getTime() - b.stream.start.getTime(),
+          ),
         }))
         .sort((a, b) => a.day.getTime() - b.day.getTime())
       return { days }
@@ -989,7 +1001,10 @@ const fullSchedule = os.fullScheduleContract
       .where(pairConditionTags)
       .all()
 
-    const tagsMap = new Map<string, Array<{ name: string; slug: string; color: string }>>()
+    const tagsMap = new Map<
+      string,
+      Array<{ name: string; slug: string; color: string }>
+    >()
     for (const t of tagRows) {
       const key = `${t.scheduleId}:${t.streamId}`
       const arr = tagsMap.get(key) ?? []
@@ -1103,7 +1118,7 @@ const fullSchedule = os.fullScheduleContract
         const owner = ownerId ? ownersMap.get(ownerId) : undefined
         return { stream, owner }
       })
-      .filter(user => {
+      .filter((user) => {
         return user != null
       })
 
@@ -1114,7 +1129,13 @@ const fullSchedule = os.fullScheduleContract
     const groups = new Map<string, { day: Date; streams: UserStream[] }>()
     for (const us of allUserStreams) {
       const s = us.stream
-      const d = new Date(Date.UTC(s.start.getUTCFullYear(), s.start.getUTCMonth(), s.start.getUTCDate()))
+      const d = new Date(
+        Date.UTC(
+          s.start.getUTCFullYear(),
+          s.start.getUTCMonth(),
+          s.start.getUTCDate(),
+        ),
+      )
       const key = d.toISOString()
       const g = groups.get(key) ?? { day: d, streams: [] }
       g.streams.push(us)
@@ -1124,7 +1145,9 @@ const fullSchedule = os.fullScheduleContract
     const days = Array.from(groups.values())
       .map(({ day, streams }) => ({
         day,
-        streams: streams.sort((a, b) => a.stream.start.getTime() - b.stream.start.getTime()),
+        streams: streams.sort(
+          (a, b) => a.stream.start.getTime() - b.stream.start.getTime(),
+        ),
       }))
       .sort((a, b) => a.day.getTime() - b.day.getTime())
 
@@ -1133,7 +1156,11 @@ const fullSchedule = os.fullScheduleContract
     // Store in KV (10 minutes)
     await putJSON(context.env.KV, cacheKey, result, 600)
     return result
-  })
+  } catch (e) {
+    console.error('fullSchedule', e)
+    throw new ORPCError('INTERNAL_SERVER_ERROR')
+  }
+})
 
 export const jjRouter = {
   campaigns,
