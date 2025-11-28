@@ -1,10 +1,11 @@
 import type { JJDrizzleDatabase } from '../../../db/db.ts'
 import { twitchChannelSchema } from '../../../db/schema/twitch-channel-schema.ts'
 import { and, eq, sql } from 'drizzle-orm'
-import type {
-  CurrenciesTV,
-  JJCampaignTVType,
-  JJCauseTVType,
+import {
+  type CurrenciesTV,
+  type JJCampaignTVType,
+  type JJCauseTVType,
+  type StreamTVType,
 } from './contract.ts'
 import type { UserDisplay } from '../schemas/UserDisplaySchema.ts'
 import { jjCampaign } from '../../../db/schema/jj-api-schema.ts'
@@ -511,4 +512,280 @@ export function valueToCurrencies(
     usdFormatted: USD.format(usd),
     euroFormatted: EUR.format(euro),
   }
+}
+
+export async function getHardCodedEventsNoYogsForExtension(): Promise<
+  StreamTVType[]
+> {
+  const week1: StreamTVType[] = [
+    {
+      title: 'JACK MANIFOLD 24 hours of non-stop action',
+      subtitle: 'Headliner',
+      description:
+        'Tune in for a full 24 hours of non-stop action with the master of the long stream. Expect everything from chaotic IRL segments and party games to loads more.',
+      start: new Date('2025-12-02T18:00:00.000Z'),
+      end: new Date('2025-12-03T18:00:00.000Z'),
+      color: '#E30E50',
+      creators: [
+        {
+          id: 'jackmanifoldtv',
+          name: 'JackManifoldTV',
+          url: 'https://twitch.tv/jackmanifoldtv',
+          color: '#3584BF',
+          imageUrl:
+            'https://static-cdn.jtvnw.net/jtv_user_pictures/f7bfa0ca-e9ec-4ca6-935a-a9b6c5c8f651-profile_image-70x70.png',
+        },
+      ],
+    },
+    {
+      title: 'JEN AND ALIONA',
+      subtitle: 'Headliner',
+      description:
+        'Join Clair Obscur: Expedition 33 stars Jennifer English and Aliona Baranova as they carve a path to the Monolith to fight the Paintress!',
+      start: new Date('2025-12-02T19:00:00.000Z'),
+      end: new Date('2025-12-02T22:00:00.000Z'),
+      color: '#E30E50',
+      creators: [
+        {
+          id: 'jenandaliona',
+          name: 'JenandAliona',
+          url: 'https://twitch.tv/jenandaliona',
+          color: '#3584BF',
+          imageUrl:
+            'https://static-cdn.jtvnw.net/jtv_user_pictures/46d24a55-a2a1-47b9-89c8-8446e69657fc-profile_image-70x70.png',
+        },
+      ],
+    },
+    /*
+    {
+      title: 'LITTLEBUNNY_X',
+      subtitle: 'Wild games and cooking streams',
+      description:
+        'Support Bunny as she takes on a variety of wild games on 2nd December and check back in throughout the two weeks for cooking streams and special guests!',
+      start: new Date('2025-12-02T11:00:00.000Z'),
+      end: new Date('2025-12-02T13:00:00.000Z'),
+      color: '#E30E50',
+      creators: [
+        {
+          id: 'littlebunny_x',
+          name: 'littlebunny_x',
+          url: 'https://twitch.tv/littlebunny_x',
+          color: '#3584BF',
+          imageUrl:
+            'https://static-cdn.jtvnw.net/jtv_user_pictures/de635b64-2eaf-4a2e-8704-02c74d0c1ea4-profile_image-70x70.png',
+        },
+      ],
+    },*/
+    {
+      title: 'NAKED & AFRAID',
+      subtitle: 'Headline',
+      description:
+        '21 seasoned Minecraft pros take on the hardest survival challenge on the internet, with one life and no hope.',
+      start: new Date('2025-12-02T14:00:00.000Z'),
+      end: new Date('2025-12-02T16:00:00.000Z'),
+      color: '#E30E50',
+      creators: [
+        {
+          id: 'shubble',
+          name: 'shubble',
+          url: 'https://twitch.tv/shubble',
+          color: '#3584BF',
+          imageUrl:
+            'https://static-cdn.jtvnw.net/jtv_user_pictures/a2c21c36-d5fa-4c47-a1ef-ea0e4eb6cfbe-profile_image-70x70.png',
+        },
+      ],
+    },
+    {
+      title: 'NAKED & AFRAID',
+      subtitle: 'Headline',
+      description:
+        '21 seasoned Minecraft pros take on the hardest survival challenge on the internet, with one life and no hope.',
+      start: new Date('2025-12-04T14:00:00.000Z'),
+      end: new Date('2025-12-04T16:00:00.000Z'),
+      color: '#E30E50',
+      creators: [
+        {
+          id: 'REKRAP22',
+          name: 'REKRAP22',
+          url: 'https://twitch.tv/REKRAP22',
+          color: '#3584BF',
+          imageUrl:
+            'https://static-cdn.jtvnw.net/jtv_user_pictures/5efe4026-499c-4b67-bcf6-eee1021ca735-profile_image-70x70.png',
+        },
+      ],
+    },
+    {
+      title: 'NAKED & AFRAID',
+      subtitle: 'Headline',
+      description:
+        '21 seasoned Minecraft pros take on the hardest survival challenge on the internet, with one life and no hope.',
+      start: new Date('2025-12-06T14:00:00.000Z'),
+      end: new Date('2025-12-06T16:00:00.000Z'),
+      color: '#E30E50',
+      creators: [
+        {
+          id: 'CLOWNPIERCE',
+          name: 'CLOWNPIERCE',
+          url: 'https://twitch.tv/CLOWNPIERCE',
+          color: '#3584BF',
+          imageUrl:
+            'https://static-cdn.jtvnw.net/jtv_user_pictures/45e12999-67cc-4217-8a18-c8f750bca3cf-profile_image-70x70.png',
+        },
+      ],
+    },
+    {
+      title: 'ZEALAND',
+      subtitle: "Headliner",
+      description:
+        "Join Zealand as he takes on his Football Manager '26 'Charity-O-Thon' save trying to win the championship with a team linked to War Child. But what team will he choose?",
+      start: new Date('2025-12-07T16:00:00.000Z'),
+      end: new Date('2025-12-07T18:00:00.000Z'),
+      color: '#E30E50',
+      creators: [
+        {
+          id: 'zeaiand',
+          name: 'Zealand',
+          url: 'https://twitch.tv/zeaiand',
+          color: '#3584BF',
+          imageUrl:
+            'https://static-cdn.jtvnw.net/jtv_user_pictures/97eab8e6-7c73-4c57-8982-03af8a0d83df-profile_image-70x70.png',
+        },
+      ],
+    },
+    /*
+    {
+      title: "WAR CHILD'S QUIZ OF THE YEAR",
+      subtitle: undefined,
+      description:
+        "War Child's Quiz of the Year returns! Join the stream and play-along with their creator contestants as they battle it out to be named quiz champion.",
+      start: new Date('2025-12-03T20:00:00.000Z'),
+      end: new Date('2025-12-03T22:00:00.000Z'),
+      color: '#E30E50',
+      creators: [
+        {
+          id: 'warchildukgaming',
+          name: 'WarChildUKGaming',
+          url: 'https://twitch.tv/warchildukgaming',
+          color: '#3584BF',
+          imageUrl:
+            'https://static-cdn.jtvnw.net/jtv_user_pictures/f80cf57e-714f-438f-8041-6cfbb3381fc3-profile_image-70x70.jpg',
+        },
+      ],
+    },*/
+    /*
+    {
+      title: 'ARTHURTV',
+      subtitle: 'Planet Zoo and guests',
+      description:
+        'Join Arthur for a evening of wildlife fun including Planet Zoo and maybe even some special guests!',
+      start: new Date('2025-12-03T18:00:00.000Z'),
+      end: new Date('2025-12-03T20:00:00.000Z'),
+      color: '#E30E50',
+      creators: [
+        {
+          id: 'arthurtv',
+          name: 'arthurtv',
+          url: 'https://twitch.tv/arthurtv',
+          color: '#3584BF',
+          imageUrl:
+            'https://static-cdn.jtvnw.net/jtv_user_pictures/dc49b1e8-16f3-400c-b57c-bd5546e5f79e-profile_image-70x70.png',
+        },
+      ],
+    },*/
+    {
+      title: 'TALIA MAR 12-hour streaming marathon',
+      subtitle: 'Headliner',
+      description:
+        "Back for her second Jingle Jam, join Talia for a 12-hour streaming marathon! She's bringing nonstop music, hilarious games, and a full day of charity goodness.",
+      start: new Date('2025-12-04T10:00:00.000Z'),
+      end: new Date('2025-12-04T22:00:00.000Z'),
+      color: '#E30E50',
+      creators: [
+        {
+          id: 'TaliaMar',
+          name: 'taliamar',
+          url: 'https://twitch.tv/TaliaMar',
+          color: '#3584BF',
+          imageUrl:
+            'https://static-cdn.jtvnw.net/jtv_user_pictures/05a2f862-6ea4-4e31-901f-0ff846d173eb-profile_image-70x70.png',
+        },
+      ],
+    },
+    {
+      title: 'JUST ANOTHER MINECRAFT SERVER (JAMS)',
+      subtitle: 'Headliner',
+      description:
+        'Chaotic 100 creator Minecraft SMP featuring a race to complete a series of 9 collaborative quests whilst also avoiding the mayhem caused by the various donation incentives.',
+      start: new Date('2025-12-05T21:00:00.000Z'),
+      end: new Date('2025-12-05T23:00:00.000Z'),
+      color: '#E30E50',
+      creators: [
+        {
+          id: 'jojosolos',
+          name: 'jojosolos',
+          url: 'https://twitch.tv/jojosolos',
+          color: '#3584BF',
+          imageUrl:'https://static-cdn.jtvnw.net/jtv_user_pictures/b4f58c1c-7a8c-41bb-9f4e-5f5d4af2f836-profile_image-70x70.png'
+        },
+      ],
+    },
+    {
+      title: 'JUST CREATE SMP WEEKENDER',
+      subtitle: 'Headliner',
+      description: '',
+      start: new Date('2025-12-06T10:00:00.000Z'),
+      end: new Date('2025-12-06T20:00:00.000Z'),
+      color: '#E30E50',
+      creators: [
+        {
+          id: 'FOXYNOTAIL',
+          name: 'FOXYNOTAIL',
+          url: 'https://twitch.tv/FOXYNOTAIL',
+          color: '#3584BF',
+          imageUrl:
+            'https://static-cdn.jtvnw.net/jtv_user_pictures/6b51aaed-e715-44a4-b492-2b0272913f45-profile_image-70x70.png',
+        },
+      ],
+    },
+    {
+      title: 'Medival Rust Armada',
+      subtitle: 'Headliner',
+      description: '',
+      start: new Date('2025-12-04T19:00:00.000Z'),
+      end: new Date('2025-12-04T22:00:00.000Z'),
+      color: '#E30E50',
+      creators: [
+        {
+          id: 'JACKSHEPARDTV',
+          name: 'JACKSHEPARDTV',
+          url: 'https://twitch.tv/JACKSHEPARDTV',
+          color: '#E30E50',
+          imageUrl: 'https://static-cdn.jtvnw.net/jtv_user_pictures/fe33f2df-837d-478a-a853-277cd319f963-profile_image-70x70.png'
+        },
+      ],
+    },
+    {
+      title: 'HIGH ROLLERS DND',
+      subtitle: 'Headliner',
+      description:
+        "The High Rollers crew return for another unforgettable DnD one-shot. Prepare for chaos - where they end up is anyone's guess!",
+      start: new Date('2025-12-07T17:00:00.000Z'),
+      end: new Date('2025-12-07T20:00:00.000Z'),
+      color: '#E30E50',
+      creators: [
+        {
+          id: 'highrollersdnd',
+          name: 'highrollersdnd',
+          url: 'https://twitch.tv/highrollersdnd',
+          color: '#E30E50',
+          imageUrl:
+            'https://static-cdn.jtvnw.net/jtv_user_pictures/9005fcb8-2b5a-4c86-a625-e865a816f5cd-profile_image-70x70.png',
+        },
+      ],
+    },
+  ]
+
+  const allEvents = [...week1]
+
+  return allEvents
 }

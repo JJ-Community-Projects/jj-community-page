@@ -107,6 +107,8 @@ export const StreamSchema = z.object({
   color: z.string(),
 })
 
+export type StreamTVType = z.infer<typeof StreamSchema>
+
 export const ExtensionConfigSchema = z.object({
   year: z.number(),
   showYogsSchedule: z.boolean(),

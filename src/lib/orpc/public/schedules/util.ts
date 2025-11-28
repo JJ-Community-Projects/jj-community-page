@@ -124,6 +124,7 @@ export async function getScheduleStreams(db: JJDrizzleDatabase, scheduleId: numb
 
   return streams.map(stream => ({
     ...stream,
+    isTimeTBD: false,
     tags: streamTagsMap.get(stream.id) || [],
     participants: streamParticipantsMap.get(stream.id) || [],
   }));

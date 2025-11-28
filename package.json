@@ -23,6 +23,7 @@
     "deployCurrentScheduletoFirestore": "node deployCurrentScheduleToFirestore.js",
     "updateTwitchUser": "node updateTwitchUser.js",
     "generate:yogs-images": "node generateYogsSchedulePreview.js",
+    "generate:headliner-days": "tsx scripts/generateHeadlinerScheduleDays.ts",
     "openapi-generator-cli:tiltify": "openapi-generator-cli generate -i ./src/lib/externalAPI/tiltify/spec.json -g typescript-fetch -o ./src/lib/externalAPI/tiltify/api/ --additional-properties=npmName=tiltify"
   },
   "dependencies": {

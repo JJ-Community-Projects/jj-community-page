@@ -1,5 +1,9 @@
 import { implement, ORPCError, os as server } from '@orpc/server'
-import { contracts, type ExtensionConfigTVType, type JJCampaignsTVType, } from './contract.ts'
+import {
+  contracts,
+  type ExtensionConfigTVType,
+  type JJCampaignsTVType,
+} from './contract.ts'
 import { getEntry } from 'astro:content'
 import { hasAstroContext } from '../../middleware/hasAstroContext.ts'
 import { getStreamColors } from '../../../../functions/jjDatesToColors.ts'
@@ -18,6 +22,7 @@ import {
 import { userDisplayView } from '../../../db/schema/views-schema.ts'
 import { friendsTable } from '../../../db/schema/auth-schema.ts'
 import {
+  getHardCodedEventsNoYogsForExtension,
   getUserIdByTwitchChannelId,
   loadCause,
   loadOverview,
@@ -425,15 +430,17 @@ const campaigns = os.campaignsContract
         const val = it?.raised?.gbp
         return typeof val === 'number' ? val : 0
       }
-      const sortedList = mergedList.toSorted((a: any, b: any) => {
-        const ga = getGroupRank(a)
-        const gb = getGroupRank(b)
-        if (ga !== gb) return ga - gb
-        const ra = getRaisedGbp(a)
-        const rb = getRaisedGbp(b)
-        if (ra !== rb) return rb - ra // higher raised first
-        return 0
-      }).slice(0,100)
+      const sortedList = mergedList
+        .toSorted((a: any, b: any) => {
+          const ga = getGroupRank(a)
+          const gb = getGroupRank(b)
+          if (ga !== gb) return ga - gb
+          const ra = getRaisedGbp(a)
+          const rb = getRaisedGbp(b)
+          if (ra !== rb) return rb - ra // higher raised first
+          return 0
+        })
+        .slice(0, 100)
 
       return {
         count: campaignsDisplay.count ?? sortedList.length,
@@ -626,14 +633,59 @@ const yogsSchedule = os.yogsScheduleContract
       streams: typeof outStreams
     }> = []
 
+    const enableHardCoded = false
+
+    const hardcodedStreams = await getHardCodedEventsNoYogsForExtension()
+    // Group hardcoded streams by ISO date (YYYY-MM-DD) of their start time for quick lookup
+    const hardcodedByDay = new Map<string, typeof hardcodedStreams>()
+    for (const hs of hardcodedStreams ?? []) {
+      // Use UTC date (YYYY-MM-DD) to avoid timezone mismatches when grouping
+      const key = hs.start?.toISOString?.().slice(0, 10)
+      if (!key) continue
+      const arr = hardcodedByDay.get(key) ?? []
+      arr.push(hs)
+      hardcodedByDay.set(key, arr)
+    }
+
+    console.log('hardcodedByDay', hardcodedByDay)
+
     // Traverse weeks -> days -> streams, resolving referenced entries via getEntry
     for (const week of schedule.data.weeks ?? []) {
       for (const dayRef of week.days ?? []) {
         const dayEntry = await getEntry(dayRef)
         if (!dayEntry) continue
+        const day = dayEntry.data
 
-        const dayStreams = dayEntry.data.streams ?? []
+        const dayStreams = day.streams ?? []
         const dayOutStreams: typeof outStreams = []
+
+        // Prepend hardcoded streams matching this day (must appear at the beginning)
+        const dayDateISO = day.date.toISOString().slice(0, 10)
+
+        if (enableHardCoded) {
+          const prepend = dayDateISO
+            ? (hardcodedByDay.get(dayDateISO) ?? [])
+            : []
+          // Sort by start time just in case
+          prepend.sort((a, b) => a.start.getTime() - b.start.getTime())
+          for (const hs of prepend) {
+            const mapped = {
+              title: hs.title,
+              subtitle: hs.subtitle,
+              description: hs.description,
+              markdownDescription: hs.markdownDescription,
+              start: hs.start,
+              end: hs.end,
+              creators: hs.creators,
+              vods: hs.vods,
+              color:
+                hs.color ||
+                getStreamColors(DateTime.fromJSDate(hs.start))['500'],
+            }
+            dayOutStreams.push(mapped)
+            outStreams.push(mapped)
+          }
+        }
         for (const s of dayStreams) {
           // Resolve creators referenced by the stream (if any)
           let creators:
@@ -703,6 +755,7 @@ const yogsSchedule = os.yogsScheduleContract
           start: dayOutStreams[0]?.start ?? new Date(),
           end: dayOutStreams[dayOutStreams.length - 1]?.end ?? new Date(),
         }
+        dayOutStreams.sort((a, b) => a.start.getTime() - b.start.getTime())
         days.push({
           start: range.start,
           end: range.end,
