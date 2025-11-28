@@ -810,6 +810,9 @@ export const UpcomingStreamsStreamCard: Component<ScheduleStreamCardProps> = (
           style={{ 'background-color': highlightColor }}
         >
           <div class="flex h-full w-full flex-row items-center gap-2 text-[var(--text-color)]">
+            <Show when={props.stream.participants.length > 0}>
+              <FaSolidUsers />
+            </Show>
             <Show when={isLive()}>
               <div class="flex flex-row items-center gap-1">
                 <p class="text-xs">LIVE</p>
