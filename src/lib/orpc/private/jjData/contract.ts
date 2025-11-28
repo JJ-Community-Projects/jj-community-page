@@ -215,6 +215,14 @@ export type FullCommunitySchedule = z.infer<typeof FullScheduleSchema>
 
 const fullScheduleContract = oc.output(FullScheduleSchema)
 
+const HardcodedStreamsSchema = z.object({
+  yogs: z.array(UserStreamSchema),
+  nonYogs: z.array(UserStreamSchema),
+})
+
+export type HardcodedStreams = z.infer<typeof HardcodedStreamsSchema>
+
+const hardcodedStreamsContract = oc.output(HardcodedStreamsSchema)
 export const contracts = {
   campaignsContract,
   causesContract,
@@ -222,5 +230,6 @@ export const contracts = {
   getAllUsersWithInfoContract,
   getUserCampaignPairsContract,
   overviewContract,
-  fullScheduleContract
+  fullScheduleContract,
+  hardcodedStreamsContract
 }
