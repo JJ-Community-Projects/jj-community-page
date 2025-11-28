@@ -107,9 +107,9 @@ export const StreamSchema = z.object({
   /** Unique identifier for the stream */
   id: z.number().int(),
   /** ID of the schedule this stream belongs to */
-  scheduleId: z.number().int().nonnegative(),
+  scheduleId: z.number().int(),
   /** ID of the user who created this stream */
-  createdBy: z.number().int().nonnegative(),
+  createdBy: z.number().int(),
   /** Display title of the stream */
   title: z.string(),
   /** Whether this stream is publicly visible */
