@@ -673,7 +673,7 @@ async function getUsers(
 
     // Store in KV if available
     if (kv) {
-      await kv.put('getUsers', JSON.stringify(result), { expirationTtl: 60 })
+      await kv.put('getUsers', JSON.stringify(result), { expirationTtl: 180 })
     }
     return result
   } catch (e) {
@@ -691,7 +691,7 @@ const getAllUsersWithInfo = os.getAllUsersWithInfoContract.handler(
 
     const users = await getUsers(context.db, context.env.KV)
     await context.env.KV.put('getAllUsersWithInfo', JSON.stringify(users), {
-      expirationTtl: 60,
+      expirationTtl: 300,
     })
     return users
   },
@@ -768,7 +768,7 @@ const getUserCampaignPairs = os.getUserCampaignPairsContract.handler(
     })
 
     await context.env.KV.put('getUserCampaignPairs', JSON.stringify(pairs), {
-      expirationTtl: 60,
+      expirationTtl: 180,
     })
 
     return pairs
