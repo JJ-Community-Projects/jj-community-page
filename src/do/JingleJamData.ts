@@ -16,23 +16,33 @@ import type {
   JJCauseTVType,
 } from '../lib/orpc/public/twitchExtension/contract.ts'
 import type {
-  FullCommunitySchedule, HardcodedStreams,
+  FullCommunitySchedule,
+  HardcodedStreams,
   JJCampaignType,
   Stream,
   UserDisplay,
   UserStream,
 } from '../lib/orpc/private/jjData/contract.ts'
 import { and, asc, desc, eq, or } from 'drizzle-orm'
-import { schedulesTable, streamParticipantsTable, streamsTable } from '../lib/db/schema/jj-schema.ts'
+import {
+  schedulesTable,
+  streamParticipantsTable,
+  streamsTable,
+} from '../lib/db/schema/jj-schema.ts'
 import {
   tagUserCountsView,
   userDisplayView,
 } from '../lib/db/schema/views-schema.ts'
-import { streamTagsTable, tags, userTagsTable } from '../lib/db/schema/tags-schema.ts'
+import {
+  streamTagsTable,
+  tags,
+  userTagsTable,
+} from '../lib/db/schema/tags-schema.ts'
 import { TiltifyAPI, type TiltifyUserData } from '../lib/TiltifyAPI.ts'
 import { jjCampaign, jjCauses } from '../lib/db/schema/jj-api-schema.ts'
 import type { BatchItem } from 'drizzle-orm/batch'
 import type { TwitchUser } from '../lib/model/TwitchUser.ts'
+import { accounts } from '../lib/db/schema/auth-schema.ts'
 
 type UserWithTags = {
   userId: number
@@ -125,6 +135,13 @@ export class JingleJamData extends DurableObject<Env> {
       everyMs: 60 * 60 * 1000,
       run: async () => {
         await this.generateFullSchedule()
+      },
+    },
+    {
+      name: 'updateTiltifyProfiles',
+      everyMs: 60 * 60 * 1000,
+      run: async () => {
+        await this.updateTiltifyProfiles()
       },
     },
   ] as const
@@ -791,7 +808,7 @@ export class JingleJamData extends DurableObject<Env> {
     const start = Date.now()
     console.log('loadAllTiltifySocials')
     const campaigns = await this.getCampaigns()
-    const slugs = campaigns.map((c => c.user.slug))
+    const slugs = campaigns.map((c) => c.user.slug)
     console.log('loadAllTiltifySocials', 'slugs', slugs.length)
     console.log('loadAllTiltifySocials', 'slugs', slugs)
     // console.log('loadAllTiltifySocials', 'campaigns', campaigns.length)
@@ -808,7 +825,8 @@ export class JingleJamData extends DurableObject<Env> {
     // console.log('loadAllTiltifySocials', 'users', users.length)
     await this.storage.put('socials:tiltify', users)
 
-    const twitch = users.map((u) => u.social.twitch)
+    const twitch = users
+      .map((u) => u.social.twitch)
       .filter((s) => s !== undefined)
       .map((s) => this.normalizeTwitchLogin(s))
       .filter((s) => s.length > 0)
@@ -1563,21 +1581,21 @@ export class JingleJamData extends DurableObject<Env> {
     // Try KV cache first
     const cacheKey = `jj:fullSchedule:${year}`
 
-    let hardcoded: UserStream[] =[]
+    let hardcoded: UserStream[] = []
 
-    try{
-      const hardcodedResp = await fetch('https://jinglejam.ostof.dev/api/private/jj/hardcodedStreams', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+    try {
+      const hardcodedResp = await fetch(
+        'https://jinglejam.ostof.dev/api/private/jj/hardcodedStreams',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
         },
-      })
+      )
       if (hardcodedResp.ok) {
         const data = (await hardcodedResp.json()) as HardcodedStreams
-        hardcoded = [
-          ...(data.nonYogs),
-          ...(data.yogs)
-        ]
+        hardcoded = [...data.nonYogs, ...data.yogs]
       } else {
         hardcodedResp.text().then(console.error)
         console.error('generateFullSchedule', 'hardcodedResp', hardcodedResp)
@@ -1585,7 +1603,6 @@ export class JingleJamData extends DurableObject<Env> {
     } catch (e) {
       console.error('generateFullSchedule', 'hardcodedResp error', e)
     }
-
 
     // 1) Find all visible & primary schedules for the current year
     const scheduleRows = await db
@@ -1636,7 +1653,11 @@ export class JingleJamData extends DurableObject<Env> {
 
     // 2) Load all visible streams for those schedules
     // Avoid building a giant OR(...) with many variables; iterate per schedule
-    const basePairs: Array<{ scheduleId: number; streamId: number; start: Date }> = []
+    const basePairs: Array<{
+      scheduleId: number
+      streamId: number
+      start: Date
+    }> = []
     for (const sid of scheduleIds) {
       const rows = await db
         .select({
@@ -1645,7 +1666,9 @@ export class JingleJamData extends DurableObject<Env> {
           start: streamsTable.start,
         })
         .from(streamsTable)
-        .where(and(eq(streamsTable.visible, true), eq(streamsTable.scheduleId, sid)))
+        .where(
+          and(eq(streamsTable.visible, true), eq(streamsTable.scheduleId, sid)),
+        )
         .orderBy(asc(streamsTable.start))
         .all()
       for (const row of rows) {
@@ -1698,7 +1721,12 @@ export class JingleJamData extends DurableObject<Env> {
           end: streamsTable.end,
         })
         .from(streamsTable)
-        .where(and(eq(streamsTable.scheduleId, p.scheduleId), eq(streamsTable.id, p.streamId)))
+        .where(
+          and(
+            eq(streamsTable.scheduleId, p.scheduleId),
+            eq(streamsTable.id, p.streamId),
+          ),
+        )
         .all()
       for (const s of rows) {
         detailMap.set(`${s.scheduleId}:${s.id}`, s)
@@ -1721,7 +1749,12 @@ export class JingleJamData extends DurableObject<Env> {
         })
         .from(streamTagsTable)
         .innerJoin(tags, eq(streamTagsTable.tagId, tags.id))
-        .where(and(eq(streamTagsTable.scheduleId, p.scheduleId), eq(streamTagsTable.streamId, p.streamId)))
+        .where(
+          and(
+            eq(streamTagsTable.scheduleId, p.scheduleId),
+            eq(streamTagsTable.streamId, p.streamId),
+          ),
+        )
         .all()
       for (const t of tagRows) {
         const key = `${t.scheduleId}:${t.streamId}`
@@ -1872,5 +1905,38 @@ export class JingleJamData extends DurableObject<Env> {
     const result = { days }
 
     await this.storage.put('full-community-schedule', result)
+  }
+
+  private async updateTiltifyProfiles() {
+    const db = getDB(this.env)
+    const accountsList = await db
+      .select()
+      .from(accounts)
+      .where(eq(accounts.provider, 'tiltify'))
+      .all()
+    const api = new TiltifyAPI(this.env)
+    const token = await api.getAppToken()
+    if (!token){
+      console.error('updateTiltifyProfiles', 'no token')
+      return
+    }
+    for (const account of accountsList) {
+      const tiltifyId = account.providerId
+      const tiltifyUser = await api.getUserById(tiltifyId, token)
+      try {
+        if (tiltifyUser) {
+          await db
+            .update(accounts)
+            .set({
+              providerUsername: tiltifyUser.data.username,
+              meta: tiltifyUser.data,
+            })
+            .where(eq(accounts.userId, account.userId))
+          console.log('DO-scheduler', 'updated tiltify profile', tiltifyUser.data.slug)
+        }
+      } catch (e) {
+        console.error('updateTiltifyProfiles', 'error', e)
+      }
+    }
   }
 }
