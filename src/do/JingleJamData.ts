@@ -778,6 +778,9 @@ export class JingleJamData extends DurableObject<Env> {
     const start = Date.now()
     console.log('loadAllTiltifySocials')
     const campaigns = await this.getCampaigns()
+    const slugs = campaigns.map((c => c.user.slug))
+    console.log('loadAllTiltifySocials', 'slugs', slugs.length)
+    console.log('loadAllTiltifySocials', 'slugs', slugs)
     // console.log('loadAllTiltifySocials', 'campaigns', campaigns.length)
     const api = new TiltifyAPI(this.env)
     const token = await api.getAppToken()
@@ -791,6 +794,15 @@ export class JingleJamData extends DurableObject<Env> {
       .then((r) => r.map((u) => u.data))
     // console.log('loadAllTiltifySocials', 'users', users.length)
     await this.storage.put('socials:tiltify', users)
+
+    const twitch = users.map((u) => u.social.twitch)
+      .filter((s) => s !== undefined)
+      .map((s) => this.normalizeTwitchLogin(s))
+
+    console.log('loadAllTiltifySocials', 'twitch', twitch.length)
+    console.log('loadAllTiltifySocials', 'twitch', twitch)
+    await this.setStringArray('tiltify:socials:twitch', twitch)
+
     console.log('loadAllTiltifySocials', 'ms', Date.now() - start)
   }
 
