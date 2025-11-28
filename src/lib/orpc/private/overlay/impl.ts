@@ -389,6 +389,8 @@ const schedulePrimary = os.schedulePrimaryContract.handler(
     const now = DateTime.now()
     const currentYear = now.year
 
+    console.log('overlay', 'schedule-primary', input)
+
     const inputTimezone = input.timezone ?? 'Europe/London'
     console.log('inputTimezone', inputTimezone)
 
