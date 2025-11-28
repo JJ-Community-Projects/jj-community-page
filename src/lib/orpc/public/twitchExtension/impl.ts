@@ -647,8 +647,6 @@ const yogsSchedule = os.yogsScheduleContract
       hardcodedByDay.set(key, arr)
     }
 
-    console.log('hardcodedByDay', hardcodedByDay)
-
     // Traverse weeks -> days -> streams, resolving referenced entries via getEntry
     for (const week of schedule.data.weeks ?? []) {
       for (const dayRef of week.days ?? []) {
