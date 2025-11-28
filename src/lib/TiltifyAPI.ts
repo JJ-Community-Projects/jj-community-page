@@ -340,8 +340,8 @@ export class TiltifyAPI {
       },
     )
     if (!resp.ok) {
-      const b = resp.body
-      b?.cancel()
+      const b = await resp.json()
+      console.error('getTiltifyUserBySlug error:', b)
       return null
     }
     return resp.json() as Promise<TiltifyUserResponse>
