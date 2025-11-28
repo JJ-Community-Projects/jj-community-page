@@ -319,8 +319,10 @@ export class TiltifyAPI {
     }
   }
 
-
-  async getUserBySlug(slug: string, token?: string | null): Promise<TiltifyUserResponse | null> {
+  async getUserBySlug(
+    slug: string,
+    token?: string | null,
+  ): Promise<TiltifyUserResponse | null> {
     if (!token) {
       token = await this.getAppToken()
     }
@@ -341,7 +343,7 @@ export class TiltifyAPI {
     )
     if (!resp.ok) {
       const b = await resp.json()
-      console.error('getTiltifyUserBySlug error:', b)
+      console.error('getTiltifyUserBySlug error:', slug, b)
       return null
     }
     return resp.json() as Promise<TiltifyUserResponse>
@@ -423,7 +425,10 @@ export class TiltifyAPI {
     const TILTIFY_CLIENT_ID = this.env.TILTIFY_CLIENT_ID
     const TILTIFY_SECRET = this.env.TILTIFY_SECRET
     console.log('getNewAppToken', TILTIFY_CLIENT_ID, TILTIFY_SECRET)
-    console.log('getNewAppToken', `https://v5api.tiltify.com/oauth/token&client_id=${TILTIFY_CLIENT_ID}&client_secret=${TILTIFY_SECRET}&grant_type=client_credentials`)
+    console.log(
+      'getNewAppToken',
+      `https://v5api.tiltify.com/oauth/token&client_id=${TILTIFY_CLIENT_ID}&client_secret=${TILTIFY_SECRET}&grant_type=client_credentials`,
+    )
     const tokenRes = await fetch(
       `https://v5api.tiltify.com/oauth/token?client_id=${TILTIFY_CLIENT_ID}&client_secret=${TILTIFY_SECRET}&grant_type=client_credentials`,
       {
