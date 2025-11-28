@@ -902,21 +902,23 @@ const fullSchedule = os.fullScheduleContract.handler(async ({ context }) => {
     }
 
     // 2) Load all visible streams for those schedules
-    const basePairs = await db
-      .select({
-        scheduleId: streamsTable.scheduleId,
-        streamId: streamsTable.id,
-        start: streamsTable.start,
-      })
-      .from(streamsTable)
-      .where(
-        and(
-          eq(streamsTable.visible, true),
-          or(...scheduleIds.map((id) => eq(streamsTable.scheduleId, id))),
-        ),
-      )
-      .orderBy(asc(streamsTable.start))
-      .all()
+    // Avoid building a giant OR(...) with many variables; iterate per schedule
+    const basePairs: Array<{ scheduleId: number; streamId: number; start: Date }> = []
+    for (const sid of scheduleIds) {
+      const rows = await db
+        .select({
+          scheduleId: streamsTable.scheduleId,
+          streamId: streamsTable.id,
+          start: streamsTable.start,
+        })
+        .from(streamsTable)
+        .where(and(eq(streamsTable.visible, true), eq(streamsTable.scheduleId, sid)))
+        .orderBy(asc(streamsTable.start))
+        .all()
+      for (const row of rows) {
+        basePairs.push(row)
+      }
+    }
 
     if (basePairs.length === 0) {
       const groups = new Map<string, { day: Date; streams: UserStream[] }>()
@@ -945,105 +947,58 @@ const fullSchedule = os.fullScheduleContract.handler(async ({ context }) => {
       return { days }
     }
 
-    // Build composite condition for subsequent selects
-    const pairConditionStreams = or(
-      ...basePairs.map((p) =>
-        and(
-          eq(streamsTable.scheduleId, p.scheduleId),
-          eq(streamsTable.id, p.streamId),
-        ),
-      ),
-    )
-
-    // 3) Core stream details
-    const streamDetails = await db
-      .select({
-        id: streamsTable.id,
-        scheduleId: streamsTable.scheduleId,
-        createdBy: streamsTable.createdBy,
-        title: streamsTable.title,
-        visible: streamsTable.visible,
-        subtitle: streamsTable.subtitle,
-        description: streamsTable.description,
-        youtubeVodUrl: streamsTable.youtubeVodUrl,
-        twitchVodUrl: streamsTable.twitchVodUrl,
-        start: streamsTable.start,
-        end: streamsTable.end,
-      })
-      .from(streamsTable)
-      .where(pairConditionStreams)
-      .all()
-
+    // 3) Core stream details — query per pair to avoid too many SQL variables
     const detailMap = new Map<string, any>()
-    for (const s of streamDetails) {
-      detailMap.set(`${s.scheduleId}:${s.id}`, s)
+    for (const p of basePairs) {
+      const rows = await db
+        .select({
+          id: streamsTable.id,
+          scheduleId: streamsTable.scheduleId,
+          createdBy: streamsTable.createdBy,
+          title: streamsTable.title,
+          visible: streamsTable.visible,
+          subtitle: streamsTable.subtitle,
+          description: streamsTable.description,
+          youtubeVodUrl: streamsTable.youtubeVodUrl,
+          twitchVodUrl: streamsTable.twitchVodUrl,
+          start: streamsTable.start,
+          end: streamsTable.end,
+        })
+        .from(streamsTable)
+        .where(and(eq(streamsTable.scheduleId, p.scheduleId), eq(streamsTable.id, p.streamId)))
+        .all()
+      for (const s of rows) {
+        detailMap.set(`${s.scheduleId}:${s.id}`, s)
+      }
     }
 
-    // 4) Tags per stream
-    const pairConditionTags = or(
-      ...basePairs.map((p) =>
-        and(
-          eq(streamTagsTable.scheduleId, p.scheduleId),
-          eq(streamTagsTable.streamId, p.streamId),
-        ),
-      ),
-    )
-    const tagRows = await db
-      .select({
-        scheduleId: streamTagsTable.scheduleId,
-        streamId: streamTagsTable.streamId,
-        name: tags.name,
-        slug: tags.slug,
-        color: tags.color,
-      })
-      .from(streamTagsTable)
-      .innerJoin(tags, eq(streamTagsTable.tagId, tags.id))
-      .where(pairConditionTags)
-      .all()
-
+    // 4) Tags per stream — query per pair
     const tagsMap = new Map<
       string,
       Array<{ name: string; slug: string; color: string }>
     >()
-    for (const t of tagRows) {
-      const key = `${t.scheduleId}:${t.streamId}`
-      const arr = tagsMap.get(key) ?? []
-      arr.push({ name: t.name, slug: t.slug, color: t.color })
-      tagsMap.set(key, arr)
+    for (const p of basePairs) {
+      const tagRows = await db
+        .select({
+          scheduleId: streamTagsTable.scheduleId,
+          streamId: streamTagsTable.streamId,
+          name: tags.name,
+          slug: tags.slug,
+          color: tags.color,
+        })
+        .from(streamTagsTable)
+        .innerJoin(tags, eq(streamTagsTable.tagId, tags.id))
+        .where(and(eq(streamTagsTable.scheduleId, p.scheduleId), eq(streamTagsTable.streamId, p.streamId)))
+        .all()
+      for (const t of tagRows) {
+        const key = `${t.scheduleId}:${t.streamId}`
+        const arr = tagsMap.get(key) ?? []
+        arr.push({ name: t.name, slug: t.slug, color: t.color })
+        tagsMap.set(key, arr)
+      }
     }
 
-    // 5) Participants per stream
-    const pairConditionParticipants = or(
-      ...basePairs.map((p) =>
-        and(
-          eq(streamParticipantsTable.scheduleId, p.scheduleId),
-          eq(streamParticipantsTable.streamId, p.streamId),
-        ),
-      ),
-    )
-    const participantRows = await db
-      .select({
-        scheduleId: streamParticipantsTable.scheduleId,
-        streamId: streamParticipantsTable.streamId,
-        userId: userDisplayView.userId,
-        primaryLiveStream: userDisplayView.primaryLiveStream,
-        createdAt: userDisplayView.createdAt,
-        username: userDisplayView.username,
-        profileImage: userDisplayView.profileImage,
-        twitchLogin: userDisplayView.twitchLogin,
-        tiltifySlug: userDisplayView.tiltifySlug,
-        tiltifyUrl: userDisplayView.tiltifyUrl,
-        primaryColor: userDisplayView.primaryColor,
-        accentColor: userDisplayView.accentColor,
-      })
-      .from(streamParticipantsTable)
-      .innerJoin(
-        userDisplayView,
-        eq(streamParticipantsTable.userId, userDisplayView.userId),
-      )
-      .where(pairConditionParticipants)
-      .all()
-
+    // 5) Participants per stream — query per pair
     const participantsMap = new Map<
       string,
       Array<{
@@ -1059,33 +1014,11 @@ const fullSchedule = os.fullScheduleContract.handler(async ({ context }) => {
         accentColor: string | null
       }>
     >()
-    for (const p of participantRows) {
-      const key = `${p.scheduleId}:${p.streamId}`
-      const arr = participantsMap.get(key) ?? []
-      arr.push({
-        userId: p.userId,
-        primaryLiveStream: p.primaryLiveStream,
-        createdAt: p.createdAt,
-        username: p.username,
-        profileImage: p.profileImage,
-        twitchLogin: p.twitchLogin,
-        tiltifySlug: p.tiltifySlug,
-        tiltifyUrl: p.tiltifyUrl,
-        primaryColor: p.primaryColor,
-        accentColor: p.accentColor,
-      })
-      participantsMap.set(key, arr)
-    }
-
-    // 6) Load owners for the schedules
-    const ownerIds = Array.from(new Set(scheduleRows.map((r) => r.ownerId)))
-    let ownersMap = new Map<number, UserDisplay>()
-    if (ownerIds.length > 0) {
-      const ownerConds = or(
-        ...ownerIds.map((id) => eq(userDisplayView.userId, id)),
-      )
-      const owners = await db
+    for (const p of basePairs) {
+      const rows = await db
         .select({
+          scheduleId: streamParticipantsTable.scheduleId,
+          streamId: streamParticipantsTable.streamId,
           userId: userDisplayView.userId,
           primaryLiveStream: userDisplayView.primaryLiveStream,
           createdAt: userDisplayView.createdAt,
@@ -1097,9 +1030,61 @@ const fullSchedule = os.fullScheduleContract.handler(async ({ context }) => {
           primaryColor: userDisplayView.primaryColor,
           accentColor: userDisplayView.accentColor,
         })
-        .from(userDisplayView)
-        .where(ownerConds)
+        .from(streamParticipantsTable)
+        .innerJoin(
+          userDisplayView,
+          eq(streamParticipantsTable.userId, userDisplayView.userId),
+        )
+        .where(
+          and(
+            eq(streamParticipantsTable.scheduleId, p.scheduleId),
+            eq(streamParticipantsTable.streamId, p.streamId),
+          ),
+        )
         .all()
+      for (const r of rows) {
+        const key = `${r.scheduleId}:${r.streamId}`
+        const arr = participantsMap.get(key) ?? []
+        arr.push({
+          userId: r.userId,
+          primaryLiveStream: r.primaryLiveStream,
+          createdAt: r.createdAt,
+          username: r.username,
+          profileImage: r.profileImage,
+          twitchLogin: r.twitchLogin,
+          tiltifySlug: r.tiltifySlug,
+          tiltifyUrl: r.tiltifyUrl,
+          primaryColor: r.primaryColor,
+          accentColor: r.accentColor,
+        })
+        participantsMap.set(key, arr)
+      }
+    }
+
+    // 6) Load owners for the schedules
+    const ownerIds = Array.from(new Set(scheduleRows.map((r) => r.ownerId)))
+    let ownersMap = new Map<number, UserDisplay>()
+    if (ownerIds.length > 0) {
+      const owners: UserDisplay[] = []
+      for (const oid of ownerIds) {
+        const rows = await db
+          .select({
+            userId: userDisplayView.userId,
+            primaryLiveStream: userDisplayView.primaryLiveStream,
+            createdAt: userDisplayView.createdAt,
+            username: userDisplayView.username,
+            profileImage: userDisplayView.profileImage,
+            twitchLogin: userDisplayView.twitchLogin,
+            tiltifySlug: userDisplayView.tiltifySlug,
+            tiltifyUrl: userDisplayView.tiltifyUrl,
+            primaryColor: userDisplayView.primaryColor,
+            accentColor: userDisplayView.accentColor,
+          })
+          .from(userDisplayView)
+          .where(eq(userDisplayView.userId, oid))
+          .all()
+        owners.push(...(rows as any))
+      }
       ownersMap = new Map(owners.map((o) => [o.userId, o]))
     }
 
@@ -1154,7 +1139,7 @@ const fullSchedule = os.fullScheduleContract.handler(async ({ context }) => {
     const result = { days }
 
     // Store in KV (10 minutes)
-    await putJSON(context.env.KV, cacheKey, result, 600)
+    await putJSON(context.env.KV, cacheKey, result, 900)
     return result
   } catch (e) {
     console.error('fullSchedule', e)
