@@ -33,8 +33,6 @@ import { TiltifyAPI, type TiltifyUserData } from '../lib/TiltifyAPI.ts'
 import { jjCampaign, jjCauses } from '../lib/db/schema/jj-api-schema.ts'
 import type { BatchItem } from 'drizzle-orm/batch'
 import type { TwitchUser } from '../lib/model/TwitchUser.ts'
-import { getHardCodedEventsJustYogs, getHardCodedEventsNoYogs } from '../lib/orpc/private/jjData/getHardCodedEvents.ts'
-import { serverClientPrivate } from '../lib/orpc/serverClient.ts'
 
 type UserWithTags = {
   userId: number
