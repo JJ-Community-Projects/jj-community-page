@@ -859,6 +859,16 @@ const fullSchedule = os.fullScheduleContract.handler(async ({ context }) => {
   }
 })
 
+const hardcodedStreams = os.hardcodedStreamsContract
+  .handler(async ({context})=>{
+    const hardcodedNonYogs = await getHardCodedEventsNoYogs()
+    const hardcodedYogs = await getHardCodedEventsJustYogs()
+    return {
+      yogs: hardcodedYogs,
+      nonYogs: hardcodedNonYogs,
+    }
+  })
+
 export const jjRouter = {
   campaigns,
   causes,
@@ -868,6 +878,7 @@ export const jjRouter = {
   overview,
   campaignsAll,
   fullSchedule,
+  hardcodedStreams,
   /*
   causeById,
   campaignLookup,
