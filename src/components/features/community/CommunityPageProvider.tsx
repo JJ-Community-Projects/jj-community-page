@@ -8,17 +8,9 @@ import {
 import { useQuery } from '@tanstack/solid-query'
 import { orpcPrivate } from '../../../lib/orpc/client.ts'
 import { makePersisted } from '@solid-primitives/storage'
-import type { CharitiesStatic } from '../../../content/schema.ts'
-import type { JJCauseType } from '../../../lib/orpc/private/jjData/contract.ts'
+import { useCurrency } from '../../common/CurrencyProvider.tsx'
 
-const useCommunityPageHook = (charitiesData?: CharitiesStatic) => {
-  const overviewQuery = useQuery(() =>
-    orpcPrivate.jj.overview.queryOptions({
-      staleTime: 60_000,
-      refetchInterval: 60_000 * 2,
-    }),
-  )
-
+const useCommunityPageHook = () => {
   const communityQuery = useQuery(() =>
     orpcPrivate.jj.campaigns.queryOptions({
       staleTime: 60_000 * 4,
@@ -50,9 +42,7 @@ const useCommunityPageHook = (charitiesData?: CharitiesStatic) => {
     createSignal<'raised' | 'live' | 'cause'>('live'),
   )
 
-  const [currency, setCurrency] = makePersisted(
-    createSignal<'GBP' | 'USD' | 'EUR'>('GBP'),
-  )
+  const {currency, setCurrency} = useCurrency()
 
   // Selected tags for community page filtering/searching
   const [selectedTagIds, setSelectedTagIds] = createSignal<number[]>([])
@@ -158,31 +148,9 @@ const useCommunityPageHook = (charitiesData?: CharitiesStatic) => {
       .filter((e) => e.campaigns.length > 0)
   })
 
-  const mergedCharityItems = createMemo(() => {
-
-    const c = causeQuery.data
-    if (!c) {
-      return []
-    }
-    const map = new Map<string, JJCauseType>(c.causes.map((c) => [c.id, c]))
-    return (
-      charitiesData?.charities.map((c) => {
-        return {
-          donationData: map.get(c.tiltify_id),
-          staticData: c,
-        }
-      }) ?? []
-    )
-  })
-
-  const [charityOpen, setCharityOpen] = makePersisted(createSignal<boolean>(true))
-
-
   return {
     community: communityQuery,
-    cause: causeQuery,
     upcomingStreams: upcomingStreamsQuery,
-    overview: overviewQuery,
     sortBy,
     setSortBy,
     currency,
@@ -197,14 +165,10 @@ const useCommunityPageHook = (charitiesData?: CharitiesStatic) => {
     clearSelectedTags,
     usersFiltered,
     campaignsByCauseFiltered,
-    mergedCharityItems,
-    charityOpen, setCharityOpen
   }
 }
 
-interface CommunityPageProps {
-  charitiesData?: CharitiesStatic
-}
+interface CommunityPageProps {}
 
 const CommunityPageContext =
   createContext<ReturnType<typeof useCommunityPageHook>>()
@@ -212,7 +176,7 @@ const CommunityPageContext =
 export const CommunityPageProvider: ParentComponent<CommunityPageProps> = (
   props,
 ) => {
-  const hook = useCommunityPageHook(props.charitiesData)
+  const hook = useCommunityPageHook()
   return (
     <CommunityPageContext.Provider value={hook}>
       {props.children}

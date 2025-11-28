@@ -27,7 +27,9 @@ import type { CharitiesStatic } from '../../../content/schema.ts'
 import {
   CommunityCharitiesOverview,
   CommunityCharitiesOverviewMobile,
-} from './causes/CommunityCharitiesOverview.tsx'
+} from '../../common/charityOverview/CommunityCharitiesOverview.tsx'
+import { CharityOverviewProvider } from '../../common/charityOverview/CharityOverviewProvider.tsx'
+import { CurrencyProvider } from '../../common/CurrencyProvider.tsx'
 
 export const CommunityPage: Component<{
   charitiesData?: CharitiesStatic
@@ -36,9 +38,13 @@ export const CommunityPage: Component<{
   return (
     <QueryClientProvider client={new QueryClient()}>
       <I18nProvider i18n={i18n}>
-        <CommunityPageProvider charitiesData={props.charitiesData}>
-          <_CommunityPage />
-        </CommunityPageProvider>
+        <CurrencyProvider>
+          <CommunityPageProvider>
+            <CharityOverviewProvider charitiesData={props.charitiesData}>
+              <_CommunityPage />
+            </CharityOverviewProvider>
+          </CommunityPageProvider>
+        </CurrencyProvider>
       </I18nProvider>
     </QueryClientProvider>
   )
@@ -50,7 +56,7 @@ const _CommunityPage: Component = (props) => {
   const isJJ = useIsJJ()
   const isBefore = useIsBeforeJJ()
 
-  const { community, cause, campaignsSorted } = useCommunityPage()
+  const { community } = useCommunityPage()
 
   return (
     <I18nProvider i18n={i18n}>
@@ -264,11 +270,7 @@ const Body: Component = () => {
   return (
     <div class={'flex w-full flex-col items-stretch justify-center gap-6'}>
       <Header />
-      <div
-        class={
-          'flex w-full flex-row items-start justify-start gap-6'
-        }
-      >
+      <div class={'flex w-full flex-row items-start justify-start gap-6'}>
         <div class={'hidden lg:block'}>
           <CommunityCharitiesOverview />
         </div>
@@ -294,7 +296,8 @@ const CampaignGrid: Component = () => {
       <div
         class={twMerge(
           'flex w-full flex-wrap items-end justify-between gap-x-4 gap-y-2',
-        )}>
+        )}
+      >
         <div class={'flex flex-col'}>
           <h2 class={twMerge('text-lg font-semibold text-white')}>
             Fundraisers (2024)

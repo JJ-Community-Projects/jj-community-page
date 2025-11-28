@@ -1,0 +1,19 @@
+---
+export const prerender = false
+import { getEntry } from 'astro:content'
+import BaseLayout from '../../layouts/BaseLayout.astro'
+import { UpcomingStreamsPage } from '../../components/features/upcoming/UpcomingStreamsPage.tsx'
+const charityData = await getEntry('charities', '2025')
+---
+
+<BaseLayout
+  title="The Jingle Jam Community - Upcoming Streams"
+  description="Explore the upcoming streams for Jingle Jam 2025"
+  canonical="https://jinglejam.ostof.dev/community/upcoming"
+>
+  <div class="w-full flex flex-col justify-center items-stretch gap-4">
+    <UpcomingStreamsPage
+      charitiesData={charityData?.data}
+      client:only="solid-js" />
+  </div>
+</BaseLayout>
