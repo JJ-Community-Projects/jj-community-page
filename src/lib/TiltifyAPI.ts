@@ -349,6 +349,36 @@ export class TiltifyAPI {
     return resp.json() as Promise<TiltifyUserResponse>
   }
 
+  async getUserById(
+    id: string,
+    token?: string | null,
+  ): Promise<TiltifyUserResponse | null> {
+    if (!token) {
+      token = await this.getAppToken()
+    }
+    if (!token) {
+      return null
+    }
+    // console.log('getUserBySlug', slug,  token)
+    // console.log('getUserBySlug', `https://v5api.tiltify.com/api/public/users/by/slug/${slug}`)
+    const resp = await fetch(
+      `https://v5api.tiltify.com/api/public/users/${id}`,
+      {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      },
+    )
+    if (!resp.ok) {
+      const b = await resp.json()
+      console.error('getUserById error:', id, b)
+      return null
+    }
+    return resp.json() as Promise<TiltifyUserResponse>
+  }
+
   async getAppToken() {
     const tokenFromCache = await this.tokenCache.getToken('APP_TOKEN')
     if (tokenFromCache) {
