@@ -340,6 +340,8 @@ export class TiltifyAPI {
       },
     )
     if (!resp.ok) {
+      const b = resp.body
+      b?.cancel()
       return null
     }
     return resp.json() as Promise<TiltifyUserResponse>
