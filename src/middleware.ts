@@ -70,6 +70,15 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
 
   try {
+    if (context.locals.user) {
+      if (!context.locals.user.tiltifySlug) {
+        context.locals.user = null;
+        context.locals.session = null;
+        deleteSessionTokenCookie(context);
+        console.log('authMiddleware', context.request.url, 'tiltifySlug === null');
+        return next();
+      }
+    }
     if (token === null) {
       context.locals.session = null;
       context.locals.user = null;

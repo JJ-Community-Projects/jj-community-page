@@ -9,6 +9,7 @@ import type {TiltifySocial, TiltifyToken, TiltifyUserData} from "./tiltify.ts";
 import type {AstroContext} from "../lib/AstroContext.ts";
 import {drizzle} from "drizzle-orm/d1";
 import {socialUrlRegex} from "./socialUrlRegex.ts";
+import { tiltifyMetadataView } from '../lib/db/schema/views-schema.ts'
 
 /**
  * Saves social media information from Tiltify to the userSocials table
@@ -152,20 +153,21 @@ export async function validateSessionToken(ctx: AstroContext, token: string): Pr
   if (!session.id) {
     return {session: null, user: null};
   }
+  const tiltifyUser = await db.select()
+    .from(tiltifyMetadataView)
+    .where(eq(
+      tiltifyMetadataView.userId, session.userId
+    )).get()
 
-  const account = await db.select()
-    .from(accounts)
-    .where(eq(accounts.userId, session.userId))
-    .get();
-
-  if (!account) {
+  if (!tiltifyUser) {
     return {session: null, user: null};
   }
 
   const user: User = {
-    id: account.userId,
-    tiltifyId: account.providerId,
-    tiltifyName: account.providerUsername,
+    id: tiltifyUser.userId,
+    tiltifyId: tiltifyUser.id,
+    tiltifyName: tiltifyUser.username,
+    tiltifySlug: tiltifyUser.slug,
   };
 
   // Check if session has expired
@@ -202,22 +204,24 @@ export async function validateSessionTokenFromEnv(env: Env, token: string): Prom
     return {session: null, user: null};
   }
 
-  const account = await db.select()
-    .from(accounts)
-    .where(eq(accounts.userId, session.userId))
-    .get();
+  const tiltifyUser = await db.select()
+    .from(tiltifyMetadataView)
+    .where(eq(
+      tiltifyMetadataView.userId, session.userId
+    )).get()
 
-  if (!account) {
+  if (!tiltifyUser) {
     return {session: null, user: null};
   }
 
   const user: User = {
-    id: account.userId,
-    tiltifyId: account.providerId,
-    tiltifyName: account.providerUsername,
+    id: tiltifyUser.userId,
+    tiltifyId: tiltifyUser.id,
+    tiltifyName: tiltifyUser.username,
+    tiltifySlug: tiltifyUser.slug,
   };
 
-// Check if session has expired
+  // Check if session has expired
   if (Date.now() >= session.expiresAt.getTime()) {
     await KV.delete(`session:${sessionId}`);
     return {session: null, user: null};
