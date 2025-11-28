@@ -47,7 +47,7 @@ export const MobileNav: Component<MobileNavProps> = (props) => {
       >
         <a href="/">Home</a>
         <a href="/community">Community</a>
-        <a href="/community/upcoming">Upcoming Streams</a>
+        <a href="/community/schedule">Schedule</a>
         <a href="/teams">Teams</a>
         <div class="group relative">
           <a

@@ -196,6 +196,23 @@ export type Overview = z.infer<typeof OverviewSchema>
 const overviewContract = oc
   .output(OverviewSchema)
 
+const ScheduleDaySchema = z.object({
+  /** Date object for the day */
+  day: z.date(),
+  /** Array of streams occurring on this day, sorted by start time */
+  streams: z.array(UserStreamSchema),
+});
+
+export type ScheduleDay = z.infer<typeof ScheduleDaySchema>
+
+const FullScheduleSchema = z.object({
+  /** Streams organized by day for calendar-style display */
+  days: z.array(ScheduleDaySchema),
+});
+
+
+const fullScheduleContract = oc.output(FullScheduleSchema)
+
 export const contracts = {
   campaignsContract,
   causesContract,
@@ -203,4 +220,5 @@ export const contracts = {
   getAllUsersWithInfoContract,
   getUserCampaignPairsContract,
   overviewContract,
+  fullScheduleContract
 }

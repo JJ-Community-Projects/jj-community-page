@@ -20,7 +20,11 @@ import { tagUserCountsView, userDisplayView, } from '../../../db/schema/views-sc
 import { UserDisplaySchema } from '../../public/schemas/UserDisplaySchema.ts'
 import type { JJDrizzleDatabase } from '../../../db/db.ts'
 import type { CurrenciesTV } from '../../public/twitchExtension/contract.ts'
-import { getHardCodedEvents } from './getHardCodedEvents.ts'
+import {
+  getHardCodedEvents,
+  getHardCodedEventsJustYogs,
+  getHardCodedEventsNoYogs,
+} from './getHardCodedEvents.ts'
 // New: get campaign by Twitch id
 
 const jjDataCacheMiddleware = cacheMiddleware({
@@ -825,6 +829,312 @@ const overview = os.overviewContract
     return overview
   })
 
+
+const fullSchedule = os.fullScheduleContract
+  .handler(async ({ context})=>{
+    const db = context.db
+    const year = new Date().getUTCFullYear()
+
+    // Try KV cache first
+    const cacheKey = `jj:fullSchedule:${year}`
+    const cached = await getJSON<any>(context.env.KV, cacheKey)
+    if (cached && Array.isArray(cached.days)) {
+      // Revive Dates from ISO strings for UserStream shape
+      const days = cached.days.map((d: any) => ({
+        day: new Date(d.day),
+        streams: Array.isArray(d.streams)
+          ? d.streams.map(reviveUserStream)
+          : [],
+      }))
+      return { days }
+    }
+
+    // 0) Hardcoded events (map to Stream only later)
+    const hardcodedNonYogs = await getHardCodedEventsNoYogs()
+    const hardcodedYogs = await getHardCodedEventsJustYogs()
+
+    const hardcoded = [
+      ...hardcodedNonYogs,
+      ...hardcodedYogs,
+    ]
+
+    // 1) Find all visible & primary schedules for the current year
+    const scheduleRows = await db
+      .select({ id: schedulesTable.id, ownerId: schedulesTable.ownerId })
+      .from(schedulesTable)
+      .where(
+        and(
+          eq(schedulesTable.year, year),
+          eq(schedulesTable.visible, true),
+          eq(schedulesTable.primary, true),
+        ),
+      )
+      .all()
+
+    const scheduleIds = scheduleRows.map((s) => s.id)
+    const scheduleOwnerMap = new Map<number, number>(
+      scheduleRows.map((r) => [r.id, r.ownerId]),
+    )
+
+    // If no schedules, return just hardcoded (grouped by day)
+    if (scheduleIds.length === 0) {
+      // Group by UTC day
+      const groups = new Map<string, { day: Date; streams: UserStream[] }>()
+      for (const us of hardcoded) {
+        const s = us.stream
+        const d = new Date(Date.UTC(s.start.getUTCFullYear(), s.start.getUTCMonth(), s.start.getUTCDate()))
+        const key = d.toISOString()
+        const g = groups.get(key) ?? { day: d, streams: [] }
+        g.streams.push(us)
+        groups.set(key, g)
+      }
+      const days = Array.from(groups.values())
+        .map(({ day, streams }) => ({
+          day,
+          streams: streams.sort((a, b) => a.stream.start.getTime() - b.stream.start.getTime()),
+        }))
+        .sort((a, b) => a.day.getTime() - b.day.getTime())
+      return { days }
+    }
+
+    // 2) Load all visible streams for those schedules
+    const basePairs = await db
+      .select({
+        scheduleId: streamsTable.scheduleId,
+        streamId: streamsTable.id,
+        start: streamsTable.start,
+      })
+      .from(streamsTable)
+      .where(
+        and(
+          eq(streamsTable.visible, true),
+          or(...scheduleIds.map((id) => eq(streamsTable.scheduleId, id))),
+        ),
+      )
+      .orderBy(asc(streamsTable.start))
+      .all()
+
+    if (basePairs.length === 0) {
+      const groups = new Map<string, { day: Date; streams: UserStream[] }>()
+      for (const us of hardcoded) {
+        const s = us.stream
+        const d = new Date(Date.UTC(s.start.getUTCFullYear(), s.start.getUTCMonth(), s.start.getUTCDate()))
+        const key = d.toISOString()
+        const g = groups.get(key) ?? { day: d, streams: [] }
+        g.streams.push(us)
+        groups.set(key, g)
+      }
+      const days = Array.from(groups.values())
+        .map(({ day, streams }) => ({
+          day,
+          streams: streams.sort((a, b) => a.stream.start.getTime() - b.stream.start.getTime()),
+        }))
+        .sort((a, b) => a.day.getTime() - b.day.getTime())
+      return { days }
+    }
+
+    // Build composite condition for subsequent selects
+    const pairConditionStreams = or(
+      ...basePairs.map((p) =>
+        and(
+          eq(streamsTable.scheduleId, p.scheduleId),
+          eq(streamsTable.id, p.streamId),
+        ),
+      ),
+    )
+
+    // 3) Core stream details
+    const streamDetails = await db
+      .select({
+        id: streamsTable.id,
+        scheduleId: streamsTable.scheduleId,
+        createdBy: streamsTable.createdBy,
+        title: streamsTable.title,
+        visible: streamsTable.visible,
+        subtitle: streamsTable.subtitle,
+        description: streamsTable.description,
+        youtubeVodUrl: streamsTable.youtubeVodUrl,
+        twitchVodUrl: streamsTable.twitchVodUrl,
+        start: streamsTable.start,
+        end: streamsTable.end,
+      })
+      .from(streamsTable)
+      .where(pairConditionStreams)
+      .all()
+
+    const detailMap = new Map<string, any>()
+    for (const s of streamDetails) {
+      detailMap.set(`${s.scheduleId}:${s.id}`, s)
+    }
+
+    // 4) Tags per stream
+    const pairConditionTags = or(
+      ...basePairs.map((p) =>
+        and(
+          eq(streamTagsTable.scheduleId, p.scheduleId),
+          eq(streamTagsTable.streamId, p.streamId),
+        ),
+      ),
+    )
+    const tagRows = await db
+      .select({
+        scheduleId: streamTagsTable.scheduleId,
+        streamId: streamTagsTable.streamId,
+        name: tags.name,
+        slug: tags.slug,
+        color: tags.color,
+      })
+      .from(streamTagsTable)
+      .innerJoin(tags, eq(streamTagsTable.tagId, tags.id))
+      .where(pairConditionTags)
+      .all()
+
+    const tagsMap = new Map<string, Array<{ name: string; slug: string; color: string }>>()
+    for (const t of tagRows) {
+      const key = `${t.scheduleId}:${t.streamId}`
+      const arr = tagsMap.get(key) ?? []
+      arr.push({ name: t.name, slug: t.slug, color: t.color })
+      tagsMap.set(key, arr)
+    }
+
+    // 5) Participants per stream
+    const pairConditionParticipants = or(
+      ...basePairs.map((p) =>
+        and(
+          eq(streamParticipantsTable.scheduleId, p.scheduleId),
+          eq(streamParticipantsTable.streamId, p.streamId),
+        ),
+      ),
+    )
+    const participantRows = await db
+      .select({
+        scheduleId: streamParticipantsTable.scheduleId,
+        streamId: streamParticipantsTable.streamId,
+        userId: userDisplayView.userId,
+        primaryLiveStream: userDisplayView.primaryLiveStream,
+        createdAt: userDisplayView.createdAt,
+        username: userDisplayView.username,
+        profileImage: userDisplayView.profileImage,
+        twitchLogin: userDisplayView.twitchLogin,
+        tiltifySlug: userDisplayView.tiltifySlug,
+        tiltifyUrl: userDisplayView.tiltifyUrl,
+        primaryColor: userDisplayView.primaryColor,
+        accentColor: userDisplayView.accentColor,
+      })
+      .from(streamParticipantsTable)
+      .innerJoin(
+        userDisplayView,
+        eq(streamParticipantsTable.userId, userDisplayView.userId),
+      )
+      .where(pairConditionParticipants)
+      .all()
+
+    const participantsMap = new Map<
+      string,
+      Array<{
+        userId: number
+        primaryLiveStream: string
+        createdAt: Date
+        username: string
+        profileImage: string
+        twitchLogin: string | null
+        tiltifySlug: string
+        tiltifyUrl: string
+        primaryColor: string | null
+        accentColor: string | null
+      }>
+    >()
+    for (const p of participantRows) {
+      const key = `${p.scheduleId}:${p.streamId}`
+      const arr = participantsMap.get(key) ?? []
+      arr.push({
+        userId: p.userId,
+        primaryLiveStream: p.primaryLiveStream,
+        createdAt: p.createdAt,
+        username: p.username,
+        profileImage: p.profileImage,
+        twitchLogin: p.twitchLogin,
+        tiltifySlug: p.tiltifySlug,
+        tiltifyUrl: p.tiltifyUrl,
+        primaryColor: p.primaryColor,
+        accentColor: p.accentColor,
+      })
+      participantsMap.set(key, arr)
+    }
+
+    // 6) Load owners for the schedules
+    const ownerIds = Array.from(new Set(scheduleRows.map((r) => r.ownerId)))
+    let ownersMap = new Map<number, UserDisplay>()
+    if (ownerIds.length > 0) {
+      const ownerConds = or(
+        ...ownerIds.map((id) => eq(userDisplayView.userId, id)),
+      )
+      const owners = await db
+        .select({
+          userId: userDisplayView.userId,
+          primaryLiveStream: userDisplayView.primaryLiveStream,
+          createdAt: userDisplayView.createdAt,
+          username: userDisplayView.username,
+          profileImage: userDisplayView.profileImage,
+          twitchLogin: userDisplayView.twitchLogin,
+          tiltifySlug: userDisplayView.tiltifySlug,
+          tiltifyUrl: userDisplayView.tiltifyUrl,
+          primaryColor: userDisplayView.primaryColor,
+          accentColor: userDisplayView.accentColor,
+        })
+        .from(userDisplayView)
+        .where(ownerConds)
+        .all()
+      ownersMap = new Map(owners.map((o) => [o.userId, o]))
+    }
+
+    // 7) Compose UserStream objects from DB
+    const dbUserStreams: UserStream[] = basePairs
+      .map((pair) => {
+        const key = `${pair.scheduleId}:${pair.streamId}`
+        const core = detailMap.get(key)
+        if (!core) return null
+        const stream: Stream = {
+          ...(core as any),
+          tags: tagsMap.get(key) ?? [],
+          participants: participantsMap.get(key) ?? [],
+        }
+        const ownerId = scheduleOwnerMap.get(pair.scheduleId)
+        const owner = ownerId ? ownersMap.get(ownerId) : undefined
+        return { stream, owner }
+      })
+      .filter(user => {
+        return user != null
+      })
+
+    // 8) Merge hardcoded user streams
+    const allUserStreams: UserStream[] = [...dbUserStreams, ...hardcoded]
+
+    // 9) Group by day (UTC) and sort
+    const groups = new Map<string, { day: Date; streams: UserStream[] }>()
+    for (const us of allUserStreams) {
+      const s = us.stream
+      const d = new Date(Date.UTC(s.start.getUTCFullYear(), s.start.getUTCMonth(), s.start.getUTCDate()))
+      const key = d.toISOString()
+      const g = groups.get(key) ?? { day: d, streams: [] }
+      g.streams.push(us)
+      groups.set(key, g)
+    }
+
+    const days = Array.from(groups.values())
+      .map(({ day, streams }) => ({
+        day,
+        streams: streams.sort((a, b) => a.stream.start.getTime() - b.stream.start.getTime()),
+      }))
+      .sort((a, b) => a.day.getTime() - b.day.getTime())
+
+    const result = { days }
+
+    // Store in KV (10 minutes)
+    await putJSON(context.env.KV, cacheKey, result, 600)
+    return result
+  })
+
 export const jjRouter = {
   campaigns,
   causes,
@@ -832,7 +1142,8 @@ export const jjRouter = {
   getAllUsersWithInfo,
   getUserCampaignPairs,
   overview,
-  campaignsAll
+  campaignsAll,
+  fullSchedule,
   /*
   causeById,
   campaignLookup,

@@ -1,4 +1,5 @@
 import { type Component, createSignal, For, Show } from 'solid-js'
+import { FaSolidChevronRight } from 'solid-icons/fa'
 import { useCommunityPage } from './CommunityPageProvider.tsx'
 import {
   UpcomingStreamsStreamCard,
@@ -15,7 +16,16 @@ export const UpcomingStreams: Component = () => {
 
   return (
     <div class="w-full flex flex-col gap-2">
-      <h2 class="w-full text-lg font-semibold text-white">Upcoming streams</h2>
+      <div class="w-full flex flex-col">
+        <h2 class="text-lg font-semibold text-white">Upcoming streams</h2>
+        <a
+          href="/community/schedule"
+          class="group inline-flex items-center gap-1 text-sm font-semibold text-white/80 hover:text-white transition-colors"
+        >
+          <span>full schedule</span>
+          <FaSolidChevronRight class="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+        </a>
+      </div>
       <Show when={upcomingStreams.isLoading}>
         <p class="text-white/80">Loading upcoming streams…</p>
       </Show>
