@@ -1563,8 +1563,6 @@ export class JingleJamData extends DurableObject<Env> {
     // Try KV cache first
     const cacheKey = `jj:fullSchedule:${year}`
 
-
-
     let hardcoded: UserStream[] =[]
 
     try{
@@ -1873,6 +1871,6 @@ export class JingleJamData extends DurableObject<Env> {
 
     const result = { days }
 
-    this.storage.put('full-community-schedule', result)
+    await this.storage.put('full-community-schedule', result)
   }
 }
