@@ -169,6 +169,16 @@ const FullSchedule = () => {
           )
         }}
       </Show>
+      <Show when={schedule.error}>
+        <div class={'rounded-2xl bg-white p-2'}>
+          <p class="text-red-400">Failed to load full schedule.</p>
+        </div>
+      </Show>
+      <Show when={schedule.isLoading}>
+        <div class={'rounded-2xl bg-white p-2'}>
+          <p>Loading...</p>
+        </div>
+      </Show>
     </>
   )
 }
@@ -204,7 +214,10 @@ const DayAccordionItem: Component<{
   }
 
   return (
-    <Accordion.Item value={props.index.toString()} class="accordion__item bg-white rounded-2xl shadow-lg">
+    <Accordion.Item
+      value={props.index.toString()}
+      class="accordion__item rounded-2xl bg-white shadow-lg"
+    >
       <Accordion.Header class="accordion__item-header">
         <Accordion.Trigger
           class="accordion__item-trigger rounded-lg bg-white"

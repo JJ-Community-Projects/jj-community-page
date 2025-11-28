@@ -210,6 +210,8 @@ const FullScheduleSchema = z.object({
   days: z.array(ScheduleDaySchema),
 });
 
+export type FullCommunitySchedule = z.infer<typeof FullScheduleSchema>
+
 
 const fullScheduleContract = oc.output(FullScheduleSchema)
 
