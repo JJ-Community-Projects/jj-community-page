@@ -798,6 +798,7 @@ export class JingleJamData extends DurableObject<Env> {
     const twitch = users.map((u) => u.social.twitch)
       .filter((s) => s !== undefined)
       .map((s) => this.normalizeTwitchLogin(s))
+      .filter((s) => s.length > 0)
 
     console.log('loadAllTiltifySocials', 'twitch', twitch.length)
     console.log('loadAllTiltifySocials', 'twitch', twitch)
