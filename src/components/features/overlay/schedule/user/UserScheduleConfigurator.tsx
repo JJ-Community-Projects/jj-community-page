@@ -13,7 +13,7 @@ export const UserScheduleConfigurator: Component<{ visible?: boolean }> = (
   const { user } = useUser()
   const scheduleUrl = createMemo(() =>
     buildUrl('/overlays/schedule', {
-      user: user?.tiltifyName,
+      user: user?.tiltifySlug,
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       theme: theme(),
       style: streamStyle(),
