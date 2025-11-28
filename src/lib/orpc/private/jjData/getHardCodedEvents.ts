@@ -5,10 +5,10 @@ import type { YogsCreator } from '../yogs/contract.ts'
 
 export async function getHardCodedEvents(): Promise<UserStream[]> {
   const currentDate = new Date()
-  const yogs =await getHardCodedEventsJustYogs()
-  const noYogs =await getHardCodedEventsNoYogs()
+  // const yogs =await getHardCodedEventsJustYogs()
+  const noYogs = await getHardCodedEventsNoYogs()
 
-  const allEvents = [...yogs, ...noYogs]
+  const allEvents = [...noYogs]
 
   const upcomingEvents = allEvents.filter(
     (event) => event.stream.start >= currentDate,
