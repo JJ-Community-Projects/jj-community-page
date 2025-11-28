@@ -16,7 +16,7 @@ import type {
   JJCauseTVType,
 } from '../lib/orpc/public/twitchExtension/contract.ts'
 import type {
-  FullCommunitySchedule,
+  FullCommunitySchedule, HardcodedStreams,
   JJCampaignType,
   Stream,
   UserDisplay,
@@ -34,6 +34,7 @@ import { jjCampaign, jjCauses } from '../lib/db/schema/jj-api-schema.ts'
 import type { BatchItem } from 'drizzle-orm/batch'
 import type { TwitchUser } from '../lib/model/TwitchUser.ts'
 import { getHardCodedEventsJustYogs, getHardCodedEventsNoYogs } from '../lib/orpc/private/jjData/getHardCodedEvents.ts'
+import { serverClientPrivate } from '../lib/orpc/serverClient.ts'
 
 type UserWithTags = {
   userId: number
@@ -1564,11 +1565,31 @@ export class JingleJamData extends DurableObject<Env> {
     // Try KV cache first
     const cacheKey = `jj:fullSchedule:${year}`
 
-    // 0) Hardcoded events (map to Stream only later)
-    const hardcodedNonYogs = await getHardCodedEventsNoYogs()
-    const hardcodedYogs = await getHardCodedEventsJustYogs()
 
-    const hardcoded = [...hardcodedNonYogs, ...hardcodedYogs]
+
+    let hardcoded: UserStream[] =[]
+
+    try{
+      const hardcodedResp = await fetch('https://jinglejam.ostof.dev/api/private/jj/hardcodedStreams', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      if (hardcodedResp.ok) {
+        const data = (await hardcodedResp.json()) as HardcodedStreams
+        hardcoded = [
+          ...(data.nonYogs),
+          ...(data.yogs)
+        ]
+      } else {
+        hardcodedResp.text().then(console.error)
+        console.error('generateFullSchedule', 'hardcodedResp', hardcodedResp)
+      }
+    } catch (e) {
+      console.error('generateFullSchedule', 'hardcodedResp error', e)
+    }
+
 
     // 1) Find all visible & primary schedules for the current year
     const scheduleRows = await db
