@@ -40,6 +40,7 @@ const useCommunityPageHook = () => {
 
   const [sortBy, setSortBy] = makePersisted(
     createSignal<'raised' | 'live' | 'cause'>('live'),
+    { name: 'community-sort-by' }
   )
 
   const {currency, setCurrency} = useCurrency()
