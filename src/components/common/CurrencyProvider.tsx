@@ -10,6 +10,9 @@ const useCurrencyHook = () => {
 
   const [currency, setCurrency] = makePersisted(
     createSignal<'GBP' | 'USD' | 'EUR'>('GBP'),
+    {
+      name: 'currency',
+    }
   )
   return {
     currency, setCurrency
