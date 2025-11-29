@@ -581,16 +581,8 @@ function reviveUserDisplay(u: any) {
 
 async function getUsers(
   db: JJDrizzleDatabase,
-  kv?: KVNamespace,
 ): Promise<UserWithInfo[]> {
   try {
-    // KV cache (optional)
-    if (kv) {
-      const cached = await kv.get('getUsers')
-      if (cached) {
-        return JSON.parse(cached)
-      }
-    }
     const currentYear = new Date().getFullYear()
     // Subquery: aggregate tags per user into JSON
     // Step 1: Build a subquery that ranks tags per-user by global popularity
@@ -671,10 +663,6 @@ async function getUsers(
         : undefined,
     }))
 
-    // Store in KV if available
-    if (kv) {
-      await kv.put('getUsers', JSON.stringify(result), { expirationTtl: 180 })
-    }
     return result
   } catch (e) {
     console.error(e)
@@ -686,10 +674,13 @@ const getAllUsersWithInfo = os.getAllUsersWithInfoContract.handler(
   async ({ context }) => {
     const cached = await context.env.KV.get('getAllUsersWithInfo')
     if (cached) {
-      return JSON.parse(cached)
+      const users = JSON.parse(cached) as UserWithInfo[]
+      console.log('getAllUsersWithInfo','cache', users.length)
+      return users
     }
 
-    const users = await getUsers(context.db, context.env.KV)
+    const users = await getUsers(context.db)
+    console.log('getAllUsersWithInfo', users.length)
     await context.env.KV.put('getAllUsersWithInfo', JSON.stringify(users), {
       expirationTtl: 300,
     })
@@ -705,7 +696,7 @@ const getUserCampaignPairs = os.getUserCampaignPairsContract.handler(
       return JSON.parse(cache)
     }
 
-    const users: UserWithInfo[] = await getUsers(context.db, context.env.KV)
+    const users: UserWithInfo[] = await getUsers(context.db)
 
     const DO = context.env.JingleJamData
     const stubID = DO.idFromName('JJ_API_CACHE')
