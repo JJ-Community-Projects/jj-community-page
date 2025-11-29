@@ -663,6 +663,7 @@ const hasInvisibleStreamsInVisibleSchedule =
             and(
               eq(schedulesTable.ownerId, userId),
               eq(schedulesTable.primary, true),
+              eq(schedulesTable.visible, true),
               eq(schedulesTable.year, year),
             ),
           )
