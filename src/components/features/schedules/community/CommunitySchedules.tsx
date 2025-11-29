@@ -23,6 +23,7 @@ import { DateTime } from 'luxon'
 import { getStreamColor } from '../../../../functions/jjDatesToColors.ts'
 import { getTextColor } from '../../../../lib/utils/textColors.ts'
 import './CommunitySchedules.css'
+import { useNow } from '../../../../lib/utils/useNow.ts'
 
 const Header: Component = () => {
   const nextJJStartDate = useNextJJStartDate()
@@ -213,6 +214,26 @@ const DayAccordionItem: Component<{
     })
   }
 
+  const streams = () => props.day.streams
+
+  const now = useNow()
+
+  const liveStreams = () => {
+    return streams().filter((s) => {
+      const start = DateTime.fromJSDate(s.stream.start)
+      const end = DateTime.fromJSDate(s.stream.end)
+      return start < now() && end > now()
+    })
+  }
+
+  const liveStreamsCount = () => liveStreams().length
+
+  const liveStreamsCountText = () => {
+    const count = liveStreamsCount()
+    if (count === 0) return ''
+    return count === 1 ? ' (1 live stream)' : ` (${count} live streams)`
+  }
+
   return (
     <Accordion.Item
       value={props.index.toString()}
@@ -236,7 +257,7 @@ const DayAccordionItem: Component<{
           <div class="accordion__item-trigger-bg" />
 
           <span class="accordion__item-trigger-text">
-            {formatDate(props.day.day)} ({props.day.streams.length} streams)
+            {formatDate(props.day.day)} ({props.day.streams.length} streams){liveStreamsCountText()}
           </span>
           <FaSolidChevronDown class="accordion__item-trigger-chevron" />
         </Accordion.Trigger>
