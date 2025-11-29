@@ -84,7 +84,7 @@ export const ScheduleHeader: Component<ScheduleHeaderProps> = (props) => {
               aria-hidden="true"
             />
             <p class="leading-relaxed ~text-sm/base">
-              Some streams in your public schedule are hidden. Set those streams to Visible so they appear on your page.
+              All streams in your public primary schedule are hidden. Set those streams to Visible so they appear on your page.
             </p>
           </div>
         </Show>
