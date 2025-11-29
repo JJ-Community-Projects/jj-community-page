@@ -198,6 +198,7 @@ export class JingleJamData extends DurableObject<Env> {
     const entries: Record<string, JJCampaign> = {}
     for (const c of campaigns) {
       entries[this.campaignKey(c.id)] = c
+      entries[this.campaignKey(c.slug)] = c
     }
     await this.storage.put(entries)
   }
