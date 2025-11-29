@@ -31,6 +31,19 @@ const os = implement({
   discardDraftContract,
 }).use(dbMiddleware)
 
+// Helper: chunk an array into subarrays of size `size`
+function chunk<T>(arr: T[], size: number): T[][] {
+  if (size <= 0) return [arr]
+  const out: T[][] = []
+  for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size))
+  return out
+}
+
+// Safe limits to avoid SQLite bound-parameter limit (~999)
+const DELETE_MAX_IDS = 3 // 1 var per id + a few extras for other predicates
+const PARTS_MAX_ROWS = 3 // ~3 vars per row
+const TAGS_MAX_ROWS = 3  // ~4 vars per row
+
 function getScheduleEditingStub(env: Env, scheduleId: number) {
   const channelId = scheduleEditingChannels.edit(scheduleId)
   const DO = env.ScheduleEditingObject
@@ -216,15 +229,17 @@ const publishDraft = os.publishDraftContract
         .filter((s) => !finalIds.has(s.id))
         .map((s) => s.id)
       if (toDelete.length > 0) {
-        await db
-          .delete(streamsTable)
-          .where(
-            and(
-              eq(streamsTable.scheduleId, scheduleId),
-              inArray(streamsTable.id, toDelete),
-            ),
-          )
-          .run()
+        for (const ids of chunk(toDelete, DELETE_MAX_IDS)) {
+          await db
+            .delete(streamsTable)
+            .where(
+              and(
+                eq(streamsTable.scheduleId, scheduleId),
+                inArray(streamsTable.id, ids),
+              ),
+            )
+            .run()
+        }
         deleted += toDelete.length
       }
 
@@ -255,14 +270,13 @@ const publishDraft = os.publishDraftContract
           streamId: idMap.get(p.streamId)!,
           userId: p.userId,
         }))
-        // Single-batch insert (kept chunking structure for potential future batching)
-        for (const chunk of [values]) {
-          if (chunk.length > 0) {
+        for (const rows of chunk(values, PARTS_MAX_ROWS)) {
+          if (rows.length > 0) {
             await db
               .insert(streamParticipantsTable)
-              .values(chunk as any)
+              .values(rows as any)
               .run()
-            addedParticipants += chunk.length
+            addedParticipants += rows.length
           }
         }
       }
@@ -293,11 +307,10 @@ const publishDraft = os.publishDraftContract
           tagId: t.tagId,
           addedAt: t.addedAt,
         }))
-        // Single-batch insert (kept chunking structure for potential future batching)
-        for (const chunk of [tagValues]) {
-          if (chunk.length > 0) {
-            await db.insert(streamTagsTable).values(chunk).run()
-            addedTags += chunk.length
+        for (const rows of chunk(tagValues, TAGS_MAX_ROWS)) {
+          if (rows.length > 0) {
+            await db.insert(streamTagsTable).values(rows as any).run()
+            addedTags += rows.length
           }
         }
       }
