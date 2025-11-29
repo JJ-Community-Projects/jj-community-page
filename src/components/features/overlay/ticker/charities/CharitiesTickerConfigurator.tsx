@@ -14,7 +14,7 @@ export const CharitiesTickerConfigurator: Component<{ visible?: boolean }> = (
     buildUrl('/overlays/charities', {
       theme: theme(),
       currency: currency(),
-      user: user?.tiltifyName,
+      user: user?.tiltifySlug,
     }),
   )
 

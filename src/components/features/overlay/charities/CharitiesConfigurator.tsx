@@ -62,7 +62,7 @@ type Currency = 'GBP' | 'USD' | 'EUR'
       currency: currency(),
       showUrl: showUrl(),
       causes: causesParam(),
-      user: user?.tiltifyName,
+      user: user?.tiltifySlug,
     }),
   )
 
