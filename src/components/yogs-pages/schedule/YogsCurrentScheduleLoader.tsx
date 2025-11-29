@@ -229,19 +229,19 @@ const Body: Component<BodyProps> = (props) => {
             >
               <a
                 class={'transition-all hover:scale-110'}
-                href={'https://www.youtube.com/yogscast'}
-                target={'_blank'}
-                aria-label={'Yogscast Youtube channel'}
-              >
-                <YoutubeIcon class={'size-4'} />
-              </a>
-              <a
-                class={'transition-all hover:scale-110'}
                 href={'https://twitch.tv/yogscast'}
                 target={'_blank'}
                 aria-label={'Yogscast Twitch channel'}
               >
                 <TwitchIcon class={'size-4'} />
+              </a>
+              <a
+                class={'transition-all hover:scale-110'}
+                href={'https://www.youtube.com/yogscast'}
+                target={'_blank'}
+                aria-label={'Yogscast Youtube channel'}
+              >
+                <YoutubeIcon class={'size-4'} />
               </a>
               <a
                 class={'transition-all hover:scale-110'}
@@ -254,10 +254,10 @@ const Body: Component<BodyProps> = (props) => {
               <a
                 class={'transition-all hover:scale-110'}
                 target={'_blank'}
-                href={'https://x.com/yogscast'}
-                aria-label={'Yogscast Twitter'}
+                href={'https://www.tiktok.com/@yogscastofficial'}
+                aria-label={'Jingle Jam Tiktok'}
               >
-                <TwitterIcon class={'size-4'} />
+                <TiktokIcon class={'size-4'} />
               </a>
               <a
                 class={'transition-all hover:scale-110'}
@@ -270,13 +270,12 @@ const Body: Component<BodyProps> = (props) => {
               <a
                 class={'transition-all hover:scale-110'}
                 target={'_blank'}
-                href={'https://www.tiktok.com/@yogscastofficial'}
-                aria-label={'Jingle Jam Tiktok'}
+                href={'https://x.com/yogscast'}
+                aria-label={'Yogscast Twitter'}
               >
-                <TiktokIcon class={'size-4'} />
+                <TwitterIcon class={'size-4'} />
               </a>
             </div>
-
             <p>
               This Yogscast Jingle Jam schedule is maintained by the community.
               If you find errors or see that a stream is missing use the contact
