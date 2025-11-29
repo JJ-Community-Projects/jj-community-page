@@ -35,6 +35,7 @@ import {
   getHardCodedEventsJustYogs,
   getHardCodedEventsNoYogs,
 } from './getHardCodedEvents.ts'
+import { loadUsersWithInfo, storeUsersWithInfo } from './usersWithInfoCache.ts'
 // New: get campaign by Twitch id
 
 const jjDataCacheMiddleware = cacheMiddleware({
@@ -672,18 +673,15 @@ async function getUsers(
 
 const getAllUsersWithInfo = os.getAllUsersWithInfoContract.handler(
   async ({ context }) => {
-    const cached = await context.env.KV.get('getAllUsersWithInfo')
+    const cached = await loadUsersWithInfo(context.env.KV, 'getAllUsersWithInfo')
     if (cached) {
-      const users = JSON.parse(cached) as UserWithInfo[]
-      console.log('getAllUsersWithInfo','cache', users.length)
-      return users
+      console.log('getAllUsersWithInfo','cache', cached.length)
+      return cached
     }
 
     const users = await getUsers(context.db)
     console.log('getAllUsersWithInfo', users.length)
-    await context.env.KV.put('getAllUsersWithInfo', JSON.stringify(users), {
-      expirationTtl: 300,
-    })
+    await storeUsersWithInfo(context.env.KV, 'getAllUsersWithInfo', users, 300)
     return users
   },
 )
