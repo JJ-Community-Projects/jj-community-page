@@ -133,7 +133,7 @@ const campaignsAll = os.campaignsContract
   )
   .handler(async ({ context }) => {
     // KV cache
-    const cached = await context.env.KV.get('campaigns')
+    const cached = await context.env.KV.get('campaigns-all')
     if (cached) {
       return JSON.parse(cached)
     }
@@ -190,7 +190,7 @@ const campaignsAll = os.campaignsContract
 
       const sortedData = { ...(data as any), list: sortedList }
       // store in KV for 60s
-      await context.env.KV.put('campaigns', JSON.stringify(sortedData), {
+      await context.env.KV.put('campaigns-all', JSON.stringify(sortedData), {
         expirationTtl: 60,
       })
       return sortedData
