@@ -2,12 +2,15 @@ import { privateSchedulesContract } from './contract.ts'
 import { implement, ORPCError } from '@orpc/server'
 import { dbMiddleware } from '../../middleware/dbMiddleware.ts'
 import { authMiddleware } from '../../middleware/authMiddleware.ts'
-import { schedulesTable } from '../../../db/schema/jj-schema.ts'
+import { schedulesTable, streamsTable } from '../../../db/schema/jj-schema.ts'
 import { editSchedulesTable } from '../../../db/schema/edit-schedules-schema.ts'
 import { accounts, users } from '../../../db/schema/auth-schema.ts'
 import { and, eq, not } from 'drizzle-orm'
 import { DateTime } from 'luxon'
-import { createSlug, generateScheduleSlugAlternativesLocals, } from '../../../../functions/slug.ts'
+import {
+  createSlug,
+  generateScheduleSlugAlternativesLocals,
+} from '../../../../functions/slug.ts'
 import { checkCanCreateSchedule } from '../util/limits.ts'
 
 const os = implement(privateSchedulesContract).use(dbMiddleware)
@@ -639,6 +642,59 @@ const canCreateSchedule = os.canCreateSchedule
     return checkCanCreateSchedule(db, userId, year)
   })
 
+const hasInvisibleStreamsInVisibleSchedule =
+  os.hasInvisibleStreamsInVisibleScheduleContract
+    .use(authMiddleware)
+    .handler(async ({ context }) => {
+      const db = context.db
+      const userId = context.userId
+
+      const year = new Date().getFullYear()
+
+      try {
+        // Get all schedules for the authenticated user
+        const schedule = await db
+          .select({
+            id: schedulesTable.id,
+            visible: schedulesTable.visible,
+          })
+          .from(schedulesTable)
+          .where(
+            and(
+              eq(schedulesTable.ownerId, userId),
+              eq(schedulesTable.primary, true),
+              eq(schedulesTable.year, year),
+            ),
+          )
+          .get()
+
+        if (!schedule) {
+          return false
+        }
+
+        const streams = await db
+          .select({
+            visible: streamsTable.visible,
+          })
+          .from(streamsTable)
+          .where(eq(streamsTable.scheduleId, schedule.id))
+          .all()
+
+        if (streams.length === 0) {
+          return false
+        }
+
+        const allVisible = streams.every(s => s.visible)
+
+        return !allVisible;
+      } catch (error) {
+        console.error('Error getting schedules for user:', error)
+        throw new ORPCError('INTERNAL_SERVER_ERROR', {
+          message: 'Failed to get schedules',
+        })
+      }
+    })
+
 export const privateSchedulesRouter = {
   // Schedule CRUD Operations
   create,
@@ -668,4 +724,6 @@ export const privateSchedulesRouter = {
 
   // Limit-checks
   canCreateSchedule,
+
+  hasInvisibleStreamsInVisibleSchedule,
 }

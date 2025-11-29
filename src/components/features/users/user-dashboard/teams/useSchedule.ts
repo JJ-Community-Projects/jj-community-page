@@ -37,13 +37,22 @@ export const useSchedule = () => {
     return d >= novFirst
   }
 
+  // Check if there are invisible streams within the visible primary schedule for the current year
+  const invisibleStreamsInVisibleScheduleQuery = useQuery(() =>
+    orpcPrivate.schedules.hasInvisibleStreamsInVisibleSchedule.queryOptions({
+      staleTime: 30 * 1000,
+    }),
+  )
+  const hasInvisibleStreamsInVisibleSchedule = () =>
+    invisibleStreamsInVisibleScheduleQuery.data ?? false
+
 
 
   const showWarning = () =>{
     if (!hasSchedules()){
       return false
     }
-    return !hasPrimarySchedule() || !hasVisibleSchedule() || !hasVisiblePrimaryForCurrentYear() || !isAfterNovFirstThisYear()
+    return !hasPrimarySchedule() || !hasVisibleSchedule() || !hasVisiblePrimaryForCurrentYear() || !isAfterNovFirstThisYear() || hasInvisibleStreamsInVisibleSchedule()
   }
 
 
@@ -55,5 +64,7 @@ export const useSchedule = () => {
     hasVisiblePrimaryForCurrentYear,
     isAfterNovFirstThisYear,
     showWarning,
+    hasInvisibleStreamsInVisibleSchedule,
+    invisibleStreamsInVisibleScheduleQuery,
   }
 }

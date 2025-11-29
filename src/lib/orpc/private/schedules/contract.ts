@@ -214,6 +214,9 @@ const canCreateScheduleContract = oc
   .input(z.object({ year: z.number().int().min(2000).max(2100) }))
   .output(z.object({ canCreate: z.boolean(), schedules: z.number(), year: z.number(), maxSchedules: z.number() }));
 
+
+const hasInvisibleStreamsInVisibleScheduleContract = oc.output(z.boolean());
+
 export const privateSchedulesContract = {
   // Schedule CRUD Operations
   create: createContract,
@@ -242,4 +245,6 @@ export const privateSchedulesContract = {
 
   // Limit-checks
   canCreateSchedule: canCreateScheduleContract,
+
+  hasInvisibleStreamsInVisibleScheduleContract: hasInvisibleStreamsInVisibleScheduleContract
 }

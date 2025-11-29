@@ -14,8 +14,6 @@ import { useNow } from '../../../../lib/utils/useNow.ts'
 import { useSchedule } from './teams/useSchedule.ts'
 
 const ScheduleCard: Component = () => {
-  const now = useNow()
-  // Query for user schedules
   const { showWarning } = useSchedule()
 
   return (

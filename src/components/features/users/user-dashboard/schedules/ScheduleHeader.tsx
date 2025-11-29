@@ -32,7 +32,9 @@ export const ScheduleHeader: Component<ScheduleHeaderProps> = (props) => {
     hasPrimarySchedule,
     hasVisibleSchedule,
     hasVisiblePrimaryForCurrentYear,
-    isAfterNovFirstThisYear, } = useSchedule()
+    isAfterNovFirstThisYear,
+    hasInvisibleStreamsInVisibleSchedule,
+  } = useSchedule()
   const now = useNow()
 
   return (
@@ -70,6 +72,19 @@ export const ScheduleHeader: Component<ScheduleHeaderProps> = (props) => {
               You haven't set a primary schedule yet. Your page will not
               highlight a schedule until you set one. Use the star button on a
               schedule to mark it as your primary.
+            </p>
+          </div>
+        </Show>
+
+        {/* Warning when some streams in the visible primary schedule are hidden */}
+        <Show when={hasInvisibleStreamsInVisibleSchedule()}>
+          <div class="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-3 text-amber-900">
+            <FaSolidTriangleExclamation
+              class="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-500"
+              aria-hidden="true"
+            />
+            <p class="leading-relaxed ~text-sm/base">
+              Some streams in your public schedule are hidden. Set those streams to Visible so they appear on your page.
             </p>
           </div>
         </Show>
