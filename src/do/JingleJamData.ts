@@ -221,7 +221,7 @@ export class JingleJamData extends DurableObject<Env> {
   }
 
   public async getCampaigns() {
-    const map = (await this.storage.list({ prefix: 'campaign:api:' })) as Map<
+    const map = (await this.storage.list({ prefix: 'campaign:api:slug:' })) as Map<
       string,
       unknown
     >
