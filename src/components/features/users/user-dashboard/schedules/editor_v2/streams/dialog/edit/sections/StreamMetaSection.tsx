@@ -7,8 +7,7 @@ export const StreamMetaSection: Component<{ streamId: number }> = (_props) => {
   const dialog = useStreamEditorDialog();
 
   const updateTitle = ((v: string) => {
-    const title = v?.trim();
-    dialog.setTitle(title || "");
+    dialog.setTitle(v || "");
   });
 
   const updateSubtitle = ((v: string) => {

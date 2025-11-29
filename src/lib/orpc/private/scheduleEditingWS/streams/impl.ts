@@ -407,6 +407,19 @@ export const updateStreamWithDetails = os.updateStreamWithDetailsContract
       for (const k of keys)
         if (k in patch && (patch as any)[k] !== undefined)
           (allowed as any)[k] = (patch as any)[k]
+      // Trim whitespace on selected string fields before persisting
+      const trimKeys = [
+        'title',
+        'subtitle',
+        'description',
+        'youtubeVodUrl',
+        'twitchVodUrl',
+      ] as const
+      for (const k of trimKeys) {
+        if (k in allowed && typeof (allowed as any)[k] === 'string') {
+          ;(allowed as any)[k] = ((allowed as any)[k] as string).trim()
+        }
+      }
       if (Object.keys(allowed).length > 0) {
         allowedPatch = { ...allowed }
         ;(allowed as any).updatedAt = sql`(unixepoch())`

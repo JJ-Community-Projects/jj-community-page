@@ -19,7 +19,7 @@ export const StreamEditFormBody: Component<{ streamId: number }> = (props) => {
           <StreamTimeSection streamId={s().id} />
           <StreamLinksSection streamId={s().id} />
           <StreamDescriptionSection streamId={s().id} />
-          <StreamParticipantsSection streamId={s().id} />
+          <StreamParticipantsSection />
           <StreamTagsSection streamId={s().id} />
         </div>
       )}
