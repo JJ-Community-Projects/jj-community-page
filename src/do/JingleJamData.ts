@@ -191,20 +191,25 @@ export class JingleJamData extends DurableObject<Env> {
 
   // Campaigns
   public async setCampaign(campaign: JJCampaign) {
+    await this.storage.put(this.campaignKeyId(campaign.id), campaign)
     await this.storage.put(this.campaignKey(campaign.id), campaign)
   }
 
   public async setCampaigns(campaigns: JJCampaign[]) {
     const entries: Record<string, JJCampaign> = {}
     for (const c of campaigns) {
-      entries[this.campaignKey(c.id)] = c
+      entries[this.campaignKeyId(c.id)] = c
       entries[this.campaignKey(c.slug)] = c
     }
     await this.storage.put(entries)
   }
 
-  public getCampaign(userRef: string) {
-    return this.storage.get(this.campaignKey(userRef)) as Promise<
+  public async getCampaign(userRef: string) {
+    const campaign = await this.storage.get<JJCampaign>(this.campaignKey(userRef))
+    if (campaign) {
+      return campaign
+    }
+    return this.storage.get(this.campaignKeyId(userRef)) as Promise<
       JJCampaign | undefined
     >
   }
@@ -1474,7 +1479,11 @@ export class JingleJamData extends DurableObject<Env> {
 
   // Key helpers
   private campaignKey(userRef: string) {
-    return `campaign:api:${userRef}`
+    return `campaign:api:slug:${userRef}`
+  }
+
+  private campaignKeyId(userRef: string) {
+    return `campaign:api:id:${userRef}`
   }
 
   private causeKey(causeId: string) {
