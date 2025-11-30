@@ -7,7 +7,7 @@ import {
   OverviewComponent,
   OverviewComponentClosed,
 } from './CharityOverview.tsx'
-import { useCharityOverview } from './CharityOverviewProvider.tsx' // Top-level subcomponents (do not define components inside other components)
+import { useCharityOverview } from './CharityOverviewProvider.tsx'
 
 export const CommunityCharitiesOverview: Component = () => {
   const { mergedCharityItems, overview, charityOpen } =

@@ -1,4 +1,4 @@
-import { type Component, createSignal, For, Show } from 'solid-js'
+import { type Component, createMemo, createSignal, For, Show } from 'solid-js'
 import {
   useIsJJ,
   useJJStartCountdown,
@@ -18,14 +18,19 @@ import {
   CommunityCharitiesOverviewMobile,
 } from '../../../common/charityOverview/CommunityCharitiesOverview.tsx'
 import { FaSolidCalendarWeek, FaSolidChevronDown } from 'solid-icons/fa'
-import type { ScheduleDay } from '../../../../lib/orpc/private/jjData/contract.ts'
+import type {
+  FullCommunitySchedule,
+  ScheduleDay,
+} from '../../../../lib/orpc/private/jjData/contract.ts'
 import { DateTime } from 'luxon'
 import { getStreamColor } from '../../../../functions/jjDatesToColors.ts'
 import { getTextColor } from '../../../../lib/utils/textColors.ts'
 import './CommunitySchedules.css'
 import { useNow } from '../../../../lib/utils/useNow.ts'
 
-const Header: Component = () => {
+const Header: Component<{
+  schedule?: FullCommunitySchedule
+}> = (props) => {
   const nextJJStartDate = useNextJJStartDate()
   const jjStartCountdown = useJJStartCountdown()
   const isJJ = useIsJJ()
@@ -38,6 +43,16 @@ const Header: Component = () => {
             <FaSolidCalendarWeek class="h-8 w-8 text-neutral-600" />
             <h1 class="font-bold text-black ~text-2xl/4xl">Full Schedule</h1>
           </div>
+          <Show when={props.schedule}>
+            {(schedule) => {
+              const streamCount = createMemo(() => {
+                const days = schedule().days
+                const streams = days.map((d) => d.streams).flat()
+                return streams.length
+              })
+              return <p>{streamCount()} Streams</p>
+            }}
+          </Show>
         </div>
 
         {/* Right: Countdown (right-aligned, moves below on small screens) */}
@@ -74,15 +89,38 @@ export const CommunitySchedulesPage: Component<{
 }
 
 const Body: Component = () => {
+  const scheduleQuery = useQuery(() =>
+    orpcPrivate.jj.fullSchedule.queryOptions({
+      staleTime: 60_000 * 12,
+      refetchInterval: 60_000 * 15,
+    }),
+  )
+
+  const schedule = (): FullCommunitySchedule | undefined => scheduleQuery.data
+
   return (
     <div class={'flex w-full flex-col items-stretch justify-center gap-6'}>
-      <Header />
+      <Header schedule={schedule()} />
       <div class={'flex w-full flex-row items-start justify-start gap-6'}>
         <div class={'hidden lg:block'}>
           <CommunityCharitiesOverview />
         </div>
         <div class={'flex flex-1 flex-col items-start justify-center gap-6'}>
-          <FullSchedule />
+          <Show when={scheduleQuery.data}>
+            {(schedule) => {
+              return <FullSchedule schedule={schedule()} />
+            }}
+          </Show>
+          <Show when={scheduleQuery.error}>
+            <div class={'rounded-2xl bg-white p-2'}>
+              <p class="text-red-400">Failed to load full schedule.</p>
+            </div>
+          </Show>
+          <Show when={scheduleQuery.isLoading}>
+            <div class={'rounded-2xl bg-white p-2'}>
+              <p>Loading...</p>
+            </div>
+          </Show>
         </div>
       </div>
       <div class={'block w-full lg:hidden'}>
@@ -92,95 +130,27 @@ const Body: Component = () => {
   )
 }
 
-const UpcomingStreams: Component = () => {
-  const upcomingStreams = useQuery(() =>
-    orpcPrivate.jj.upcomingStreams.queryOptions({
-      staleTime: 60_000 * 8,
-      refetchInterval: 60_000 * 10,
-    }),
-  )
-  const [showAll, setShowAll] = createSignal(false)
-
-  const items = () => upcomingStreams.data?.streams ?? []
-  const firstFour = () => items().slice(0, 12)
-  const remainingCount = () => Math.max(items().length - 12, 0)
-  const visibleItems = () => (showAll() ? items() : firstFour())
-
-  return (
-    <div class="flex w-full flex-col gap-2">
-      <Show when={upcomingStreams.isLoading}>
-        <p class="text-white/80">Loading upcoming streams…</p>
-      </Show>
-      <Show when={upcomingStreams.isError}>
-        <p class="text-red-400">Failed to load upcoming streams.</p>
-      </Show>
-      <Show when={upcomingStreams.isSuccess && items().length > 0}>
-        <div class="grid w-full grid-cols-[repeat(auto-fit,_minmax(250px,_1fr))] gap-2">
-          <For each={visibleItems()}>
-            {(item) => {
-              const { stream, owner } = item
-              return <UpcomingStreamsStreamCard stream={stream} user={owner} />
-            }}
-          </For>
-        </div>
-        <Show when={remainingCount() > 0}>
-          <div class="mt-3 flex justify-center">
-            <button
-              class="rounded-lg bg-white/10 px-4 py-2 text-sm font-semibold text-white backdrop-blur transition-colors hover:bg-white/20"
-              onClick={() => setShowAll((v) => !v)}
-            >
-              {showAll() ? 'Show less' : `Show ${remainingCount()} more`}
-            </button>
-          </div>
-        </Show>
-      </Show>
-    </div>
-  )
-}
-
-const FullSchedule = () => {
-  const schedule = useQuery(() =>
-    orpcPrivate.jj.fullSchedule.queryOptions({
-      staleTime: 60_000 * 12,
-      refetchInterval: 60_000 * 15,
-    }),
-  )
+const FullSchedule: Component<{
+  schedule: FullCommunitySchedule
+}> = (props) => {
   const [expandedDays, setExpandedDays] = createSignal<string[]>([])
   return (
-    <>
-      <Show when={schedule.data}>
-        {(schedule) => {
-          return (
-            <Accordion.Root
-              class="flex w-full flex-col gap-2"
-              collapsible={true}
-              value={expandedDays()}
-              onChange={setExpandedDays}
-            >
-              <For each={schedule().days}>
-                {(day, index) => (
-                  <DayAccordionItem
-                    day={day}
-                    index={index()}
-                    expandedDays={expandedDays}
-                  />
-                )}
-              </For>
-            </Accordion.Root>
-          )
-        }}
-      </Show>
-      <Show when={schedule.error}>
-        <div class={'rounded-2xl bg-white p-2'}>
-          <p class="text-red-400">Failed to load full schedule.</p>
-        </div>
-      </Show>
-      <Show when={schedule.isLoading}>
-        <div class={'rounded-2xl bg-white p-2'}>
-          <p>Loading...</p>
-        </div>
-      </Show>
-    </>
+    <Accordion.Root
+      class="flex w-full flex-col gap-2"
+      collapsible={true}
+      value={expandedDays()}
+      onChange={setExpandedDays}
+    >
+      <For each={props.schedule.days}>
+        {(day, index) => (
+          <DayAccordionItem
+            day={day}
+            index={index()}
+            expandedDays={expandedDays}
+          />
+        )}
+      </For>
+    </Accordion.Root>
   )
 }
 
@@ -257,7 +227,8 @@ const DayAccordionItem: Component<{
           <div class="accordion__item-trigger-bg" />
 
           <span class="accordion__item-trigger-text">
-            {formatDate(props.day.day)} ({props.day.streams.length} streams){liveStreamsCountText()}
+            {formatDate(props.day.day)} ({props.day.streams.length} streams)
+            {liveStreamsCountText()}
           </span>
           <FaSolidChevronDown class="accordion__item-trigger-chevron" />
         </Accordion.Trigger>
