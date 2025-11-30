@@ -21,6 +21,7 @@ import {
   useQueryClient,
 } from '@tanstack/solid-query'
 import { QueryClient } from '@tanstack/query-core'
+import { UserDashboardFeedback } from '../UserDashboardFeedback.tsx'
 
 interface TeamsListProps {
   user: User
@@ -89,6 +90,7 @@ const TeamsHeader: Component = () => {
               <span>Create Team</span>
             </button>
           </div>
+          <UserDashboardFeedback />
         </div>
       </div>
 

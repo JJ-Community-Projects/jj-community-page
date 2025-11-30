@@ -3,6 +3,7 @@ import { FaSolidChevronLeft, FaSolidTriangleExclamation } from 'solid-icons/fa'
 import type { Schedule } from '../../../../../lib/orpc/private/schemas/schedules.ts'
 import { useSchedule } from '../teams/useSchedule.ts'
 import { useNow } from '../../../../../lib/utils/useNow.ts'
+import { UserDashboardFeedback } from '../UserDashboardFeedback.tsx'
 
 /**
  * ScheduleHeader Component
@@ -131,6 +132,8 @@ export const ScheduleHeader: Component<ScheduleHeaderProps> = (props) => {
           while any other schedules—whether from the same year or different
           years—will still be available to view from your page.
         </p>
+
+        <UserDashboardFeedback/>
       </div>
     </div>
   )

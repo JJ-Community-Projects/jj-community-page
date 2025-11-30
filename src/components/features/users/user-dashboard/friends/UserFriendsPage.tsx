@@ -6,6 +6,7 @@ import {UserFriendsSection} from "./UserFriendsSection.tsx";
 import {QueryClientProvider} from "@tanstack/solid-query";
 import {QueryClient} from "@tanstack/query-core";
 import {UserFriendsProvider} from "./UserFriendsProvider.tsx";
+import { UserDashboardFeedback } from '../UserDashboardFeedback.tsx'
 
 interface UserFriendsPageProps {
   user: User
@@ -46,6 +47,7 @@ const UserFriendsHeader: Component = () => {
         <div class="flex justify-between items-center">
           <h2 class="text-xl font-bold">Your Friends</h2>
         </div>
+        <UserDashboardFeedback/>
       </div>
     </div>
   );

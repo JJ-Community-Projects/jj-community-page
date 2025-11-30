@@ -6,6 +6,7 @@ import {UserTagsSection} from "./UserTagsSection.tsx";
 import {QueryClientProvider} from "@tanstack/solid-query";
 import {QueryClient} from "@tanstack/query-core";
 import {UserTagsProvider} from "./UserTagsProvider.tsx";
+import { UserDashboardFeedback } from '../UserDashboardFeedback.tsx'
 
 interface UserTagsPageProps {
   user: User
@@ -46,6 +47,7 @@ const UserTagsHeader: Component = () => {
         <div class="flex justify-between items-center">
           <h2 class="text-xl font-bold">Your Tags</h2>
         </div>
+        <UserDashboardFeedback/>
       </div>
     </div>
   );

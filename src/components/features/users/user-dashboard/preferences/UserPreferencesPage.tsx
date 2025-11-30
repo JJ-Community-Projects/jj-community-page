@@ -4,6 +4,7 @@ import { UserSocialsSection } from './UserSocialsSection.tsx'
 import { QueryClient } from '@tanstack/query-core'
 import { QueryClientProvider } from '@tanstack/solid-query'
 import { UserStylesSection } from './UserStylesSection.tsx'
+import { UserDashboardFeedback } from '../UserDashboardFeedback.tsx'
 
 const UserPreferencesHeader: Component = () => {
   return (
@@ -21,6 +22,7 @@ const UserPreferencesHeader: Component = () => {
         <div class="flex items-center justify-between">
           <h2 class="text-xl font-bold">Preferences</h2>
         </div>
+        <UserDashboardFeedback />
       </div>
     </div>
   )

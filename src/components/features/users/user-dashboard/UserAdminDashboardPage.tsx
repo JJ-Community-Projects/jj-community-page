@@ -7,6 +7,7 @@ import { QueryClientProvider, useQuery } from '@tanstack/solid-query'
 import { QueryClient } from '@tanstack/query-core'
 import { FaSolidArrowUpRightFromSquare, FaSolidUser } from 'solid-icons/fa'
 import { UserDashboardCards } from './UserDashboardCards.tsx'
+import { UserDashboardFeedback } from './UserDashboardFeedback.tsx'
 
 const ProfileCard: Component = () => {
 
@@ -50,8 +51,8 @@ const ProfileCard: Component = () => {
         </div>
       }
     >
-      <div class="rounded-xl border-2 border-primary-200 bg-white p-6 shadow-md transition-all duration-300 md:p-8">
-        <div class="mb-6 flex items-center justify-between">
+      <div class="flex flex-col rounded-xl border-2 border-primary-200 bg-white p-6 gap-8 shadow-md transition-all duration-300 md:p-8">
+        <div class="flex items-center justify-between">
           <div class={'flex flex-col'}>
             <div class={'flex flex-col'}>
               <div class={'flex flex-row items-center gap-3'}>
@@ -90,7 +91,7 @@ const ProfileCard: Component = () => {
           </form>
         </div>
 
-        <div class="mt-6">
+        <div class="">
           <h3 class="mb-3 font-poppins font-bold text-neutral-800 ~text-lg/xl">
             Tiltify Links
           </h3>
@@ -124,6 +125,8 @@ const ProfileCard: Component = () => {
             </a>
           </div>
         </div>
+
+        <UserDashboardFeedback/>
       </div>
     </Show>
   )

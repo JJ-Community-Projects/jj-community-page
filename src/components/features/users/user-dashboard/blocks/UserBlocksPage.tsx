@@ -6,6 +6,7 @@ import {UserBlocksSection} from "./UserBlocksSection.tsx";
 import {QueryClientProvider} from "@tanstack/solid-query";
 import {QueryClient} from "@tanstack/query-core";
 import {UserBlockProvider} from "./UserBlockProvider.tsx";
+import { UserDashboardFeedback } from '../UserDashboardFeedback.tsx'
 
 interface UserBlocksPageProps {
   user: User
@@ -46,6 +47,7 @@ const UserBlocksHeader: Component = () => {
         <div class="flex justify-between items-center">
           <h2 class="text-xl font-bold">Block Users</h2>
         </div>
+        <UserDashboardFeedback/>
       </div>
     </div>
   );

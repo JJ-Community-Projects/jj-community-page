@@ -20,9 +20,12 @@ import {
   TwitterIcon,
   InstagramIcon,
   TiktokIcon,
+  DiscordIcon,
+  RedditIcon,
 } from '../../common/icons/JJIcons.tsx'
 import { DateTime } from 'luxon'
 import { YogsCreatorPill } from '../creators/YogsCreatorPill.tsx'
+import { FaSolidEnvelope } from 'solid-icons/fa'
 
 interface ConfigLoaderProps {
   creators: YogsCreator[]
@@ -166,7 +169,7 @@ const Body: Component<BodyProps> = (props) => {
   return (
     <Switch>
       <Match when={schedule.data}>
-        <>
+        <div class={'flex flex-col items-center justify-center gap-2'}>
           <div class="desktop-schedule flex w-full flex-col items-center justify-center gap-2">
             <YogsScheduleComponent
               schedule={schedule.data!}
@@ -175,7 +178,7 @@ const Body: Component<BodyProps> = (props) => {
             <Show when={schedule.data?.updatedAt}>
               {(updatedAt) => {
                 return (
-                  <p class={'pb-4 text-center text-white'}>
+                  <p class={'text-center text-white'}>
                     Last Updated{' '}
                     {DateTime.fromJSDate(updatedAt()).toLocaleString({
                       year: 'numeric',
@@ -189,6 +192,7 @@ const Body: Component<BodyProps> = (props) => {
                 )
               }}
             </Show>
+            <Feedback/>
           </div>
           <div class="mobile-schedule flex w-full flex-col items-center justify-center gap-2">
             <MobileYogsScheduleComponent
@@ -198,7 +202,7 @@ const Body: Component<BodyProps> = (props) => {
             <Show when={schedule.data?.updatedAt}>
               {(updatedAt) => {
                 return (
-                  <p class={'pb-4 text-center text-white'}>
+                  <p class={'text-center text-white'}>
                     Last Updated{' '}
                     {DateTime.fromJSDate(updatedAt()).toLocaleString({
                       month: 'short',
@@ -211,7 +215,9 @@ const Body: Component<BodyProps> = (props) => {
                 )
               }}
             </Show>
+            <Feedback/>
           </div>
+          <Creators creators={props.creators} />
           <div
             class={
               'flex flex-col items-center justify-center gap-1 text-pretty text-center text-white'
@@ -285,8 +291,7 @@ const Body: Component<BodyProps> = (props) => {
               with the Jingle Jam, the Yogscast or their partners.
             </p>
           </div>
-          <Creators creators={props.creators} />
-        </>
+        </div>
       </Match>
       <Match when={schedule.isPending}>
         <div class={'loading-container'}>
@@ -339,5 +344,49 @@ const Creators: Component<{
         </Show>
       </div>
     </Show>
+  )
+}
+
+
+
+const Feedback: Component = () => {
+  return (
+    <div class={'flex flex-col items-center justify-start text-white p-2 gap-1'}>
+      <p class={'text-base font-bold'}>Send Feedback</p>
+      <div class={'flex flex-row gap-4'}>
+        <a
+          class={
+            'rounded-full transition-all hover:scale-110 hover:bg-white/10'
+          }
+          href={'https://discord.gg/D5eqweWQPs'}
+        >
+          <DiscordIcon class={'size-5'} />
+        </a>
+        <a
+          class={
+            'rounded-full transition-all hover:scale-110 hover:bg-white/10'
+          }
+          href={'https://bsky.app/profile/ostof.bsky.social'}
+        >
+          <BskyIcon class={'size-5'} />
+        </a>
+        <a
+          class={
+            'rounded-full transition-all hover:scale-110 hover:bg-white/10'
+          }
+          href={'mailto:ostof13@gmail.com'}
+        >
+          <FaSolidEnvelope class={'size-5'} />
+        </a>
+        <a
+          class={
+            'rounded-full transition-all hover:scale-110 hover:bg-white/10'
+          }
+          href={'https://old.reddit.com/message/compose/?to=Ostof'}
+        >
+          <RedditIcon class={'size-5'} />
+        </a>
+      </div>
+    </div>
   )
 }
