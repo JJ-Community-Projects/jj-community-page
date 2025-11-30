@@ -27,7 +27,7 @@ streams:
       tileSize: 2
     title: SWEATY SHOOTERS
     vods: []
-  - creators: [pedguin]
+  - creators: [pedguin,ravs]
     duration_hours: 3
     end: '2025-12-04T17:00:00Z'
     start: '2025-12-04T16:00:00Z'
@@ -40,7 +40,7 @@ streams:
       tileSize: 1
     title: Core Keeper Relay Finish!
     vods: []
-  - creators: [lewis, zylus, briony,boba,martyn]
+  - creators: [lewis, zylus, briony,boba,martyn,ravs]
     duration_hours: 6
     start: '2025-12-04T17:00:00Z'
     end: '2025-12-05T00:00:00Z'

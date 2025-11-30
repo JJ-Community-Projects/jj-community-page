@@ -27,7 +27,7 @@ streams:
       tileSize: 3
     title: COLOURING WITH KIRBY CREW
     vods: []
-  - creators: [simon_clark,briony,martyn]
+  - creators: [simon_clark,briony,martyn,ravs]
     duration_hours: 4.5
     end: '2025-12-06T21:00:00Z'
     start: '2025-12-06T17:00:00Z'
