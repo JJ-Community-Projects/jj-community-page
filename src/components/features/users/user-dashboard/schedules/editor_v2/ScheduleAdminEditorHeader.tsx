@@ -7,6 +7,7 @@ import { Transition } from 'solid-transition-group'
 import { twMerge } from 'tailwind-merge'
 import { FaSolidChevronLeft } from 'solid-icons/fa'
 import { DateTime } from 'luxon'
+import { UserDashboardFeedback } from '../../UserDashboardFeedback.tsx'
 
 export const ScheduleAdminEditorHeader: Component = () => {
   const {
@@ -196,6 +197,7 @@ export const ScheduleAdminEditorHeader: Component = () => {
             </div>
           </Show>
         </Transition>
+        <UserDashboardFeedback/>
       </div>
 
       <ConfirmationDialog
