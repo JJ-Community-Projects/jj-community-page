@@ -188,7 +188,7 @@ const Body: Component<BodyProps> = (props) => {
     <Switch>
       <Match when={schedule.data}>
         <div class={'flex flex-col items-center justify-center gap-2'}>
-          <Show when={isBeforeJJ}>
+          <Show when={isBeforeJJ()}>
             <div
               class={
                 'font-bebas tracking-wide flex flex-col items-center gap-1 rounded-xl border border-white/10 bg-white/5 p-4 text-center font-semibold text-white text-white/90 sm:p-4'
