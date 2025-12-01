@@ -204,6 +204,55 @@ const DayAccordionItem: Component<{
     return count === 1 ? ' (1 live stream)' : ` (${count} live streams)`
   }
 
+  const colors = new Map<number, string>([
+    [0, '#1e3a8a'],
+    [6, '#15803d'],
+    [12, '#eab308'],
+    [18, '#b91c1c'],
+  ])
+
+  const ranges = [
+    {
+      start: 0,
+      end: 6,
+    },
+    {
+      start: 6,
+      end: 12,
+    },
+    {
+      start: 12,
+      end: 18,
+    },
+    {
+      start: 18,
+      end: 24,
+    },
+  ]
+
+  const groupedStreams = () => {
+    return ranges.map((range) => {
+      return {
+        start: DateTime.fromObject({
+          hour: range.start,
+        }),
+        end: DateTime.fromObject({
+          hour: range.end,
+        }),
+        streamColor: colors.get(range.start),
+        streams: streams()
+          .filter((s) => {
+            const start = DateTime.fromJSDate(s.stream.start)
+            return start.hour >= range.start && start.hour < range.end
+          })
+          .map((s) => ({
+            stream: s.stream,
+            owner: s.owner,
+          })),
+      }
+    }).filter(({streams}) => streams.length > 0)
+  }
+
   return (
     <Accordion.Item
       value={props.index.toString()}
@@ -239,16 +288,40 @@ const DayAccordionItem: Component<{
             when={props.day.streams.length > 0}
             fallback={<p>No streams scheduled for this day.</p>}
           >
-            <div class="grid w-full grid-cols-[repeat(auto-fit,_minmax(250px,_1fr))] gap-2">
-              <For each={props.day.streams}>
-                {(item) => {
-                  const { stream, owner } = item
-                  return (
-                    <UpcomingStreamsStreamCard stream={stream} user={owner} />
-                  )
-                }}
-              </For>
-            </div>
+            <For each={groupedStreams()}>
+              {(group) => {
+                const { start, end, streams, streamColor } = group
+                return (
+                  <div class={'div flex flex-col gap-2'}>
+                    <p>
+                      {start.toLocaleString({
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}{' '}
+                      -{' '}
+                      {end.toLocaleString({
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                    </p>
+                    <div class="grid w-full grid-cols-[repeat(auto-fit,_minmax(250px,_1fr))] gap-2">
+                      <For each={streams}>
+                        {(item) => {
+                          const { stream, owner } = item
+                          return (
+                            <UpcomingStreamsStreamCard
+                              stream={stream}
+                              user={owner}
+                              streamColor={streamColor}
+                            />
+                          )
+                        }}
+                      </For>
+                    </div>
+                  </div>
+                )
+              }}
+            </For>
           </Show>
         </div>
       </Accordion.Content>
