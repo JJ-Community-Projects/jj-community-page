@@ -25,7 +25,6 @@ export const CollectionCountdown = () => {
 }
 
 const Countdown = () => {
-  const nextJJStartDate = useNextJJStartDate()
   const jjStartCountdown = useJJStartCountdown()
   return (
     <div
@@ -35,6 +34,16 @@ const Countdown = () => {
     >
       <p class={'text-xl'}>Is the collection live?</p>
       <p class={'text-6xl'}>No</p>
+      <p>
+        Checkout the{' '}
+        <a href={'/yogs'} class={'underline'}>
+          Yogs Schedule
+        </a>{' '}
+        and the{' '}
+        <a href={'/community/schedule'} class={'underline'}>
+          Community Streams
+        </a>
+      </p>
       <div class={'mt-3 flex flex-col items-center sm:mt-4'}>
         <p class={'text-lg font-semibold sm:text-xl'}>
           The collection goes live in
@@ -57,9 +66,7 @@ const JJIsLive = () => {
     >
       <p class={'text-xl'}>Is the collection live?</p>
       <p class={'text-6xl'}>YES</p>
-      <a href={'https://jinglejam.tiltify.com'}>
-        <button class="btn btn-primary">Donate to the Jingle Jam</button>
-      </a>
+      <a href={'https://jinglejam.tiltify.com'} class={'underline'}>Donate to the Jingle Jam</a>
     </div>
   )
 }
