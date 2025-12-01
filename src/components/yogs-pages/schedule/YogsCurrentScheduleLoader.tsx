@@ -14,18 +14,22 @@ import {
   MainJJStartTimes,
 } from '../../common/ui/MainHeader.tsx'
 import {
-  YoutubeIcon,
-  TwitchIcon,
   BskyIcon,
-  TwitterIcon,
-  InstagramIcon,
-  TiktokIcon,
   DiscordIcon,
+  InstagramIcon,
   RedditIcon,
+  TiktokIcon,
+  TwitchIcon,
+  TwitterIcon,
+  YoutubeIcon,
 } from '../../common/icons/JJIcons.tsx'
 import { DateTime } from 'luxon'
 import { YogsCreatorPill } from '../creators/YogsCreatorPill.tsx'
 import { FaSolidEnvelope } from 'solid-icons/fa'
+import {
+  useIsBeforeJJ,
+  useJJStartCountdown,
+} from '../../../lib/utils/jjDates.ts'
 
 interface ConfigLoaderProps {
   creators: YogsCreator[]
@@ -58,9 +62,12 @@ const ConfigLoader: Component<ConfigLoaderProps> = (props) => {
               'flex w-full flex-col items-center justify-center gap-1 rounded-xl border border-white/10 bg-white/5 p-4 text-center text-white/90 sm:p-4'
             }
           >
-            <h1 class={'text-center ~text-2xl/4xl'}>Yogscast Jingle Jam Schedule 2025</h1>
+            <h1 class={'text-center ~text-2xl/4xl'}>
+              Yogscast Jingle Jam Schedule 2025
+            </h1>
             <h2 class="text-center ~text-lg/xl">
-              The Yogscast Jingle Jam in your timezone with Links to participants, vods and more.
+              The Yogscast Jingle Jam in your timezone with Links to
+              participants, vods and more.
             </h2>
             <MainCountdownSimple />
             <MainJJStartTimes />
@@ -166,10 +173,31 @@ const Body: Component<BodyProps> = (props) => {
     }),
   )
 
+  const isBeforeJJ = useIsBeforeJJ()
+  const jjStartCountdown = useJJStartCountdown()
+
+  const countdownFormat = () => {
+    const countdown = jjStartCountdown()
+    if (countdown.days === 0) {
+      return countdown.toFormat("hh'h' mm'm' ss's'")
+    }
+    return countdown.toFormat("dd'd' hh'h' mm'm' ss's'")
+  }
+
   return (
     <Switch>
       <Match when={schedule.data}>
         <div class={'flex flex-col items-center justify-center gap-2'}>
+          <Show when={isBeforeJJ}>
+            <div
+              class={
+                'font-bebas tracking-wide flex flex-col items-center gap-1 rounded-xl border border-white/10 bg-white/5 p-4 text-center font-semibold text-white text-white/90 sm:p-4'
+              }
+            >
+              <p>The collection goes live in</p>
+              <p class={'font-mono'}>{countdownFormat()}</p>
+            </div>
+          </Show>
           <div class="desktop-schedule flex w-full flex-col items-center justify-center gap-2">
             <YogsScheduleComponent
               schedule={schedule.data!}
@@ -192,7 +220,7 @@ const Body: Component<BodyProps> = (props) => {
                 )
               }}
             </Show>
-            <Feedback/>
+            <Feedback />
           </div>
           <div class="mobile-schedule flex w-full flex-col items-center justify-center gap-2">
             <MobileYogsScheduleComponent
@@ -215,7 +243,7 @@ const Body: Component<BodyProps> = (props) => {
                 )
               }}
             </Show>
-            <Feedback/>
+            <Feedback />
           </div>
           <Creators creators={props.creators} />
           <div
@@ -347,11 +375,11 @@ const Creators: Component<{
   )
 }
 
-
-
 const Feedback: Component = () => {
   return (
-    <div class={'flex flex-col items-center justify-start text-white p-2 gap-1'}>
+    <div
+      class={'flex flex-col items-center justify-start gap-1 p-2 text-white'}
+    >
       <p class={'text-base font-bold'}>Send Feedback</p>
       <div class={'flex flex-row gap-4'}>
         <a
