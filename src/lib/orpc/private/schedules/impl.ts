@@ -7,10 +7,7 @@ import { editSchedulesTable } from '../../../db/schema/edit-schedules-schema.ts'
 import { accounts, users } from '../../../db/schema/auth-schema.ts'
 import { and, eq, not } from 'drizzle-orm'
 import { DateTime } from 'luxon'
-import {
-  createSlug,
-  generateScheduleSlugAlternativesLocals,
-} from '../../../../functions/slug.ts'
+import { createSlug, generateScheduleSlugAlternativesLocals, } from '../../../../functions/slug.ts'
 import { checkCanCreateSchedule } from '../util/limits.ts'
 
 const os = implement(privateSchedulesContract).use(dbMiddleware)
@@ -685,9 +682,7 @@ const hasInvisibleStreamsInVisibleSchedule =
           return false
         }
 
-        const allVisible = streams.every(s => s.visible)
-
-        return !allVisible;
+        return streams.every((s) => !s.visible)
       } catch (error) {
         console.error('Error getting schedules for user:', error)
         throw new ORPCError('INTERNAL_SERVER_ERROR', {
