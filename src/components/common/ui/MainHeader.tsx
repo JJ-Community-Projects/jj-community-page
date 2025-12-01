@@ -1,18 +1,25 @@
-import { useJJStartCountdown, useNextJJStartDate, } from '../../../lib/utils/jjDates.ts'
+import {
+  useIsJJ,
+  useJJStartCountdown,
+  useNextJJStartDate,
+} from '../../../lib/utils/jjDates.ts'
 import { type Component, Show } from 'solid-js'
 
 export const MainCountdownSimple: Component = () => {
   const nextJJStartDate = useNextJJStartDate()
   const jjStartCountdown = useJJStartCountdown()
+  const isJJ = useIsJJ()
   return (
-    <div class={'mt-3 flex flex-col items-center sm:mt-4'}>
-      <p class={'text-lg font-semibold sm:text-xl'}>
-        Jingle Jam {nextJJStartDate().year} starts in
-      </p>
-      <p class={'font-mono text-2xl tabular-nums tracking-tight sm:text-3xl'}>
-        {jjStartCountdown().toFormat("dd'd' hh'h' mm'm' ss's'")}
-      </p>
-    </div>
+    <Show when={!isJJ()}>
+      <div class={'mt-3 flex flex-col items-center sm:mt-4'}>
+        <p class={'text-lg font-semibold sm:text-xl'}>
+          Jingle Jam {nextJJStartDate().year} starts in
+        </p>
+        <p class={'font-mono text-2xl tabular-nums tracking-tight sm:text-3xl'}>
+          {jjStartCountdown().toFormat("dd'd' hh'h' mm'm' ss's'")}
+        </p>
+      </div>
+    </Show>
   )
 }
 
