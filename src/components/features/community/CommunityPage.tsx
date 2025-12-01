@@ -300,11 +300,8 @@ const CampaignGrid: Component = () => {
       >
         <div class={'flex flex-col'}>
           <h2 class={twMerge('text-lg font-semibold text-white')}>
-            Fundraisers (2024)
+            Fundraisers 2025
           </h2>
-          <p class={twMerge('text-white')}>
-            2025 Fundraisers will be shown after the Jingle Jam has started.
-          </p>
         </div>
         <div
           class={twMerge(
