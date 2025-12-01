@@ -1,7 +1,7 @@
 import {Match, type ParentComponent, Switch} from 'solid-js'
-import red from '../../../../../images/overlay/Jingle_Jam_Logo_2024_Red.png'
-import blue from '../../../../../images/overlay/Jingle_Jam_Logo_2024_Blue.png'
-import white from '../../../../../images/overlay/Jingle_Jam_Logo_2024_White.png'
+import red from '../../../../../images/overlay/Jingle_Jam_Logo_2025_Red.png'
+import blue from '../../../../../images/overlay/Jingle_Jam_Logo_2025_Blue.png'
+import white from '../../../../../images/overlay/Jingle_Jam_Logo_2025_White.png'
 
 interface TitleProps {
   theme: string

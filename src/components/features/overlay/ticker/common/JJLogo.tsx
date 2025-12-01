@@ -1,6 +1,6 @@
 import { type VoidComponent } from 'solid-js'
-import red from '../../../../../images/overlay/Jingle_Jam_Logo_2024_Red.png'
-import blue from '../../../../../images/overlay/Jingle_Jam_Logo_2024_Blue.png'
+import red from '../../../../../images/overlay/Jingle_Jam_Logo_2025_Red.png'
+import blue from '../../../../../images/overlay/Jingle_Jam_Logo_2025_Blue.png'
 
 interface TitleProps {
   theme?: 'default' | 'red' | 'blue'
