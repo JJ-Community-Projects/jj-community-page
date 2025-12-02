@@ -1,4 +1,8 @@
-import { getEntry } from 'astro:content'
+import {
+  getEntry,
+  type CollectionEntry,
+  type ReferenceDataEntry,
+} from 'astro:content'
 import type {
   YogsCreator,
   YogsSchedule,
@@ -10,14 +14,24 @@ import { getStreamColors } from '../functions/jjDatesToColors.ts'
 import { DateTime } from 'luxon'
 import { rangeFromData } from '../lib/utils/rangeFromData.ts'
 
+type DayRef =  ReferenceDataEntry<"scheduleDays", string>
+type CreatorRef = ReferenceDataEntry<"creators", string>
+
 export async function getYogsScheduleFromContent(
   year: number,
 ): Promise<YogsSchedule> {
-  const schedule = await getEntry('schedules', `${year}`)
+  return getScheduleFromContent(`${year}`, `Yogscast Jingle Jam ${year ?? 2024}`)
+}
+
+export async function getScheduleFromContent(
+  id: string,
+  title: string = 'Schedule'
+): Promise<YogsSchedule> {
+  const schedule = await getEntry('schedules', id)
   if (!schedule) {
     const now = new Date()
     return {
-      title: `Yogscast Jingle Jam ${year ?? 2024}`,
+      title: title,
       start: now,
       end: now,
       initialDayIndex: 0,
@@ -159,7 +173,7 @@ export async function getYogsScheduleFromContent(
   const times = schedule.data.times
 
   return {
-    title: `Yogscast Jingle Jam ${year ?? 2024}`,
+    title: title,
     updatedAt: schedule.data.updatedAt,
     start: range.start,
     end: range.end,
