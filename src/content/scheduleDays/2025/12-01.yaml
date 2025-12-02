@@ -1,6 +1,6 @@
 date: '2025-12-01'
 streams:
-  - creators: [boba,martyn]
+  - creators: [boba,martyn,def,nina,jack,joe,pedguin,sarah,harry]
     duration_hours: 3
     end: '2025-12-01T14:00:00Z'
     start: '2025-12-01T11:00:00Z'
@@ -13,7 +13,6 @@ streams:
       tileSize: 3
     title: Decorating the Tree
     subtitle: Office Cam
-    description: Creators are added as soon as they are confirmed.
     vods:
       - type: youtube
         label: Youtube Live
@@ -60,7 +59,7 @@ streams:
         link: https://youtube.com/watch?v=vVSbLHY6Ppk
       - type: twitch
         label: Twitch
-        link: https://www.twitch.tv/videos/2632578797?t=03h00m22s
+        link: https://www.twitch.tv/videos/2632578797?t=05h58m07s
   - creators: [lewis, duncan, spiff, pedguin, lolipopgi, rythian, alex_the_rambler]
     duration_hours: 3
     end: '2025-12-01T23:00:00Z'
@@ -75,4 +74,10 @@ streams:
     subtitle: Lewis, Duncan, Spiff & Friends
     title: TRAINS AND GIN
     description: Creators are added as soon as they are confirmed.
-    vods: []
+    vods:
+      - type: youtube
+        label: Youtube Live
+        link: https://www.youtube.com/watch?v=kxLtFNbzviM
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2632578797?t=09h31m10s
