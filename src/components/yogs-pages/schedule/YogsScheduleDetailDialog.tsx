@@ -176,7 +176,7 @@ const Body: Component<BodyProps> = (props) => {
             <Show when={(props.stream.creators?.length ?? 0) > 0}>
               <p class={'text-lg'}>Creators</p>
               <div class={'flex flex-wrap gap-2'}>
-                <For each={props.stream.creators}>
+                <For each={props.stream.creators?.sort((a, b) => a.name.localeCompare(b.name))}>
                   {(creator) => (
                     <CreatorComponent
                       creator={creator}

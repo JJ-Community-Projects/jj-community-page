@@ -338,7 +338,7 @@ const Creators: Component<{
 }> = (props) => {
   const yogs = props.creators.filter(
     (creator) => creator.type === 'yogs' || creator.type === 'staff',
-  )
+  ).sort((a, b) => a.name.localeCompare(b.name))
   const bestOf = props.creators.filter((creator) => creator.type === 'best_of')
   const friends = props.creators.filter((creator) => creator.type === 'friend')
 
