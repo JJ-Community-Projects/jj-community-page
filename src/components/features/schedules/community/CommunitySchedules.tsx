@@ -20,7 +20,7 @@ import {
 import { FaSolidCalendarWeek, FaSolidChevronDown } from 'solid-icons/fa'
 import type {
   FullCommunitySchedule,
-  ScheduleDay,
+  ScheduleDay, UserStream,
 } from '../../../../lib/orpc/private/jjData/contract.ts'
 import { DateTime } from 'luxon'
 import { getStreamColor } from '../../../../functions/jjDatesToColors.ts'
@@ -134,6 +134,26 @@ const FullSchedule: Component<{
   schedule: FullCommunitySchedule
 }> = (props) => {
   const [expandedDays, setExpandedDays] = createSignal<string[]>([])
+
+  const streams = () => props.schedule.streams
+
+  const groupedStreams = createMemo(() => {
+
+    const streamMap = new Map<string, UserStream[]>()
+    const list = streams()
+    for(const c of list) {
+      const start = DateTime.fromJSDate(c.stream.start).toLocal()
+      const key = start.toFormat('yyyy-MM-dd')
+      const value = streamMap.get(key) ?? []
+      streamMap.set(key, [...value, c])
+    }
+
+    return Array.from(streamMap.entries()).map(([key, value]) => ({
+      day: DateTime.fromFormat(key, 'yyyy-MM-dd').toJSDate(),
+      streams: value,
+    }))
+  })
+
   return (
     <Accordion.Root
       class="flex w-full flex-col gap-2"
@@ -141,7 +161,7 @@ const FullSchedule: Component<{
       value={expandedDays()}
       onChange={setExpandedDays}
     >
-      <For each={props.schedule.days}>
+      <For each={groupedStreams()}>
         {(day, index) => (
           <DayAccordionItem
             day={day}
