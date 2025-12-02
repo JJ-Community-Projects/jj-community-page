@@ -224,6 +224,9 @@ const HardcodedStreamsSchema = z.object({
 export type HardcodedStreams = z.infer<typeof HardcodedStreamsSchema>
 
 const hardcodedStreamsContract = oc.output(HardcodedStreamsSchema)
+
+const headlinerContract = oc.output(z.array(UserStreamSchema))
+
 export const contracts = {
   campaignsContract,
   causesContract,
@@ -232,5 +235,6 @@ export const contracts = {
   getUserCampaignPairsContract,
   overviewContract,
   fullScheduleContract,
-  hardcodedStreamsContract
+  hardcodedStreamsContract,
+  headlinerContract
 }
