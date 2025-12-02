@@ -1152,7 +1152,7 @@ const userSchedule = os.userScheduleContract
         url: u.twitchLogin ? `https://twitch.tv/${u.twitchLogin}` : '',
         imageUrl: u.profileImage ?? undefined,
         color: u.primaryColor ?? '#000000',
-      }))
+      })).toSorted((a,b) => a.name.localeCompare(b.name))
       const colorMap = getStreamColors(DateTime.fromJSDate(s.start as any))
       return {
         title: s.title,
