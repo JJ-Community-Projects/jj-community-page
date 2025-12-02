@@ -17,7 +17,15 @@ async function getJSON<T>(kv: KVNamespace, key: string): Promise<T | null> {
 export async function loadYogsSchedule(
   kv: KVNamespace,
 ): Promise<YogsSchedule | null> {
-  const data = await getJSON<any>(kv, 'web:yogs-schedule')
+  return loadSchedule(kv, 'web:yogs-schedule')
+}
+
+
+export async function loadSchedule(
+  kv: KVNamespace,
+  key: string,
+): Promise<YogsSchedule | null> {
+  const data = await getJSON<any>(kv, key)
   if (!data) return null
   const revivedDays: YogsScheduleDay[] = Array.isArray(data.days)
     ? data.days.map((d: any) => ({
@@ -89,7 +97,16 @@ export async function storeYogsSchedule(
   data: YogsSchedule,
   ttlSeconds: number = 60,
 ) {
-  return putJSON(kv, 'web:yogs-schedule', data, ttlSeconds)
+  return storeSchedule(kv,'web:yogs-schedule', data, ttlSeconds)
+}
+
+export async function storeSchedule(
+  kv: KVNamespace,
+  key: string,
+  data: YogsSchedule,
+  ttlSeconds: number = 60,
+) {
+  return putJSON(kv, key, data, ttlSeconds)
 }
 
 async function putJSON(

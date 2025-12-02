@@ -1,9 +1,17 @@
 import { implement, ORPCError } from '@orpc/server'
 import { contracts } from './contract'
 import { hasAstroContext } from '../../middleware/hasAstroContext.ts'
-import { loadYogsSchedule, storeYogsSchedule } from './util.ts'
+import {
+  loadSchedule,
+  loadYogsSchedule,
+  storeSchedule,
+  storeYogsSchedule,
+} from './util.ts'
 import { getEntry } from 'astro:content'
-import { getYogsScheduleFromContent } from '../../../../content/getYogsScheduleFromContent.ts'
+import {
+  getScheduleFromContent,
+  getYogsScheduleFromContent,
+} from '../../../../content/getYogsScheduleFromContent.ts'
 import { cacheMiddleware } from '../../middleware/cacheControl.ts'
 
 const os = implement(contracts).use(hasAstroContext)
@@ -74,7 +82,50 @@ export const schedule = os.schedule
     }
   })
 
+export const headliner = os.schedule
+  .use(
+    cacheMiddleware({
+      maxAge: 300,
+      sMaxAge: 300,
+      staleWhileRevalidate: 150,
+    }),
+  )
+  .handler(async ({ context }) => {
+    try {
+      const cachedSchedule = await loadSchedule(context.env.KV, 'web:headliner-schedule')
+
+      if (cachedSchedule) {
+        return cachedSchedule
+      }
+
+      const schedule = await getEntry('schedules', `2025-headliner`)
+      if (!schedule) {
+        const now = new Date()
+        return {
+          title: `Headliner`,
+          start: now,
+          end: now,
+          initialDayIndex: 0,
+          days: [],
+          streams: [],
+          weeks: [],
+          times: [],
+          creators: [],
+        }
+      }
+      const result = await getScheduleFromContent(`2025-headliner`)
+      await storeSchedule(context.env.KV,'web:headliner-schedule',  result, 300)
+      return result
+    } catch (e) {
+      console.error('headliner.schedule', e)
+      throw new ORPCError('INTERNAL_SERVER_ERROR', {
+        message: 'Failed to fetch headliner schedule',
+      })
+    }
+  })
+
 export const yogsRouter = {
   config,
   schedule,
+  headliner
 }
