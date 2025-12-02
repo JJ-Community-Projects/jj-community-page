@@ -4,7 +4,6 @@ import {
   type ExtensionConfigTVType,
   type JJCampaignsTVType,
   type StreamTVType,
-  type UserScheduleTVType,
 } from './contract.ts'
 import { getCollection, getEntries, getEntry } from 'astro:content'
 import { hasAstroContext } from '../../middleware/hasAstroContext.ts'
@@ -34,7 +33,8 @@ import {
   loadUserRelations,
   loadUserSchedule,
   loadYogsSchedule,
-  storeCause, storeChannelOverview,
+  storeCause,
+  storeChannelOverview,
   storeUserData,
   storeUserExtensionConfig,
   storeUserRelatedSchedule,
@@ -44,10 +44,7 @@ import {
   type UserExtensionTab,
   valueToCurrencies,
 } from './util.ts'
-import {
-  getScheduleFromContentForCreator,
-  getYogsScheduleFromContent,
-} from '../../../../content/getYogsScheduleFromContent.ts'
+import { getScheduleFromContentForCreator } from '../../../../content/getYogsScheduleFromContent.ts'
 import type {
   ContentCreator,
   ContentTwitchUser,
@@ -300,14 +297,13 @@ const userExtensionConfig = os.userExtensionConfigContract
       }
     }
 
-
     const isYogsMember = yogsMembers.includes(input.channelId)
 
     if (isYogsMember) {
       const { streams } = await getYogsStream(input.channelId)
       let tabs: UserExtensionTab[] = []
       if (streams.length > 0) {
-        tabs = ['user-schedule','charities', 'fundraisers', 'yogs', ]
+        tabs = ['user-schedule', 'charities', 'fundraisers', 'yogs']
       } else {
         tabs = ['yogs', 'charities', 'fundraisers']
       }
@@ -316,10 +312,14 @@ const userExtensionConfig = os.userExtensionConfigContract
         hasSchedule: streams.length > 0,
         tabs: tabs,
       }
-      await storeUserExtensionConfig(context.env.KV, input.channelId, result, 300)
+      await storeUserExtensionConfig(
+        context.env.KV,
+        input.channelId,
+        result,
+        300,
+      )
       return result
     }
-
 
     const db = context.db
 
@@ -594,7 +594,7 @@ const overview = os.overviewContract
         donations: donations,
         date: new Date(dateStr),
       }
-      await storeChannelOverview(context.env.KV, overview, channelId,60)
+      await storeChannelOverview(context.env.KV, overview, channelId, 60)
     }
 
     const yogs = await stub.getCampaignByUserSlug('yogscast')
@@ -613,7 +613,7 @@ const overview = os.overviewContract
       date: new Date(dateStr),
     }
 
-    await storeChannelOverview(context.env.KV, overview,  channelId,60)
+    await storeChannelOverview(context.env.KV, overview, channelId, 60)
 
     return overview
   })
@@ -951,17 +951,14 @@ const userData = os.userDataContract
     return { campaign }
   })
 
-
 async function getYogsStream(channelId: string): Promise<{
   streams: StreamTVType[]
-  twitchUser?: ContentTwitchUser,
+  twitchUser?: ContentTwitchUser
   creator?: ContentCreator
 }> {
   if (yogsMembers.includes(channelId)) {
     const twitchUserCollection = await getCollection('twitchUser')
     const twitchUserEntries = await getEntries(twitchUserCollection)
-
-
 
     const twitchUser = twitchUserEntries.find((u) => u.data.id === channelId)
 
@@ -986,12 +983,23 @@ async function getYogsStream(channelId: string): Promise<{
       }
     }
 
-    const yogsSchedule = await getScheduleFromContentForCreator('2025', creator.id)
+    const yogsSchedule = await getScheduleFromContentForCreator(
+      '2025',
+      creator.id,
+    )
     const streams = yogsSchedule.streams.map((s) => {
+      const lst = []
+      if (s.subtitle) {
+        lst.push(s.subtitle)
+      }
+      if (s.description) {
+        lst.push(s.description)
+      }
+      const desc = lst.join(' - ')
       return {
         title: s.title,
-        subtitle: s.subtitle,
-        description: s.description,
+        subtitle: 'Watch on the Yogscast channel',
+        description: desc,
         markdownDescription: s.markdownDescription,
         start: s.start,
         end: s.end,
@@ -1010,7 +1018,6 @@ async function getYogsStream(channelId: string): Promise<{
   return {
     streams: [],
   }
-
 }
 
 // Resolve user's primary schedule and upcoming streams
@@ -1039,14 +1046,15 @@ const userSchedule = os.userScheduleContract
 
     if (!userId) {
       const streams = yogsStreams.streams
-      if (streams.length> 0) {
-
+      if (streams.length > 0) {
         const range = rangeFromData(streams) || {
           start: streams[0]!.start,
           end: streams[streams.length - 1]!.end,
         }
         const result = {
-          title: yogsStreams.creator? `${yogsStreams.creator} Schedule`: 'Schedule',
+          title: yogsStreams.creator
+            ? `${yogsStreams.creator.name} Schedule`
+            : 'Schedule',
           start: range.start,
           end: range.end,
           streams: streams,
@@ -1132,35 +1140,30 @@ const userSchedule = os.userScheduleContract
       creatorsByKey.set(`${s.scheduleId}-${s.id}`, parts)
     }
 
-    const out = streams
-      .map((s) => {
-        const key = `${s.scheduleId}-${s.id}`
-        const creators = (creatorsByKey.get(key) ?? []).map((u) => ({
-          id: String(u.userId),
-          name: u.username,
-          url: u.twitchLogin ? `https://twitch.tv/${u.twitchLogin}` : '',
-          imageUrl: u.profileImage ?? undefined,
-          color: u.primaryColor ?? '#000000',
-        }))
-        const colorMap = getStreamColors(DateTime.fromJSDate(s.start as any))
-        return {
-          title: s.title,
-          subtitle: s.subtitle ?? undefined,
-          description: s.description ?? undefined,
-          start: s.start,
-          end: s.end,
-          creators,
-          color: colorMap['500'],
-        }
-      })
+    const out = streams.map((s) => {
+      const key = `${s.scheduleId}-${s.id}`
+      const creators = (creatorsByKey.get(key) ?? []).map((u) => ({
+        id: String(u.userId),
+        name: u.username,
+        url: u.twitchLogin ? `https://twitch.tv/${u.twitchLogin}` : '',
+        imageUrl: u.profileImage ?? undefined,
+        color: u.primaryColor ?? '#000000',
+      }))
+      const colorMap = getStreamColors(DateTime.fromJSDate(s.start as any))
+      return {
+        title: s.title,
+        subtitle: s.subtitle ?? undefined,
+        description: s.description ?? undefined,
+        start: s.start,
+        end: s.end,
+        creators,
+        color: colorMap['500'],
+      }
+    })
 
-    const finalStreams = [
-      ...out,
-      ...(yogsStreams.streams),
-    ]
-      .toSorted((a, b) => {
-        return a.end.getTime() - b.end.getTime()
-      })
+    const finalStreams = [...out, ...yogsStreams.streams].toSorted((a, b) => {
+      return a.end.getTime() - b.end.getTime()
+    })
 
     const range = rangeFromData(out) || {
       start: finalStreams[0]!.start,
