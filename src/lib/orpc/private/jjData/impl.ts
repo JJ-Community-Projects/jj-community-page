@@ -13,7 +13,7 @@ import { getJSON, putJSON } from '../util/cache.ts'
 import { dbMiddleware } from '../../middleware/dbMiddleware.ts'
 import { implement, ORPCError } from '@orpc/server'
 import { cacheMiddleware } from '../../middleware/cacheControl.ts'
-import { and, asc, eq, inArray, not, or, sql } from 'drizzle-orm'
+import { and, asc, eq, inArray, not, sql } from 'drizzle-orm'
 import {
   schedulesTable,
   streamParticipantsTable,
@@ -362,7 +362,12 @@ const upcomingStreams = os.upcomingStreamsContract
             end: streamsTable.end,
           })
           .from(streamsTable)
-          .where(and(eq(streamsTable.scheduleId, sid), inArray(streamsTable.id, ids)))
+          .where(
+            and(
+              eq(streamsTable.scheduleId, sid),
+              inArray(streamsTable.id, ids),
+            ),
+          )
           .all()
         for (const s of streamDetails) {
           detailMap.set(`${s.scheduleId}:${s.id}`, s)
@@ -580,9 +585,7 @@ function reviveUserDisplay(u: any) {
   }
 }
 
-async function getUsers(
-  db: JJDrizzleDatabase,
-): Promise<UserWithInfo[]> {
+async function getUsers(db: JJDrizzleDatabase): Promise<UserWithInfo[]> {
   try {
     const currentYear = new Date().getFullYear()
     // Subquery: aggregate tags per user into JSON
@@ -673,9 +676,12 @@ async function getUsers(
 
 const getAllUsersWithInfo = os.getAllUsersWithInfoContract.handler(
   async ({ context }) => {
-    const cached = await loadUsersWithInfo(context.env.KV, 'getAllUsersWithInfo')
+    const cached = await loadUsersWithInfo(
+      context.env.KV,
+      'getAllUsersWithInfo',
+    )
     if (cached) {
-      console.log('getAllUsersWithInfo','cache', cached.length)
+      console.log('getAllUsersWithInfo', 'cache', cached.length)
       return cached
     }
 
@@ -863,7 +869,12 @@ const fullSchedule = os.fullScheduleContract.handler(async ({ context }) => {
           ? d.streams.map(reviveUserStream)
           : [],
       }))
-      return { days }
+      return {
+        days,
+        streams: Array.isArray(cached.streams)
+          ? cached.streams.map(reviveUserStream)
+          : [],
+      }
     }
     const DO = context.env.JingleJamData
     const stubID = DO.idFromName('JJ_API_CACHE')

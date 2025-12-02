@@ -208,6 +208,7 @@ export type ScheduleDay = z.infer<typeof ScheduleDaySchema>
 const FullScheduleSchema = z.object({
   /** Streams organized by day for calendar-style display */
   days: z.array(ScheduleDaySchema),
+  streams: z.array(UserStreamSchema),
 });
 
 export type FullCommunitySchedule = z.infer<typeof FullScheduleSchema>
