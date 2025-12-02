@@ -722,7 +722,7 @@ const yogsSchedule = os.yogsScheduleContract
               markdownDescription: hs.markdownDescription,
               start: hs.start,
               end: hs.end,
-              creators: hs.creators,
+              creators: hs.creators?.toSorted((a,b) => a.name.localeCompare(b.name)),
               vods: hs.vods,
               color:
                 hs.color ||
@@ -770,7 +770,7 @@ const yogsSchedule = os.yogsScheduleContract
                 color,
               })
             }
-            creators = list
+            creators = list.toSorted((a,b) => a.name.localeCompare(b.name))
           }
 
           // Map VODs if present
@@ -1007,7 +1007,7 @@ async function getYogsStream(channelId: string): Promise<{
         markdownDescription: s.markdownDescription,
         start: s.start,
         end: s.end,
-        creators: s.creators,
+        creators: s.creators?.toSorted((a,b) => a.name.localeCompare(b.name)),
         vods: s.vods,
         color: s.color,
       }
