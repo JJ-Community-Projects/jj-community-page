@@ -33,7 +33,6 @@ streams:
       tileSize: 3
     subtitle: Tom & Friends
     title: Tabs
-    description: Creators are added as soon as they are confirmed.
     vods:
       - type: youtube
         label: Youtube Live
