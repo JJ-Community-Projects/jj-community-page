@@ -1,0 +1,2 @@
+domain:jinglejam.yogs.app
+domain:yogs.app
