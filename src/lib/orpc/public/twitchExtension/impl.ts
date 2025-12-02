@@ -300,6 +300,10 @@ const userExtensionConfig = os.userExtensionConfigContract
     const isYogsMember = yogsMembers.includes(input.channelId)
 
     if (isYogsMember) {
+      const JJDO = context.env.JingleJamData
+      const jjStub = JJDO.get(JJDO.idFromName('JJ_API_CACHE'))
+      const campaignByTwitchId = await jjStub.getCampaignDisplay(input.channelId)
+      const hasCampaign = !!campaignByTwitchId
       const { streams } = await getYogsStream(input.channelId)
       let tabs: UserExtensionTab[] = []
       if (streams.length > 0) {
@@ -308,7 +312,7 @@ const userExtensionConfig = os.userExtensionConfigContract
         tabs = ['yogs', 'charities', 'fundraisers']
       }
       const result = {
-        hasCampaign: false,
+        hasCampaign: hasCampaign,
         hasSchedule: streams.length > 0,
         tabs: tabs,
       }
