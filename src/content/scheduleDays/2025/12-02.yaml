@@ -13,7 +13,13 @@ streams:
       tileSize: 3
     subtitle: BRIONY & KIRSTY
     title: WIZARD WARRIORS
-    vods: []
+    vods:
+      - type: youtube
+        label: Youtube Live
+        link: https://www.youtube.com/watch?v=E6RA7sjVwG0
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2633382453?t=0h3m2s
   - creators: [tom,boba,ben,daf,lewis]
     duration_hours: 3
     end: '2025-12-02T17:00:00Z'
@@ -28,7 +34,13 @@ streams:
     subtitle: Tom & Friends
     title: Tabs
     description: Creators are added as soon as they are confirmed.
-    vods: []
+    vods:
+      - type: youtube
+        label: Youtube Live
+        link: https://www.youtube.com/watch?v=jNr_JuL398M
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2633464324?t=0h6m47s
   - creators: [martyn]
     duration_hours: 3
     end: '2025-12-02T20:00:00Z'
@@ -43,7 +55,13 @@ streams:
     subtitle: MINECRAFT WITH MARTYN AND FRIENDS
     title: HEART SCRAMBLE
     description: "Heart Scramble cast: AbolishRegret, ApoKuna, AvidMC_, Bekyamon, Cambam, CherriFire, Infinitedrift, Martyn, Legundo, OrionSound, OwengeJuiceTV, Pyroscythe, Shubble, Smajor, SolidarityGaming, SoupForEloise, Sparkles, ZombieCleo"
-    vods: []
+    vods:
+      - type: youtube
+        label: Youtube Live
+        link: https://www.youtube.com/watch?v=iFOO3HwgbYY
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2633464324?t=3h6m34s
   - creators: [duncan, pedguin, osie, ravs]
     duration_hours: 3
     end: '2025-12-02T23:23:00'
