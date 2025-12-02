@@ -202,6 +202,14 @@ export async function storeOverview(
 ) {
   return putJSON(kv, 'twitch-extension:overview', data, ttlSeconds)
 }
+export async function storeChannelOverview(
+  kv: KVNamespace,
+  data: OverviewOutput,
+  channelId: string,
+  ttlSeconds: number = 60,
+) {
+  return putJSON(kv, `twitch-extension:overview:${channelId}`, data, ttlSeconds)
+}
 
 export async function storeYogsSchedule(
   kv: KVNamespace,
@@ -322,6 +330,20 @@ export async function loadOverview(
   kv: KVNamespace,
 ): Promise<OverviewOutput | null> {
   const data = await getJSON<any>(kv, 'twitch-extension:overview')
+  if (!data) return null
+  const revived: OverviewOutput = {
+    raised: data.raised,
+    collections: data.collections,
+    donations: Number(data.donations ?? 0),
+    date: new Date(data.date),
+  }
+  return revived
+}
+export async function loadChannelOverview(
+  kv: KVNamespace,
+  channelId: string,
+): Promise<OverviewOutput | null> {
+  const data = await getJSON<any>(kv, `twitch-extension:overview:${channelId}`)
   if (!data) return null
   const revived: OverviewOutput = {
     raised: data.raised,

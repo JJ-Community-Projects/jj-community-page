@@ -25,6 +25,7 @@ import {
   getHardCodedEventsNoYogsForExtension,
   getUserIdByTwitchChannelId,
   loadCause,
+  loadChannelOverview,
   loadOverview,
   loadUserData,
   loadUserExtensionConfig,
@@ -32,7 +33,7 @@ import {
   loadUserRelations,
   loadUserSchedule,
   loadYogsSchedule,
-  storeCause,
+  storeCause, storeChannelOverview,
   storeOverview,
   storeUserData,
   storeUserExtensionConfig,
@@ -44,11 +45,64 @@ import {
   valueToCurrencies,
 } from './util.ts'
 
+const yogsMembers = [
+  '20786541',
+  '26538483',
+  '21945983',
+  '19309473',
+  '22168131',
+  '38051463',
+  '12131870',
+  '21615575',
+  '26574506',
+  '43903804',
+  '91990032',
+  '87245015',
+  '145983935',
+  '46969360',
+  '96502692',
+  '21285936',
+  '38167015',
+  '43903922',
+  '113954840',
+  '42314834',
+  '37569443',
+  '24070690',
+  '219068259',
+  '62568743',
+  '52172280',
+  '62904151',
+  '31883069',
+  '40639871',
+  '141902679',
+  '416016021',
+  '44135610',
+  '27063689',
+  '38180017',
+  '79911474',
+  '64758947',
+  '239617169',
+  '150004439',
+  '21069037',
+  '465613748',
+  '91904368',
+  '48950229',
+  '68525019',
+  '172932486',
+  '57595823',
+  '32155062',
+  '1012950837',
+]
+const yogsId = '20786541'
+const ostofbot = '960814823'
+const ostof = '96860795'
+
 interface ORPCContext extends ResponseHeadersPluginContext {
   locals?: App.Locals
   request?: Request
   env?: Env
 }
+
 const rateLimit = server.$context<ORPCContext>().middleware(
   async (
     { context, next },
@@ -220,9 +274,6 @@ const userExtensionConfig = os.userExtensionConfigContract
       return cached
     }
 
-    const yogsId = '20786541'
-    const ostofbot = '960814823'
-    const ostof = '96860795'
 
     if (input.channelId === ostofbot) {
       return {
@@ -242,54 +293,6 @@ const userExtensionConfig = os.userExtensionConfigContract
       }
     }
 
-    const yogsMembers = [
-      '20786541',
-      '26538483',
-      '21945983',
-      '19309473',
-      '22168131',
-      '38051463',
-      '12131870',
-      '21615575',
-      '26574506',
-      '43903804',
-      '91990032',
-      '87245015',
-      '145983935',
-      '46969360',
-      '96502692',
-      '21285936',
-      '38167015',
-      '43903922',
-      '113954840',
-      '42314834',
-      '37569443',
-      '24070690',
-      '219068259',
-      '62568743',
-      '52172280',
-      '62904151',
-      '31883069',
-      '40639871',
-      '141902679',
-      '416016021',
-      '44135610',
-      '27063689',
-      '38180017',
-      '79911474',
-      '64758947',
-      '239617169',
-      '150004439',
-      '21069037',
-      '465613748',
-      '91904368',
-      '48950229',
-      '68525019',
-      '172932486',
-      '57595823',
-      '32155062',
-      '1012950837',
-    ]
 
     const db = context.db
 
@@ -536,9 +539,10 @@ const overview = os.overviewContract
       staleWhileRevalidate: 30,
     }),
   )
-  .handler(async ({ context }) => {
+  .handler(async ({ context, input }) => {
+    const channelId = input.channelId
     // Try KV cache first
-    const cached = await loadOverview(context.env.KV)
+    const cached = await loadChannelOverview(context.env.KV, channelId)
     if (cached) {
       return cached
     }
@@ -553,7 +557,20 @@ const overview = os.overviewContract
     const collections = await stub.getCollections()
     const donations = await stub.getDonations()
     const dateStr = await stub.getDate()
-    const yogs = await stub.getCampaignBySlug('yogscast')
+
+    if (yogsMembers.includes(input.channelId)) {
+      const overview = {
+        raised: {
+          total: valueToCurrencies(raised, usdRate, eurRate),
+        },
+        collections: collections,
+        donations: donations,
+        date: new Date(dateStr),
+      }
+      await storeChannelOverview(context.env.KV, overview, channelId,30)
+    }
+
+    const yogs = await stub.getCampaignByUserSlug('yogscast')
     const overview = {
       raised: {
         yogscast: yogs
@@ -569,7 +586,7 @@ const overview = os.overviewContract
       date: new Date(dateStr),
     }
 
-    await storeOverview(context.env.KV, overview, 60)
+    await storeChannelOverview(context.env.KV, overview,  channelId,30)
 
     return overview
   })

@@ -829,7 +829,7 @@ const overview = os.overviewContract.handler(async ({ context }) => {
   const collections = await stub.getCollections()
   const donations = await stub.getDonations()
   const dateStr = await stub.getDate()
-  const yogs = await stub.getCampaignBySlug('yogscast')
+  const yogs = await stub.getCampaignByUserSlug('yogscast')
   const overview: Overview = {
     raised: {
       yogscast: yogs

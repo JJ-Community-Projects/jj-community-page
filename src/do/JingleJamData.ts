@@ -200,12 +200,15 @@ export class JingleJamData extends DurableObject<Env> {
     for (const c of campaigns) {
       entries[this.campaignKeyId(c.id)] = c
       entries[this.campaignKey(c.slug)] = c
+      entries[this.campaignKeyUserSlug(c.user.slug)] = c
     }
     await this.storage.put(entries)
   }
 
   public async getCampaign(userRef: string) {
-    const campaign = await this.storage.get<JJCampaign>(this.campaignKey(userRef))
+    const campaign = await this.storage.get<JJCampaign>(
+      this.campaignKey(userRef),
+    )
     if (campaign) {
       return campaign
     }
@@ -215,16 +218,20 @@ export class JingleJamData extends DurableObject<Env> {
   }
 
   public getCampaignBySlug(slug: string) {
-    return this.storage.get(`campaign:by-slug:${slug}`) as Promise<
+    return this.storage.get(`campaign:slug:${slug}`) as Promise<
+      JJCampaign | undefined
+    >
+  }
+  public getCampaignByUserSlug(slug: string) {
+    return this.storage.get(`campaign:api:user-slug:${slug}`) as Promise<
       JJCampaign | undefined
     >
   }
 
   public async getCampaigns() {
-    const map = (await this.storage.list({ prefix: 'campaign:api:slug:' })) as Map<
-      string,
-      unknown
-    >
+    const map = (await this.storage.list({
+      prefix: 'campaign:api:slug:',
+    })) as Map<string, unknown>
     return Array.from(map.values()) as JJCampaign[]
   }
 
@@ -629,7 +636,6 @@ export class JingleJamData extends DurableObject<Env> {
     const liveStreamsIds: string[] = []
     const liveStreamsLogins: string[] = []
     const loginChunks = this.chunk(logins, 50)
-    console.log('checkLiveStreams', 'logins', logins)
     console.log('checkLiveStreams', 'logins', logins.length)
     for (const logins of loginChunks) {
       const stream = await api.fetchStreamsByLogins(logins, accessToken)
@@ -642,7 +648,6 @@ export class JingleJamData extends DurableObject<Env> {
     }
     await this.setStringArray('twitch:liveStreams:ids', liveStreamsIds)
     await this.setStringArray('twitch:liveStreams:logins', liveStreamsLogins)
-    console.log('checkLiveStreams', 'liveStreamsLogins', liveStreamsLogins)
     console.log(
       'checkLiveStreams',
       'liveStreamsLogins',
@@ -816,7 +821,7 @@ export class JingleJamData extends DurableObject<Env> {
     const campaigns = await this.getCampaigns()
     const slugs = campaigns.map((c) => c.user.slug)
     console.log('loadAllTiltifySocials', 'slugs', slugs.length)
-    console.log('loadAllTiltifySocials', 'slugs', slugs)
+    // console.log('loadAllTiltifySocials', 'slugs', slugs)
     // console.log('loadAllTiltifySocials', 'campaigns', campaigns.length)
     const api = new TiltifyAPI(this.env)
     const token = await api.getAppToken()
@@ -838,7 +843,7 @@ export class JingleJamData extends DurableObject<Env> {
       .filter((s) => s.length > 0)
 
     console.log('loadAllTiltifySocials', 'twitch', twitch.length)
-    console.log('loadAllTiltifySocials', 'twitch', twitch)
+    // console.log('loadAllTiltifySocials', 'twitch', twitch)
     await this.setStringArray('tiltify:socials:twitch', twitch)
 
     console.log('loadAllTiltifySocials', 'ms', Date.now() - start)
@@ -850,7 +855,10 @@ export class JingleJamData extends DurableObject<Env> {
   }
 
   async alarm(alarmInfo?: AlarmInvocationInfo) {
-    console.log('DO-scheduler', 'alarm', alarmInfo)
+    console.log('DO-scheduler', 'alarm', {
+      isRetry: alarmInfo?.isRetry,
+      retryCount: alarmInfo?.retryCount,
+    })
     await this.runOverdueTasks(Date.now())
     await this.scheduleNextAlarm()
   }
@@ -1481,6 +1489,9 @@ export class JingleJamData extends DurableObject<Env> {
   private campaignKey(userRef: string) {
     return `campaign:api:slug:${userRef}`
   }
+  private campaignKeyUserSlug(userRef: string) {
+    return `campaign:api:user-slug:${userRef}`
+  }
 
   private campaignKeyId(userRef: string) {
     return `campaign:api:id:${userRef}`
@@ -1926,7 +1937,7 @@ export class JingleJamData extends DurableObject<Env> {
       .all()
     const api = new TiltifyAPI(this.env)
     const token = await api.getAppToken()
-    if (!token){
+    if (!token) {
       console.error('updateTiltifyProfiles', 'no token')
       return
     }
@@ -1942,7 +1953,11 @@ export class JingleJamData extends DurableObject<Env> {
               meta: tiltifyUser.data,
             })
             .where(eq(accounts.userId, account.userId))
-          console.log('DO-scheduler', 'updated tiltify profile', tiltifyUser.data.slug)
+          console.log(
+            'DO-scheduler',
+            'updated tiltify profile',
+            tiltifyUser.data.slug,
+          )
         }
       } catch (e) {
         console.error('updateTiltifyProfiles', 'error', e)
