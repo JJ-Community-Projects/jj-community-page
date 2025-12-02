@@ -3,8 +3,10 @@ import {
   contracts,
   type ExtensionConfigTVType,
   type JJCampaignsTVType,
+  type StreamTVType,
+  type UserScheduleTVType,
 } from './contract.ts'
-import { getEntry } from 'astro:content'
+import { getCollection, getEntries, getEntry } from 'astro:content'
 import { hasAstroContext } from '../../middleware/hasAstroContext.ts'
 import { getStreamColors } from '../../../../functions/jjDatesToColors.ts'
 import { DateTime } from 'luxon'
@@ -42,6 +44,14 @@ import {
   type UserExtensionTab,
   valueToCurrencies,
 } from './util.ts'
+import {
+  getScheduleFromContentForCreator,
+  getYogsScheduleFromContent,
+} from '../../../../content/getYogsScheduleFromContent.ts'
+import type {
+  ContentCreator,
+  ContentTwitchUser,
+} from '../../../model/ContentTypes.ts'
 
 const yogsMembers = [
   '20786541',
@@ -268,10 +278,10 @@ const userExtensionConfig = os.userExtensionConfigContract
       context.env.KV,
       input.channelId,
     )
+
     if (cached) {
       return cached
     }
-
 
     if (input.channelId === ostofbot) {
       return {
@@ -282,13 +292,32 @@ const userExtensionConfig = os.userExtensionConfigContract
     }
 
     const isYogs = input.channelId === yogsId || input.channelId === ostof
-
     if (isYogs) {
       return {
         hasCampaign: false,
         hasSchedule: false,
         tabs: ['yogs', 'charities', 'fundraisers'],
       }
+    }
+
+
+    const isYogsMember = yogsMembers.includes(input.channelId)
+
+    if (isYogsMember) {
+      const { streams } = await getYogsStream(input.channelId)
+      let tabs: UserExtensionTab[] = []
+      if (streams.length > 0) {
+        tabs = ['user-schedule','charities', 'fundraisers', 'yogs', ]
+      } else {
+        tabs = ['yogs', 'charities', 'fundraisers']
+      }
+      const result = {
+        hasCampaign: false,
+        hasSchedule: streams.length > 0,
+        tabs: tabs,
+      }
+      await storeUserExtensionConfig(context.env.KV, input.channelId, result, 300)
+      return result
     }
 
 
@@ -922,6 +951,68 @@ const userData = os.userDataContract
     return { campaign }
   })
 
+
+async function getYogsStream(channelId: string): Promise<{
+  streams: StreamTVType[]
+  twitchUser?: ContentTwitchUser,
+  creator?: ContentCreator
+}> {
+  if (yogsMembers.includes(channelId)) {
+    const twitchUserCollection = await getCollection('twitchUser')
+    const twitchUserEntries = await getEntries(twitchUserCollection)
+
+
+
+    const twitchUser = twitchUserEntries.find((u) => u.data.id === channelId)
+
+    if (twitchUser === undefined) {
+      console.warn('yogs twitch channel not found')
+      return {
+        streams: [],
+      }
+    }
+
+    const creatorCollection = await getCollection('creators')
+    const creatorsEntries = await getEntries(creatorCollection)
+    const creator = creatorsEntries.find((c) => {
+      return c.data?.twitchUser?.id === twitchUser.id
+    })
+
+    if (creator === undefined) {
+      console.warn('yogs creator not found')
+      return {
+        streams: [],
+        twitchUser: twitchUser.data,
+      }
+    }
+
+    const yogsSchedule = await getScheduleFromContentForCreator('2025', creator.id)
+    const streams = yogsSchedule.streams.map((s) => {
+      return {
+        title: s.title,
+        subtitle: s.subtitle,
+        description: s.description,
+        markdownDescription: s.markdownDescription,
+        start: s.start,
+        end: s.end,
+        creators: s.creators,
+        vods: s.vods,
+        color: s.color,
+      }
+    })
+    return {
+      streams,
+      twitchUser: twitchUser.data,
+      creator: creator.data,
+    }
+  }
+
+  return {
+    streams: [],
+  }
+
+}
+
 // Resolve user's primary schedule and upcoming streams
 const userSchedule = os.userScheduleContract
   .use(rateLimit)
@@ -941,10 +1032,29 @@ const userSchedule = os.userScheduleContract
 
     const db = context.db
 
+    const yogsStreams = await getYogsStream(input.channelId)
+
     // find twitch channel
     const userId = await getUserIdByTwitchChannelId(db, input.channelId)
 
     if (!userId) {
+      const streams = yogsStreams.streams
+      if (streams.length> 0) {
+
+        const range = rangeFromData(streams) || {
+          start: streams[0]!.start,
+          end: streams[streams.length - 1]!.end,
+        }
+        const result = {
+          title: yogsStreams.creator? `${yogsStreams.creator} Schedule`: 'Schedule',
+          start: range.start,
+          end: range.end,
+          streams: streams,
+        }
+        await storeUserSchedule(context.env.KV, input.channelId, result, 600)
+        return result
+      }
+
       throw new ORPCError('NOT_FOUND', { message: 'Twitch channel not found' })
     }
 
@@ -1043,19 +1153,24 @@ const userSchedule = os.userScheduleContract
           color: colorMap['500'],
         }
       })
+
+    const finalStreams = [
+      ...out,
+      ...(yogsStreams.streams),
+    ]
       .toSorted((a, b) => {
         return a.end.getTime() - b.end.getTime()
       })
 
     const range = rangeFromData(out) || {
-      start: out[0]!.start,
-      end: out[out.length - 1]!.end,
+      start: finalStreams[0]!.start,
+      end: finalStreams[finalStreams.length - 1]!.end,
     }
     const result = {
       title: schedule.title,
       start: range.start,
       end: range.end,
-      streams: out,
+      streams: finalStreams,
     }
     await storeUserSchedule(context.env.KV, input.channelId, result, 600)
     return result

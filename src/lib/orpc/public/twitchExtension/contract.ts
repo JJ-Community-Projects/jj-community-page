@@ -210,6 +210,8 @@ export const UserScheduleSchema = z.object({
   streams: z.array(StreamSchema),
 })
 
+export type UserScheduleTVType = z.infer<typeof UserScheduleSchema>
+
 export const UserDataSchema = z.object({
   campaign: JJCampaignSchema,
   cause: JJCauseSchema.optional(),
