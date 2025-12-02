@@ -901,6 +901,13 @@ const hardcodedStreams = os.hardcodedStreamsContract.handler(
     }
   },
 )
+const headliner = os.headlinerContract.handler(
+  async ({ context }) => {
+
+
+    return []
+  },
+)
 
 export const jjRouter = {
   campaigns,
