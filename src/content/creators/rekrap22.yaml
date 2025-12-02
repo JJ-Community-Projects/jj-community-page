@@ -1,0 +1,10 @@
+name: REKRAP22
+type: friend
+link: https://twitch.tv/REKRAP22
+profileImage:
+  small: https://static-cdn.jtvnw.net/jtv_user_pictures/5efe4026-499c-4b67-bcf6-eee1021ca735-profile_image-70x70.png
+  large: https://static-cdn.jtvnw.net/jtv_user_pictures/5efe4026-499c-4b67-bcf6-eee1021ca735-profile_image-300x300.png
+links:
+  - name: Twitch
+    type: twitch
+    url: https://twitch.tv/REKRAP22

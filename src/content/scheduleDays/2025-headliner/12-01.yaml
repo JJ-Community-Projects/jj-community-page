@@ -1,0 +1,63 @@
+date: '2025-12-01'
+streams:
+  - creators: [tom, ben]
+    duration_hours: 3
+    end: '2025-12-01T17:00:00Z'
+    start: '2025-12-01T14:00:00Z'
+    style:
+      background:
+        colors:
+          - '#E30E50'
+          - '#E30E50'
+        orientation: TD
+      tileSize: 3
+    subtitle: Get Warmed up
+    title: Tom & Ben
+    vods:
+      - type: youtube
+        label: Youtube Live
+        link: https://www.youtube.com/watch?v=rqLQMmxZ238
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2632578797?t=03h00m22s
+  - creators: [lewis, simon]
+    duration_hours: 3
+    end: '2025-12-01T20:00:00Z'
+    start: '2025-12-01T17:00:00Z'
+    style:
+      background:
+        colors:
+          - '#3485C0'
+          - '#3485C0'
+        orientation: TD
+      tileSize: 3
+    subtitle: Lewis & Simon
+    title: Jingle Cats
+    vods:
+      - type: youtube
+        label: Youtube Live
+        link: https://youtube.com/watch?v=vVSbLHY6Ppk
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2632578797?t=05h58m07s
+  - creators: [lewis, duncan, spiff, pedguin, lolipopgi, rythian, alex_the_rambler]
+    duration_hours: 3
+    end: '2025-12-01T23:00:00Z'
+    start: '2025-12-01T20:00:00Z'
+    style:
+      background:
+        colors:
+          - '#E30E50'
+          - '#E30E50'
+        orientation: TD
+      tileSize: 3
+    subtitle: Lewis, Duncan, Spiff & Friends
+    title: TRAINS AND GIN
+    description: Creators are added as soon as they are confirmed.
+    vods:
+      - type: youtube
+        label: Youtube Live
+        link: https://www.youtube.com/watch?v=kxLtFNbzviM
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2632578797?t=09h31m10s

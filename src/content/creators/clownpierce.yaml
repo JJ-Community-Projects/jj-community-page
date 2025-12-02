@@ -1,0 +1,10 @@
+name: CLOWNPIERCE
+type: friend
+link: https://twitch.tv/CLOWNPIERCE
+profileImage:
+  small: https://static-cdn.jtvnw.net/jtv_user_pictures/45e12999-67cc-4217-8a18-c8f750bca3cf-profile_image-70x70.png
+  large: https://static-cdn.jtvnw.net/jtv_user_pictures/45e12999-67cc-4217-8a18-c8f750bca3cf-profile_image-300x300.png
+links:
+  - name: Twitch
+    type: twitch
+    url: https://twitch.tv/CLOWNPIERCE

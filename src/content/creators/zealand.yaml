@@ -1,0 +1,10 @@
+name: Zealand
+type: friend
+link: https://twitch.tv/zealand
+profileImage:
+  small: https://static-cdn.jtvnw.net/jtv_user_pictures/97eab8e6-7c73-4c57-8982-03af8a0d83df-profile_image-70x70.png
+  large: https://static-cdn.jtvnw.net/jtv_user_pictures/97eab8e6-7c73-4c57-8982-03af8a0d83df-profile_image-300x300.png
+links:
+  - name: Twitch
+    type: twitch
+    url: https://twitch.tv/zealand

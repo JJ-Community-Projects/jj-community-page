@@ -1,0 +1,28 @@
+date: '2025-12-07'
+streams:
+  - creators: [zealand]
+    duration_hours: 2
+    start: '2025-12-07T16:00:00Z'
+    end: '2025-12-07T18:00:00Z'
+    style:
+      background:
+        colors: ['#E30E50', '#E30E50']
+        orientation: TD
+      tileSize: 3
+    title: ZEALAND
+    subtitle: Headliner
+    description: "Join Zealand as he takes on his Football Manager '26 'Charity-O-Thon' save trying to win the championship with a team linked to War Child. But what team will he choose?"
+    vods: []
+  - creators: [high_rollers]
+    duration_hours: 3
+    start: '2025-12-07T17:00:00Z'
+    end: '2025-12-07T20:00:00Z'
+    style:
+      background:
+        colors: ['#E30E50', '#E30E50']
+        orientation: TD
+      tileSize: 3
+    title: HIGH ROLLERS DND
+    subtitle: Headliner
+    description: "The High Rollers crew return for another unforgettable DnD one-shot. Prepare for chaos - where they end up is anyone's guess!"
+    vods: []

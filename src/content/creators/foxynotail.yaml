@@ -1,0 +1,10 @@
+name: FOXYNOTAIL
+type: friend
+link: https://twitch.tv/FOXYNOTAIL
+profileImage:
+  small: https://static-cdn.jtvnw.net/jtv_user_pictures/6b51aaed-e715-44a4-b492-2b0272913f45-profile_image-70x70.png
+  large: https://static-cdn.jtvnw.net/jtv_user_pictures/6b51aaed-e715-44a4-b492-2b0272913f45-profile_image-300x300.png
+links:
+  - name: Twitch
+    type: twitch
+    url: https://twitch.tv/FOXYNOTAIL

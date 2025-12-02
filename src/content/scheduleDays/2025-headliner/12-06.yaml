@@ -1,0 +1,28 @@
+date: '2025-12-06'
+streams:
+  - creators: [foxynotail]
+    duration_hours: 10
+    start: '2025-12-06T10:00:00Z'
+    end: '2025-12-06T20:00:00Z'
+    style:
+      background:
+        colors: ['#E30E50', '#E30E50']
+        orientation: TD
+      tileSize: 3
+    title: JUST CREATE SMP WEEKENDER
+    subtitle: Headliner
+    description: ''
+    vods: []
+  - creators: [clownpierce]
+    duration_hours: 2
+    start: '2025-12-06T14:00:00Z'
+    end: '2025-12-06T16:00:00Z'
+    style:
+      background:
+        colors: ['#E30E50', '#E30E50']
+        orientation: TD
+      tileSize: 3
+    title: NAKED & AFRAID
+    subtitle: Headline
+    description: '21 seasoned Minecraft pros take on the hardest survival challenge on the internet, with one life and no hope.'
+    vods: []

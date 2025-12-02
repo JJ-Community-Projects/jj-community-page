@@ -1,0 +1,41 @@
+date: '2025-12-02'
+streams:
+  - creators: [shubble]
+    duration_hours: 2
+    start: '2025-12-02T14:00:00Z'
+    end: '2025-12-02T16:00:00Z'
+    style:
+      background:
+        colors: ['#E30E50', '#E30E50']
+        orientation: TD
+      tileSize: 3
+    title: NAKED & AFRAID
+    subtitle: Headline
+    description: '21 seasoned Minecraft pros take on the hardest survival challenge on the internet, with one life and no hope.'
+    vods: []
+  - creators: [jackmanifoldtv]
+    duration_hours: 24
+    start: '2025-12-02T18:00:00Z'
+    end: '2025-12-03T18:00:00Z'
+    style:
+      background:
+        colors: ['#E30E50', '#E30E50']
+        orientation: TD
+      tileSize: 3
+    title: JACK MANIFOLD 24 hours of non-stop action
+    subtitle: Headliner
+    description: 'Tune in for a full 24 hours of non-stop action with the master of the long stream. Expect everything from chaotic IRL segments and party games to loads more.'
+    vods: []
+  - creators: [jenandaliona]
+    duration_hours: 3
+    start: '2025-12-02T19:00:00Z'
+    end: '2025-12-02T22:00:00Z'
+    style:
+      background:
+        colors: ['#E30E50', '#E30E50']
+        orientation: TD
+      tileSize: 3
+    title: JEN AND ALIONA
+    subtitle: Headliner
+    description: 'Join Clair Obscur: Expedition 33 stars Jennifer English and Aliona Baranova as they carve a path to the Monolith to fight the Paintress!'
+    vods: []

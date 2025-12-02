@@ -1,0 +1,29 @@
+date: '2025-12-03'
+streams:
+  - creators: [pedguin,ravs]
+    duration_hours: 3
+    end: '2025-12-04T18:00:00Z'
+    start: '2025-12-03T17:00:00Z'
+    style:
+      background:
+        colors:
+          - '#E30E50'
+          - '#E30E50'
+        orientation: TD
+      tileSize: 1
+    title: Core Keeper Relay Start!
+    vods: []
+  - creators: [hat_films]
+    duration_hours: 3
+    end: '2025-12-04T00:00:00Z'
+    start: '2025-12-03T18:00:00Z'
+    style:
+      background:
+        colors:
+          - '#E30E50'
+          - '#E30E50'
+        orientation: TD
+      tileSize: 5
+    subtitle: ROSS, SMITH & TROTT
+    title: HAT FILMS MUSIC STREAM
+    vods: []

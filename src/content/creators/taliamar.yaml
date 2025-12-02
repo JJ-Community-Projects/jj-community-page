@@ -1,0 +1,10 @@
+name: Talia Mar
+type: friend
+link: https://twitch.tv/TaliaMar
+profileImage:
+  small: https://static-cdn.jtvnw.net/jtv_user_pictures/05a2f862-6ea4-4e31-901f-0ff846d173eb-profile_image-70x70.png
+  large: https://static-cdn.jtvnw.net/jtv_user_pictures/05a2f862-6ea4-4e31-901f-0ff846d173eb-profile_image-300x300.png
+links:
+  - name: Twitch
+    type: twitch
+    url: https://twitch.tv/TaliaMar

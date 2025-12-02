@@ -1,0 +1,10 @@
+name: jojosolos
+type: friend
+link: https://twitch.tv/jojosolos
+profileImage:
+  small: https://static-cdn.jtvnw.net/jtv_user_pictures/b4f58c1c-7a8c-41bb-9f4e-5f5d4af2f836-profile_image-70x70.png
+  large: https://static-cdn.jtvnw.net/jtv_user_pictures/b4f58c1c-7a8c-41bb-9f4e-5f5d4af2f836-profile_image-300x300.png
+links:
+  - name: Twitch
+    type: twitch
+    url: https://twitch.tv/jojosolos

@@ -1,0 +1,10 @@
+name: Jen and Aliona
+type: friend
+link: https://twitch.tv/jenandaliona
+profileImage:
+  small: https://static-cdn.jtvnw.net/jtv_user_pictures/46d24a55-a2a1-47b9-89c8-8446e69657fc-profile_image-70x70.png
+  large: https://static-cdn.jtvnw.net/jtv_user_pictures/46d24a55-a2a1-47b9-89c8-8446e69657fc-profile_image-300x300.png
+links:
+  - name: Twitch
+    type: twitch
+    url: https://twitch.tv/jenandaliona
