@@ -3,8 +3,8 @@ link: https://www.twitch.tv/drsimonclark
 twitchUser: drsimonclark
 type: friend
 profileImage:
-  large: https://yt3.googleusercontent.com/ytc/AIdro_me3fz_LIqw8IjHEy8lI6_cG9BIUsgQS9_J6mwcZ3KXxis=s300-c-k-c0x00ffffff-no-rj
-  small: https://yt3.googleusercontent.com/ytc/AIdro_me3fz_LIqw8IjHEy8lI6_cG9BIUsgQS9_J6mwcZ3KXxis=s70-c-k-c0x00ffffff-no-rj
+  large: https://static-cdn.jtvnw.net/jtv_user_pictures/f5bca7c3-5f81-4e68-af34-097e2ada306d-profile_image-300x300.png
+  small: https://static-cdn.jtvnw.net/jtv_user_pictures/f5bca7c3-5f81-4e68-af34-097e2ada306d-profile_image-70x70.png
 
 links:
   - name: Twitter
