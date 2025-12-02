@@ -565,7 +565,7 @@ const overview = os.overviewContract
         donations: donations,
         date: new Date(dateStr),
       }
-      await storeChannelOverview(context.env.KV, overview, channelId,30)
+      await storeChannelOverview(context.env.KV, overview, channelId,60)
     }
 
     const yogs = await stub.getCampaignByUserSlug('yogscast')
@@ -584,7 +584,7 @@ const overview = os.overviewContract
       date: new Date(dateStr),
     }
 
-    await storeChannelOverview(context.env.KV, overview,  channelId,30)
+    await storeChannelOverview(context.env.KV, overview,  channelId,60)
 
     return overview
   })
