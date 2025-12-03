@@ -1601,6 +1601,7 @@ export class JingleJamData extends DurableObject<Env> {
 
     let hardcoded: UserStream[] = []
 
+    /*
     try {
       const hardcodedResp = await fetch(
         'https://jinglejam.ostof.dev/api/private/jj/hardcodedStreams',
@@ -1620,7 +1621,7 @@ export class JingleJamData extends DurableObject<Env> {
       }
     } catch (e) {
       console.error('generateFullSchedule', 'hardcodedResp error', e)
-    }
+    }*/
 
     // 1) Find all visible & primary schedules for the current year
     const scheduleRows = await db
