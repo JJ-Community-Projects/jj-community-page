@@ -36,6 +36,7 @@ import {
   getHardCodedEventsNoYogs,
 } from './getHardCodedEvents.ts'
 import { loadUsersWithInfo, storeUsersWithInfo } from './usersWithInfoCache.ts'
+import { getUpcomingStreamsFromSchedule } from '../../../../content/getYogsScheduleFromContent.ts'
 // New: get campaign by Twitch id
 
 const jjDataCacheMiddleware = cacheMiddleware({
@@ -253,7 +254,7 @@ const upcomingStreams = os.upcomingStreamsContract
         return reviveUpcomingStreamsResult(cached)
       }
 
-      const hardcodedStreams = await getHardCodedEvents()
+      // const hardcodedStreams = await getHardCodedEvents()
       const db = context.db
       const nowSec = Math.floor(Date.now() / 1000)
       const year = new Date().getUTCFullYear()
@@ -280,8 +281,8 @@ const upcomingStreams = os.upcomingStreamsContract
       )
       if (scheduleIds.length === 0) {
         return {
-          count: hardcodedStreams.length,
-          streams: [...hardcodedStreams],
+          count: 0,
+          streams: [],
         }
       }
 
@@ -317,8 +318,8 @@ const upcomingStreams = os.upcomingStreamsContract
 
       if (basePairs.length === 0) {
         return {
-          count: hardcodedStreams.length,
-          streams: [...hardcodedStreams],
+          count: 0,
+          streams: [],
         }
       }
 
@@ -530,7 +531,7 @@ const upcomingStreams = os.upcomingStreamsContract
           return user != null
         })
 
-      const composed = [...userStreams, ...hardcodedStreams]
+      const composed = [...userStreams]
 
       composed.sort(
         (a, b) => a.stream.start.getTime() - b.stream.start.getTime(),
@@ -901,13 +902,74 @@ const hardcodedStreams = os.hardcodedStreamsContract.handler(
     }
   },
 )
-const headliner = os.headlinerContract.handler(
-  async ({ context }) => {
 
+// Local helpers to map Yogs creators to UserDisplay shape
+function twitchLoginFromUrl(url?: string): string | null {
+  if (!url) return null
+  try {
+    const u = new URL(url)
+    const seg = u.pathname.split('/').filter(Boolean)[0]
+    return seg || null
+  } catch {
+    const m = url.match(/twitch\.tv\/([^/?#]+)/i)
+    return m?.[1] ?? null
+  }
+}
 
-    return []
-  },
-)
+function yogsCreatorToUser(yog: any): UserDisplay {
+  const links = Array.isArray(yog?.links) ? yog.links : []
+  const twitchLink = links.find(
+    (l: any) => String(l.type).toLowerCase() === 'twitch',
+  )
+  const youtubeLink = links.find(
+    (l: any) => String(l.type).toLowerCase() === 'youtube',
+  )
+
+  return {
+    userId: -1,
+    primaryLiveStream: twitchLink ? 'twitch' : 'youtube',
+    createdAt: new Date('2020-01-01T00:00:00.000Z'),
+    username: yog?.name ?? 'Unknown',
+    profileImage:
+      yog?.imageUrl ||
+      'https://static-cdn.jtvnw.net/jtv_user_pictures/29532548-dedd-4898-84cb-62782f64ef30-profile_image-70x70.png',
+    twitchLogin: twitchLoginFromUrl(twitchLink?.url),
+    youtubeUrl: youtubeLink?.url ?? null,
+    tiltifySlug: '',
+    tiltifyUrl: '',
+    primaryColor: yog?.color ?? '#E30E50',
+    accentColor: '#E30E50',
+  }
+}
+
+const headliner = os.headlinerContract.handler(async ({ context }) => {
+  const streams = await getUpcomingStreamsFromSchedule('2025-headliner')
+  return streams
+    .map((s) => {
+      const owner = s.owner ? yogsCreatorToUser(s.owner) : undefined
+      const participants = s.creators?.map((c) => yogsCreatorToUser(c)) ?? []
+      return {
+        stream: {
+          id: -1,
+          scheduleId: 1,
+          createdBy: -1,
+          title: s.title,
+          visible: true,
+          subtitle: s.subtitle ?? null,
+          description: s.description ?? null,
+          youtubeVodUrl: null,
+          twitchVodUrl: null,
+          start: s.start,
+          end: s.end,
+          isTimeTBD: false,
+          participants,
+          tags: [],
+        },
+        owner,
+      }
+    })
+    .slice(0, 6)
+})
 
 export const jjRouter = {
   campaigns,
@@ -919,6 +981,7 @@ export const jjRouter = {
   campaignsAll,
   fullSchedule,
   hardcodedStreams,
+  headliner,
   /*
   causeById,
   campaignLookup,
