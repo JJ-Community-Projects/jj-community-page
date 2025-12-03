@@ -30,6 +30,7 @@ import {
   useIsBeforeJJ,
   useJJStartCountdown,
 } from '../../../lib/utils/jjDates.ts'
+import { HeadlinerTicker } from '../../features/schedules/common/HeadlinerTicker.tsx'
 
 interface ConfigLoaderProps {
   creators: YogsCreator[]
@@ -221,6 +222,9 @@ const Body: Component<BodyProps> = (props) => {
               }}
             </Show>
             <Feedback />
+          </div>
+          <div class={'max-w-[80vw]'}>
+            <HeadlinerTicker/>
           </div>
           <div class="mobile-schedule flex w-full flex-col items-center justify-center gap-2">
             <MobileYogsScheduleComponent

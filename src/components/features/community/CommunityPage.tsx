@@ -30,6 +30,7 @@ import {
 } from '../../common/charityOverview/CommunityCharitiesOverview.tsx'
 import { CharityOverviewProvider } from '../../common/charityOverview/CharityOverviewProvider.tsx'
 import { CurrencyProvider } from '../../common/CurrencyProvider.tsx'
+import { HeadlinerTicker } from '../schedules/common/HeadlinerTicker.tsx'
 
 export const CommunityPage: Component<{
   charitiesData?: CharitiesStatic
@@ -271,10 +272,13 @@ const Body: Component = () => {
     <div class={'flex w-full flex-col items-stretch justify-center gap-6'}>
       <Header />
       <div class={'flex w-full flex-row items-start justify-start gap-6'}>
-        <div class={'hidden lg:block'}>
+        <div class={'hidden shrink-0 lg:block'}>
           <CommunityCharitiesOverview />
         </div>
-        <div class={'flex flex-1 flex-col items-start justify-center gap-6'}>
+        <div class={'min-w-0 basis-0 flex flex-1 flex-col items-start justify-center gap-6'}>
+          <div class={'w-full max-w-full'}>
+            <HeadlinerTicker />
+          </div>
           <UpcomingStreams />
           <Show when={isSortByCause()} fallback={<CampaignGrid />}>
             <CampaignGridByCause />

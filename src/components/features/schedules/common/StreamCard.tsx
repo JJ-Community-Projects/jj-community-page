@@ -3,10 +3,7 @@ import type { Stream } from '../../../../lib/orpc/public/schemas/schedules.ts'
 import { DateTime } from 'luxon'
 import { useNow } from '../../../../lib/utils/useNow.ts'
 import { createModalSignal } from '../../../../lib/createModalSignal.ts'
-import {
-  getStreamColor,
-  getStreamColors,
-} from '../../../../functions/jjDatesToColors.ts'
+import { getStreamColor, getStreamColors, } from '../../../../functions/jjDatesToColors.ts'
 import { getTextColor } from '../../../../lib/utils/textColors.ts'
 import { ScheduleStreamDetailDialog } from './ScheduleStreamDetailDialog.tsx'
 import { twMerge } from 'tailwind-merge'
@@ -792,9 +789,9 @@ export const UpcomingStreamsStreamCard: Component<ScheduleStreamCardProps> = (
   } = useScheduleStreamState(props.stream, props.streamColor)
 
   const bg = () => {
-    if (props.stream.id < 0) {
+    /*if (props.stream.id < 0) {
       return 'bg-primary-300 text-white'
-    }
+    }*/
     return 'bg-white'
   }
 
@@ -856,11 +853,32 @@ export const UpcomingStreamsStreamCard: Component<ScheduleStreamCardProps> = (
             }
           >
             <div class="flex w-full flex-1 flex-col items-start justify-start">
-              <p class="line-clamp-1 text-ellipsis text-xs font-bold uppercase">
-                {props.stream.title}
-              </p>
+              <div class={'flex w-full flex-row gap-1'}>
+                <p class="line-clamp-1 flex-1 text-ellipsis text-xs font-bold uppercase">
+                  {props.stream.title}
+                </p>
+                <Show when={props.user}>
+                  {(user) => {
+                    return (
+                      <div class="flex min-w-0 flex-row items-center justify-end gap-1">
+                        <img
+                          class="size-4 shrink-0 rounded-lg ring-1 ring-black/10"
+                          alt={user().username}
+                          src={user().profileImage}
+                          loading="lazy"
+                        />
+                        <div class="min-w-0">
+                          <p class="truncate text-xs font-semibold">
+                            {user().username}
+                          </p>
+                        </div>
+                      </div>
+                    )
+                  }}
+                </Show>
+              </div>
               <Show when={props.stream.subtitle}>
-                <p class="line-clamp-1 text-ellipsis text-xs uppercase">
+                <p class="truncate text-xs uppercase">
                   {props.stream.subtitle}
                 </p>
               </Show>
@@ -871,26 +889,6 @@ export const UpcomingStreamsStreamCard: Component<ScheduleStreamCardProps> = (
                 </p>
               </Show>
             </div>
-
-            <Show when={props.user}>
-              {(user) => {
-                return (
-                  <div class="flex items-center gap-1">
-                    <img
-                      class="size-4 shrink-0 rounded-lg ring-1 ring-black/10"
-                      alt={user().username}
-                      src={user().profileImage}
-                      loading="lazy"
-                    />
-                    <div class="min-w-0">
-                      <p class="truncate text-ellipsis text-xs font-semibold">
-                        {user().username}
-                      </p>
-                    </div>
-                  </div>
-                )
-              }}
-            </Show>
           </div>
         </div>
       </button>

@@ -27,6 +27,7 @@ import { getStreamColor } from '../../../../functions/jjDatesToColors.ts'
 import { getTextColor } from '../../../../lib/utils/textColors.ts'
 import './CommunitySchedules.css'
 import { useNow } from '../../../../lib/utils/useNow.ts'
+import { HeadlinerTicker } from '../common/HeadlinerTicker.tsx'
 
 const Header: Component<{
   schedule?: FullCommunitySchedule
@@ -102,10 +103,17 @@ const Body: Component = () => {
     <div class={'flex w-full flex-col items-stretch justify-center gap-6'}>
       <Header schedule={schedule()} />
       <div class={'flex w-full flex-row items-start justify-start gap-6'}>
-        <div class={'hidden lg:block'}>
+        <div class={'hidden shrink-0 lg:block'}>
           <CommunityCharitiesOverview />
         </div>
-        <div class={'flex flex-1 flex-col items-start justify-center gap-6'}>
+        <div
+          class={
+            "gap-6' flex min-w-0 flex-1 basis-0 flex-col items-start justify-center"
+          }
+        >
+          <div class={'w-full max-w-full'}>
+            <HeadlinerTicker />
+          </div>
           <Show when={scheduleQuery.data}>
             {(schedule) => {
               return <FullSchedule schedule={schedule()} />

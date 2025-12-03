@@ -40,9 +40,9 @@ const StreamParticipant: Component<{ participant: UserDisplay }> = (props) => {
   }
 
   const primaryColor = () => {
-    if (hasTwitchLogin()) {
+    /*if (hasTwitchLogin()) {
       return '#9146FF'
-    }
+    }*/
     return props.participant.primaryColor ?? '#E30E50'
   }
 
