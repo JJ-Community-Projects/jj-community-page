@@ -44,7 +44,7 @@ import {
   type UserExtensionTab,
   valueToCurrencies,
 } from './util.ts'
-import { getScheduleFromContentForCreator } from '../../../../content/getYogsScheduleFromContent.ts'
+import { getScheduleFromContent, getScheduleFromContentForCreator } from '../../../../content/getYogsScheduleFromContent.ts'
 import type {
   ContentCreator,
   ContentTwitchUser,
@@ -681,19 +681,28 @@ const yogsSchedule = os.yogsScheduleContract
       streams: typeof outStreams
     }> = []
 
-    const enableHardCoded = false
+    const enableHardCoded = true
 
-    const hardcodedStreams = await getHardCodedEventsNoYogsForExtension()
+    const hardcodedSchedule = await getScheduleFromContent('2025-headliner')
+
+    const hardcodedStreams = hardcodedSchedule.streams
+      .filter(s => s.owner === undefined || s.owner?.type !== 'yogs')
+      .toSorted((a, b) => a.start.getTime() - b.start.getTime())
+    console.log('hardcodedStreams', hardcodedStreams)
+    // await getHardCodedEventsNoYogsForExtension()
     // Group hardcoded streams by ISO date (YYYY-MM-DD) of their start time for quick lookup
-    const hardcodedByDay = new Map<string, typeof hardcodedStreams>()
+    const hardcodedByDay = new Map<string, typeof hardcodedStreams[number]>()
     for (const hs of hardcodedStreams ?? []) {
       // Use UTC date (YYYY-MM-DD) to avoid timezone mismatches when grouping
       const key = hs.start?.toISOString?.().slice(0, 10)
       if (!key) continue
-      const arr = hardcodedByDay.get(key) ?? []
-      arr.push(hs)
-      hardcodedByDay.set(key, arr)
+      const s = hardcodedByDay.get(key)
+      if (!s) {
+        hardcodedByDay.set(key, hs)
+      }
     }
+
+    console.log('hardcodedByDay', hardcodedByDay)
 
     // Traverse weeks -> days -> streams, resolving referenced entries via getEntry
     for (const week of schedule.data.weeks ?? []) {
@@ -705,33 +714,6 @@ const yogsSchedule = os.yogsScheduleContract
         const dayStreams = day.streams ?? []
         const dayOutStreams: typeof outStreams = []
 
-        // Prepend hardcoded streams matching this day (must appear at the beginning)
-        const dayDateISO = day.date.toISOString().slice(0, 10)
-
-        if (enableHardCoded) {
-          const prepend = dayDateISO
-            ? (hardcodedByDay.get(dayDateISO) ?? [])
-            : []
-          // Sort by start time just in case
-          prepend.sort((a, b) => a.start.getTime() - b.start.getTime())
-          for (const hs of prepend) {
-            const mapped = {
-              title: hs.title,
-              subtitle: hs.subtitle,
-              description: hs.description,
-              markdownDescription: hs.markdownDescription,
-              start: hs.start,
-              end: hs.end,
-              creators: hs.creators?.toSorted((a,b) => a.name.localeCompare(b.name)),
-              vods: hs.vods,
-              color:
-                hs.color ||
-                getStreamColors(DateTime.fromJSDate(hs.start))['500'],
-            }
-            dayOutStreams.push(mapped)
-            outStreams.push(mapped)
-          }
-        }
         for (const s of dayStreams) {
           // Resolve creators referenced by the stream (if any)
           let creators:
@@ -802,10 +784,52 @@ const yogsSchedule = os.yogsScheduleContract
           end: dayOutStreams[dayOutStreams.length - 1]?.end ?? new Date(),
         }
         dayOutStreams.sort((a, b) => a.start.getTime() - b.start.getTime())
+
+
+        // Prepend hardcoded streams matching this day (must appear at the beginning)
+        const dayDateISO = day.date.toISOString().slice(0, 10)
+
+        let finalDaysStream = []
+        if (enableHardCoded) {
+          const hs = hardcodedByDay.get(dayDateISO)
+          if (hs) {
+            const lst = []
+            if (hs.subtitle) {
+              lst.push(hs.subtitle)
+            }
+            if (hs.description) {
+              lst.push(hs.description)
+            }
+            const desc = lst.join(' - ')
+            const mapped = {
+              title: hs.title,
+              subtitle: 'Headliner', // hs.subtitle,
+              description: desc,
+              markdownDescription: hs.markdownDescription,
+              start: hs.start,
+              end: hs.end,
+              creators: hs.creators?.toSorted((a,b) => a.name.localeCompare(b.name)),
+              vods: hs.vods,
+              color: '#E30E50',
+              // hs.color ||
+              // getStreamColors(DateTime.fromJSDate(hs.start))['500'],
+            }
+            outStreams.push(mapped)
+            finalDaysStream = [
+              mapped,
+              ...dayOutStreams
+            ]
+          } else {
+            finalDaysStream = [...dayOutStreams]
+          }
+        } else {
+          finalDaysStream = [...dayOutStreams]
+        }
+
         days.push({
           start: range.start,
           end: range.end,
-          streams: dayOutStreams,
+          streams: finalDaysStream,
         })
       }
     }
@@ -830,7 +854,7 @@ const yogsSchedule = os.yogsScheduleContract
       days,
       streams: outStreams,
     }
-    await storeYogsSchedule(context.env.KV, result, 600)
+    await storeYogsSchedule(context.env.KV, result, 300)
     return result
   })
 
