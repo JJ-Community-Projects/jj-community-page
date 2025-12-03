@@ -13,7 +13,13 @@ streams:
       tileSize: 3
     subtitle: Lydia & Gee
     title: CHILL ADVENTURES
-    vods: []
+    vods:
+      - type: youtube
+        label: Youtube Live
+        link: https://www.youtube.com/watch?v=stIQ6AK7WdE
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2634220745?t=0h3m23s
   - creators: [ben,lewis,lydia,breeh,duncan,martyn,mini-muka,tom,markhulmes,ravs,osie,gee,boba,hat_films,briony]
     duration_hours: 3
     end: '2025-12-03T17:00:00Z'
@@ -27,7 +33,13 @@ streams:
       tileSize: 3
     subtitle: Games Night Special
     title: FESTIVUS MAXIMUS
-    vods: []
+    vods:
+      - type: youtube
+        label: Youtube Live
+        link: https://www.youtube.com/watch?v=qg6ezLrv6F8
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2634220745?t=3h16m5s
   - creators: [pedguin,ravs]
     duration_hours: 3
     end: '2025-12-04T18:00:00Z'
@@ -40,7 +52,13 @@ streams:
         orientation: TD
       tileSize: 1
     title: Core Keeper Relay Start!
-    vods: []
+    vods:
+      - type: youtube
+        label: Youtube Live
+        link: https://www.youtube.com/watch?v=caP1X_VzMoI
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2634220745?t=5h58m5s
   - creators: [hat_films]
     duration_hours: 3
     end: '2025-12-04T00:00:00Z'
