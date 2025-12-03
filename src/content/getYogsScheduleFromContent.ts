@@ -1,6 +1,4 @@
-import {
-  getEntry,
-} from 'astro:content'
+import { getEntry, type ReferenceDataEntry } from 'astro:content'
 import type {
   YogsCreator,
   YogsSchedule,
@@ -15,12 +13,15 @@ import { rangeFromData } from '../lib/utils/rangeFromData.ts'
 export async function getYogsScheduleFromContent(
   year: number,
 ): Promise<YogsSchedule> {
-  return getScheduleFromContent(`${year}`, `Yogscast Jingle Jam ${year ?? 2024}`)
+  return getScheduleFromContent(
+    `${year}`,
+    `Yogscast Jingle Jam ${year ?? 2024}`,
+  )
 }
 
 export async function getScheduleFromContent(
   id: string,
-  title: string = 'Schedule'
+  title: string = 'Schedule',
 ): Promise<YogsSchedule> {
   const schedule = await getEntry('schedules', id)
   if (!schedule) {
@@ -63,31 +64,8 @@ export async function getScheduleFromContent(
         if (Array.isArray(s.creators) && s.creators.length > 0) {
           const list: Array<YogsCreator> = []
           for (const cRef of s.creators) {
-            const cEntry = await getEntry(cRef)
-            if (!cEntry) continue
-            const cd = cEntry.data
-            const imageUrl: string | undefined =
-              cd?.profileImage?.medium ||
-              cd?.profileImage?.large ||
-              cd?.profileImage?.small
-            const links = cd.links?.filter((c) => c.type === 'twitch').at(0)
-            const url: string = links?.url ?? '' // cd?.link || (Array.isArray(cd?.links) && cd.links[0]?.url) || ''
-            const color: string = cd?.style?.primaryColor || '#000000'
-            const creator: YogsCreator = {
-              type: cEntry.data.type,
-              id: cEntry.id,
-              name: cd?.name ?? '',
-              url,
-              imageUrl,
-              color,
-              links: cd.links?.map((link) => {
-                return {
-                  type: link.type ?? 'none',
-                  name: link.name,
-                  url: link.url,
-                }
-              }),
-            }
+            const creator = await getCreatorFromRef(cRef)
+            if (!creator) continue
             list.push(creator)
             if (!creatorsMap.has(creator.id)) {
               creatorsMap.set(creator.id, creator)
@@ -108,6 +86,8 @@ export async function getScheduleFromContent(
         // Choose a representative color for the stream from its background style (fallback to black)
         const colorMap = getStreamColors(DateTime.fromJSDate(s.start))
 
+        const owner = await getCreatorFromRef(s.owner)
+
         const mapped: YogsStream = {
           title: s.title,
           subtitle: s.subtitle,
@@ -119,6 +99,7 @@ export async function getScheduleFromContent(
           vods,
           color: colorMap[500],
           size: s.style.tileSize,
+          owner,
         }
 
         dayOutStreams.push(mapped)
@@ -184,7 +165,7 @@ export async function getScheduleFromContent(
 export async function getScheduleFromContentForCreator(
   id: string,
   creatorId: string,
-  title: string = 'Schedule'
+  title: string = 'Schedule',
 ): Promise<YogsSchedule> {
   const schedule = await getEntry('schedules', id)
   if (!schedule) {
@@ -227,37 +208,14 @@ export async function getScheduleFromContentForCreator(
         let creators: Array<YogsCreator> | undefined
         if (Array.isArray(s.creators) && s.creators.length > 0) {
           const list: Array<YogsCreator> = []
-          const creatorIds = s.creators.map(c => c.id)
+          const creatorIds = s.creators.map((c) => c.id)
           if (!creatorIds.includes(creatorId)) {
             addStream = false
             continue
           }
           for (const cRef of s.creators) {
-            const cEntry = await getEntry(cRef)
-            if (!cEntry) continue
-            const cd = cEntry.data
-            const imageUrl: string | undefined =
-              cd?.profileImage?.medium ||
-              cd?.profileImage?.large ||
-              cd?.profileImage?.small
-            const links = cd.links?.filter((c) => c.type === 'twitch').at(0)
-            const url: string = links?.url ?? '' // cd?.link || (Array.isArray(cd?.links) && cd.links[0]?.url) || ''
-            const color: string = cd?.style?.primaryColor || '#000000'
-            const creator: YogsCreator = {
-              type: cEntry.data.type,
-              id: cEntry.id,
-              name: cd?.name ?? '',
-              url,
-              imageUrl,
-              color,
-              links: cd.links?.map((link) => {
-                return {
-                  type: link.type ?? 'none',
-                  name: link.name,
-                  url: link.url,
-                }
-              }),
-            }
+            const creator = await getCreatorFromRef(cRef)
+            if (!creator) continue
             list.push(creator)
             if (!creatorsMap.has(creator.id)) {
               creatorsMap.set(creator.id, creator)
@@ -278,6 +236,7 @@ export async function getScheduleFromContentForCreator(
         // Choose a representative color for the stream from its background style (fallback to black)
         const colorMap = getStreamColors(DateTime.fromJSDate(s.start))
 
+        const owner = await getCreatorFromRef(s.owner)
         const mapped: YogsStream = {
           title: s.title,
           subtitle: s.subtitle,
@@ -289,6 +248,7 @@ export async function getScheduleFromContentForCreator(
           vods,
           color: colorMap[500],
           size: s.style.tileSize,
+          owner,
         }
         if (!addStream) continue
         dayOutStreams.push(mapped)
@@ -349,4 +309,43 @@ export async function getScheduleFromContentForCreator(
     times,
     creators: Array.from(creatorsMap.values()),
   }
+}
+
+async function getCreatorFromRef(
+  cRef?: ReferenceDataEntry<'creators', string>,
+) {
+  if (!cRef) return undefined
+  const cEntry = await getEntry(cRef)
+  if (!cEntry) return undefined
+  const cd = cEntry.data
+  const imageUrl: string | undefined =
+    cd?.profileImage?.medium ||
+    cd?.profileImage?.large ||
+    cd?.profileImage?.small
+  const links = cd.links?.filter((c) => c.type === 'twitch').at(0)
+  const url: string = links?.url ?? '' // cd?.link || (Array.isArray(cd?.links) && cd.links[0]?.url) || ''
+  const color: string = cd?.style?.primaryColor || '#E30E50'
+  const creator: YogsCreator = {
+    type: cEntry.data.type,
+    id: cEntry.id,
+    name: cd?.name ?? '',
+    url,
+    imageUrl,
+    color,
+    links: cd.links?.map((link) => {
+      return {
+        type: link.type ?? 'none',
+        name: link.name,
+        url: link.url,
+      }
+    }),
+  }
+  return creator
+}
+
+
+export async function getUpcomingStreamsFromSchedule(scheduleId: string): Promise<YogsStream[]> {
+  const schedule = await getScheduleFromContent(scheduleId)
+  const now = new Date()
+  return schedule.streams.filter(s => s.start > now)
 }
