@@ -108,7 +108,7 @@ const Body: Component = () => {
         </div>
         <div
           class={
-            "gap-6' flex min-w-0 flex-1 basis-0 flex-col items-start justify-center"
+            "gap-6 flex min-w-0 flex-1 basis-0 flex-col items-start justify-center"
           }
         >
           <div class={'w-full max-w-full'}>
