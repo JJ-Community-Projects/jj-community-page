@@ -42,7 +42,7 @@ streams:
         link: https://www.twitch.tv/videos/2634220745?t=3h16m5s
   - creators: [pedguin,ravs]
     duration_hours: 3
-    end: '2025-12-04T18:00:00Z'
+    end: '2025-12-03T18:00:00Z'
     start: '2025-12-03T17:00:00Z'
     style:
       background:
