@@ -38,6 +38,7 @@ export const StreamSchema = z.object({
   size: z.number().default(1),
   vods: z.array(VOD).optional(),
   color: z.string(),
+  owner: CreatorSchema.optional(),
 })
 
 export const ScheduleDaySchema = z.object({
