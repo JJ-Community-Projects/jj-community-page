@@ -8,7 +8,7 @@ This page is built using [Astro](https://astro.build/),
 If you would like to contribute to this project you can do so in the following ways:
  - Create an issue with your idea
  - Fork the project and create a pull request
- - Join my [Discord](https://discord.gg/D5eqweWQPs) 
+ - Join my [Discord](https://discord.gg/hBdKXkB) 
  - Have a look at the src/content folder for the yaml or markdown files that are used to generate the pages
 
 # Run the project

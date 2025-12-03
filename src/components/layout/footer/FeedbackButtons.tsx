@@ -17,7 +17,7 @@ export const FeedbackButtons: Component = (props) => {
         class={
           'rounded-full transition-all hover:scale-110 hover:bg-white hover:text-discord'
         }
-        href={'https://discord.gg/D5eqweWQPs'}
+        href={'https://discord.gg/hBdKXkB'}
       >
         <DiscordIcon />
       </a>

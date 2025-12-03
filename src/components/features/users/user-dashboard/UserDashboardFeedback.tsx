@@ -15,7 +15,7 @@ export const UserDashboardFeedback: Component = () => {
           class={
             'rounded-full transition-all hover:scale-110 hover:bg-black/10'
           }
-          href={'https://discord.gg/D5eqweWQPs'}
+          href={'https://discord.gg/hBdKXkB'}
         >
           <DiscordIcon class={'size-5'} />
         </a>
