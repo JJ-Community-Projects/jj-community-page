@@ -691,8 +691,7 @@ const yogsSchedule = os.yogsScheduleContract
       .filter(s => s.start > now)
       .filter(s => s.owner === undefined || s.owner?.type !== 'yogs')
       .toSorted((a, b) => a.start.getTime() - b.start.getTime())
-    console.log('hardcodedStreams', hardcodedStreams)
-    // await getHardCodedEventsNoYogsForExtension()
+
     // Group hardcoded streams by ISO date (YYYY-MM-DD) of their start time for quick lookup
     const hardcodedByDay = new Map<string, typeof hardcodedStreams[number]>()
     for (const hs of hardcodedStreams ?? []) {
@@ -704,8 +703,6 @@ const yogsSchedule = os.yogsScheduleContract
         hardcodedByDay.set(key, hs)
       }
     }
-
-    console.log('hardcodedByDay', hardcodedByDay)
 
     // Traverse weeks -> days -> streams, resolving referenced entries via getEntry
     for (const week of schedule.data.weeks ?? []) {
