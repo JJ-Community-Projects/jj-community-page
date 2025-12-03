@@ -638,6 +638,8 @@ const yogsSchedule = os.yogsScheduleContract
       return yogsSchedule
     }
 
+    // Determine initialDayIndex: first day that hasn't fully ended yet; fallback to last day or 0
+    const now = new Date()
     // Resolve the current schedule year from the Config Durable Object
     const ConfigDO = context.env.ConfigDO
     const stubId = ConfigDO.idFromName('ConfigDO')
@@ -686,6 +688,7 @@ const yogsSchedule = os.yogsScheduleContract
     const hardcodedSchedule = await getScheduleFromContent('2025-headliner')
 
     const hardcodedStreams = hardcodedSchedule.streams
+      .filter(s => s.start > now)
       .filter(s => s.owner === undefined || s.owner?.type !== 'yogs')
       .toSorted((a, b) => a.start.getTime() - b.start.getTime())
     console.log('hardcodedStreams', hardcodedStreams)
@@ -839,8 +842,6 @@ const yogsSchedule = os.yogsScheduleContract
       end: new Date(),
     }
 
-    // Determine initialDayIndex: first day that hasn't fully ended yet; fallback to last day or 0
-    const now = new Date()
     let initialDayIndex = days.findIndex((d) => now <= d.end)
     if (initialDayIndex === -1) {
       initialDayIndex = Math.max(0, days.length - 1)
