@@ -1,0 +1,15 @@
+date: '2025-12-07'
+streams:
+  - creators: [mousie]
+    duration_hours: 3
+    start: '2025-12-13T20:00:00Z'
+    end: '2025-12-13T23:00:00Z'
+    style:
+      background:
+        colors: ['#E30E50', '#E30E50']
+        orientation: TD
+      tileSize: 3
+    title: "Slay or Lay: The Monster Dating Game Show"
+    description: "Join Mousie, Melon, and an array of fantastic guests as we discuss date-ability of various monsters and see who comes out on top."
+    vods: []
+    owner: mousie

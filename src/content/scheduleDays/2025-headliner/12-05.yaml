@@ -1,6 +1,6 @@
 date: '2025-12-05'
 streams:
-  - creators: [jojosolos]
+  - creators: [jojosolos, derapchu, antfrost, highkeyhateme, baablu, nominalgravy, lynxyliam, katiegobrr, rubyco_, harry, sarah, wadebox]
     duration_hours: 2
     start: '2025-12-05T21:00:00Z'
     end: '2025-12-05T23:00:00Z'
@@ -10,22 +10,9 @@ streams:
         orientation: TD
       tileSize: 3
     title: JUST ANOTHER MINECRAFT SERVER (JAMS)
-    subtitle: Headliner
     description: 'Chaotic 100 creator Minecraft SMP featuring a race to complete a series of 9 collaborative quests whilst also avoiding the mayhem caused by the various donation incentives.'
     vods: []
-  - creators: []
-    duration_hours: 2
-    start: '2025-12-05T14:00:00Z'
-    end: '2025-12-05T17:00:00Z'
-    style:
-      background:
-        colors: ['#E30E50', '#E30E50']
-        orientation: TD
-      tileSize: 3
-    title: JUST ANOTHER MINECRAFT SERVER (JAMS)
-    subtitle: Headliner
-    description: 'Chaotic 100 creator Minecraft SMP featuring a race to complete a series of 9 collaborative quests whilst also avoiding the mayhem caused by the various donation incentives.'
-    vods: []
+    owner: wadebox
   - creators: [lewis, duncan, spiff, kirsty, rythian, alex_the_rambler, daltos]
     duration_hours: 9
     end: '2025-12-05T23:26:00Z'
@@ -37,6 +24,6 @@ streams:
           - '#E30E50'
         orientation: TD
       tileSize: 6
-    subtitle: LEWIS, DUNCAN, SPIFF, KIRSTY, RYTHIAN, RAMBLER, DALTOS
     title: CIV 5 ON THE 5TH
     vods: []
+    owner: yogscast

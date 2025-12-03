@@ -13,6 +13,7 @@ streams:
       tileSize: 1
     title: Core Keeper Relay Start!
     vods: []
+    owner: yogscast
   - creators: [hat_films]
     duration_hours: 3
     end: '2025-12-04T00:00:00Z'
@@ -24,6 +25,6 @@ streams:
           - '#E30E50'
         orientation: TD
       tileSize: 5
-    subtitle: ROSS, SMITH & TROTT
     title: HAT FILMS MUSIC STREAM
     vods: []
+    owner: yogscast

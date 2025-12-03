@@ -10,10 +10,10 @@ streams:
         orientation: TD
       tileSize: 3
     title: JUST CREATE SMP WEEKENDER
-    subtitle: Headliner
     description: ''
     vods: []
-  - creators: [clownpierce]
+    owner: foxynotail
+  - creators: [clownpierce, harry, martyn]
     duration_hours: 2
     start: '2025-12-06T14:00:00Z'
     end: '2025-12-06T16:00:00Z'
@@ -23,6 +23,6 @@ streams:
         orientation: TD
       tileSize: 3
     title: NAKED & AFRAID
-    subtitle: Headline
     description: '21 seasoned Minecraft pros take on the hardest survival challenge on the internet, with one life and no hope.'
     vods: []
+    owner: clownpierce

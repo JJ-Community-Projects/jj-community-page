@@ -1,6 +1,6 @@
 date: '2025-12-01'
 streams:
-  - creators: [boba,martyn,def,nina,jack,joe,pedguin,sarah,harry]
+  - creators: [boba,martyn,daf,nina,jack,joe,pedguin,sarah,harry]
     duration_hours: 3
     end: '2025-12-01T14:00:00Z'
     start: '2025-12-01T11:00:00Z'

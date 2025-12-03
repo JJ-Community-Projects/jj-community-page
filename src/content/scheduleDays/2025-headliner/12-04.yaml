@@ -10,10 +10,10 @@ streams:
         orientation: TD
       tileSize: 3
     title: TALIA MAR 12-hour streaming marathon
-    subtitle: Headliner
     description: "Back for her second Jingle Jam, join Talia for a 12-hour streaming marathon! She's bringing nonstop music, hilarious games, and a full day of charity goodness."
     vods: []
-  - creators: [rekrap22]
+    owner: taliamar
+  - creators: [rekrap22, harry, martyn]
     duration_hours: 2
     start: '2025-12-04T14:00:00Z'
     end: '2025-12-04T16:00:00Z'
@@ -23,9 +23,9 @@ streams:
         orientation: TD
       tileSize: 3
     title: NAKED & AFRAID
-    subtitle: Headline
     description: '21 seasoned Minecraft pros take on the hardest survival challenge on the internet, with one life and no hope.'
     vods: []
+    owner: rekrap22
   - creators: [jackshepardtv]
     duration_hours: 3
     start: '2025-12-04T19:00:00Z'
@@ -36,6 +36,6 @@ streams:
         orientation: TD
       tileSize: 3
     title: Medival Rust Armada
-    subtitle: Headliner
     description: ''
     vods: []
+    owner: jackshepardtv

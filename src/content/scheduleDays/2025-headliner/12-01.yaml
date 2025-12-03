@@ -1,6 +1,7 @@
 date: '2025-12-01'
 streams:
   - creators: [tom, ben]
+    owner: yogscast
     duration_hours: 3
     end: '2025-12-01T17:00:00Z'
     start: '2025-12-01T14:00:00Z'
@@ -21,6 +22,7 @@ streams:
         label: Twitch
         link: https://www.twitch.tv/videos/2632578797?t=03h00m22s
   - creators: [lewis, simon]
+    owner: yogscast
     duration_hours: 3
     end: '2025-12-01T20:00:00Z'
     start: '2025-12-01T17:00:00Z'
@@ -41,6 +43,7 @@ streams:
         label: Twitch
         link: https://www.twitch.tv/videos/2632578797?t=05h58m07s
   - creators: [lewis, duncan, spiff, pedguin, lolipopgi, rythian, alex_the_rambler]
+    owner: yogscast
     duration_hours: 3
     end: '2025-12-01T23:00:00Z'
     start: '2025-12-01T20:00:00Z'
