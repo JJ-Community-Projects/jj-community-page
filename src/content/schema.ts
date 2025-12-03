@@ -39,6 +39,7 @@ export const StreamSchema = z.object({
     }),
     tileSize: z.number().default(1),
   }),
+  owner: reference('creators').optional(),
 })
 
 export const ScheduleDaySchema = z.object({
