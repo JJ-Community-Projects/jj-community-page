@@ -74,4 +74,10 @@ streams:
       tileSize: 3
     subtitle: FARMING SIM
     title: YE OLDE FEEDE A COWE FOR XMAS
-    vods: []
+    vods:
+      - type: youtube
+        label: Youtube Live
+        link: https://www.youtube.com/watch?v=9tcH45rtmBg
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2633464324?t=5h59m45s
