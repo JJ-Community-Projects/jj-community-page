@@ -40,7 +40,7 @@ streams:
       tileSize: 1
     title: Core Keeper Relay Finish!
     vods: [ ]
-  - creators: [ lewis, zylus, briony, boba, martyn, ravs, zoey, martyn ]
+  - creators: [ lewis, zylus, briony, boba, martyn, ravs, zoey ]
     duration_hours: 6
     start: '2025-12-04T17:00:00Z'
     end: '2025-12-04T23:00:00Z'
