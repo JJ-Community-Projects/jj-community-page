@@ -16,7 +16,7 @@ streams:
     vods: [ ]
   - creators: [ sips, ravs, gee, rythian, markhulmes ]
     duration_hours: 3
-    end: '2025-12-04T16:00:00Z'
+    end: '2025-12-04T17:00:00Z'
     start: '2025-12-04T14:00:00Z'
     style:
       background:
@@ -24,13 +24,13 @@ streams:
           - '#DD5502'
           - '#DD5502'
         orientation: TD
-      tileSize: 2
+      tileSize: 3
     title: SWEATY SHOOTERS
     vods: [ ]
   - creators: [ pedguin,ravs ]
     duration_hours: 3
-    end: '2025-12-04T17:00:00Z'
-    start: '2025-12-04T16:00:00Z'
+    end: '2025-12-04T18:00:00Z'
+    start: '2025-12-04T17:00:00Z'
     style:
       background:
         colors:
@@ -41,8 +41,8 @@ streams:
     title: Core Keeper Relay Finish!
     vods: [ ]
   - creators: [ lewis, zylus, briony, boba, martyn, ravs, zoey ]
-    duration_hours: 6
-    start: '2025-12-04T17:00:00Z'
+    duration_hours: 5
+    start: '2025-12-04T18:00:00Z'
     end: '2025-12-04T23:00:00Z'
     style:
       background:
@@ -50,7 +50,7 @@ streams:
           - '#DD5502'
           - '#DD5502'
         orientation: TD
-      tileSize: 6
+      tileSize: 5
     subtitle: LEWIS, ZYLUS & FRIENDS
     title: BLOOD ON THE CLOCKTOWER LIVE IN MINECRAFT
     description: Creators are added as soon as they are confirmed.
