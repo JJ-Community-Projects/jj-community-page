@@ -40,8 +40,8 @@ interface ConfigLoaderProps {
 const ConfigLoader: Component<ConfigLoaderProps> = (props) => {
   const config = useQuery(() =>
     orpcPrivate.yogs.config.queryOptions({
-      staleTime: 60_000 * 5,
-      refetchInterval: 60_000 * 10,
+      staleTime: 60_000,
+      refetchInterval: 60_000 * 5,
       refetchOnMount: true,
       refetchOnReconnect: true,
       refetchIntervalInBackground: true,
@@ -165,8 +165,8 @@ interface BodyProps {
 const Body: Component<BodyProps> = (props) => {
   const schedule = useQuery(() =>
     orpcPrivate.yogs.schedule.queryOptions({
-      staleTime: 60_000 * 5,
-      refetchInterval: 60_000 * 10,
+      staleTime: 60_000,
+      refetchInterval: 60_000 * 5,
       refetchOnMount: true,
       refetchOnReconnect: true,
       refetchIntervalInBackground: true,
