@@ -40,7 +40,7 @@ streams:
       tileSize: 1
     title: Core Keeper Relay Finish!
     vods: [ ]
-  - creators: [ lewis, zylus, daltos, duncan, gee, kirsty, martyn, nilesy, osie, zoey, briony, boba, ravs ]
+  - creators: [ lewis, zylus, daltos, duncan, gee, kirsty, martyn, nilesy, osie, zoey, ben, boba, breeh, briony, markhulmes, pedguin, ravs, rythian ]
     duration_hours: 6
     start: '2025-12-04T17:00:00Z'
     end: '2025-12-04T23:00:00Z'
@@ -54,12 +54,9 @@ streams:
     subtitle: LEWIS, ZYLUS & FRIENDS
     title: BLOOD ON THE CLOCKTOWER LIVE IN MINECRAFT
     description: >-
-      Creators are added as soon as they are confirmed.
-      Game 1: Daltos, Duncan, Gee, Kirsty, Martyn, Nilsey, Osie, Zoey
-      Game 2: Boba, Briony, Ravs, TBD
+      Game 1 & 2: Daltos, Duncan, Gee, Kirsty, Martyn, Nilsey, Osie, Zoey
+      Game 3 & 4: Ben, Boba, Breeh, Briony, Mark, Pedguin, Ravs, Rythian
     markdownDescription: |
-      Creators are added as soon as they are confirmed.
-      
-      - Game 1: Daltos, Duncan, Gee, Kirsty, Martyn, Nilsey, Osie, Zoey
-      - Game 2:
+      - Game 1 & 2: Daltos, Duncan, Gee, Kirsty, Martyn, Nilsey, Osie, Zoey
+      - Game 3 & 4: Ben, Boba, Breeh, Briony, Mark, Pedguin, Ravs, Rythian
     vods: [ ]
