@@ -14,7 +14,7 @@ streams:
     subtitle: Martyn & Boba
     title: SPELUNK AND SIM
     vods: []
-  - creators: [simon, harry, tom, sarah]
+  - creators: [simon, harry, tom, sarah, lydia]
     duration_hours: 3
     end: '2025-12-05T17:00:00Z'
     start: '2025-12-05T14:00:00Z'
