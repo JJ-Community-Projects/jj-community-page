@@ -27,7 +27,7 @@ streams:
       tileSize: 3
     title: COLOURING WITH KIRBY CREW
     vods: []
-  - creators: [simon_clark,briony,martyn,ravs,mousie]
+  - creators: [boba,harry,briony,martyn,ravs,mousie]
     duration_hours: 4.5
     end: '2025-12-06T21:00:00Z'
     start: '2025-12-06T17:00:00Z'
@@ -40,7 +40,7 @@ streams:
       tileSize: 4
     subtitle: ANNUAL QUIZ SHOW
     title: DR SIMON CLARK'S COUNTJAM!
-    description: Creators are added as soon as they are confirmed.
+    description: Creators are added as soon as they are confirmed. Simon is sick and wont be able to host (see is post on bluesky). The show will be hosted by Boba and Harry.
     vods: []
   - creators: [nilesy, breeh, zylus, kirsty]
     duration_hours: 3
