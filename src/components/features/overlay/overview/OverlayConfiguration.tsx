@@ -13,7 +13,8 @@ import { FundraisersByCauseConfigurator } from '../ticker/fundraisers/Fundraiser
 import { UserProvider } from '../../users/user-dashboard/providers/UserProvider.tsx'
 import type { User } from '../../../../lib/auth/User.ts'
 import { TeamScheduleConfigurator } from '../schedule/team/TeamScheduleConfigurator.tsx'
-import { CampaignGoalConfigurator } from '../campaignGoal/CampaignGoalConfigurator.tsx'
+import { CampaignGoalConfigurator } from '../jjRibbons/campaignGoal/CampaignGoalConfigurator.tsx'
+import { BasicRibbonLabelConfigurator } from '../jjRibbons/basicRibbonLabel/BasicRibbonLabelConfigurator.tsx'
 
 const Body: Component = () => {
   const [expanded, setExpanded] = createSignal<string[]>([])
@@ -57,30 +58,6 @@ const Body: Component = () => {
         </Accordion.Content>
       </Accordion.Item>
 
-      {/* Campaign Goal Panel */}
-      <Accordion.Item
-        value="campaign-goal"
-        class="flex w-full flex-col items-center transition-all"
-      >
-        <Accordion.Header class="w-full">
-          <Accordion.Trigger
-            class={twMerge(
-              'hover:scale-102 hover:brightness-102 border-1 group m-2 flex w-full flex-row items-center rounded border-accent-500 bg-primary-200/50 p-2 text-xl text-white shadow',
-            )}
-          >
-            <p class="flex-1 text-left">Campaign Goal Panel (NEW, EXPERIMENTAL)</p>
-            <FaSolidChevronDown
-              class={twMerge(
-                'transition-all group-hover:animate-none',
-                isOpen('campaign-goal') && 'rotate-180 animate-none',
-              )}
-            />
-          </Accordion.Trigger>
-        </Accordion.Header>
-        <Accordion.Content class="w-full p-2">
-          <CampaignGoalConfigurator visible={isOpen('campaign-goal')} />
-        </Accordion.Content>
-      </Accordion.Item>
 
       {/* Schedule (Full) */}
       <Accordion.Item
@@ -235,6 +212,64 @@ const Body: Component = () => {
         <Accordion.Content class="w-full p-2">
           <FundraisersByCauseConfigurator
             visible={isOpen('cause-fundraiser')}
+          />
+        </Accordion.Content>
+      </Accordion.Item>
+
+
+      {/* Tickers Section Header */}
+      <div class="mx-2 mt-6 w-full text-left text-2xl font-semibold text-white/90">
+        Jingle Jam Ribbons (New)
+      </div>
+
+      {/* Campaign Goal Panel */}
+      <Accordion.Item
+        value="campaign-goal"
+        class="flex w-full flex-col items-center transition-all"
+      >
+        <Accordion.Header class="w-full">
+          <Accordion.Trigger
+            class={twMerge(
+              'hover:scale-102 hover:brightness-102 border-1 group m-2 flex w-full flex-row items-center rounded border-accent-500 bg-primary-200/50 p-2 text-xl text-white shadow',
+            )}
+          >
+            <p class="flex-1 text-left">Campaign Goal (EXPERIMENTAL)</p>
+            <FaSolidChevronDown
+              class={twMerge(
+                'transition-all group-hover:animate-none',
+                isOpen('campaign-goal') && 'rotate-180 animate-none',
+              )}
+            />
+          </Accordion.Trigger>
+        </Accordion.Header>
+        <Accordion.Content class="w-full p-2">
+          <CampaignGoalConfigurator visible={isOpen('campaign-goal')} />
+        </Accordion.Content>
+      </Accordion.Item>
+
+      {/* Basic Ribbon Label */}
+      <Accordion.Item
+        value="basic-ribbon-label"
+        class="flex w-full flex-col items-center transition-all"
+      >
+        <Accordion.Header class="w-full">
+          <Accordion.Trigger
+            class={twMerge(
+              'hover:scale-102 hover:brightness-102 border-1 group m-2 flex w-full flex-row items-center rounded border-accent-500 bg-primary-200/50 p-2 text-xl text-white shadow',
+            )}
+          >
+            <p class="flex-1 text-left">Basic Label</p>
+            <FaSolidChevronDown
+              class={twMerge(
+                'transition-all group-hover:animate-none',
+                isOpen('basic-ribbon-label') && 'rotate-180 animate-none',
+              )}
+            />
+          </Accordion.Trigger>
+        </Accordion.Header>
+        <Accordion.Content class="w-full p-2">
+          <BasicRibbonLabelConfigurator
+            visible={isOpen('basic-ribbon-label')}
           />
         </Accordion.Content>
       </Accordion.Item>

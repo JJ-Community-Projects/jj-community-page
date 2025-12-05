@@ -1,0 +1,24 @@
+---
+import { BasicRibbonLabelOverlay } from '../../components/features/overlay/jjRibbons/basicRibbonLabel/BasicRibbonLabelOverlay.tsx'
+
+const styleParam = Astro.url.searchParams.get('style')
+const alignmentParam = Astro.url.searchParams.get('alignment')
+const textParam = Astro.url.searchParams.get('text')
+
+const style = ((): 'red' | 'blue' | 'black' => {
+  const v = (styleParam ?? 'red').toLowerCase()
+  return v === 'blue' ? 'blue' : v === 'black' ? 'black' : 'red'
+})()
+
+const alignment = ((): 'left' | 'right' | 'center' => {
+  const v = (alignmentParam ?? 'center').toLowerCase()
+  return v === 'left' ? 'left' : v === 'right' ? 'right' : 'center'
+})()
+
+const text = textParam ?? ''
+---
+
+<div class="bg-transparent">
+  <BasicRibbonLabelOverlay client:only="solid-js" style={style} alignment={alignment} text={text} />
+
+</div>
