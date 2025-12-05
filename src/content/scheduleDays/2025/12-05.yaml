@@ -13,7 +13,10 @@ streams:
       tileSize: 3
     subtitle: Martyn & Boba
     title: SPELUNK AND SIM
-    vods: []
+    vods:
+      - type: youtube
+        label: Youtube Live
+        link: https://www.youtube.com/watch?v=apY8QdqLNI8
   - creators: [simon, harry, tom, sarah, lydia]
     duration_hours: 3
     end: '2025-12-05T17:00:00Z'
@@ -28,7 +31,10 @@ streams:
     subtitle: SIMON AND FRIENDS
     title: IMPORTANT VIDEOS
     description: Creators are added as soon as they are confirmed.
-    vods: []
+    vods:
+      - type: youtube
+        label: Youtube Live
+        link: https://www.youtube.com/watch?v=gx-x7qov0ck
   - creators: [lewis, duncan, spiff, kirsty, rythian, alex_the_rambler, daltos]
     duration_hours: 9
     end: '2025-12-05T23:26:00Z'

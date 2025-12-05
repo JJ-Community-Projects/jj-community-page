@@ -13,7 +13,13 @@ streams:
       tileSize: 3
     subtitle: Tom & Ben
     title: DOING A WARHAMMER
-    vods: [ ]
+    vods:
+      - type: youtube
+        label: Youtube Live
+        link: https://www.youtube.com/watch?v=ZS38oN6G-GU
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2635048755?t=0h1m53s
   - creators: [ sips, ravs, gee, rythian, markhulmes ]
     duration_hours: 2
     end: '2025-12-04T16:00:00Z'
@@ -26,7 +32,13 @@ streams:
         orientation: TD
       tileSize: 2
     title: SWEATY SHOOTERS
-    vods: [ ]
+    vods:
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2635048755?t=3h3m35s
+      - type: youtube
+        label: Youtube Live
+        link: https://www.youtube.com/watch?v=2RkMg9xGHsY
   - creators: [ pedguin,ravs ]
     duration_hours: 3
     end: '2025-12-04T17:00:00Z'
@@ -39,7 +51,13 @@ streams:
         orientation: TD
       tileSize: 1
     title: Core Keeper Relay Finish!
-    vods: [ ]
+    vods:
+      - type: youtube
+        label: Youtube Live
+        link: https://www.youtube.com/watch?v=_E8soMAUKmU
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2635048755?t=5h15m46s
   - creators: [ lewis, zylus, daltos, duncan, gee, kirsty, martyn, nilesy, osie, zoey, ben, boba, breeh, briony, markhulmes, pedguin, ravs, rythian ]
     duration_hours: 6
     start: '2025-12-04T17:00:00Z'
@@ -59,4 +77,46 @@ streams:
     markdownDescription: |
       - Game 1 & 2: Daltos, Duncan, Gee, Kirsty, Martyn, Nilsey, Osie, Zoey
       - Game 3 & 4: Ben, Boba, Breeh, Briony, Mark, Pedguin, Ravs, Rythian
-    vods: [ ]
+    vods:
+      - type: youtube
+        label: Youtube Live (Part 1)
+        link: https://www.youtube.com/watch?v=FBf3clzQnDs
+      - type: youtube
+        label: Youtube Live (Part 2)
+        link: https://www.youtube.com/watch?v=V6Og5suuJrQ
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2635048755?t=6h17m11s
+      - type: twitch
+        label: Ben POV
+        link: https://www.twitch.tv/videos/2635358043
+      - type: twitch
+        label: Boba POV
+        link: https://www.twitch.tv/videos/2635358043
+      - type: twitch
+        label: Breeh POV
+        link: https://www.twitch.tv/videos/2635358043
+      - type: twitch
+        label: Briony POV
+        link: https://www.twitch.tv/videos/2635366276
+      - type: twitch
+        label: Daltos POV
+        link: https://www.twitch.tv/videos/2635228636
+      - type: twitch
+        label: Martyn POV
+        link: https://www.twitch.tv/videos/2635124166?t=3h3m8s
+      - type: twitch
+        label: Nilesy POV
+        link: https://www.twitch.tv/videos/2635229497
+      - type: twitch
+        label: Pedguin POV
+        link: https://www.twitch.tv/videos/2634186462?t=35h26m47s
+      - type: twitch
+        label: Ravs POV
+        link: https://www.twitch.tv/videos/2635261844?t=2h29m24s
+      - type: twitch
+        label: Rythian POV
+        link: https://www.twitch.tv/videos/2635367786
+      - type: twitch
+        label: Zoey POV
+        link: https://www.twitch.tv/videos/2635188190?t=1h4m22s
