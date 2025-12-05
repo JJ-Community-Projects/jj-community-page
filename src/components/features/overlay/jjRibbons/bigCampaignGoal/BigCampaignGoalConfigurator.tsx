@@ -52,7 +52,7 @@ export const BigCampaignGoalConfigurator: Component<{
         Display your current campaign total and goal with large ribbons. The
         progress bar can be placed above or below the ribbons. Paste the
         generated URL into an OBS Browser Source. The overlay updates roughly
-        every 30 seconds. Recommended width around 500–900px.
+        every 30 seconds. Recommended size around 100x1920px but experiment with different widths.
       </p>
       <div class="flex flex-row gap-1">
         <div class="flex flex-1 flex-col gap-4">
