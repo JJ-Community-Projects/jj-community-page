@@ -20,7 +20,6 @@ export const CampaignGoalConfigurator: Component<{
   const [alignment, setAlignment] = createSignal<Alignment>('right')
   const [showChangeLabel, setShowChangeLabel] = createSignal<boolean>(true)
 
-
   const url = createMemo(() =>
     buildUrl('/overlays/campaign-goal', {
       user: user?.tiltifySlug,
@@ -50,8 +49,8 @@ export const CampaignGoalConfigurator: Component<{
       <p class="mb-2 rounded border border-white/10 bg-white/5 p-2 text-sm text-white/80">
         Display your current campaign total and goal with a compact progress
         bar. Pick a color style and paste the generated URL into an OBS Browser
-        Source. The overlay will update once
-        per minutes. Recommended size around 300x100 but experiment with different widths.
+        Source. The overlay updates roughly every 30 seconds. Recommended size
+        around 300x100 but experiment with different widths.
       </p>
       <div class="flex flex-row gap-1">
         <div class="flex flex-1 flex-col gap-4">
@@ -82,7 +81,9 @@ export const CampaignGoalConfigurator: Component<{
               <select
                 class="rounded bg-black/40 px-2 py-1"
                 value={alignment()}
-                onChange={(e) => setAlignment(e.currentTarget.value as Alignment)}
+                onChange={(e) =>
+                  setAlignment(e.currentTarget.value as Alignment)
+                }
               >
                 <option value="left">Left</option>
                 <option value="right">Right</option>
