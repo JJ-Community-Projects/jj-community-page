@@ -65,7 +65,7 @@ export const BasicRibbonLabelOverlay: Component<
   return (
     <div
       class={twMerge(
-        'flex w-full',
+        'flex w-full items-center justify-center',
       )}
       style={{ '--main-ribbon-color': mainRibbonColor(props.style) }}
     >
