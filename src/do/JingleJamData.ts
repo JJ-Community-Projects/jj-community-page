@@ -201,6 +201,10 @@ export class JingleJamData extends DurableObject<Env> {
       entries[this.campaignKeyId(c.id)] = c
       entries[this.campaignKey(c.slug)] = c
       entries[this.campaignKeyUserSlug(c.user.slug)] = c
+
+      const goal = c.goal
+      const raised = c.raised
+
     }
     await this.storage.put(entries)
   }
@@ -222,6 +226,7 @@ export class JingleJamData extends DurableObject<Env> {
       JJCampaign | undefined
     >
   }
+
   public getCampaignByUserSlug(slug: string) {
     return this.storage.get(`campaign:api:user-slug:${slug}`) as Promise<
       JJCampaign | undefined
@@ -286,12 +291,14 @@ export class JingleJamData extends DurableObject<Env> {
       }
       console.log('refreshAllCampaigns', 'all', all.length)
       await this.setCampaigns(all)
+      await this.updateGoalsAfterSetCampaigns(all)
     } catch (e) {
       console.error('refreshAllCampaigns failed', e)
       // Best-effort: still persist whatever we have
       if (all.length > 0) {
         try {
           await this.setCampaigns(all)
+          await this.updateGoalsAfterSetCampaigns(all)
         } catch (e2) {
           console.error('refreshAllCampaigns setCampaigns partial failed', e2)
         }
@@ -951,13 +958,64 @@ export class JingleJamData extends DurableObject<Env> {
     return this.storage.get<FullCommunitySchedule>('full-community-schedule')
   }
 
+  public async getGoalByUserSlug(slug: string): Promise<number> {
+    const value = await this.storage.get<number>(this.campaignGoalKeyUserSlug(slug))
+    return value ?? 0
+  }
+
+  public async getPreviousGoalByUserSlug(slug: string): Promise<number> {
+    const value = await this.storage.get<number>(this.campaignPreviousGoalKeyUserSlug(slug))
+    return value ?? 0
+  }
+
+  // Helper: fully-qualified YouTube URL from any incoming value (channel/video URL, id, or handle)
+
+  private async updateGoalsAfterSetCampaigns(campaigns: JJCampaign[]) {
+    const writes: Record<string, number> = {}
+
+    for (const c of campaigns) {
+      const id = c.id
+      const slug = c.slug
+      const userSlug = c.user?.slug
+      const newGoal = c.goal
+
+      // Read the canonical current goal by id; we will write all variants
+      const current = await this.storage.get<number>(this.campaignGoalKeyId(id))
+
+      if (typeof current === 'number') {
+        if (current !== newGoal) {
+          // shift current -> previous for all refs, then set new current for all refs
+          writes[this.campaignPreviousGoalKeyId(id)] = current
+          writes[this.campaignGoalKeyId(id)] = newGoal
+
+          if (slug) {
+            writes[this.campaignPreviousGoalKey(slug)] = current
+            writes[this.campaignGoalKey(slug)] = newGoal
+          }
+          if (userSlug) {
+            writes[this.campaignPreviousGoalKeyUserSlug(userSlug)] = current
+            writes[this.campaignGoalKeyUserSlug(userSlug)] = newGoal
+          }
+        }
+        // unchanged: no writes
+      } else {
+        // First time: initialize current for all refs; do not set previous
+        writes[this.campaignGoalKeyId(id)] = newGoal
+        if (slug) writes[this.campaignGoalKey(slug)] = newGoal
+        if (userSlug) writes[this.campaignGoalKeyUserSlug(userSlug)] = newGoal
+      }
+    }
+
+    if (Object.keys(writes).length > 0) {
+      await this.storage.put(writes)
+    }
+  }
+
   private chunk<T>(arr: T[], size: number) {
     const out: T[][] = []
     for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size))
     return out
   }
-
-  // Helper: fully-qualified YouTube URL from any incoming value (channel/video URL, id, or handle)
 
   private async fetchFromRateAPI() {
     try {
@@ -1489,12 +1547,39 @@ export class JingleJamData extends DurableObject<Env> {
   private campaignKey(userRef: string) {
     return `campaign:api:slug:${userRef}`
   }
+
   private campaignKeyUserSlug(userRef: string) {
     return `campaign:api:user-slug:${userRef}`
   }
 
   private campaignKeyId(userRef: string) {
     return `campaign:api:id:${userRef}`
+  }
+
+  // Goal Key helpers
+  private campaignGoalKey(userRef: string) {
+    return `campaign-goal:api:slug:${userRef}`
+  }
+
+  private campaignGoalKeyUserSlug(userRef: string) {
+    return `campaign-goal:api:user-slug:${userRef}`
+  }
+
+  private campaignGoalKeyId(userRef: string) {
+    return `campaign-goal:api:id:${userRef}`
+  }
+
+  // Previous Goal Key helpers
+  private campaignPreviousGoalKey(userRef: string) {
+    return `campaign-previous-goal:api:slug:${userRef}`
+  }
+
+  private campaignPreviousGoalKeyUserSlug(userRef: string) {
+    return `campaign-previous-goal:api:user-slug:${userRef}`
+  }
+
+  private campaignPreviousGoalKeyId(userRef: string) {
+    return `campaign-previous-goal:api:id:${userRef}`
   }
 
   private causeKey(causeId: string) {

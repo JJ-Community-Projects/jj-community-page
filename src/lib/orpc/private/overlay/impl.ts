@@ -1,11 +1,19 @@
 import { implement, ORPCError } from '@orpc/server'
 import { contracts, type FundraiserItem } from './contract'
 import { dbMiddleware } from '../../middleware/dbMiddleware'
-import { schedulesTable, streamsTable, teamMembersTable, teamsTable, } from '../../../db/schema/jj-schema'
+import {
+  schedulesTable,
+  streamsTable,
+  teamMembersTable,
+  teamsTable,
+} from '../../../db/schema/jj-schema'
 import { and, eq, gte, inArray } from 'drizzle-orm'
 import { getScheduleStreams } from '../../public/schedules/util'
 import type { JJCampaign } from '../../../../do/types/JJAPIModel.ts'
-import { tiltifyMetadataView, userDisplayView, } from '../../../db/schema/views-schema.ts'
+import {
+  tiltifyMetadataView,
+  userDisplayView,
+} from '../../../db/schema/views-schema.ts'
 import { DateTime, IANAZone } from 'luxon'
 import { getStreamColors } from '../../../../functions/jjDatesToColors.ts'
 
@@ -123,7 +131,7 @@ const charities = os.charitiesContract.handler(async ({ input, context }) => {
           : raisedGBP
     const raisedFormatted = formatter.format(convertedRaised)
     return {
-      id: (cause.id),
+      id: cause.id,
       name: String(cause.name ?? ''),
       logoUrl: cause.logo || undefined,
       websiteUrl: cause.url || undefined,
@@ -147,17 +155,17 @@ const causeById = os.causeByIdContract.handler(async ({ input, context }) => {
   const causes = await stub.getCausesTV()
   if (!causes?.length) return null
 
-  const id = (input.causeId)
+  const id = input.causeId
   if (id === '') return null
 
-  const cause = causes.find((c) => (c?.id) === id)
+  const cause = causes.find((c) => c?.id === id)
   console.log('cause', cause)
   if (!cause) return null
 
   const r = new Date().getUTCSeconds()
 
   return {
-    id:  (cause.id),
+    id: cause.id,
     name: String(cause.name ?? ''),
     logoUrl: cause.logo || undefined,
     websiteUrl: cause.url || undefined,
@@ -262,14 +270,10 @@ const teamFundraisers = os.teamFundraisersContract.handler(
     // Get Tiltify accounts for these users
     const tiltifyAccounts = await db
       .select({
-        slug: tiltifyMetadataView.slug
+        slug: tiltifyMetadataView.slug,
       })
       .from(tiltifyMetadataView)
-      .where(
-        and(
-          inArray(tiltifyMetadataView.userId, userIds),
-        ),
-      )
+      .where(and(inArray(tiltifyMetadataView.userId, userIds)))
       .all()
 
     if (tiltifyAccounts.length === 0) {
@@ -294,7 +298,7 @@ const teamFundraisers = os.teamFundraisersContract.handler(
 
     const filtered = list.filter((c) => {
       const uslug = String(c?.user?.slug ?? '').toLowerCase()
-      return  (uslug && slugSet.has(uslug))
+      return uslug && slugSet.has(uslug)
     })
 
     const mapped = filtered.map((c) =>
@@ -359,7 +363,7 @@ const causeFundraisers = os.causeFundraisersContract.handler(
     const mapped = list.map((c) =>
       campaignMapper(c, currency, avgConversionRate, eurRate),
     )
-    console.log('causeFundraisers','mapped', mapped)
+    console.log('causeFundraisers', 'mapped', mapped)
 
     switch (orderBy) {
       case 'top':
@@ -635,6 +639,29 @@ const scheduleByTeamId = os.scheduleByTeamIdContract.handler(
   },
 )
 
+const campaignGoalSlug = os.campaignGoalContract.handler(
+  async ({ context, input }) => {
+    const currency = input.currency
+    const DO = context.env.JingleJamData
+    const stub = DO.get(DO.idFromName('JJ_API_CACHE'))
+    const campaign = await stub.getCampaignByUserSlug(input.tiltifySlug)
+    const previousGoalGBP = await stub.getPreviousGoalByUserSlug(
+      input.tiltifySlug,
+    )
+    if (!campaign) {
+      return { previousGoal:0, raised:0, goal:0 }
+    }
+    const usd = await stub.getDollarConversionRate()
+    const eur = await stub.getGbpToEurRate()
+    const mult = currency === 'USD' ? usd : currency === 'EUR' ? eur : 1
+    const raised = campaign.raised * mult
+    const goal = campaign.goal * mult
+    const previousGoal = previousGoalGBP * mult
+
+    return { previousGoal, raised, goal }
+  },
+)
+
 export const privateOverlayRouter = {
   // Charity outputs
   charities,
@@ -646,4 +673,6 @@ export const privateOverlayRouter = {
   // Schedule output
   schedulePrimary,
   scheduleByTeamId,
+  // Campaigns
+  campaignGoalSlug,
 }

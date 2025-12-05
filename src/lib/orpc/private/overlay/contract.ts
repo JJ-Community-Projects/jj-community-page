@@ -187,6 +187,35 @@ const scheduleByTeamIdContract = oc
     }),
   )
 
+
+// ----------------------
+// Campaign by Tiltify user slug (private)
+// ----------------------
+
+// JJ API User schema (matches src/do/types/JJAPIModel.ts)
+export const JJApiUserSchema = z.object({
+  name: z.string(),
+  slug: z.string(),
+  avatar: z.string(),
+  url: z.string(),
+})
+
+// JJ API Campaign schema (matches src/do/types/JJAPIModel.ts JJCampaign)
+export const JJApiCampaignSchema = z.object({
+  raised: z.number(),
+  goal: z.number(),
+  previousGoal: z.number(),
+})
+
+export const OverlayCampaignByUserSlugInput = z.object({
+  tiltifySlug: z.string(),
+  currency: Currency.default('GBP'),
+})
+
+const campaignGoalContract = oc
+  .input(OverlayCampaignByUserSlugInput)
+  .output(JJApiCampaignSchema)
+
 export const contracts = {
   // Charity outputs
   charitiesContract,
@@ -198,4 +227,6 @@ export const contracts = {
   // Schedule output
   schedulePrimaryContract,
   scheduleByTeamIdContract,
+  // Campaigns
+  campaignGoalContract,
 }
