@@ -252,7 +252,7 @@ const extensionConfig = os.extensionConfigContract
       'twitch-extension:config',
       JSON.stringify(config),
       {
-        expirationTtl: 300,
+        expirationTtl: 120,
       },
     )
 
@@ -263,9 +263,9 @@ const userExtensionConfig = os.userExtensionConfigContract
   .use(rateLimit)
   .use(
     cacheMiddleware({
-      maxAge: 300,
-      sMaxAge: 300,
-      staleWhileRevalidate: 180,
+      maxAge: 60,
+      sMaxAge: 60,
+      staleWhileRevalidate: 120,
     }),
   )
   .use(dbMiddleware)
@@ -402,7 +402,7 @@ const userExtensionConfig = os.userExtensionConfigContract
       tabs,
     }
 
-    await storeUserExtensionConfig(context.env.KV, input.channelId, result, 300)
+    await storeUserExtensionConfig(context.env.KV, input.channelId, result, 180)
 
     return result
   })
@@ -626,9 +626,9 @@ const yogsSchedule = os.yogsScheduleContract
   .use(rateLimit)
   .use(
     cacheMiddleware({
-      maxAge: 300,
-      sMaxAge: 300,
-      staleWhileRevalidate: 180,
+      maxAge: 60,
+      sMaxAge: 60,
+      staleWhileRevalidate: 120,
     }),
   )
   .handler(async ({ context }) => {
@@ -852,7 +852,7 @@ const yogsSchedule = os.yogsScheduleContract
       days,
       streams: outStreams,
     }
-    await storeYogsSchedule(context.env.KV, result, 300)
+    await storeYogsSchedule(context.env.KV, result, 180)
     return result
   })
 
