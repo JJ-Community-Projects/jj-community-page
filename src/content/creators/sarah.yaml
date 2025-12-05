@@ -5,6 +5,9 @@ links:
 - name: Tiktok
   type: tiktok
   url: https://www.tiktok.com/@yogtok
+- name: Twitch
+  type: twitch
+  url: https://www.twitch.tv/sarahsera_
 name: Sarah
 type: staff
 profileImage:
