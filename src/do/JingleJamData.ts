@@ -124,13 +124,6 @@ export class JingleJamData extends DurableObject<Env> {
       },
     },
     {
-      name: 'buildDisplayData',
-      everyMs: 30 * 1000,
-      run: async () => {
-        await this.buildDisplayData()
-      },
-    },
-    {
       name: 'generateFullSchedule',
       everyMs: 60 * 60 * 1000,
       run: async () => {
@@ -142,6 +135,13 @@ export class JingleJamData extends DurableObject<Env> {
       everyMs: 2 * 60 * 60 * 1000,
       run: async () => {
         await this.updateTiltifyProfiles()
+      },
+    },
+    {
+      name: 'buildDisplayData',
+      everyMs: 30 * 1000,
+      run: async () => {
+        await this.buildDisplayData()
       },
     },
   ] as const
