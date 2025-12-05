@@ -950,7 +950,7 @@ export class JingleJamData extends DurableObject<Env> {
   public async ensureAlarm() {
     const existing = await this.storage.getAlarm()
     if (!existing) {
-      await this.scheduleNextAlarm(1000 * 60) // start in ~1min
+      await this.scheduleNextAlarm(1000 * 30) // start in ~1min
     }
   }
 
@@ -1674,7 +1674,7 @@ export class JingleJamData extends DurableObject<Env> {
     }
     const { nextDueAt } = await this.getDueInfo(now)
     // Clamp next alarm not earlier than now + 1s to avoid tight loops
-    const when = Math.max(nextDueAt, now + 1000)
+    const when = Math.max(nextDueAt, now + 500)
     await this.storage.setAlarm(when)
     console.log('DO-scheduler', 'scheduleNextAlarm', when)
   }
