@@ -1,0 +1,36 @@
+---
+import { BigCampaignGoalOverlay } from '../../components/features/overlay/jjRibbons/bigCampaignGoal/BigCampaignGoalOverlay.tsx'
+
+const userParam = Astro.url.searchParams.get('user')
+const themeParam = Astro.url.searchParams.get('theme')
+const currencyParam = Astro.url.searchParams.get('currency')
+const debugParam = Astro.url.searchParams.get('debug')
+const showChangeLabelParam = Astro.url.searchParams.get('showChangeLabel')
+const alignmentParam = Astro.url.searchParams.get('alignment')
+
+const user = userParam ?? undefined
+const theme = ((): 'red' | 'blue' | 'black' => {
+  const v = (themeParam ?? 'red').toLowerCase()
+  return v === 'blue' ? 'blue' : v === 'black' ? 'black' : 'red'
+})()
+const currency = (() => {
+  const v = (currencyParam ?? 'GBP').toUpperCase()
+  return v === 'USD' ? 'USD' : v === 'EUR' ? 'EUR' : 'GBP'
+})()
+const debug = debugParam === 'true' || debugParam === '1'
+const showChangeLabel = showChangeLabelParam === 'true' || showChangeLabelParam === '1'
+const alignment = alignmentParam === 'top' || alignmentParam === 'bottom' ? alignmentParam : 'bottom'
+---
+
+<div class="bg-transparent">
+  <BigCampaignGoalOverlay
+    client:only="solid-js"
+    user={user}
+    theme={theme}
+    currency={currency}
+    debug={debug}
+    showChangeLabel={showChangeLabel}
+    alignment={alignment}
+  />
+
+</div>
