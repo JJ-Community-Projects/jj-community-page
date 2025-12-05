@@ -80,7 +80,7 @@ export class JingleJamData extends DurableObject<Env> {
   private tasks = [
     {
       name: 'jjAPIRefresh',
-      everyMs: 60 * 1000,
+      everyMs: 30 * 1000,
       run: async () => {
         await this.refresh()
         await this.refreshAllCampaigns()
@@ -97,7 +97,7 @@ export class JingleJamData extends DurableObject<Env> {
     },
     {
       name: 'checkLiveStreams',
-      everyMs: 5 * 60 * 1000,
+      everyMs: 4 * 60 * 1000,
       run: async () => {
         await this.checkLiveStreams()
       },
@@ -111,21 +111,21 @@ export class JingleJamData extends DurableObject<Env> {
     },
     {
       name: 'loadAllTiltifySocials',
-      everyMs: 2 * 60 * 60 * 1000,
+      everyMs: 3 * 60 * 60 * 1000,
       run: async () => {
         await this.loadAllTiltifySocials()
       },
     },
     {
       name: 'buildAndStoreUserTags',
-      everyMs: 2 * 60 * 60 * 1000,
+      everyMs: 4 * 60 * 60 * 1000,
       run: async () => {
         await this.buildAndStoreUserTags()
       },
     },
     {
-      name: 'buildDisplayData', // previously */1 when NOT JJ season
-      everyMs: 60 * 1000,
+      name: 'buildDisplayData',
+      everyMs: 30 * 1000,
       run: async () => {
         await this.buildDisplayData()
       },
@@ -139,7 +139,7 @@ export class JingleJamData extends DurableObject<Env> {
     },
     {
       name: 'updateTiltifyProfiles',
-      everyMs: 60 * 60 * 1000,
+      everyMs: 2 * 60 * 60 * 1000,
       run: async () => {
         await this.updateTiltifyProfiles()
       },
