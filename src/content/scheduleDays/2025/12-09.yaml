@@ -1,6 +1,6 @@
 date: '2025-12-09'
 streams:
-  - creators: []
+  - creators: [pyrion, sips]
     duration_hours: 3
     end: '2025-12-09T14:00:00Z'
     start: '2025-12-09T11:00:00Z'
@@ -11,13 +11,10 @@ streams:
           - '#FA9900'
         orientation: TD
       tileSize: 3
-    subtitle: Title 1
-    title: Title 1
-    description: So Bold
-    markdownDescription: |
-      [So Bold](https://www.youtube.com/watch?v=aPj5FI1wygg)
+    subtitle: PYRION & SIPS
+    title: BIG SPACE BIG SHIPS BIG FUN
     vods: []
-  - creators: []
+  - creators: [lewis, simon]
     duration_hours: 3
     end: '2025-12-09T17:00:00Z'
     start: '2025-12-09T14:00:00Z'
@@ -28,12 +25,11 @@ streams:
           - '#FA9900'
         orientation: TD
       tileSize: 3
-    subtitle: Title 2
-    title: Title 2
+    title: SIMON'S FESTIVE PECULIAR PORTIONS
     vods: []
-  - creators: []
+  - creators: [briony, kirsty, zylus, breeh]
     duration_hours: 3
-    end: '2025-12-09T23:00:00Z'
+    end: '2025-12-09T20:00:00Z'
     start: '2025-12-09T17:00:00Z'
     style:
       background:
@@ -41,7 +37,21 @@ streams:
           - '#FA9900'
           - '#FA9900'
         orientation: TD
-      tileSize: 6
-    subtitle: Title 3
-    title: Title 3
+      tileSize: 3
+    subtitle: BRIONY, KIRSTY, ZYLUS & BREEH
+    title: MERRY PLATEUP!
+    vods: []
+  - creators: [shadowatnoon]
+    duration_hours: 3
+    end: '2025-12-09T23:00:00Z'
+    start: '2025-12-09T20:00:00Z'
+    style:
+      background:
+        colors:
+          - '#FA9900'
+          - '#FA9900'
+        orientation: TD
+      tileSize: 3
+    subtitle: SHADOW & FRIENDS
+    title: SHADOW'S SPECIAL STREAM
     vods: []

@@ -1,0 +1,13 @@
+links:
+  - name: Twitch
+    type: twitch
+    url: https://www.twitch.tv/digbytathamwarter
+  - name: Twitter
+    type: twitter
+    url: https://x.com/DigbyTW
+name: Digby
+link: https://www.twitch.tv/digbytathamwarter
+profileImage:
+  large: https://static-cdn.jtvnw.net/jtv_user_pictures/9a1a82ba-ec58-4e1a-ad23-7e5d8c954c89-profile_image-300x300.png
+  small: https://static-cdn.jtvnw.net/jtv_user_pictures/9a1a82ba-ec58-4e1a-ad23-7e5d8c954c89-profile_image-70x70.png
+twitchUser: digbytathamwarter

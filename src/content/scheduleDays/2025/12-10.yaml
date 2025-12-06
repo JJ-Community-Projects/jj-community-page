@@ -1,6 +1,6 @@
 date: '2025-12-10'
 streams:
-  - creators: []
+  - creators: [briony, kirsty]
     duration_hours: 3
     end: '2025-12-10T14:00:00Z'
     start: '2025-12-10T11:00:00Z'
@@ -11,12 +11,12 @@ streams:
           - '#7AA70E'
         orientation: TD
       tileSize: 3
-    subtitle: Title 1
-    title: Title 1
+    subtitle: KIRSTY & BRIONY
+    title: DOUBLE GAMES DOUBLE FUN!
     vods: []
   - creators: []
-    duration_hours: 3
-    end: '2025-12-10T22:00:00Z'
+    duration_hours: 6
+    end: '2025-12-10T20:00:00Z'
     start: '2025-12-10T14:00:00Z'
     style:
       background:
@@ -24,14 +24,17 @@ streams:
           - '#7AA70E'
           - '#7AA70E'
         orientation: TD
-      tileSize: 9
-    subtitle: Title 2
-    title: Title 2
+      tileSize: 6
+    subtitle: |
+      THE WORST SPEEDRUNS
+      THE BEST OF FRIENDS
+      LOADS OF YOGS
+    title: YOGSFAST SPEEDRUNS
     vods: []
-  - creators: []
+  - creators: [rtgame]
     duration_hours: 4
-    end: '2025-12-11T11:00:00Z'
-    start: '2025-12-10T22:00:00Z'
+    end: '2025-12-10T23:00:00Z'
+    start: '2025-12-10T20:00:00Z'
     style:
       background:
         colors:
@@ -39,6 +42,6 @@ streams:
           - '#7AA70E'
         orientation: TD
       tileSize: 3
-    subtitle: Title 3
-    title: Title 3
+    subtitle: RTGAME, NOGLA TERRORISER & MORE
+    title: IRISH LADS
     vods: []
