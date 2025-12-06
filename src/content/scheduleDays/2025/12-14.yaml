@@ -42,7 +42,7 @@ streams:
     subtitle: BRIONY & FRIENDS
     title: AN XMAS CAROL
     vods: []
-  - creators: [breeh]
+  - creators: [breeh,briony]
     duration_hours: 3
     end: '2025-12-15T00:00:00Z'
     start: '2025-12-14T20:00:00Z'

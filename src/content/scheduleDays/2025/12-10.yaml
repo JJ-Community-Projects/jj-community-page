@@ -14,7 +14,7 @@ streams:
     subtitle: KIRSTY & BRIONY
     title: DOUBLE GAMES DOUBLE FUN!
     vods: []
-  - creators: []
+  - creators: [briony]
     duration_hours: 6
     end: '2025-12-10T20:00:00Z'
     start: '2025-12-10T14:00:00Z'
@@ -25,6 +25,7 @@ streams:
           - '#7AA70E'
         orientation: TD
       tileSize: 6
+    description: Creator are added as soon as they are confirmed.
     subtitle: |
       THE WORST SPEEDRUNS
       THE BEST OF FRIENDS
