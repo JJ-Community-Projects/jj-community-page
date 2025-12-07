@@ -37,7 +37,8 @@ streams:
   - creators: [ tom,pyrion,hat_films,
                 bouphe,rtgame,boba,ravs,alex_the_rambler,
                 ben,lewis,duncan,joe,harry,
-                briony,pedguin,mousie,daf,kirsty,digby]
+                kirsty,pedguin,osie,mousie,mini-muka,lolipopgi,
+                briony,daf,digby]
     duration_hours: 6
     end: '2025-12-07T23:00:00Z'
     start: '2025-12-07T17:00:00Z'
@@ -54,7 +55,7 @@ streams:
       Creators are added as soon as they are confirmed.
       - Game 1: Bouphe, RTGame, Boba, Ravs, Alex, Alex the Rabmber
       - Game 2: Ben, Lewis, Duncan, Ross, Joe, Harry
-      - Game 3: TBA
+      - Game 3: Kirsty, Pedguin, Osie, Mousie, Mini-Muka, Lolipopgi
       - Game 4: TBA
       - Final: TBA
     markdownDescription: | 
@@ -62,9 +63,9 @@ streams:
 
       - Game 1: Bouphe, RTGame, Boba, Ravs, Alex, **Alex the Rabmber**
 
-      - Game 2: Ben, Lewis, Duncan, Ross, Joe, Harry
+      - Game 2: **Ben**, Lewis, Duncan, Ross, Joe, Harry
 
-      - Game 3: TBA
+      - Game 3: Kirsty, Pedguin, Osie, Mousie, Mini-Muka, Lolipopgi
 
       - Game 4: TBA
 
