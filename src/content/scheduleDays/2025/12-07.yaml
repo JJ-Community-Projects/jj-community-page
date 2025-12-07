@@ -34,7 +34,10 @@ streams:
       - type: youtube
         label: Youtube Live
         link: https://www.youtube.com/watch?v=_zK8O4H1RPc
-  - creators: [tom,pyrion,bouphe,rtgame,boba,ravs,hat_films,alex_the_rambler,briony,pedguin,mousie,lewis,daf]
+  - creators: [ tom,pyrion,hat_films,
+                bouphe,rtgame,boba,ravs,alex_the_rambler,
+                ben,lewis,duncan,joe,harry,
+                briony,pedguin,mousie,daf,kirsty,digby]
     duration_hours: 6
     end: '2025-12-07T23:00:00Z'
     start: '2025-12-07T17:00:00Z'
@@ -50,16 +53,16 @@ streams:
     description: | 
       Creators are added as soon as they are confirmed.
       - Game 1: Bouphe, RTGame, Boba, Ravs, Alex, Alex the Rabmber
-      - Game 2: TBA
+      - Game 2: Ben, Lewis, Duncan, Ross, Joe, Harry
       - Game 3: TBA
       - Game 4: TBA
       - Final: TBA
     markdownDescription: | 
       Creators are added as soon as they are confirmed.
 
-      - Game 1: Bouphe, RTGame, Boba, Ravs, Alex, Alex the Rabmber
+      - Game 1: Bouphe, RTGame, Boba, Ravs, Alex, **Alex the Rabmber**
 
-      - Game 2: TBA
+      - Game 2: Ben, Lewis, Duncan, Ross, Joe, Harry
 
       - Game 3: TBA
 
