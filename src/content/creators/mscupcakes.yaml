@@ -1,0 +1,14 @@
+links:
+  - name: Twitch
+    type: twitch
+    url: https://www.twitch.tv/mscupcakes
+link: https://www.twitch.tv/mscupcakes
+name: mscupcakes
+type: friend
+profileImage:
+  large: https://static-cdn.jtvnw.net/jtv_user_pictures/092c7d00-f25a-473e-b3ce-8d2bdd867a72-profile_image-300x300.png
+  small: https://static-cdn.jtvnw.net/jtv_user_pictures/092c7d00-f25a-473e-b3ce-8d2bdd867a72-profile_image-70x70.png
+style:
+  primaryColor: '#d77ba5'
+  secondaryColor: '#8ed1c3'
+twitchUser: mscupcakes
