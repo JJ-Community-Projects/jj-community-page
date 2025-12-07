@@ -13,7 +13,10 @@ streams:
       tileSize: 3
     subtitle: FIONN & MOUSIE
     title: A ROYAL APPOINTMENT
-    vods: []
+    vods:
+      - type: youtube
+        label: Youtube Live
+        link: https://www.youtube.com/watch?v=gDcZrs3-ha0
   - creators: [ravs, sarah, osie, gee]
     duration_hours: 3
     end: '2025-12-07T17:00:00Z'
@@ -27,8 +30,11 @@ streams:
       tileSize: 3
     subtitle: RAVS, SARAH OSIE & GEESTAR
     title: PRE-POKER PARTY
-    vods: []
-  - creators: [tom,pyrion,briony,boba,pedguin,ravs,mousie]
+    vods:
+      - type: youtube
+        label: Youtube Live
+        link: https://www.youtube.com/watch?v=_zK8O4H1RPc
+  - creators: [tom,pyrion,bouphe,rtgame,boba,ravs,hat_films,alex_the_rambler,briony,pedguin,mousie,lewis,daf]
     duration_hours: 6
     end: '2025-12-07T23:00:00Z'
     start: '2025-12-07T17:00:00Z'
@@ -41,5 +47,24 @@ streams:
       tileSize: 6
     subtitle: HOSTED BY PYRION & TOM
     title: POKER REVAMPED
-    description: Creators are added as soon as they are confirmed.
+    description: | 
+      Creators are added as soon as they are confirmed.
+      - Game 1: Bouphe, RTGame, Boba, Ravs, Alex, Alex the Rabmber
+      - Game 2: TBA
+      - Game 3: TBA
+      - Game 4: TBA
+      - Final: TBA
+    markdownDescription: | 
+      Creators are added as soon as they are confirmed.
+
+      - Game 1: Bouphe, RTGame, Boba, Ravs, Alex, Alex the Rabmber
+
+      - Game 2: TBA
+
+      - Game 3: TBA
+
+      - Game 4: TBA
+
+      - Final: TBA
+
     vods: []

@@ -13,7 +13,13 @@ streams:
       tileSize: 3
     subtitle: BOUPHE & GEE
     title: SATURDAY SCARIES
-    vods: []
+    vods:
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2636775593?t=0h9m20s
+      - type: youtube
+        label: Youtube Live
+        link: https://www.youtube.com/watch?v=ib2_LNA5UG0
   - creators: [briony, kirsty, rythian]
     duration_hours: 3
     end: '2025-12-06T17:00:00Z'
@@ -26,7 +32,13 @@ streams:
         orientation: TD
       tileSize: 3
     title: COLOURING WITH KIRBY CREW
-    vods: []
+    vods:
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2636775593?t=3h15m36s
+      - type: youtube
+        label: Youtube Live
+        link: https://www.youtube.com/watch?v=H-s1C_MyqNc
   - creators: [boba,harry,duncan,osie,lydia,briony,bouphe,markhulmes,martyn,ben,tom,lewis,ravs,alex_the_rambler,mousie,kirsty,lolipopgi]
     duration_hours: 4.5
     end: '2025-12-06T20:30:00Z'
@@ -41,7 +53,13 @@ streams:
     subtitle: ANNUAL QUIZ SHOW
     title: DR SIMON CLARK'S COUNTJAM!
     description: Creators are added as soon as they are confirmed. Simon is sick and wont be able to host (see is post on bluesky). The show will be hosted by Boba and Harry.
-    vods: []
+    vods:
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2636775593?t=6h26m7s
+      - type: youtube
+        label: Youtube Live
+        link: https://www.youtube.com/watch?v=1RDgBnW054c
   - creators: [nilesy, breeh, zylus, kirsty, rythian, hybridpanda]
     duration_hours: 3
     end: '2025-12-07T00:00:00Z'
@@ -55,4 +73,10 @@ streams:
       tileSize: 2
     subtitle: TIL LATE!
     title: THE PROTESSIONAL STREM
-    vods: []
+    vods:
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2636775593?t=9h41m38s
+      - type: youtube
+        label: Youtube Live
+        link: https://www.youtube.com/watch?v=gy1jgBFFRPw&pp=0gcJCSMKAYcqIYzv

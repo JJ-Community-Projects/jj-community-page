@@ -17,6 +17,9 @@ streams:
       - type: youtube
         label: Youtube Live
         link: https://www.youtube.com/watch?v=apY8QdqLNI8
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2635887874?t=0h2m53s
   - creators: [simon, harry, tom, sarah, lydia]
     duration_hours: 3
     end: '2025-12-05T17:00:00Z'
@@ -35,6 +38,9 @@ streams:
       - type: youtube
         label: Youtube Live
         link: https://www.youtube.com/watch?v=gx-x7qov0ck
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2635887874?t=3h2m53s
   - creators: [lewis, duncan, spiff, kirsty, rythian, alex_the_rambler, daltos]
     duration_hours: 9
     end: '2025-12-05T23:26:00Z'
@@ -48,4 +54,10 @@ streams:
       tileSize: 6
     subtitle: LEWIS, DUNCAN, SPIFF, KIRSTY, RYTHIAN, RAMBLER, DALTOS
     title: CIV 5 ON THE 5TH
-    vods: []
+    vods:
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2635887874?t=6h0m39s
+      - type: youtube
+        label: Youtube Live
+        link: https://www.youtube.com/watch?v=VIUScQ3Yjbs
