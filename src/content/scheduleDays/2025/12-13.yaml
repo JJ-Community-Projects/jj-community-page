@@ -14,7 +14,7 @@ streams:
     subtitle: PYRION & RYTHIAN
     title: GETTING PLATFORMED
     vods: []
-  - creators: []
+  - creators: [ravs]
     duration_hours: 3
     end: '2025-12-13T17:00:00Z'
     start: '2025-12-13T14:00:00Z'
