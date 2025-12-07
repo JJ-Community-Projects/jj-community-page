@@ -38,7 +38,8 @@ streams:
                 bouphe,rtgame,boba,ravs,alex_the_rambler,
                 ben,lewis,duncan,joe,harry,
                 kirsty,pedguin,osie,mousie,mini-muka,lolipopgi,
-                briony,daf,digby]
+                lydia,mscupcakes,sarah,daf,briony,digby
+  ]
     duration_hours: 6
     end: '2025-12-07T23:00:00Z'
     start: '2025-12-07T17:00:00Z'
@@ -52,22 +53,20 @@ streams:
     subtitle: HOSTED BY PYRION & TOM
     title: POKER REVAMPED
     description: | 
-      Creators are added as soon as they are confirmed.
       - Game 1: Bouphe, RTGame, Boba, Ravs, Alex, Alex the Rabmber
       - Game 2: Ben, Lewis, Duncan, Ross, Joe, Harry
       - Game 3: Kirsty, Pedguin, Osie, Mousie, Mini-Muka, Lolipopgi
-      - Game 4: TBA
+      - Game 4: Lydia, MSCupcakes, Sarah, Daf, Briony, Digby
       - Final: TBA
     markdownDescription: | 
-      Creators are added as soon as they are confirmed.
 
       - Game 1: Bouphe, RTGame, Boba, Ravs, Alex, **Alex the Rabmber**
 
       - Game 2: **Ben**, Lewis, Duncan, Ross, Joe, Harry
 
-      - Game 3: Kirsty, Pedguin, Osie, Mousie, Mini-Muka, Lolipopgi
+      - Game 3: Kirsty, Pedguin, Osie, Mousie, **Mini-Muka**, Lolipopgi
 
-      - Game 4: TBA
+      - Game 4: Lydia, MSCupcakes, Sarah, Daf, Briony, Digby
 
       - Final: TBA
 
