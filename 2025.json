@@ -1,0 +1,682 @@
+{
+  "title": "Yogscast Jingle Jam 2025",
+  "days": [
+    {
+      "date": "2025-12-01",
+      "streams": [
+        {
+          "title": "Decorating the Tree",
+          "start": "2025-12-01T11:00:00Z",
+          "end": "2025-12-01T14:00:00Z",
+          "color": "#3485C0",
+          "creators": [
+            "boba",
+            "martyn",
+            "daf",
+            "nina",
+            "jack",
+            "joe",
+            "pedguin",
+            "sarah",
+            "harry"
+          ]
+        },
+        {
+          "title": "Tom & Ben",
+          "start": "2025-12-01T14:00:00Z",
+          "end": "2025-12-01T17:00:00Z",
+          "color": "#3485C0",
+          "creators": [
+            "tom",
+            "ben"
+          ]
+        },
+        {
+          "title": "Jingle Cats",
+          "start": "2025-12-01T17:00:00Z",
+          "end": "2025-12-01T20:00:00Z",
+          "color": "#3485C0",
+          "creators": [
+            "lewis",
+            "simon"
+          ]
+        },
+        {
+          "title": "TRAINS AND GIN",
+          "start": "2025-12-01T20:00:00Z",
+          "end": "2025-12-01T23:00:00Z",
+          "color": "#3485C0",
+          "creators": [
+            "lewis",
+            "duncan",
+            "spiff",
+            "pedguin",
+            "lolipopgi",
+            "rythian",
+            "alex_the_rambler"
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2025-12-02",
+      "streams": [
+        {
+          "title": "WIZARD WARRIORS",
+          "start": "2025-12-02T11:00:00Z",
+          "end": "2025-12-02T14:00:00Z",
+          "color": "#FA9900",
+          "creators": [
+            "briony",
+            "kirsty"
+          ]
+        },
+        {
+          "title": "Tabs",
+          "start": "2025-12-02T14:00:00Z",
+          "end": "2025-12-02T17:00:00Z",
+          "color": "#FA9900",
+          "creators": [
+            "tom",
+            "boba",
+            "ben",
+            "daf",
+            "lewis"
+          ]
+        },
+        {
+          "title": "HEART SCRAMBLE",
+          "start": "2025-12-02T17:00:00Z",
+          "end": "2025-12-02T20:00:00Z",
+          "color": "#FA9900",
+          "creators": [
+            "martyn"
+          ]
+        },
+        {
+          "title": "YE OLDE FEEDE A COWE FOR XMAS",
+          "start": "2025-12-02T20:00:00Z",
+          "end": "2025-12-02T23:00:00Z",
+          "color": "#FA9900",
+          "creators": [
+            "duncan",
+            "pedguin",
+            "osie",
+            "ravs"
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2025-12-03",
+      "streams": [
+        {
+          "title": "CHILL ADVENTURES",
+          "start": "2025-12-03T11:00:00Z",
+          "end": "2025-12-03T14:00:00Z",
+          "color": "#7AA70E",
+          "creators": [
+            "lydia",
+            "gee"
+          ]
+        },
+        {
+          "title": "FESTIVUS MAXIMUS",
+          "start": "2025-12-03T14:00:00Z",
+          "end": "2025-12-03T17:00:00Z",
+          "color": "#7AA70E",
+          "creators": [
+            "ben",
+            "lewis",
+            "lydia",
+            "breeh",
+            "duncan",
+            "martyn",
+            "mini-muka",
+            "tom",
+            "markhulmes",
+            "ravs",
+            "osie",
+            "gee",
+            "boba",
+            "hat_films",
+            "briony"
+          ]
+        },
+        {
+          "title": "Core Keeper Relay Start!",
+          "start": "2025-12-03T17:00:00Z",
+          "end": "2025-12-03T18:00:00Z",
+          "color": "#7AA70E",
+          "creators": [
+            "pedguin",
+            "ravs"
+          ]
+        },
+        {
+          "title": "HAT FILMS MUSIC STREAM",
+          "start": "2025-12-03T18:00:00Z",
+          "end": "2025-12-04T00:00:00Z",
+          "color": "#7AA70E",
+          "creators": [
+            "hat_films"
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2025-12-04",
+      "streams": [
+        {
+          "title": "DOING A WARHAMMER",
+          "start": "2025-12-04T11:00:00Z",
+          "end": "2025-12-04T14:00:00Z",
+          "color": "#DD5502",
+          "creators": [
+            "tom",
+            "ben"
+          ]
+        },
+        {
+          "title": "SWEATY SHOOTERS",
+          "start": "2025-12-04T14:00:00Z",
+          "end": "2025-12-04T16:00:00Z",
+          "color": "#DD5502",
+          "creators": [
+            "sips",
+            "ravs",
+            "gee",
+            "rythian",
+            "markhulmes"
+          ]
+        },
+        {
+          "title": "Core Keeper Relay Finish!",
+          "start": "2025-12-04T16:00:00Z",
+          "end": "2025-12-04T17:00:00Z",
+          "color": "#DD5502",
+          "creators": [
+            "pedguin",
+            "ravs"
+          ]
+        },
+        {
+          "title": "BLOOD ON THE CLOCKTOWER LIVE IN MINECRAFT",
+          "start": "2025-12-04T17:00:00Z",
+          "end": "2025-12-04T23:00:00Z",
+          "color": "#DD5502",
+          "creators": [
+            "lewis",
+            "zylus",
+            "daltos",
+            "duncan",
+            "gee",
+            "kirsty",
+            "martyn",
+            "nilesy",
+            "osie",
+            "zoey",
+            "ben",
+            "boba",
+            "breeh",
+            "briony",
+            "markhulmes",
+            "pedguin",
+            "ravs",
+            "rythian"
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2025-12-05",
+      "streams": [
+        {
+          "title": "SPELUNK AND SIM",
+          "start": "2025-12-05T11:00:00Z",
+          "end": "2025-12-05T14:00:00Z",
+          "color": "#05B8AA",
+          "creators": [
+            "martyn",
+            "boba"
+          ]
+        },
+        {
+          "title": "IMPORTANT VIDEOS",
+          "start": "2025-12-05T14:00:00Z",
+          "end": "2025-12-05T17:00:00Z",
+          "color": "#05B8AA",
+          "creators": [
+            "simon",
+            "harry",
+            "tom",
+            "sarah",
+            "lydia"
+          ]
+        },
+        {
+          "title": "CIV 5 ON THE 5TH",
+          "start": "2025-12-05T17:00:00Z",
+          "end": "2025-12-05T23:26:00Z",
+          "color": "#05B8AA",
+          "creators": [
+            "lewis",
+            "duncan",
+            "spiff",
+            "kirsty",
+            "rythian",
+            "alex_the_rambler",
+            "daltos"
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2025-12-06",
+      "streams": [
+        {
+          "title": "SATURDAY SCARIES",
+          "start": "2025-12-06T11:00:00Z",
+          "end": "2025-12-06T14:00:00Z",
+          "color": "#D23D99",
+          "creators": [
+            "bouphe",
+            "gee"
+          ]
+        },
+        {
+          "title": "COLOURING WITH KIRBY CREW",
+          "start": "2025-12-06T14:00:00Z",
+          "end": "2025-12-06T17:00:00Z",
+          "color": "#D23D99",
+          "creators": [
+            "briony",
+            "kirsty",
+            "rythian"
+          ]
+        },
+        {
+          "title": "DR SIMON CLARK'S COUNTJAM!",
+          "start": "2025-12-06T17:00:00Z",
+          "end": "2025-12-06T20:30:00Z",
+          "color": "#D23D99",
+          "creators": [
+            "boba",
+            "harry",
+            "duncan",
+            "osie",
+            "lydia",
+            "briony",
+            "bouphe",
+            "markhulmes",
+            "martyn",
+            "ben",
+            "tom",
+            "lewis",
+            "ravs",
+            "alex_the_rambler",
+            "mousie",
+            "kirsty",
+            "lolipopgi"
+          ]
+        },
+        {
+          "title": "THE PROTESSIONAL STREM",
+          "start": "2025-12-06T20:30:00Z",
+          "end": "2025-12-07T00:00:00Z",
+          "color": "#D23D99",
+          "creators": [
+            "nilesy",
+            "breeh",
+            "zylus",
+            "kirsty",
+            "rythian",
+            "hybridpanda"
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2025-12-07",
+      "streams": [
+        {
+          "title": "A ROYAL APPOINTMENT",
+          "start": "2025-12-07T11:00:00Z",
+          "end": "2025-12-07T14:00:00Z",
+          "color": "#F07700",
+          "creators": [
+            "fionn",
+            "mousie"
+          ]
+        },
+        {
+          "title": "PRE-POKER PARTY",
+          "start": "2025-12-07T14:00:00Z",
+          "end": "2025-12-07T17:00:00Z",
+          "color": "#F07700",
+          "creators": [
+            "ravs",
+            "sarah",
+            "osie",
+            "gee"
+          ]
+        },
+        {
+          "title": "POKER REVAMPED",
+          "start": "2025-12-07T17:00:00Z",
+          "end": "2025-12-07T23:00:00Z",
+          "color": "#F07700",
+          "creators": [
+            "tom",
+            "pyrion",
+            "briony",
+            "boba",
+            "pedguin",
+            "ravs",
+            "mousie"
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2025-12-08",
+      "streams": [
+        {
+          "title": "OLD WORLD, NEW TRICKS",
+          "start": "2025-12-08T11:00:00Z",
+          "end": "2025-12-08T14:00:00Z",
+          "color": "#3485C0",
+          "creators": [
+            "duncan",
+            "kirsty",
+            "spiff"
+          ]
+        },
+        {
+          "title": "WII SHIT",
+          "start": "2025-12-08T14:00:00Z",
+          "end": "2025-12-08T17:00:00Z",
+          "color": "#3485C0",
+          "creators": [
+            "rtgame"
+          ]
+        },
+        {
+          "title": "SHANTY'OKE",
+          "start": "2025-12-08T17:00:00Z",
+          "end": "2025-12-09T20:00:00Z",
+          "color": "#3485C0",
+          "creators": [
+            "longest_johns",
+            "briony"
+          ]
+        },
+        {
+          "title": "MARIO KART WORLD LOBBY",
+          "start": "2025-12-08T20:00:00Z",
+          "end": "2025-12-09T23:00:00Z",
+          "color": "#3485C0",
+          "creators": []
+        }
+      ]
+    },
+    {
+      "date": "2025-12-09",
+      "streams": [
+        {
+          "title": "BIG SPACE BIG SHIPS BIG FUN",
+          "start": "2025-12-09T11:00:00Z",
+          "end": "2025-12-09T14:00:00Z",
+          "color": "#FA9900",
+          "creators": [
+            "pyrion",
+            "sips"
+          ]
+        },
+        {
+          "title": "SIMON'S FESTIVE PECULIAR PORTIONS",
+          "start": "2025-12-09T14:00:00Z",
+          "end": "2025-12-09T17:00:00Z",
+          "color": "#FA9900",
+          "creators": [
+            "lewis",
+            "simon"
+          ]
+        },
+        {
+          "title": "MERRY PLATEUP!",
+          "start": "2025-12-09T17:00:00Z",
+          "end": "2025-12-09T20:00:00Z",
+          "color": "#FA9900",
+          "creators": [
+            "briony",
+            "kirsty",
+            "zylus",
+            "breeh"
+          ]
+        },
+        {
+          "title": "SHADOW'S SPECIAL STREAM",
+          "start": "2025-12-09T20:00:00Z",
+          "end": "2025-12-09T23:00:00Z",
+          "color": "#FA9900",
+          "creators": [
+            "shadowatnoon"
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2025-12-10",
+      "streams": [
+        {
+          "title": "DOUBLE GAMES DOUBLE FUN!",
+          "start": "2025-12-10T11:00:00Z",
+          "end": "2025-12-10T14:00:00Z",
+          "color": "#7AA70E",
+          "creators": [
+            "briony",
+            "kirsty"
+          ]
+        },
+        {
+          "title": "YOGSFAST SPEEDRUNS",
+          "start": "2025-12-10T14:00:00Z",
+          "end": "2025-12-10T20:00:00Z",
+          "color": "#7AA70E",
+          "creators": [
+            "briony"
+          ]
+        },
+        {
+          "title": "IRISH LADS",
+          "start": "2025-12-10T20:00:00Z",
+          "end": "2025-12-10T23:00:00Z",
+          "color": "#7AA70E",
+          "creators": [
+            "rtgame"
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2025-12-11",
+      "streams": [
+        {
+          "title": "THESE GATES DON'T KEEP THEMSELVES!",
+          "start": "2025-12-11T11:00:00Z",
+          "end": "2025-12-11T14:00:00Z",
+          "color": "#DD5502",
+          "creators": [
+            "pyrion",
+            "boba",
+            "bekkiboom",
+            "lolipopgi"
+          ]
+        },
+        {
+          "title": "HAT FILMS GAME SHOW",
+          "start": "2025-12-11T14:00:00Z",
+          "end": "2025-12-11T17:00:00Z",
+          "color": "#DD5502",
+          "creators": [
+            "hat_films"
+          ]
+        },
+        {
+          "title": "MINECRAFT NATIVITY",
+          "start": "2025-12-11T17:00:00Z",
+          "end": "2025-12-11T20:00:00Z",
+          "color": "#DD5502",
+          "creators": [
+            "simon",
+            "tom",
+            "harry"
+          ]
+        },
+        {
+          "title": "MASSIVE MULTIPLAYER MADNESS",
+          "start": "2025-12-11T20:00:00Z",
+          "end": "2025-12-11T23:00:00Z",
+          "color": "#DD5502",
+          "creators": [
+            "pedguin"
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2025-12-12",
+      "streams": [
+        {
+          "title": "MAD STRATS",
+          "start": "2025-12-12T11:00:00Z",
+          "end": "2025-12-12T14:00:00Z",
+          "color": "#05B8AA",
+          "creators": [
+            "ben",
+            "lydia"
+          ]
+        },
+        {
+          "title": "JAFFA QUEST",
+          "start": "2025-12-12T14:00:00Z",
+          "end": "2025-12-12T17:00:00Z",
+          "color": "#05B8AA",
+          "creators": [
+            "duncan",
+            "lewis",
+            "simon",
+            "harry"
+          ]
+        },
+        {
+          "title": "MYSTERY QUEST",
+          "start": "2025-12-12T17:00:00Z",
+          "end": "2025-12-12T20:00:00Z",
+          "color": "#05B8AA",
+          "creators": [
+            "tom"
+          ]
+        },
+        {
+          "title": "TOWER UNITE",
+          "start": "2025-12-12T20:00:00Z",
+          "end": "2025-12-12T23:00:00Z",
+          "color": "#05B8AA",
+          "creators": []
+        }
+      ]
+    },
+    {
+      "date": "2025-12-13",
+      "streams": [
+        {
+          "title": "GETTING PLATFORMED",
+          "start": "2025-12-13T11:00:00Z",
+          "end": "2025-12-13T14:00:00Z",
+          "color": "#D23D99",
+          "creators": [
+            "pyrion",
+            "rythian"
+          ]
+        },
+        {
+          "title": "A VERY SUCCESSFUL FOR THE KING 2 PLAYTHROUGH",
+          "start": "2025-12-13T14:00:00Z",
+          "end": "2025-12-13T17:00:00Z",
+          "color": "#D23D99",
+          "creators": []
+        },
+        {
+          "title": "MINECRAFT 4 PLAYERS VS 1 NERD",
+          "start": "2025-12-13T17:00:00Z",
+          "end": "2025-12-13T20:00:00Z",
+          "color": "#D23D99",
+          "creators": [
+            "harry",
+            "briony"
+          ]
+        },
+        {
+          "title": "TRUST IN RUST",
+          "start": "2025-12-13T20:00:00Z",
+          "end": "2025-12-13T23:00:00Z",
+          "color": "#D23D99",
+          "creators": [
+            "harry",
+            "pyrion",
+            "spiff",
+            "digby",
+            "ravs"
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2025-12-14",
+      "streams": [
+        {
+          "title": "JINGLE JAM GAME JAM",
+          "start": "2025-12-14T11:00:00Z",
+          "end": "2025-12-14T14:00:00Z",
+          "color": "#F07700",
+          "creators": [
+            "briony",
+            "bekkiboom"
+          ]
+        },
+        {
+          "title": "FIGHTING FANTASY",
+          "start": "2025-12-14T14:00:00Z",
+          "end": "2025-12-14T17:00:00Z",
+          "color": "#F07700",
+          "creators": [
+            "lewis",
+            "simon",
+            "nina"
+          ]
+        },
+        {
+          "title": "AN XMAS CAROL",
+          "start": "2025-12-14T17:00:00Z",
+          "end": "2025-12-14T20:00:00Z",
+          "color": "#F07700",
+          "creators": [
+            "briony"
+          ]
+        },
+        {
+          "title": "THE LATE LATE CREW",
+          "start": "2025-12-14T20:00:00Z",
+          "end": "2025-12-15T00:00:00Z",
+          "color": "#F07700",
+          "creators": [
+            "breeh",
+            "briony"
+          ]
+        }
+      ]
+    }
+  ]
+}
