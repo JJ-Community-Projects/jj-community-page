@@ -689,7 +689,6 @@ const yogsSchedule = os.yogsScheduleContract
 
     const hardcodedStreams = hardcodedSchedule.streams
       .filter(s => s.start > now)
-      .filter(s => s.owner === undefined || s.owner?.type !== 'yogs')
       .toSorted((a, b) => a.start.getTime() - b.start.getTime())
 
     // Group hardcoded streams by ISO date (YYYY-MM-DD) of their start time for quick lookup
