@@ -30,7 +30,7 @@ streams:
     vods: []
   - creators: [longest_johns,briony]
     duration_hours: 3
-    end: '2025-12-09T20:00:00Z'
+    end: '2025-12-08T20:00:00Z'
     start: '2025-12-08T17:00:00Z'
     style:
       background:
@@ -43,9 +43,9 @@ streams:
     subtitle: HOSTED BY THE LONGEST JOHNS
     title: SHANTY'OKE
     vods: []
-  - creators: [ravs,lydia,zoey,harry,shadowatnoon]
+  - creators: [ravs,lydia,zoey,harry,shadowatnoon,tom,duncan,rtgame,zylus,pedguin]
     duration_hours: 3
-    end: '2025-12-09T23:00:00Z'
+    end: '2025-12-08T23:00:00Z'
     start: '2025-12-08T20:00:00Z'
     style:
       background:
