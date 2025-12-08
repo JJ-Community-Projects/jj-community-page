@@ -75,6 +75,7 @@ export class JingleJamData extends DurableObject<Env> {
     ['highrollersdnd', 'highrollersdnd'],
     ['jackmanifoldtv', 'jackmanifoldtv'],
     ['mudkipninja', 'mudkipninja'],
+    ['fionn', 'fionn'],
   ])
   // Task definition
   private tasks = [
@@ -204,7 +205,6 @@ export class JingleJamData extends DurableObject<Env> {
 
       const goal = c.goal
       const raised = c.raised
-
     }
     await this.storage.put(entries)
   }
@@ -959,12 +959,16 @@ export class JingleJamData extends DurableObject<Env> {
   }
 
   public async getGoalByUserSlug(slug: string): Promise<number> {
-    const value = await this.storage.get<number>(this.campaignGoalKeyUserSlug(slug))
+    const value = await this.storage.get<number>(
+      this.campaignGoalKeyUserSlug(slug),
+    )
     return value ?? 0
   }
 
   public async getPreviousGoalByUserSlug(slug: string): Promise<number> {
-    const value = await this.storage.get<number>(this.campaignPreviousGoalKeyUserSlug(slug))
+    const value = await this.storage.get<number>(
+      this.campaignPreviousGoalKeyUserSlug(slug),
+    )
     return value ?? 0
   }
 
