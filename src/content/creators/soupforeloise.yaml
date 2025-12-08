@@ -1,0 +1,11 @@
+links:
+  - name: Twitch
+    type: twitch
+    url: https://www.twitch.tv/soupforeloise
+link: https://www.twitch.tv/soupforeloise
+name: soupforeloise
+type: friend
+profileImage:
+  large: https://static-cdn.jtvnw.net/jtv_user_pictures/3f65be3b-3335-4bd6-8974-7428070852ea-profile_image-300x300.png
+  small: https://static-cdn.jtvnw.net/jtv_user_pictures/3f65be3b-3335-4bd6-8974-7428070852ea-profile_image-70x70.png
+twitchUser: soupforeloise

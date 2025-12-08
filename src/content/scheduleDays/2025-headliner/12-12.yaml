@@ -1,0 +1,41 @@
+date: '2025-12-12'
+streams:
+  - creators: [cakejumper]
+    duration_hours: 3
+    start: '2025-12-12T13:00:00Z'
+    end: '2025-12-12T17:00:00Z'
+    style:
+      background:
+        colors: ['#05B8AA', '#05B8AA']
+        orientation: TD
+      tileSize: 3
+    title: "Gingerbread Baking "
+    description: "Some gingerbread structure will be made...it's up to how much you donate if it'll be jumped over!"
+    vods: []
+    owner: cakejumper
+  - creators: [averageharry_]
+    duration_hours: 3
+    start: '2025-12-12T17:00:00Z'
+    end: '2025-12-12T20:00:00Z'
+    style:
+      background:
+        colors: ['#05B8AA', '#05B8AA']
+        orientation: TD
+      tileSize: 3
+    title: "24 hours Stream"
+    description: "Tune in for a full 24 hours of non-stop chaos! Expect the unexpected... plus special guests."
+    vods: []
+    owner: averageharry_
+  - creators: [arthurtv]
+    duration_hours: 3
+    start: '2025-12-12T20:00:00Z'
+    end: '2025-12-12T23:00:00Z'
+    style:
+      background:
+        colors: ['#05B8AA', '#05B8AA']
+        orientation: TD
+      tileSize: 3
+    title: "Planet Zoo & Quizzes"
+    description: "Join Arthur for a evening of wildlife fun including Planet Zoo and maybe even some special guests!"
+    vods: []
+    owner: arthurtv

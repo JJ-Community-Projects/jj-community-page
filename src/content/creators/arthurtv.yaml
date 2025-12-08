@@ -1,0 +1,11 @@
+links:
+  - name: Twitch
+    type: twitch
+    url: https://www.twitch.tv/arthurtv
+link: https://www.twitch.tv/arthurtv
+name: arthurtv
+type: friend
+profileImage:
+  large: https://static-cdn.jtvnw.net/jtv_user_pictures/dc49b1e8-16f3-400c-b57c-bd5546e5f79e-profile_image-300x300.png
+  small: https://static-cdn.jtvnw.net/jtv_user_pictures/dc49b1e8-16f3-400c-b57c-bd5546e5f79e-profile_image-70x70.png
+twitchUser: arthurtv

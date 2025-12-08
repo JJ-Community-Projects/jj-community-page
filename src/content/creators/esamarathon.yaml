@@ -1,0 +1,11 @@
+links:
+  - name: Twitch
+    type: twitch
+    url: https://www.twitch.tv/esamarathon
+link: https://www.twitch.tv/esamarathon
+name: ESAMarathon
+type: friend
+profileImage:
+  large: https://static-cdn.jtvnw.net/jtv_user_pictures/21df6206-6be7-4a70-937d-e4853b99c475-profile_image-300x300.png
+  small: https://static-cdn.jtvnw.net/jtv_user_pictures/21df6206-6be7-4a70-937d-e4853b99c475-profile_image-70x70.png
+twitchUser: esamarathon

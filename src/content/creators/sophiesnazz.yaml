@@ -1,0 +1,11 @@
+links:
+  - name: Twitch
+    type: twitch
+    url: https://www.twitch.tv/sophiesnazz
+link: https://www.twitch.tv/sophiesnazz
+name: sophiesnazz
+type: friend
+profileImage:
+  large: https://static-cdn.jtvnw.net/jtv_user_pictures/faccb531-2b45-4197-b8eb-9194f5c04594-profile_image-300x300.png
+  small: https://static-cdn.jtvnw.net/jtv_user_pictures/faccb531-2b45-4197-b8eb-9194f5c04594-profile_image-70x70.png
+twitchUser: sophiesnazz
