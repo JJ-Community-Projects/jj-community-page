@@ -1,6 +1,6 @@
 date: '2025-12-08'
 streams:
-  - creators: [duncan, kirsty, spiff]
+  - creators: [duncan, kirsty, spiff, alex_the_rambler, rythian, potatomcwhisky]
     duration_hours: 3
     end: '2025-12-08T14:00:00Z'
     start: '2025-12-08T11:00:00Z'
@@ -14,7 +14,7 @@ streams:
     subtitle: DUNCAN, SPIFF KIRSTY & MORE
     title: OLD WORLD, NEW TRICKS
     vods: []
-  - creators: [rtgame]
+  - creators: [rtgame,lewis,lolipopgi,mscupcakes]
     duration_hours: 3
     end: '2025-12-08T17:00:00Z'
     start: '2025-12-08T14:00:00Z'
@@ -43,7 +43,7 @@ streams:
     subtitle: HOSTED BY THE LONGEST JOHNS
     title: SHANTY'OKE
     vods: []
-  - creators: [ravs,lydia,zoey]
+  - creators: [ravs,lydia,zoey,harry]
     duration_hours: 3
     end: '2025-12-09T23:00:00Z'
     start: '2025-12-08T20:00:00Z'
