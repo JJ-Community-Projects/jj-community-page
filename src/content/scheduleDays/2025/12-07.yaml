@@ -17,6 +17,9 @@ streams:
       - type: youtube
         label: Youtube Live
         link: https://www.youtube.com/watch?v=gDcZrs3-ha0
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2637676090?t=0h7m28s
   - creators: [ravs, sarah, osie, gee]
     duration_hours: 3
     end: '2025-12-07T17:00:00Z'
@@ -28,12 +31,15 @@ streams:
           - '#F07700'
         orientation: TD
       tileSize: 3
-    subtitle: RAVS, SARAH OSIE & GEESTAR
+    subtitle: RAVS, SARAH, OSIE & GEESTAR
     title: PRE-POKER PARTY
     vods:
       - type: youtube
         label: Youtube Live
         link: https://www.youtube.com/watch?v=_zK8O4H1RPc
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2637676090?t=3h17m40s
   - creators: [ tom,pyrion,hat_films,
                 bouphe,rtgame,boba,ravs,alex_the_rambler,
                 ben,lewis,duncan,joe,harry,
@@ -57,7 +63,7 @@ streams:
       - Game 2: Ben, Lewis, Duncan, Ross, Joe, Harry
       - Game 3: Kirsty, Pedguin, Osie, Mousie, Mini-Muka, Lolipopgi
       - Game 4: Lydia, MSCupcakes, Sarah, Daf, Briony, Digby
-      - Final: TBA
+      - Final: Lydia, MSCupcakes, Briony, Alex the Rabmber, Ben, Mini-Muka
     markdownDescription: | 
 
       - Game 1: Bouphe, RTGame, Boba, Ravs, Alex, **Alex the Rabmber**
@@ -66,8 +72,11 @@ streams:
 
       - Game 3: Kirsty, Pedguin, Osie, Mousie, **Mini-Muka**, Lolipopgi
 
-      - Game 4: Lydia, MSCupcakes, Sarah, Daf, Briony, Digby
+      - Game 4: Lydia, **MSCupcakes**, Sarah, Daf, Briony, Digby
 
-      - Final: TBA
+      - Final: Lydia, MSCupcakes, Briony, Alex the Rabmber, Ben, Mini-Muka
 
-    vods: []
+    vods:
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2637676090?t=6h22m12s
