@@ -1,6 +1,6 @@
 date: '2025-12-10'
 streams:
-  - creators: [kirsty]
+  - creators: [kirsty,zylus]
     duration_hours: 3
     end: '2025-12-10T14:00:00Z'
     start: '2025-12-10T11:00:00Z'
@@ -11,10 +11,10 @@ streams:
           - '#7AA70E'
         orientation: TD
       tileSize: 3
-    subtitle: KIRSTY & TBD
-    title: DOUBLE GAMES DOUBLE FUN!
+    subtitle: KIRSTY & Zylus?
+    title: Where in the world are
     vods: []
-  - creators: []
+  - creators: [bekkiboom,ben,boba,bouphe,breeh,daf,duncan,harry,lolipopgi,mousie,osie,pedguin,pyrion,ravs,zylus]
     duration_hours: 6
     end: '2025-12-10T20:00:00Z'
     start: '2025-12-10T14:00:00Z'

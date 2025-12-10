@@ -80,3 +80,6 @@ streams:
       - type: twitch
         label: Twitch
         link: https://www.twitch.tv/videos/2637676090?t=6h22m12s
+      - type: youtube
+        label: Youtube Live
+        link: https://www.youtube.com/watch?v=_P3YCMu-tsM

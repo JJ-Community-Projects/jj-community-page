@@ -369,11 +369,7 @@
           "creators": [
             "tom",
             "pyrion",
-            "briony",
-            "boba",
-            "pedguin",
-            "ravs",
-            "mousie"
+            "hat_films"
           ]
         }
       ]
@@ -389,7 +385,10 @@
           "creators": [
             "duncan",
             "kirsty",
-            "spiff"
+            "spiff",
+            "alex_the_rambler",
+            "rythian",
+            "potatomcwhisky"
           ]
         },
         {
@@ -398,25 +397,46 @@
           "end": "2025-12-08T17:00:00Z",
           "color": "#3485C0",
           "creators": [
-            "rtgame"
+            "rtgame",
+            "lewis",
+            "lolipopgi",
+            "mscupcakes"
           ]
         },
         {
           "title": "SHANTY'OKE",
           "start": "2025-12-08T17:00:00Z",
-          "end": "2025-12-09T20:00:00Z",
+          "end": "2025-12-08T20:00:00Z",
           "color": "#3485C0",
           "creators": [
             "longest_johns",
-            "briony"
+            "briony",
+            "lewis",
+            "breeh",
+            "lolipopgi",
+            "daf",
+            "sarah",
+            "pyrion",
+            "rtgame"
           ]
         },
         {
           "title": "MARIO KART WORLD LOBBY",
           "start": "2025-12-08T20:00:00Z",
-          "end": "2025-12-09T23:00:00Z",
+          "end": "2025-12-08T23:00:00Z",
           "color": "#3485C0",
-          "creators": []
+          "creators": [
+            "ravs",
+            "lydia",
+            "zoey",
+            "harry",
+            "shadowatnoon",
+            "tom",
+            "duncan",
+            "rtgame",
+            "zylus",
+            "pedguin"
+          ]
         }
       ]
     },
@@ -440,7 +460,9 @@
           "color": "#FA9900",
           "creators": [
             "lewis",
-            "simon"
+            "simon",
+            "osie",
+            "boba"
           ]
         },
         {
@@ -449,7 +471,7 @@
           "end": "2025-12-09T20:00:00Z",
           "color": "#FA9900",
           "creators": [
-            "briony",
+            "rythian",
             "kirsty",
             "zylus",
             "breeh"
@@ -461,7 +483,11 @@
           "end": "2025-12-09T23:00:00Z",
           "color": "#FA9900",
           "creators": [
-            "shadowatnoon"
+            "shadowatnoon",
+            "fionn",
+            "mousie",
+            "bekkiboom",
+            "krinxshow"
           ]
         }
       ]
@@ -475,7 +501,6 @@
           "end": "2025-12-10T14:00:00Z",
           "color": "#7AA70E",
           "creators": [
-            "briony",
             "kirsty"
           ]
         },
@@ -484,9 +509,7 @@
           "start": "2025-12-10T14:00:00Z",
           "end": "2025-12-10T20:00:00Z",
           "color": "#7AA70E",
-          "creators": [
-            "briony"
-          ]
+          "creators": []
         },
         {
           "title": "IRISH LADS",
@@ -520,7 +543,8 @@
           "end": "2025-12-11T17:00:00Z",
           "color": "#DD5502",
           "creators": [
-            "hat_films"
+            "hat_films",
+            "ravs"
           ]
         },
         {
@@ -584,7 +608,9 @@
           "start": "2025-12-12T20:00:00Z",
           "end": "2025-12-12T23:00:00Z",
           "color": "#05B8AA",
-          "creators": []
+          "creators": [
+            "ravs"
+          ]
         }
       ]
     },
@@ -606,7 +632,9 @@
           "start": "2025-12-13T14:00:00Z",
           "end": "2025-12-13T17:00:00Z",
           "color": "#D23D99",
-          "creators": []
+          "creators": [
+            "ravs"
+          ]
         },
         {
           "title": "MINECRAFT 4 PLAYERS VS 1 NERD",
@@ -673,7 +701,8 @@
           "color": "#F07700",
           "creators": [
             "breeh",
-            "briony"
+            "briony",
+            "zoey"
           ]
         }
       ]
