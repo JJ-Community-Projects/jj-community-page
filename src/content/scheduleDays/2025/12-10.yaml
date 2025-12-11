@@ -20,7 +20,7 @@ streams:
       - type: youtube
         label: YouTube Live
         link: https://www.youtube.com/watch?v=1mt37uJR2O4&pp=0gcJCSkKAYcqIYzv
-  - creators: [bekkiboom,ben,boba,bouphe,breeh,daf,duncan,harry,lewis,lolipopgi,martyn,mousie,nilesy,osie,pedguin,pyrion,rtgame,rythian,sarah,simon,zylus]
+  - creators: [bekkiboom,ben,boba,bouphe,breeh,daf,duncan,harry,lewis,lolipopgi,martyn,mousie,nilesy,osie,pedguin,pyrion,rtgame,rythian,sarah,simon,shadowatnoon,zylus]
     duration_hours: 6
     end: '2025-12-10T21:30:00Z'
     start: '2025-12-10T14:00:00Z'
