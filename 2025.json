@@ -496,24 +496,47 @@
       "date": "2025-12-10",
       "streams": [
         {
-          "title": "DOUBLE GAMES DOUBLE FUN!",
+          "title": "Where in the world are",
           "start": "2025-12-10T11:00:00Z",
           "end": "2025-12-10T14:00:00Z",
           "color": "#7AA70E",
           "creators": [
-            "kirsty"
+            "kirsty",
+            "zylus"
           ]
         },
         {
           "title": "YOGSFAST SPEEDRUNS",
           "start": "2025-12-10T14:00:00Z",
-          "end": "2025-12-10T20:00:00Z",
+          "end": "2025-12-10T21:30:00Z",
           "color": "#7AA70E",
-          "creators": []
+          "creators": [
+            "bekkiboom",
+            "ben",
+            "boba",
+            "bouphe",
+            "breeh",
+            "daf",
+            "duncan",
+            "harry",
+            "lewis",
+            "lolipopgi",
+            "martyn",
+            "mousie",
+            "nilesy",
+            "osie",
+            "pedguin",
+            "pyrion",
+            "rtgame",
+            "rythian",
+            "sarah",
+            "simon",
+            "zylus"
+          ]
         },
         {
           "title": "IRISH LADS",
-          "start": "2025-12-10T20:00:00Z",
+          "start": "2025-12-10T21:30:00Z",
           "end": "2025-12-10T23:00:00Z",
           "color": "#7AA70E",
           "creators": [
@@ -544,7 +567,10 @@
           "color": "#DD5502",
           "creators": [
             "hat_films",
-            "ravs"
+            "ravs",
+            "lydia",
+            "pyrion",
+            "boba"
           ]
         },
         {
@@ -600,7 +626,9 @@
           "end": "2025-12-12T20:00:00Z",
           "color": "#05B8AA",
           "creators": [
-            "tom"
+            "tom",
+            "ravs",
+            "lydia"
           ]
         },
         {
@@ -609,7 +637,14 @@
           "end": "2025-12-12T23:00:00Z",
           "color": "#05B8AA",
           "creators": [
-            "ravs"
+            "duncan",
+            "markhulmes",
+            "nilesy",
+            "osie",
+            "pedguin",
+            "ravs",
+            "rythian",
+            "zylus"
           ]
         }
       ]

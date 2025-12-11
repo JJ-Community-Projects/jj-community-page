@@ -28,7 +28,7 @@ streams:
     subtitle: MEDALS OF DECEIT
     title: HAT FILMS GAME SHOW
     vods: []
-  - creators: [simon, tom, harry]
+  - creators: [simon, tom, harry, daf, sarah]
     duration_hours: 3
     end: '2025-12-11T20:00:00Z'
     start: '2025-12-11T17:00:00Z'
