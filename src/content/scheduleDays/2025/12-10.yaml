@@ -13,10 +13,16 @@ streams:
       tileSize: 3
     subtitle: KIRSTY & Zylus?
     title: Where in the world are
-    vods: []
+    vods:
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2640176395?t=0h1m7s
+      - type: youtube
+        label: YouTube Live
+        link: https://www.youtube.com/watch?v=1mt37uJR2O4&pp=0gcJCSkKAYcqIYzv
   - creators: [bekkiboom,ben,boba,bouphe,breeh,daf,duncan,harry,lewis,lolipopgi,martyn,mousie,nilesy,osie,pedguin,pyrion,rtgame,rythian,sarah,simon,zylus]
     duration_hours: 6
-    end: '2025-12-10T20:00:00Z'
+    end: '2025-12-10T21:30:00Z'
     start: '2025-12-10T14:00:00Z'
     style:
       background:
@@ -31,11 +37,17 @@ streams:
       THE BEST OF FRIENDS
       LOADS OF YOGS
     title: YOGSFAST SPEEDRUNS
-    vods: []
+    vods:
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2640176395?t=3h12m14s
+      - type: youtube
+        label: YouTube Live
+        link: https://www.youtube.com/watch?v=fJI_xQNaZQo
   - creators: [rtgame]
     duration_hours: 4
     end: '2025-12-10T23:00:00Z'
-    start: '2025-12-10T20:00:00Z'
+    start: '2025-12-10T21:30:00Z'
     style:
       background:
         colors:
@@ -45,4 +57,10 @@ streams:
       tileSize: 3
     subtitle: RTGAME, NOGLA TERRORISER & MORE
     title: IRISH LADS
-    vods: []
+    vods:
+      - link: https://www.twitch.tv/videos/2640553246
+        label: Twitch
+        type: twitch
+      - type: youtube
+        label: YouTube Live
+        link: https://www.youtube.com/watch?v=ih0tU6D3XvA
