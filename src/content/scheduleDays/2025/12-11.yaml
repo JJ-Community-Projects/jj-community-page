@@ -30,7 +30,7 @@ streams:
     vods: []
   - creators: [simon, tom, harry, daf, sarah]
     duration_hours: 3
-    end: '2025-12-11T20:00:00Z'
+    end: '2025-12-11T19:00:00Z'
     start: '2025-12-11T17:00:00Z'
     style:
       background:
@@ -42,10 +42,10 @@ streams:
     subtitle: SIMON, TOM & HARRY
     title: MINECRAFT NATIVITY
     vods: []
-  - creators: [pedguin]
+  - creators: [lolipopgi]
     duration_hours: 3
     end: '2025-12-11T23:00:00Z'
-    start: '2025-12-11T20:00:00Z'
+    start: '2025-12-11T19:00:00Z'
     style:
       background:
         colors:
@@ -53,6 +53,6 @@ streams:
           - '#DD5502'
         orientation: TD
       tileSize: 3
-    subtitle: PEDGUIN & Friends
+    subtitle: Lolip & Friends
     title: MASSIVE MULTIPLAYER MADNESS
     vods: []
