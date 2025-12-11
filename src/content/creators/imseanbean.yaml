@@ -1,0 +1,10 @@
+links:
+  - name: Twitch
+    type: twitch
+    url: https://www.twitch.tv/imseanbean
+name: ImSeanBean
+link: https://www.twitch.tv/imseanbean
+profileImage:
+  large: https://static-cdn.jtvnw.net/jtv_user_pictures/bcbdfd96-7457-4223-a678-eee1f3e60945-profile_image-300x300.png
+  small: https://static-cdn.jtvnw.net/jtv_user_pictures/bcbdfd96-7457-4223-a678-eee1f3e60945-profile_image-70x70.png
+twitchUser: imseanbean
