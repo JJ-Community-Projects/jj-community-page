@@ -28,7 +28,7 @@ streams:
     subtitle: DUNCAN, LEWIS, SIMON & HARRY
     title: JAFFA QUEST
     vods: []
-  - creators: [tom]
+  - creators: [tom, ravs, lydia]
     duration_hours: 3
     end: '2025-12-12T20:00:00Z'
     start: '2025-12-12T17:00:00Z'
@@ -42,7 +42,7 @@ streams:
     subtitle: HOSTED BY ANGORYTOM
     title: MYSTERY QUEST
     vods: []
-  - creators: [ravs]
+  - creators: [duncan,markhulmes,nilesy,osie,pedguin,ravs,rythian,zylus]
     duration_hours: 3
     end: '2025-12-12T23:00:00Z'
     start: '2025-12-12T20:00:00Z'
