@@ -15,8 +15,10 @@ streams:
     title: THESE GATES DON'T KEEP THEMSELVES!
     vods:
       - type: twitch
+        label: Twitch
         link: https://www.twitch.tv/videos/2641000377?t=0h6m48s
       - type: youtube
+        label: YouTube Live
         link: https://www.youtube.com/watch?v=Q85nN7uHf6o
   - creators: [hat_films,ravs,lydia,pyrion,boba]
     duration_hours: 3
@@ -33,8 +35,10 @@ streams:
     title: HAT FILMS GAME SHOW
     vods:
       - type: twitch
+        label: Twitch
         link: https://www.twitch.tv/videos/2641000377?t=3h14m50s
       - type: youtube
+        label: YouTube Live
         link: https://www.youtube.com/watch?v=B8HmdKMeHjA
   - creators: [simon, tom, harry, daf, sarah]
     duration_hours: 2
@@ -51,8 +55,10 @@ streams:
     title: MINECRAFT NATIVITY
     vods:
       - type: twitch
+        label: Twitch
         link: https://www.twitch.tv/videos/2641000377?t=6h22m35s
       - type: youtube
+        label: YouTube Live
         link: https://www.youtube.com/watch?v=phYepE7XmWg
   - creators: [lolipopgi,daltos,duncan,mscupcakes,spiff,pedguin]
     duration_hours: 4
@@ -69,6 +75,8 @@ streams:
     title: MASSIVE MULTIPLAYER MADNESS
     vods:
       - type: twitch
+        label: Twitch
         link: https://www.twitch.tv/videos/2641266526?t=0h6m37s
       - type: youtube
+        label: YouTube Live
         link: https://www.youtube.com/watch?v=NieCqpz4kjM

@@ -15,6 +15,7 @@ streams:
     title: MAD STRATS
     vods:
       - type: youtube
+        label: YouTube Live
         link: https://www.youtube.com/watch?v=m6TlSo_IOxg
   - creators: [duncan, lewis, simon, harry]
     duration_hours: 3
@@ -31,6 +32,7 @@ streams:
     title: JAFFA QUEST
     vods:
       - type: youtube
+        label: YouTube Live
         link: https://www.youtube.com/watch?v=CePMSOx2y7A
   - creators: [tom, ben, lydia]
     duration_hours: 3
@@ -47,6 +49,7 @@ streams:
     title: MYSTERY QUEST
     vods:
       - type: youtube
+        label: YouTube Live
         link: https://www.youtube.com/watch?v=1Qi6JBduv1A
   - creators: [duncan,markhulmes,nilesy,osie,pedguin,rythian,zylus]
     duration_hours: 3
