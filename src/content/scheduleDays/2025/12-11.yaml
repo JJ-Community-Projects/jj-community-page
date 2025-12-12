@@ -13,8 +13,12 @@ streams:
       tileSize: 3
     subtitle: PYRION, BOBA LOLIP & BEKKI
     title: THESE GATES DON'T KEEP THEMSELVES!
-    vods: []
-  - creators: [hat_films,ravs,lydia,pyrion,boba,]
+    vods:
+      - type: twitch
+        link: https://www.twitch.tv/videos/2641000377?t=0h6m48s
+      - type: youtube
+        link: https://www.youtube.com/watch?v=Q85nN7uHf6o
+  - creators: [hat_films,ravs,lydia,pyrion,boba]
     duration_hours: 3
     end: '2025-12-11T17:00:00Z'
     start: '2025-12-11T14:00:00Z'
@@ -27,7 +31,11 @@ streams:
       tileSize: 3
     subtitle: MEDALS OF DECEIT
     title: HAT FILMS GAME SHOW
-    vods: []
+    vods:
+      - type: twitch
+        link: https://www.twitch.tv/videos/2641000377?t=3h14m50s
+      - type: youtube
+        link: https://www.youtube.com/watch?v=B8HmdKMeHjA
   - creators: [simon, tom, harry, daf, sarah]
     duration_hours: 2
     end: '2025-12-11T19:00:00Z'
@@ -41,7 +49,11 @@ streams:
       tileSize: 2
     subtitle: SIMON, TOM & HARRY
     title: MINECRAFT NATIVITY
-    vods: []
+    vods:
+      - type: twitch
+        link: https://www.twitch.tv/videos/2641000377?t=6h22m35s
+      - type: youtube
+        link: https://www.youtube.com/watch?v=phYepE7XmWg
   - creators: [lolipopgi,daltos,duncan,mscupcakes,spiff,pedguin]
     duration_hours: 4
     end: '2025-12-11T23:00:00Z'
@@ -55,4 +67,8 @@ streams:
       tileSize: 4
     subtitle: Lolip & Friends
     title: MASSIVE MULTIPLAYER MADNESS
-    vods: []
+    vods:
+      - type: twitch
+        link: https://www.twitch.tv/videos/2641266526?t=0h6m37s
+      - type: youtube
+        link: https://www.youtube.com/watch?v=NieCqpz4kjM

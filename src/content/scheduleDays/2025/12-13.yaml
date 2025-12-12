@@ -1,6 +1,6 @@
 date: '2025-12-13'
 streams:
-  - creators: [pyrion, rythian]
+  - creators: [zylus, rythian]
     duration_hours: 3
     end: '2025-12-13T14:00:00Z'
     start: '2025-12-13T11:00:00Z'
@@ -14,7 +14,7 @@ streams:
     subtitle: PYRION & RYTHIAN
     title: GETTING PLATFORMED
     vods: []
-  - creators: [ravs]
+  - creators: [ravs,pedguin,duncan,lolipopgi]
     duration_hours: 3
     end: '2025-12-13T17:00:00Z'
     start: '2025-12-13T14:00:00Z'
@@ -27,7 +27,7 @@ streams:
       tileSize: 3
     title: A VERY SUCCESSFUL FOR THE KING 2 PLAYTHROUGH
     vods: []
-  - creators: [harry,briony]
+  - creators: [harry,briony,osie,sarah,kirsty]
     duration_hours: 3
     end: '2025-12-13T20:00:00Z'
     start: '2025-12-13T17:00:00Z'
