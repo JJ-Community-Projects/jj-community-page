@@ -13,7 +13,10 @@ streams:
       tileSize: 3
     subtitle: BEKKI & BRIONY
     title: JINGLE JAM GAME JAM
-    vods: []
+    vods:
+      - type: youtube
+        label: YouTube Live
+        link: https://www.youtube.com/watch?v=EEpWe8c6Zxs
   - creators: [lewis, simon, nina]
     duration_hours: 3
     end: '2025-12-14T17:00:00Z'
@@ -27,7 +30,10 @@ streams:
       tileSize: 3
     subtitle: LEWIS, SIMON & NINA-SERENA
     title: FIGHTING FANTASY
-    vods: []
+    vods:
+      - type: youtube
+        label: YouTube Live
+        link: https://www.youtube.com/watch?v=4jrIQdiJAjA
   - creators: [briony]
     duration_hours: 3
     end: '2025-12-14T20:00:00Z'
@@ -41,8 +47,11 @@ streams:
       tileSize: 3
     subtitle: BRIONY & FRIENDS
     title: AN XMAS CAROL
-    vods: []
-  - creators: [breeh,briony,zoey]
+    vods:
+      - type: youtube
+        label: YouTube Live
+        link: https://www.youtube.com/watch?v=ptPPl0yuYWo&pp=0gcJCSkKAYcqIYzv
+  - creators: [breeh,briony,zoey,rythian,nilesy,daltos,kirsty,zylus,mousie,pedguin,jack]
     duration_hours: 3
     end: '2025-12-15T00:00:00Z'
     start: '2025-12-14T20:00:00Z'
