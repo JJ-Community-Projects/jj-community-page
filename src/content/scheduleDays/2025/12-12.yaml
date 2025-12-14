@@ -17,6 +17,9 @@ streams:
       - type: youtube
         label: YouTube Live
         link: https://www.youtube.com/watch?v=m6TlSo_IOxg
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2641822144?t=0h6m33s
   - creators: [duncan, lewis, simon, harry]
     duration_hours: 3
     end: '2025-12-12T17:00:00Z'
@@ -34,6 +37,9 @@ streams:
       - type: youtube
         label: YouTube Live
         link: https://www.youtube.com/watch?v=CePMSOx2y7A
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2641822144?t=3h13m43s
   - creators: [tom, ben, lydia]
     duration_hours: 3
     end: '2025-12-12T20:00:00Z'
@@ -51,6 +57,9 @@ streams:
       - type: youtube
         label: YouTube Live
         link: https://www.youtube.com/watch?v=1Qi6JBduv1A
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2641822144?t=6h12m46s
   - creators: [duncan,markhulmes,nilesy,osie,pedguin,rythian,zylus]
     duration_hours: 3
     end: '2025-12-12T23:00:00Z'
@@ -64,4 +73,10 @@ streams:
       tileSize: 3
     subtitle: LOADS OF YOGS
     title: TOWER UNITE
-    vods: []
+    vods:
+      - type: youtube
+        label: YouTube Live
+        link: https://www.youtube.com/watch?v=6jY67x40K3Q
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2641822144?t=9h22m12s

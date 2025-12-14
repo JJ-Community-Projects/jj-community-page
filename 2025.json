@@ -531,6 +531,7 @@
             "rythian",
             "sarah",
             "simon",
+            "shadowatnoon",
             "zylus"
           ]
         },
@@ -576,7 +577,7 @@
         {
           "title": "MINECRAFT NATIVITY",
           "start": "2025-12-11T17:00:00Z",
-          "end": "2025-12-11T20:00:00Z",
+          "end": "2025-12-11T19:00:00Z",
           "color": "#DD5502",
           "creators": [
             "simon",
@@ -588,10 +589,15 @@
         },
         {
           "title": "MASSIVE MULTIPLAYER MADNESS",
-          "start": "2025-12-11T20:00:00Z",
+          "start": "2025-12-11T19:00:00Z",
           "end": "2025-12-11T23:00:00Z",
           "color": "#DD5502",
           "creators": [
+            "lolipopgi",
+            "daltos",
+            "duncan",
+            "mscupcakes",
+            "spiff",
             "pedguin"
           ]
         }
@@ -607,7 +613,7 @@
           "color": "#05B8AA",
           "creators": [
             "ben",
-            "lydia"
+            "pyrion"
           ]
         },
         {
@@ -629,7 +635,7 @@
           "color": "#05B8AA",
           "creators": [
             "tom",
-            "ravs",
+            "ben",
             "lydia"
           ]
         },
@@ -644,7 +650,6 @@
             "nilesy",
             "osie",
             "pedguin",
-            "ravs",
             "rythian",
             "zylus"
           ]
@@ -660,7 +665,7 @@
           "end": "2025-12-13T14:00:00Z",
           "color": "#D23D99",
           "creators": [
-            "pyrion",
+            "zylus",
             "rythian"
           ]
         },
@@ -670,7 +675,10 @@
           "end": "2025-12-13T17:00:00Z",
           "color": "#D23D99",
           "creators": [
-            "ravs"
+            "ravs",
+            "pedguin",
+            "duncan",
+            "lolipopgi"
           ]
         },
         {
@@ -680,13 +688,16 @@
           "color": "#D23D99",
           "creators": [
             "harry",
-            "briony"
+            "briony",
+            "osie",
+            "sarah",
+            "kirsty"
           ]
         },
         {
           "title": "TRUST IN RUST",
-          "start": "2025-12-13T20:00:00Z",
-          "end": "2025-12-13T23:00:00Z",
+          "start": "2025-12-13T21:00:00Z",
+          "end": "2025-12-14T00:00:00Z",
           "color": "#D23D99",
           "creators": [
             "harry",
