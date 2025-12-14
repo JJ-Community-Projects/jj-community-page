@@ -51,7 +51,7 @@ streams:
       - type: youtube
         label: YouTube Live
         link: https://www.youtube.com/watch?v=ptPPl0yuYWo&pp=0gcJCSkKAYcqIYzv
-  - creators: [breeh,briony,zoey,rythian,nilesy,daltos,kirsty,zylus,mousie,pedguin,jack]
+  - creators: [breeh,briony,zoey,rythian,nilesy,daltos,kirsty,zylus,mousie,pedguin,jack,markhulmes]
     duration_hours: 3
     end: '2025-12-15T00:00:00Z'
     start: '2025-12-14T20:00:00Z'
