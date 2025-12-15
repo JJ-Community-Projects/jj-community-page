@@ -17,6 +17,9 @@ streams:
       - type: youtube
         label: YouTube Live
         link: https://www.youtube.com/watch?v=EEpWe8c6Zxs
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2643599903?t=0h7m36s
   - creators: [lewis, simon, nina]
     duration_hours: 3
     end: '2025-12-14T17:00:00Z'
@@ -34,6 +37,9 @@ streams:
       - type: youtube
         label: YouTube Live
         link: https://www.youtube.com/watch?v=4jrIQdiJAjA
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2643599903?t=3h8m36s
   - creators: [briony]
     duration_hours: 3
     end: '2025-12-14T20:00:00Z'
@@ -49,8 +55,11 @@ streams:
     title: AN XMAS CAROL
     vods:
       - type: youtube
-        label: YouTube Live
-        link: https://www.youtube.com/watch?v=ptPPl0yuYWo&pp=0gcJCSkKAYcqIYzv
+        label: Briony's YouTube
+        link: https://www.youtube.com/watch?v=6vMFfaPyzHw
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2643599903?t=6h8m48s
   - creators: [breeh,briony,zoey,rythian,nilesy,daltos,kirsty,zylus,mousie,pedguin,jack,markhulmes]
     duration_hours: 3
     end: '2025-12-15T00:00:00Z'
@@ -65,4 +74,10 @@ streams:
     description: Creator are added as soon as they are confirmed.
     subtitle: BREEH & FRIENDS
     title: THE LATE LATE CREW
-    vods: []
+    vods:
+      - type: youtube
+        label: YouTube Live
+        link: https://www.youtube.com/watch?v=u6cJCgQ6okE&pp=0gcJCSkKAYcqIYzv
+      - type: twitch
+        label: Twitch
+        link: https://www.twitch.tv/videos/2643950749
