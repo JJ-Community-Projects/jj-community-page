@@ -27,10 +27,12 @@ import { DateTime } from 'luxon'
 import { YogsCreatorPill } from '../creators/YogsCreatorPill.tsx'
 import { FaSolidEnvelope } from 'solid-icons/fa'
 import {
+  useIsAfterJJEnd,
   useIsBeforeJJ,
   useJJStartCountdown,
 } from '../../../lib/utils/jjDates.ts'
 import { HeadlinerTicker } from '../../features/schedules/common/HeadlinerTicker.tsx'
+import { useNow } from '../../../lib/utils/useNow.ts'
 
 interface ConfigLoaderProps {
   creators: YogsCreator[]
@@ -174,7 +176,9 @@ const Body: Component<BodyProps> = (props) => {
     }),
   )
 
+  const now = useNow()
   const isBeforeJJ = useIsBeforeJJ()
+  const isAfterJJEnd = useIsAfterJJEnd()
   const jjStartCountdown = useJJStartCountdown()
 
   const countdownFormat = () => {
@@ -185,14 +189,22 @@ const Body: Component<BodyProps> = (props) => {
     return countdown.toFormat("dd'd' hh'h' mm'm' ss's'")
   }
 
+  const showCountdown = () => {
+    const isNov = now().month === 11
+    const isDec = now().month === 12
+    return isBeforeJJ() && !isAfterJJEnd() && (
+      isNov || isDec
+    )
+  }
+
   return (
     <Switch>
       <Match when={schedule.data}>
         <div class={'flex flex-col items-center justify-center gap-2'}>
-          <Show when={isBeforeJJ()}>
+          <Show when={showCountdown()}>
             <div
               class={
-                'font-bebas tracking-wide flex flex-col items-center gap-1 rounded-xl border border-white/10 bg-white/5 p-4 text-center font-semibold text-white text-white/90 sm:p-4'
+                'font-bebas flex flex-col items-center gap-1 rounded-xl border border-white/10 bg-white/5 p-4 text-center font-semibold tracking-wide text-white text-white/90 sm:p-4'
               }
             >
               <p>The collection goes live in</p>
@@ -224,7 +236,7 @@ const Body: Component<BodyProps> = (props) => {
             <Feedback />
           </div>
           <div class={'max-w-[80vw]'}>
-            <HeadlinerTicker/>
+            <HeadlinerTicker />
           </div>
           <div class="mobile-schedule flex w-full flex-col items-center justify-center gap-2">
             <MobileYogsScheduleComponent
