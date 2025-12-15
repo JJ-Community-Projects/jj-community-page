@@ -40,7 +40,7 @@ streams:
       - type: twitch
         label: Twitch
         link: https://www.twitch.tv/videos/2643599903?t=3h8m36s
-  - creators: [briony]
+  - creators: [briony,markhulmes,ben,simon_clark,bouphe,rythian,lewis,bekkiboom,simon,zoey,lydia,boba,daf,tom,lolipopgi,nilesy,breeh,zylus,jack,kirsty,osie,mousie,ravs,daltos,shadowatnoon,hat_films,duncan,rtgame]
     duration_hours: 3
     end: '2025-12-14T20:00:00Z'
     start: '2025-12-14T17:00:00Z'
@@ -53,6 +53,7 @@ streams:
       tileSize: 3
     subtitle: BRIONY & FRIENDS
     title: AN XMAS CAROL
+    description: See the Youtube video description for the full credits.
     vods:
       - type: youtube
         label: Briony's YouTube
