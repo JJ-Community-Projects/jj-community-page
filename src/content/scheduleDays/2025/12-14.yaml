@@ -71,7 +71,6 @@ streams:
           - '#F07700'
         orientation: TD
       tileSize: 3
-    description: Creator are added as soon as they are confirmed.
     subtitle: BREEH & FRIENDS
     title: THE LATE LATE CREW
     vods:

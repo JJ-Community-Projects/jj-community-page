@@ -50,7 +50,6 @@ streams:
           - '#D23D99'
         orientation: TD
       tileSize: 3
-    description: Creator are added as soon as they are confirmed.
     subtitle: YES, HARRY IS THE NERD
     title: MINECRAFT 4 PLAYERS VS 1 NERD
     vods:

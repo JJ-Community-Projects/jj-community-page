@@ -52,7 +52,6 @@ streams:
       tileSize: 4
     subtitle: ANNUAL QUIZ SHOW
     title: DR SIMON CLARK'S COUNTJAM!
-    description: Creators are added as soon as they are confirmed. Simon is sick and wont be able to host (see is post on bluesky). The show will be hosted by Boba and Harry.
     vods:
       - type: twitch
         label: Twitch

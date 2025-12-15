@@ -33,7 +33,6 @@ streams:
       tileSize: 3
     subtitle: SIMON AND FRIENDS
     title: IMPORTANT VIDEOS
-    description: Creators are added as soon as they are confirmed.
     vods:
       - type: youtube
         label: Youtube Live
