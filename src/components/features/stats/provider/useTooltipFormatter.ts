@@ -30,7 +30,7 @@ export const useTooltipFormatter = (streams: () => StatsStream[]) => {
     const date = DateTime.fromISO(slot.start)
     const f = date.toFormat('MMM dd yyyy, HH:mm')
     return `
-                  ${params.seriesName}
+                  ${params.seriesName} (#${dataIndex+1})
                   <br>${params.marker}${slot.title} ${f} ${date.offsetNameShort}
                   <span style='float: right; margin-left: 20px'><b>${params.value}</b></span>`
   }
