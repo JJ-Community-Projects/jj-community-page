@@ -1,4 +1,4 @@
-import {createContext, type ParentComponent, useContext} from "solid-js";
+import { createContext, type ParentComponent, useContext } from 'solid-js'
 import {
   type Series,
   type SingleData,
@@ -6,11 +6,11 @@ import {
   type StatsStream,
   StatsValueType,
   type XAxis
-} from "../../../../lib/model/Stats.ts";
-import {useStatsSettings} from "./StatsSettings.tsx";
-import {type EChartsOption} from "echarts";
-import {useTooltipFormatter} from "./useTooltipFormatter.ts";
-import {DateTime} from "luxon";
+} from '../../../../lib/model/Stats.ts'
+import { useStatsSettings } from './StatsSettings.tsx'
+import { type EChartsOption } from 'echarts'
+import { useTooltipFormatter } from './useTooltipFormatter.ts'
+import { DateTime } from 'luxon'
 
 const round = (n: number, r = 2) => {
   return +n.toFixed(r)
@@ -222,11 +222,18 @@ const useStatsHook = (
     }
   }
 
+  const dataCount = () => {
+
+    const streams = data().length
+
+    return `(${streams} streams)`
+  }
+
   const chartOptions = (): EChartsOption => {
     return {
       backgroundColor: '#fff',
       title: {
-        text: title(),
+        text: `${title()} ${dataCount()}`,
         left: 'center',
       },
       tooltip: {
