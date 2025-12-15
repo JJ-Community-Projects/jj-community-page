@@ -40,12 +40,7 @@ streams:
       - type: twitch
         label: Twitch
         link: https://www.twitch.tv/videos/2637676090?t=3h17m40s
-  - creators: [ tom,pyrion,hat_films,
-                bouphe,rtgame,boba,ravs,alex_the_rambler,
-                ben,lewis,duncan,joe,harry,
-                kirsty,pedguin,osie,mousie,mini-muka,lolipopgi,
-                lydia,mscupcakes,sarah,daf,briony,digby
-  ]
+  - creators: [tom,pyrion,hat_films,bouphe,rtgame,boba,ravs,alex_the_rambler,ben,lewis,duncan,joe,harry,kirsty,pedguin,osie,mousie,mini-muka,lolipopgi,lydia,mscupcakes,sarah,daf,briony,digby]
     duration_hours: 6
     end: '2025-12-07T23:00:00Z'
     start: '2025-12-07T17:00:00Z'

@@ -14,6 +14,8 @@ export const useStatsSettingsHook = (initSettings?: StatsSettings) => {
     value: StatsValueType.Yogs,
     showNights: false,
     bar: 'streams',
+    days: [],
+    creators: []
   })
 
   const toggleShow2021 = () => setSettings('show2021', s => !s)

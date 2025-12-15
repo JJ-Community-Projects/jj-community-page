@@ -81,6 +81,8 @@ export interface StatsSettings {
   showDay1: boolean
   showNights: boolean
   bar: 'hours' | 'streams'
+  days: number[]
+  creators: string[]
 }
 
 export interface CreatorStatsSettings {

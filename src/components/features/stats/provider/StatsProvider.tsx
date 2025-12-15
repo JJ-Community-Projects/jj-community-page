@@ -128,6 +128,21 @@ const useStatsHook = (
     if (!settings.showDay1) {
       s = s.filter(filterDay1)
     }
+
+    // Filter by selected creator (only one creator can be selected at a time)
+    if (settings.creators && settings.creators.length > 0) {
+      const creatorId = settings.creators[0]
+      s = s.filter(stream => stream.creators?.includes(creatorId))
+    }
+
+    // Filter by selected calendar days (December 1st–14th) when any day is selected
+    if (settings.days && settings.days.length > 0) {
+      s = s.filter(stream => {
+        const start = DateTime.fromISO(stream.start)
+        // Only consider December days 1–14
+        return start.month === 12 && settings.days.includes(start.day)
+      })
+    }
     if (settings.onlyTop15) {
       s = s.sort(sortByValue).slice(0, 15)
     }
@@ -252,7 +267,10 @@ const useStatsHook = (
     }
   }
 
-  return {chartOptions}
+  // Expose creators list (as-is) so controls can render a selector
+  const creators = () => stats.creators
+
+  return {chartOptions, creators}
 }
 
 interface StatsProps {
