@@ -126,7 +126,10 @@ const schedulerTaskSchema = z.object({
 export type SchedulerTask = z.infer<typeof schedulerTaskSchema>
 
 const getSchedulerTasksStatusContract = oc.output(
-  z.array(schedulerTaskSchema),
+  z.object({
+    paused: z.boolean(),
+    tasks: z.array(schedulerTaskSchema),
+  }),
 )
 
 const setTaskEnabledContract = oc
@@ -138,6 +141,10 @@ const runSchedulerTaskContract = oc
   .output(z.void())
 
 const runOverdueTasksNowContract = oc.input(z.void()).output(z.void())
+
+const setSchedulerPausedContract = oc
+  .input(z.object({ paused: z.boolean() }))
+  .output(z.void())
 
 // --- Campaigns (admin) ---
 // Return the exact data shape from DO: getCommunityCampaignsDisplayAll
@@ -190,6 +197,7 @@ export const contracts = {
   setTaskEnabledContract,
   runSchedulerTaskContract,
   runOverdueTasksNowContract,
+  setSchedulerPausedContract,
   // campaigns
   getAllCampaignsContract,
 }

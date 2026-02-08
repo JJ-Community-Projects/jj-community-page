@@ -46,10 +46,28 @@ export const AdminSchedulerSection: Component = () => {
     onSuccess: refetchAll,
   }))
 
+  const togglePaused = useMutation(() => admin.setSchedulerPaused.mutationOptions({
+    onSuccess: refetchAll,
+  }))
+
   return (
     <div class="rounded border border-gray-300 bg-white p-4">
       <div class="mb-2 flex items-center justify-between">
-        <h2 class="text-lg font-semibold">Background Tasks</h2>
+        <div class="flex items-center gap-3">
+          <h2 class="text-lg font-semibold">Background Tasks</h2>
+          <Show when={tasksQuery.data}>
+            {(data) => (
+              <button
+                class={`rounded px-3 py-1.5 text-xs text-white ${data().paused ? 'bg-red-600 hover:bg-red-500' : 'bg-green-600 hover:bg-green-500'}`}
+                disabled={togglePaused.isPending}
+                onClick={() => togglePaused.mutate({ paused: !data().paused })}
+                title={data().paused ? 'Resume the alarm scheduler' : 'Pause the alarm scheduler (cron triggers still work)'}
+              >
+                {togglePaused.isPending ? '…' : data().paused ? 'Scheduler Paused' : 'Scheduler Active'}
+              </button>
+            )}
+          </Show>
+        </div>
         <div class="flex items-center gap-2">
           <button
             class={`rounded px-3 py-1.5 text-white ${tasksQuery.isFetching ? 'bg-gray-400' : 'bg-neutral-800 hover:bg-neutral-700'}`}
@@ -68,7 +86,7 @@ export const AdminSchedulerSection: Component = () => {
         </div>
       </div>
 
-      <Show when={tasksQuery.data} fallback={<p class="text-sm text-gray-500">{tasksQuery.isLoading ? 'Loading…' : tasksQuery.isError ? 'Failed to load tasks' : ''}</p>}>
+      <Show when={tasksQuery.data?.tasks} fallback={<p class="text-sm text-gray-500">{tasksQuery.isLoading ? 'Loading…' : tasksQuery.isError ? 'Failed to load tasks' : ''}</p>}>
         {(tasks) => (
           <div class="overflow-x-auto">
             <table class="min-w-full text-sm">

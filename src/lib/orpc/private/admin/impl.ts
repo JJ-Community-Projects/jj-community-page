@@ -41,7 +41,11 @@ const getSchedulerTasksStatus = os.getSchedulerTasksStatusContract.handler(
     const DO = context.env.JingleJamData
     const stubID = DO.idFromName('JJ_API_CACHE')
     const stub = DO.get(stubID)
-    return await stub.getTasksStatus()
+    const [paused, tasks] = await Promise.all([
+      stub.isSchedulerPaused(),
+      stub.getTasksStatus(),
+    ])
+    return { paused, tasks }
   },
 )
 
@@ -69,6 +73,15 @@ const runOverdueTasksNow = os.runOverdueTasksNowContract.handler(
     const stubID = DO.idFromName('JJ_API_CACHE')
     const stub = DO.get(stubID)
     await stub.runOverdueNow()
+  },
+)
+
+const setSchedulerPaused = os.setSchedulerPausedContract.handler(
+  async ({ context, input }) => {
+    const DO = context.env.JingleJamData
+    const stubID = DO.idFromName('JJ_API_CACHE')
+    const stub = DO.get(stubID)
+    await stub.setSchedulerPaused(input.paused)
   },
 )
 
@@ -793,5 +806,6 @@ export const adminRouter = {
   getSchedulerTasksStatus,
   setTaskEnabled,
   runSchedulerTask,
-  runOverdueTasksNow
+  runOverdueTasksNow,
+  setSchedulerPaused,
 }
