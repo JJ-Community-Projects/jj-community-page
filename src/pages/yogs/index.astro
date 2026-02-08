@@ -4,6 +4,14 @@ export const prerender = false
 import BaseLayoutYogs from '../../layouts/BaseLayoutYogs.astro'
 import { getYogsScheduleFromContent } from '../../content/getYogsScheduleFromContent.ts'
 import { YogsCurrentScheduleLoader } from '../../components/yogs-pages/schedule/YogsCurrentScheduleLoader.tsx'
+
+const HIDE_CONTENT = true
+
+if (HIDE_CONTENT) {
+  return Astro.redirect('/yogs/archive/2025')
+}
+
+
 const ConfigDO = Astro.locals.runtime.env.ConfigDO
 const stubId = ConfigDO.idFromName('ConfigDO')
 const stub = ConfigDO.get(stubId)
