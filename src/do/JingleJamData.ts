@@ -772,11 +772,12 @@ export class JingleJamData extends DurableObject<Env> {
 
   public async loadAllTiltifySocials() {
     const campaigns = await this.getCampaigns()
-    // console.log('loadAllTiltifySocials', 'slugs', slugs)
-    // console.log('loadAllTiltifySocials', 'campaigns', campaigns.length)
     const api = new TiltifyAPI(this.env)
     const token = await api.getAppToken()
-    // console.log('loadAllTiltifySocials', 'token', token)
+    if (!token) {
+      console.error('loadAllTiltifySocials', 'no token')
+      return
+    }
     const users = await Promise.all(
       campaigns.map((c) => {
         return api.getUserBySlug(c.user.slug, token)
@@ -808,6 +809,21 @@ export class JingleJamData extends DurableObject<Env> {
     })
     await this.runOverdueTasks(Date.now())
     await this.scheduleNextAlarm()
+  }
+
+  public async setSchedulerPaused(paused: boolean) {
+    await this.storage.put('scheduler:paused', paused)
+    if (paused) {
+      await this.storage.deleteAlarm()
+      console.log('DO-scheduler', 'paused – alarm deleted')
+    } else {
+      await this.scheduleNextAlarm()
+      console.log('DO-scheduler', 'resumed – alarm scheduled')
+    }
+  }
+
+  public async isSchedulerPaused(): Promise<boolean> {
+    return (await this.storage.get<boolean>('scheduler:paused')) ?? false
   }
 
   public async setTaskEnabled(name: string, enabled: boolean) {
@@ -888,6 +904,7 @@ export class JingleJamData extends DurableObject<Env> {
 
   // Call this once (manually or via any request) to bootstrap the first alarm
   public async ensureAlarm() {
+    if (await this.isSchedulerPaused()) return
     const existing = await this.storage.getAlarm()
     if (!existing) {
       await this.scheduleNextAlarm(1000 * 30) // start in ~1min
@@ -1561,6 +1578,10 @@ export class JingleJamData extends DurableObject<Env> {
 
   // Compute and set the next alarm based on soonest next-due task
   private async scheduleNextAlarm(afterNowMs?: number) {
+    if (await this.isSchedulerPaused()) {
+      await this.storage.deleteAlarm()
+      return
+    }
     const now = Date.now()
     if (afterNowMs && afterNowMs > 0) {
       await this.storage.setAlarm(now + afterNowMs)
