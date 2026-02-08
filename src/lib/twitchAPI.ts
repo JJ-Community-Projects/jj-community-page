@@ -38,7 +38,7 @@ export class TwitchAPI {
   ): Promise<TwitchUser | null> {
     if (!login) return null
     try {
-      const raw = await this.env.KV.get(this.makeTwitchUserKeyByLogin(login))
+      const raw = await this.env.KV.get(this.makeTwitchUserKeyByLogin(login), { cacheTtl: 3600 })
       if (!raw) return null
       return JSON.parse(raw) as TwitchUser
     } catch (error) {
@@ -55,7 +55,7 @@ export class TwitchAPI {
   public async loadTwitchUserById(id: string): Promise<TwitchUser | null> {
     if (!id) return null
     try {
-      const raw = await this.env.KV.get(this.makeTwitchUserKeyById(id))
+      const raw = await this.env.KV.get(this.makeTwitchUserKeyById(id), { cacheTtl: 3600 })
       if (!raw) return null
       return JSON.parse(raw) as TwitchUser
     } catch (error) {
@@ -656,7 +656,7 @@ export class TwitchAPI {
    */
   private async getTokenFromKV(): Promise<TokenData | null> {
     try {
-      const tokenString = await this.env.KV.get('twitch:app_token')
+      const tokenString = await this.env.KV.get('twitch:app_token', { cacheTtl: 3600 })
       if (!tokenString) {
         return null
       }

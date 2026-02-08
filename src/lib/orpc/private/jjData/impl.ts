@@ -58,7 +58,7 @@ const campaigns = os.campaignsContract
   )
   .handler(async ({ context }) => {
     // KV cache
-    const cached = await context.env.KV.get('campaigns')
+    const cached = await context.env.KV.get('campaigns', { cacheTtl: 60 })
     if (cached) {
       return JSON.parse(cached)
     }
@@ -135,7 +135,7 @@ const campaignsAll = os.campaignsContract
   )
   .handler(async ({ context }) => {
     // KV cache
-    const cached = await context.env.KV.get('campaigns-all')
+    const cached = await context.env.KV.get('campaigns-all', { cacheTtl: 60 })
     if (cached) {
       return JSON.parse(cached)
     }
@@ -213,7 +213,7 @@ const causes = os.causesContract
   )
   .handler(async ({ context }) => {
     // KV cache
-    const cached = await context.env.KV.get('causes')
+    const cached = await context.env.KV.get('causes', { cacheTtl: 60 })
     if (cached) {
       return JSON.parse(cached)
     }
@@ -695,7 +695,7 @@ const getAllUsersWithInfo = os.getAllUsersWithInfoContract.handler(
 
 const getUserCampaignPairs = os.getUserCampaignPairsContract.handler(
   async ({ context }) => {
-    const cache = await context.env.KV.get('getUserCampaignPairs')
+    const cache = await context.env.KV.get('getUserCampaignPairs', { cacheTtl: 60 })
 
     if (cache) {
       return JSON.parse(cache)

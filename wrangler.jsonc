@@ -18,7 +18,8 @@
     "directory": "./dist"
   },
   "observability": {
-    "enabled": true
+    "enabled": true,
+    "head_sampling_rate": 0.01
   },
   "migrations": [
     {
@@ -194,7 +195,8 @@
         }
       ],
       "observability": {
-        "enabled": true
+        "enabled": true,
+        "head_sampling_rate": 0.01
       },
       "migrations": [
         {
@@ -348,7 +350,8 @@
         }
       ],
       "observability": {
-        "enabled": true
+        "enabled": true,
+        "head_sampling_rate": 0.01
       },
       "migrations": [
         {

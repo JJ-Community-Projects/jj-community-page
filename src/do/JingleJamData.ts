@@ -138,13 +138,6 @@ export class JingleJamData extends DurableObject<Env> {
         await this.updateTiltifyProfiles()
       },
     },
-    {
-      name: 'buildDisplayData',
-      everyMs: 30 * 1000,
-      run: async () => {
-        await this.buildDisplayData()
-      },
-    },
   ] as const
 
   private get storage() {
@@ -334,40 +327,18 @@ export class JingleJamData extends DurableObject<Env> {
       console.error('setCampaigns', e)
     }*/
 
-    // Store event metadata as separate keys
+    // Store event metadata in a single batched write
     try {
-      await this.storage.put('date', data.date)
+      await this.storage.put({
+        'date': data.date,
+        'event:year': data.event.year,
+        'raised': data.raised,
+        'collections': data.collections,
+        'donations': data.donations,
+        'dollarConversionRate': data.dollarConversionRate,
+      })
     } catch (e) {
-      console.error('put date', e)
-    }
-    try {
-      await this.storage.put('event:year', data.event.year)
-    } catch (e) {
-      console.error('put event:year', e)
-    }
-
-    try {
-      await this.storage.put('raised', data.raised)
-    } catch (e) {
-      console.error('put raised', e)
-    }
-
-    try {
-      await this.storage.put('collections', data.collections)
-    } catch (e) {
-      console.error('put collections', e)
-    }
-
-    try {
-      await this.storage.put('donations', data.donations)
-    } catch (e) {
-      console.error('put donations', e)
-    }
-
-    try {
-      await this.storage.put('dollarConversionRate', data.dollarConversionRate)
-    } catch (e) {
-      console.error('put dollarConversionRate', e)
+      console.error('put metadata', e)
     }
   }
 
@@ -580,22 +551,6 @@ export class JingleJamData extends DurableObject<Env> {
     const loginsToValidate = logins.filter((l) => !storedValidSet.has(l))
     const validLogins: string[] = [...storedValidSet]
 
-    console.log('validateTwitchChannels', 'campaignLogins', logins.length)
-    console.log(
-      'validateTwitchChannels',
-      'storedValidLogins',
-      storedValidLogins.length,
-    )
-    console.log(
-      'validateTwitchChannels',
-      'storedInvalidLogins',
-      storedInvalidLogins.length,
-    )
-    console.log(
-      'validateTwitchChannels',
-      'loginsToValidate',
-      loginsToValidate.length,
-    )
 
     for (const login of loginsToValidate) {
       const normalized = this.normalizeTwitchLogin(login)
@@ -625,8 +580,6 @@ export class JingleJamData extends DurableObject<Env> {
       }
     }
 
-    console.log('validateTwitchChannels', 'validLogins', validLogins.length)
-    console.log('validateTwitchChannels', 'invalidLogins', invalidLogins.length)
 
     await this.setStringArray('twitch:validLogins', validLogins)
     await this.setStringArray('twitch:invalidLogins', invalidLogins)
@@ -643,7 +596,6 @@ export class JingleJamData extends DurableObject<Env> {
     const liveStreamsIds: string[] = []
     const liveStreamsLogins: string[] = []
     const loginChunks = this.chunk(logins, 50)
-    console.log('checkLiveStreams', 'logins', logins.length)
     for (const logins of loginChunks) {
       const stream = await api.fetchStreamsByLogins(logins, accessToken)
       if (stream.data && !stream.error) {
@@ -655,11 +607,6 @@ export class JingleJamData extends DurableObject<Env> {
     }
     await this.setStringArray('twitch:liveStreams:ids', liveStreamsIds)
     await this.setStringArray('twitch:liveStreams:logins', liveStreamsLogins)
-    console.log(
-      'checkLiveStreams',
-      'liveStreamsLogins',
-      liveStreamsLogins.length,
-    )
 
     // Update per-campaign live flags based on current live logins
     try {
@@ -667,16 +614,17 @@ export class JingleJamData extends DurableObject<Env> {
       const campaigns = await this.getCampaigns()
 
       const users = await this.getTiltifyUsersMap()
+      const liveEntries: Record<string, boolean> = {}
       for (const c of campaigns) {
         const userSlug = c.user.slug
         const user = users.get(userSlug)
-        // if (!user) continue
         const login =
           this.tiltifySlugToTwitchLoginMap.get(userSlug) ?? user?.social.twitch
         if (!login) continue
         const isLive = liveSet.has(this.normalizeTwitchLogin(login))
-        await this.storage.put(`campaign:live:${c.user.slug}`, isLive)
+        liveEntries[`campaign:live:${c.user.slug}`] = isLive
       }
+      await this.storage.put(liveEntries)
     } catch (e) {
       console.error('update campaign live flags', e)
     }
@@ -823,11 +771,7 @@ export class JingleJamData extends DurableObject<Env> {
   }
 
   public async loadAllTiltifySocials() {
-    const start = Date.now()
-    console.log('loadAllTiltifySocials')
     const campaigns = await this.getCampaigns()
-    const slugs = campaigns.map((c) => c.user.slug)
-    console.log('loadAllTiltifySocials', 'slugs', slugs.length)
     // console.log('loadAllTiltifySocials', 'slugs', slugs)
     // console.log('loadAllTiltifySocials', 'campaigns', campaigns.length)
     const api = new TiltifyAPI(this.env)
@@ -849,11 +793,7 @@ export class JingleJamData extends DurableObject<Env> {
       .map((s) => this.normalizeTwitchLogin(s))
       .filter((s) => s.length > 0)
 
-    console.log('loadAllTiltifySocials', 'twitch', twitch.length)
-    // console.log('loadAllTiltifySocials', 'twitch', twitch)
     await this.setStringArray('tiltify:socials:twitch', twitch)
-
-    console.log('loadAllTiltifySocials', 'ms', Date.now() - start)
   }
 
   public async getTiltifyUsersMap() {
@@ -1124,10 +1064,10 @@ export class JingleJamData extends DurableObject<Env> {
       const rawCampaigns = await this.getCampaigns()
 
       // Build display items for ALL campaigns
+      const displayEntries: Record<string, JJCampaignTVType> = {}
       const allDisplayList: JJCampaignTVType[] = await Promise.all(
         rawCampaigns.map(async (c) => {
           const userSlug = c.user.slug
-          // console.log('buildAndStoreCampaignsDisplay', 'processing', 'userSlug', userSlug)
           let isLive = false
           try {
             const val = await this.storage.get<boolean>(
@@ -1138,15 +1078,12 @@ export class JingleJamData extends DurableObject<Env> {
             console.error(
               'buildAndStoreCampaignsDisplay',
               'error getting live flag',
-              'userSlug',
               userSlug,
-              'error',
               e,
             )
           }
 
           const user = tiltifyUsers.get(userSlug)
-          // console.log('buildAndStoreCampaignsDisplay', 'user', userSlug, 'user', user)
           let twitch: JJCampaignTVType['twitch'] | undefined = undefined
           const twitchSocial =
             this.tiltifySlugToTwitchLoginMap.get(userSlug) ??
@@ -1154,12 +1091,10 @@ export class JingleJamData extends DurableObject<Env> {
           let login = twitchSocial
             ? this.normalizeTwitchLogin(twitchSocial)
             : ''
-          // console.log('buildAndStoreCampaignsDisplay', 'twitchSocial', twitchSocial, 'login', login)
           let twitchId = ''
           if (login) {
             let twitchAvatar: string | undefined
             const tuser = await this.storage.get<any>(`twitch:login:${login}`)
-            // console.log('buildAndStoreCampaignsDisplay', 'tuser', tuser)
             if (tuser) {
               twitchAvatar = (tuser as any)?.profile_image_url
               twitchId = (tuser as any)?.id ?? ''
@@ -1185,61 +1120,16 @@ export class JingleJamData extends DurableObject<Env> {
             goal: this.toCurrencies(c.goal, usdRate, eurRate),
             twitch,
           }
-          try {
-            await this.storage.put(`campaign:display:${userSlug}`, display)
-            if (twitchId !== '') {
-              await this.storage.put(
-                `campaign:display:twitchId:${twitchId}`,
-                display,
-              )
-              /*
-              console.log(
-                'buildAndStoreCampaignsDisplay',
-                'storing twitchId',
-                'userSlug',
-                userSlug,
-                'twitchId',
-                twitchId,
-                'twitchSocial',
-                twitchSocial,
-                'login',
-                login,
-                'display',
-                display,
-              )*/
-            } else {
-              /*
-              console.log(
-                'buildAndStoreCampaignsDisplay',
-                'no twitchId for',
-                userSlug,
-                'twitchSocial',
-                twitchSocial,
-                'login',
-                login,
-                'display',
-                display
-              )*/
-            }
-          } catch (e) {
-            console.error(
-              'buildAndStoreCampaignsDisplay',
-              'error storing',
-              'userSlug',
-              userSlug,
-              'twitchSocial',
-              twitchSocial,
-              'login',
-              login,
-              'display',
-              display,
-              'error',
-              e,
-            )
+          displayEntries[`campaign:display:${userSlug}`] = display
+          if (twitchId !== '') {
+            displayEntries[`campaign:display:twitchId:${twitchId}`] = display
           }
           return display
         }),
       )
+
+      // Batch write all campaign display entries
+      await this.storage.put(displayEntries)
 
       // Create TOP 100 slice by raised GBP descending
       const top100 = [...allDisplayList]
@@ -1257,10 +1147,11 @@ export class JingleJamData extends DurableObject<Env> {
         date: new Date(),
       }
 
-      // Backward compatibility: keep campaigns:display as TOP 100
-      await this.storage.put('campaigns:display', campaignsDisplayTop)
-      // New key with ALL campaigns
-      await this.storage.put('campaigns:display:all', campaignsDisplayAll)
+      // Batch write summary display entries
+      await this.storage.put({
+        'campaigns:display': campaignsDisplayTop,
+        'campaigns:display:all': campaignsDisplayAll,
+      })
     } catch (e) {
       console.error('build display campaigns', e)
     }
@@ -1483,16 +1374,16 @@ export class JingleJamData extends DurableObject<Env> {
         .sort((a, b) => b.raised.gbp - a.raised.gbp)
         .slice(0, 100)
 
-      // Backward compatibility: keep legacy key as TOP 100
-      await this.storage.put('community:campaigns:display', {
-        count: listTop.length,
-        list: listTop,
-      })
-
-      // New key with ALL community campaigns
-      await this.storage.put('community:campaigns:display:all', {
-        count: listAll.length,
-        list: listAll,
+      // Batch write both community campaign display entries
+      await this.storage.put({
+        'community:campaigns:display': {
+          count: listTop.length,
+          list: listTop,
+        },
+        'community:campaigns:display:all': {
+          count: listAll.length,
+          list: listAll,
+        },
       })
     } catch (e) {
       console.error('build display community campaigns', e)

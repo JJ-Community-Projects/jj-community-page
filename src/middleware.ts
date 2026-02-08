@@ -1,7 +1,5 @@
 import {defineMiddleware} from "astro:middleware";
 import {deleteSessionTokenCookie, setSessionTokenCookie, validateSessionToken} from "./functions/session.ts";
-import {getActionContext} from "astro:actions";
-
 /**
  * Middleware that handles session validation and user authentication.
  *
@@ -16,7 +14,18 @@ import {getActionContext} from "astro:actions";
  * @returns {Promise<Response>} The response from the next middleware or route handler
  */
 export const onRequest = defineMiddleware(async (context, next) => {
-  // console.log('onRequest', context.url)
+  const path = new URL(context.request.url).pathname;
+  if (
+    path.startsWith('/_astro/') ||
+    path.startsWith('/fonts/') ||
+    path === '/favicon.ico' ||
+    path === '/robots.txt' ||
+    path === '/site.webmanifest' ||
+    /\.(js|css|png|jpg|jpeg|svg|gif|ico|woff2?|ttf|webp|avif)$/.test(path)
+  ) {
+    return next();
+  }
+
   const token = context.cookies.get("session")?.value ?? null;
   const upgradeHeader = context.request.headers.get("upgrade");
   if (upgradeHeader && upgradeHeader.toLowerCase() === "websocket") {
@@ -37,37 +46,8 @@ export const onRequest = defineMiddleware(async (context, next) => {
       // Replace the original request with the new one
       context.request = newRequest;
     }
-    // Bypass middleware for WebSocket upgrade requests
-    console.log('middleware', 'websocket', context.request.url);
     return next()
   }
-
-
-  const {action} = getActionContext(context);
-
-
-  if (action?.calledFrom === 'rpc') {
-    const ip = context.request.headers.get("CF-Connecting-IP");
-    if (ip) {
-      try {
-        const UserRateLimiter = context.locals.runtime.env.UserRateLimiter
-        const id = UserRateLimiter.idFromName(ip);
-        const stub = UserRateLimiter.get(id);
-        /*
-        const milliseconds_to_next_request =
-          await stub.attempt();
-        if (milliseconds_to_next_request > 0) {
-          // Alternatively one could sleep for the necessary length of time
-          return new Response("Rate limit exceeded", {status: 429});
-        }*/
-      } catch (error) {
-        console.log(error);
-        // TODO
-        // return new Response("Could not connect to rate limiter", { status: 502 });
-      }
-    }
-  }
-
 
   try {
     if (context.locals.user) {
@@ -75,14 +55,12 @@ export const onRequest = defineMiddleware(async (context, next) => {
         context.locals.user = null;
         context.locals.session = null;
         deleteSessionTokenCookie(context);
-        console.log('authMiddleware', context.request.url, 'tiltifySlug === null');
         return next();
       }
     }
     if (token === null) {
       context.locals.session = null;
       context.locals.user = null;
-      console.log('authMiddleware', context.request.url, 'token === null');
       return next();
     }
     const {user, session} = await validateSessionToken(context, token);

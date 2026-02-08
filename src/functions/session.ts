@@ -141,7 +141,7 @@ export async function validateSessionToken(ctx: AstroContext, token: string): Pr
 
   const KV = ctx.locals.runtime.env.KV;
   const db = getDB(ctx);
-  const rawSession = await KV.get(`session:${sessionId}`);
+  const rawSession = await KV.get(`session:${sessionId}`, { cacheTtl: 300 });
   if (!rawSession) {
     return {session: null, user: null};
   }
@@ -176,10 +176,12 @@ export async function validateSessionToken(ctx: AstroContext, token: string): Pr
     return {session: null, user: null};
   }
 
-  // Extend session if it's within 15 days of expiration
-  if (Date.now() >= session.expiresAt.getTime() - 1000 * 60 * 60 * 24 * 15) {
+  // Extend session if it's within 3 days of expiration
+  if (Date.now() >= session.expiresAt.getTime() - 1000 * 60 * 60 * 24 * 3) {
     session.expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24 * 30); // Extend by 30 days
-    await KV.put(`session:${sessionId}`, JSON.stringify(session));
+    await KV.put(`session:${sessionId}`, JSON.stringify(session), {
+      expirationTtl: 30 * 24 * 60 * 60
+    });
   }
 
   return {session, user};
@@ -191,7 +193,7 @@ export async function validateSessionTokenFromEnv(env: Env, token: string): Prom
 
   const KV = env.KV;
   const db = drizzle(env.DB)
-  const rawSession = await KV.get(`session:${sessionId}`);
+  const rawSession = await KV.get(`session:${sessionId}`, { cacheTtl: 300 });
   if (!rawSession) {
     return {session: null, user: null};
   }
@@ -227,10 +229,12 @@ export async function validateSessionTokenFromEnv(env: Env, token: string): Prom
     return {session: null, user: null};
   }
 
-// Extend session if it's within 15 days of expiration
-  if (Date.now() >= session.expiresAt.getTime() - 1000 * 60 * 60 * 24 * 15) {
+// Extend session if it's within 3 days of expiration
+  if (Date.now() >= session.expiresAt.getTime() - 1000 * 60 * 60 * 24 * 3) {
     session.expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24 * 30); // Extend by 30 days
-    await KV.put(`session:${sessionId}`, JSON.stringify(session));
+    await KV.put(`session:${sessionId}`, JSON.stringify(session), {
+      expirationTtl: 30 * 24 * 60 * 60
+    });
   }
 
   return {session, user};
@@ -410,9 +414,9 @@ export async function createSession(context: AstroContext, token: string, userId
     expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30) // 30 days
   };
 
-  // Store the session in KV storage with 7-day TTL
+  // Store the session in KV storage with 30-day TTL (matching session expiry)
   await KV.put(`session:${sessionId}`, JSON.stringify(session), {
-    expirationTtl: 7 * 24 * 60 * 60 // 7 days
+    expirationTtl: 30 * 24 * 60 * 60 // 30 days
   });
 
   // Get existing sessionIds for this user
@@ -530,9 +534,9 @@ export async function createNewUserSession(
       // Continue even if setting styles fails
     }
 
-    // Store the session in KV storage with 7-day TTL
+    // Store the session in KV storage with 30-day TTL (matching session expiry)
     await KV.put(`session:${sessionId}`, JSON.stringify(session), {
-      expirationTtl: 7 * 24 * 60 * 60 // 7 days
+      expirationTtl: 30 * 24 * 60 * 60 // 30 days
     });
 
     return session;

@@ -23,6 +23,7 @@ async function getTagsForUser(db: JJDrizzleDatabase, env: Env, userId: number) {
     `tagsForUser:${userId}`,
     {
       type: 'json',
+      cacheTtl: 300,
     }
   )
 
@@ -93,7 +94,7 @@ async function setUserDisplay(
 // Helper: cache final related users list (short TTL)
 async function getCachedRelatedUsers(env: Env, userId: number, limit: number) {
   const KV = env.KV
-  return KV.get<string>(`relatedUsers:${userId}:limit=${limit}`)
+  return KV.get<string>(`relatedUsers:${userId}:limit=${limit}`, { cacheTtl: 300 })
 }
 
 async function setCachedRelatedUsers(
