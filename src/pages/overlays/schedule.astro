@@ -1,6 +1,8 @@
 ---
 import { UserScheduleOverlay } from '../../components/features/overlay/schedule/user/UserScheduleOverlay.tsx'
 
+const HIDE_CONTENT = true
+
 const userParam = Astro.url.searchParams.get('user')
 const timezoneParam = Astro.url.searchParams.get('timezone')
 const themeParam = Astro.url.searchParams.get('theme')
@@ -17,12 +19,16 @@ const limit = Number.isFinite(limitRaw) ? Math.min(100, Math.max(1, Math.floor(l
 ---
 
 <div class="min-h-screen bg-transparent text-white">
-  <UserScheduleOverlay
-    client:only="solid-js"
-    user={user}
-    timezone={timezone}
-    theme={theme}
-    style={style}
-    limit={limit}
-  />
+  {HIDE_CONTENT ? (
+    <p class="p-4 text-center text-sm text-white/60">Overlay currently unavailable</p>
+  ) : (
+    <UserScheduleOverlay
+      client:only="solid-js"
+      user={user}
+      timezone={timezone}
+      theme={theme}
+      style={style}
+      limit={limit}
+    />
+  )}
 </div>

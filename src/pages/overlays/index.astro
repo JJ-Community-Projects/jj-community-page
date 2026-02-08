@@ -3,6 +3,8 @@ import BaseLayout from '../../layouts/BaseLayout.astro'
 import { OverlayConfiguration } from '../../components/features/overlay/overview/OverlayConfiguration.tsx'
 import { PublicOverlayConfiguration } from '../../components/features/overlay/overview/PublicOverlayConfiguration.tsx'
 
+const HIDE_CONTENT = true
+
 const user = Astro.locals.user
 
 const isLoggedIn = user !== null
@@ -13,18 +15,27 @@ const isLoggedIn = user !== null
   description="Configure your Overlay V2 links and copy ready-to-use URLs for OBS browser sources."
   canonical="https://jinglejam.ostof.dev/overlays-v2"
 >
-  <div
-    class="mx-auto flex w-fit flex-col items-center p-1 text-center text-base text-white md:w-[50%] md:text-2xl"
-  >
-    <p class="p-1 text-2xl font-bold md:p-2 md:text-4xl">
-      JJ Community OBS Overlays
-    </p>
-    <p>
-      These overlays are designed for OBS browser sources. Configure your
-      overlay below and copy the generated link.
-    </p>
-    <p class="text-xl font-bold">Feedback is appreciated!</p>
-  </div>
-  {isLoggedIn && <OverlayConfiguration client:only="solid-js" user={user} />}
-  {!isLoggedIn && <PublicOverlayConfiguration client:only="solid-js" user={user} />}
+  {HIDE_CONTENT ? (
+    <div class="flex w-full flex-col items-center gap-2 rounded-xl border border-white/10 bg-white/5 p-6 text-center text-white">
+      <h1 class="text-2xl font-bold">JJ Community OBS Overlays</h1>
+      <p class="text-white/60">Overlays are currently unavailable. They will be back when the Jingle Jam starts!</p>
+    </div>
+  ) : (
+    <>
+      <div
+        class="mx-auto flex w-fit flex-col items-center p-1 text-center text-base text-white md:w-[50%] md:text-2xl"
+      >
+        <p class="p-1 text-2xl font-bold md:p-2 md:text-4xl">
+          JJ Community OBS Overlays
+        </p>
+        <p>
+          These overlays are designed for OBS browser sources. Configure your
+          overlay below and copy the generated link.
+        </p>
+        <p class="text-xl font-bold">Feedback is appreciated!</p>
+      </div>
+      {isLoggedIn && <OverlayConfiguration client:only="solid-js" user={user} />}
+      {!isLoggedIn && <PublicOverlayConfiguration client:only="solid-js" user={user} />}
+    </>
+  )}
 </BaseLayout>

@@ -1,6 +1,8 @@
 ---
 import { CharitiesTickerOverlay } from '../../components/features/overlay/ticker/charities/CharitiesTickerOverlay.tsx'
 
+const HIDE_CONTENT = true
+
 const themeParam = Astro.url.searchParams.get('theme')
 const speedParam = Astro.url.searchParams.get('speed')
 const currencyParam = Astro.url.searchParams.get('currency')
@@ -13,5 +15,9 @@ const user = userParam ?? undefined
 
 ---
 <div class="min-h-screen bg-transparent text-white">
-  <CharitiesTickerOverlay client:only="solid-js" theme={theme} speed={speed} currency={currency} user={user} />
+  {HIDE_CONTENT ? (
+    <p class="p-4 text-center text-sm text-white/60">Overlay currently unavailable</p>
+  ) : (
+    <CharitiesTickerOverlay client:only="solid-js" theme={theme} speed={speed} currency={currency} user={user} />
+  )}
 </div>

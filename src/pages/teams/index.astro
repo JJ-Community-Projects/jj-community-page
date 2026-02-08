@@ -3,6 +3,12 @@ import { serverClientPublic } from '../../lib/orpc/serverClient'
 import { TeamsGrid } from '../../components/features/teams/public/TeamsGrid'
 import BaseLayout4xl from '../../layouts/BaseLayout4xl.astro'
 import TeamsIndexHeader from '../../components/features/teams/public/TeamsIndexHeader'
+import {
+  MainCountdownSimple,
+  MainJJStartTimes,
+} from '../../components/common/ui/MainHeader.tsx'
+
+const HIDE_CONTENT = true
 
 const { data: teams, error } = await serverClientPublic.teams.findVisible(
   {},
@@ -16,24 +22,38 @@ const { data: teams, error } = await serverClientPublic.teams.findVisible(
 ---
 
 <BaseLayout4xl title="Teams - Jingle Jam Community">
-  <!-- Error State -->
-  {
-    error && (
-      <div class="bg-red-500 bg-opacity-20 p-4 rounded-lg text-white mb-6">
-        <h2 class="text-xl font-semibold">Error Loading Teams</h2>
-        <p>
-          {error?.message || 'An unknown error occurred while loading teams.'}
-        </p>
+  {HIDE_CONTENT ? (
+    <div class="flex w-full flex-col items-center gap-1 rounded-xl border border-white/10 bg-white/5 p-4 text-center text-white text-white/90 sm:p-4">
+      <div class="flex flex-col items-center justify-center text-white">
+        <h1 class="w-full text-center ~text-2xl/4xl">Teams</h1>
+        <h2 class="text-center ~text-lg/xl">
+          Teams will be available when the Jingle Jam starts!
+        </h2>
       </div>
-    )
-  }
+      <div class="w-full">
+        <MainCountdownSimple client:only="solid-js" />
+      </div>
+      <div class="w-full">
+        <MainJJStartTimes client:only="solid-js" />
+      </div>
+    </div>
+  ) : (
+    <>
+      {error && (
+        <div class="bg-red-500 bg-opacity-20 p-4 rounded-lg text-white mb-6">
+          <h2 class="text-xl font-semibold">Error Loading Teams</h2>
+          <p>
+            {error?.message || 'An unknown error occurred while loading teams.'}
+          </p>
+        </div>
+      )}
 
-  {
-    teams && (
-      <div class="w-full flex flex-col justify-center items-stretch gap-4 ">
-        <TeamsIndexHeader client:only="solid-js" />
-        <TeamsGrid teams={teams} client:only="solid-js" />
-      </div>
-    )
-  }
+      {teams && (
+        <div class="w-full flex flex-col justify-center items-stretch gap-4 ">
+          <TeamsIndexHeader client:only="solid-js" />
+          <TeamsGrid teams={teams} client:only="solid-js" />
+        </div>
+      )}
+    </>
+  )}
 </BaseLayout4xl>

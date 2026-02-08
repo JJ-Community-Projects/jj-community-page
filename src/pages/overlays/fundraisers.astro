@@ -1,6 +1,8 @@
 ---
 import { FundraisersTickerOverlay } from '../../components/features/overlay/ticker/fundraisers/FundraisersTickerOverlay.tsx'
 
+const HIDE_CONTENT = true
+
 const orderByParam = Astro.url.searchParams.get('orderBy')
 const pageSizeParam = Astro.url.searchParams.get('pageSize')
 const currencyParam = Astro.url.searchParams.get('currency')
@@ -16,5 +18,9 @@ const user = userParam ?? undefined
 ---
 
 <div class="min-h-screen bg-transparent text-white">
-  <FundraisersTickerOverlay client:only="solid-js" orderBy={orderBy} pageSize={pageSize} currency={currency} user={user} />
+  {HIDE_CONTENT ? (
+    <p class="p-4 text-center text-sm text-white/60">Overlay currently unavailable</p>
+  ) : (
+    <FundraisersTickerOverlay client:only="solid-js" orderBy={orderBy} pageSize={pageSize} currency={currency} user={user} />
+  )}
 </div>

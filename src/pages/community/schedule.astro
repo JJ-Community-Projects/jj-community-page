@@ -3,6 +3,13 @@ export const prerender = false
 import { CommunitySchedulesPage } from '../../components/features/schedules/community/CommunitySchedules.tsx'
 import { getEntry } from 'astro:content'
 import BaseLayout from '../../layouts/BaseLayout.astro'
+import {
+  MainCountdownSimple,
+  MainJJStartTimes,
+} from '../../components/common/ui/MainHeader.tsx'
+
+const HIDE_CONTENT = true
+
 const charityData = await getEntry('charities', '2025')
 ---
 
@@ -11,9 +18,26 @@ const charityData = await getEntry('charities', '2025')
   description="Explore the upcoming streams for Jingle Jam 2025"
   canonical="https://jinglejam.ostof.dev/community/schedules"
 >
-  <div class="w-full flex flex-col justify-center items-stretch gap-4">
-    <CommunitySchedulesPage
-      charitiesData={charityData?.data}
-      client:only="solid-js" />
-  </div>
+  {HIDE_CONTENT ? (
+    <div class="flex w-full flex-col items-center gap-1 rounded-xl border border-white/10 bg-white/5 p-4 text-center text-white text-white/90 sm:p-4">
+      <div class="flex flex-col items-center justify-center text-white">
+        <h1 class="w-full text-center ~text-2xl/4xl">Community Schedule</h1>
+        <h2 class="text-center ~text-lg/xl">
+          The schedule will be available when the Jingle Jam starts!
+        </h2>
+      </div>
+      <div class="w-full">
+        <MainCountdownSimple client:only="solid-js" />
+      </div>
+      <div class="w-full">
+        <MainJJStartTimes client:only="solid-js" />
+      </div>
+    </div>
+  ) : (
+    <div class="w-full flex flex-col justify-center items-stretch gap-4">
+      <CommunitySchedulesPage
+        charitiesData={charityData?.data}
+        client:only="solid-js" />
+    </div>
+  )}
 </BaseLayout>

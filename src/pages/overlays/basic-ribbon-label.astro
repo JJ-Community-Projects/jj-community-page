@@ -1,6 +1,8 @@
 ---
 import { BasicRibbonLabelOverlay } from '../../components/features/overlay/jjRibbons/basicRibbonLabel/BasicRibbonLabelOverlay.tsx'
 
+const HIDE_CONTENT = true
+
 const styleParam = Astro.url.searchParams.get('style')
 const alignmentParam = Astro.url.searchParams.get('alignment')
 const textParam = Astro.url.searchParams.get('text')
@@ -19,6 +21,9 @@ const text = textParam ?? ''
 ---
 
 <div class="bg-transparent">
-  <BasicRibbonLabelOverlay client:only="solid-js" style={style} alignment={alignment} text={text} />
-
+  {HIDE_CONTENT ? (
+    <p class="p-4 text-center text-sm text-white/60">Overlay currently unavailable</p>
+  ) : (
+    <BasicRibbonLabelOverlay client:only="solid-js" style={style} alignment={alignment} text={text} />
+  )}
 </div>

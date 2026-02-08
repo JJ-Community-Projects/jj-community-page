@@ -1,6 +1,8 @@
 ---
 import { TeamScheduleOverlay } from '../../components/features/overlay/schedule/team/TeamScheduleOverlay.tsx'
 
+const HIDE_CONTENT = true
+
 const teamIdParam = Astro.url.searchParams.get('teamId')
 const timezoneParam = Astro.url.searchParams.get('timezone')
 const themeParam = Astro.url.searchParams.get('theme')
@@ -18,12 +20,16 @@ const limit = typeof limitCandidate === 'number' ? Math.max(3, Math.min(10, limi
 ---
 
 <div class="min-h-screen bg-transparent text-white">
-  <TeamScheduleOverlay
-    client:only="solid-js"
-    teamId={teamId}
-    timezone={timezone}
-    theme={theme}
-    style={style}
-    limit={limit}
-  />
+  {HIDE_CONTENT ? (
+    <p class="p-4 text-center text-sm text-white/60">Overlay currently unavailable</p>
+  ) : (
+    <TeamScheduleOverlay
+      client:only="solid-js"
+      teamId={teamId}
+      timezone={timezone}
+      theme={theme}
+      style={style}
+      limit={limit}
+    />
+  )}
 </div>

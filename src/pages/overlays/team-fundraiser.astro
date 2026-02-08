@@ -2,6 +2,8 @@
 import BaseLayout from '../../layouts/BaseLayout.astro'
 import { FundraisersByTeamOverlay } from '../../components/features/overlay/ticker/fundraisers/FundraisersByTeamOverlay.tsx'
 
+const HIDE_CONTENT = true
+
 const teamParam = Astro.url.searchParams.get('team')
 const themeParam = Astro.url.searchParams.get('theme')
 const speedParam = Astro.url.searchParams.get('speed')
@@ -18,5 +20,9 @@ const user = userParam ?? undefined
 ---
 
 <div class="min-h-screen bg-transparent text-white">
-  <FundraisersByTeamOverlay client:only="solid-js" teamSlug={team} theme={theme} speed={speed} showRaised={showRaised} currency={currency} user={user} />
+  {HIDE_CONTENT ? (
+    <p class="p-4 text-center text-sm text-white/60">Overlay currently unavailable</p>
+  ) : (
+    <FundraisersByTeamOverlay client:only="solid-js" teamSlug={team} theme={theme} speed={speed} showRaised={showRaised} currency={currency} user={user} />
+  )}
 </div>

@@ -1,5 +1,8 @@
 ---
 import { CampaignGoalOverlay } from '../../components/features/overlay/jjRibbons/campaignGoal/CampaignGoalOverlay.tsx'
+
+const HIDE_CONTENT = true
+
 const userParam = Astro.url.searchParams.get('user')
 const themeParam = Astro.url.searchParams.get('theme')
 const currencyParam = Astro.url.searchParams.get('currency')
@@ -23,13 +26,17 @@ const alignment =
 ---
 
 <div class="bg-transparent">
-  <CampaignGoalOverlay
-    client:only="solid-js"
-    user={user}
-    theme={theme}
-    currency={currency}
-    debug={debug}
-    showChangeLabel={showChangeLabel}
-    alignment={alignment}
-  />
+  {HIDE_CONTENT ? (
+    <p class="p-4 text-center text-sm text-white/60">Overlay currently unavailable</p>
+  ) : (
+    <CampaignGoalOverlay
+      client:only="solid-js"
+      user={user}
+      theme={theme}
+      currency={currency}
+      debug={debug}
+      showChangeLabel={showChangeLabel}
+      alignment={alignment}
+    />
+  )}
 </div>
