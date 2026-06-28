@@ -1,1966 +1,271 @@
 import { DurableObject } from 'cloudflare:workers'
-import { getDB } from '../lib/db/db.ts'
-import type {
-  JingleJamCampaignsResponse,
-  JingleJamResponse,
-  JJCampaign,
-  JJCause,
-  JJCollections,
-} from './types/JJAPIModel.ts'
-import { TwitchAPI } from '../lib/twitchAPI.ts'
-import type {
-  CausesDisplayTVType,
-  CurrenciesTV,
-  JJCampaignsTVType,
-  JJCampaignTVType,
-  JJCauseTVType,
-} from '../lib/orpc/public/twitchExtension/contract.ts'
-import type {
-  FullCommunitySchedule,
-  HardcodedStreams,
-  JJCampaignType,
-  Stream,
-  UserDisplay,
-  UserStream,
-} from '../lib/orpc/private/jjData/contract.ts'
-import { and, asc, desc, eq, or } from 'drizzle-orm'
-import {
-  schedulesTable,
-  streamParticipantsTable,
-  streamsTable,
-} from '../lib/db/schema/jj-schema.ts'
-import {
-  tagUserCountsView,
-  userDisplayView,
-} from '../lib/db/schema/views-schema.ts'
-import {
-  streamTagsTable,
-  tags,
-  userTagsTable,
-} from '../lib/db/schema/tags-schema.ts'
-import { TiltifyAPI, type TiltifyUserData } from '../lib/TiltifyAPI.ts'
-import { jjCampaign, jjCauses } from '../lib/db/schema/jj-api-schema.ts'
-import type { BatchItem } from 'drizzle-orm/batch'
-import type { TwitchUser } from '../lib/model/TwitchUser.ts'
-import { accounts } from '../lib/db/schema/auth-schema.ts'
+import type { JJCampaign, JJCause } from './types/JJAPIModel.ts'
+import type { JJCauseTVType } from '../lib/orpc/public/twitchExtension/contract.ts'
+import { CurrencyStore } from './jingleJamData/CurrencyStore.ts'
+import { TiltifyStore } from './jingleJamData/TiltifyStore.ts'
+import { TwitchTracker } from './jingleJamData/TwitchTracker.ts'
+import { UserTagsBuilder } from './jingleJamData/UserTagsBuilder.ts'
+import { ScheduleBuilder } from './jingleJamData/ScheduleBuilder.ts'
+import { DisplayBuilder } from './jingleJamData/DisplayBuilder.ts'
+import { Scheduler } from './jingleJamData/Scheduler.ts'
 
-type UserWithTags = {
-  userId: number
-  tiltifySlug: string
-  tags: Array<{
-    name: string
-    id: number
-    slug: string
-    color: string
-    usage: number
-  }>
-}
-
+// Facade Durable Object. Preserves the public method surface that consumers call
+// via `env.JingleJamData` + `idFromName('JJ_API_CACHE')`, while the real work
+// lives in focused feature modules that share this DO's single storage.
+//
+// Module boundaries (see ./jingleJamData/*):
+//   CurrencyStore   — USD/EUR conversion rates
+//   TiltifyStore    — JJ API campaigns/causes/goals/socials + D1 persistence
+//   TwitchTracker   — Twitch validation, live polling, per-campaign live flags
+//   UserTagsBuilder — user-tags display projection
+//   ScheduleBuilder — full community schedule
+//   DisplayBuilder  — TV/display projections
+//   Scheduler       — alarm-driven task runner
 export class JingleJamData extends DurableObject<Env> {
-  replaceMap: Map<string, string> = new Map([
-    ['crustydoggo', 'kirsty'],
-    ['bobawitch', 'boba'],
-    ['boba_witch', 'boba'],
-  ])
+  private currency: CurrencyStore
+  private tiltify: TiltifyStore
+  private twitch: TwitchTracker
+  private userTags: UserTagsBuilder
+  private schedule: ScheduleBuilder
+  private display: DisplayBuilder
+  private scheduler: Scheduler
 
-  tiltifySlugToTwitchLoginMap: Map<string, string> = new Map([
-    ['hrry', 'hrry'],
-    ['rtgamecrowd', 'rtgame'],
-    ['bobawitch', 'boba'],
-    ['crustydoggo', 'kirsty'],
-    ['inthelittlewood', 'inthelittlewood'],
-    ['ravs', 'ravs_'],
-    ['sips-yogscast', 'sips_'],
-    ['pedguin', 'pedguin'],
-    ['highrollersdnd', 'highrollersdnd'],
-    ['jackmanifoldtv', 'jackmanifoldtv'],
-    ['mudkipninja', 'mudkipninja'],
-    ['fionn', 'fionn'],
-  ])
-  // Task definition
-  private tasks = [
-    {
-      name: 'jjAPIRefresh',
-      everyMs: 30 * 1000,
-      run: async () => {
-        await this.refresh()
-        await this.refreshAllCampaigns()
-        await this.insertIntoDB()
-        await this.buildDisplayData()
-      },
-    },
-    {
-      name: 'validateTwitchChannels',
-      everyMs: 6 * 60 * 60 * 1000,
-      run: async () => {
-        await this.validateTwitchChannels()
-      },
-    },
-    {
-      name: 'checkLiveStreams',
-      everyMs: 4 * 60 * 1000,
-      run: async () => {
-        await this.checkLiveStreams()
-      },
-    },
-    {
-      name: 'fetchGBPToEURConversionRate',
-      everyMs: 4 * 60 * 60 * 1000,
-      run: async () => {
-        await this.fetchGBPToEURConversionRate()
-      },
-    },
-    {
-      name: 'loadAllTiltifySocials',
-      everyMs: 3 * 60 * 60 * 1000,
-      run: async () => {
-        await this.loadAllTiltifySocials()
-      },
-    },
-    {
-      name: 'buildAndStoreUserTags',
-      everyMs: 4 * 60 * 60 * 1000,
-      run: async () => {
-        await this.buildAndStoreUserTags()
-      },
-    },
-    {
-      name: 'generateFullSchedule',
-      everyMs: 60 * 60 * 1000,
-      run: async () => {
-        await this.generateFullSchedule()
-      },
-    },
-    {
-      name: 'updateTiltifyProfiles',
-      everyMs: 2 * 60 * 60 * 1000,
-      run: async () => {
-        await this.updateTiltifyProfiles()
-      },
-    },
-  ] as const
-
-  private get storage() {
-    return this.ctx.storage
-  }
-
-  // Causes
-  public async setTVCause(cause: JJCauseTVType) {
-    await this.storage.put(this.causeKeyTV(cause.id), cause)
-  }
-
-  public async setCauses(causes: JJCause[]) {
-    const entries: Record<string, JJCause> = {}
-    for (const c of causes) entries[this.causeKey(c.id)] = c
-    await this.storage.put(entries)
-  }
-
-  public getTVCause(causeId: string) {
-    return this.storage.get(this.causeKeyTV(causeId)) as Promise<
-      JJCauseTVType | undefined
-    >
-  }
-
-  public getCause(causeId: string) {
-    return this.storage.get(this.causeKey(causeId)) as Promise<
-      JJCause | undefined
-    >
-  }
-
-  public async getCausesTV() {
-    const map = (await this.storage.list({ prefix: 'cause:tv:' })) as Map<
-      string,
-      unknown
-    >
-    return Array.from(map.values()) as JJCauseTVType[]
-  }
-
-  public async getCauses() {
-    const map = (await this.storage.list({ prefix: 'cause:raw:' })) as Map<
-      string,
-      unknown
-    >
-    return Array.from(map.values()) as JJCause[]
-  }
-
-  // Campaigns
-  public async setCampaign(campaign: JJCampaign) {
-    await this.storage.put(this.campaignKeyId(campaign.id), campaign)
-    await this.storage.put(this.campaignKey(campaign.id), campaign)
-  }
-
-  public async setCampaigns(campaigns: JJCampaign[]) {
-    const entries: Record<string, JJCampaign> = {}
-    for (const c of campaigns) {
-      entries[this.campaignKeyId(c.id)] = c
-      entries[this.campaignKey(c.slug)] = c
-      entries[this.campaignKeyUserSlug(c.user.slug)] = c
-
-      const goal = c.goal
-      const raised = c.raised
-    }
-    await this.storage.put(entries)
-  }
-
-  public async getCampaign(userRef: string) {
-    const campaign = await this.storage.get<JJCampaign>(
-      this.campaignKey(userRef),
+  constructor(ctx: DurableObjectState, env: Env) {
+    super(ctx, env)
+    const storage = ctx.storage
+    this.currency = new CurrencyStore(storage)
+    this.tiltify = new TiltifyStore(storage, env, this.currency)
+    this.twitch = new TwitchTracker(storage, env, this.tiltify)
+    this.userTags = new UserTagsBuilder(storage, env)
+    this.schedule = new ScheduleBuilder(storage, env)
+    this.display = new DisplayBuilder(
+      storage,
+      env,
+      this.tiltify,
+      this.twitch,
+      this.currency,
+      this.userTags,
     )
-    if (campaign) {
-      return campaign
-    }
-    return this.storage.get(this.campaignKeyId(userRef)) as Promise<
-      JJCampaign | undefined
-    >
-  }
-
-  public getCampaignBySlug(slug: string) {
-    return this.storage.get(`campaign:slug:${slug}`) as Promise<
-      JJCampaign | undefined
-    >
-  }
-
-  public getCampaignByUserSlug(slug: string) {
-    return this.storage.get(`campaign:api:user-slug:${slug}`) as Promise<
-      JJCampaign | undefined
-    >
-  }
-
-  public async getCampaigns() {
-    const map = (await this.storage.list({
-      prefix: 'campaign:api:slug:',
-    })) as Map<string, unknown>
-    return Array.from(map.values()) as JJCampaign[]
-  }
-
-  public async getCampaignsForCause(causeId: string) {
-    const campaigns = await this.getCampaigns()
-    return campaigns.filter((c) => c.causeId === causeId)
-  }
-
-  public async fetchCampaigns(
-    limit: number,
-    offset: number,
-  ): Promise<JingleJamCampaignsResponse> {
-    const res = await fetch(
-      this.env.JJ_DASHBOARD_URL +
-        '/api/campaigns?' +
-        'limit=' +
-        limit +
-        '&offset=' +
-        offset,
-    )
-    if (!res.ok) {
-      throw new Error(
-        `Failed to fetch JingleJam campaigns: ${res.status} ${res.statusText}`,
-      )
-    }
-    const data = (await res.json()) as JingleJamCampaignsResponse
-    console.log('fetchCampaigns', data.campaigns.count)
-    return data
-  }
-
-  public async refreshAllCampaigns() {
-    const limit = 100
-    let offset = 0
-    const all: JJCampaign[] = []
-
-    try {
-      while (true) {
-        const res = await this.fetchCampaigns(limit, offset)
-        // Try common shapes: list or campaigns
-        const batch: JJCampaign[] =
-          // @ts-ignore – tolerate different response shapes
-          (res as any)?.list ?? ((res as any)?.campaigns as JJCampaign[]) ?? []
-
-        if (!Array.isArray(batch) || batch.length === 0) break
-
-        all.push(...batch)
-
-        // If we received fewer than limit items, we've reached the end
-        if (batch.length < limit) break
-
-        offset += limit
-      }
-      console.log('refreshAllCampaigns', 'all', all.length)
-      await this.setCampaigns(all)
-      await this.updateGoalsAfterSetCampaigns(all)
-    } catch (e) {
-      console.error('refreshAllCampaigns failed', e)
-      // Best-effort: still persist whatever we have
-      if (all.length > 0) {
-        try {
-          await this.setCampaigns(all)
-          await this.updateGoalsAfterSetCampaigns(all)
-        } catch (e2) {
-          console.error('refreshAllCampaigns setCampaigns partial failed', e2)
-        }
-      }
-    }
-  }
-
-  // Refresh from API and persist to storage and DB
-  public async refresh() {
-    const res = await fetch(this.env.JJ_DASHBOARD_URL + '/api/tiltify')
-    if (!res.ok) {
-      throw new Error(
-        `Failed to fetch JingleJam data: ${res.status} ${res.statusText}`,
-      )
-    }
-
-    const data = (await res.json()) as JingleJamResponse
-
-    // Update DO storage (granular)
-    try {
-      await this.setCauses(data.causes)
-    } catch (e) {
-      console.error('setCauses', e)
-    }
-
-    /*
-    try {
-      await this.setCampaigns(data.campaigns.list)
-      for (const c of data.campaigns.list) {
-        await this.storage.put(`campaign:by-slug:${c.user.slug}`, c)
-      }
-    } catch (e) {
-      console.error('setCampaigns', e)
-    }*/
-
-    // Store event metadata in a single batched write
-    try {
-      await this.storage.put({
-        'date': data.date,
-        'event:year': data.event.year,
-        'raised': data.raised,
-        'collections': data.collections,
-        'donations': data.donations,
-        'dollarConversionRate': data.dollarConversionRate,
-      })
-    } catch (e) {
-      console.error('put metadata', e)
-    }
-  }
-
-  public async buildDisplayData() {
-    // Build and store display projections matching JJCampaignsSchema
-    await this.buildAndStoreCampaignsDisplay()
-
-    // Build and store display projections for causes
-    await this.buildAndStoreCausesDisplay()
-
-    // Build and store display projections for community campaigns
-    await this.buildAndStoreCommunityCampaignsDisplay()
-  }
-
-  public async insertIntoDB() {
-    const causes = await this.getCauses()
-    const campaigns = await this.getCampaigns()
-    const year = await this.storage.get<number>('event:year')
-    try {
-      const db = getDB(this.env)
-
-      // Conservative variable ceiling (SQLite default is 999). Leave some safety headroom.
-      const VARS_LIMIT = 5
-
-      // Helper to chunk an array
-      const chunk = <T>(arr: T[], size: number) => {
-        const out: T[][] = []
-        for (let i = 0; i < arr.length; i += size)
-          out.push(arr.slice(i, i + size))
-        return out
-      }
-
-      // Prepare rows
-      const causeRows = await Promise.all(
-        causes.map(async (cause) => ({
-          id: cause.id,
-          year: year!,
-          name: cause.name,
-          logo: cause.logo,
-          description: cause.description,
-          url: cause.url,
-          donateUrl: cause.donateUrl,
-          raised: cause.raised,
-        })),
-      )
-
-      const tiltifyUsers = await this.getTiltifyUsersMap()
-
-      const getLivestream = (slug: string) => {
-        const user = tiltifyUsers.get(slug)
-        if (!user)
-          return {
-            channel: '',
-            type: '',
-          }
-        const twitch =
-          this.tiltifySlugToTwitchLoginMap.get(slug) ?? user.social.twitch
-        if (twitch) {
-          return {
-            channel: this.normalizeTwitchLogin(twitch),
-            type: 'twitch',
-          }
-        }
-        if (user.social.youtube) {
-          return {
-            channel: user.social.youtube,
-            type: 'youtube',
-          }
-        }
-      }
-
-      const campaignRows = await Promise.all(
-        campaigns.map(async (c) => ({
-          year: year!,
-          causeId: c.causeId ? await c.causeId! : null,
-          name: c.name,
-          description: c.description,
-          slug: c.slug,
-          url: c.url,
-          startTime: c.startTime ?? '',
-          raised: c.raised,
-          goal: c.goal,
-          livestream: getLivestream(c.user.slug),
-          userName: c.user.name,
-          userSlug: c.user.slug,
-          userAvatar: c.user.avatar,
-          userUrl: c.user.url,
-        })),
-      )
-
-      // Estimate columns per row (must match the values object shape)
-      const CAUSE_COLS = 4
-      const CAMPAIGN_COLS = 4 // adjust to exact count if different
-
-      const causeChunkSize = Math.max(1, Math.floor(VARS_LIMIT / CAUSE_COLS))
-      const campaignChunkSize = Math.max(
-        1,
-        Math.floor(VARS_LIMIT / CAMPAIGN_COLS),
-      )
-
-      const causeChunks = chunk(causeRows, causeChunkSize)
-      const campaignChunks = chunk(campaignRows, campaignChunkSize)
-
-      // Build statements, but keep batch sizes moderate as well
-      const statements: BatchItem<'sqlite'>[] = []
-
-      for (const rows of causeChunks) {
-        statements.push(db.insert(jjCauses).values(rows).onConflictDoNothing())
-      }
-      for (const rows of campaignChunks) {
-        statements.push(
-          db.insert(jjCampaign).values(rows).onConflictDoNothing(),
-        )
-      }
-
-      // Optionally, run statements in batches to avoid huge batch payloads
-      const BATCH_SIZE = 25
-      for (let i = 0; i < statements.length; i += BATCH_SIZE) {
-        const slice = statements.slice(i, i + BATCH_SIZE)
-        const [firstOp, ...restOps] = slice
-        await db.batch([firstOp, ...restOps] as const)
-      }
-    } catch (e) {
-      console.error('db.batch persist JJ data', e)
-    }
-  }
-
-  public async getDollarConversionRate() {
-    const dollarConversionRate = await this.storage.get<number>(
-      'dollarConversionRate',
-    )
-    return dollarConversionRate ?? 1
-  }
-
-  // Returns the cached GBP->EUR rate or 1 if not available
-  public async getGbpToEurRate() {
-    const rate = await this.storage.get<number>('gbp:eur:rate')
-    return rate ?? 1
-  }
-
-  public async getRaised() {
-    const raised = await this.storage.get<number>('raised')
-    return raised ?? 0
-  }
-
-  public async getCollections() {
-    const collections = await this.storage.get<JJCollections>('collections')
-    return collections ?? { redeemed: 0, total: 0 }
-  }
-
-  public async getDonations() {
-    const donations = await this.storage.get<number>('donations')
-    return donations ?? 0
-  }
-
-  public async getDate() {
-    const donations = await this.storage.get<string>('date')
-    return donations ?? new Date().toISOString()
-  }
-
-  public getCampaignsDisplay(): Promise<JJCampaignsTVType | undefined> {
-    return this.storage.get<JJCampaignsTVType>('campaigns:display')
-  }
-
-  // New: full list (ALL) campaigns display
-  public getCampaignsDisplayAll(): Promise<JJCampaignsTVType | undefined> {
-    return this.storage.get<JJCampaignsTVType>('campaigns:display:all')
-  }
-
-  public getCausesDisplay(): Promise<CausesDisplayTVType | undefined> {
-    return this.storage.get<CausesDisplayTVType>('causes:display')
-  }
-
-  // New: full list (ALL) causes display
-  public getCausesDisplayAll(): Promise<CausesDisplayTVType | undefined> {
-    return this.storage.get<CausesDisplayTVType>('causes:display:all')
-  }
-
-  public async getLiveLogins() {
-    return this.getStringArray('twitch:liveStreams:logins')
-  }
-
-  // String array helpers
-  public async setStringArray(name: string, values: string[]) {
-    await this.storage.put(this.stringArrayKey(name), values)
-  }
-
-  public async getStringArray(name: string) {
-    const values = await this.storage.get<string[]>(this.stringArrayKey(name))
-    return values ?? []
-  }
-
-  public async validateTwitchChannels() {
-    const api = new TwitchAPI(this.env)
-
-    const logins = await this.getTwitchLoginsFromCampaigns()
-
-    const accessToken = await api.getAppToken()
-
-    const invalidLogins: string[] = []
-
-    const storedInvalidLogins = await this.getStringArray(
-      'twitch:invalidLogins',
-    )
-    const storedValidLogins = await this.getStringArray('twitch:validLogins')
-    // Normalize previously stored invalid logins for proper comparison
-    const storedInvalidSet = new Set(storedInvalidLogins)
-    const storedValidSet = new Set(storedValidLogins)
-
-    const loginsToValidate = logins.filter((l) => !storedValidSet.has(l))
-    const validLogins: string[] = [...storedValidSet]
-
-
-    for (const login of loginsToValidate) {
-      const normalized = this.normalizeTwitchLogin(login)
-      if (!normalized) continue
-
-      if (storedInvalidSet.has(normalized)) {
-        invalidLogins.push(normalized)
-        // console.log('validateTwitchChannels', 'isInvalid', normalized)
-        continue
-      }
-
-      const channel = await api.fetchUsersByLogin(normalized, accessToken)
-
-      if (channel.data && !channel.error) {
-        if (!validLogins.includes(normalized)) validLogins.push(normalized)
-
-        await this.storage.put(`twitch:id:${channel.data.id}`, channel.data)
-        await this.storage.put(
-          `twitch:login:${channel.data.login}`,
-          channel.data,
-        )
-      } else {
-        if (channel.error.status !== 401) {
-          if (!invalidLogins.includes(normalized))
-            invalidLogins.push(normalized)
-        }
-      }
-    }
-
-
-    await this.setStringArray('twitch:validLogins', validLogins)
-    await this.setStringArray('twitch:invalidLogins', invalidLogins)
-  }
-
-  public getTwitchChannelByChannelId(channelId: string) {
-    return this.storage.get<TwitchUser>(`twitch:id:${channelId}`)
-  }
-
-  public async checkLiveStreams() {
-    const logins = await this.getStringArray('twitch:validLogins')
-    const api = new TwitchAPI(this.env)
-    const accessToken = await api.getAppToken()
-    const liveStreamsIds: string[] = []
-    const liveStreamsLogins: string[] = []
-    const loginChunks = this.chunk(logins, 50)
-    for (const logins of loginChunks) {
-      const stream = await api.fetchStreamsByLogins(logins, accessToken)
-      if (stream.data && !stream.error) {
-        for (const s of stream.data) {
-          liveStreamsIds.push(s.user_id)
-          liveStreamsLogins.push(s.user_login)
-        }
-      }
-    }
-    await this.setStringArray('twitch:liveStreams:ids', liveStreamsIds)
-    await this.setStringArray('twitch:liveStreams:logins', liveStreamsLogins)
-
-    // Update per-campaign live flags based on current live logins
-    try {
-      const liveSet = new Set(liveStreamsLogins.map((l) => l.toLowerCase()))
-      const campaigns = await this.getCampaigns()
-
-      const users = await this.getTiltifyUsersMap()
-      const liveEntries: Record<string, boolean> = {}
-      for (const c of campaigns) {
-        const userSlug = c.user.slug
-        const user = users.get(userSlug)
-        const login =
-          this.tiltifySlugToTwitchLoginMap.get(userSlug) ?? user?.social.twitch
-        if (!login) continue
-        const isLive = liveSet.has(this.normalizeTwitchLogin(login))
-        liveEntries[`campaign:live:${c.user.slug}`] = isLive
-      }
-      await this.storage.put(liveEntries)
-    } catch (e) {
-      console.error('update campaign live flags', e)
-    }
-  }
-
-  async getCampaignDisplay(channelId: string) {
-    return this.storage.get<JJCampaignTVType>(
-      `campaign:display:twitchId:${channelId}`,
-    )
-  }
-
-  async getAllCampaignDisplay() {
-    const map = await this.storage.list({
-      prefix: `campaign:display:twitchId:`,
+    this.scheduler = new Scheduler(storage, {
+      tiltify: this.tiltify,
+      twitch: this.twitch,
+      currency: this.currency,
+      userTags: this.userTags,
+      display: this.display,
+      schedule: this.schedule,
     })
-    return Array.from(map.values()) as JJCampaignTVType[]
   }
 
-  public getValidTwitchLogins() {
-    return this.getStringArray('twitch:validLogins')
+  // --- Tiltify: causes ---
+  setCauses(causes: JJCause[]) {
+    return this.tiltify.setCauses(causes)
+  }
+  getCause(causeId: string) {
+    return this.tiltify.getCause(causeId)
+  }
+  getCauses() {
+    return this.tiltify.getCauses()
   }
 
-  public getInvalidTwitchLogins() {
-    return this.getStringArray('twitch:invalidLogins')
+  // --- Tiltify: campaigns ---
+  setCampaign(campaign: JJCampaign) {
+    return this.tiltify.setCampaign(campaign)
+  }
+  setCampaigns(campaigns: JJCampaign[]) {
+    return this.tiltify.setCampaigns(campaigns)
+  }
+  getCampaign(userRef: string) {
+    return this.tiltify.getCampaign(userRef)
+  }
+  getCampaignBySlug(slug: string) {
+    return this.tiltify.getCampaignBySlug(slug)
+  }
+  getCampaignByUserSlug(slug: string) {
+    return this.tiltify.getCampaignByUserSlug(slug)
+  }
+  getCampaigns() {
+    return this.tiltify.getCampaigns()
+  }
+  getCampaignsForCause(causeId: string) {
+    return this.tiltify.getCampaignsForCause(causeId)
+  }
+  fetchCampaigns(limit: number, offset: number) {
+    return this.tiltify.fetchCampaigns(limit, offset)
+  }
+  refreshAllCampaigns() {
+    return this.tiltify.refreshAllCampaigns()
+  }
+  refresh() {
+    return this.tiltify.refresh()
+  }
+  insertIntoDB() {
+    return this.tiltify.insertIntoDB()
   }
 
-  public async clearInvalidTwitchLogins() {
-    await this.setStringArray('twitch:invalidLogins', [])
+  // --- Tiltify: event metadata ---
+  getRaised() {
+    return this.tiltify.getRaised()
+  }
+  getCollections() {
+    return this.tiltify.getCollections()
+  }
+  getDonations() {
+    return this.tiltify.getDonations()
+  }
+  getDate() {
+    return this.tiltify.getDate()
   }
 
-  // Returns all Twitch channels (logins) referenced by current campaigns
-  public async getAllTwitchLogins() {
-    return this.getTwitchLoginsFromCampaigns()
+  // --- Tiltify: goals ---
+  getGoalByUserSlug(slug: string) {
+    return this.tiltify.getGoalByUserSlug(slug)
+  }
+  getPreviousGoalByUserSlug(slug: string) {
+    return this.tiltify.getPreviousGoalByUserSlug(slug)
   }
 
-  public async getAllYoutubeLogins() {
-    return this.getYoutubeLoginsFromCampaigns()
+  // --- Tiltify: socials / users ---
+  loadAllTiltifySocials() {
+    return this.tiltify.loadAllTiltifySocials()
+  }
+  getTiltifyUsersMap() {
+    return this.tiltify.getTiltifyUsersMap()
+  }
+  getAllTwitchLogins() {
+    return this.tiltify.getAllTwitchLogins()
+  }
+  getAllYoutubeLogins() {
+    return this.tiltify.getAllYoutubeLogins()
+  }
+  updateTiltifyProfiles() {
+    return this.tiltify.updateTiltifyProfiles()
   }
 
-  // GBP->EUR conversion via Google Finance
-  public async fetchGBPToEURConversionRate() {
-    const lastFetchedAt = await this.storage.get<number>(
-      'gbp:eur:lastFetchedAt',
-    )
-    if (!lastFetchedAt || Date.now() - lastFetchedAt > 4 * 60 * 60 * 1000) {
-      const value = await this.fetchFromRateAPI()
-      if (Number.isFinite(value)) {
-        await this.storage.put('gbp:eur:rate', value)
-        await this.storage.put('gbp:eur:lastFetchedAt', Date.now())
-      }
-    }
+  // --- Currency ---
+  getDollarConversionRate() {
+    return this.currency.getDollarConversionRate()
+  }
+  getGbpToEurRate() {
+    return this.currency.getGbpToEurRate()
+  }
+  fetchGBPToEURConversionRate() {
+    return this.currency.fetchGBPToEURConversionRate()
   }
 
-  public clear() {
-    return this.storage.deleteAll()
+  // --- Twitch ---
+  setStringArray(name: string, values: string[]) {
+    return this.twitch.setStringArray(name, values)
+  }
+  getStringArray(name: string) {
+    return this.twitch.getStringArray(name)
+  }
+  getLiveLogins() {
+    return this.twitch.getLiveLogins()
+  }
+  validateTwitchChannels() {
+    return this.twitch.validateTwitchChannels()
+  }
+  checkLiveStreams() {
+    return this.twitch.checkLiveStreams()
+  }
+  getTwitchChannelByChannelId(channelId: string) {
+    return this.twitch.getTwitchChannelByChannelId(channelId)
+  }
+  getValidTwitchLogins() {
+    return this.twitch.getValidTwitchLogins()
+  }
+  getInvalidTwitchLogins() {
+    return this.twitch.getInvalidTwitchLogins()
+  }
+  clearInvalidTwitchLogins() {
+    return this.twitch.clearInvalidTwitchLogins()
   }
 
-  public getCommunityCampaignsDisplay(): Promise<
-    { count: number; list: JJCampaignType[] } | undefined
-  > {
-    return this.storage.get<{ count: number; list: JJCampaignType[] }>(
-      'community:campaigns:display',
-    )
+  // --- User tags ---
+  buildAndStoreUserTags() {
+    return this.userTags.buildAndStoreUserTags()
+  }
+  getUserTagsDisplay() {
+    return this.userTags.getUserTagsDisplay()
   }
 
-  // New: full list (ALL) community campaigns display
-  public getCommunityCampaignsDisplayAll(): Promise<
-    { count: number; list: JJCampaignType[] } | undefined
-  > {
-    return this.storage.get<{ count: number; list: JJCampaignType[] }>(
-      'community:campaigns:display:all',
-    )
+  // --- Schedule ---
+  getFullSchedule() {
+    return this.schedule.getFullSchedule()
   }
 
-  public async buildAndStoreUserTags() {
-    const db = getDB(this.env)
-    const start = Date.now()
-
-    // 1) Global usage per tag
-    const tagUsageRows = await this.getUsedTagsWithUserCounts()
-    console.log(
-      'buildAndStoreUserTags',
-      'tagUsageRows',
-      'ms',
-      Date.now() - start,
-    )
-    const usageMap = new Map<number, number>(
-      tagUsageRows.map((r) => [r.tagId, r.usage]),
-    )
-
-    // 2) Pull all users and their tags
-    const rows = await db
-      .select({
-        userId: userDisplayView.userId,
-        tiltifySlug: userDisplayView.tiltifySlug,
-        name: tags.name,
-        tagId: tags.id,
-        tagSlug: tags.slug,
-        color: tags.color,
-      })
-      .from(userDisplayView)
-      .leftJoin(userTagsTable, eq(userTagsTable.userId, userDisplayView.userId))
-      .leftJoin(tags, eq(userTagsTable.tagId, tags.id))
-      .all()
-    console.log('buildAndStoreUserTags', 'rows', 'ms', Date.now() - start)
-
-    const byUser = new Map<number, UserWithTags>()
-
-    for (const r of rows) {
-      let entry = byUser.get(r.userId)
-      if (!entry) {
-        entry = {
-          userId: r.userId,
-          tiltifySlug: r.tiltifySlug ?? null,
-          tags: [],
-        }
-        byUser.set(r.userId, entry)
-      }
-
-      if (r.tagId != null) {
-        entry.tags.push({
-          id: r.tagId,
-          name: r.name!,
-          slug: r.tagSlug!,
-          color: r.color!,
-          usage: usageMap.get(r.tagId) ?? 0,
-        })
-      }
-    }
-
-    const result = Array.from(byUser.values())
-
-    // Sort by usage desc, then slug; then keep only top 3 per user
-    for (const u of result) {
-      u.tags.sort((a, b) => b.usage - a.usage || a.slug.localeCompare(b.slug))
-      // if (u.tags.length > 3) u.tags = u.tags.slice(0, 3)
-    }
-
-    await this.storage.put('user:tags:display', result)
+  // --- Display ---
+  buildDisplayData() {
+    return this.display.buildDisplayData()
+  }
+  setTVCause(cause: JJCauseTVType) {
+    return this.display.setTVCause(cause)
+  }
+  getTVCause(causeId: string) {
+    return this.display.getTVCause(causeId)
+  }
+  getCausesTV() {
+    return this.display.getCausesTV()
+  }
+  getCampaignsDisplay() {
+    return this.display.getCampaignsDisplay()
+  }
+  getCampaignsDisplayAll() {
+    return this.display.getCampaignsDisplayAll()
+  }
+  getCausesDisplay() {
+    return this.display.getCausesDisplay()
+  }
+  getCausesDisplayAll() {
+    return this.display.getCausesDisplayAll()
+  }
+  getCommunityCampaignsDisplay() {
+    return this.display.getCommunityCampaignsDisplay()
+  }
+  getCommunityCampaignsDisplayAll() {
+    return this.display.getCommunityCampaignsDisplayAll()
+  }
+  getCampaignDisplay(channelId: string) {
+    return this.display.getCampaignDisplay(channelId)
+  }
+  getAllCampaignDisplay() {
+    return this.display.getAllCampaignDisplay()
   }
 
-  public getUserTagsDisplay() {
-    return this.storage.get<UserWithTags[]>('user:tags:display')
+  // --- Scheduler ---
+  alarm(alarmInfo?: AlarmInvocationInfo) {
+    return this.scheduler.alarm(alarmInfo)
+  }
+  setSchedulerPaused(paused: boolean) {
+    return this.scheduler.setSchedulerPaused(paused)
+  }
+  isSchedulerPaused() {
+    return this.scheduler.isSchedulerPaused()
+  }
+  setTaskEnabled(name: string, enabled: boolean) {
+    return this.scheduler.setTaskEnabled(name, enabled)
+  }
+  getTasksStatus() {
+    return this.scheduler.getTasksStatus()
+  }
+  runTask(name: string) {
+    return this.scheduler.runTask(name)
+  }
+  runOverdueNow() {
+    return this.scheduler.runOverdueNow()
+  }
+  getDueInfo(now: number) {
+    return this.scheduler.getDueInfo(now)
+  }
+  ensureAlarm() {
+    return this.scheduler.ensureAlarm()
+  }
+  getNextAlarmStr() {
+    return this.scheduler.getNextAlarmStr()
   }
 
-  public async loadAllTiltifySocials() {
-    const campaigns = await this.getCampaigns()
-    const api = new TiltifyAPI(this.env)
-    const token = await api.getAppToken()
-    if (!token) {
-      console.error('loadAllTiltifySocials', 'no token')
-      return
-    }
-    const users = await Promise.all(
-      campaigns.map((c) => {
-        return api.getUserBySlug(c.user.slug, token)
-      }),
-    )
-      .then((r) => r.filter((u) => u !== null))
-      .then((r) => r.map((u) => u.data))
-    // console.log('loadAllTiltifySocials', 'users', users.length)
-    await this.storage.put('socials:tiltify', users)
-
-    const twitch = users
-      .map((u) => u.social.twitch)
-      .filter((s) => s !== undefined)
-      .map((s) => this.normalizeTwitchLogin(s))
-      .filter((s) => s.length > 0)
-
-    await this.setStringArray('tiltify:socials:twitch', twitch)
-  }
-
-  public async getTiltifyUsersMap() {
-    const users = await this.getTiltifyUsers()
-    return new Map(users?.map((u) => [u.slug, u]) ?? [])
-  }
-
-  async alarm(alarmInfo?: AlarmInvocationInfo) {
-    console.log('DO-scheduler', 'alarm', {
-      isRetry: alarmInfo?.isRetry,
-      retryCount: alarmInfo?.retryCount,
-    })
-    await this.runOverdueTasks(Date.now())
-    await this.scheduleNextAlarm()
-  }
-
-  public async setSchedulerPaused(paused: boolean) {
-    await this.storage.put('scheduler:paused', paused)
-    if (paused) {
-      await this.storage.deleteAlarm()
-      console.log('DO-scheduler', 'paused – alarm deleted')
-    } else {
-      await this.scheduleNextAlarm()
-      console.log('DO-scheduler', 'resumed – alarm scheduled')
-    }
-  }
-
-  public async isSchedulerPaused(): Promise<boolean> {
-    return (await this.storage.get<boolean>('scheduler:paused')) ?? false
-  }
-
-  public async setTaskEnabled(name: string, enabled: boolean) {
-    await this.storage.put(this.keyEnabled(name), enabled)
-    await this.ensureAlarm() // recompute next alarm in case enabling/disabling changes the schedule
-  }
-
-  // Expose scheduler state for admin UI
-  public async getTasksStatus() {
-    const now = Date.now()
-    const states = [] as Array<{
-      name: string
-      everyMs: number
-      enabled: boolean
-      lastRunMs: number | null
-      nextDueAtMs: number
-      dueNow: boolean
-    }>
-    for (const t of this.tasks) {
-      const [enabled, last] = await Promise.all([
-        this.isEnabled(t.name),
-        this.getLastRun(t.name),
-      ])
-      const next = (last ?? 0) + t.everyMs
-      states.push({
-        name: t.name,
-        everyMs: t.everyMs,
-        enabled,
-        lastRunMs: last ?? null,
-        nextDueAtMs: next,
-        dueNow: next <= now && enabled,
-      })
-    }
-    return states
-  }
-
-  // Manually run a single task by name (updates lastRun and reschedules)
-  public async runTask(name: string) {
-    const t = this.tasks.find((x) => x.name === name)
-    if (!t) throw new Error(`Unknown task: ${name}`)
-    const start = Date.now()
-    console.log('DO-scheduler', 'manual-run', name)
-    await t.run()
-    await this.setLastRun(name, Date.now())
-    console.log('DO-scheduler', 'manual-run', name, 'ms', Date.now() - start)
-    await this.scheduleNextAlarm()
-  }
-
-  // Run all overdue tasks now and reschedule
-  public async runOverdueNow() {
-    await this.runOverdueTasks(Date.now())
-    await this.scheduleNextAlarm()
-  }
-
-  // Returns [dueNow, nextDueAtMs]
-  public async getDueInfo(now: number) {
-    let anyDue = false
-    let nextDueAt = Number.POSITIVE_INFINITY
-    const dueNames: string[] = []
-
-    for (const t of this.tasks) {
-      if (!(await this.isEnabled(t.name))) continue
-      const last = await this.getLastRun(t.name)
-      const next = (last ?? 0) + t.everyMs
-      if (next <= now) {
-        anyDue = true
-        dueNames.push(t.name)
-      }
-      if (next < nextDueAt) nextDueAt = next
-    }
-
-    if (!Number.isFinite(nextDueAt)) {
-      // If everything was disabled, try again soon (safety)
-      nextDueAt = now + 60_000
-    }
-    return { anyDue, dueNames, nextDueAt }
-  }
-
-  // Call this once (manually or via any request) to bootstrap the first alarm
-  public async ensureAlarm() {
-    if (await this.isSchedulerPaused()) return
-    const existing = await this.storage.getAlarm()
-    if (!existing) {
-      await this.scheduleNextAlarm(1000 * 30) // start in ~1min
-    }
-  }
-
-  public getFullSchedule(): Promise<FullCommunitySchedule | undefined> {
-    return this.storage.get<FullCommunitySchedule>('full-community-schedule')
-  }
-
-  public async getGoalByUserSlug(slug: string): Promise<number> {
-    const value = await this.storage.get<number>(
-      this.campaignGoalKeyUserSlug(slug),
-    )
-    return value ?? 0
-  }
-
-  public async getPreviousGoalByUserSlug(slug: string): Promise<number> {
-    const value = await this.storage.get<number>(
-      this.campaignPreviousGoalKeyUserSlug(slug),
-    )
-    return value ?? 0
-  }
-
-  // Helper: fully-qualified YouTube URL from any incoming value (channel/video URL, id, or handle)
-
-  private async updateGoalsAfterSetCampaigns(campaigns: JJCampaign[]) {
-    const writes: Record<string, number> = {}
-
-    for (const c of campaigns) {
-      const id = c.id
-      const slug = c.slug
-      const userSlug = c.user?.slug
-      const newGoal = c.goal
-
-      // Read the canonical current goal by id; we will write all variants
-      const current = await this.storage.get<number>(this.campaignGoalKeyId(id))
-
-      if (typeof current === 'number') {
-        if (current !== newGoal) {
-          // shift current -> previous for all refs, then set new current for all refs
-          writes[this.campaignPreviousGoalKeyId(id)] = current
-          writes[this.campaignGoalKeyId(id)] = newGoal
-
-          if (slug) {
-            writes[this.campaignPreviousGoalKey(slug)] = current
-            writes[this.campaignGoalKey(slug)] = newGoal
-          }
-          if (userSlug) {
-            writes[this.campaignPreviousGoalKeyUserSlug(userSlug)] = current
-            writes[this.campaignGoalKeyUserSlug(userSlug)] = newGoal
-          }
-        }
-        // unchanged: no writes
-      } else {
-        // First time: initialize current for all refs; do not set previous
-        writes[this.campaignGoalKeyId(id)] = newGoal
-        if (slug) writes[this.campaignGoalKey(slug)] = newGoal
-        if (userSlug) writes[this.campaignGoalKeyUserSlug(userSlug)] = newGoal
-      }
-    }
-
-    if (Object.keys(writes).length > 0) {
-      await this.storage.put(writes)
-    }
-  }
-
-  private chunk<T>(arr: T[], size: number) {
-    const out: T[][] = []
-    for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size))
-    return out
-  }
-
-  private async fetchFromRateAPI() {
-    try {
-      const url = 'https://www.google.com/finance/quote/GBP-EUR'
-      const res = await fetch(url, {
-        headers: {
-          // Some sites return different content for bots; set a common UA
-          'User-Agent':
-            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36',
-          'Accept-Language': 'en-US,en;q=0.9',
-        },
-      })
-      if (!res.ok) {
-        throw new Error(
-          `Failed to fetch GBP->EUR page: ${res.status} ${res.statusText}`,
-        )
-      }
-      const html = await res.text()
-
-      // Look for an element that contains both classes "YMlKec" and "fxKbKc"
-      const match = html.match(
-        /<[^>]*class=\"[^\"]*\bYMlKec\b[^\"]*\bfxKbKc\b[^\"]*\"[^>]*>([^<]+)<\/[^>]*>/i,
-      )
-      if (!match) {
-        throw new Error('GBP->EUR conversion rate element not found')
-      }
-      const rawText = match[1].trim()
-      const numericText = rawText.replace(/[^0-9.,-]/g, '').replace(/,/g, '')
-      const value = parseFloat(numericText)
-      if (!Number.isFinite(value)) {
-        throw new Error(
-          `Unable to parse GBP->EUR conversion rate from text: "${rawText}"`,
-        )
-      }
-      return value
-    } catch (e) {
-      console.error(e)
-      return 1
-    }
-  }
-
-  private async getUsedTagsWithUserCounts() {
-    const db = getDB(this.env)
-    return db
-      .select({
-        tagId: tagUserCountsView.tagId,
-        tagSlug: tagUserCountsView.tagSlug,
-        color: tags.color,
-        usage: tagUserCountsView.userCount,
-      })
-      .from(tagUserCountsView)
-      .leftJoin(tags, eq(tags.id, tagUserCountsView.tagId))
-      .orderBy(desc(tagUserCountsView.userCount))
-  }
-
-  private normalizeTwitchLogin(input: string | undefined | null) {
-    if (!input) return ''
-    let s = String(input).trim().toLowerCase()
-    // Remove protocol and domain prefixes
-    s = s.replace(/^https?:\/\/(www\.)?twitch\.tv\//i, '')
-    s = s.replace(/^(www\.)?twitch\.tv\//i, '')
-    // Take only the first path segment, drop query/fragment
-    s = s.split(/[\/?#]/)[0]
-    if (this.replaceMap.has(s)) {
-      s = this.replaceMap.get(s) ?? ''
-    }
-    return s
-  }
-
-  private toCurrencies(
-    gbp: number,
-    usdRateIn: number,
-    eurRateIn: number,
-  ): CurrenciesTV {
-    const usd = Math.round(gbp * usdRateIn * 100) / 100
-    const euro = Math.round(gbp * eurRateIn * 100) / 100
-    return {
-      gbp,
-      usd,
-      euro,
-      gbpFormatted: new Intl.NumberFormat('en-GB', {
-        style: 'currency',
-        currency: 'GBP',
-      }).format(gbp),
-      usdFormatted: new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD',
-      }).format(usd),
-      euroFormatted: new Intl.NumberFormat('de-DE', {
-        style: 'currency',
-        currency: 'EUR',
-      }).format(euro),
-    }
-  }
-
-  // Extracted from refresh: builds and stores display projections matching JJCampaignsSchema
-  private async buildAndStoreCampaignsDisplay() {
-    try {
-      const usdRate = await this.getDollarConversionRate()
-      const eurRate = await this.getGbpToEurRate()
-      const tiltifyUsers = await this.getTiltifyUsersMap()
-      const rawCampaigns = await this.getCampaigns()
-
-      // Build display items for ALL campaigns
-      const displayEntries: Record<string, JJCampaignTVType> = {}
-      const allDisplayList: JJCampaignTVType[] = await Promise.all(
-        rawCampaigns.map(async (c) => {
-          const userSlug = c.user.slug
-          let isLive = false
-          try {
-            const val = await this.storage.get<boolean>(
-              `campaign:live:${userSlug}`,
-            )
-            isLive = !!val
-          } catch (e) {
-            console.error(
-              'buildAndStoreCampaignsDisplay',
-              'error getting live flag',
-              userSlug,
-              e,
-            )
-          }
-
-          const user = tiltifyUsers.get(userSlug)
-          let twitch: JJCampaignTVType['twitch'] | undefined = undefined
-          const twitchSocial =
-            this.tiltifySlugToTwitchLoginMap.get(userSlug) ??
-            user?.social.twitch
-          let login = twitchSocial
-            ? this.normalizeTwitchLogin(twitchSocial)
-            : ''
-          let twitchId = ''
-          if (login) {
-            let twitchAvatar: string | undefined
-            const tuser = await this.storage.get<any>(`twitch:login:${login}`)
-            if (tuser) {
-              twitchAvatar = (tuser as any)?.profile_image_url
-              twitchId = (tuser as any)?.id ?? ''
-              const displayName = (tuser as any)?.display_name
-              twitch = {
-                name: displayName ?? login,
-                avatar: twitchAvatar ?? c.user.avatar ?? '',
-                isLive,
-                url: `https://twitch.tv/${login}`,
-              }
-            }
-          }
-
-          const display: JJCampaignTVType = {
-            tiltifySlug: c.user.slug,
-            campaignName: c.name,
-            tiltifyUrl: c.url,
-            tiltifyName: c.user.name,
-            tiltifyDescription: c.description,
-            tiltifyCauseId: c.causeId ? c.causeId : undefined,
-            avatar: c.user.avatar ?? '',
-            raised: this.toCurrencies(c.raised, usdRate, eurRate),
-            goal: this.toCurrencies(c.goal, usdRate, eurRate),
-            twitch,
-          }
-          displayEntries[`campaign:display:${userSlug}`] = display
-          if (twitchId !== '') {
-            displayEntries[`campaign:display:twitchId:${twitchId}`] = display
-          }
-          return display
-        }),
-      )
-
-      // Batch write all campaign display entries
-      await this.storage.put(displayEntries)
-
-      // Create TOP 100 slice by raised GBP descending
-      const top100 = [...allDisplayList]
-        .sort((a, b) => b.raised.gbp - a.raised.gbp)
-        .slice(0, 100)
-
-      const campaignsDisplayTop: JJCampaignsTVType = {
-        count: top100.length,
-        campaigns: top100,
-        date: new Date(),
-      }
-      const campaignsDisplayAll: JJCampaignsTVType = {
-        count: allDisplayList.length,
-        campaigns: allDisplayList,
-        date: new Date(),
-      }
-
-      // Batch write summary display entries
-      await this.storage.put({
-        'campaigns:display': campaignsDisplayTop,
-        'campaigns:display:all': campaignsDisplayAll,
-      })
-    } catch (e) {
-      console.error('build display campaigns', e)
-    }
-  }
-
-  // Build and store display projections for causes matching causesContract output
-  private async buildAndStoreCausesDisplay() {
-    try {
-      const usdRate = await this.getDollarConversionRate()
-      const eurRate = await this.getGbpToEurRate()
-      const toCurrencies = (
-        gbp: number,
-        usdRateIn: number,
-        eurRateIn: number,
-      ): CurrenciesTV => {
-        const usd = Math.round(gbp * usdRateIn * 100) / 100
-        const euro = Math.round(gbp * eurRateIn * 100) / 100
-        return {
-          gbp,
-          usd,
-          euro,
-          gbpFormatted: new Intl.NumberFormat('en-GB', {
-            style: 'currency',
-            currency: 'GBP',
-          }).format(gbp),
-          usdFormatted: new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'USD',
-          }).format(usd),
-          euroFormatted: new Intl.NumberFormat('de-DE', {
-            style: 'currency',
-            currency: 'EUR',
-          }).format(euro),
-        }
-      }
-
-      const rawCauses = await this.getCauses()
-
-      const causes: JJCauseTVType[] = await Promise.all(
-        rawCauses.map(async (c) => {
-          const raised = toCurrencies(c.raised, usdRate, eurRate)
-          return {
-            id: c.id,
-            name: c.name,
-            logo: c.logo,
-            description: c.description,
-            url: c.url,
-            donateUrl: c.donateUrl,
-            raised: raised,
-          }
-        }),
-      )
-
-      await Promise.all(causes.map((c) => this.setTVCause(c)))
-
-      /*
-      const overview: CausesDisplayType['overview'] = {
-        raised: {
-          yogscast: toCurrencies(data.raised.yogscast, data.dollarConversionRate),
-          fundraisers: toCurrencies(
-            data.raised.fundraisers,
-            data.dollarConversionRate,
-          ),
-          total: toCurrencies(
-            parseFloat(
-              (data.raised.fundraisers + data.raised.yogscast).toFixed(2),
-            ),
-            data.dollarConversionRate,
-          ),
-        },
-        collections: data.collections,
-        donations: data.donations.count,
-        date: new Date(data.date),
-      }
-      */
-
-      const output: CausesDisplayTVType = {
-        count: causes.length,
-        causes,
-      }
-
-      await this.storage.put('causes:display', output)
-    } catch (e) {
-      console.error('build display causes', e)
-    }
-  }
-
-  // Automatically detects whether the input represents a video, channel, or handle and returns
-  private async buildAndStoreCommunityCampaignsDisplay() {
-    const rawCampaigns = await this.getCampaigns()
-    try {
-      const usdRate = await this.getDollarConversionRate()
-      const eurRate = await this.getGbpToEurRate()
-
-      const slugs = Array.from(
-        new Set(
-          rawCampaigns
-            .map((c) => c.user?.slug)
-            .filter((s): s is string => Boolean(s)),
-        ),
-      )
-
-      let scheduleByTiltify = new Map<string, string>()
-      const year = new Date().getFullYear()
-      if (slugs.length > 0) {
-        // console.log('fetching schedules for', slugs.length)
-        // console.log('fetching schedules for', slugs)
-        try {
-          const db = getDB(this.env)
-          const slugPred = or(
-            ...slugs.map((s) => eq(userDisplayView.tiltifySlug, s)),
-          )
-          const rows = await db
-            .select({
-              tiltifySlug: userDisplayView.tiltifySlug,
-              scheduleSlug: schedulesTable.slug,
-            })
-            .from(schedulesTable)
-            .innerJoin(
-              userDisplayView,
-              eq(userDisplayView.userId, schedulesTable.ownerId),
-            )
-            .where(
-              and(
-                eq(schedulesTable.year, year),
-                eq(schedulesTable.visible, true),
-                // If you only want to expose primary schedules uncomment:
-                eq(schedulesTable.primary, true),
-                // slugPred,
-              ),
-            )
-            .all()
-          scheduleByTiltify = new Map(
-            rows.map((r) => [r.tiltifySlug, r.scheduleSlug]),
-          )
-        } catch (e) {
-          console.error('schedule lookup failed', e)
-        }
-      }
-
-      const userTags = await this.getUserTagsDisplay()
-      let userTagsMap = new Map<string, UserWithTags>()
-      if (userTags) {
-        userTagsMap = new Map<string, UserWithTags>(
-          userTags.map((u) => [u.tiltifySlug, u]),
-        )
-      }
-
-      const tiltifyUsers = await this.getTiltifyUsersMap()
-
-      const listAll = await Promise.all(
-        rawCampaigns.map(async (c) => {
-          const userSlug = c.user.slug
-          const user = tiltifyUsers.get(userSlug)
-          const userTwitch =
-            this.tiltifySlugToTwitchLoginMap.get(userSlug) ??
-            user?.social.twitch
-          const userYoutube = user?.social.youtube
-          const login = userTwitch
-            ? this.normalizeTwitchLogin(userTwitch)
-            : undefined
-
-          let tuser = undefined
-
-          if (login) {
-            tuser = await this.storage.get<any>(`twitch:login:${login}`)
-          }
-
-          const twitchAvatar = (tuser as any)?.profile_image_url
-          const twitch = userTwitch ? this.toTwitchUrl(userTwitch) : undefined
-
-          const youtube = userYoutube
-            ? this.toYouTubeUrl(userYoutube)
-            : undefined
-
-          const val = await this.storage.get<boolean>(
-            `campaign:live:${c.user.slug}`,
-          )
-          const sSlug = userSlug ? scheduleByTiltify.get(userSlug) : undefined
-
-          const display: JJCampaignType = {
-            campaignName: c.name,
-            tiltifyUrl: c.url,
-            tiltifySlug: c.user.slug,
-            tiltifyName: c.user.name,
-            tiltifyDescription: c.description || undefined,
-            tiltifyCauseId: c.causeId,
-            avatar: twitchAvatar ?? c.user.avatar ?? '',
-            raised: this.toCurrencies(c.raised, usdRate, eurRate),
-            twitch,
-            youtube,
-            isTwitchLive: val ?? false,
-            scheduleUrl: sSlug ? `/schedules/${sSlug}` : undefined,
-            tags: userTagsMap.get(c.user.slug)?.tags ?? [],
-          }
-
-          /*
-          console.log(
-            'buildAndStoreCommunityCampaignsDisplay',
-            'user',
-            userSlug,
-            'twitch',
-            userTwitch,
-            'login',
-            login,
-            'youtube',
-            userYoutube,
-            'user',
-            user,
-            'display',
-            display,
-          )*/
-
-          return display
-        }),
-      )
-
-      // Create TOP 100 slice by raised GBP descending
-      const listTop = [...listAll]
-        .sort((a, b) => b.raised.gbp - a.raised.gbp)
-        .slice(0, 100)
-
-      // Batch write both community campaign display entries
-      await this.storage.put({
-        'community:campaigns:display': {
-          count: listTop.length,
-          list: listTop,
-        },
-        'community:campaigns:display:all': {
-          count: listAll.length,
-          list: listAll,
-        },
-      })
-    } catch (e) {
-      console.error('build display community campaigns', e)
-    }
-  }
-
-  // Helper: fully-qualified Twitch URL from any incoming channel value
-  private toTwitchUrl(input: string | null | undefined): string | undefined {
-    if (!input) return undefined
-    const login = this.normalizeTwitchLogin(String(input).toLowerCase())
-    return login ? `https://twitch.tv/${login}` : undefined
-  }
-
-  // the appropriate canonical YouTube URL. The "type" parameter was removed; detection is inferred.
-  private toYouTubeUrl(input: string | null | undefined): string | undefined {
-    if (!input) return undefined
-    let s = String(input).trim()
-    if (!s) return undefined
-
-    // If it's already a URL, normalize common short links and otherwise return as-is
-    if (/^https?:\/\//i.test(s)) {
-      try {
-        const url = new URL(s)
-        const host = url.hostname.toLowerCase()
-        const path = url.pathname
-        if (host === 'youtu.be') {
-          // Short link: https://youtu.be/<videoId>
-          const id = path.replace(/^\//, '').split('/')[0]
-          if (/^[a-zA-Z0-9_-]{11}$/.test(id))
-            return `https://www.youtube.com/watch?v=${id}`
-        }
-        // For other youtube.com URLs, return as-is
-        return s
-      } catch {
-        // fall-through to ID/handle detection if URL parsing fails
-      }
-    }
-
-    // Detect a YouTube video id (11 chars)
-    if (/^[a-zA-Z0-9_-]{11}$/.test(s)) {
-      return `https://www.youtube.com/watch?v=${s}`
-    }
-
-    // Detect a channel id starting with UC and length 24 (UC + 22)
-    if (/^UC[a-zA-Z0-9_-]{22}$/i.test(s)) {
-      return `https://www.youtube.com/channel/${s}`
-    }
-
-    // Detect a handle (with @) or treat as handle if not having @ but looks like a name
-    if (s.startsWith('@')) return `https://www.youtube.com/${s}`
-    // As a sane default, treat as a handle-style channel name
-    return `https://www.youtube.com/@${s}`
-  }
-
-  // Key helpers
-  private campaignKey(userRef: string) {
-    return `campaign:api:slug:${userRef}`
-  }
-
-  private campaignKeyUserSlug(userRef: string) {
-    return `campaign:api:user-slug:${userRef}`
-  }
-
-  private campaignKeyId(userRef: string) {
-    return `campaign:api:id:${userRef}`
-  }
-
-  // Goal Key helpers
-  private campaignGoalKey(userRef: string) {
-    return `campaign-goal:api:slug:${userRef}`
-  }
-
-  private campaignGoalKeyUserSlug(userRef: string) {
-    return `campaign-goal:api:user-slug:${userRef}`
-  }
-
-  private campaignGoalKeyId(userRef: string) {
-    return `campaign-goal:api:id:${userRef}`
-  }
-
-  // Previous Goal Key helpers
-  private campaignPreviousGoalKey(userRef: string) {
-    return `campaign-previous-goal:api:slug:${userRef}`
-  }
-
-  private campaignPreviousGoalKeyUserSlug(userRef: string) {
-    return `campaign-previous-goal:api:user-slug:${userRef}`
-  }
-
-  private campaignPreviousGoalKeyId(userRef: string) {
-    return `campaign-previous-goal:api:id:${userRef}`
-  }
-
-  private causeKey(causeId: string) {
-    return `cause:raw:${causeId}`
-  }
-
-  // --- Start: lightweight DO scheduler ---
-
-  private causeKeyTV(causeId: string) {
-    return `cause:tv:${causeId}`
-  }
-
-  private stringArrayKey(name: string) {
-    return `strarr:${name}`
-  }
-
-  private async getTwitchLoginsFromCampaigns() {
-    const users = await this.getTiltifyUsers()
-    return (users
-      ?.map(
-        (c) => this.tiltifySlugToTwitchLoginMap.get(c.slug) ?? c.social.twitch,
-      )
-      .filter((c) => c !== undefined)
-      .filter((c) => this.normalizeTwitchLogin(c)) ?? []) as string[]
-  }
-
-  private async getYoutubeLoginsFromCampaigns() {
-    const users = await this.getTiltifyUsers()
-    return (users
-      ?.map((c) => c.social.youtube)
-      .filter((c) => c !== undefined)
-      .filter((c) => c) ?? []) as string[]
-  }
-
-  private getTiltifyUsers() {
-    return this.storage.get<TiltifyUserData[]>('socials:tiltify')
-  }
-
-  // Storage keys
-  private keyLastRun(name: string) {
-    return `task:lastRun:${name}`
-  }
-
-  private keyEnabled(name: string) {
-    return `task:enabled:${name}`
-  }
-
-  // Read last run (ms since epoch), undefined if never
-  private async getLastRun(name: string) {
-    return (await this.storage.get<number>(this.keyLastRun(name))) ?? undefined
-  }
-
-  private async setLastRun(name: string, ts: number) {
-    await this.storage.put(this.keyLastRun(name), ts)
-  }
-
-  private async isEnabled(name: string) {
-    const val = await this.storage.get<boolean>(this.keyEnabled(name))
-    return val ?? true // default: enabled
-  }
-
-  // Run only the tasks that are currently overdue
-  private async runOverdueTasks(now: number) {
-    for (const t of this.tasks) {
-      if (!(await this.isEnabled(t.name))) continue
-      const last = await this.getLastRun(t.name)
-      const next = (last ?? 0) + t.everyMs
-      if (next <= now) {
-        const start = Date.now()
-        try {
-          console.log('DO-scheduler', 'run', t.name)
-          await t.run()
-          await this.setLastRun(t.name, now)
-          console.log('DO-scheduler', t.name, 'ms', Date.now() - start)
-        } catch (e) {
-          console.error('DO-scheduler', 'error', t.name, e)
-          // Do not update lastRun on failure; it will retry next alarm
-        }
-      }
-    }
-  }
-
-  // --- End: lightweight DO scheduler ---
-
-  // Compute and set the next alarm based on soonest next-due task
-  private async scheduleNextAlarm(afterNowMs?: number) {
-    if (await this.isSchedulerPaused()) {
-      await this.storage.deleteAlarm()
-      return
-    }
-    const now = Date.now()
-    if (afterNowMs && afterNowMs > 0) {
-      await this.storage.setAlarm(now + afterNowMs)
-      console.log('DO-scheduler', 'scheduleNextAlarm', now + afterNowMs)
-      return
-    }
-    const { nextDueAt } = await this.getDueInfo(now)
-    // Clamp next alarm not earlier than now + 1s to avoid tight loops
-    const when = Math.max(nextDueAt, now + 500)
-    await this.storage.setAlarm(when)
-    console.log('DO-scheduler', 'scheduleNextAlarm', when)
-  }
-
-  private async generateFullSchedule() {
-    const year = new Date().getUTCFullYear()
-
-    const db = getDB(this.env)
-
-    let hardcoded: UserStream[] = []
-
-    /*
-    try {
-      const hardcodedResp = await fetch(
-        'https://jinglejam.ostof.dev/api/private/jj/hardcodedStreams',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        },
-      )
-      if (hardcodedResp.ok) {
-        const data = (await hardcodedResp.json()) as HardcodedStreams
-        hardcoded = [...data.nonYogs, ...data.yogs]
-      } else {
-        hardcodedResp.text().then(console.error)
-        console.error('generateFullSchedule', 'hardcodedResp', hardcodedResp)
-      }
-    } catch (e) {
-      console.error('generateFullSchedule', 'hardcodedResp error', e)
-    }*/
-
-    // 1) Find all visible & primary schedules for the current year
-    const scheduleRows = await db
-      .select({ id: schedulesTable.id, ownerId: schedulesTable.ownerId })
-      .from(schedulesTable)
-      .where(
-        and(
-          eq(schedulesTable.year, year),
-          eq(schedulesTable.visible, true),
-          eq(schedulesTable.primary, true),
-        ),
-      )
-      .all()
-
-    const scheduleIds = scheduleRows.map((s) => s.id)
-    const scheduleOwnerMap = new Map<number, number>(
-      scheduleRows.map((r) => [r.id, r.ownerId]),
-    )
-
-    // If no schedules, return just hardcoded (grouped by day)
-    if (scheduleIds.length === 0) {
-      // Group by UTC day
-      const groups = new Map<string, { day: Date; streams: UserStream[] }>()
-      for (const us of hardcoded) {
-        const s = us.stream
-        const d = new Date(
-          Date.UTC(
-            s.start.getUTCFullYear(),
-            s.start.getUTCMonth(),
-            s.start.getUTCDate(),
-          ),
-        )
-        const key = d.toISOString()
-        const g = groups.get(key) ?? { day: d, streams: [] }
-        g.streams.push(us)
-        groups.set(key, g)
-      }
-      const days = Array.from(groups.values())
-        .map(({ day, streams }) => ({
-          day,
-          streams: streams.sort(
-            (a, b) => a.stream.start.getTime() - b.stream.start.getTime(),
-          ),
-        }))
-        .sort((a, b) => a.day.getTime() - b.day.getTime())
-      return { days }
-    }
-
-    // 2) Load all visible streams for those schedules
-    // Avoid building a giant OR(...) with many variables; iterate per schedule
-    const basePairs: Array<{
-      scheduleId: number
-      streamId: number
-      start: Date
-    }> = []
-    for (const sid of scheduleIds) {
-      const rows = await db
-        .select({
-          scheduleId: streamsTable.scheduleId,
-          streamId: streamsTable.id,
-          start: streamsTable.start,
-        })
-        .from(streamsTable)
-        .where(
-          and(eq(streamsTable.visible, true), eq(streamsTable.scheduleId, sid)),
-        )
-        .orderBy(asc(streamsTable.start))
-        .all()
-      for (const row of rows) {
-        basePairs.push(row)
-      }
-    }
-
-    if (basePairs.length === 0) {
-      const groups = new Map<string, { day: Date; streams: UserStream[] }>()
-      for (const us of hardcoded) {
-        const s = us.stream
-        const d = new Date(
-          Date.UTC(
-            s.start.getUTCFullYear(),
-            s.start.getUTCMonth(),
-            s.start.getUTCDate(),
-          ),
-        )
-        const key = d.toISOString()
-        const g = groups.get(key) ?? { day: d, streams: [] }
-        g.streams.push(us)
-        groups.set(key, g)
-      }
-      const days = Array.from(groups.values())
-        .map(({ day, streams }) => ({
-          day,
-          streams: streams.sort(
-            (a, b) => a.stream.start.getTime() - b.stream.start.getTime(),
-          ),
-        }))
-        .sort((a, b) => a.day.getTime() - b.day.getTime())
-      return { days }
-    }
-
-    // 3) Core stream details — query per pair to avoid too many SQL variables
-    const detailMap = new Map<string, any>()
-    for (const p of basePairs) {
-      const rows = await db
-        .select({
-          id: streamsTable.id,
-          scheduleId: streamsTable.scheduleId,
-          createdBy: streamsTable.createdBy,
-          title: streamsTable.title,
-          visible: streamsTable.visible,
-          subtitle: streamsTable.subtitle,
-          description: streamsTable.description,
-          youtubeVodUrl: streamsTable.youtubeVodUrl,
-          twitchVodUrl: streamsTable.twitchVodUrl,
-          start: streamsTable.start,
-          end: streamsTable.end,
-        })
-        .from(streamsTable)
-        .where(
-          and(
-            eq(streamsTable.scheduleId, p.scheduleId),
-            eq(streamsTable.id, p.streamId),
-          ),
-        )
-        .all()
-      for (const s of rows) {
-        detailMap.set(`${s.scheduleId}:${s.id}`, s)
-      }
-    }
-
-    // 4) Tags per stream — query per pair
-    const tagsMap = new Map<
-      string,
-      Array<{ name: string; slug: string; color: string }>
-    >()
-    for (const p of basePairs) {
-      const tagRows = await db
-        .select({
-          scheduleId: streamTagsTable.scheduleId,
-          streamId: streamTagsTable.streamId,
-          name: tags.name,
-          slug: tags.slug,
-          color: tags.color,
-        })
-        .from(streamTagsTable)
-        .innerJoin(tags, eq(streamTagsTable.tagId, tags.id))
-        .where(
-          and(
-            eq(streamTagsTable.scheduleId, p.scheduleId),
-            eq(streamTagsTable.streamId, p.streamId),
-          ),
-        )
-        .all()
-      for (const t of tagRows) {
-        const key = `${t.scheduleId}:${t.streamId}`
-        const arr = tagsMap.get(key) ?? []
-        arr.push({ name: t.name, slug: t.slug, color: t.color })
-        tagsMap.set(key, arr)
-      }
-    }
-
-    // 5) Participants per stream — query per pair
-    const participantsMap = new Map<
-      string,
-      Array<{
-        userId: number
-        primaryLiveStream: string
-        createdAt: Date
-        username: string
-        profileImage: string
-        twitchLogin: string | null
-        tiltifySlug: string
-        tiltifyUrl: string
-        primaryColor: string | null
-        accentColor: string | null
-      }>
-    >()
-    for (const p of basePairs) {
-      const rows = await db
-        .select({
-          scheduleId: streamParticipantsTable.scheduleId,
-          streamId: streamParticipantsTable.streamId,
-          userId: userDisplayView.userId,
-          primaryLiveStream: userDisplayView.primaryLiveStream,
-          createdAt: userDisplayView.createdAt,
-          username: userDisplayView.username,
-          profileImage: userDisplayView.profileImage,
-          twitchLogin: userDisplayView.twitchLogin,
-          tiltifySlug: userDisplayView.tiltifySlug,
-          tiltifyUrl: userDisplayView.tiltifyUrl,
-          primaryColor: userDisplayView.primaryColor,
-          accentColor: userDisplayView.accentColor,
-        })
-        .from(streamParticipantsTable)
-        .innerJoin(
-          userDisplayView,
-          eq(streamParticipantsTable.userId, userDisplayView.userId),
-        )
-        .where(
-          and(
-            eq(streamParticipantsTable.scheduleId, p.scheduleId),
-            eq(streamParticipantsTable.streamId, p.streamId),
-          ),
-        )
-        .all()
-      for (const r of rows) {
-        const key = `${r.scheduleId}:${r.streamId}`
-        const arr = participantsMap.get(key) ?? []
-        arr.push({
-          userId: r.userId,
-          primaryLiveStream: r.primaryLiveStream,
-          createdAt: r.createdAt,
-          username: r.username,
-          profileImage: r.profileImage,
-          twitchLogin: r.twitchLogin,
-          tiltifySlug: r.tiltifySlug,
-          tiltifyUrl: r.tiltifyUrl,
-          primaryColor: r.primaryColor,
-          accentColor: r.accentColor,
-        })
-        participantsMap.set(key, arr)
-      }
-    }
-
-    // 6) Load owners for the schedules
-    const ownerIds = Array.from(new Set(scheduleRows.map((r) => r.ownerId)))
-    let ownersMap = new Map<number, UserDisplay>()
-    if (ownerIds.length > 0) {
-      const owners: UserDisplay[] = []
-      for (const oid of ownerIds) {
-        const rows = await db
-          .select({
-            userId: userDisplayView.userId,
-            primaryLiveStream: userDisplayView.primaryLiveStream,
-            createdAt: userDisplayView.createdAt,
-            username: userDisplayView.username,
-            profileImage: userDisplayView.profileImage,
-            twitchLogin: userDisplayView.twitchLogin,
-            tiltifySlug: userDisplayView.tiltifySlug,
-            tiltifyUrl: userDisplayView.tiltifyUrl,
-            primaryColor: userDisplayView.primaryColor,
-            accentColor: userDisplayView.accentColor,
-          })
-          .from(userDisplayView)
-          .where(eq(userDisplayView.userId, oid))
-          .all()
-        owners.push(...(rows as any))
-      }
-      ownersMap = new Map(owners.map((o) => [o.userId, o]))
-    }
-
-    // 7) Compose UserStream objects from DB
-    const dbUserStreams: UserStream[] = basePairs
-      .map((pair) => {
-        const key = `${pair.scheduleId}:${pair.streamId}`
-        const core = detailMap.get(key)
-        if (!core) return null
-        const stream: Stream = {
-          ...(core as any),
-          tags: tagsMap.get(key) ?? [],
-          participants: participantsMap.get(key) ?? [],
-        }
-        const ownerId = scheduleOwnerMap.get(pair.scheduleId)
-        const owner = ownerId ? ownersMap.get(ownerId) : undefined
-        return { stream, owner }
-      })
-      .filter((user) => {
-        return user != null
-      })
-
-    // 8) Merge hardcoded user streams
-    const allUserStreams: UserStream[] = [...dbUserStreams, ...hardcoded]
-
-    // 9) Group by day (UTC) and sort
-    const groups = new Map<string, { day: Date; streams: UserStream[] }>()
-    for (const us of allUserStreams) {
-      const s = us.stream
-      const d = new Date(
-        Date.UTC(
-          s.start.getUTCFullYear(),
-          s.start.getUTCMonth(),
-          s.start.getUTCDate(),
-        ),
-      )
-      const key = d.toISOString()
-      const g = groups.get(key) ?? { day: d, streams: [] }
-      g.streams.push(us)
-      groups.set(key, g)
-    }
-
-    const days = Array.from(groups.values())
-      .map(({ day, streams }) => ({
-        day,
-        streams: streams.sort(
-          (a, b) => a.stream.start.getTime() - b.stream.start.getTime(),
-        ),
-      }))
-      .sort((a, b) => a.day.getTime() - b.day.getTime())
-
-    const result: FullCommunitySchedule = { days, streams: allUserStreams }
-
-    await this.storage.put('full-community-schedule', result)
-  }
-
-  private async updateTiltifyProfiles() {
-    const db = getDB(this.env)
-    const accountsList = await db
-      .select()
-      .from(accounts)
-      .where(eq(accounts.provider, 'tiltify'))
-      .all()
-    const api = new TiltifyAPI(this.env)
-    const token = await api.getAppToken()
-    if (!token) {
-      console.error('updateTiltifyProfiles', 'no token')
-      return
-    }
-    for (const account of accountsList) {
-      const tiltifyId = account.providerId
-      const tiltifyUser = await api.getUserById(tiltifyId, token)
-      try {
-        if (tiltifyUser) {
-          await db
-            .update(accounts)
-            .set({
-              providerUsername: tiltifyUser.data.username,
-              meta: tiltifyUser.data,
-            })
-            .where(eq(accounts.userId, account.userId))
-          console.log(
-            'DO-scheduler',
-            'updated tiltify profile',
-            tiltifyUser.data.slug,
-          )
-        }
-      } catch (e) {
-        console.error('updateTiltifyProfiles', 'error', e)
-      }
-    }
+  // --- Storage lifecycle ---
+  clear() {
+    return this.ctx.storage.deleteAll()
   }
 }
