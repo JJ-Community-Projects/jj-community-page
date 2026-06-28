@@ -64,6 +64,12 @@
         "ConfigDO",
         "TwitchExtensionRateLimiter"
       ]
+    },
+    {
+      "tag": "v5",
+      "new_sqlite_classes": [
+        "JingleJamDataV2"
+      ]
     }
   ],
   "durable_objects": {
@@ -71,6 +77,10 @@
       {
         "name": "JingleJamData",
         "class_name": "JingleJamData"
+      },
+      {
+        "name": "JJ_DATA_V2",
+        "class_name": "JingleJamDataV2"
       },
       {
         "name": "UserRateLimiter",
@@ -223,6 +233,12 @@
             "ConfigDO",
             "TwitchExtensionRateLimiter"
           ]
+        },
+        {
+          "tag": "jjdatav2",
+          "new_sqlite_classes": [
+            "JingleJamDataV2"
+          ]
         }
       ],
       "durable_objects": {
@@ -230,6 +246,10 @@
           {
             "name": "JingleJamData",
             "class_name": "JingleJamData"
+          },
+          {
+            "name": "JJ_DATA_V2",
+            "class_name": "JingleJamDataV2"
           },
           {
             "name": "UserRateLimiter",
@@ -395,6 +415,12 @@
             "ConfigDO",
             "TwitchExtensionRateLimiter"
           ]
+        },
+        {
+          "tag": "jjdatav2",
+          "new_sqlite_classes": [
+            "JingleJamDataV2"
+          ]
         }
       ],
       "durable_objects": {
@@ -402,6 +428,10 @@
           {
             "name": "JingleJamData",
             "class_name": "JingleJamData"
+          },
+          {
+            "name": "JJ_DATA_V2",
+            "class_name": "JingleJamDataV2"
           },
           {
             "name": "UserRateLimiter",
