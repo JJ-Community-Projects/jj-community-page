@@ -22,7 +22,6 @@ declare namespace Cloudflare {
 		JJ_DASHBOARD_URL: string;
 		VITE_BUILD_DATE: string;
 		JingleJamData: DurableObjectNamespace<import("./src/worker").JingleJamData>;
-		JJ_DATA_V2: DurableObjectNamespace<import("./src/worker").JingleJamDataV2>;
 		UserRateLimiter: DurableObjectNamespace<import("./src/worker").UserRateLimiter>;
 		FriendRequestIncomingObject: DurableObjectNamespace<import("./src/worker").FriendRequestIncomingObject>;
 		FriendRequestSentObject: DurableObjectNamespace<import("./src/worker").FriendRequestSentObject>;

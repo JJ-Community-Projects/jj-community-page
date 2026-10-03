@@ -79,10 +79,6 @@
         "class_name": "JingleJamData"
       },
       {
-        "name": "JJ_DATA_V2",
-        "class_name": "JingleJamDataV2"
-      },
-      {
         "name": "UserRateLimiter",
         "class_name": "UserRateLimiter"
       },
@@ -246,10 +242,6 @@
           {
             "name": "JingleJamData",
             "class_name": "JingleJamData"
-          },
-          {
-            "name": "JJ_DATA_V2",
-            "class_name": "JingleJamDataV2"
           },
           {
             "name": "UserRateLimiter",
@@ -428,10 +420,6 @@
           {
             "name": "JingleJamData",
             "class_name": "JingleJamData"
-          },
-          {
-            "name": "JJ_DATA_V2",
-            "class_name": "JingleJamDataV2"
           },
           {
             "name": "UserRateLimiter",

@@ -29,7 +29,6 @@ export default {
 }
 
 export { JingleJamData } from './do/JingleJamData.ts'
-export { JingleJamDataV2 } from './do/jingleJamData-v2/JingleJamDataV2.ts'
 export { UserRateLimiter } from './do/rateLimiter/UserRateLimiter.ts'
 
 export { FriendRequestIncomingObject } from './lib/orpc/private/friendsWS/do/FriendRequestIncomingObject.ts'
