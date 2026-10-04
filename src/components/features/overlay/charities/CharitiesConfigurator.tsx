@@ -69,9 +69,7 @@ type Currency = 'GBP' | 'USD' | 'EUR'
   return (
     <div class="flex flex-col gap-2 rounded bg-black/30 p-3">
       <p class="mb-2 rounded border border-white/10 bg-white/5 p-2 text-sm text-white/80">
-        Show a selected team’s upcoming stream slots in a compact panel. Choose
-        a theme, pick filled or striped style, and set the item limit. Set your
-        OBS Browser Source to 300x450 px.
+        Show a info panel. Choose a theme, pick filled or striped style, and set the item limit. Set your OBS Browser Source to 300x450 px.
       </p>
       <div class="flex flex-row gap-1">
         <div class="flex flex-1 flex-col gap-4">
