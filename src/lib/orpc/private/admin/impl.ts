@@ -10,6 +10,7 @@ import type { TwitchUser } from '../../../model/TwitchAPIModel.ts'
 import { accounts, userSocials } from '../../../db/schema/auth-schema.ts'
 import { schedulesTable, streamParticipantsTable, streamsTable, } from '../../../db/schema/jj-schema.ts'
 import { streamTagsTable, tags } from '../../../db/schema/tags-schema.ts'
+import { CONTENT_VISIBILITY_KV_KEY, readContentVisibility } from '../../../services/overlayVisibility.ts'
 
 const os = implement(contracts).use(adminAuthMiddleware)
 
@@ -187,6 +188,22 @@ const deleteKVValue = os.deleteKVValueContract.handler(
     const { key } = input
     const KV = context.env.KV
     await KV.delete(key)
+  },
+)
+
+const setContentVisibility = os.setContentVisibilityContract.handler(
+  async ({ context, input }) => {
+    await context.env.KV.put(
+      CONTENT_VISIBILITY_KV_KEY,
+      input.hidden ? 'hidden' : 'visible',
+    )
+    return input.hidden
+  },
+)
+
+const getContentVisibility = os.getContentVisibilityContract.handler(
+  async ({ context }) => {
+    return (await readContentVisibility(context.env)) === 'hidden'
   },
 )
 
@@ -786,6 +803,8 @@ export const adminRouter = {
   getAllKVKeys,
   putKVValue,
   deleteKVValue,
+  setContentVisibility,
+  getContentVisibility,
   triggerTwitchLiveCheck,
   getTwitchStreams,
   getGBPToEURRate,

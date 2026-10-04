@@ -8,7 +8,16 @@ import {
   MainJJStartTimes,
 } from '../../components/common/ui/MainHeader.tsx'
 
-const HIDE_CONTENT = true
+const { data: contentHidden } = await serverClientPublic.overlays.visibility.getHidden(
+  {},
+  {
+    context: {
+      locals: Astro.locals,
+      request: Astro.request,
+    },
+  },
+)
+const HIDE_CONTENT = contentHidden ?? true
 
 const { data: teams, error } = await serverClientPublic.teams.findVisible(
   {},

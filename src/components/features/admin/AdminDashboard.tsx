@@ -5,6 +5,7 @@ import { TagsCategoriesSection } from './tags/category/TagsCategoriesSection.tsx
 import { JJData } from './JJData.tsx'
 import { AdminConfigSection } from './config/AdminConfigSection'
 import { AdminKVConfigSection } from './config/AdminKVConfigSection'
+import { AdminOverlayVisibilitySection } from './AdminOverlayVisibilitySection'
 import { AdminTwitchSection } from './AdminTwitchSection'
 import { AdminFXRateSection } from './AdminFXRateSection'
 import { AdminScheduleList } from './AdminScheduleList.tsx'
@@ -17,6 +18,7 @@ export const AdminDashboard: Component = () => {
     <QueryClientProvider client={new QueryClient()}>
       <div class="flex flex-col gap-6">
         <AdminFXRateSection />
+        <AdminOverlayVisibilitySection />
         <AdminKVConfigSection />
         <AdminConfigSection />
         <AdminTwitchSection />

@@ -4,8 +4,18 @@ export const prerender = false
 import BaseLayoutYogs from '../../layouts/BaseLayoutYogs.astro'
 import { getYogsScheduleFromContent } from '../../content/getYogsScheduleFromContent.ts'
 import { YogsCurrentScheduleLoader } from '../../components/yogs-pages/schedule/YogsCurrentScheduleLoader.tsx'
+import { serverClientPublic } from '../../lib/orpc/serverClient'
 
-const HIDE_CONTENT = true
+const { data: contentHidden } = await serverClientPublic.overlays.visibility.getHidden(
+  {},
+  {
+    context: {
+      locals: Astro.locals,
+      request: Astro.request,
+    },
+  },
+)
+const HIDE_CONTENT = contentHidden ?? true
 
 if (HIDE_CONTENT) {
   return Astro.redirect('/yogs/archive/2025')

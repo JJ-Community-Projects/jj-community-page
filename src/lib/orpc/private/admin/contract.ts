@@ -58,6 +58,14 @@ const deleteKVValueContract = oc
 
 const triggerTwitchLiveCheckContract = oc.input(z.void()).output(z.void())
 
+// Content visibility: KV-backed kill switch for overlays/community/teams/yogs.
+// Returns the new hidden state.
+const setContentVisibilityContract = oc
+  .input(z.object({ hidden: z.boolean() }))
+  .output(z.boolean())
+
+const getContentVisibilityContract = oc.output(z.boolean())
+
 // Clear JJ DO storage
 const clearJingleJamDataContract = oc.input(z.void()).output(z.void())
 
@@ -176,6 +184,8 @@ export const contracts = {
   putKVValueContract,
   deleteKVValueContract,
   triggerTwitchLiveCheckContract,
+  setContentVisibilityContract,
+  getContentVisibilityContract,
   // new exports
   clearJingleJamDataContract,
   getAllTwitchChannelsContract,

@@ -2,8 +2,18 @@
 import BaseLayout from '../../layouts/BaseLayout.astro'
 import { OverlayConfiguration } from '../../components/features/overlay/overview/OverlayConfiguration.tsx'
 import { PublicOverlayConfiguration } from '../../components/features/overlay/overview/PublicOverlayConfiguration.tsx'
+import { serverClientPublic } from '../../lib/orpc/serverClient'
 
-const HIDE_CONTENT = true
+const { data: contentHidden } = await serverClientPublic.overlays.visibility.getHidden(
+  {},
+  {
+    context: {
+      locals: Astro.locals,
+      request: Astro.request,
+    },
+  },
+)
+const HIDE_CONTENT = contentHidden ?? true
 
 const user = Astro.locals.user
 

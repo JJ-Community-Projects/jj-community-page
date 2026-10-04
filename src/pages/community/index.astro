@@ -7,8 +7,18 @@ import {
   MainCountdownSimple,
   MainJJStartTimes,
 } from '../../components/common/ui/MainHeader.tsx'
+import { serverClientPublic } from '../../lib/orpc/serverClient'
 
-const HIDE_CONTENT = true
+const { data: contentHidden } = await serverClientPublic.overlays.visibility.getHidden(
+  {},
+  {
+    context: {
+      locals: Astro.locals,
+      request: Astro.request,
+    },
+  },
+)
+const HIDE_CONTENT = contentHidden ?? true
 
 const charityData = await getEntry('charities', '2025')
 ---

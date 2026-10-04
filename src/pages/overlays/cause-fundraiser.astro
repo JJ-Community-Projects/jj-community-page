@@ -1,8 +1,18 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro'
 import { FundraisersByCauseOverlay } from '../../components/features/overlay/ticker/fundraisers/FundraisersByCauseOverlay.tsx'
+import { serverClientPublic } from '../../lib/orpc/serverClient'
 
-const HIDE_CONTENT = true
+const { data: contentHidden } = await serverClientPublic.overlays.visibility.getHidden(
+  {},
+  {
+    context: {
+      locals: Astro.locals,
+      request: Astro.request,
+    },
+  },
+)
+const HIDE_CONTENT = contentHidden ?? true
 
 const causeParam = Astro.url.searchParams.get('cause')
 const themeParam = Astro.url.searchParams.get('theme')

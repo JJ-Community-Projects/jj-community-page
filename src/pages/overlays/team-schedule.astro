@@ -1,7 +1,17 @@
 ---
 import { TeamScheduleOverlay } from '../../components/features/overlay/schedule/team/TeamScheduleOverlay.tsx'
+import { serverClientPublic } from '../../lib/orpc/serverClient'
 
-const HIDE_CONTENT = true
+const { data: contentHidden } = await serverClientPublic.overlays.visibility.getHidden(
+  {},
+  {
+    context: {
+      locals: Astro.locals,
+      request: Astro.request,
+    },
+  },
+)
+const HIDE_CONTENT = contentHidden ?? true
 
 const teamIdParam = Astro.url.searchParams.get('teamId')
 const timezoneParam = Astro.url.searchParams.get('timezone')
