@@ -20,6 +20,7 @@ import type { TiltifyStore } from './TiltifyStore.ts'
 import type { TwitchTracker } from './TwitchTracker.ts'
 import type { CurrencyStore } from './CurrencyStore.ts'
 import type { UserTagsBuilder, UserWithTags } from './UserTagsBuilder.ts'
+import type { DonationMatchStore } from './DonationMatchStore.ts'
 
 // TV/display projections (the hot read path for the Twitch extension and
 // overlay). Reads from the Tiltify/Twitch/Currency/UserTags modules plus D1.
@@ -34,6 +35,7 @@ export class DisplayBuilder {
     private twitch: TwitchTracker,
     private currency: CurrencyStore,
     private userTags: UserTagsBuilder,
+    private donationMatches: DonationMatchStore,
   ) {}
 
   public async buildDisplayData() {
@@ -120,6 +122,7 @@ export class DisplayBuilder {
       const eurRate = await this.currency.getGbpToEurRate()
       const tiltifyUsers = await this.tiltify.getTiltifyUsersMap()
       const rawCampaigns = await this.tiltify.getCampaigns()
+      const matchState = await this.donationMatches.getState()
 
       // Build display items for ALL campaigns
       const displayEntries: Record<string, JJCampaignTVType> = {}
@@ -161,6 +164,7 @@ export class DisplayBuilder {
             }
           }
 
+          const matchStarts = matchState[c.id]?.activeStarts ?? null
           const display: JJCampaignTVType = {
             tiltifySlug: c.user.slug,
             campaignName: c.name,
@@ -172,6 +176,9 @@ export class DisplayBuilder {
             raised: toCurrencies(c.raised, usdRate, eurRate),
             goal: toCurrencies(c.goal, usdRate, eurRate),
             twitch,
+            hasActiveDonationMatch: matchStarts !== null,
+            donationMatchStartsAt:
+              matchStarts === null ? null : new Date(matchStarts),
           }
           displayEntries[`campaign:display:${userSlug}`] = display
           if (twitchId !== '') {
@@ -302,6 +309,7 @@ export class DisplayBuilder {
       }
 
       const tiltifyUsers = await this.tiltify.getTiltifyUsersMap()
+      const matchState = await this.donationMatches.getState()
 
       const listAll = await Promise.all(
         rawCampaigns.map(async (c) => {
@@ -326,6 +334,7 @@ export class DisplayBuilder {
           const val = await this.twitch.getCampaignLive(c.user.slug)
           const sSlug = userSlug ? scheduleByTiltify.get(userSlug) : undefined
 
+          const matchStarts = matchState[c.id]?.activeStarts ?? null
           const display: JJCampaignType = {
             campaignName: c.name,
             tiltifyUrl: c.url,
@@ -340,6 +349,9 @@ export class DisplayBuilder {
             isTwitchLive: val ?? false,
             scheduleUrl: sSlug ? `/schedules/${sSlug}` : undefined,
             tags: userTagsMap.get(c.user.slug)?.tags ?? [],
+            hasActiveDonationMatch: matchStarts !== null,
+            donationMatchStartsAt:
+              matchStarts === null ? null : new Date(matchStarts),
           }
 
           return display

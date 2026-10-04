@@ -7,6 +7,7 @@ import { TwitchTracker } from './jingleJamData/TwitchTracker.ts'
 import { UserTagsBuilder } from './jingleJamData/UserTagsBuilder.ts'
 import { ScheduleBuilder } from './jingleJamData/ScheduleBuilder.ts'
 import { DisplayBuilder } from './jingleJamData/DisplayBuilder.ts'
+import { DonationMatchStore } from './jingleJamData/DonationMatchStore.ts'
 import { Scheduler } from './jingleJamData/Scheduler.ts'
 
 // Facade Durable Object. Preserves the public method surface that consumers call
@@ -20,6 +21,7 @@ import { Scheduler } from './jingleJamData/Scheduler.ts'
 //   UserTagsBuilder — user-tags display projection
 //   ScheduleBuilder — full community schedule
 //   DisplayBuilder  — TV/display projections
+//   DonationMatchStore — per-campaign active donation-match state (rolling sweep)
 //   Scheduler       — alarm-driven task runner
 export class JingleJamData extends DurableObject<Env> {
   private currency: CurrencyStore
@@ -28,6 +30,7 @@ export class JingleJamData extends DurableObject<Env> {
   private userTags: UserTagsBuilder
   private schedule: ScheduleBuilder
   private display: DisplayBuilder
+  private donationMatches: DonationMatchStore
   private scheduler: Scheduler
 
   constructor(ctx: DurableObjectState, env: Env) {
@@ -38,6 +41,7 @@ export class JingleJamData extends DurableObject<Env> {
     this.twitch = new TwitchTracker(storage, env, this.tiltify)
     this.userTags = new UserTagsBuilder(storage, env)
     this.schedule = new ScheduleBuilder(storage, env)
+    this.donationMatches = new DonationMatchStore(storage, this.tiltify, env)
     this.display = new DisplayBuilder(
       storage,
       env,
@@ -45,6 +49,7 @@ export class JingleJamData extends DurableObject<Env> {
       this.twitch,
       this.currency,
       this.userTags,
+      this.donationMatches,
     )
     this.scheduler = new Scheduler(storage, {
       tiltify: this.tiltify,
@@ -53,6 +58,7 @@ export class JingleJamData extends DurableObject<Env> {
       userTags: this.userTags,
       display: this.display,
       schedule: this.schedule,
+      donationMatches: this.donationMatches,
     })
   }
 
@@ -88,6 +94,9 @@ export class JingleJamData extends DurableObject<Env> {
   }
   getCampaignsForCause(causeId: string) {
     return this.tiltify.getCampaignsForCause(causeId)
+  }
+  refreshDonationMatches() {
+    return this.donationMatches.refreshActiveMatches()
   }
   fetchCampaigns(limit: number, offset: number) {
     return this.tiltify.fetchCampaigns(limit, offset)

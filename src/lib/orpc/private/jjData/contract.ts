@@ -59,6 +59,8 @@ const JJCampaignSchema = z.object({
   scheduleUrl: z.string().optional(),
   // NEW tags for the user
   tags: z.array(SimpleCampaignTag).default([]),
+  hasActiveDonationMatch: z.boolean().default(false),
+  donationMatchStartsAt: z.date().nullable().default(null),
 })
 
 export const JJCampaignsSchema = z.object({

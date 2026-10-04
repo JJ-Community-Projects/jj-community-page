@@ -66,6 +66,8 @@ export const JJCampaignSchema = z.object({
       url: z.string(),
     })
     .optional(),
+  hasActiveDonationMatch: z.boolean().default(false),
+  donationMatchStartsAt: z.date().nullable().default(null),
 })
 
 // JJCampaigns schema

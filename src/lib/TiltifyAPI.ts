@@ -5,6 +5,7 @@ import { tokens } from './db/schema/auth-schema.ts'
 import { and, eq, type InferSelectModel } from 'drizzle-orm'
 import { drizzle, type DrizzleD1Database } from 'drizzle-orm/d1'
 import { TiltifyTokenCache } from './db/cache/TiltifyTokenCache.ts'
+import type { DonationMatchPaginatedResponse1 } from './externalAPI/tiltify/api/src/models/DonationMatchPaginatedResponse1.ts'
 
 export type TiltifyToken = {
   accessToken: string
@@ -377,6 +378,45 @@ export class TiltifyAPI {
       return null
     }
     return resp.json() as Promise<TiltifyUserResponse>
+  }
+
+  // Active donation matches for one campaign. Returns null on any failure
+  // (token, network, non-OK) so callers can distinguish "fetch failed" from
+  // "campaign has no active matches" (an OK response with an empty data array).
+  async getCampaignDonationMatches(
+    campaignId: string,
+    token?: string | null,
+  ): Promise<DonationMatchPaginatedResponse1 | null> {
+    if (!token) {
+      token = await this.getAppToken()
+    }
+    if (!token) {
+      return null
+    }
+    try {
+      const resp = await fetch(
+        `https://v5api.tiltify.com/api/public/campaigns/${campaignId}/donation_matches?status=active&limit=100`,
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        },
+      )
+      if (!resp.ok) {
+        console.error(
+          'getCampaignDonationMatches error:',
+          campaignId,
+          resp.status,
+        )
+        return null
+      }
+      return (await resp.json()) as DonationMatchPaginatedResponse1
+    } catch (error) {
+      console.error('getCampaignDonationMatches error:', campaignId, error)
+      return null
+    }
   }
 
   async getAppToken() {

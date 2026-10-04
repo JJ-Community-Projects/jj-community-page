@@ -4,6 +4,7 @@ import type { CurrencyStore } from './CurrencyStore.ts'
 import type { UserTagsBuilder } from './UserTagsBuilder.ts'
 import type { DisplayBuilder } from './DisplayBuilder.ts'
 import type { ScheduleBuilder } from './ScheduleBuilder.ts'
+import type { DonationMatchStore } from './DonationMatchStore.ts'
 
 export interface SchedulerModules {
   tiltify: TiltifyStore
@@ -12,6 +13,7 @@ export interface SchedulerModules {
   userTags: UserTagsBuilder
   display: DisplayBuilder
   schedule: ScheduleBuilder
+  donationMatches: DonationMatchStore
 }
 
 // Central task runner — owns the Durable Object alarm, the pause switch and
@@ -30,6 +32,13 @@ export class Scheduler {
         await this.m.tiltify.refreshAllCampaigns()
         await this.m.tiltify.insertIntoDB()
         await this.m.display.buildDisplayData()
+      },
+    },
+    {
+      name: 'refreshDonationMatches',
+      everyMs: 60 * 1000,
+      run: async () => {
+        await this.m.donationMatches.refreshActiveMatches()
       },
     },
     {
