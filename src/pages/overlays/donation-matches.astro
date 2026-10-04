@@ -1,0 +1,34 @@
+---
+import { DonationMatchesOverlay } from '../../components/features/overlay/donationMatches/DonationMatchesOverlay.tsx'
+import {
+  BG_PRESETS,
+  type BgPreset,
+} from '../../components/features/overlay/donationMatches/presets.ts'
+import { serverClientPublic } from '../../lib/orpc/serverClient'
+
+const { data: contentHidden } = await serverClientPublic.overlays.visibility.getHidden(
+  {},
+  {
+    context: {
+      locals: Astro.locals,
+      request: Astro.request,
+    },
+  },
+)
+const HIDE_CONTENT = contentHidden ?? true
+
+const bgParam = Astro.url.searchParams.get('bg')
+const demoParam = Astro.url.searchParams.get('demo')
+
+const bg: BgPreset =
+  bgParam && bgParam in BG_PRESETS ? (bgParam as BgPreset) : 'red'
+const demo = demoParam === 'true' || demoParam === '1'
+---
+
+<div class="min-h-screen bg-transparent text-white">
+  {HIDE_CONTENT ? (
+    <p class="p-4 text-center text-sm text-white/60">Overlay currently unavailable</p>
+  ) : (
+    <DonationMatchesOverlay client:only="solid-js" bg={bg} demo={demo} />
+  )}
+</div>

@@ -8,6 +8,7 @@ import { UserScheduleConfigurator } from '../schedule/user/UserScheduleConfigura
 import { FundraisersTickerConfigurator } from '../ticker/fundraisers/FundraisersTickerConfigurator.tsx'
 import { CharitiesTickerConfigurator } from '../ticker/charities/CharitiesTickerConfigurator.tsx'
 import { CharitiesConfigurator } from '../charities/CharitiesConfigurator.tsx'
+import { DonationMatchesConfigurator } from '../donationMatches/DonationMatchesConfigurator.tsx'
 import { FundraisersByTeamConfigurator } from '../ticker/fundraisers/FundraisersByTeamConfigurator.tsx'
 import { FundraisersByCauseConfigurator } from '../ticker/fundraisers/FundraisersByCauseConfigurator.tsx'
 import { UserProvider } from '../../users/user-dashboard/providers/UserProvider.tsx'
@@ -56,6 +57,31 @@ const Body: Component = () => {
         </Accordion.Header>
         <Accordion.Content class="w-full p-2">
           <CharitiesConfigurator visible={isOpen('charities2')} />
+        </Accordion.Content>
+      </Accordion.Item>
+
+      {/* Active Dono Matches */}
+      <Accordion.Item
+        value="donation-matches"
+        class="flex w-full flex-col items-center transition-all"
+      >
+        <Accordion.Header class="w-full">
+          <Accordion.Trigger
+            class={twMerge(
+              'hover:scale-102 hover:brightness-102 border-1 group m-2 flex w-full flex-row items-center rounded border-accent-500 bg-primary-200/50 p-2 text-xl text-white shadow',
+            )}
+          >
+            <p class="flex-1 text-left">Active Dono Matches</p>
+            <FaSolidChevronDown
+              class={twMerge(
+                'transition-all group-hover:animate-none',
+                isOpen('donation-matches') && 'rotate-180 animate-none',
+              )}
+            />
+          </Accordion.Trigger>
+        </Accordion.Header>
+        <Accordion.Content class="w-full p-2">
+          <DonationMatchesConfigurator visible={isOpen('donation-matches')} />
         </Accordion.Content>
       </Accordion.Item>
 

@@ -1,5 +1,6 @@
 import { implement, ORPCError } from '@orpc/server'
 import { contracts, type FundraiserItem } from './contract'
+import { selectRecentDonationMatches } from './selectRecentDonationMatches.ts'
 import { dbMiddleware } from '../../middleware/dbMiddleware'
 import {
   schedulesTable,
@@ -662,6 +663,22 @@ const campaignGoalSlug = os.campaignGoalContract.handler(
   },
 )
 
+// ----------------------
+// Active donation matches (top N most recent)
+// ----------------------
+const donationMatches = os.donationMatchesContract.handler(
+  async ({ input, context }) => {
+    const limit = clamp(input?.limit ?? 5, 1, 20)
+    const DO = context.env.JingleJamData
+    const stub = DO.get(DO.idFromName('JJ_API_CACHE'))
+
+    const data = await stub.getCampaignsDisplayAll()
+    const matches = selectRecentDonationMatches(data?.campaigns ?? [], limit)
+
+    return { count: matches.length, matches }
+  },
+)
+
 export const privateOverlayRouter = {
   // Charity outputs
   charities,
@@ -675,4 +692,6 @@ export const privateOverlayRouter = {
   scheduleByTeamId,
   // Campaigns
   campaignGoalSlug,
+  // Donation matches
+  donationMatches,
 }

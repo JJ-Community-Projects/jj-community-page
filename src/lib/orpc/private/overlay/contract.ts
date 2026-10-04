@@ -216,6 +216,33 @@ const campaignGoalContract = oc
   .input(OverlayCampaignByUserSlugInput)
   .output(JJApiCampaignSchema)
 
+// ----------------------
+// Active donation matches (top N most recent)
+// ----------------------
+
+export const DonationMatchItemSchema = z.object({
+  campaignName: z.string(),
+  channelUrl: z.string(),
+  twitchName: z.string().optional(),
+  avatar: z.string().optional(),
+  startsAt: z.date().nullable(),
+})
+
+export type DonationMatchItem = z.infer<typeof DonationMatchItemSchema>
+
+const donationMatchesContract = oc
+  .input(
+    z.object({
+      limit: z.number().int().min(1).max(20).default(5),
+    }),
+  )
+  .output(
+    z.object({
+      count: z.number(),
+      matches: z.array(DonationMatchItemSchema),
+    }),
+  )
+
 export const contracts = {
   // Charity outputs
   charitiesContract,
@@ -229,4 +256,6 @@ export const contracts = {
   scheduleByTeamIdContract,
   // Campaigns
   campaignGoalContract,
+  // Donation matches
+  donationMatchesContract,
 }
