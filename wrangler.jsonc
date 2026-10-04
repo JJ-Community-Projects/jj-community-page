@@ -128,7 +128,7 @@
     {
       "binding": "DB",
       "database_name": "beta-d1-jj",
-      "database_id": "b32d1f6f-5f53-487f-a355-4d9e9b9a0658",
+      "database_id": "c2a696d2-43eb-4e25-9677-a148c665b68c",
       "migrations_dir": "drizzle"
     }
   ],
@@ -384,8 +384,10 @@
           "tag": "v3",
           "deleted_classes": [
             "UserDO",
-            "TeamDO",
-            "ScheduleEditorDO"
+            "TeamDO"
+            // NOTE: "ScheduleEditorDO" was removed here: it was added and dropped in
+            // source between beta deploys, so it never existed in the deployed beta
+            // script and CF rejects delete-class migrations for unknown classes (10074).
           ],
           "new_sqlite_classes": [
 
@@ -407,13 +409,10 @@
             "ConfigDO",
             "TwitchExtensionRateLimiter"
           ]
-        },
-        {
-          "tag": "jjdatav2",
-          "new_sqlite_classes": [
-            "JingleJamDataV2"
-          ]
         }
+        // NOTE: the "jjdatav2" / JingleJamDataV2 migration was removed here: no such
+        // class exists in src (not exported by src/worker.js), so CF rejects the
+        // create-class migration (10070). The tag was never applied on beta.
       ],
       "durable_objects": {
         "bindings": [
@@ -477,7 +476,7 @@
         {
           "binding": "DB",
           "database_name": "beta-d1-jj",
-          "database_id": "b32d1f6f-5f53-487f-a355-4d9e9b9a0658",
+          "database_id": "c2a696d2-43eb-4e25-9677-a148c665b68c",
           "migrations_dir": "drizzle"
         }
       ],
