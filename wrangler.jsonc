@@ -64,12 +64,6 @@
         "ConfigDO",
         "TwitchExtensionRateLimiter"
       ]
-    },
-    {
-      "tag": "v5",
-      "new_sqlite_classes": [
-        "JingleJamDataV2"
-      ]
     }
   ],
   "durable_objects": {
@@ -228,12 +222,6 @@
             // other
             "ConfigDO",
             "TwitchExtensionRateLimiter"
-          ]
-        },
-        {
-          "tag": "jjdatav2",
-          "new_sqlite_classes": [
-            "JingleJamDataV2"
           ]
         }
       ],
@@ -410,9 +398,6 @@
             "TwitchExtensionRateLimiter"
           ]
         }
-        // NOTE: the "jjdatav2" / JingleJamDataV2 migration was removed here: no such
-        // class exists in src (not exported by src/worker.js), so CF rejects the
-        // create-class migration (10070). The tag was never applied on beta.
       ],
       "durable_objects": {
         "bindings": [
