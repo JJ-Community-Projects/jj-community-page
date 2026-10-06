@@ -30,7 +30,7 @@ const limit = Number.isFinite(limitRaw) ? Math.min(100, Math.max(1, Math.floor(l
 
 <div class="min-h-screen bg-transparent text-white">
   {HIDE_CONTENT ? (
-    <p class="p-4 text-center text-sm text-white/60">Overlay currently unavailable</p>
+    <p class="bg-black/70 p-4 text-center text-sm text-white/60">Overlay currently unavailable</p>
   ) : (
     <UserScheduleOverlay
       client:only="solid-js"

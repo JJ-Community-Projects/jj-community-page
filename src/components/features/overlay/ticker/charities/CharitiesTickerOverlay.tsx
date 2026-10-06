@@ -17,6 +17,7 @@ import { useQuery, QueryClientProvider } from '@tanstack/solid-query'
 import { QueryClient } from '@tanstack/query-core'
 import { CharityTickerChild } from '../common/CharityTickerChild'
 import { JJLogo } from '../common/JJLogo.tsx'
+import { DEMO_CHARITIES } from '../../demoData.ts'
 
 export type CharitiesProps = {
   theme?: 'default' | 'red' | 'blue'
@@ -25,6 +26,7 @@ export type CharitiesProps = {
   titleLogo?: string
   user?: string
   currency?: 'GBP' | 'USD' | 'EUR'
+  demo?: boolean
 }
 
 export const CharitiesTickerOverlay: Component<CharitiesProps> = (props) => {
@@ -34,6 +36,7 @@ export const CharitiesTickerOverlay: Component<CharitiesProps> = (props) => {
     titleLogo: props.titleLogo ?? 'none',
     user: props.user,
     currency: props.currency ?? 'GBP',
+    demo: props.demo,
   }
   const i18n = createI18n({ language: useLocale().locale() })
   return (
@@ -45,6 +48,7 @@ export const CharitiesTickerOverlay: Component<CharitiesProps> = (props) => {
           titleLogo={resolved.titleLogo}
           user={resolved.user}
           currency={resolved.currency}
+          demo={resolved.demo}
         />
       </I18nProvider>
     </QueryClientProvider>
@@ -57,10 +61,12 @@ const Body: Component<{
   titleLogo: string
   user?: string
   currency: 'GBP' | 'USD' | 'EUR'
+  demo?: boolean
 }> = (props) => {
   const q = useQuery(() =>
     orpcPrivate.overlay.charities.queryOptions({
       input: { includeTotals: true, currency: props.currency, user: props.user },
+      enabled: !props.demo,
       staleTime: 60_000,
       refetchInterval: 60_000,
       refetchOnWindowFocus: false,
@@ -69,17 +75,20 @@ const Body: Component<{
     }),
   )
 
+  // `demo` swaps the live query for static fixtures so the editor preview is
+  // always populated.
+  const data = () => (props.demo ? DEMO_CHARITIES : q.data)
+
   const displayItems = () => {
-    if (!q.data) {
-      return []
+    const result: any[] = []
+    const d0 = data()
+    if (!d0) {
+      return result
     }
 
-    const data = q.data
-
     const gap = 4
-    const result: any[] = []
 
-    const base = data.charities
+    const base = d0.charities
     const newChildren = Array.from({ length: gap * 2 }, () => base).flat()
 
     let hi = 0
@@ -90,7 +99,7 @@ const Body: Component<{
           result.push(<JJLogo theme={props.theme} />)
         } else {
           result.push(
-            <JJLink theme={props.theme} url={data.userFundraiser?.url} />,
+            <JJLink theme={props.theme} url={d0.userFundraiser?.url} />,
           )
         }
         hi = (hi + 1) % 2
@@ -98,7 +107,7 @@ const Body: Component<{
       result.push(
         <CharityTickerChild
           item={d}
-          theme={props.theme as any}
+          theme={props.theme}
           showRaised={true}
         />,
       )
@@ -109,7 +118,7 @@ const Body: Component<{
   const speed = createMemo(() => displayItems().length * 4)
   return (
     <Switch>
-      <Match when={q.data}>
+      <Match when={data()}>
         <p>{}</p>
         <div class="relative flex overflow-x-hidden">
           <div

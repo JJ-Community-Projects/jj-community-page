@@ -17,6 +17,7 @@ const orderByParam = Astro.url.searchParams.get('orderBy')
 const pageSizeParam = Astro.url.searchParams.get('pageSize')
 const currencyParam = Astro.url.searchParams.get('currency')
 const userParam = Astro.url.searchParams.get('user')
+const demoParam = Astro.url.searchParams.get('demo')
 
 const orderBy =
   orderByParam === 'top' || orderByParam === 'alphabetical'
@@ -25,12 +26,13 @@ const orderBy =
 const pageSize = pageSizeParam ? Number(pageSizeParam) : undefined
 const currency = (() => { const v = (currencyParam ?? 'GBP').toUpperCase(); return v === 'USD' ? 'USD' : v === 'EUR' ? 'EUR' : 'GBP' })()
 const user = userParam ?? undefined
+const demo = demoParam === 'true' || demoParam === '1'
 ---
 
 <div class="min-h-screen bg-transparent text-white">
   {HIDE_CONTENT ? (
-    <p class="p-4 text-center text-sm text-white/60">Overlay currently unavailable</p>
+    <p class="bg-black/70 p-4 text-center text-sm text-white/60">Overlay currently unavailable</p>
   ) : (
-    <FundraisersTickerOverlay client:only="solid-js" orderBy={orderBy} pageSize={pageSize} currency={currency} user={user} />
+    <FundraisersTickerOverlay client:only="solid-js" orderBy={orderBy} pageSize={pageSize} currency={currency} user={user} demo={demo} />
   )}
 </div>

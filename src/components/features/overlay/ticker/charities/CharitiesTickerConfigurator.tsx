@@ -1,5 +1,5 @@
 import { type Component, createMemo, createSignal } from 'solid-js'
-import { buildUrl, FieldRow, LinkPreview, PreviewFrame, } from '../../overview/Common.tsx'
+import { buildUrl, FieldRow, LinkPreview, PreviewDataField, type PreviewDataMode, PreviewFrame, } from '../../overview/Common.tsx'
 import { useUser } from '../../../users/user-dashboard/providers/UserProvider.tsx'
 
 export const CharitiesTickerConfigurator: Component<{ visible?: boolean }> = (
@@ -7,6 +7,7 @@ export const CharitiesTickerConfigurator: Component<{ visible?: boolean }> = (
 ) => {
   const [theme, setTheme] = createSignal<string>('default')
   const [currency, setCurrency] = createSignal<'GBP' | 'USD' | 'EUR'>('GBP')
+  const [previewData, setPreviewData] = createSignal<PreviewDataMode>('test')
 
   const { user } = useUser()
 
@@ -18,12 +19,24 @@ export const CharitiesTickerConfigurator: Component<{ visible?: boolean }> = (
     }),
   )
 
+  // Preview requests demo fixtures by default so the ticker is populated even
+  // when no live data is available; the OBS URL never includes `demo`.
+  const previewUrl = createMemo(() =>
+    buildUrl('/overlays/charities', {
+      theme: theme(),
+      currency: currency(),
+      user: user?.tiltifySlug,
+      demo: previewData() === 'test',
+    }),
+  )
+
   return (
     <div class="flex flex-col gap-2 rounded bg-black/30 p-3">
       <p class="mb-2 rounded border border-white/10 bg-white/5 p-2 text-sm text-white/80">
         A horizontal scrolling ticker that cycles through charities. Choose a
         theme and currency. Set your OBS Browser Source to 1920x80 px.
       </p>
+      <PreviewDataField value={previewData()} onChange={setPreviewData} />
       <FieldRow label="Theme">
         <select
           value={theme()}
@@ -47,7 +60,7 @@ export const CharitiesTickerConfigurator: Component<{ visible?: boolean }> = (
         </select>
       </FieldRow>
       <LinkPreview url={charitiesUrl()} />
-      <PreviewFrame url={charitiesUrl()} visible={p.visible} />
+      <PreviewFrame url={previewUrl()} visible={p.visible} />
     </div>
   )
 }

@@ -7,6 +7,7 @@ import { FundraiserTickerChild } from '../common/FundraiserTickerChild'
 import { JJLogo } from '../common/JJLogo.tsx'
 import { TickerHeader } from '../common/TickerHeader.tsx'
 import { JJLink } from '../common/JJLinkCard.tsx'
+import { DEMO_TEAM_FUNDRAISERS } from '../../demoData.ts'
 
 export type TeamFundraiserProps = {
   teamSlug?: string
@@ -14,6 +15,7 @@ export type TeamFundraiserProps = {
   showRaised?: boolean
   currency?: 'GBP' | 'USD' | 'EUR'
   user?: string
+  demo?: boolean
 }
 
 const Body: Component<TeamFundraiserProps> = (props) => {
@@ -32,34 +34,37 @@ const Body: Component<TeamFundraiserProps> = (props) => {
       staleTime: 60_000,
       refetchInterval: 60_000,
       refetchOnWindowFocus: false,
-      enabled: Boolean(teamSlug()),
+      enabled: Boolean(teamSlug()) && !props.demo,
       placeholderData: (prev) => prev,
     }),
   )
 
-  const items = () => teamQ.data?.fundraisers ?? []
+  // `demo` swaps the live query for static fixtures so the editor preview is
+  // always populated (also covers the "All teams" empty-slug case).
+  const data = () => (props.demo ? DEMO_TEAM_FUNDRAISERS : teamQ.data)
 
   const displayItems = () => {
     const gap = 4
     const result: any[] = []
 
-    const base = items()
+    const d0 = data()
+    const base = d0?.fundraisers ?? []
     const newChildren = Array.from({ length: gap * 3 }, () => base).flat()
 
     let hi = 0
     for (let i = 0; i < newChildren.length; i++) {
       const d = newChildren[i]
-      if (teamQ.data) {
+      if (d0) {
         if (i % gap === 0) {
           if (hi === 0) {
             result.push(
-              <TickerHeader theme={props.theme} title={teamQ.data.teamName} />,
+              <TickerHeader theme={props.theme} title={d0.teamName} />,
             )
           } else if (hi === 1) {
             result.push(
               <JJLink
                 theme={props.theme}
-                url={teamQ.data?.userFundraiser?.url}
+                url={d0.userFundraiser?.url}
               />,
             )
           } else {
@@ -82,7 +87,7 @@ const Body: Component<TeamFundraiserProps> = (props) => {
   const speed = createMemo(() => displayItems().length * 4)
 
   return (
-    <Show when={teamQ.data}>
+    <Show when={data()}>
       <div class="relative flex overflow-x-hidden">
         <div
           style={{

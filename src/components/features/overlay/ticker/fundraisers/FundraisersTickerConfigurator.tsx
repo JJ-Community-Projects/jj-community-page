@@ -1,5 +1,5 @@
 import { type Component, createMemo, createSignal } from 'solid-js'
-import { buildUrl, FieldRow, LinkPreview, PreviewFrame, } from '../../overview/Common.tsx'
+import { buildUrl, FieldRow, LinkPreview, PreviewDataField, type PreviewDataMode, PreviewFrame, } from '../../overview/Common.tsx'
 import { useUser } from '../../../users/user-dashboard/providers/UserProvider.tsx'
 
 type OrderBy = 'recent' | 'top' | 'alphabetical'
@@ -9,6 +9,7 @@ export const FundraisersTickerConfigurator: Component<{
 }> = (p) => {
   const [orderBy, setOrderBy] = createSignal<OrderBy>('recent')
   const [currency, setCurrency] = createSignal<'GBP' | 'USD' | 'EUR'>('GBP')
+  const [previewData, setPreviewData] = createSignal<PreviewDataMode>('test')
 
   const { user } = useUser()
 
@@ -20,11 +21,23 @@ export const FundraisersTickerConfigurator: Component<{
     }),
   )
 
+  // Preview requests demo fixtures by default so the ticker is populated even
+  // when no live data is available; the OBS URL never includes `demo`.
+  const previewUrl = createMemo(() =>
+    buildUrl('/overlays/fundraisers', {
+      orderBy: orderBy(),
+      currency: currency(),
+      user: user?.tiltifySlug,
+      demo: previewData() === 'test',
+    }),
+  )
+
   return (
     <div class="flex flex-col gap-2 rounded bg-black/30 p-3">
       <div class="mb-2 rounded border border-white/10 bg-white/5 p-2 text-sm text-white/80">
         A horizontal scrolling ticker of community fundraisers. Sort by recent, top, or alphabetical and pick a currency. Set your OBS Browser Source to 1920x80 px.
       </div>
+      <PreviewDataField value={previewData()} onChange={setPreviewData} />
       <FieldRow label="Order By">
         <select
           class="rounded bg-black/40 px-2 py-1"
@@ -48,7 +61,7 @@ export const FundraisersTickerConfigurator: Component<{
         </select>
       </FieldRow>
       <LinkPreview url={fundraisersUrl()} />
-      <PreviewFrame url={fundraisersUrl()} visible={p.visible} />
+      <PreviewFrame url={previewUrl()} visible={p.visible} />
     </div>
   )
 }

@@ -30,6 +30,32 @@ export const FieldRow: Component<{ label: string; children: any }> = (p) => (
   </label>
 )
 
+export type PreviewDataMode = 'test' | 'live'
+
+// Preview source switch used by configurators whose overlay supports `?demo=1`.
+// Only affects the embedded preview iframe; the copyable OBS URL stays live.
+export const PreviewDataField: Component<{
+  value: PreviewDataMode
+  onChange: (v: PreviewDataMode) => void
+}> = (p) => (
+  <FieldRow label="Preview Data">
+    <div class="flex flex-col items-start gap-1">
+      <select
+        class="rounded bg-black/40 px-2 py-1"
+        value={p.value}
+        onChange={(e) => p.onChange(e.currentTarget.value as PreviewDataMode)}
+      >
+        <option value="test">Example</option>
+        <option value="live">Live data</option>
+      </select>
+      <p class="text-xs opacity-70">
+        Example data is fake sample charities/fundraisers shown only in this
+        preview. Your copied OBS link always shows live data.
+      </p>
+    </div>
+  </FieldRow>
+)
+
 export const LinkPreview: Component<{ url: string }> = (p) => {
   const copy = async () => {
     try {

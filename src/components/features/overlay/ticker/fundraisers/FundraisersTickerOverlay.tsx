@@ -6,6 +6,7 @@ import '../common/marquee.css'
 import { FundraiserTickerChild } from '../common/FundraiserTickerChild'
 import { JJLogo } from '../common/JJLogo.tsx'
 import { JJLink } from '../common/JJLinkCard.tsx'
+import { DEMO_FUNDRAISERS } from '../../demoData.ts'
 
 export type FundraisersOrder = 'recent' | 'top' | 'alphabetical'
 
@@ -16,6 +17,7 @@ type Props = {
   theme?: 'default' | 'red' | 'blue'
   showRaised?: boolean
   user?: string
+  demo?: boolean
 }
 
 const Body: Component<Props> = (props) => {
@@ -30,18 +32,21 @@ const Body: Component<Props> = (props) => {
         currency: props.currency ?? 'GBP',
         user: props.user,
       },
+      enabled: !props.demo,
       staleTime: 60_000,
       refetchOnWindowFocus: false,
     }),
   )
 
-  const items = () => q.data?.fundraisers ?? []
+  // `demo` swaps the live query for static fixtures so the editor preview is
+  // always populated.
+  const data = () => (props.demo ? DEMO_FUNDRAISERS : q.data)
 
   const displayItems = () => {
     const gap = 4
     const result: any[] = []
 
-    const base = items()
+    const base = data()?.fundraisers ?? []
     const newChildren = Array.from({ length: gap * 2 }, () => base).flat()
 
     let hi = 0
@@ -49,7 +54,7 @@ const Body: Component<Props> = (props) => {
       const d = newChildren[i]
       if (i % gap === 0) {
         if (hi === 0) {
-          result.push(<JJLink theme={props.theme} url={q.data?.userFundraiser?.url} />)
+          result.push(<JJLink theme={props.theme} url={data()?.userFundraiser?.url} />)
         } else {
           result.push(<JJLogo theme={props.theme} />)
         }
@@ -69,7 +74,7 @@ const Body: Component<Props> = (props) => {
   const speed = createMemo(() => displayItems().length * 4)
 
   return (
-    <Show when={q.data}>
+    <Show when={data()}>
       <div class="relative flex overflow-x-hidden">
         <div
           style={{

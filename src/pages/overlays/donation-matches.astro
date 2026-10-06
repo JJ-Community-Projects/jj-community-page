@@ -27,7 +27,7 @@ const demo = demoParam === 'true' || demoParam === '1'
 
 <div class="min-h-screen bg-transparent text-white">
   {HIDE_CONTENT ? (
-    <p class="p-4 text-center text-sm text-white/60">Overlay currently unavailable</p>
+    <p class="bg-black/70 p-4 text-center text-sm text-white/60">Overlay currently unavailable</p>
   ) : (
     <DonationMatchesOverlay client:only="solid-js" bg={bg} demo={demo} />
   )}

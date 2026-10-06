@@ -24,6 +24,9 @@ const showUrlParam = Astro.url.searchParams.get('showUrl')
 const causesParam = Astro.url.searchParams.get('causes')
 const currencyParam = Astro.url.searchParams.get('currency')
 const user = Astro.url.searchParams.get('user') ?? undefined
+const demoParam = Astro.url.searchParams.get('demo')
+
+const demo = demoParam === 'true' || demoParam === '1'
 
 const includeTotals = includeTotalsParam === 'true' || includeTotalsParam === '1'
 const theme = themeParam ?? undefined
@@ -44,8 +47,8 @@ const causes = causesParam
 ---
   <div class="h-screen bg-transparent text-white">
     {HIDE_CONTENT ? (
-      <p class="p-4 text-center text-sm text-white/60">Overlay currently unavailable</p>
+      <p class="bg-black/70 p-4 text-center text-sm text-white/60">Overlay currently unavailable</p>
     ) : (
-      <CharitiesOverlay client:only="solid-js" headers={headers} includeTotals={includeTotals} theme={theme} headerTheme={headerTheme} showDesc={showDesc} qrCode={qrCode} currency={currency} showUrl={showUrl} causes={causes} user={user} />
+      <CharitiesOverlay client:only="solid-js" headers={headers} includeTotals={includeTotals} theme={theme} headerTheme={headerTheme} showDesc={showDesc} qrCode={qrCode} currency={currency} showUrl={showUrl} causes={causes} user={user} demo={demo} />
     )}
   </div>

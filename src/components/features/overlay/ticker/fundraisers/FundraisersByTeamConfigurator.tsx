@@ -3,6 +3,8 @@ import {
   buildUrl,
   FieldRow,
   LinkPreview,
+  PreviewDataField,
+  type PreviewDataMode,
   PreviewFrame,
 } from '../../overview/Common.tsx'
 import { orpcPrivate } from '../../../../../lib/orpc/client.ts'
@@ -14,6 +16,7 @@ const Body: Component<{ visible?: boolean }> = (p) => {
   const [showRaised, setShowRaised] = createSignal<boolean>(true)
   const [teamSlug, setTeamSlug] = createSignal<string>('')
   const [currency, setCurrency] = createSignal<'GBP' | 'USD' | 'EUR'>('GBP')
+  const [previewData, setPreviewData] = createSignal<PreviewDataMode>('test')
 
   const qTeams = useQuery(() =>
     orpcPrivate.teams.getUserTeams.queryOptions({
@@ -33,12 +36,25 @@ const Body: Component<{ visible?: boolean }> = (p) => {
     }),
   )
 
+  // Preview requests demo fixtures by default so the ticker is populated even
+  // when no team/live data is available; the OBS URL never includes `demo`.
+  const previewUrl = createMemo(() =>
+    buildUrl('/overlays/team-fundraiser', {
+      team: teamSlug() || undefined,
+      theme: theme(),
+      showraised: showRaised(),
+      currency: currency(),
+      demo: previewData() === 'test',
+    }),
+  )
+
   return (
     <div class="flex flex-col gap-2 rounded bg-black/30 p-3">
       <div class="mb-2 rounded border border-white/10 bg-white/5 p-2 text-sm text-white/80">
         A horizontal scrolling ticker showing fundraisers filtered by team.
         Choose a theme and currency. Set your OBS Browser Source to 1920x80 px.
       </div>
+      <PreviewDataField value={previewData()} onChange={setPreviewData} />
       <Show when={!qTeams.isLoading && noTeams()}>
         <div class="mb-2 rounded border border-yellow-400/40 bg-yellow-500/10 p-2 text-sm text-yellow-300">
           You are not part of any team yet. Create or join a team to filter by
@@ -92,7 +108,7 @@ const Body: Component<{ visible?: boolean }> = (p) => {
         />
       </FieldRow>
       <LinkPreview url={url()} />
-      <PreviewFrame url={url()} visible={p.visible} />
+      <PreviewFrame url={previewUrl()} visible={p.visible} />
     </div>
   )
 }

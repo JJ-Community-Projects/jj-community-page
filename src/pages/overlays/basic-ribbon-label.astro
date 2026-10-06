@@ -32,7 +32,7 @@ const text = textParam ?? ''
 
 <div class="bg-transparent">
   {HIDE_CONTENT ? (
-    <p class="p-4 text-center text-sm text-white/60">Overlay currently unavailable</p>
+    <p class="bg-black/70 p-4 text-center text-sm text-white/60">Overlay currently unavailable</p>
   ) : (
     <BasicRibbonLabelOverlay client:only="solid-js" style={style} alignment={alignment} text={text} />
   )}

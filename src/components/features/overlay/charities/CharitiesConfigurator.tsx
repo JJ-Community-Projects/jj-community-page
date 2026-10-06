@@ -1,5 +1,5 @@
 import { type Component, createMemo, createSignal, For, Show } from 'solid-js'
-import { buildUrl, FieldRow, LinkPreview, PreviewFrame, } from '../overview/Common.tsx'
+import { buildUrl, FieldRow, LinkPreview, PreviewDataField, type PreviewDataMode, PreviewFrame, } from '../overview/Common.tsx'
 import { useQuery } from '@tanstack/solid-query'
 import { orpcPrivate } from '../../../../lib/orpc/client.ts'
 import { useUser } from '../../users/user-dashboard/providers/UserProvider.tsx'
@@ -26,6 +26,7 @@ type Currency = 'GBP' | 'USD' | 'EUR'
   const [currency, setCurrency] = createSignal<Currency>('GBP')
   const [showUrl, setShowUrl] = createSignal<boolean>(true)
   const [selectedIds, setSelectedIds] = createSignal<string[]>([])
+  const [previewData, setPreviewData] = createSignal<PreviewDataMode>('test')
 
   // Fetch charities list via oRPC for checkbox selection
   const q = useQuery(() =>
@@ -66,6 +67,24 @@ type Currency = 'GBP' | 'USD' | 'EUR'
     }),
   )
 
+  // Preview requests demo fixtures by default so the panel is populated even
+  // when no live data is available; the OBS URL never includes `demo`.
+  const previewUrl = createMemo(() =>
+    buildUrl('/overlays/charities2', {
+      header: selectedHeaders(),
+      includeTotals: includeTotals2(),
+      theme: theme2(),
+      headerTheme: headerTheme2(),
+      showDesc: showDesc(),
+      qrCode: qrCode(),
+      currency: currency(),
+      showUrl: showUrl(),
+      causes: causesParam(),
+      user: user?.tiltifySlug,
+      demo: previewData() === 'test',
+    }),
+  )
+
   return (
     <div class="flex flex-col gap-2 rounded bg-black/30 p-3">
       <p class="mb-2 rounded border border-white/10 bg-white/5 p-2 text-sm text-white/80">
@@ -73,6 +92,7 @@ type Currency = 'GBP' | 'USD' | 'EUR'
       </p>
       <div class="flex flex-row gap-1">
         <div class="flex flex-1 flex-col gap-4">
+          <PreviewDataField value={previewData()} onChange={setPreviewData} />
           <div class="flex flex-1 flex-col">
             <FieldRow label="Theme">
               <select
@@ -205,7 +225,7 @@ type Currency = 'GBP' | 'USD' | 'EUR'
         </div>
         <div class="flex flex-1 flex-col">
           <PreviewFrame
-            url={charities2Url()}
+            url={previewUrl()}
             visible={p.visible}
             class={'h-[450px] w-[300px]'}
           />

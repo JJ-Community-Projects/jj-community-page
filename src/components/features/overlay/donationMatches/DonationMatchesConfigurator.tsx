@@ -3,6 +3,8 @@ import {
   buildUrl,
   FieldRow,
   LinkPreview,
+  PreviewDataField,
+  type PreviewDataMode,
   PreviewFrame,
 } from '../overview/Common.tsx'
 import { BG_PRESETS, BG_PRESET_ORDER, type BgPreset } from './presets.ts'
@@ -11,15 +13,19 @@ export const DonationMatchesConfigurator: Component<{ visible?: boolean }> = (
   props,
 ) => {
   const [bg, setBg] = createSignal<BgPreset>('red')
+  const [previewData, setPreviewData] = createSignal<PreviewDataMode>('test')
 
   const url = createMemo(() =>
     buildUrl('/overlays/donation-matches', { bg: bg() }),
   )
 
-  // Preview always requests demo fixtures so the list is populated even when
-  // no donation match is live.
+  // Preview requests Example fixtures by default so the list is populated even
+  // when no donation match is live; the OBS URL never includes `demo`.
   const previewUrl = createMemo(() =>
-    buildUrl('/overlays/donation-matches', { bg: bg(), demo: true }),
+    buildUrl('/overlays/donation-matches', {
+      bg: bg(),
+      demo: previewData() === 'test',
+    }),
   )
 
   return (
@@ -27,6 +33,7 @@ export const DonationMatchesConfigurator: Component<{ visible?: boolean }> = (
       <p class="mb-2 rounded border border-white/10 bg-white/5 p-2 text-sm text-white/80">
         A list of the 5 most recent active donation matches.
       </p>
+      <PreviewDataField value={previewData()} onChange={setPreviewData} />
       <FieldRow label="Background">
         <select
           class="rounded bg-black/40 px-2 py-1"

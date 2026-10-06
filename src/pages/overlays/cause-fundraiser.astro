@@ -20,6 +20,7 @@ const speedParam = Astro.url.searchParams.get('speed')
 const showRaisedParam = Astro.url.searchParams.get('showraised')
 const currencyParam = Astro.url.searchParams.get('currency')
 const userParam = Astro.url.searchParams.get('user')
+const demoParam = Astro.url.searchParams.get('demo')
 
 const causeId = causeParam ? (causeParam) : undefined
 const theme = (themeParam as any) ?? undefined
@@ -27,12 +28,13 @@ const speed = speedParam ? Number(speedParam) : undefined
 const showRaised = showRaisedParam === '1' || showRaisedParam === 'true' || showRaisedParam === null ? true : false
 const currency = (() => { const v = (currencyParam ?? 'GBP').toUpperCase(); return v === 'USD' ? 'USD' : v === 'EUR' ? 'EUR' : 'GBP' })()
 const user = userParam ?? undefined
+const demo = demoParam === 'true' || demoParam === '1'
 ---
 
 <div class="min-h-screen bg-transparent text-white">
   {HIDE_CONTENT ? (
-    <p class="p-4 text-center text-sm text-white/60">Overlay currently unavailable</p>
+    <p class="bg-black/70 p-4 text-center text-sm text-white/60">Overlay currently unavailable</p>
   ) : (
-    <FundraisersByCauseOverlay client:only="solid-js" causeId={causeId} theme={theme} speed={speed} showRaised={showRaised} currency={currency} user={user} />
+    <FundraisersByCauseOverlay client:only="solid-js" causeId={causeId} theme={theme} speed={speed} showRaised={showRaised} currency={currency} user={user} demo={demo} />
   )}
 </div>

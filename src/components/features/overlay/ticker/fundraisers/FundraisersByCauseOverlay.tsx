@@ -7,6 +7,7 @@ import { FundraiserTickerChild } from '../common/FundraiserTickerChild'
 import { CauseHeader } from '../common/TickerHeaderVariants'
 import { JJLogo } from '../common/JJLogo.tsx'
 import { JJLink } from '../common/JJLinkCard.tsx'
+import { DEMO_CAUSE, DEMO_CAUSE_FUNDRAISERS } from '../../demoData.ts'
 
 export type CauseFundraiserProps = {
   causeId?: string
@@ -15,6 +16,7 @@ export type CauseFundraiserProps = {
   showRaised?: boolean
   currency?: 'GBP' | 'USD' | 'EUR'
   user?: string
+  demo?: boolean
 }
 
 const Body: Component<CauseFundraiserProps> = (props) => {
@@ -32,7 +34,7 @@ const Body: Component<CauseFundraiserProps> = (props) => {
       staleTime: 60_000,
       refetchInterval: 60_000,
       refetchOnWindowFocus: false,
-      enabled: Boolean(causeId()),
+      enabled: Boolean(causeId()) && !props.demo,
       placeholderData: (prev) => prev,
     }),
   )
@@ -48,22 +50,24 @@ const Body: Component<CauseFundraiserProps> = (props) => {
       staleTime: 60_000,
       refetchInterval: 60_000,
       refetchOnWindowFocus: false,
-      enabled: Boolean(causeId()),
+      enabled: Boolean(causeId()) && !props.demo,
       placeholderData: (prev) => prev,
     }),
   )
 
-  const items = () => (causeId() ? (causeQ.data?.fundraisers ?? []) : [])
-
   const displayItems = () => {
-    const cause = causeInfoQ.data
+    const cause = props.demo ? DEMO_CAUSE : causeInfoQ.data
     if (!cause) {
       return []
     }
     const gap = 4
     const result: any[] = []
 
-    const base = items()
+    const base = props.demo
+      ? DEMO_CAUSE_FUNDRAISERS.fundraisers
+      : causeId()
+        ? (causeQ.data?.fundraisers ?? [])
+        : []
     const newChildren = Array.from({ length: gap * 2 }, () => base).flat()
 
     let hi = 0
@@ -87,7 +91,11 @@ const Body: Component<CauseFundraiserProps> = (props) => {
           result.push(
             <JJLink
               theme={props.theme}
-              url={causeQ.data?.userFundraiser?.url}
+              url={
+                props.demo
+                  ? DEMO_CAUSE_FUNDRAISERS.userFundraiser?.url
+                  : causeQ.data?.userFundraiser?.url
+              }
             />,
           )
         } else {
@@ -110,7 +118,7 @@ const Body: Component<CauseFundraiserProps> = (props) => {
 
   return (
     <>
-      <Show when={causeQ.data && causeInfoQ.data}>
+      <Show when={props.demo || (causeQ.data && causeInfoQ.data)}>
         <div class="relative flex overflow-x-hidden">
           <div
             style={{

@@ -7,6 +7,7 @@ import { orpcPrivate } from '../../../../lib/orpc/client.ts'
 import { QueryClientProvider, useQuery } from '@tanstack/solid-query'
 import { QueryClient } from '@tanstack/query-core'
 import type { CharityItem, FundraiserItem, } from '../../../../lib/orpc/private/overlay/contract.ts'
+import { DEMO_CHARITIES } from '../demoData.ts'
 
 // Header cards (mirrors V1 CharityOverlay2)
 function bg(theme: string) {
@@ -140,6 +141,7 @@ export type Props = {
   causes?: string[]
   user?: string
   currency?: 'GBP' | 'USD' | 'EUR'
+  demo?: boolean
 }
 
 function clamp(n: number, min: number, max: number) {
@@ -172,6 +174,7 @@ const Charities2OverlayBody: Component<Props> = (props) => {
   const q = useQuery(() =>
     orpcPrivate.overlay.charities.queryOptions({
       input: { currency: props.currency ?? 'GBP', user: props.user },
+      enabled: !props.demo,
       staleTime: 60_000,
       refetchInterval: 60_000,
       refetchOnWindowFocus: false,
@@ -179,7 +182,10 @@ const Charities2OverlayBody: Component<Props> = (props) => {
       placeholderData: (prev) => prev,
     }),
   )
-  const charities = () => q.data?.charities ?? []
+  // `demo` swaps the live query for static fixtures so the editor preview is
+  // always populated.
+  const data = () => (props.demo ? DEMO_CHARITIES : q.data)
+  const charities = () => data()?.charities ?? []
   const filteredCharities = () =>
     causes().length === 0
       ? charities()
@@ -233,7 +239,7 @@ const Charities2OverlayBody: Component<Props> = (props) => {
     return (
       <CharityItem
         charity={list[i % list.length]}
-        fundraiser={q.data?.userFundraiser ?? undefined}
+        fundraiser={data()?.userFundraiser ?? undefined}
         theme={currentTheme(i)}
         showDesc={showDesc()}
         qrCode={qrCode()}
@@ -256,7 +262,7 @@ const Charities2OverlayBody: Component<Props> = (props) => {
           fallback={
             <CharityItem
               charity={displayList()[0]}
-              fundraiser={q.data?.userFundraiser ?? undefined}
+              fundraiser={data()?.userFundraiser ?? undefined}
               theme={currentTheme(0)}
               showDesc={showDesc()}
               qrCode={qrCode()}
