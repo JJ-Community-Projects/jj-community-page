@@ -1,4 +1,5 @@
 ---
+import { env } from 'cloudflare:workers'
 import YogsBanner from '../../components/yogs-pages/common/YogsBanner.astro'
 export const prerender = false
 import BaseLayoutYogs from '../../layouts/BaseLayoutYogs.astro'
@@ -22,7 +23,7 @@ if (HIDE_CONTENT) {
 }
 
 
-const ConfigDO = Astro.locals.runtime.env.ConfigDO
+const ConfigDO = env.ConfigDO
 const stubId = ConfigDO.idFromName('ConfigDO')
 const stub = ConfigDO.get(stubId)
 

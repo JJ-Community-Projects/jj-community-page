@@ -1,5 +1,3 @@
-import type { MessageSendRequest } from '@cloudflare/workers-types/experimental/index.ts'
-
 export class TwitchLiveNotifierQueue {
   send(twitchIds: string[], env: Env) {
     const msgs: MessageSendRequest[] = twitchIds.map((id) => ({

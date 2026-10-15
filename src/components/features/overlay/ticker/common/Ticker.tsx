@@ -1,4 +1,4 @@
-import { For, JSX, type VoidComponent } from 'solid-js'
+import { For, type JSX, type VoidComponent } from 'solid-js'
 import { interleaveComponents } from './interleave'
 import './marquee.css'
 

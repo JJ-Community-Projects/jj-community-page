@@ -1,3 +1,4 @@
+import { env } from 'cloudflare:workers'
 import type {APIContext} from "astro";
 import type {AstroContext} from "../lib/AstroContext.ts";
 import {getDB} from "../lib/db/db.ts";
@@ -26,8 +27,8 @@ export type TiltifyToken = {
  * }
  */
 export async function getTiltifyTokenFromCode(ctx: APIContext): Promise<TiltifyToken | null> {
-  const TILTIFY_CLIENT_ID = import.meta.env.TILTIFY_CLIENT_ID;
-  const TILTIFY_SECRET = import.meta.env.TILTIFY_SECRET;
+  const TILTIFY_CLIENT_ID = env.TILTIFY_CLIENT_ID;
+  const TILTIFY_SECRET = env.TILTIFY_SECRET;
   const url = new URL(ctx.request.url);
   const code = url.searchParams.get("code");
   const redirectUri = new URL("/api/auth/tiltify/callback/",
@@ -66,8 +67,8 @@ export async function getTiltifyTokenFromContext(ctx: AstroContext): Promise<str
   if (!session || !user) {
     return null
   }
-  const TILTIFY_CLIENT_ID = ctx.locals.runtime.env.TILTIFY_CLIENT_ID;
-  const TILTIFY_SECRET = ctx.locals.runtime.env.TILTIFY_SECRET;
+  const TILTIFY_CLIENT_ID = env.TILTIFY_CLIENT_ID;
+  const TILTIFY_SECRET = env.TILTIFY_SECRET;
 
   const db = getDB(ctx)
   const now = DateTime.now();

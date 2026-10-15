@@ -1,3 +1,4 @@
+import { env } from 'cloudflare:workers'
 import { ORPCError } from '@orpc/server'
 import { dbMiddleware } from './dbMiddleware.ts'
 import { authMiddleware } from './authMiddleware.ts'
@@ -55,7 +56,7 @@ export const adminAuthMiddleware = dbMiddleware
       context: {
         locals: context.locals,
         request: context.request,
-        env: context.locals.runtime.env,
+        env: env,
         user: context.locals.user,
         userId: context.locals.user.id as number,
         tiltifyId: context.locals.user.tiltifyId as string,

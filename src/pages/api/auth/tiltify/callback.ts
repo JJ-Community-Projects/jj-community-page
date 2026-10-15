@@ -1,3 +1,4 @@
+import { env } from 'cloudflare:workers'
 import type { APIRoute } from 'astro'
 import { accounts, userSocials } from '../../../../lib/db/schema/auth-schema.ts'
 import { and, eq } from 'drizzle-orm'
@@ -31,7 +32,7 @@ export const GET: APIRoute = async (ctx) => {
   }
   // endregion
 
-  const tiltifyAPI = new TiltifyAPI(ctx.locals.runtime.env)
+  const tiltifyAPI = new TiltifyAPI(env)
   // region get tiltify token
   let tokenData
   try {
@@ -118,7 +119,7 @@ export const GET: APIRoute = async (ctx) => {
       )
 
       // Resolve Twitch channel and upsert channel profile
-      const twitchAPI = new TwitchAPI(ctx.locals.runtime.env)
+      const twitchAPI = new TwitchAPI(env)
       const { data, error } = await twitchAPI.fetchUserByLogin(username)
       console.log('api/auth/tiltify/callback', 'twitch.data', data)
       if (error){

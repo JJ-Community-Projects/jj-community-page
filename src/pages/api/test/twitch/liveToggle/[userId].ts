@@ -1,3 +1,4 @@
+import { env } from 'cloudflare:workers'
 import type { APIRoute } from 'astro'
 
 export const GET: APIRoute = async (ctx) => {
@@ -11,7 +12,7 @@ export const GET: APIRoute = async (ctx) => {
 
   /*
   // Get database connection and create TwitchRepo instance
-  const twitchRepo = new TwitchRepo(ctx.locals.runtime.env, 'api');
+  const twitchRepo = new TwitchRepo(env, 'api');
 
   try {
     // Get the twitch channel by userId
@@ -63,7 +64,7 @@ export const GET: APIRoute = async (ctx) => {
 
     const notifier = new twitch-live-notifierQueue()
 
-    await notifier.send([channel.id], ctx.locals.runtime.env)
+    await notifier.send([channel.id], env)
 
     // Return the result
     return new Response(JSON.stringify(result), {

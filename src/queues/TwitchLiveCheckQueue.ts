@@ -1,4 +1,3 @@
-import type { MessageSendRequest } from '@cloudflare/workers-types/experimental/index.ts'
 import { TwitchAPI } from '../lib/twitchAPI.ts'
 import { getDB } from '../lib/db/db.ts'
 import { twitchStreamSchema } from '../lib/db/schema/twitch-channel-schema.ts'

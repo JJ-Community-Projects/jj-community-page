@@ -1,3 +1,4 @@
+import { env } from 'cloudflare:workers'
 import { ORPCError, os } from '@orpc/server'
 import type { ResponseHeadersPluginContext } from '@orpc/server/plugins'
 
@@ -18,7 +19,7 @@ export const hasAstroContext = os
       context: {
         locals: context.locals,
         request: context.request,
-        env: context.locals.runtime.env,
+        env: env,
         resHeaders: context.resHeaders,
       },
     })

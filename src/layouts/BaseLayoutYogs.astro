@@ -1,4 +1,6 @@
 ---
+import '../styles/global.css'
+import { env } from 'cloudflare:workers'
 import Navigation from '../components/layout/navigation/Navigation.astro'
 import Footer from '../components/layout/footer/Footer.astro'
 import AdminNavigation from '../components/layout/navigation/AdminNavigation.astro'
@@ -6,8 +8,7 @@ import type { YogsSchedule } from '../lib/orpc/private/yogs/contract.ts'
 import { getJingleJamEventSeries } from '../content/getJingleJamEventSeries.ts'
 import FeedbackBanner from "../components/features/feedback/FeedbackBanner.astro";
 
-const env = Astro.locals.runtime.env.ENVIRONMENT
-const isProd = env === 'PROD'
+const isProd = env.ENVIRONMENT === 'PROD'
 
 interface Props {
   title?: string

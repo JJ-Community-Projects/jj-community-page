@@ -1,4 +1,5 @@
-import { reference, z } from 'astro:content'
+import { reference } from 'astro:content'
+import { z } from 'astro/zod'
 import { IANAZone } from 'luxon'
 
 const DateSchema = z.coerce.date().or(z.string().transform((v) => new Date(v)))
@@ -20,7 +21,7 @@ export const StreamBackgroundSchema = z.object({
 export const VodSchema = z.object({
   type: z.enum(['youtube', 'twitch']).default('youtube'),
   label: z.string().optional(),
-  link: z.string().url(),
+  link: z.url(),
 })
 
 export const StreamSchema = z.object({
@@ -50,7 +51,7 @@ export const ScheduleDaySchema = z.object({
 export const CreatorSchema = z.object({
   name: z.string(),
   type: z.enum(['yogs', 'best_of', 'staff', 'friend']).default('yogs'),
-  link: z.string().url().optional(),
+  link: z.url().optional(),
   twitchUser: reference('twitchUser').optional(),
   birthdate: DateSchema.optional(),
   bio: z.string().optional(),
@@ -58,7 +59,7 @@ export const CreatorSchema = z.object({
     .array(
       z.object({
         name: z.string(),
-        url: z.string().url(),
+        url: z.url(),
         type: z.string().optional(),
         avatar: z.string().optional(),
       }),

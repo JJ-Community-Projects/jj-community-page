@@ -1,4 +1,5 @@
 ---
+import { env } from 'cloudflare:workers'
 import jj_image from '../../../images/Jingle_Jam_Logo_White_Large.png'
 import { Image } from 'astro:assets'
 import YogsScheduleNavigation from './YogsScheduleNavigation.astro'
@@ -6,7 +7,7 @@ import CommunityNavigation from './CommunityNavigation.astro'
 import { MobileNav } from './MobileNav'
 import { getCollection } from 'astro:content'
 
-const ENV = Astro.locals.runtime.env.ENVIRONMENT
+const ENV = env.ENVIRONMENT
 
 const isBeta = ENV === 'BETA'
 const isDev = ENV === 'DEV'

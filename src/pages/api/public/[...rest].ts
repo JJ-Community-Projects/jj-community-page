@@ -1,8 +1,9 @@
+import { env } from 'cloudflare:workers'
 import type { APIRoute } from 'astro'
 import { CORSPlugin, ResponseHeadersPlugin } from '@orpc/server/plugins'
 import { OpenAPIHandler } from '@orpc/openapi/fetch'
 import { OpenAPIReferencePlugin } from '@orpc/openapi/plugins'
-import { experimental_SmartCoercionPlugin as SmartCoercionPlugin } from '@orpc/json-schema'
+import { SmartCoercionPlugin } from '@orpc/json-schema'
 import { ZodToJsonSchemaConverter } from '@orpc/zod/zod4'
 import { publicRouter } from '../../../lib/orpc/public/publicRouter.ts'
 import { onError } from '@orpc/client'
@@ -93,7 +94,7 @@ export const ALL: APIRoute = async (context) => {
       context: {
         locals: context.locals,
         request: context.request,
-        env: context.locals.runtime.env,
+        env: env,
       },
     })
     return response ?? new Response('Not found', { status: 404 })

@@ -4,31 +4,20 @@ export const prerender = false;
 import {type FullSchedule} from "../../../../lib/model/ContentTypes";
 import {YogsScheduleComponent} from "../../../../components/yogs-pages/schedule/YogsScheduleComponent.tsx";
 import {contentScheduleToJs} from "../../../../content/loadScheduleFromContent";
-import {type CollectionEntry, getCollection,} from 'astro:content';
+import {getEntry} from 'astro:content';
 import {loadAllCreatorsFromContent} from "../../../../content/loadCreatorsFromContent";
 import {MobileYogsScheduleComponent} from "../../../../components/yogs-pages/schedule/mobile/MobileYogsScheduleComponent.tsx";
 
-export async function getStaticPaths() {
-  const schedules = await getCollection('schedules');
-  return schedules.map(schedule => ({
-    params: {year: schedule.id}, props: {schedule}
-  })).filter(({props}) => props.schedule.data.visible)
-}
+const year = Astro.params.year
+const entry = year ? await getEntry('schedules', year) : undefined
 
-interface Props {
-  schedule: CollectionEntry<'schedules'>;
-}
-const visible = Astro.props.schedule.data.visible
-
-if (!visible) {
+if (!entry || !entry.data.visible) {
   return Astro.redirect('/yogs')
 }
 
-const schedule: FullSchedule = await contentScheduleToJs(Astro.props.schedule.data)
+const schedule: FullSchedule = await contentScheduleToJs(entry.data)
 
 const creators = await loadAllCreatorsFromContent()
-
-const year = Astro.params.year
 
 ---
 

@@ -1,4 +1,5 @@
 ---
+import { env } from 'cloudflare:workers'
 export const prerender = false
 import {
   serverClientPrivate,
@@ -7,7 +8,7 @@ import BaseLayoutYogs from '../../layouts/BaseLayoutYogs.astro'
 import { getYogsScheduleFromContent } from '../../content/getYogsScheduleFromContent.ts'
 import { YogsCurrentScheduleLoader } from '../../components/yogs-pages/schedule-ssr/YogsCurrentScheduleLoader.tsx'
 
-const ConfigDO = Astro.locals.runtime.env.ConfigDO
+const ConfigDO = env.ConfigDO
 const stubId = ConfigDO.idFromName('ConfigDO')
 const stub = ConfigDO.get(stubId)
 

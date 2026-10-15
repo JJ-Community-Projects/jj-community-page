@@ -1,13 +1,30 @@
-import { defineConfig, passthroughImageService } from 'astro/config'
+import { defineConfig, sessionDrivers } from 'astro/config'
 
 import solidJs from '@astrojs/solid-js'
 
 import cloudflare from '@astrojs/cloudflare'
 
-import tailwind from '@astrojs/tailwind'
-
 import sitemap from '@astrojs/sitemap'
-import commonjs from 'vite-plugin-commonjs' // https://astro.build/config
+
+/**
+ * vite-plugin-solid excludes Solid source packages (e.g. solid-icons) only from the client dep optimizer.
+ * In the workerd SSR environment Vite 8 would pre-bundle them with Rolldown's default React JSX runtime
+ * ("Cannot find module 'react/jsx-runtime'"), so apply the same exclude list to the server environments.
+ */
+function excludeSolidDepsFromSsrOptimizer() {
+  let solidExcludes = []
+  return {
+    name: 'exclude-solid-deps-from-ssr-optimizer',
+    config(config) {
+      solidExcludes = config.optimizeDeps?.exclude ?? []
+    },
+    configEnvironment(name) {
+      if (name === 'ssr' || name === 'prerender') {
+        return { optimizeDeps: { exclude: solidExcludes } }
+      }
+    },
+  }
+}
 
 // https://astro.build/config
 export default defineConfig({
@@ -15,9 +32,10 @@ export default defineConfig({
   security: {
     checkOrigin: true,
   },
+  // Astro 7 defaults to 'jsx', which strips whitespace between inline elements. Keep the v6 output for now.
+  compressHTML: true,
   integrations: [
     solidJs(),
-    tailwind(),
     sitemap({
       filenameBase: 'sitemap',
       /*
@@ -77,16 +95,16 @@ export default defineConfig({
   ],
   output: 'server',
   adapter: cloudflare({
-    imageService: 'passthrough',
-    platformProxy: {
-      enabled: true,
-    },
+    // Optimize images with sharp at build time (as Astro 5 did for prerendered pages); serve originals at runtime.
+    imageService: 'compile',
   }),
-  image: {
-    service: passthroughImageService(),
+  // The app keeps its own KV sessions (src/functions/session.ts) and never uses Astro.session.
+  // A null driver stops the adapter from provisioning a SESSION KV binding.
+  session: {
+    driver: sessionDrivers.null(),
   },
   vite: {
-    plugins: [commonjs()],
+    plugins: [excludeSolidDepsFromSsrOptimizer()],
     optimizeDeps: {
       include: ['debug', 'extend'],
     },
@@ -98,17 +116,5 @@ export default defineConfig({
     build: {
       minify: false,
     },
-  },
-  optimizeDeps: {
-    include: ['debug', 'solid-markdown', 'extend'],
-  },
-  resolve: {
-    alias: {
-      debug: 'debug/src/browser.js',
-      extend: 'extend/index.js',
-    },
-  },
-  build: {
-    exclude: ['.cache', 'node_modules'],
   },
 })

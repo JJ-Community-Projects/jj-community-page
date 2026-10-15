@@ -26,11 +26,11 @@ export type JJRaised = z.infer<typeof JJRaisedSchema>
 export const JJCauseSchema = z.object({
   id: z.string(),
   name: z.string(),
-  logo: z.string().url(), // logo is always a URL
+  logo: z.url(), // logo is always a URL
   description: z.string(),
   color: z.string().optional(),
-  url: z.string().url(),
-  donateUrl: z.string().url(),
+  url: z.url(),
+  donateUrl: z.url(),
   raised: CurrenciesSchema,
 })
 

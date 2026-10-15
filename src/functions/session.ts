@@ -1,3 +1,4 @@
+import { env } from 'cloudflare:workers'
 import {getDB, type JJDrizzleDatabase} from "../lib/db/db.ts";
 import {accounts, tokens, users, userSocials, userStyles} from "../lib/db/schema/auth-schema.ts";
 import type {Session} from "../lib/auth/Session.ts";
@@ -139,7 +140,7 @@ type SessionValidationResult = { session: Session; user: User } | { session: nul
 export async function validateSessionToken(ctx: AstroContext, token: string): Promise<SessionValidationResult> {
   const sessionId = encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
 
-  const KV = ctx.locals.runtime.env.KV;
+  const KV = env.KV;
   const db = getDB(ctx);
   const rawSession = await KV.get(`session:${sessionId}`, { cacheTtl: 300 });
   if (!rawSession) {
@@ -253,7 +254,7 @@ export async function validateSessionTokenFromEnv(env: Env, token: string): Prom
  * @returns {Promise<void>}
  */
 export async function invalidateSession(ctx: AstroContext, sessionId: string): Promise<void> {
-  const KV = ctx.locals.runtime.env.KV;
+  const KV = env.KV;
   const rawSession = await KV.get(`session:${sessionId}`);
   if (!rawSession) {
     return;
@@ -345,7 +346,7 @@ export function deleteSessionTokenCookie(context: AstroContext): void {
  * @returns {Promise<void>}
  */
 export async function invalidateUserSessions(ctx: AstroContext, userId: number): Promise<void> {
-  const KV = ctx.locals.runtime.env.KV;
+  const KV = env.KV;
 
   // Get all sessionIds for this user
   const userSessionsKey = `user-sessions:${userId}`;
@@ -404,7 +405,7 @@ export function generateSessionToken(): string {
  * @returns {Promise<Session>} The created session object
  */
 export async function createSession(context: AstroContext, token: string, userId: number): Promise<Session> {
-  const KV = context.locals.runtime.env.KV;
+  const KV = env.KV;
   const sessionId = encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
 
   // Create a new session with 30-day expiration
@@ -465,7 +466,7 @@ export async function createNewUserSession(
   tiltifyUser: TiltifyUserData,
   tiltifyToken: TiltifyToken,
 ): Promise<Session | null> {
-  const KV = ctx.locals.runtime.env.KV;
+  const KV = env.KV;
   const db = getDB(ctx);
 
   try {

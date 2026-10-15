@@ -1,9 +1,10 @@
 ---
+import '../styles/global.css'
+import { env } from 'cloudflare:workers'
 import Footer from "../components/layout/footer/Footer.astro";
 import PWANavigation from "../components/layout/navigation/PWANavigation.astro";
 
-const env = Astro.locals.runtime.env.ENVIRONMENT
-const isProd = env === 'PROD'
+const isProd = env.ENVIRONMENT === 'PROD'
 
 interface Props {
   title?: string;

@@ -4,7 +4,7 @@ import {TwitchChannelSchema} from "../schemas/users.ts";
 
 export const twitchContract = {
   validateTwitchUrl: oc
-    .input(z.string().url())
+    .input(z.url())
     .output(z.object({
       id: z.string(),
       login: z.string(),

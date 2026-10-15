@@ -8,7 +8,7 @@ import {SocialSchema} from "../schemas/users.ts";
  const addSocialContract = oc
   .input(z.object({
     provider: SocialProviderSchema,
-    url: z.string().url()
+    url: z.url()
   }).refine((data) => {
     const regexes = socialUrlRegex();
     return regexes[data.provider]?.test(data.url);

@@ -1,4 +1,5 @@
 // src/pages/api/private/ws/[...ws].ts
+import { env } from 'cloudflare:workers'
 import type { APIRoute } from 'astro'
 import { upgradeDurableIteratorRequest } from '@orpc/experimental-durable-iterator/durable-object'
 
@@ -25,7 +26,6 @@ function resolveNamespaceByChannel(
 export const ALL: APIRoute = async (context) => {
   try {
     const url = new URL(context.request.url)
-    const env = context.locals.runtime.env
     const signingKey = env.ORPC_DEI_SIGNING_KEY
     if (!signingKey) return new Response('Missing signing key', { status: 500 })
 

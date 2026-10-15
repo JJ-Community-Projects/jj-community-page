@@ -1,5 +1,3 @@
-import type {KVNamespacePutOptions} from "@cloudflare/workers-types/2021-11-03/index.ts";
-
 
 export abstract class Cache<T> {
   kv: KVNamespace

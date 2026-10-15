@@ -1,3 +1,4 @@
+import { env } from 'cloudflare:workers'
 // import {loadAllCreatorsFromContent} from "../content/loadCreatorsFromContent.ts";
 import {getDB} from "../lib/db/db.ts";
 import {accounts} from "../lib/db/schema/auth-schema.ts";
@@ -16,7 +17,7 @@ export async function getBlockedNamesLocals(locals: App.Locals) {
   });
 
   // Get all provider usernames from accounts except the current user's
-  const db = getDB(locals.runtime.env);
+  const db = getDB(env);
   const currentUser = locals.user;
 
 

@@ -1,4 +1,4 @@
-import { type Component, JSX } from 'solid-js'
+import { type Component, type JSX } from 'solid-js'
 import { TickerHeader } from './TickerHeader'
 
 export type Theme = 'default' | 'red' | 'blue'

@@ -92,7 +92,7 @@ export const SocialSchema = z.object({
   /** Social media platform identifier (e.g., 'twitter', 'instagram', 'youtube') */
   provider: z.string(),
   /** Full URL to the user's profile on the social media platform */
-  url: z.string().url(),
+  url: z.url(),
 })
 
 /**

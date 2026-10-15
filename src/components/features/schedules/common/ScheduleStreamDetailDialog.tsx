@@ -1,4 +1,4 @@
-import { type Component, JSX, Show } from 'solid-js'
+import { type Component, type JSX, Show } from 'solid-js'
 import type { Stream } from '../../../../lib/orpc/public/schemas/schedules.ts'
 import { DateTime, Duration } from 'luxon'
 import ical, { ICalAlarmType } from 'ical-generator'

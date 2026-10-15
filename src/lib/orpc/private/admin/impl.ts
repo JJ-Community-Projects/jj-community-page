@@ -330,7 +330,11 @@ const syncTwitchChannelsFromSocials =
 
     // 4) Fetch Twitch user data for the missing logins in batches
     // Twitch helix/users supports up to 100 logins per request
-    const token = await getToken()
+    const twitchCredentials = {
+      clientId: context.env.TWITCH_CLIENT_ID,
+      clientSecret: context.env.TWITCH_CLIENT_SECRET,
+    }
+    const token = await getToken(twitchCredentials)
 
     const chunks: (typeof missing)[] = []
     for (let i = 0; i < missing.length; i += 100) {
@@ -341,7 +345,11 @@ const syncTwitchChannelsFromSocials =
     for (const chunk of chunks) {
       const logins = chunk.map((m) => m.login)
       try {
-        const res = await getTwitchDataByLogins(logins, token.access_token)
+        const res = await getTwitchDataByLogins(
+          logins,
+          token.access_token,
+          twitchCredentials.clientId,
+        )
         for (const u of res.data ?? []) {
           userMap.set(u.login.toLowerCase(), u)
         }
@@ -385,6 +393,39 @@ const clearJingleJamData = os.clearJingleJamDataContract.handler(
     } catch (e) {
       console.error('clearJingleJamData', e)
       throw new ORPCError('INTERNAL_SERVER_ERROR')
+    }
+  },
+)
+
+// --- Temporary: JJ DO data migration (prod → beta) ---
+// Delete alongside the JingleJamData.dumpStorage/loadStorage block.
+const exportJJData = os.exportJJDataContract.handler(
+  async ({ context, input }) => {
+    const DO = context.env.JingleJamData
+    const stub = DO.get(DO.idFromName('JJ_API_CACHE'))
+    return stub.dumpStorage(input.startAfter, input.limit)
+  },
+)
+
+const importJJData = os.importJJDataContract.handler(
+  async ({ context, input }) => {
+    const environment = String(context.env.ENVIRONMENT ?? '').toUpperCase()
+    if (environment !== 'BETA') {
+      throw new ORPCError('FORBIDDEN', {
+        message: `JJ data import is beta-only (ENVIRONMENT=${environment || 'unset'})`,
+      })
+    }
+    const DO = context.env.JingleJamData
+    const stub = DO.get(DO.idFromName('JJ_API_CACHE'))
+    try {
+      const written = await stub.loadStorage(input.entries)
+      if (input.rebuildDisplays) await stub.buildDisplayData()
+      return { written, displaysRebuilt: input.rebuildDisplays }
+    } catch (e) {
+      console.error('importJJData', e)
+      throw new ORPCError('INTERNAL_SERVER_ERROR', {
+        message: e instanceof Error ? e.message : 'import failed',
+      })
     }
   },
 )
@@ -827,4 +868,7 @@ export const adminRouter = {
   runSchedulerTask,
   runOverdueTasksNow,
   setSchedulerPaused,
+  // jj data migration (temporary)
+  exportJJData,
+  importJJData,
 }

@@ -1,3 +1,4 @@
+import { env } from 'cloudflare:workers'
 import {ORPCError, os} from "@orpc/server";
 import {hasAstroContext} from "./hasAstroContext.ts";
 
@@ -15,7 +16,7 @@ const auth = os
       context: {
         locals: context.locals,
         request: context.request,
-        env: context.locals.runtime.env,
+        env: env,
         user: context.locals.user,
         userId: context.locals.user.id as number,
         tiltifyId: context.locals.user.tiltifyId as string,

@@ -1,33 +1,32 @@
-import { defineCollection, z } from 'astro:content'
-import { CharitiesStaticSchema, CreatorSchema, ScheduleDaySchema, ScheduleSchema, TwitchUserSchema, } from './schema.ts'
-import { updateTwitchUser } from './updateTwitchUser.ts'
+import { defineCollection } from 'astro:content'
+import { glob } from 'astro/loaders'
+import { z } from 'astro/zod'
+import { CharitiesStaticSchema, CreatorSchema, ScheduleDaySchema, ScheduleSchema, TwitchUserSchema, } from './content/schema.ts'
+
+const yamlLoader = (dir: string) => glob({ base: `./src/content/${dir}`, pattern: '**/*.{yaml,yml}' })
 
 const schedules = defineCollection({
-  type: 'data',
+  loader: yamlLoader('schedules'),
   schema: ScheduleSchema,
 })
 
 const scheduleDays = defineCollection({
-  type: 'data',
+  loader: yamlLoader('scheduleDays'),
   schema: ScheduleDaySchema,
 })
 
 const creators = defineCollection({
-  type: 'data',
+  loader: yamlLoader('creators'),
   schema: CreatorSchema,
 })
 
 const twitchUser = defineCollection({
-  type: 'data',
+  loader: yamlLoader('twitchUser'),
   schema: TwitchUserSchema,
 })
 
-const jinglejam = defineCollection({})
-
-const jinglejamCollection = defineCollection({})
-
 const faqCollection = defineCollection({
-  type: 'content',
+  loader: glob({ base: './src/content/faq', pattern: '**/*.md' }),
   schema: z.object({
     question: z.string(),
     answer: z.string(),
@@ -35,7 +34,7 @@ const faqCollection = defineCollection({
 })
 
 const charitiesCollection = defineCollection({
-  type: 'data',
+  loader: yamlLoader('charities'),
   schema: CharitiesStaticSchema,
 })
 
@@ -47,5 +46,3 @@ export const collections = {
   faq: faqCollection,
   charities: charitiesCollection,
 }
-
-await updateTwitchUser()

@@ -1,4 +1,4 @@
-import astroWorker from '../dist/_worker.js/index.js'
+import { handle } from '@astrojs/cloudflare/handler'
 import { TwitchLiveNotifierQueue } from './queues/TwitchLiveNotifierQueue.js'
 import { TwitchLiveCheckQueue } from './queues/TwitchLiveCheckQueue.js'
 // Export the main worker with a fetch handler.
@@ -6,7 +6,7 @@ import { TwitchLiveCheckQueue } from './queues/TwitchLiveCheckQueue.js'
 export default {
   async fetch(request, env, ctx) {
     // console.log("fetch", request.url);
-    return astroWorker.fetch(request, env, ctx)
+    return handle(request, env, ctx)
   },
   async queue(batch, env, ctx) {
     const twitchLiveCheckQueue = new TwitchLiveCheckQueue()

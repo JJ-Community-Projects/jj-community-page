@@ -1,13 +1,14 @@
+import { env } from 'cloudflare:workers'
 import type { APIRoute } from 'astro'
 
 function getStub(ctx: Parameters<APIRoute>[0]) {
-  const DO = ctx.locals.runtime.env.JingleJamData
+  const DO = env.JingleJamData
   const id = DO.idFromName('JJ_API_CACHE')
   return DO.get(id)
 }
 
 function authorize(ctx: Parameters<APIRoute>[0]): boolean {
-  const secret = ctx.locals.runtime.env.ORPC_DEI_SIGNING_KEY
+  const secret = env.ORPC_DEI_SIGNING_KEY
   const auth = ctx.request.headers.get('Authorization')
   if (!auth || !secret) return false
   return auth === `Bearer ${secret}`

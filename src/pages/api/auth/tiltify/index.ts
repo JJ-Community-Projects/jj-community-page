@@ -1,10 +1,11 @@
+import { env } from 'cloudflare:workers'
 import type { APIRoute } from 'astro'
 import { generateState } from 'arctic'
 
 export const GET: APIRoute = (ctx) => {
   const state = generateState()
   console.log('ctx.request.url', ctx.request.url)
-  const TILTIFY_CLIENT_ID = ctx.locals.runtime.env.TILTIFY_CLIENT_ID
+  const TILTIFY_CLIENT_ID = env.TILTIFY_CLIENT_ID
   const redirectUri = new URL(
     '/api/auth/tiltify/callback/',
     ctx.request.url,

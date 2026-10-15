@@ -1,3 +1,4 @@
+import { env } from 'cloudflare:workers'
 const prerender = false
 import type { APIRoute } from 'astro'
 import { draw_text, PhotonImage, resize, SamplingFilter, watermark, } from '@cf-wasm/photon'
@@ -77,10 +78,9 @@ function estimateTextWidth(text: string, fontSize: number): number {
   return Math.round(sum)
 }
 
-export const GET: APIRoute = async ({ request, redirect, locals }) => {
+export const GET: APIRoute = async ({ request, redirect }) => {
 
-  const env = locals.runtime.env.ENVIRONMENT as string
-  if (env === "PROD") {
+  if (env.ENVIRONMENT === "PROD") {
     return redirect('/jj-og-yogs.png')
   }
 

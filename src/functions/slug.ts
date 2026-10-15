@@ -1,3 +1,4 @@
+import { env } from 'cloudflare:workers'
 import type {AstroContext} from "../lib/AstroContext";
 import {getDB} from "../lib/db/db";
 import {schedulesTable, teamsTable} from "../lib/db/schema/schema";
@@ -107,7 +108,7 @@ export async function generateTeamSlugAlternativesLocals(locals: App.Locals, slu
     return nonBlockedAlternatives;
   }
 
-  const db = getDB(locals.runtime.env);
+  const db = getDB(env);
 
   // Check if the slug is already in use
   try {
@@ -193,7 +194,7 @@ export async function generateScheduleSlugAlternativesLocals(locals: App.Locals,
     return nonBlockedAlternatives;
   }
 
-  const db = getDB(locals.runtime.env);
+  const db = getDB(env);
 
   // Check if the slug is already in use (excluding the current schedule if ID is provided)
   try {
