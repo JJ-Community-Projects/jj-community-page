@@ -1,3 +1,4 @@
+import fs from 'node:fs'
 import path from 'node:path'
 import { defineConfig } from 'vitest/config'
 import { cloudflareTest, readD1Migrations } from '@cloudflare/vitest-plugin'
@@ -10,6 +11,12 @@ const fromRoot = (p: string) => path.resolve(root, p)
 
 // The same files `wrangler d1 migrations apply` uses, applied to the test D1 in name order.
 const migrations = await readD1Migrations(fromRoot('drizzle'))
+
+// Prod-shaped, sanitised seed (one INSERT per line, parents before children); loaded on demand by loadSeed().
+const seed = fs
+  .readFileSync(fromRoot('test/fixtures/seed.sql'), 'utf8')
+  .split('\n')
+  .filter((line) => line.startsWith('INSERT'))
 
 // Astro virtual modules and the Astro request handler don't exist outside an Astro build.
 const astroStubs = {
@@ -39,7 +46,7 @@ const workersPool = () =>
     main: fromRoot('test/workers/entry.ts'),
     wrangler: { configPath: fromRoot('wrangler.jsonc') },
     miniflare: {
-      bindings: { ...testVars, TEST_MIGRATIONS: migrations },
+      bindings: { ...testVars, TEST_MIGRATIONS: migrations, TEST_SEED: seed },
       // No test may reach the real network; external APIs are mocked inside the worker.
       outboundService: (request: Request) =>
         new Response(
