@@ -4,5 +4,9 @@
     "jsx": "preserve",
     "jsxImportSource": "solid-js",
     "skipLibCheck": true
-  }
+  },
+  "exclude": [
+    "dist",
+    "test"
+  ]
 }
