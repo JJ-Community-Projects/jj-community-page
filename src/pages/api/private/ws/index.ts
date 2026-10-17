@@ -30,21 +30,14 @@ export const ALL: APIRoute = async (context) => {
     if (!signingKey) return new Response('Missing signing key', { status: 500 })
 
     const rawToken = url.searchParams.get('token')
-    console.log('rawToken', rawToken)
-    console.log('signingKey', signingKey)
     if (!rawToken) return new Response('Missing token', { status: 400 })
-    const [jsonStr, signature] = rawToken.split('.')
-    console.log('jsonStr', jsonStr)
-    console.log('signature', signature)
+    const [jsonStr] = rawToken.split('.')
     const payload = JSON.parse(jsonStr)
-    console.log('payload', payload)
     const chn = String(payload.chn || '')
     if (!chn)
       return new Response('Invalid token payload (missing chn)', {
         status: 401,
       })
-    console.log('chn', chn)
-    console.log('signingKey', signingKey)
     const namespace = resolveNamespaceByChannel(env, chn)
     if (!namespace) return new Response('Unsupported channel', { status: 400 })
 

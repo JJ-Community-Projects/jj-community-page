@@ -7,7 +7,7 @@ import type {UserTeamInvitesObject} from "./do/UserTeamInvitesObject.ts";
 import type {UserTeamsObject} from "./do/UserTeamsObject.ts";
 import type {TeamAdminInvitesObject} from "./do/TeamAdminInvitesObject.ts";
 import type {TeamAdminMembersObject} from "./do/TeamAdminMembersObject.ts";
-import {teamsOwnerMiddleware} from "../teams/middleware.ts";
+import {teamsMemberMiddleware, teamsOwnerMiddleware} from "../teams/middleware.ts";
 import {privateTeamsWSContract} from "./contract.ts";
 
 const os = implement(privateTeamsWSContract)
@@ -70,10 +70,10 @@ const getTeamAdminInvitesWS = os
     }
   });
 
-// Per-team-admin: members
+// Per-team: members (owner and members; the member view of a team uses it too)
 const getTeamAdminMembersWS = os
   .getTeamAdminMembersWS
-  // .use(teamsOwnerMiddleware)
+  .use(teamsMemberMiddleware)
   .handler(async ({context, input}) => {
     const teamId = input.teamId
     try {

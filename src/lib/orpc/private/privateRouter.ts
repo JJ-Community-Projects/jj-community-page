@@ -5,7 +5,6 @@ import { friendsRouter } from './friends/impl.ts'
 import { blockRouter } from './blocking/impl.ts'
 import { tagsRouter } from './tags/impl.ts'
 import { adminTagsRouter } from './tagsAdmin/impl.ts'
-import { streamTagsRouter } from './tagsStream/impl.ts'
 import { twitchRouter } from './twitch/twitchRouter.ts'
 import { privateSchedulesRouter } from './schedules/impl.ts'
 import { socialRouter } from './social/impl.ts'
@@ -33,7 +32,6 @@ export const privateRouter = os.use(hasAstroContext).router({
   blocking: blockRouter,
   tags: tagsRouter,
   adminTags: adminTagsRouter,
-  streamTags: streamTagsRouter,
   teams: privateTeamsRouter,
   teamsSSE: privateTeamsSSERouter,
   teamsWS: privateTeamsWSRouter,
