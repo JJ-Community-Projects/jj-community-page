@@ -1,0 +1,116 @@
+import { StandardRPCJsonSerializer } from '@orpc/client/standard'
+import { type CachePolicy, ttlFor } from './cachePolicy.ts'
+
+// Read-through cache on the Cache API (`caches.default`): free, per data center, no KV writes.
+// Freshness is decided here from headers written at put time, not by the Cache API's own expiry
+// (which only caps how long an entry is kept): fresh for the policy's TTL, then served stale for
+// `swr` more seconds while one background refresh runs, then a miss.
+// Values go through oRPC's serializer, so Dates, Maps, Sets and undefined come back as they went in.
+// Note: the Cache API is a no-op on *.workers.dev; it works on the custom domains.
+
+export type EdgeEntry<T> = { value: T } | { notFound: true; message?: string }
+
+const STORED_AT = 'x-edge-stored-at'
+const TTL = 'x-edge-ttl'
+const SWR = 'x-edge-swr'
+
+const serializer = new StandardRPCJsonSerializer()
+
+// The tsconfig's DOM lib types `caches` without the Workers-only `default`.
+const edgeCache = () => (caches as unknown as { default: Cache }).default
+
+// Keys whose background refresh is running in this isolate, so a burst of stale hits refreshes once.
+const refreshing = new Set<string>()
+
+type Options<T> = {
+  /** Absolute URL of the entry; build it with edgeCacheKey. */
+  key: string
+  policy: CachePolicy
+  load: () => Promise<EdgeEntry<T>>
+  /** The request's waitUntil. Without it, puts are awaited and stale entries count as misses. */
+  waitUntil?: (promise: Promise<unknown>) => void
+}
+
+/** Cache URL for `parts` on the request's own host (`/__edge-cache/…`, never served to visitors). */
+export function edgeCacheKey(requestUrl: string, parts: string[]) {
+  const path = parts.map(encodeURIComponent).join('/')
+  return new URL(`/__edge-cache/v1/${path}`, requestUrl).toString()
+}
+
+export async function edgeCached<T>({
+  key,
+  policy,
+  load,
+  waitUntil,
+}: Options<T>): Promise<EdgeEntry<T>> {
+  const now = Date.now()
+  const hit = await match(key)
+  if (hit) {
+    const storedAt = Number(hit.headers.get(STORED_AT))
+    const ttl = Number(hit.headers.get(TTL))
+    const swr = Number(hit.headers.get(SWR))
+    const age = (now - storedAt) / 1000
+    // A negative age (stored "in the future" by a skewed clock) counts as a miss.
+    if (age >= 0 && age < ttl) return read<T>(hit)
+    if (age >= 0 && age < ttl + swr && waitUntil) {
+      if (!refreshing.has(key)) {
+        refreshing.add(key)
+        waitUntil(
+          load()
+            .then((entry) => put(key, entry, policy))
+            .catch((e) => console.error('edge cache refresh failed', key, e))
+            .finally(() => refreshing.delete(key)),
+        )
+      }
+      return read<T>(hit)
+    }
+  }
+
+  const entry = await load()
+  const stored = put(key, entry, policy)
+  if (waitUntil) waitUntil(stored)
+  else await stored
+  return entry
+}
+
+async function match(key: string) {
+  try {
+    return await edgeCache().match(key)
+  } catch (e) {
+    console.error('edge cache match failed', key, e)
+    return undefined
+  }
+}
+
+async function read<T>(response: Response): Promise<EdgeEntry<T>> {
+  const { json, meta } = (await response.json()) as {
+    json: unknown
+    meta: Parameters<StandardRPCJsonSerializer['deserialize']>[1]
+  }
+  return serializer.deserialize(json, meta) as EdgeEntry<T>
+}
+
+/** Stores `entry`; a NOT_FOUND only when the policy has a negativeTtl. Never throws. */
+async function put<T>(key: string, entry: EdgeEntry<T>, policy: CachePolicy) {
+  const isNotFound = 'notFound' in entry
+  if (isNotFound && policy.negativeTtl === undefined) return
+  const ttl = isNotFound ? policy.negativeTtl! : ttlFor(policy, new Date())
+  const swr = isNotFound ? 0 : (policy.swr ?? 0)
+  const [json, meta] = serializer.serialize(entry)
+  try {
+    await edgeCache().put(
+      key,
+      new Response(JSON.stringify({ json, meta }), {
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': `max-age=${ttl + swr}`,
+          [STORED_AT]: String(Date.now()),
+          [TTL]: String(ttl),
+          [SWR]: String(swr),
+        },
+      }),
+    )
+  } catch (e) {
+    console.error('edge cache put failed', key, e)
+  }
+}

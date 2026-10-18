@@ -25,9 +25,8 @@ import { hasAstroContext } from './hasAstroContext.ts'
  * Note:
  * - This middleware composes on top of hasAstroContext to ensure the Astro
  *   context is present and to get resHeaders from the plugin.
- * - WARNING: As currently implemented, "max-age" uses the sMaxAge value when provided.
- *   If you intend different values for maxAge vs sMaxAge, consider changing the first
- *   interpolation below to `cacheControl.maxAge ?? 60`.
+ * - The header is only set on success, so errors (429, 404) are never cached by browsers,
+ *   and a cache hit returned by a later middleware (`cached`) still gets it.
  */
 export const cacheMiddleware = (cacheControl: {
   // maxAge: Number of seconds browsers (private caches) may cache the response.
@@ -44,17 +43,18 @@ export const cacheMiddleware = (cacheControl: {
   staleWhileRevalidate?: number
 }) =>
   // Ensure we have Astro context and (via ResponseHeadersPlugin) a resHeaders setter
-  hasAstroContext.concat(({ context, next }) => {
+  hasAstroContext.concat(async ({ context, next }) => {
+    // Continue to the next middleware/handler without modifying the context
+    // (we still return it explicitly for clarity).
+    const result = await next({
+      context: context,
+    })
+
     // Set the Cache-Control header with sensible defaults; optional chaining here
     // keeps things safe if the plugin wasn't installed.
     context.resHeaders?.set(
       'Cache-Control',
-      `public, max-age=${cacheControl.sMaxAge ?? 60}, s-maxage=${cacheControl.sMaxAge ?? 300}, stale-while-revalidate=${cacheControl.staleWhileRevalidate ?? 60}`,
+      `public, max-age=${cacheControl.maxAge ?? 60}, s-maxage=${cacheControl.sMaxAge ?? 300}, stale-while-revalidate=${cacheControl.staleWhileRevalidate ?? 60}`,
     )
-
-    // Continue to the next middleware/handler without modifying the context
-    // (we still return it explicitly for clarity).
-    return next({
-      context: context,
-    })
+    return result
   })

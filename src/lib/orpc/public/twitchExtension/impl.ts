@@ -10,6 +10,7 @@ import { hasAstroContext } from '../../middleware/hasAstroContext.ts'
 import { getStreamColors } from '../../../../functions/jjDatesToColors.ts'
 import { DateTime } from 'luxon'
 import { cacheMiddleware } from '../../middleware/cacheControl.ts'
+import { cached } from '../../middleware/cached.ts'
 import { rangeFromData } from '../../../utils/rangeFromData.ts'
 import type { ResponseHeadersPluginContext } from '@orpc/server/plugins'
 import { dbMiddleware } from '../../middleware/dbMiddleware.ts'
@@ -44,6 +45,7 @@ import {
   storeUserRelations,
   storeUserSchedule,
   storeYogsSchedule,
+  type OverviewVariant,
   type UserExtensionTab,
   valueToCurrencies,
 } from './util.ts'
@@ -167,8 +169,12 @@ const originCheck = server.$context<ORPCContext>().middleware(
 
 const os = implement(contracts).use(hasAstroContext)
 
+type ExtensionInput = { channelId: string; userId: string }
+
+const overviewVariant = (channelId: string): OverviewVariant =>
+  yogsMembers.includes(channelId) ? 'yogs' : 'default'
+
 const extensionConfig = os.extensionConfigContract
-  .use(rateLimit)
   .use(
     cacheMiddleware({
       maxAge: 120,
@@ -176,6 +182,8 @@ const extensionConfig = os.extensionConfigContract
       staleWhileRevalidate: 30,
     }),
   )
+  .use(cached('config', () => ''))
+  .use(rateLimit)
   .handler(async ({ context, input }) => {
     const cachedConfig = await context.env.KV.get('twitch-extension:config')
 
@@ -266,7 +274,6 @@ const extensionConfig = os.extensionConfigContract
   })
 
 const userExtensionConfig = os.userExtensionConfigContract
-  .use(rateLimit)
   .use(
     cacheMiddleware({
       maxAge: 60,
@@ -274,6 +281,8 @@ const userExtensionConfig = os.userExtensionConfigContract
       staleWhileRevalidate: 120,
     }),
   )
+  .use(cached('schedule', (i: ExtensionInput) => i.channelId))
+  .use(rateLimit)
   .use(dbMiddleware)
   .handler(async ({ context, input }) => {
     // Try KV cache first
@@ -415,7 +424,6 @@ const userExtensionConfig = os.userExtensionConfigContract
 
 // List all campaigns from DO cache
 const campaigns = os.campaignsContract
-  .use(rateLimit)
   .use(
     cacheMiddleware({
       maxAge: 60,
@@ -423,6 +431,8 @@ const campaigns = os.campaignsContract
       staleWhileRevalidate: 30,
     }),
   )
+  .use(cached('jjLive', () => ''))
+  .use(rateLimit)
   .handler(async ({ context }) => {
     const DO = context.env.JingleJamData
     const stubID = DO.idFromName('JJ_API_CACHE')
@@ -494,7 +504,6 @@ const campaigns = os.campaignsContract
 
 // List all causes from DO cache
 const causes = os.causesContract
-  .use(rateLimit)
   .use(
     cacheMiddleware({
       maxAge: 60,
@@ -502,6 +511,8 @@ const causes = os.causesContract
       staleWhileRevalidate: 30,
     }),
   )
+  .use(cached('jjLive', (i: ExtensionInput) => i.channelId))
+  .use(rateLimit)
   .handler(async ({ context, input }) => {
     const DO = context.env.JingleJamData
     const stubID = DO.idFromName('JJ_API_CACHE')
@@ -568,7 +579,6 @@ const causes = os.causesContract
   })
 
 const overview = os.overviewContract
-  .use(rateLimit)
   .use(
     cacheMiddleware({
       maxAge: 60,
@@ -576,9 +586,11 @@ const overview = os.overviewContract
       staleWhileRevalidate: 30,
     }),
   )
+  .use(cached('jjLive', (i: ExtensionInput) => overviewVariant(i.channelId)))
+  .use(rateLimit)
   .handler(async ({ context, input }) => {
     // Yogs members get the total only; every other channel the same split overview.
-    const variant = yogsMembers.includes(input.channelId) ? 'yogs' : 'default'
+    const variant = overviewVariant(input.channelId)
     // Try KV cache first
     const cached = await loadChannelOverview(context.env.KV, variant)
     if (cached) {
@@ -641,7 +653,6 @@ const overview = os.overviewContract
   })
 
 const yogsSchedule = os.yogsScheduleContract
-  .use(rateLimit)
   .use(
     cacheMiddleware({
       maxAge: 60,
@@ -649,6 +660,8 @@ const yogsSchedule = os.yogsScheduleContract
       staleWhileRevalidate: 120,
     }),
   )
+  .use(cached('config', () => ''))
+  .use(rateLimit)
   .handler(async ({ context }) => {
     const yogsSchedule = await loadYogsSchedule(context.env.KV)
 
@@ -875,7 +888,6 @@ const yogsSchedule = os.yogsScheduleContract
 
 // Resolve user by Twitch channel, return JJ campaign for current year
 const userData = os.userDataContract
-  .use(rateLimit)
   .use(
     cacheMiddleware({
       maxAge: 60,
@@ -883,6 +895,8 @@ const userData = os.userDataContract
       staleWhileRevalidate: 30,
     }),
   )
+  .use(cached('jjLive', (i: ExtensionInput) => i.channelId, { negativeTtl: CACHE_POLICY.channelMap.negativeTtl }))
+  .use(rateLimit)
   .use(dbMiddleware)
   .handler(async ({ context, input }) => {
     const ostofbot = '960814823'
@@ -1080,7 +1094,6 @@ async function getYogsStream(channelId: string): Promise<{
 
 // Resolve user's primary schedule and upcoming streams
 const userSchedule = os.userScheduleContract
-  .use(rateLimit)
   .use(
     cacheMiddleware({
       maxAge: 60,
@@ -1088,6 +1101,8 @@ const userSchedule = os.userScheduleContract
       staleWhileRevalidate: 30,
     }),
   )
+  .use(cached('schedule', (i: ExtensionInput) => i.channelId))
+  .use(rateLimit)
   .use(dbMiddleware)
   .handler(async ({ context, input }) => {
     const userSchedule = await loadUserSchedule(context.env.KV, input.channelId)
@@ -1270,7 +1285,6 @@ const userSchedule = os.userScheduleContract
 
 // Find user friends
 const userRelations = os.userRelationsContract
-  .use(rateLimit)
   .use(
     cacheMiddleware({
       maxAge: 60,
@@ -1278,6 +1292,8 @@ const userRelations = os.userRelationsContract
       staleWhileRevalidate: 30,
     }),
   )
+  .use(cached('team', (i: ExtensionInput) => i.channelId))
+  .use(rateLimit)
   .use(dbMiddleware)
   .handler(async ({ context, input }) => {
     const relations = await loadUserRelations(context.env.KV, input.channelId)
@@ -1344,7 +1360,6 @@ const userRelations = os.userRelationsContract
 
 // Related schedule via teams: next 3 streams across user's teams
 const userRelatedSchedule = os.userRelatedScheduleContract
-  .use(rateLimit)
   .use(
     cacheMiddleware({
       maxAge: 60,
@@ -1352,6 +1367,8 @@ const userRelatedSchedule = os.userRelatedScheduleContract
       staleWhileRevalidate: 30,
     }),
   )
+  .use(cached('upcoming', (i: ExtensionInput) => i.channelId, { negativeTtl: CACHE_POLICY.channelMap.negativeTtl }))
+  .use(rateLimit)
   .use(dbMiddleware)
   .handler(async ({ context, input }) => {
     const related = await loadUserRelatedSchedule(
