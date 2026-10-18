@@ -1,8 +1,25 @@
 import { TwitchAPI } from '../lib/twitchAPI.ts'
 import { getDB } from '../lib/db/db.ts'
 import { twitchStreamSchema } from '../lib/db/schema/twitch-channel-schema.ts'
-import { and, inArray, notInArray } from 'drizzle-orm'
+import { getTableColumns, inArray, sql } from 'drizzle-orm'
+import type { BatchItem } from 'drizzle-orm/batch'
 import type { TwitchStream } from '../lib/model/TwitchAPIModel.ts'
+
+// D1 allows 100 bound parameters per statement; an upserted row binds one per column.
+const MAX_BOUND_PARAMS = 100
+const STREAM_COLUMNS = getTableColumns(twitchStreamSchema)
+const ROWS_PER_UPSERT = Math.floor(
+  MAX_BOUND_PARAMS / Object.keys(STREAM_COLUMNS).length,
+)
+// On conflict every column except the id takes the incoming value (`excluded.<column>`).
+const UPSERT_SET = Object.fromEntries(
+  Object.entries(STREAM_COLUMNS)
+    .filter(([key]) => key !== 'streamId')
+    .map(([key, column]) => [
+      key,
+      sql`excluded.${sql.identifier(column.name)}`,
+    ]),
+)
 
 export class TwitchLiveCheckQueue {
   sendIds(ids: string[], env: Env) {
@@ -147,99 +164,55 @@ export class TwitchLiveCheckQueue {
       try {
         const db = getDB(env)
 
-        // Upsert live streams
-        if (liveStreams.length > 0) {
-          const rows = liveStreams.map((s: any) => ({
-            streamId: String(s.id),
-            twitchId: String(s.user_id),
-            userLogin: String(s.user_login),
-            userName: String(s.user_name ?? ''),
-            gameId: s.game_id ? String(s.game_id) : null,
-            gameName: s.game_name ? String(s.game_name) : null,
-            type: s.type ? String(s.type) : null,
-            title: s.title ? String(s.title) : null,
-            viewerCount:
-              typeof s.viewer_count === 'number' ? s.viewer_count : null,
-            startedAt: s.started_at ? String(s.started_at) : null,
-            language: s.language ? String(s.language) : null,
-            thumbnailUrl: s.thumbnail_url ? String(s.thumbnail_url) : null,
-            tagIds: s.tag_ids ? JSON.stringify(s.tag_ids) : null,
-            isMature: Boolean(s.is_mature ?? false),
-          }))
+        const rows = liveStreams.map((s: any) => ({
+          streamId: String(s.id),
+          twitchId: String(s.user_id),
+          userLogin: String(s.user_login),
+          userName: String(s.user_name ?? ''),
+          gameId: s.game_id ? String(s.game_id) : null,
+          gameName: s.game_name ? String(s.game_name) : null,
+          type: s.type ? String(s.type) : null,
+          title: s.title ? String(s.title) : null,
+          viewerCount:
+            typeof s.viewer_count === 'number' ? s.viewer_count : null,
+          startedAt: s.started_at ? String(s.started_at) : null,
+          language: s.language ? String(s.language) : null,
+          thumbnailUrl: s.thumbnail_url ? String(s.thumbnail_url) : null,
+          tagIds: s.tag_ids ? JSON.stringify(s.tag_ids) : null,
+          isMature: Boolean(s.is_mature ?? false),
+        }))
 
-          // Chunk inserts to avoid SQLite/D1 parameter limits (~999 params per statement)
-          const COLUMNS_PER_ROW = 14 // Keep in sync with values() fields above
-          const MAX_PARAMS = 50
-          const SAFETY_MARGIN = 1 // can be adjusted if needed
-          const MAX_ROWS_PER_INSERT = Math.max(
-            1,
-            Math.floor((MAX_PARAMS - SAFETY_MARGIN) / COLUMNS_PER_ROW),
-          )
+        // Channels of this batch that are not live: affected minus live, the same rows as
+        // `IN (affected) AND NOT IN (live)`, but each list alone fits the param limit.
+        const offlineIds = [...affectedIdsSet].filter(
+          (id) => !liveIdsSet.has(id),
+        )
+        const offlineLogins = [...affectedLoginsSet].filter(
+          (login) => !liveLoginsSet.has(login),
+        )
 
-          for (let i = 0; i < rows.length; i += MAX_ROWS_PER_INSERT) {
-            const batch = rows.slice(i, i + MAX_ROWS_PER_INSERT)
-            await db
-              .insert(twitchStreamSchema)
-              .values(batch)
-              .onConflictDoUpdate({
-                target: twitchStreamSchema.streamId,
-                set: {
-                  twitchId: (twitchStreamSchema as any).twitchId,
-                  userLogin: (twitchStreamSchema as any).userLogin,
-                  userName: (twitchStreamSchema as any).userName,
-                  gameId: (twitchStreamSchema as any).gameId,
-                  gameName: (twitchStreamSchema as any).gameName,
-                  type: (twitchStreamSchema as any).type,
-                  title: (twitchStreamSchema as any).title,
-                  viewerCount: (twitchStreamSchema as any).viewerCount,
-                  startedAt: (twitchStreamSchema as any).startedAt,
-                  language: (twitchStreamSchema as any).language,
-                  thumbnailUrl: (twitchStreamSchema as any).thumbnailUrl,
-                  tagIds: (twitchStreamSchema as any).tagIds,
-                  isMature: (twitchStreamSchema as any).isMature,
-                },
-              })
-          }
-        }
-
-        // Delete streams for channels not live anymore within this batch
-        const affectedIds = Array.from(affectedIdsSet)
-        const affectedLogins = Array.from(affectedLoginsSet)
-        const liveIds = Array.from(liveIdsSet)
-        const liveLogins = Array.from(liveLoginsSet)
-
-        if (affectedIds.length > 0) {
-          if (liveIds.length > 0) {
-            await db
+        // Upserts (a conflict takes the new values), then deletes; one round trip, one transaction.
+        const statements: BatchItem<'sqlite'>[] = [
+          ...chunk(rows, ROWS_PER_UPSERT).map((part) =>
+            db.insert(twitchStreamSchema).values(part).onConflictDoUpdate({
+              target: twitchStreamSchema.streamId,
+              set: UPSERT_SET,
+            }),
+          ),
+          ...chunk(offlineIds, MAX_BOUND_PARAMS).map((part) =>
+            db
               .delete(twitchStreamSchema)
-              .where(
-                and(
-                  inArray(twitchStreamSchema.twitchId, affectedIds),
-                  notInArray(twitchStreamSchema.twitchId, liveIds),
-                ),
-              )
-          } else {
-            await db
+              .where(inArray(twitchStreamSchema.twitchId, part)),
+          ),
+          ...chunk(offlineLogins, MAX_BOUND_PARAMS).map((part) =>
+            db
               .delete(twitchStreamSchema)
-              .where(inArray(twitchStreamSchema.twitchId, affectedIds))
-          }
-        }
-
-        if (affectedLogins.length > 0) {
-          if (liveLogins.length > 0) {
-            await db
-              .delete(twitchStreamSchema)
-              .where(
-                and(
-                  inArray(twitchStreamSchema.userLogin, affectedLogins),
-                  notInArray(twitchStreamSchema.userLogin, liveLogins),
-                ),
-              )
-          } else {
-            await db
-              .delete(twitchStreamSchema)
-              .where(inArray(twitchStreamSchema.userLogin, affectedLogins))
-          }
+              .where(inArray(twitchStreamSchema.userLogin, part)),
+          ),
+        ]
+        if (statements.length > 0) {
+          const [first, ...rest] = statements
+          await db.batch([first, ...rest])
         }
       } catch (e) {
         console.error('twitch-live-checkQueue db persist error', e)

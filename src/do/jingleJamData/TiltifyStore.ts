@@ -9,13 +9,14 @@ import type {
 import { TiltifyAPI, type TiltifyUserData } from '../../lib/TiltifyAPI.ts'
 import { jjCampaign, jjCauses } from '../../lib/db/schema/jj-api-schema.ts'
 import type { BatchItem } from 'drizzle-orm/batch'
-import { eq, getTableColumns } from 'drizzle-orm'
+import { and, eq, getTableColumns } from 'drizzle-orm'
 import { accounts } from '../../lib/db/schema/auth-schema.ts'
 import {
   normalizeTwitchLogin,
   tiltifySlugToTwitchLoginMap,
 } from '../utils/twitchLogins.ts'
 import { chunk } from '../utils/chunk.ts'
+import { sameJson } from '../utils/sameJson.ts'
 import type { CurrencyStore } from './CurrencyStore.ts'
 
 const MAX_BOUND_PARAMS = 100
@@ -455,7 +456,12 @@ export class TiltifyStore {
   public async updateTiltifyProfiles() {
     const db = getDB(this.env)
     const accountsList = await db
-      .select()
+      .select({
+        userId: accounts.userId,
+        providerId: accounts.providerId,
+        providerUsername: accounts.providerUsername,
+        meta: accounts.meta,
+      })
       .from(accounts)
       .where(eq(accounts.provider, 'tiltify'))
       .all()
@@ -465,27 +471,36 @@ export class TiltifyStore {
       console.error('updateTiltifyProfiles', 'no token')
       return
     }
+    // Only changed columns of changed profiles: an unchanged profile writes nothing.
+    const updates: BatchItem<'sqlite'>[] = []
     for (const account of accountsList) {
-      const tiltifyId = account.providerId
-      const tiltifyUser = await api.getUserById(tiltifyId, token)
-      try {
-        if (tiltifyUser) {
-          await db
-            .update(accounts)
-            .set({
-              providerUsername: tiltifyUser.data.username,
-              meta: tiltifyUser.data,
-            })
-            .where(eq(accounts.userId, account.userId))
-          console.log(
-            'DO-scheduler',
-            'updated tiltify profile',
-            tiltifyUser.data.slug,
-          )
-        }
-      } catch (e) {
-        console.error('updateTiltifyProfiles', 'error', e)
-      }
+      const tiltifyUser = await api.getUserById(account.providerId, token)
+      if (!tiltifyUser) continue
+      const profile = tiltifyUser.data
+      const set: Partial<typeof accounts.$inferInsert> = {}
+      if (profile.username !== account.providerUsername)
+        set.providerUsername = profile.username
+      if (!sameJson(profile, account.meta)) set.meta = profile
+      if (Object.keys(set).length === 0) continue
+      updates.push(
+        db
+          .update(accounts)
+          .set(set)
+          .where(
+            and(
+              eq(accounts.userId, account.userId),
+              eq(accounts.provider, 'tiltify'),
+            ),
+          ),
+      )
+      console.log('DO-scheduler', 'updated tiltify profile', profile.slug)
+    }
+    if (updates.length === 0) return
+    try {
+      const [first, ...rest] = updates
+      await db.batch([first, ...rest])
+    } catch (e) {
+      console.error('updateTiltifyProfiles', 'error', e)
     }
   }
 
