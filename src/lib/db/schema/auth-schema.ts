@@ -34,6 +34,8 @@ export const accounts =
         .default(sql`((unixepoch())
                      )`).notNull(),
       meta: text('meta', {mode: "json"}),
+      /** Tiltify slug from `meta`, indexable (X2). VIRTUAL: SQLite can't ADD a stored column. */
+      tiltifySlug: text('tiltify_slug').generatedAlwaysAs(sql`json_extract(meta, '$.slug')`, {mode: 'virtual'}),
     },
     (table) => {
       return [
@@ -41,9 +43,8 @@ export const accounts =
           name: 'pk',
           columns: [table.userId, table.provider]
         }),
-        uniqueIndex('unique_index_user_id_provider').on(table.userId, table.provider),
-        index('index_user_id').on(table.userId),
-        index('index_provider_id').on(table.providerId)
+        index('idx_accounts_tiltify_slug').on(table.tiltifySlug).where(sql`provider = 'tiltify'`),
+        index('idx_accounts_username_lower').on(sql`lower(provider_username)`),
       ]
     }
   );
@@ -82,7 +83,6 @@ export const userSocials = sqliteTable("user_socials", {
   url: text('url').notNull()
 }, (table) => [
   primaryKey({name: 'user_url_provider_pk', columns: [table.userId, table.provider]}),
-  uniqueIndex('unique_user_url_provider').on(table.userId, table.provider)
 ])
 
 /**
@@ -121,7 +121,8 @@ export const friendRequests = sqliteTable("friend_requests", {
   fromUserId: integer('from_user_id', {mode: 'number'}).notNull().references(() => users.id, {onDelete: 'cascade'}),
   toUserId: integer('to_user_id', {mode: 'number'}).notNull().references(() => users.id, {onDelete: 'cascade'}),
 }, (table) => [
-  uniqueIndex('unique_friend_requests', ).on(table.fromUserId, table.toUserId)
+  uniqueIndex('unique_friend_requests', ).on(table.fromUserId, table.toUserId),
+  index('idx_friend_requests_to').on(table.toUserId),
 ])
 
 /**
@@ -145,5 +146,6 @@ export const blockedUsers = sqliteTable("blocked_users", {
   userId: integer('user_id', {mode: 'number'}).notNull().references(() => users.id, {onDelete: 'cascade'}),
   blockedUser: integer('blocked_user_id', {mode: 'number'}).notNull().references(() => users.id, {onDelete: 'cascade'}),
 }, (table) => [
-  uniqueIndex('unique_blocked_user', ).on(table.userId, table.blockedUser)
+  uniqueIndex('unique_blocked_user', ).on(table.userId, table.blockedUser),
+  index('idx_blocked_users_blocked').on(table.blockedUser),
 ])

@@ -555,6 +555,7 @@ const getAllSchedules = os.getAllSchedulesContract.handler(
             eq(accounts.provider, 'tiltify'),
           ),
         )
+        .orderBy(schedulesTable.id)
         .all()
 
       return rows.map((r) => ({

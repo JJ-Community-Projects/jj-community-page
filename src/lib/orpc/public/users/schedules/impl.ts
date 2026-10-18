@@ -126,6 +126,7 @@ const getScheduleInfoByUserSlug = os.getScheduleInfoByUserSlugContract.handler(
           eq(schedulesTable.visible, true),
         ),
       )
+      .orderBy(schedulesTable.id)
       .all()
 
     return schedules
@@ -147,6 +148,7 @@ const getFullScheduleByUserSlug = os.getFullScheduleByUserSlugContract.handler(
           eq(schedulesTable.visible, true),
         ),
       )
+      .orderBy(schedulesTable.id)
       .all()
 
     // Build full schedule data for each schedule

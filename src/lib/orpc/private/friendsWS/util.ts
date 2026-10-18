@@ -28,6 +28,7 @@ export function getUserFriendRequests(db: JJDrizzleDatabase, userId: number) {
     .from(friendRequests)
     .innerJoin(userDisplayView, eq(friendRequests.fromUserId, userDisplayView.userId))
     .where(eq(friendRequests.toUserId, userId))
+    .orderBy(friendRequests.fromUserId)
     .all();
 }
 

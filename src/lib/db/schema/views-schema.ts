@@ -29,7 +29,8 @@ export const tiltifyMetadataView = sqliteView('tiltify_metadata_view').as(
           ),
         id: sql<string>`json_extract(${accounts.meta}, '$.id')`.as('id'),
         // legacyId: sql`json_extract(${accounts.meta}, '$.legacy_id')`.as('legacy_id'),
-        slug: sql<string>`json_extract(${accounts.meta}, '$.slug')`.as('slug'),
+        // the indexed generated column (X2), same value as json_extract(meta, '$.slug')
+        slug: sql<string>`${accounts.tiltifySlug}`.as('slug'),
         url: sql<string>`json_extract(${accounts.meta}, '$.url')`.as('url'),
         username: sql<string>`json_extract(${accounts.meta}, '$.username')`.as(
           'username'

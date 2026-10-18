@@ -27,6 +27,5 @@ export const editStreamsTable = sqliteTable('edit_streams', {
   updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
 }, (table) => [
   primaryKey({ name: 'edit_streams_pk', columns: [table.scheduleId, table.id] }),
-  index('edit_streams_schedule_idx').on(table.scheduleId),
   index('edit_streams_start_idx').on(table.start),
 ]);

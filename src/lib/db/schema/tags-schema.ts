@@ -48,7 +48,6 @@ export const tagCategories = sqliteTable("tag_categories", {
   updatedAt: integer('updated_at', {mode: 'timestamp'}).notNull()
     .default(sql`(unixepoch())`),
 }, (table) => [
-  uniqueIndex('unique_category_slug').on(table.slug),
   index('idx_categories_visible').on(table.visible),
   index('idx_categories_sort_order').on(table.sortOrder),
 ]);
@@ -92,8 +91,6 @@ export const tags = sqliteTable("tags", {
   updatedAt: integer('updated_at', {mode: 'timestamp'}).notNull()
     .default(sql`(unixepoch())`),
 }, (table) => [
-  // Unique constraint on slug for URL routing
-  uniqueIndex('unique_tag_slug').on(table.slug),
   // Index for filtering by category
   index('idx_tags_category').on(table.categoryId),
   // Index for filtering visible tags
@@ -146,12 +143,8 @@ export const userTagsTable = sqliteTable("user_tags", {
 }, (table) => [
   // Composite primary key prevents duplicate user-tag combinations
   primaryKey({name: 'user_tag_pk', columns: [table.userId, table.tagId]}),
-  // Unique index to enforce one-to-one user-tag relationship
-  uniqueIndex('unique_user_tag').on(table.userId, table.tagId),
   // Index for efficient tag-based user lookups
   index('idx_user_tags_tag_id').on(table.tagId),
-  // Index for efficient user-based tag lookups
-  index('idx_user_tags_user_id').on(table.userId),
 ]);
 
 /**
@@ -185,10 +178,6 @@ export const streamTagsTable = sqliteTable('stream_tags', {
 
   // Index for efficient tag-based stream lookups
   index('idx_stream_tags_tag_id').on(table.tagId),
-  // Index for efficient stream-based tag lookups
-  index('idx_stream_tags_stream').on(table.scheduleId, table.streamId),
-  // Index for efficient schedule-based tag lookups
-  index('idx_stream_tags_schedule').on(table.scheduleId),
 ]);
 
 /**

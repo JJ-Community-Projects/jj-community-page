@@ -17,5 +17,4 @@ export const editStreamParticipantsTable = sqliteTable('edit_stream_participants
     foreignColumns: [editStreamsTable.scheduleId, editStreamsTable.id],
   }).onDelete('cascade'),
   index('edit_stream_participants_user_idx').on(table.userId),
-  index('edit_stream_participants_stream_idx').on(table.scheduleId, table.streamId),
 ]);

@@ -1,5 +1,5 @@
 // src/lib/db/schema/twitch-channel-schema.ts
-import {integer, sqliteTable, text} from "drizzle-orm/sqlite-core";
+import {index, integer, sqliteTable, text} from "drizzle-orm/sqlite-core";
 import {users} from "./auth-schema.ts";
 
 /**
@@ -17,7 +17,9 @@ export const twitchChannelSchema = sqliteTable('twitch_channels', {
   description: text('description'),
   profileImageUrl: text('profile_image_url'),
   offlineImageUrl: text('offline_image_url'),
-})
+}, (table) => [
+  index('idx_twitch_channels_user_id').on(table.userId),
+])
 
 /**
  * Twitch streams table that stores information about active Twitch streams.

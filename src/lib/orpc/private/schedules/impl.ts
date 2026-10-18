@@ -568,6 +568,7 @@ const getSchedulesByTiltifyUsername = os.getSchedulesByTiltifyUsername.handler(
         .where(
           and(eq(users.id, account.userId), eq(schedulesTable.visible, true)),
         )
+        .orderBy(schedulesTable.id)
         .all()
 
       return schedules.map((row) => row.schedule)
@@ -616,6 +617,7 @@ const getSchedules = os.getSchedules
         .select()
         .from(schedulesTable)
         .where(eq(schedulesTable.ownerId, userId))
+        .orderBy(schedulesTable.id)
         .all()
 
       return schedules

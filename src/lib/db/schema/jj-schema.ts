@@ -1,6 +1,6 @@
 // src/lib/db/jj-schema.ts
 import {sql} from 'drizzle-orm';
-import {foreignKey, integer, primaryKey, sqliteTable, text, uniqueIndex} from 'drizzle-orm/sqlite-core';
+import {foreignKey, index, integer, primaryKey, sqliteTable, text, uniqueIndex} from 'drizzle-orm/sqlite-core';
 import {users} from "./auth-schema";
 
 /**
@@ -39,7 +39,10 @@ export const schedulesTable = sqliteTable('schedules', {
   },
   (table) => [
     // uniqueIndex('one_schedule_per_year_per_user').on(table.ownerId, table.year),
-    uniqueIndex('unique_schedule_slug').on(table.slug),
+    // owner first and all four columns: in the per-user schedules join (getAllUsersWithInfo) it out-ranks
+    // idx_schedules_year_primary_visible; (owner_id, year) lookups (TWX-02) use its prefix
+    index('idx_schedules_owner_year_primary_visible').on(table.ownerId, table.year, table.primary, table.visible),
+    index('idx_schedules_year_primary_visible').on(table.year, table.primary, table.visible),
   ]
 );
 
@@ -93,6 +96,7 @@ export const streamParticipantsTable = sqliteTable('stream_participants', {
   userId: integer('user_id').notNull(),
 }, (table) => [
   uniqueIndex('stream_participants_pk').on(table.scheduleId, table.streamId, table.userId),
+  index('idx_stream_participants_user').on(table.userId),
   foreignKey({
     name: 'stream_fk',
     columns: [table.scheduleId, table.streamId],
@@ -120,7 +124,7 @@ export const teamsTable = sqliteTable('teams', {
     visible: integer('team_visibility', {mode: 'boolean'}).notNull().default(false),
   },
   (table) => [
-    uniqueIndex('team_unique_slug').on(table.slug),
+    index('idx_teams_owner').on(table.ownerId),
   ]
 )
 
@@ -135,6 +139,7 @@ export const teamMembersTable = sqliteTable('team_members', {
   },
   (table) => [
     uniqueIndex('single_user_per_team').on(table.teamId, table.userId),
+    index('idx_team_members_user').on(table.userId),
   ]
 )
 
@@ -149,5 +154,6 @@ export const teamInvitesTable = sqliteTable('team_invites', {
   },
   (table) => [
     uniqueIndex('single_invite_per_user_per_team').on(table.teamId, table.invitedUserId),
+    index('idx_team_invites_invite').on(table.invitedUserId),
   ]
 )
