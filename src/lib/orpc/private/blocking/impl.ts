@@ -5,6 +5,7 @@ import {authMiddleware} from '../../middleware/authMiddleware.ts';
 import {blockedUsers, friendRequests, friendsTable} from '../../../db/schema/auth-schema.ts';
 import {userDisplayView} from '../../../db/schema/views-schema.ts';
 import {and, eq, or} from 'drizzle-orm';
+import {forgetRelatedUsers} from '../../../services/relatedUsersCache.ts';
 
 const os = implement(blockContract)
   .use(dbMiddleware);
@@ -62,6 +63,7 @@ const blockUser = os.blockUserContract
           blockedUser: blockedUserId
         })
     ]);
+    await forgetRelatedUsers(context.env, [userId, blockedUserId]);
 
     return { success: true };
   });
@@ -97,6 +99,7 @@ const unblockUser = os.unblockUserContract
           eq(blockedUsers.blockedUser, blockedUserId)
         )
       );
+    await forgetRelatedUsers(context.env, [userId, blockedUserId]);
 
     return { success: true };
   });

@@ -5,6 +5,10 @@ import { userDisplayView } from '../../../../db/schema/views-schema.ts'
 import { blockedUsers } from '../../../../db/schema/auth-schema.ts'
 import { UserDisplaySchema } from '../../../private/schemas/users.ts'
 import { z } from 'zod/v4'
+import {
+  getCachedRelatedUsers,
+  setCachedRelatedUsers,
+} from '../../../../services/relatedUsersCache.ts'
 
 const UserSchema = UserDisplaySchema.extend({
   sharedTags: z.number(),
@@ -15,98 +19,13 @@ const UserArraySchema = z.array(UserSchema)
 
 type User = z.infer<typeof UserSchema>
 
-// Helper: cache user tag IDs
-async function getTagsForUser(db: JJDrizzleDatabase, env: Env, userId: number) {
-  const KV = env.KV
-
-  const cachedTagsForUser = await KV.get<{ tagIds: number[] }>(
-    `tagsForUser:${userId}`,
-    {
-      type: 'json',
-      cacheTtl: 300,
-    }
-  )
-
-  if (cachedTagsForUser) {
-    const result = cachedTagsForUser.tagIds ?? []
-    console.log('getTagsForUser returning (cache hit):', {
-      userId,
-      tagIds: result,
-      cachedTagsForUser,
-    })
-    return result
-  }
-
+// Helper: the user's tag IDs
+async function getTagsForUser(db: JJDrizzleDatabase, userId: number) {
   const tagsForUser = await db
     .select({ tagId: userTagsTable.tagId })
     .from(userTagsTable)
     .where(eq(userTagsTable.userId, userId))
-
-  if (tagsForUser.length === 0) {
-    console.log('getTagsForUser returning (no tags in DB):', {
-      userId,
-      tagIds: [],
-    })
-    return []
-  }
-
-  const tagIds = tagsForUser.map((t) => t.tagId)
-
-  await KV.put(`tagsForUser:${userId}`, JSON.stringify({ tagIds }), {
-    expirationTtl: 300,
-  })
-
-  console.log('getTagsForUser returning (fresh):', { userId, tagIds })
-  return tagIds
-}
-
-// Helper: cache per-user total tag count (primitive)
-async function setUserTagCount(env: Env, userId: number, count: number) {
-  const KV = env.KV
-  await KV.put(`userTagCount:${userId}`, JSON.stringify({ count }), {
-    expirationTtl: 600,
-  })
-}
-
-// Helper: cache per-user display projection (primitive)
-async function setUserDisplay(
-  env: Env,
-  user: {
-    userId: number
-    primaryLiveStream: unknown
-    role: unknown
-    createdAt: unknown
-    username: unknown
-    profileImage: unknown
-    twitchLogin: unknown
-    tiltifySlug: unknown
-    tiltifyUrl: unknown
-    primaryColor: unknown
-    accentColor: unknown
-  },
-) {
-  const KV = env.KV
-  await KV.put(`userDisplay:${user.userId}`, JSON.stringify(user), {
-    expirationTtl: 600,
-  })
-}
-
-// Helper: cache final related users list (short TTL)
-async function getCachedRelatedUsers(env: Env, userId: number, limit: number) {
-  const KV = env.KV
-  return KV.get<string>(`relatedUsers:${userId}:limit=${limit}`, { cacheTtl: 300 })
-}
-
-async function setCachedRelatedUsers(
-  env: Env,
-  userId: number,
-  limit: number,
-  data: any,
-) {
-  const KV = env.KV
-  await KV.put(`relatedUsers:${userId}:limit=${limit}`, JSON.stringify(data), {
-    expirationTtl: 60,
-  })
+  return tagsForUser.map((t) => t.tagId)
 }
 
 export async function findRelatedUsersWithJaccard(
@@ -115,7 +34,7 @@ export async function findRelatedUsersWithJaccard(
   userId: number,
   limit = 10,
 ): Promise<User[]> {
-  // Try short-lived full-response cache first
+  // Try the full-response cache first
   const cached = await getCachedRelatedUsers(env, userId, limit)
   if (cached) {
     const arr: any[] = JSON.parse(cached)
@@ -130,7 +49,7 @@ export async function findRelatedUsersWithJaccard(
     return x
   }
 
-  const tagIds = await getTagsForUser(db, env, userId)
+  const tagIds = await getTagsForUser(db, userId)
 
   if (tagIds.length === 0) {
     console.log('findRelatedUsersWithJaccard returning (no tags):', {
@@ -138,6 +57,7 @@ export async function findRelatedUsersWithJaccard(
       limit,
       result: [],
     })
+    await setCachedRelatedUsers(env, userId, limit, [])
     return []
   }
 
@@ -190,6 +110,7 @@ export async function findRelatedUsersWithJaccard(
       limit,
       result: [],
     })
+    await setCachedRelatedUsers(env, userId, limit, [])
     return []
   }
 
@@ -205,11 +126,6 @@ export async function findRelatedUsersWithJaccard(
   const tagCountMap = Object.fromEntries(
     candidateTagCounts.map((r) => [r.userId, r.tagCount]),
   )
-
-  // Opportunistically populate per-user tag count cache
-  await Promise.allSettled(
-    candidateTagCounts.map((r) => setUserTagCount(env, r.userId, r.tagCount)),
-  ).catch(() => {})
 
   const userTagCount = tagIds.length
   const relatedUsers = Object.entries(counts)
@@ -249,11 +165,6 @@ export async function findRelatedUsersWithJaccard(
     .where(inArray(userDisplayView.userId, relatedUsersKeys))
     .all()
 
-  // Opportunistically populate per-user display cache
-  await Promise.allSettled(results.map((u) => setUserDisplay(env, u))).catch(
-    () => {},
-  )
-
   const finalPayload = results.map((user) => {
     return {
       sharedTags: relatedUsersMap[user.userId].sharedTags,
@@ -264,7 +175,7 @@ export async function findRelatedUsersWithJaccard(
 
   console.log('finalPayload', finalPayload)
 
-  // Store final short-lived cache
+  // Store the final list
   await setCachedRelatedUsers(env, userId, limit, finalPayload)
 
   return finalPayload

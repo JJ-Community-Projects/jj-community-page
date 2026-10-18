@@ -1,5 +1,8 @@
 import type { TokenData, TwitchAPIResult, TwitchStream, TwitchUser, } from './model/TwitchAPIModel.ts'
 
+// The cached app token is dropped this many seconds before Twitch's `expires_in`.
+const TOKEN_EXPIRY_MARGIN_S = 600
+
 export class TwitchAPI {
   private env: Env
 
@@ -625,9 +628,9 @@ export class TwitchAPI {
         console.error('getNewAppToken', response)
         return null
       }
-      const body = await response.json()
-      console.log('getNewAppToken', 'response', body)
-      return body as TokenData
+      const body = (await response.json()) as TokenData
+      console.log('getNewAppToken', 'expires_in', body.expires_in)
+      return body
     } catch (error) {
       console.error('Error fetching new Twitch app token:', error)
       return null
@@ -640,8 +643,11 @@ export class TwitchAPI {
    */
   private async storeToken(tokenData: TokenData): Promise<void> {
     try {
-      const expirationTtl = Number((tokenData.expires_in / 1000).toFixed(0))
-      console.log('storeToken', 'tokenData', tokenData, expirationTtl)
+      // `expires_in` is in seconds (~58 days for an app token).
+      const expirationTtl = Math.max(
+        60,
+        Math.floor(tokenData.expires_in) - TOKEN_EXPIRY_MARGIN_S,
+      )
       await this.env.KV.put('twitch:app_token', JSON.stringify(tokenData), {
         expirationTtl: expirationTtl,
       })
@@ -684,11 +690,29 @@ export class TwitchAPI {
       }
     }
 
+    const response = await this.fetchWithToken(url, accessToken)
+    if (response.status !== 401) return response
+
+    // The app token was revoked or expired early (it is cached for weeks): replace it once and retry.
+    const fresh = await this.replaceAppToken(accessToken)
+    return fresh ? this.fetchWithToken(url, fresh) : response
+  }
+
+  private fetchWithToken(url: string, accessToken: string) {
     const headers = {
       Authorization: 'Bearer ' + accessToken,
       'Client-Id': this.env.TWITCH_CLIENT_ID,
     }
-
     return fetch(url, { headers })
+  }
+
+  /** A token other than `rejected`: the cached one if another request already replaced it, else a new one. */
+  private async replaceAppToken(rejected: string) {
+    const cached = await this.getTokenFromKV()
+    if (cached && cached.access_token !== rejected) return cached.access_token
+    const newToken = await this.getNewAppToken()
+    if (!newToken) return undefined
+    await this.storeToken(newToken)
+    return newToken.access_token
   }
 }

@@ -22,6 +22,7 @@ import { tags, userTagsTable } from '../../../db/schema/tags-schema.ts'
 import { type SimplePublicTag, SimplePublicTagSchema } from '../schemas/tags.ts'
 import { UserDisplaySchema } from '../schemas/UserDisplaySchema.ts'
 import { findRelatedUsersWithJaccard } from './discovery/util.ts'
+import { PROFILE_RELATED_USERS_LIMIT } from '../../../services/relatedUsersCache.ts'
 
 const os = implement(usersContracts).use(dbMiddleware)
 
@@ -153,7 +154,7 @@ const getUserFullProfileBySlug = os.getUserFullProfileBySlugContract.handler(
       db,
       context.env,
       userId,
-      3,
+      PROFILE_RELATED_USERS_LIMIT,
     )
 
     return {
