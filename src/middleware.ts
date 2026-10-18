@@ -1,5 +1,15 @@
 import {defineMiddleware} from "astro:middleware";
 import {deleteSessionTokenCookie, setSessionTokenCookie, validateSessionToken} from "./functions/session.ts";
+
+/** API routes that never read `locals.user` / `locals.session`. */
+const SESSIONLESS_PREFIXES = [
+  '/api/public/',
+  '/api/private/jj/',
+  '/api/private/yogs/',
+  '/api/jj-data/',
+  '/api/twitch/',
+];
+
 /**
  * Middleware that handles session validation and user authentication.
  *
@@ -7,7 +17,7 @@ import {deleteSessionTokenCookie, setSessionTokenCookie, validateSessionToken} f
  * 1. Checks for a session cookie
  * 2. Validates the session token if present
  * 3. Sets the user and session in context.locals
- * 4. Refreshes the session cookie if needed
+ * 4. Refreshes the session cookie when the session was extended
  *
  * @param {AstroContext} context - The Astro context object
  * @param {Function} next - The function to call to continue to the next middleware or route handler
@@ -23,6 +33,14 @@ export const onRequest = defineMiddleware(async (context, next) => {
     path === '/site.webmanifest' ||
     /\.(js|css|png|jpg|jpeg|svg|gif|ico|woff2?|ttf|webp|avif)$/.test(path)
   ) {
+    return next();
+  }
+
+  // Routes that never read the viewer: no session lookup (KV, maybe D1) for logged-in polls.
+  // The overlays keep it, so a logged-in creator's preview refreshes the edge cache.
+  if (path === '/api/cf' || SESSIONLESS_PREFIXES.some((prefix) => path.startsWith(prefix))) {
+    context.locals.session = null;
+    context.locals.user = null;
     return next();
   }
 
@@ -50,24 +68,17 @@ export const onRequest = defineMiddleware(async (context, next) => {
   }
 
   try {
-    if (context.locals.user) {
-      if (!context.locals.user.tiltifySlug) {
-        context.locals.user = null;
-        context.locals.session = null;
-        deleteSessionTokenCookie(context);
-        return next();
-      }
-    }
     if (token === null) {
       context.locals.session = null;
       context.locals.user = null;
       return next();
     }
-    const {user, session} = await validateSessionToken(context, token);
-    if (session !== null) {
-      setSessionTokenCookie(context, token, session.expiresAt);
-    } else {
+    const {user, session, extended} = await validateSessionToken(context, token);
+    if (session === null) {
       deleteSessionTokenCookie(context);
+    } else if (extended) {
+      // Only when the expiry moved: a Set-Cookie on every response makes them all uncacheable.
+      setSessionTokenCookie(context, token, session.expiresAt);
     }
     context.locals.session = session;
     context.locals.user = user;

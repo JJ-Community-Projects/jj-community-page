@@ -11,6 +11,8 @@ import type {AstroContext} from "../lib/AstroContext.ts";
 import {drizzle} from "drizzle-orm/d1";
 import {socialUrlRegex} from "./socialUrlRegex.ts";
 import { tiltifyMetadataView } from '../lib/db/schema/views-schema.ts'
+import { CACHE_POLICY, ttlFor } from '../lib/services/cachePolicy.ts'
+import { putCache } from '../lib/services/kvCache.ts'
 
 /**
  * Saves social media information from Tiltify to the userSocials table
@@ -120,8 +122,19 @@ export function transformRawSession(rawSession: string): Session {
 
 /**
  * Result type for session validation, containing either a valid session and user or null values for both.
+ * `extended`: the session's expiry was moved, so the cookie needs the new date.
  */
-type SessionValidationResult = { session: Session; user: User } | { session: null; user: null };
+type SessionValidationResult =
+  | { session: Session; user: User; extended: boolean }
+  | { session: null; user: null; extended: false };
+
+const NO_SESSION = { session: null, user: null, extended: false } as const;
+
+/**
+ * The KV value of `session:<id>`: the session plus a copy of its user, so most requests don't read D1.
+ * Sessions stored before the copy existed have no `user`; they load it once and are rewritten.
+ */
+type StoredSession = Session & { user?: User & { cachedAt: number } };
 
 /**
  * Validates a session token and retrieves the associated user.
@@ -130,7 +143,7 @@ type SessionValidationResult = { session: Session; user: User } | { session: nul
  * 1. Converts the token to a session ID
  * 2. Retrieves the session from KV storage
  * 3. Validates the session expiration
- * 4. Retrieves the associated user account
+ * 4. Takes the user from the session, or from D1 when that copy is older than the `sessionUser` TTL
  * 5. Extends the session if it's close to expiration
  *
  * @param {AstroContext} ctx - The Astro context object
@@ -141,55 +154,85 @@ export async function validateSessionToken(ctx: AstroContext, token: string): Pr
   const sessionId = encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
 
   const KV = env.KV;
-  const db = getDB(ctx);
   const rawSession = await KV.get(`session:${sessionId}`, { cacheTtl: 300 });
   if (!rawSession) {
-    return {session: null, user: null};
+    return NO_SESSION;
   }
 
-  const session = transformRawSession(rawSession);
+  const { user: cachedUser, ...session } = transformRawSession(rawSession) as StoredSession;
 
   // If session ID is empty, it means the session couldn't be parsed properly
   // or the default session was returned from transformRawSession
   if (!session.id) {
-    return {session: null, user: null};
+    return NO_SESSION;
   }
-  const tiltifyUser = await db.select()
+
+  // Check if session has expired
+  if (Date.now() >= session.expiresAt.getTime()) {
+    await KV.delete(`session:${sessionId}`);
+    return NO_SESSION;
+  }
+
+  const reload = !cachedUser || !isFresh(cachedUser.cachedAt);
+  const user = reload ? await loadSessionUser(ctx, session.userId) : toUser(cachedUser);
+  if (!user) {
+    return NO_SESSION;
+  }
+
+  // Extend session if it's within 3 days of expiration
+  const extended = Date.now() >= session.expiresAt.getTime() - 1000 * 60 * 60 * 24 * 3;
+  if (extended) {
+    session.expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24 * 30); // Extend by 30 days
+  }
+
+  if (reload || extended) {
+    const stored: StoredSession = {
+      ...session,
+      user: { ...user, cachedAt: reload ? Date.now() : cachedUser!.cachedAt },
+    };
+    await putCache(KV, `session:${sessionId}`, JSON.stringify(stored), {
+      // KV keeps the value as long as the session lives (60 s is KV's minimum)
+      expirationTtl: Math.max(60, Math.ceil((session.expiresAt.getTime() - Date.now()) / 1000)),
+    });
+  }
+
+  return {session, user, extended};
+}
+
+/** Whether a session's user copy taken at `cachedAt` is still within the `sessionUser` TTL. */
+function isFresh(cachedAt: number) {
+  const age = Date.now() - cachedAt;
+  return age >= 0 && age < ttlFor(CACHE_POLICY.sessionUser, new Date()) * 1000;
+}
+
+function toUser({ id, tiltifyId, tiltifyName, tiltifySlug }: User): User {
+  return { id, tiltifyId, tiltifyName, tiltifySlug };
+}
+
+async function loadSessionUser(ctx: AstroContext, userId: number): Promise<User | null> {
+  const tiltifyUser = await getDB(ctx)
+    .select({
+      userId: tiltifyMetadataView.userId,
+      id: tiltifyMetadataView.id,
+      username: tiltifyMetadataView.username,
+      slug: tiltifyMetadataView.slug,
+    })
     .from(tiltifyMetadataView)
-    .where(eq(
-      tiltifyMetadataView.userId, session.userId
-    )).get()
-
+    .where(eq(tiltifyMetadataView.userId, userId))
+    .get();
   if (!tiltifyUser) {
-    return {session: null, user: null};
+    return null;
   }
-
-  const user: User = {
+  return {
     id: tiltifyUser.userId,
     tiltifyId: tiltifyUser.id,
     tiltifyName: tiltifyUser.username,
     tiltifySlug: tiltifyUser.slug,
   };
-
-  // Check if session has expired
-  if (Date.now() >= session.expiresAt.getTime()) {
-    await KV.delete(`session:${sessionId}`);
-    return {session: null, user: null};
-  }
-
-  // Extend session if it's within 3 days of expiration
-  if (Date.now() >= session.expiresAt.getTime() - 1000 * 60 * 60 * 24 * 3) {
-    session.expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24 * 30); // Extend by 30 days
-    await KV.put(`session:${sessionId}`, JSON.stringify(session), {
-      expirationTtl: 30 * 24 * 60 * 60
-    });
-  }
-
-  return {session, user};
 }
 
 
-export async function validateSessionTokenFromEnv(env: Env, token: string): Promise<SessionValidationResult> {
+export async function validateSessionTokenFromEnv(env: Env, token: string): Promise<{ session: Session; user: User } | { session: null; user: null }> {
   const sessionId = encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
 
   const KV = env.KV;
