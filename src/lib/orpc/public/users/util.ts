@@ -210,22 +210,28 @@ export async function getUserSchedules(db: JJDrizzleDatabase, userId: number): P
   return {schedules, primarySchedule};
 }
 
+/** A stream's key: stream ids are only unique within their schedule. */
+type StreamKey = { scheduleId: number; id: number };
+
+const streamKey = (scheduleId: number, streamId: number) => `${scheduleId}:${streamId}`;
+
 /**
- * Fetches stream tags for given stream IDs
+ * Fetches stream tags for given streams
  * @param db Database connection
- * @param streamIds Array of stream IDs
- * @returns Map of stream ID to array of tags
+ * @param streams Streams by (schedule ID, stream ID)
+ * @returns Map of stream key (`streamKey`) to array of tags
  */
-export async function getStreamTagsMap(db: JJDrizzleDatabase, streamIds: number[]): Promise<Map<number, Array<{
+export async function getStreamTagsMap(db: JJDrizzleDatabase, streams: StreamKey[]): Promise<Map<string, Array<{
   name: string;
   slug: string;
   color: string
 }>>> {
-  if (streamIds.length === 0) {
+  if (streams.length === 0) {
     return new Map();
   }
 
   const streamTags = await db.select({
+    scheduleId: streamTagsTable.scheduleId,
     streamId: streamTagsTable.streamId,
     name: tags.name,
     slug: tags.slug,
@@ -233,29 +239,33 @@ export async function getStreamTagsMap(db: JJDrizzleDatabase, streamIds: number[
   })
     .from(streamTagsTable)
     .innerJoin(tags, eq(streamTagsTable.tagId, tags.id))
-    .where(inArray(streamTagsTable.streamId, streamIds))
+    .where(or(...streams.map(s => and(
+      eq(streamTagsTable.scheduleId, s.scheduleId),
+      eq(streamTagsTable.streamId, s.id),
+    ))))
     .all();
 
-  // Group tags by stream ID
-  const streamTagsMap = new Map<number, Array<{ name: string; slug: string; color: string }>>();
+  // Group tags by stream
+  const streamTagsMap = new Map<string, Array<{ name: string; slug: string; color: string }>>();
   for (const tag of streamTags) {
-    if (!streamTagsMap.has(tag.streamId)) {
-      streamTagsMap.set(tag.streamId, []);
+    const key = streamKey(tag.scheduleId, tag.streamId);
+    if (!streamTagsMap.has(key)) {
+      streamTagsMap.set(key, []);
     }
-    streamTagsMap.get(tag.streamId)!.push({name: tag.name, slug: tag.slug, color: tag.color});
+    streamTagsMap.get(key)!.push({name: tag.name, slug: tag.slug, color: tag.color});
   }
 
   return streamTagsMap;
 }
 
 /**
- * Fetches stream participants for given stream IDs
+ * Fetches stream participants for given streams
  * @param db Database connection
- * @param streamIds Array of stream IDs
- * @returns Map of stream ID to array of participants
+ * @param streams Streams by (schedule ID, stream ID)
+ * @returns Map of stream key (`streamKey`) to array of participants
  */
-export async function getStreamParticipantsMap(db: JJDrizzleDatabase, streamIds: number[]): Promise<Map<number, StreamParticipant[]>> {
-  if (streamIds.length === 0) {
+export async function getStreamParticipantsMap(db: JJDrizzleDatabase, streams: StreamKey[]): Promise<Map<string, StreamParticipant[]>> {
+  if (streams.length === 0) {
     return new Map();
   }
 
@@ -275,16 +285,20 @@ export async function getStreamParticipantsMap(db: JJDrizzleDatabase, streamIds:
   })
     .from(streamParticipantsTable)
     .innerJoin(userDisplayView, eq(streamParticipantsTable.userId, userDisplayView.userId))
-    .where(inArray(streamParticipantsTable.streamId, streamIds))
+    .where(or(...streams.map(s => and(
+      eq(streamParticipantsTable.scheduleId, s.scheduleId),
+      eq(streamParticipantsTable.streamId, s.id),
+    ))))
     .all();
 
-  // Group participants by stream ID
-  const streamParticipantsMap = new Map<number, StreamParticipant[]>();
+  // Group participants by stream
+  const streamParticipantsMap = new Map<string, StreamParticipant[]>();
   for (const participant of streamParticipants) {
-    if (!streamParticipantsMap.has(participant.streamId)) {
-      streamParticipantsMap.set(participant.streamId, []);
+    const key = streamKey(participant.scheduleId, participant.streamId);
+    if (!streamParticipantsMap.has(key)) {
+      streamParticipantsMap.set(key, []);
     }
-    streamParticipantsMap.get(participant.streamId)!.push({
+    streamParticipantsMap.get(key)!.push({
       userId: participant.userId,
       primaryLiveStream: participant.primaryLiveStream,
       createdAt: participant.createdAt,
@@ -304,8 +318,8 @@ export async function getStreamParticipantsMap(db: JJDrizzleDatabase, streamIds:
 /**
  * Enriches streams with their tags and participants
  * @param streams Array of basic stream information
- * @param streamTagsMap Map of stream ID to tags
- * @param streamParticipantsMap Map of stream ID to participants
+ * @param streamTagsMap Map of stream key to tags
+ * @param streamParticipantsMap Map of stream key to participants
  * @returns Array of enriched stream information
  */
 export function enrichStreamsWithTagsAndParticipants(
@@ -322,13 +336,13 @@ export function enrichStreamsWithTagsAndParticipants(
     start: Date;
     end: Date;
   }>,
-  streamTagsMap: Map<number, Array<{ name: string; slug: string; color: string }>>,
-  streamParticipantsMap: Map<number, StreamParticipant[]>
+  streamTagsMap: Map<string, Array<{ name: string; slug: string; color: string }>>,
+  streamParticipantsMap: Map<string, StreamParticipant[]>
 ): StreamInfo[] {
   return streams.map(stream => ({
     ...stream,
-    tags: streamTagsMap.get(stream.id) || [],
-    participants: streamParticipantsMap.get(stream.id) || [],
+    tags: streamTagsMap.get(streamKey(stream.scheduleId, stream.id)) || [],
+    participants: streamParticipantsMap.get(streamKey(stream.scheduleId, stream.id)) || [],
   }));
 }
 
@@ -373,10 +387,9 @@ export async function getUserOwnStreams(db: JJDrizzleDatabase, userScheduleIds: 
   }
 
   // Get tags and participants for these streams
-  const streamIds = futureUserStreams.map(s => s.id);
   const [streamTagsMap, streamParticipantsMap] = await Promise.all([
-    getStreamTagsMap(db, streamIds),
-    getStreamParticipantsMap(db, streamIds)
+    getStreamTagsMap(db, futureUserStreams),
+    getStreamParticipantsMap(db, futureUserStreams)
   ]);
 
   return enrichStreamsWithTagsAndParticipants(
@@ -427,10 +440,9 @@ export async function getUserPrimaryStreams(db: JJDrizzleDatabase, primarySchedu
   }
 
   // Get tags and participants for these streams
-  const streamIds = futurePrimaryStreams.map(s => s.id);
   const [streamTagsMap, streamParticipantsMap] = await Promise.all([
-    getStreamTagsMap(db, streamIds),
-    getStreamParticipantsMap(db, streamIds)
+    getStreamTagsMap(db, futurePrimaryStreams),
+    getStreamParticipantsMap(db, futurePrimaryStreams)
   ]);
 
   return enrichStreamsWithTagsAndParticipants(
@@ -495,10 +507,9 @@ export async function getUserParticipatingStreams(db: JJDrizzleDatabase, userId:
   }
 
   // Get tags and participants for these streams
-  const streamIds = futureOtherStreamsFiltered.map(s => s.id);
   const [streamTagsMap, streamParticipantsMap] = await Promise.all([
-    getStreamTagsMap(db, streamIds),
-    getStreamParticipantsMap(db, streamIds)
+    getStreamTagsMap(db, futureOtherStreamsFiltered),
+    getStreamParticipantsMap(db, futureOtherStreamsFiltered)
   ]);
 
   // Map to proper stream format and enrich

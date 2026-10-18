@@ -8,7 +8,7 @@ import {
   teamMembersTable,
   teamsTable,
 } from '../../../db/schema/jj-schema'
-import { and, eq, gte, inArray } from 'drizzle-orm'
+import { and, asc, desc, eq, gte, inArray } from 'drizzle-orm'
 import { getScheduleStreams } from '../../public/schedules/util'
 import type { JJCampaign } from '../../../../do/types/JJAPIModel.ts'
 import {
@@ -426,7 +426,7 @@ const schedulePrimary = os.schedulePrimaryContract.handler(
       })
     }
 
-    // Load schedule (must be visible)
+    // Load schedule (must be visible; the primary one first, else the oldest visible one)
     const schedule = await db
       .select({
         id: schedulesTable.id,
@@ -442,6 +442,7 @@ const schedulePrimary = os.schedulePrimaryContract.handler(
           eq(schedulesTable.ownerId, user.userId),
         ),
       )
+      .orderBy(desc(schedulesTable.primary), asc(schedulesTable.id))
       .get()
 
     if (!schedule) {

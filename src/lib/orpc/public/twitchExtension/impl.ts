@@ -1178,6 +1178,7 @@ const userSchedule = os.userScheduleContract
       .where(
         and(
           eq(streamsTable.scheduleId, schedule.id),
+          eq(streamsTable.visible, true),
           // gte(streamsTable.end, now),
         ),
       )
