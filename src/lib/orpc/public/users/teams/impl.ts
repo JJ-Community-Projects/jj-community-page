@@ -4,6 +4,7 @@ import {implement} from "@orpc/server";
 import {dbMiddleware} from "../../../middleware/dbMiddleware.ts";
 import {usersTeamsContracts} from "./contract.ts";
 import {getUserBySlug as getUserBySlugUtil} from "../util.ts";
+import {cached} from "../../../middleware/cached.ts";
 
 const os = implement(usersTeamsContracts)
   .use(dbMiddleware);
@@ -14,6 +15,7 @@ const os = implement(usersTeamsContracts)
  * This includes teams where the user is either a member or owner
  */
 export const getTeamsByUserSlug = os.getTeamsByUserSlugContract
+  .use(cached('team', (input: { slug: string }) => input.slug))
   .handler(async ({context, input}) => {
     const db = context.db;
 

@@ -17,6 +17,7 @@ import {
 } from '../../../db/schema/views-schema.ts'
 import { DateTime, IANAZone } from 'luxon'
 import { getStreamColors } from '../../../../functions/jjDatesToColors.ts'
+import { byInput, cached } from '../../middleware/cached.ts'
 
 const os = implement(contracts).use(dbMiddleware)
 
@@ -96,7 +97,9 @@ async function campaignBySlug(
 // ----------------------
 // Charities
 // ----------------------
-const charities = os.charitiesContract.handler(async ({ input, context }) => {
+const charities = os.charitiesContract
+  .use(cached('jjLive', byInput))
+  .handler(async ({ input, context }) => {
   const currency = input.currency
 
   const DO = context.env.JingleJamData
@@ -148,7 +151,9 @@ const charities = os.charitiesContract.handler(async ({ input, context }) => {
 // ----------------------
 // Single Cause by ID
 // ----------------------
-const causeById = os.causeByIdContract.handler(async ({ input, context }) => {
+const causeById = os.causeByIdContract
+  .use(cached('jjLive', byInput))
+  .handler(async ({ input, context }) => {
   const includeTotals = Boolean(input?.includeTotals)
   const DO = context.env.JingleJamData
   const stubID = DO.idFromName('JJ_API_CACHE')
@@ -180,7 +185,9 @@ const causeById = os.causeByIdContract.handler(async ({ input, context }) => {
 // Fundraisers
 // ----------------------
 
-const fundraisers = os.fundraisersContract.handler(
+const fundraisers = os.fundraisersContract
+  .use(cached('jjLive', byInput))
+  .handler(
   async ({ input, context }) => {
     const pageSize = clamp(Math.floor(input?.pageSize ?? 25), 1, 200)
     const orderBy = (input?.orderBy ?? 'recent') as
@@ -235,7 +242,9 @@ const fundraisers = os.fundraisersContract.handler(
 // ----------------------
 // Team Fundraisers
 // ----------------------
-const teamFundraisers = os.teamFundraisersContract.handler(
+const teamFundraisers = os.teamFundraisersContract
+  .use(cached('jjLive', byInput))
+  .handler(
   async ({ input, context }) => {
     const db = context.db
     const slug = input.teamSlug.trim()
@@ -333,7 +342,9 @@ const teamFundraisers = os.teamFundraisersContract.handler(
 // ----------------------
 // Cause Fundraisers
 // ----------------------
-const causeFundraisers = os.causeFundraisersContract.handler(
+const causeFundraisers = os.causeFundraisersContract
+  .use(cached('jjLive', byInput))
+  .handler(
   async ({ input, context }) => {
     const causeId = input.causeId
     const orderBy = input.orderBy
@@ -387,7 +398,9 @@ const causeFundraisers = os.causeFundraisersContract.handler(
 // ----------------------
 // Schedule Simple
 // ----------------------
-const schedulePrimary = os.schedulePrimaryContract.handler(
+const schedulePrimary = os.schedulePrimaryContract
+  .use(cached('schedule', byInput))
+  .handler(
   async ({ input, context }) => {
     const db = context.db
     const slug = input.user
@@ -481,7 +494,9 @@ const schedulePrimary = os.schedulePrimaryContract.handler(
   },
 )
 
-const scheduleByTeamId = os.scheduleByTeamIdContract.handler(
+const scheduleByTeamId = os.scheduleByTeamIdContract
+  .use(cached('schedule', byInput))
+  .handler(
   async ({ input, context }) => {
     const db = context.db
     const teamId = input.teamId
@@ -641,7 +656,9 @@ const scheduleByTeamId = os.scheduleByTeamIdContract.handler(
   },
 )
 
-const campaignGoalSlug = os.campaignGoalContract.handler(
+const campaignGoalSlug = os.campaignGoalContract
+  .use(cached('jjLive', byInput))
+  .handler(
   async ({ context, input }) => {
     const currency = input.currency
     const DO = context.env.JingleJamData
@@ -667,7 +684,9 @@ const campaignGoalSlug = os.campaignGoalContract.handler(
 // ----------------------
 // Active donation matches (top N most recent)
 // ----------------------
-const donationMatches = os.donationMatchesContract.handler(
+const donationMatches = os.donationMatchesContract
+  .use(cached('jjLive', byInput))
+  .handler(
   async ({ input, context }) => {
     const limit = clamp(input?.limit ?? 5, 1, 20)
     const DO = context.env.JingleJamData

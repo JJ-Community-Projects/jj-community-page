@@ -5,11 +5,13 @@ import {schedulesTable} from "../../../db/schema/jj-schema.ts";
 import {and, eq} from "drizzle-orm";
 import {getNextStreams as getNextStreamsFromList, getScheduleStreams, organizeStreamsByTime, getNextStreamsAcrossPublicPrimarySchedules} from "./util.ts";
 import {userDisplayView} from "../../../db/schema/views-schema.ts";
+import {byInput, cached} from "../../middleware/cached.ts";
 
 const os = implement(contracts)
   .use(dbMiddleware);
 
 const getFullScheduleBySlug = os.getFullScheduleBySlugContract
+  .use(cached('schedule', (input: { slug: string }) => input.slug))
   .handler(async ({context, input}) => {
     const db = context.db
 
@@ -76,6 +78,7 @@ const getFullScheduleBySlug = os.getFullScheduleBySlugContract
   })
 
 const getVisiblePrimarySchedulesByYear = os.getVisiblePrimarySchedulesByYearContract
+  .use(cached('schedule', byInput))
   .handler(async ({context, input}) => {
     const db = context.db
 
@@ -92,6 +95,7 @@ const getVisiblePrimarySchedulesByYear = os.getVisiblePrimarySchedulesByYearCont
   })
 
 const getNextStreamsAcrossSchedules = os.getNextStreamsContract
+  .use(cached('upcoming', byInput))
   .handler(async ({context, input}) => {
     const db = context.db
     const nowSec = Math.floor(Date.now() / 1000)

@@ -14,14 +14,19 @@ import {
 } from '../../../db/schema/tags-schema.ts'
 import { userDisplayView } from '../../../db/schema/views-schema.ts'
 import { and, count, eq, gte, inArray, or } from 'drizzle-orm'
+import { byInput, cached } from '../../middleware/cached.ts'
 
 const os = implement(publicTeamsContract).use(dbMiddleware)
+
+const bySlug = (input: { slug: string }) => input.slug
 
 /**
  * Find all visible teams with member counts
  * Returns all teams where visible = true, including member count for each team
  */
-const findVisible = os.findVisibleTeamsContract.handler(async ({ context }) => {
+const findVisible = os.findVisibleTeamsContract
+  .use(cached('team', () => ''))
+  .handler(async ({ context }) => {
   const db = context.db
 
   // Get all visible teams
@@ -63,7 +68,9 @@ const findVisible = os.findVisibleTeamsContract.handler(async ({ context }) => {
  * Get team by slug with owner information
  * Returns team details with owner info for public viewing
  */
-const getBySlug = os.getBySlugContract.handler(async ({ context, input }) => {
+const getBySlug = os.getBySlugContract
+  .use(cached('team', bySlug))
+  .handler(async ({ context, input }) => {
   const db = context.db
   const { slug } = input
 
@@ -103,7 +110,9 @@ const getBySlug = os.getBySlugContract.handler(async ({ context, input }) => {
  * Get team members by team ID in user display format
  * Returns team member details for public viewing (only for visible teams)
  */
-const getMembers = os.getMembersContract.handler(async ({ context, input }) => {
+const getMembers = os.getMembersContract
+  .use(cached('team', bySlug))
+  .handler(async ({ context, input }) => {
   const db = context.db
   const { slug } = input
 
@@ -158,7 +167,10 @@ const getMembers = os.getMembersContract.handler(async ({ context, input }) => {
  * Get all primary schedules of team members for a given year
  * Returns primary schedules from all team members for the specified year
  */
-const getTeamSchedulesByYear = os.getTeamSchedulesByYearContract.handler(
+// Team membership and schedules: the shorter (schedule) TTL of the two.
+const getTeamSchedulesByYear = os.getTeamSchedulesByYearContract
+  .use(cached('schedule', byInput))
+  .handler(
   async ({ context, input }) => {
     const db = context.db
     const { slug, year } = input
@@ -231,7 +243,9 @@ const getTeamSchedulesByYear = os.getTeamSchedulesByYearContract.handler(
  * Get next n streams from all team member schedules
  * Returns upcoming streams from all team members with optional uniqueness filtering
  */
-const getTeamNextStreams = os.getTeamNextStreamsContract.handler(
+const getTeamNextStreams = os.getTeamNextStreamsContract
+  .use(cached('upcoming', byInput))
+  .handler(
   async ({ context, input }) => {
     const db = context.db
     const { slug, limit = 10, unique = false } = input

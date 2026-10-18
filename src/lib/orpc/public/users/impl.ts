@@ -23,10 +23,16 @@ import { type SimplePublicTag, SimplePublicTagSchema } from '../schemas/tags.ts'
 import { UserDisplaySchema } from '../schemas/UserDisplaySchema.ts'
 import { findRelatedUsersWithJaccard } from './discovery/util.ts'
 import { PROFILE_RELATED_USERS_LIMIT } from '../../../services/relatedUsersCache.ts'
+import { byInput, cached } from '../../middleware/cached.ts'
+import { CACHE_POLICY } from '../../../services/cachePolicy.ts'
+
+const bySlug = (input: { slug: string }) => input.slug
 
 const os = implement(usersContracts).use(dbMiddleware)
 
-const getAllUsers = os.getAllUsersContract.handler(async ({ context }) => {
+const getAllUsers = os.getAllUsersContract
+  .use(cached('userDirectory', () => ''))
+  .handler(async ({ context }) => {
   const db = context.db
   return db
     .select({
@@ -46,7 +52,9 @@ const getAllUsers = os.getAllUsersContract.handler(async ({ context }) => {
     .all()
 })
 
-const getAllUsersPaged = os.getAllUsersPagedContract.handler(
+const getAllUsersPaged = os.getAllUsersPagedContract
+  .use(cached('userDirectory', byInput))
+  .handler(
   async ({ context, input }) => {
     const db = context.db
     const { limit, page } = input
@@ -87,7 +95,9 @@ const getAllUsersPaged = os.getAllUsersPagedContract.handler(
   },
 )
 
-const getUserBySlug = os.getUserBySlugContract.handler(
+const getUserBySlug = os.getUserBySlugContract
+  .use(cached('profile', bySlug))
+  .handler(
   async ({ context, input }) => {
     const db = context.db
 
@@ -121,7 +131,15 @@ const getUserBySlug = os.getUserBySlugContract.handler(
   },
 )
 
-const getUserFullProfileBySlug = os.getUserFullProfileBySlugContract.handler(
+// The page shows the next streams of the primary schedule, so in season it follows `upcoming`.
+const getUserFullProfileBySlug = os.getUserFullProfileBySlugContract
+  .use(
+    cached('profile', bySlug, {
+      eventTtl: CACHE_POLICY.upcoming.eventTtl,
+      swr: CACHE_POLICY.upcoming.swr,
+    }),
+  )
+  .handler(
   async ({ context, input }) => {
     const db = context.db
 
@@ -178,7 +196,9 @@ const getUserFullProfileBySlug = os.getUserFullProfileBySlugContract.handler(
 )
 
 const getTwitchChannelByUserSlug =
-  os.getTwitchChannelByUserSlugContract.handler(async ({ context, input }) => {
+  os.getTwitchChannelByUserSlugContract
+    .use(cached('profile', bySlug))
+    .handler(async ({ context, input }) => {
     const db = context.db
 
     // Fetch user by slug (throws NOT_FOUND if user doesn't exist)
@@ -232,7 +252,9 @@ const searchByName = os.searchByNameContract.handler(
   },
 )
 
-const getAllUsersWithTags = os.getAllUsersWithTagsContract.handler(
+const getAllUsersWithTags = os.getAllUsersWithTagsContract
+  .use(cached('userDirectory', () => ''))
+  .handler(
   async ({ context }) => {
     const db = context.db
     // Subquery: aggregate tags per user into JSON

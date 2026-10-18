@@ -4,10 +4,13 @@ import { dbMiddleware } from '../../../middleware/dbMiddleware.ts'
 import { and, eq } from 'drizzle-orm'
 import { schedulesTable } from '../../../../db/schema/jj-schema.ts'
 import { getScheduleStreams } from '../../schedules/util.ts'
+import { byInput, cached } from '../../../middleware/cached.ts'
 
 const os = implement(contracts).use(dbMiddleware)
 
-const view = os.viewContract.handler(async ({ context, input }) => {
+const view = os.viewContract
+  .use(cached('schedule', byInput))
+  .handler(async ({ context, input }) => {
   const db = context.db
   const byId = input.scheduleId != null
   const bySlug = input.scheduleSlug != null

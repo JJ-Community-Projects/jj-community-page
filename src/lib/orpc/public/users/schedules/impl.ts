@@ -11,11 +11,16 @@ import { implement, ORPCError } from '@orpc/server'
 import { dbMiddleware } from '../../../middleware/dbMiddleware.ts'
 import { usersSchedulesContracts } from './contract.ts'
 import { userDisplayView } from '../../../../db/schema/views-schema.ts'
+import { cached } from '../../../middleware/cached.ts'
 
 const os = implement(usersSchedulesContracts).use(dbMiddleware)
 
+const bySlug = (input: { slug: string }) => input.slug
+
 const getPrimaryScheduleInfoByUserSlug =
-  os.getPrimaryScheduleInfoByUserSlugContract.handler(
+  os.getPrimaryScheduleInfoByUserSlugContract
+    .use(cached('schedule', bySlug))
+    .handler(
     async ({ context, input }) => {
       const db = context.db
       const user = await findUserBySlug(db, input.slug)
@@ -39,7 +44,9 @@ const getPrimaryScheduleInfoByUserSlug =
   )
 
 const getPrimaryFullScheduleByUserSlug =
-  os.getPrimaryFullScheduleByUserSlugContract.handler(
+  os.getPrimaryFullScheduleByUserSlugContract
+    .use(cached('schedule', bySlug))
+    .handler(
     async ({ context, input }) => {
       const db = context.db
       const user = await findUserBySlug(db, input.slug)
@@ -111,7 +118,9 @@ const getPrimaryFullScheduleByUserSlug =
     },
   )
 
-const getScheduleInfoByUserSlug = os.getScheduleInfoByUserSlugContract.handler(
+const getScheduleInfoByUserSlug = os.getScheduleInfoByUserSlugContract
+  .use(cached('schedule', bySlug))
+  .handler(
   async ({ context, input }) => {
     const db = context.db
     const user = await findUserBySlug(db, input.slug)
@@ -133,7 +142,9 @@ const getScheduleInfoByUserSlug = os.getScheduleInfoByUserSlugContract.handler(
   },
 )
 
-const getFullScheduleByUserSlug = os.getFullScheduleByUserSlugContract.handler(
+const getFullScheduleByUserSlug = os.getFullScheduleByUserSlugContract
+  .use(cached('schedule', bySlug))
+  .handler(
   async ({ context, input }) => {
     const db = context.db
     const user = await findUserBySlug(db, input.slug)

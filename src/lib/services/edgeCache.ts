@@ -14,7 +14,18 @@ const STORED_AT = 'x-edge-stored-at'
 const TTL = 'x-edge-ttl'
 const SWR = 'x-edge-swr'
 
-const serializer = new StandardRPCJsonSerializer()
+// The built-in serializer drops object properties that are `undefined` (as JSON does); this keeps
+// them, so a cached answer has the same keys as a fresh one (Astro renders island props by key).
+const serializer = new StandardRPCJsonSerializer({
+  customJsonSerializers: [
+    {
+      type: 100,
+      condition: (data) => data === undefined,
+      serialize: () => null,
+      deserialize: () => undefined,
+    },
+  ],
+})
 
 // The tsconfig's DOM lib types `caches` without the Workers-only `default`.
 const edgeCache = () => (caches as unknown as { default: Cache }).default
@@ -29,6 +40,8 @@ type Options<T> = {
   load: () => Promise<EdgeEntry<T>>
   /** The request's waitUntil. Without it, puts are awaited and stale entries count as misses. */
   waitUntil?: (promise: Promise<unknown>) => void
+  /** Skip the read: always load, then store the result (or drop the entry if it can't be stored). */
+  refresh?: boolean
 }
 
 /** Cache URL for `parts` on the request's own host (`/__edge-cache/…`, never served to visitors). */
@@ -42,9 +55,10 @@ export async function edgeCached<T>({
   policy,
   load,
   waitUntil,
+  refresh = false,
 }: Options<T>): Promise<EdgeEntry<T>> {
   const now = Date.now()
-  const hit = await match(key)
+  const hit = refresh ? undefined : await match(key)
   if (hit) {
     const storedAt = Number(hit.headers.get(STORED_AT))
     const ttl = Number(hit.headers.get(TTL))
@@ -67,7 +81,7 @@ export async function edgeCached<T>({
   }
 
   const entry = await load()
-  const stored = put(key, entry, policy)
+  const stored = put(key, entry, policy, refresh)
   if (waitUntil) waitUntil(stored)
   else await stored
   return entry
@@ -90,10 +104,21 @@ async function read<T>(response: Response): Promise<EdgeEntry<T>> {
   return serializer.deserialize(json, meta) as EdgeEntry<T>
 }
 
-/** Stores `entry`; a NOT_FOUND only when the policy has a negativeTtl. Never throws. */
-async function put<T>(key: string, entry: EdgeEntry<T>, policy: CachePolicy) {
+/**
+ * Stores `entry`; a NOT_FOUND only when the policy has a negativeTtl. On a refresh, a NOT_FOUND that
+ * can't be stored deletes the entry instead, so an older answer isn't served on. Never throws.
+ */
+async function put<T>(
+  key: string,
+  entry: EdgeEntry<T>,
+  policy: CachePolicy,
+  refresh = false,
+) {
   const isNotFound = 'notFound' in entry
-  if (isNotFound && policy.negativeTtl === undefined) return
+  if (isNotFound && policy.negativeTtl === undefined) {
+    if (refresh) await forget(key)
+    return
+  }
   const ttl = isNotFound ? policy.negativeTtl! : ttlFor(policy, new Date())
   const swr = isNotFound ? 0 : (policy.swr ?? 0)
   const [json, meta] = serializer.serialize(entry)
@@ -112,5 +137,13 @@ async function put<T>(key: string, entry: EdgeEntry<T>, policy: CachePolicy) {
     )
   } catch (e) {
     console.error('edge cache put failed', key, e)
+  }
+}
+
+async function forget(key: string) {
+  try {
+    await edgeCache().delete(key)
+  } catch (e) {
+    console.error('edge cache delete failed', key, e)
   }
 }
