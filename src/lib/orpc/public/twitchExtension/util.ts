@@ -12,6 +12,7 @@ import { jjCampaign } from '../../../db/schema/jj-api-schema.ts'
 import { ORPCError } from '@orpc/server'
 import { TwitchAPI } from '../../../twitchAPI.ts'
 import { tiltifyMetadataView } from '../../../db/schema/views-schema.ts'
+import { putCache } from '../../../services/kvCache.ts'
 
 export async function getUserIdByTwitchChannelId(
   db: JJDrizzleDatabase,
@@ -61,7 +62,9 @@ async function putJSON(
   value: unknown,
   ttlSeconds: number = 60,
 ) {
-  await kv.put(key, stringifyWithDates(value), { expirationTtl: ttlSeconds })
+  await putCache(kv, key, stringifyWithDates(value), {
+    expirationTtl: ttlSeconds,
+  })
 }
 
 function makeKey(channelId: string, name: string) {
@@ -202,13 +205,16 @@ export async function storeOverview(
 ) {
   return putJSON(kv, 'twitch-extension:overview', data, ttlSeconds)
 }
+// The overview is the same for every channel except the yogs members' variant (total only).
+export type OverviewVariant = 'default' | 'yogs'
+
 export async function storeChannelOverview(
   kv: KVNamespace,
   data: OverviewOutput,
-  channelId: string,
+  variant: OverviewVariant,
   ttlSeconds: number = 60,
 ) {
-  return putJSON(kv, `twitch-extension:overview:${channelId}`, data, ttlSeconds)
+  return putJSON(kv, `twitch-extension:overview:${variant}`, data, ttlSeconds)
 }
 
 export async function storeYogsSchedule(
@@ -226,6 +232,40 @@ export async function storeUserData(
   ttlSeconds: number = 60,
 ) {
   return putJSON(kv, makeKey(channelId, 'user-data'), data, ttlSeconds)
+}
+
+// A cached NOT_FOUND answer. Channels without a fundraiser or schedule poll as often as the others;
+// without it, every poll asks the DO or D1 again.
+export type CachedNotFound = { notFound: true; message?: string }
+
+export function isCachedNotFound(data: unknown): data is CachedNotFound {
+  return (
+    typeof data === 'object' &&
+    data !== null &&
+    (data as CachedNotFound).notFound === true
+  )
+}
+
+/** The NOT_FOUND error of a fresh or a cached answer (same code and message). */
+export function notFoundError(message?: string) {
+  return new ORPCError(
+    'NOT_FOUND',
+    message === undefined ? undefined : { message },
+  )
+}
+
+export async function storeNotFound(
+  kv: KVNamespace,
+  channelId: string,
+  name: 'user-data' | 'user-schedule',
+  message: string | undefined,
+  ttlSeconds: number,
+) {
+  const data: CachedNotFound = {
+    notFound: true,
+    ...(message !== undefined && { message }),
+  }
+  return putJSON(kv, makeKey(channelId, name), data, ttlSeconds)
 }
 
 export async function storeUserSchedule(
@@ -341,9 +381,9 @@ export async function loadOverview(
 }
 export async function loadChannelOverview(
   kv: KVNamespace,
-  channelId: string,
+  variant: OverviewVariant,
 ): Promise<OverviewOutput | null> {
-  const data = await getJSON<any>(kv, `twitch-extension:overview:${channelId}`)
+  const data = await getJSON<any>(kv, `twitch-extension:overview:${variant}`)
   if (!data) return null
   const revived: OverviewOutput = {
     raised: data.raised,
@@ -380,17 +420,21 @@ export async function loadYogsSchedule(
 export async function loadUserData(
   kv: KVNamespace,
   channelId: string,
-): Promise<JJCampaignTVType | null> {
+): Promise<JJCampaignTVType | CachedNotFound | null> {
   // JJCampaignType.startTime is a string per contract; do not convert
-  return getJSON<JJCampaignTVType>(kv, makeKey(channelId, 'user-data'))
+  return getJSON<JJCampaignTVType | CachedNotFound>(
+    kv,
+    makeKey(channelId, 'user-data'),
+  )
 }
 
 export async function loadUserSchedule(
   kv: KVNamespace,
   channelId: string,
-): Promise<UserScheduleOutput | null> {
+): Promise<UserScheduleOutput | CachedNotFound | null> {
   const data = await getJSON<any>(kv, makeKey(channelId, 'user-schedule'))
   if (!data) return null
+  if (isCachedNotFound(data)) return data
   const revived: UserScheduleOutput = {
     title: data.title,
     start: new Date(data.start),

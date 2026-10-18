@@ -1,4 +1,5 @@
 import type { UserWithInfo } from './contract.ts'
+import { putCache } from '../../../services/kvCache.ts'
 
 /**
  * Store an array of UserWithInfo objects in KV, preserving Date values.
@@ -11,7 +12,7 @@ export async function storeUsersWithInfo(
 ) {
   // Dates stringify to ISO by default
   const json = JSON.stringify(users)
-  await kv.put(key, json, { expirationTtl: ttlSeconds })
+  await putCache(kv, key, json, { expirationTtl: ttlSeconds })
 }
 
 /**

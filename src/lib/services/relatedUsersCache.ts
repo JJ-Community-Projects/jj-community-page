@@ -1,4 +1,5 @@
 import { CACHE_POLICY } from './cachePolicy.ts'
+import { putCache } from './kvCache.ts'
 
 /** The public profile shows this many related users. */
 export const PROFILE_RELATED_USERS_LIMIT = 3
@@ -12,20 +13,15 @@ export function getCachedRelatedUsers(env: Env, userId: number, limit: number) {
 }
 
 // Empty lists are cached too: users without (shared) tags are the common case.
-// A failed put is logged only: the cache must not fail the profile page.
 export async function setCachedRelatedUsers(
   env: Env,
   userId: number,
   limit: number,
   data: unknown[],
 ) {
-  try {
-    await env.KV.put(relatedUsersKey(userId, limit), JSON.stringify(data), {
-      expirationTtl: CACHE_POLICY.relatedUsers.ttl,
-    })
-  } catch (e) {
-    console.error('setCachedRelatedUsers', e)
-  }
+  await putCache(env.KV, relatedUsersKey(userId, limit), JSON.stringify(data), {
+    expirationTtl: CACHE_POLICY.relatedUsers.ttl,
+  })
 }
 
 // A block hides users from each other's lists; drop both profile lists instead of waiting for the TTL.

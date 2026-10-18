@@ -1,4 +1,6 @@
 
+import { putCache } from '../../../services/kvCache.ts'
+
 export async function getJSON<T>(kv: KVNamespace, key: string): Promise<T | null> {
   const raw = await kv.get(key)
   if (!raw) return null
@@ -15,7 +17,9 @@ export async function putJSON(
   value: unknown,
   ttlSeconds: number = 60,
 ) {
-  await kv.put(key, stringifyWithDates(value), { expirationTtl: ttlSeconds })
+  await putCache(kv, key, stringifyWithDates(value), {
+    expirationTtl: ttlSeconds,
+  })
 }
 
 function stringifyWithDates(value: unknown) {

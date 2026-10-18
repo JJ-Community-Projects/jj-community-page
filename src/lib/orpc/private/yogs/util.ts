@@ -4,6 +4,7 @@ import type {
   YogsScheduleWeek,
   YogsStream,
 } from './contract.ts'
+import { putCache } from '../../../services/kvCache.ts'
 
 async function getJSON<T>(kv: KVNamespace, key: string): Promise<T | null> {
   const raw = await kv.get(key)
@@ -115,7 +116,9 @@ async function putJSON(
   value: unknown,
   ttlSeconds: number = 60,
 ) {
-  await kv.put(key, stringifyWithDates(value), { expirationTtl: ttlSeconds })
+  await putCache(kv, key, stringifyWithDates(value), {
+    expirationTtl: ttlSeconds,
+  })
 }
 
 function stringifyWithDates(value: unknown) {

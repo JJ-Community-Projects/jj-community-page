@@ -10,6 +10,7 @@ import {
   UserWithInfoTags,
 } from './contract.ts'
 import { getJSON, putJSON } from '../util/cache.ts'
+import { putCache } from '../../../services/kvCache.ts'
 import { dbMiddleware } from '../../middleware/dbMiddleware.ts'
 import { implement, ORPCError } from '@orpc/server'
 import { cacheMiddleware } from '../../middleware/cacheControl.ts'
@@ -115,7 +116,7 @@ const campaigns = os.campaignsContract
 
       const sortedData = { ...(data as any), list: sortedList }
       // store in KV for 60s
-      await context.env.KV.put('campaigns', JSON.stringify(sortedData), {
+      await putCache(context.env.KV, 'campaigns', JSON.stringify(sortedData), {
         expirationTtl: 60,
       })
       return sortedData
@@ -192,7 +193,7 @@ const campaignsAll = os.campaignsContract
 
       const sortedData = { ...(data as any), list: sortedList }
       // store in KV for 60s
-      await context.env.KV.put('campaigns-all', JSON.stringify(sortedData), {
+      await putCache(context.env.KV, 'campaigns-all', JSON.stringify(sortedData), {
         expirationTtl: 60,
       })
       return sortedData
@@ -228,7 +229,7 @@ const causes = os.causesContract
         return { count: 0, causes: [] }
       }
 
-      await context.env.KV.put('causes', JSON.stringify(causes), {
+      await putCache(context.env.KV, 'causes', JSON.stringify(causes), {
         expirationTtl: 60,
       })
       return causes
@@ -763,7 +764,7 @@ const getUserCampaignPairs = os.getUserCampaignPairsContract.handler(
       return bRaised - aRaised
     })
 
-    await context.env.KV.put('getUserCampaignPairs', JSON.stringify(pairs), {
+    await putCache(context.env.KV, 'getUserCampaignPairs', JSON.stringify(pairs), {
       expirationTtl: 180,
     })
 

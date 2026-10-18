@@ -25,6 +25,7 @@ import { friendsTable } from '../../../db/schema/auth-schema.ts'
 import {
   getHardCodedEventsNoYogsForExtension,
   getUserIdByTwitchChannelId,
+  isCachedNotFound,
   loadCause,
   loadChannelOverview,
   loadUserData,
@@ -33,8 +34,10 @@ import {
   loadUserRelations,
   loadUserSchedule,
   loadYogsSchedule,
+  notFoundError,
   storeCause,
   storeChannelOverview,
+  storeNotFound,
   storeUserData,
   storeUserExtensionConfig,
   storeUserRelatedSchedule,
@@ -44,6 +47,8 @@ import {
   type UserExtensionTab,
   valueToCurrencies,
 } from './util.ts'
+import { CACHE_POLICY } from '../../../services/cachePolicy.ts'
+import { putCache } from '../../../services/kvCache.ts'
 import { getScheduleFromContent, getScheduleFromContentForCreator } from '../../../../content/getYogsScheduleFromContent.ts'
 import type {
   ContentCreator,
@@ -248,7 +253,8 @@ const extensionConfig = os.extensionConfigContract
       timestamp: DateTime.now().toUTC().toISO(),
     }
 
-    await context.env.KV.put(
+    await putCache(
+      context.env.KV,
       'twitch-extension:config',
       JSON.stringify(config),
       {
@@ -571,9 +577,10 @@ const overview = os.overviewContract
     }),
   )
   .handler(async ({ context, input }) => {
-    const channelId = input.channelId
+    // Yogs members get the total only; every other channel the same split overview.
+    const variant = yogsMembers.includes(input.channelId) ? 'yogs' : 'default'
     // Try KV cache first
-    const cached = await loadChannelOverview(context.env.KV, channelId)
+    const cached = await loadChannelOverview(context.env.KV, variant)
     if (cached) {
       return cached
     }
@@ -589,7 +596,7 @@ const overview = os.overviewContract
     const donations = await stub.getDonations()
     const dateStr = await stub.getDate()
 
-    if (yogsMembers.includes(input.channelId)) {
+    if (variant === 'yogs') {
       const overview = {
         raised: {
           total: valueToCurrencies(raised, usdRate, eurRate),
@@ -598,7 +605,13 @@ const overview = os.overviewContract
         donations: donations,
         date: new Date(dateStr),
       }
-      await storeChannelOverview(context.env.KV, overview, channelId, 60)
+      await storeChannelOverview(
+        context.env.KV,
+        overview,
+        variant,
+        CACHE_POLICY.extensionOverview.ttl,
+      )
+      return overview
     }
 
     const yogs = await stub.getCampaignByUserSlug('yogscast')
@@ -617,7 +630,12 @@ const overview = os.overviewContract
       date: new Date(dateStr),
     }
 
-    await storeChannelOverview(context.env.KV, overview, channelId, 60)
+    await storeChannelOverview(
+      context.env.KV,
+      overview,
+      variant,
+      CACHE_POLICY.extensionOverview.ttl,
+    )
 
     return overview
   })
@@ -908,6 +926,9 @@ const userData = os.userDataContract
     const stub = DO.get(stubID)
 
     const userData = await loadUserData(context.env.KV, input.channelId)
+    if (isCachedNotFound(userData)) {
+      throw notFoundError(userData.message)
+    }
     if (userData) {
       if (userData.tiltifyCauseId) {
         const cachedCause = await loadCause(
@@ -949,10 +970,22 @@ const userData = os.userDataContract
     const campaign = await stub.getCampaignDisplay(input.channelId)
 
     if (!campaign) {
-      throw new ORPCError('NOT_FOUND')
+      await storeNotFound(
+        context.env.KV,
+        input.channelId,
+        'user-data',
+        undefined,
+        CACHE_POLICY.extensionUserData.negativeTtl,
+      )
+      throw notFoundError()
     }
 
-    await storeUserData(context.env.KV, input.channelId, campaign)
+    await storeUserData(
+      context.env.KV,
+      input.channelId,
+      campaign,
+      CACHE_POLICY.extensionUserData.ttl,
+    )
 
     const causeId = campaign.tiltifyCauseId
     if (causeId) {
@@ -1058,8 +1091,21 @@ const userSchedule = os.userScheduleContract
   .use(dbMiddleware)
   .handler(async ({ context, input }) => {
     const userSchedule = await loadUserSchedule(context.env.KV, input.channelId)
+    if (isCachedNotFound(userSchedule)) {
+      throw notFoundError(userSchedule.message)
+    }
     if (userSchedule) {
       return userSchedule
+    }
+    const notFound = async (message: string) => {
+      await storeNotFound(
+        context.env.KV,
+        input.channelId,
+        'user-schedule',
+        message,
+        CACHE_POLICY.extensionUserSchedule.negativeTtl,
+      )
+      return notFoundError(message)
     }
 
     const db = context.db
@@ -1084,11 +1130,16 @@ const userSchedule = os.userScheduleContract
           end: range.end,
           streams: streams,
         }
-        await storeUserSchedule(context.env.KV, input.channelId, result, 600)
+        await storeUserSchedule(
+          context.env.KV,
+          input.channelId,
+          result,
+          CACHE_POLICY.extensionUserSchedule.ttl,
+        )
         return result
       }
 
-      throw new ORPCError('NOT_FOUND', { message: 'Twitch channel not found' })
+      throw await notFound('Twitch channel not found')
     }
 
     const ConfigDO = context.env!.ConfigDO
@@ -1110,8 +1161,7 @@ const userSchedule = os.userScheduleContract
       )
       .get()
 
-    if (!schedule)
-      throw new ORPCError('NOT_FOUND', { message: 'No schedule for user/year' })
+    if (!schedule) throw await notFound('No schedule for user/year')
 
     const now = new Date()
     const streams = await db
@@ -1136,7 +1186,15 @@ const userSchedule = os.userScheduleContract
 
     if (streams.length === 0) {
       const now = new Date()
-      return { title: schedule.title, start: now, end: now, streams: [] }
+      const empty = { title: schedule.title, start: now, end: now, streams: [] }
+      // Short like a NOT_FOUND: the first stream should show up soon.
+      await storeUserSchedule(
+        context.env.KV,
+        input.channelId,
+        empty,
+        CACHE_POLICY.extensionUserSchedule.negativeTtl,
+      )
+      return empty
     }
 
     // Load participants per stream and map to creators
@@ -1200,7 +1258,12 @@ const userSchedule = os.userScheduleContract
       end: range.end,
       streams: finalStreams,
     }
-    await storeUserSchedule(context.env.KV, input.channelId, result, 600)
+    await storeUserSchedule(
+      context.env.KV,
+      input.channelId,
+      result,
+      CACHE_POLICY.extensionUserSchedule.ttl,
+    )
     return result
   })
 
