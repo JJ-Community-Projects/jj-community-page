@@ -14,7 +14,7 @@ import { putCache } from '../../../services/kvCache.ts'
 import { dbMiddleware } from '../../middleware/dbMiddleware.ts'
 import { implement, ORPCError } from '@orpc/server'
 import { cacheMiddleware } from '../../middleware/cacheControl.ts'
-import { and, asc, eq, inArray, not, sql } from 'drizzle-orm'
+import { and, asc, eq, gt, inArray, not, sql } from 'drizzle-orm'
 import {
   schedulesTable,
   streamParticipantsTable,
@@ -311,7 +311,7 @@ const upcomingStreams = os.upcomingStreamsContract
             not(eq(schedulesTable.ownerId, 1)),
             not(eq(schedulesTable.ownerId, 2)),
             // upcoming or live
-            sql`${streamsTable.start} >= ${nowSec} OR (${streamsTable.start} <= ${nowSec} AND ${streamsTable.end} > ${nowSec})`,
+            gt(streamsTable.end, new Date(nowSec * 1000)),
           ),
         )
         .orderBy(asc(streamsTable.start))

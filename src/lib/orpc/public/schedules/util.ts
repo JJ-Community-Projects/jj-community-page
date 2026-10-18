@@ -2,7 +2,7 @@ import {ORPCError} from '@orpc/server';
 import {accounts} from "../../../db/schema/auth-schema.ts";
 import {schedulesTable, streamParticipantsTable, streamsTable} from "../../../db/schema/jj-schema.ts";
 import {userDisplayView} from "../../../db/schema/views-schema.ts";
-import {and, eq, asc, sql, or} from "drizzle-orm";
+import {and, eq, asc, gt, or} from "drizzle-orm";
 import {ScheduleDaySchema, ScheduleWeekSchema, StreamSchema, type Stream} from "../schemas/schedules.ts";
 import {z} from "zod/v4";
 import type {JJDrizzleDatabase} from "../../../db/db.ts";
@@ -257,7 +257,7 @@ export async function getNextStreamsAcrossPublicPrimarySchedules(
       eq(schedulesTable.primary, true),
       eq(streamsTable.visible, true),
       // upcoming or currently live
-      sql`${streamsTable.start} >= ${nowSec} OR (${streamsTable.start} <= ${nowSec} AND ${streamsTable.end} > ${nowSec})`
+      gt(streamsTable.end, new Date(nowSec * 1000))
     ))
     .orderBy(asc(streamsTable.start))
 
