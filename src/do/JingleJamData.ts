@@ -131,8 +131,8 @@ export class JingleJamData extends DurableObject<Env> {
   refresh() {
     return this.tiltify.refresh()
   }
-  insertIntoDB() {
-    return this.tiltify.insertIntoDB()
+  insertIntoDB(options?: { resend?: boolean }) {
+    return this.tiltify.insertIntoDB(options)
   }
 
   // --- Tiltify: event metadata ---

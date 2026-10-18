@@ -1,7 +1,7 @@
 import { getDB } from '../../lib/db/db.ts'
 import { and, eq } from 'drizzle-orm'
 import { schedulesTable } from '../../lib/db/schema/jj-schema.ts'
-import { userDisplayView } from '../../lib/db/schema/views-schema.ts'
+import { accounts } from '../../lib/db/schema/auth-schema.ts'
 import type {
   CausesDisplayTVType,
   JJCampaignsTVType,
@@ -268,32 +268,38 @@ export class DisplayBuilder {
       )
 
       let scheduleByTiltify = new Map<string, string>()
-      const year = new Date().getFullYear()
+      const year = new Date().getUTCFullYear() // as in ScheduleBuilder (BG-2)
       if (slugs.length > 0) {
         try {
           const db = getDB(this.env)
+          // accounts directly, not user_display_view: only the Tiltify slug is needed (BG-2).
+          // By id, so the last schedule wins a duplicate slug, as with the old scan order.
           const rows = await db
             .select({
-              tiltifySlug: userDisplayView.tiltifySlug,
+              tiltifySlug: accounts.tiltifySlug,
               scheduleSlug: schedulesTable.slug,
             })
             .from(schedulesTable)
             .innerJoin(
-              userDisplayView,
-              eq(userDisplayView.userId, schedulesTable.ownerId),
+              accounts,
+              and(
+                eq(accounts.userId, schedulesTable.ownerId),
+                eq(accounts.provider, 'tiltify'),
+              ),
             )
             .where(
               and(
                 eq(schedulesTable.year, year),
                 eq(schedulesTable.visible, true),
-                // If you only want to expose primary schedules uncomment:
                 eq(schedulesTable.primary, true),
-                // slugPred,
               ),
             )
+            .orderBy(schedulesTable.id)
             .all()
           scheduleByTiltify = new Map(
-            rows.map((r) => [r.tiltifySlug, r.scheduleSlug]),
+            rows.flatMap((r) =>
+              r.tiltifySlug ? [[r.tiltifySlug, r.scheduleSlug] as const] : [],
+            ),
           )
         } catch (e) {
           console.error('schedule lookup failed', e)

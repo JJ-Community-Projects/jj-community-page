@@ -20,7 +20,21 @@ export interface SchedulerModules {
 // per-task lastRun + enabled bookkeeping. Each task's `run` fans out to a
 // focused feature module.
 //
-// Owns storage keys: `scheduler:paused`, `task:lastRun:*`, `task:enabled:*`.
+// Owns storage keys: `scheduler:paused`, `task:lastRun:*`, `task:enabled:*`,
+// `task:retry:*`.
+//
+// A failed task is retried after a back-off (`retryDelayMs`), not on the next
+// alarm: without it, a JJ API outage re-ran jjAPIRefresh every 500 ms.
+type TaskRetry = { failures: number; at: number }
+
+const RETRY_BASE_MS = 30 * 1000
+
+// 30 s, 1 min, 2 min, … after the 1st, 2nd, 3rd failure in a row, never later
+// than the task's own interval.
+export function retryDelayMs(everyMs: number, failures: number) {
+  return Math.min(everyMs, RETRY_BASE_MS * 2 ** (failures - 1))
+}
+
 export class Scheduler {
   // Task definition
   private tasks = [
@@ -138,11 +152,12 @@ export class Scheduler {
       dueNow: boolean
     }>
     for (const t of this.tasks) {
-      const [enabled, last] = await Promise.all([
+      const [enabled, last, retry] = await Promise.all([
         this.isEnabled(t.name),
         this.getLastRun(t.name),
+        this.getRetry(t.name),
       ])
-      const next = (last ?? 0) + t.everyMs
+      const next = this.nextDue(t, last, retry)
       states.push({
         name: t.name,
         everyMs: t.everyMs,
@@ -163,6 +178,7 @@ export class Scheduler {
     console.log('DO-scheduler', 'manual-run', name)
     await t.run()
     await this.setLastRun(name, Date.now())
+    await this.clearRetry(name)
     console.log('DO-scheduler', 'manual-run', name, 'ms', Date.now() - start)
     await this.scheduleNextAlarm()
   }
@@ -181,8 +197,11 @@ export class Scheduler {
 
     for (const t of this.tasks) {
       if (!(await this.isEnabled(t.name))) continue
-      const last = await this.getLastRun(t.name)
-      const next = (last ?? 0) + t.everyMs
+      const next = this.nextDue(
+        t,
+        await this.getLastRun(t.name),
+        await this.getRetry(t.name),
+      )
       if (next <= now) {
         anyDue = true
         dueNames.push(t.name)
@@ -220,6 +239,10 @@ export class Scheduler {
     return `task:enabled:${name}`
   }
 
+  private keyRetry(name: string) {
+    return `task:retry:${name}`
+  }
+
   // Read last run (ms since epoch), undefined if never
   private async getLastRun(name: string) {
     return (await this.storage.get<number>(this.keyLastRun(name))) ?? undefined
@@ -227,6 +250,24 @@ export class Scheduler {
 
   private async setLastRun(name: string, ts: number) {
     await this.storage.put(this.keyLastRun(name), ts)
+  }
+
+  private getRetry(name: string) {
+    return this.storage.get<TaskRetry>(this.keyRetry(name))
+  }
+
+  private async clearRetry(name: string, retry?: TaskRetry) {
+    if (retry ?? (await this.getRetry(name)))
+      await this.storage.delete(this.keyRetry(name))
+  }
+
+  // After a failure the retry time, otherwise the last run + interval.
+  private nextDue(
+    t: { everyMs: number },
+    last: number | undefined,
+    retry: TaskRetry | undefined,
+  ) {
+    return retry ? retry.at : (last ?? 0) + t.everyMs
   }
 
   private async isEnabled(name: string) {
@@ -238,18 +279,24 @@ export class Scheduler {
   private async runOverdueTasks(now: number) {
     for (const t of this.tasks) {
       if (!(await this.isEnabled(t.name))) continue
-      const last = await this.getLastRun(t.name)
-      const next = (last ?? 0) + t.everyMs
+      const retry = await this.getRetry(t.name)
+      const next = this.nextDue(t, await this.getLastRun(t.name), retry)
       if (next <= now) {
         const start = Date.now()
         try {
           console.log('DO-scheduler', 'run', t.name)
           await t.run()
           await this.setLastRun(t.name, now)
+          if (retry) await this.clearRetry(t.name, retry)
           console.log('DO-scheduler', t.name, 'ms', Date.now() - start)
         } catch (e) {
           console.error('DO-scheduler', 'error', t.name, e)
-          // Do not update lastRun on failure; it will retry next alarm
+          // lastRun stays; the task is due again after the back-off
+          const failures = (retry?.failures ?? 0) + 1
+          await this.storage.put(this.keyRetry(t.name), {
+            failures,
+            at: Date.now() + retryDelayMs(t.everyMs, failures),
+          } satisfies TaskRetry)
         }
       }
     }

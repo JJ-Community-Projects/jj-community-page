@@ -9,7 +9,7 @@ import type {
 import { TiltifyAPI, type TiltifyUserData } from '../../lib/TiltifyAPI.ts'
 import { jjCampaign, jjCauses } from '../../lib/db/schema/jj-api-schema.ts'
 import type { BatchItem } from 'drizzle-orm/batch'
-import { eq } from 'drizzle-orm'
+import { eq, getTableColumns } from 'drizzle-orm'
 import { accounts } from '../../lib/db/schema/auth-schema.ts'
 import {
   normalizeTwitchLogin,
@@ -18,13 +18,19 @@ import {
 import { chunk } from '../utils/chunk.ts'
 import type { CurrencyStore } from './CurrencyStore.ts'
 
+const MAX_BOUND_PARAMS = 100
+
+// Keys of the jj_causes (cause id) and jj_campaign (user slug) rows already inserted for `year`.
+const INSERTED_KEY = 'd1:jj:inserted'
+type InsertedRows = { year: number; causes: string[]; campaigns: string[] }
+
 // Source-of-truth cache for Jingle Jam API data: campaigns, causes, event
 // metadata, per-campaign goal tracking and Tiltify user/social records. Also
 // persists derived rows to D1.
 //
 // Owns storage keys: `campaign:api:*`, `campaign-goal:api:*`,
 // `campaign-previous-goal:api:*`, `cause:raw:*`, `socials:tiltify`,
-// `strarr:tiltify:socials:twitch`, and event metadata (`date`, `event:year`,
+// `strarr:tiltify:socials:twitch`, `d1:jj:inserted`, and event metadata (`date`, `event:year`,
 // `raised`, `collections`, `donations`).
 export class TiltifyStore {
   constructor(
@@ -207,29 +213,43 @@ export class TiltifyStore {
     }
   }
 
-  public async insertIntoDB() {
-    const causes = await this.getCauses()
-    const campaigns = await this.getCampaigns()
+  // jj_causes / jj_campaign are insert-only (ON CONFLICT DO NOTHING, and no live reader: F-34), so
+  // a row never has to be sent twice. `d1:jj:inserted` remembers the keys already in D1 for the
+  // event year, and a refresh inserts only the others (BG-1): in steady state no statement at all.
+  // `resend` forgets them first and sends every row again (the admin full refresh).
+  public async insertIntoDB({ resend = false } = {}) {
     const year = await this.storage.get<number>('event:year')
+    if (year === undefined) {
+      console.error('insertIntoDB', 'no event year yet')
+      return
+    }
+    const stored = resend
+      ? undefined
+      : await this.storage.get<InsertedRows>(INSERTED_KEY)
+    const inserted: InsertedRows =
+      stored?.year === year ? stored : { year, causes: [], campaigns: [] }
+    const causeIds = new Set(inserted.causes)
+    const userSlugs = new Set(inserted.campaigns)
+
+    const causes = (await this.getCauses()).filter((c) => !causeIds.has(c.id))
+    const campaigns = (await this.getCampaigns()).filter(
+      (c) => !userSlugs.has(c.user.slug),
+    )
+    if (causes.length === 0 && campaigns.length === 0) return
+
     try {
       const db = getDB(this.env)
 
-      // Conservative variable ceiling (SQLite default is 999). Leave some safety headroom.
-      const VARS_LIMIT = 5
-
-      // Prepare rows
-      const causeRows = await Promise.all(
-        causes.map(async (cause) => ({
-          id: cause.id,
-          year: year!,
-          name: cause.name,
-          logo: cause.logo,
-          description: cause.description,
-          url: cause.url,
-          donateUrl: cause.donateUrl,
-          raised: cause.raised,
-        })),
-      )
+      const causeRows = causes.map((cause) => ({
+        id: cause.id,
+        year,
+        name: cause.name,
+        logo: cause.logo,
+        description: cause.description,
+        url: cause.url,
+        donateUrl: cause.donateUrl,
+        raised: cause.raised,
+      }))
 
       const tiltifyUsers = await this.getTiltifyUsersMap()
 
@@ -256,57 +276,47 @@ export class TiltifyStore {
         }
       }
 
-      const campaignRows = await Promise.all(
-        campaigns.map(async (c) => ({
-          year: year!,
-          causeId: c.causeId ? await c.causeId! : null,
-          name: c.name,
-          description: c.description,
-          slug: c.slug,
-          url: c.url,
-          startTime: c.startTime ?? '',
-          raised: c.raised,
-          goal: c.goal,
-          livestream: getLivestream(c.user.slug),
-          userName: c.user.name,
-          userSlug: c.user.slug,
-          userAvatar: c.user.avatar,
-          userUrl: c.user.url,
-        })),
-      )
+      const campaignRows = campaigns.map((c) => ({
+        year,
+        causeId: c.causeId || null,
+        name: c.name,
+        description: c.description,
+        slug: c.slug,
+        url: c.url,
+        startTime: c.startTime ?? '',
+        raised: c.raised,
+        goal: c.goal,
+        livestream: getLivestream(c.user.slug),
+        userName: c.user.name,
+        userSlug: c.user.slug,
+        userAvatar: c.user.avatar,
+        userUrl: c.user.url,
+      }))
 
-      // Estimate columns per row (must match the values object shape)
-      const CAUSE_COLS = 4
-      const CAMPAIGN_COLS = 4 // adjust to exact count if different
-
-      const causeChunkSize = Math.max(1, Math.floor(VARS_LIMIT / CAUSE_COLS))
-      const campaignChunkSize = Math.max(
-        1,
-        Math.floor(VARS_LIMIT / CAMPAIGN_COLS),
-      )
-
-      const causeChunks = chunk(causeRows, causeChunkSize)
-      const campaignChunks = chunk(campaignRows, campaignChunkSize)
-
-      // Build statements, but keep batch sizes moderate as well
-      const statements: BatchItem<'sqlite'>[] = []
-
-      for (const rows of causeChunks) {
-        statements.push(db.insert(jjCauses).values(rows).onConflictDoNothing())
-      }
-      for (const rows of campaignChunks) {
-        statements.push(
-          db.insert(jjCampaign).values(rows).onConflictDoNothing(),
+      // Each row binds at most one parameter per column; D1 allows 100 per statement.
+      const rowsPerStatement = (table: typeof jjCauses | typeof jjCampaign) =>
+        Math.floor(
+          MAX_BOUND_PARAMS / Object.keys(getTableColumns(table)).length,
         )
-      }
 
-      // Optionally, run statements in batches to avoid huge batch payloads
-      const BATCH_SIZE = 25
-      for (let i = 0; i < statements.length; i += BATCH_SIZE) {
-        const slice = statements.slice(i, i + BATCH_SIZE)
-        const [firstOp, ...restOps] = slice
-        await db.batch([firstOp, ...restOps] as const)
-      }
+      const statements: BatchItem<'sqlite'>[] = [
+        ...chunk(causeRows, rowsPerStatement(jjCauses)).map((rows) =>
+          db.insert(jjCauses).values(rows).onConflictDoNothing(),
+        ),
+        ...chunk(campaignRows, rowsPerStatement(jjCampaign)).map((rows) =>
+          db.insert(jjCampaign).values(rows).onConflictDoNothing(),
+        ),
+      ]
+
+      // One round trip; the batch is a transaction, so either all rows are in D1 or none.
+      const [first, ...rest] = statements
+      await db.batch([first, ...rest])
+
+      await this.storage.put(INSERTED_KEY, {
+        year,
+        causes: [...causeIds, ...causes.map((c) => c.id)],
+        campaigns: [...userSlugs, ...campaigns.map((c) => c.user.slug)],
+      } satisfies InsertedRows)
     } catch (e) {
       console.error('db.batch persist JJ data', e)
     }
