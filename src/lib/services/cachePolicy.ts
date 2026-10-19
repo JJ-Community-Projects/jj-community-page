@@ -46,6 +46,8 @@ export const CACHE_POLICY = {
   extensionUserData: { ttl: 60, negativeTtl: 5 * 60 },
   /** Twitch extension: a channel's schedule (`userSchedule`) in KV. */
   extensionUserSchedule: { ttl: 10 * 60, negativeTtl: 5 * 60 },
+  /** Community upcoming streams in KV, under the edge cache: one build shared by all data centers. Kept short so the edge TTL decides. */
+  communityUpcoming: { ttl: 60 },
 } as const satisfies Record<string, CachePolicy>
 
 export type CacheEntity = keyof typeof CACHE_POLICY

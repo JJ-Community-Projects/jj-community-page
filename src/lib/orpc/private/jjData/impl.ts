@@ -36,7 +36,8 @@ import {
   getHardCodedEventsJustYogs,
   getHardCodedEventsNoYogs,
 } from './getHardCodedEvents.ts'
-import { loadUsersWithInfo, storeUsersWithInfo } from './usersWithInfoCache.ts'
+import { cached } from '../../middleware/cached.ts'
+import { CACHE_POLICY } from '../../../services/cachePolicy.ts'
 import { getUpcomingStreamsFromSchedule } from '../../../../content/getYogsScheduleFromContent.ts'
 // New: get campaign by Twitch id
 
@@ -247,6 +248,7 @@ const upcomingStreams = os.upcomingStreamsContract
       staleWhileRevalidate: 150,
     }),
   )
+  .use(cached('upcoming', () => ''))
   .handler(async ({ context }) => {
     try {
       // KV cache (revive Date fields)
@@ -540,7 +542,12 @@ const upcomingStreams = os.upcomingStreamsContract
 
       const result = { count: composed.length, streams: composed }
 
-      await putJSON(context.env.KV, 'upcomingStreams', result, 300)
+      await putJSON(
+        context.env.KV,
+        'upcomingStreams',
+        result,
+        CACHE_POLICY.communityUpcoming.ttl,
+      )
 
       return result
     } catch (e) {
@@ -676,23 +683,9 @@ async function getUsers(db: JJDrizzleDatabase): Promise<UserWithInfo[]> {
   }
 }
 
-const getAllUsersWithInfo = os.getAllUsersWithInfoContract.handler(
-  async ({ context }) => {
-    const cached = await loadUsersWithInfo(
-      context.env.KV,
-      'getAllUsersWithInfo',
-    )
-    if (cached) {
-      console.log('getAllUsersWithInfo', 'cache', cached.length)
-      return cached
-    }
-
-    const users = await getUsers(context.db)
-    console.log('getAllUsersWithInfo', users.length)
-    await storeUsersWithInfo(context.env.KV, 'getAllUsersWithInfo', users, 300)
-    return users
-  },
-)
+const getAllUsersWithInfo = os.getAllUsersWithInfoContract
+  .use(cached('userDirectory', () => ''))
+  .handler(async ({ context }) => getUsers(context.db))
 
 const getUserCampaignPairs = os.getUserCampaignPairsContract.handler(
   async ({ context }) => {
