@@ -53,16 +53,10 @@ const useUserTagsHook = () => {
   )
 
   // Computed values
-  const availableTags = () => {
-    const searchTerm = tagSearch.debouncedInput()
-    if (searchTerm.length > 0) {
-      return tagSearch.searchQuery.data || []
-    }
-    return tagSearch.popularTagsQuery.data?.tags || []
-  }
+  const availableTags = tagSearch.availableTags
 
   // Popular tags only (no search fallback)
-  const popularTags = () => tagSearch.popularTagsQuery.data?.tags || []
+  const popularTags = tagSearch.popularTags
 
   const userTags = () => getUserTagsQuery.data ?? []
   const categories = (): {
@@ -99,8 +93,7 @@ const useUserTagsHook = () => {
 
   // Loading states
   const isLoadingTags = () =>
-    tagSearch.popularTagsQuery.isLoading ||
-    tagSearch.searchQuery.isLoading ||
+    tagSearch.isLoadingTags() ||
     addTagMutation.isPending ||
     removeTagMutation.isPending
 
@@ -114,8 +107,7 @@ const useUserTagsHook = () => {
 
   // Error states
   const hasTagsError = () =>
-    !!tagSearch.popularTagsQuery.error ||
-    !!tagSearch.searchQuery.error ||
+    tagSearch.hasTagsError() ||
     !!addTagMutation.error ||
     !!removeTagMutation.error
 
@@ -176,13 +168,7 @@ const useUserTagsHook = () => {
   }
 
   // Error messages
-  const availableTagsError = () => {
-    return (
-      tagSearch.popularTagsQuery.error?.message ||
-      tagSearch.searchQuery.error?.message ||
-      'Unknown error'
-    )
-  }
+  const availableTagsError = tagSearch.availableTagsError
 
   const userTagsError = () => {
     return (

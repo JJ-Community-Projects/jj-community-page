@@ -1,33 +1,30 @@
 import {createSignal} from "solid-js";
 import {debounce} from "@solid-primitives/scheduled";
 import {useQuery} from "@tanstack/solid-query";
-import {orpcPrivate} from "./orpc/client.ts";
+import {type CatalogTag, popularTags as rankPopular, searchTags, TAG_CATALOG_URL} from "./tagCatalog.ts";
 
 type UseTagSearchOptions = {
   debounceMs?: number;
   limit?: number;
-  timeRange?: "7d" | "30d" | "90d";
-  includeEmptyCategories?: boolean;
   initialSelectedCategoryIds?: number[];
-  popularStaleTime?: number;
-  popularGcTime?: number;
-  searchStaleTime?: number;
-  categoriesStaleTime?: number;
+  catalogStaleTime?: number;
 };
 
-export function useTagSearch(opts: UseTagSearchOptions = {}) {
-  const t = orpcPrivate.tags;
+// The public tag catalog (one cached GET for everybody, logged in or not); popular tags and
+// search results are computed from it in the browser, so typing sends no requests.
+// `/api/public` is an OpenAPI handler, which the `orpcPublic` (RPCLink) client cannot talk to.
+async function fetchTagCatalog(): Promise<CatalogTag[]> {
+  const res = await fetch(TAG_CATALOG_URL);
+  if (!res.ok) throw new Error(`Failed to load tags (${res.status})`);
+  return ((await res.json()) as { tags: CatalogTag[] }).tags;
+}
 
+export function useTagSearch(opts: UseTagSearchOptions = {}) {
   const {
     debounceMs = 1000,
     limit = 15,
-    timeRange = "30d",
-    includeEmptyCategories = false,
     initialSelectedCategoryIds = [],
-    popularStaleTime = 5 * 60 * 1000,
-    popularGcTime = 10 * 60 * 1000,
-    searchStaleTime = 30 * 1000,
-    categoriesStaleTime = 10 * 60 * 1000,
+    catalogStaleTime = 5 * 60 * 1000,
   } = opts;
 
   // State
@@ -39,39 +36,20 @@ export function useTagSearch(opts: UseTagSearchOptions = {}) {
   const debouncedSetSearchInput = debounce((value: string) => setDebouncedInput(value), debounceMs);
 
   // Queries
-  const popularTagsQuery = useQuery(() =>
-    t.getPopularTags.queryOptions({
-      input: { limit, timeRange },
-      staleTime: popularStaleTime,
-      gcTime: popularGcTime,
-    })
-  );
-
-  const searchQuery = useQuery(() =>
-    t.fullTagsSearch.queryOptions({
-      input: {
-        query: debouncedInput(),
-        limit,
-      },
-      enabled: () => debouncedInput().length > 0,
-      staleTime: searchStaleTime,
-    })
-  );
-
-  const getTagCategoriesQuery = useQuery(() =>
-    t.getTagCategories.queryOptions({
-      input: { includeEmpty: includeEmptyCategories },
-      staleTime: categoriesStaleTime,
-    })
-  );
+  const catalogQuery = useQuery(() => ({
+    queryKey: ["tags", "catalog"],
+    queryFn: fetchTagCatalog,
+    staleTime: catalogStaleTime,
+  }));
 
   // Derived
+  const catalog = () => catalogQuery.data ?? [];
+  const popularTags = () => rankPopular(catalog(), limit);
   const availableTags = () => {
     const q = debouncedInput();
-    if (q.length > 0) return searchQuery.data || [];
-    return popularTagsQuery.data?.tags || [];
+    if (q.length > 0) return searchTags(catalog(), q, limit);
+    return popularTags();
   };
-  const categories = () => getTagCategoriesQuery.data || [];
 
   // Handlers
   const handleSearchInput = (value: string) => {
@@ -84,15 +62,9 @@ export function useTagSearch(opts: UseTagSearchOptions = {}) {
   };
 
   // Status
-  const isLoadingTags = () => popularTagsQuery.isLoading || searchQuery.isLoading;
-  const isLoadingCategories = () => getTagCategoriesQuery.isLoading;
-
-  const hasTagsError = () => !!popularTagsQuery.error || !!searchQuery.error;
-  const hasCategoriesError = () => !!getTagCategoriesQuery.error;
-
-  const availableTagsError = () =>
-    popularTagsQuery.error?.message || searchQuery.error?.message || "Unknown error";
-  const categoriesError = () => getTagCategoriesQuery.error?.message || "Unknown error";
+  const isLoadingTags = () => catalogQuery.isLoading;
+  const hasTagsError = () => !!catalogQuery.error;
+  const availableTagsError = () => catalogQuery.error?.message || "Unknown error";
 
   return {
     // state
@@ -107,19 +79,14 @@ export function useTagSearch(opts: UseTagSearchOptions = {}) {
 
     // data
     availableTags,
-    categories,
+    popularTags,
 
     // status
     isLoadingTags,
-    isLoadingCategories,
     hasTagsError,
-    hasCategoriesError,
     availableTagsError,
-    categoriesError,
 
     // queries (optional)
-    popularTagsQuery,
-    searchQuery,
-    getTagCategoriesQuery,
+    catalogQuery,
   } as const;
 }

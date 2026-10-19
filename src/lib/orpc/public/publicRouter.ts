@@ -8,6 +8,7 @@ import { overlaysScheduleRouter } from './overlays/schedule/impl.ts'
 import { overlaysVisibilityRouter } from './overlays/visibility/impl.ts'
 import { twitchExtensionRouter } from './twitchExtension/impl.ts'
 import { publicJJDataRouter } from './jjData/impl.ts'
+import { publicTagsRouter } from './tags/impl.ts'
 
 export const publicRouter = os
   .use(hasAstroContext)
@@ -22,4 +23,5 @@ export const publicRouter = os
     },
     twitchExtension: twitchExtensionRouter,
     jjData: publicJJDataRouter,
+    tags: publicTagsRouter,
   })
