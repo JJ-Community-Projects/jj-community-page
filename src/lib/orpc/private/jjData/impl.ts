@@ -5,7 +5,6 @@ import {
   type Overview,
   type Stream,
   type UserDisplay,
-  type UserStream,
   type UserWithInfo,
   UserWithInfoTags,
 } from './contract.ts'
@@ -14,7 +13,16 @@ import { putCache } from '../../../services/kvCache.ts'
 import { dbMiddleware } from '../../middleware/dbMiddleware.ts'
 import { implement, ORPCError } from '@orpc/server'
 import { cacheMiddleware } from '../../middleware/cacheControl.ts'
-import { and, asc, eq, gt, inArray, not, sql } from 'drizzle-orm'
+import {
+  and,
+  asc,
+  type Column,
+  eq,
+  gt,
+  inArray,
+  notInArray,
+  sql,
+} from 'drizzle-orm'
 import {
   schedulesTable,
   streamParticipantsTable,
@@ -37,7 +45,7 @@ import {
   getHardCodedEventsNoYogs,
 } from './getHardCodedEvents.ts'
 import { cached } from '../../middleware/cached.ts'
-import { CACHE_POLICY } from '../../../services/cachePolicy.ts'
+import { alias } from 'drizzle-orm/sqlite-core'
 import { getUpcomingStreamsFromSchedule } from '../../../../content/getYogsScheduleFromContent.ts'
 // New: get campaign by Twitch id
 
@@ -251,108 +259,30 @@ const upcomingStreams = os.upcomingStreamsContract
   .use(cached('upcoming', () => ''))
   .handler(async ({ context }) => {
     try {
-      // KV cache (revive Date fields)
-      const cached = await getJSON<any>(context.env.KV, 'upcomingStreams')
-      if (cached) {
-        return reviveUpcomingStreamsResult(cached)
-      }
-
-      // const hardcodedStreams = await getHardCodedEvents()
       const db = context.db
-      const nowSec = Math.floor(Date.now() / 1000)
+      const now = new Date(Math.floor(Date.now() / 1000) * 1000)
       const year = new Date().getUTCFullYear()
 
-      // 1) Find visible primary schedules for current year (with owners)
-      const scheduleRows = await db
-        .select({ id: schedulesTable.id, ownerId: schedulesTable.ownerId })
-        .from(schedulesTable)
-        .where(
-          and(
-            eq(schedulesTable.year, year),
-            eq(schedulesTable.visible, true),
-            eq(schedulesTable.primary, true),
-            not(eq(schedulesTable.ownerId, 0)),
-            not(eq(schedulesTable.ownerId, 1)),
-            not(eq(schedulesTable.ownerId, 2)),
-          ),
-        )
-        .all()
-
-      const scheduleIds = scheduleRows.map((s) => s.id)
-      const scheduleOwnerMap = new Map<number, number>(
-        scheduleRows.map((r) => [r.id, r.ownerId]),
-      )
-      if (scheduleIds.length === 0) {
-        return {
-          count: 0,
-          streams: [],
-        }
+      const userDisplay = {
+        userId: userDisplayView.userId,
+        primaryLiveStream: userDisplayView.primaryLiveStream,
+        createdAt: userDisplayView.createdAt,
+        username: userDisplayView.username,
+        profileImage: userDisplayView.profileImage,
+        twitchLogin: userDisplayView.twitchLogin,
+        tiltifySlug: userDisplayView.tiltifySlug,
+        tiltifyUrl: userDisplayView.tiltifyUrl,
+        primaryColor: userDisplayView.primaryColor,
+        accentColor: userDisplayView.accentColor,
       }
 
-      // 2) Identify upcoming or currently-live visible streams across those schedules
-      //    Avoid giant OR(...) over scheduleIds by joining schedules with filters.
-      const basePairs = await db
+      // 1) The next 2 upcoming or live visible streams of every visible primary schedule of the
+      //    year (owner ids 0, 1 and 2 excluded), with the schedule's owner, chronological. A
+      //    stream whose owner isn't in user_display_view is left out.
+      const next = alias(streamsTable, 'next')
+      const streamRows = await db
         .select({
-          scheduleId: streamsTable.scheduleId,
-          streamId: streamsTable.id,
-          start: streamsTable.start,
-        })
-        .from(streamsTable)
-        .innerJoin(
-          schedulesTable,
-          eq(streamsTable.scheduleId, schedulesTable.id),
-        )
-        .where(
-          and(
-            eq(streamsTable.visible, true),
-            eq(schedulesTable.year, year),
-            eq(schedulesTable.visible, true),
-            eq(schedulesTable.primary, true),
-            // exclude special owner ids (0,1,2)
-            not(eq(schedulesTable.ownerId, 0)),
-            not(eq(schedulesTable.ownerId, 1)),
-            not(eq(schedulesTable.ownerId, 2)),
-            // upcoming or live
-            gt(streamsTable.end, new Date(nowSec * 1000)),
-          ),
-        )
-        .orderBy(asc(streamsTable.start))
-        .all()
-
-      if (basePairs.length === 0) {
-        return {
-          count: 0,
-          streams: [],
-        }
-      }
-
-      // Limit to next 2 streams per schedule (based on ascending start order)
-      const limitedPairs = (() => {
-        const counts = new Map<number, number>()
-        const acc: typeof basePairs = []
-        for (const p of basePairs) {
-          const c = counts.get(p.scheduleId) ?? 0
-          if (c < 2) {
-            acc.push(p)
-            counts.set(p.scheduleId, c + 1)
-          }
-        }
-        return acc
-      })()
-
-      // Group selected pairs by schedule to keep follow-up queries tiny (<= 2 ids per schedule)
-      const pairsBySchedule = new Map<number, number[]>()
-      for (const p of limitedPairs) {
-        const arr = pairsBySchedule.get(p.scheduleId) ?? []
-        arr.push(p.streamId)
-        pairsBySchedule.set(p.scheduleId, arr)
-      }
-
-      // 3) Load stream core details (per schedule, using small IN lists)
-      const detailMap = new Map<string, any>()
-      for (const [sid, ids] of pairsBySchedule) {
-        const streamDetails = await db
-          .select({
+          stream: {
             id: streamsTable.id,
             scheduleId: streamsTable.scheduleId,
             createdBy: streamsTable.createdBy,
@@ -364,28 +294,64 @@ const upcomingStreams = os.upcomingStreamsContract
             twitchVodUrl: streamsTable.twitchVodUrl,
             start: streamsTable.start,
             end: streamsTable.end,
-          })
-          .from(streamsTable)
-          .where(
-            and(
-              eq(streamsTable.scheduleId, sid),
-              inArray(streamsTable.id, ids),
+          },
+          owner: userDisplay,
+        })
+        .from(schedulesTable)
+        .innerJoin(streamsTable, eq(streamsTable.scheduleId, schedulesTable.id))
+        .innerJoin(
+          userDisplayView,
+          eq(userDisplayView.userId, schedulesTable.ownerId),
+        )
+        .where(
+          and(
+            eq(schedulesTable.year, year),
+            eq(schedulesTable.visible, true),
+            eq(schedulesTable.primary, true),
+            notInArray(schedulesTable.ownerId, [0, 1, 2]),
+            inArray(
+              streamsTable.id,
+              db
+                .select({ id: next.id })
+                .from(next)
+                .where(
+                  and(
+                    eq(next.scheduleId, schedulesTable.id),
+                    eq(next.visible, true),
+                    // upcoming or live
+                    gt(next.end, now),
+                  ),
+                )
+                .orderBy(asc(next.start), asc(next.id))
+                .limit(2),
             ),
-          )
-          .all()
-        for (const s of streamDetails) {
-          detailMap.set(`${s.scheduleId}:${s.id}`, s)
-        }
+          ),
+        )
+        .orderBy(
+          asc(streamsTable.start),
+          asc(streamsTable.scheduleId),
+          asc(streamsTable.id),
+        )
+        .all()
+
+      if (streamRows.length === 0) {
+        return { count: 0, streams: [] }
       }
 
-      // 4) Load tags for selected streams (per schedule)
-      const tagsMap = new Map<
-        string,
-        Array<{ name: string; slug: string; color: string }>
-      >()
-      for (const [sid, ids] of pairsBySchedule) {
-        if (ids.length === 0) continue
-        const tagRows = await db
+      // 2) Their tags and participants in one batch, keyed by the selected (schedule_id,
+      //    stream_id) pairs passed as one JSON parameter: two bound parameters per pair would
+      //    exceed D1's limit of 100 per statement.
+      const selected = sql`json_each(${JSON.stringify(
+        streamRows.map(({ stream }) => [stream.scheduleId, stream.id]),
+      )}) as "selected"`
+      const isSelected = (scheduleId: Column, streamId: Column) =>
+        and(
+          eq(scheduleId, sql`"selected"."value" ->> 0`),
+          eq(streamId, sql`"selected"."value" ->> 1`),
+        )
+
+      const [tagRows, participantRows] = await db.batch([
+        db
           .select({
             scheduleId: streamTagsTable.scheduleId,
             streamId: streamTagsTable.streamId,
@@ -393,179 +359,76 @@ const upcomingStreams = os.upcomingStreamsContract
             slug: tags.slug,
             color: tags.color,
           })
-          .from(streamTagsTable)
-          .innerJoin(tags, eq(streamTagsTable.tagId, tags.id))
-          .where(
-            and(
-              eq(streamTagsTable.scheduleId, sid),
-              inArray(streamTagsTable.streamId, ids),
-            ),
+          .from(selected)
+          .innerJoin(
+            streamTagsTable,
+            isSelected(streamTagsTable.scheduleId, streamTagsTable.streamId),
           )
-          .all()
-        for (const t of tagRows) {
-          const key = `${t.scheduleId}:${t.streamId}`
-          const arr = tagsMap.get(key) ?? []
-          arr.push({ name: t.name, slug: t.slug, color: t.color })
-          tagsMap.set(key, arr)
-        }
-      }
-
-      // 5) Load participants for selected streams (per schedule)
-      const participantRows: Array<{
-        scheduleId: number
-        streamId: number
-        userId: number
-        primaryLiveStream: string
-        createdAt: Date
-        username: string
-        profileImage: string
-        twitchLogin: string | null
-        tiltifySlug: string
-        tiltifyUrl: string
-        primaryColor: string | null
-        accentColor: string | null
-      }> = []
-      for (const [sid, ids] of pairsBySchedule) {
-        if (ids.length === 0) continue
-        const rows = await db
+          .innerJoin(tags, eq(streamTagsTable.tagId, tags.id))
+          .orderBy(
+            asc(streamTagsTable.scheduleId),
+            asc(streamTagsTable.streamId),
+            asc(streamTagsTable.tagId),
+          ),
+        db
           .select({
             scheduleId: streamParticipantsTable.scheduleId,
             streamId: streamParticipantsTable.streamId,
-            userId: userDisplayView.userId,
-            primaryLiveStream: userDisplayView.primaryLiveStream,
-            createdAt: userDisplayView.createdAt,
-            username: userDisplayView.username,
-            profileImage: userDisplayView.profileImage,
-            twitchLogin: userDisplayView.twitchLogin,
-            tiltifySlug: userDisplayView.tiltifySlug,
-            tiltifyUrl: userDisplayView.tiltifyUrl,
-            primaryColor: userDisplayView.primaryColor,
-            accentColor: userDisplayView.accentColor,
+            ...userDisplay,
           })
-          .from(streamParticipantsTable)
+          .from(selected)
+          .innerJoin(
+            streamParticipantsTable,
+            isSelected(
+              streamParticipantsTable.scheduleId,
+              streamParticipantsTable.streamId,
+            ),
+          )
           .innerJoin(
             userDisplayView,
             eq(streamParticipantsTable.userId, userDisplayView.userId),
           )
-          .where(
-            and(
-              eq(streamParticipantsTable.scheduleId, sid),
-              inArray(streamParticipantsTable.streamId, ids),
-            ),
-          )
-          .all()
-        participantRows.push(...rows)
+          .orderBy(
+            asc(streamParticipantsTable.scheduleId),
+            asc(streamParticipantsTable.streamId),
+            asc(streamParticipantsTable.userId),
+          ),
+      ])
+
+      const tagsMap = new Map<string, Stream['tags']>()
+      for (const { scheduleId, streamId, ...tag } of tagRows) {
+        const key = `${scheduleId}:${streamId}`
+        const arr = tagsMap.get(key) ?? []
+        arr.push(tag)
+        tagsMap.set(key, arr)
       }
 
-      const participantsMap = new Map<
-        string,
-        Array<{
-          userId: number
-          primaryLiveStream: string
-          createdAt: Date
-          username: string
-          profileImage: string
-          twitchLogin: string | null
-          tiltifySlug: string
-          tiltifyUrl: string
-          primaryColor: string | null
-          accentColor: string | null
-        }>
-      >()
-
-      for (const p of participantRows) {
-        const key = `${p.scheduleId}:${p.streamId}`
+      const participantsMap = new Map<string, UserDisplay[]>()
+      for (const { scheduleId, streamId, ...user } of participantRows) {
+        const key = `${scheduleId}:${streamId}`
         const arr = participantsMap.get(key) ?? []
-        arr.push({
-          userId: p.userId,
-          primaryLiveStream: p.primaryLiveStream,
-          createdAt: p.createdAt,
-          username: p.username,
-          profileImage: p.profileImage,
-          twitchLogin: p.twitchLogin,
-          tiltifySlug: p.tiltifySlug,
-          tiltifyUrl: p.tiltifyUrl,
-          primaryColor: p.primaryColor,
-          accentColor: p.accentColor,
-        })
+        arr.push(user)
         participantsMap.set(key, arr)
       }
 
-      // 6) Load owners for the schedules
-      const ownerIds = Array.from(new Set(scheduleRows.map((r) => r.ownerId)))
-      let ownersMap = new Map<number, any>()
-      if (ownerIds.length > 0) {
-        const owners = await db
-          .select({
-            userId: userDisplayView.userId,
-            primaryLiveStream: userDisplayView.primaryLiveStream,
-            createdAt: userDisplayView.createdAt,
-            username: userDisplayView.username,
-            profileImage: userDisplayView.profileImage,
-            twitchLogin: userDisplayView.twitchLogin,
-            tiltifySlug: userDisplayView.tiltifySlug,
-            tiltifyUrl: userDisplayView.tiltifyUrl,
-            primaryColor: userDisplayView.primaryColor,
-            accentColor: userDisplayView.accentColor,
-          })
-          .from(userDisplayView)
-          .where(inArray(userDisplayView.userId as any, ownerIds as any))
-          .all()
-        ownersMap = new Map(owners.map((o) => [o.userId, o]))
-      }
-
-      // 7) Compose final user streams preserving chronological order
-      const userStreams: UserStream[] = limitedPairs
-        .map((pair) => {
-          const key = `${pair.scheduleId}:${pair.streamId}`
-          const core = detailMap.get(key)
-          if (!core) return null
-          const stream: Stream = {
-            ...(core as any),
+      const streams = streamRows.map(({ stream, owner }) => {
+        const key = `${stream.scheduleId}:${stream.id}`
+        return {
+          stream: {
+            ...stream,
             tags: tagsMap.get(key) ?? [],
             participants: participantsMap.get(key) ?? [],
-          }
-          const ownerId = scheduleOwnerMap.get(pair.scheduleId)!
-          const owner: UserDisplay = ownersMap.get(ownerId)
-          if (!owner) return null
-          return { stream, owner }
-        })
-        .filter((user) => {
-          return user != null
-        })
+          },
+          owner,
+        }
+      })
 
-      const composed = [...userStreams]
-
-      composed.sort(
-        (a, b) => a.stream.start.getTime() - b.stream.start.getTime(),
-      )
-
-      const result = { count: composed.length, streams: composed }
-
-      await putJSON(
-        context.env.KV,
-        'upcomingStreams',
-        result,
-        CACHE_POLICY.communityUpcoming.ttl,
-      )
-
-      return result
+      return { count: streams.length, streams }
     } catch (e) {
       console.error('upcoming-streams', e)
       throw new ORPCError('INTERNAL_SERVER_ERROR')
     }
   })
-
-// Helpers to revive Dates for upcomingStreams cache
-function reviveUpcomingStreamsResult(data: any) {
-  const revived = {
-    count: Number(data?.count ?? 0),
-    streams: Array.isArray(data?.streams)
-      ? data.streams.map(reviveUserStream)
-      : [],
-  }
-  return revived
-}
 
 function reviveUserStream(item: any) {
   const stream = item?.stream ?? {}
