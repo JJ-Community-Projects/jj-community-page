@@ -90,8 +90,10 @@ export const removeParticipant = os.removeParticipantContract
       )
       .run()
 
-    if ((res as any).rowsAffected === 0) {
-      throw new Error('Draft stream participant not found')
+    if (res.meta.changes === 0) {
+      throw new ORPCError('NOT_FOUND', {
+        message: 'Draft stream participant not found',
+      })
     }
 
     // WS publish via DO

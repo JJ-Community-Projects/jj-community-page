@@ -10,19 +10,30 @@ import { privateScheduleEditingWSContract } from './contract.ts'
 
 const os = implement(privateScheduleEditingWSContract)
 
+/**
+ * Lifetime of an editor socket token. The client renews it before it expires, through the
+ * access check of `scheduleOwnerOrEditorMiddleware`, so a removed editor or a demoted admin loses
+ * the live draft feed within this time.
+ */
+const EDITOR_TOKEN_TTL_SECONDS = 5 * 60
+
 export const streamDraftWS = os.streamDraftWS
   .use(authMiddleware)
   .use(dbMiddleware)
   .use(scheduleOwnerOrEditorMiddleware)
   .handler(async ({ context, input }) => {
     const { db, env, userId } = context
-    const { scheduleId } = input
+    const { scheduleId, renew } = input
     try {
-      await ensureDraftInitialized(db, scheduleId, userId)
+      // A renewal must not touch the draft: the seed's repair of emptied drafts would copy the
+      // published streams back into a draft whose streams the editors deleted, and the seed
+      // moves `editor_id`.
+      if (!renew) await ensureDraftInitialized(db, scheduleId, userId)
       const channelId = scheduleEditingChannels.edit(scheduleId)
       return new DurableIterator<ScheduleEditingObject>(channelId, {
         signingKey: env!.ORPC_DEI_SIGNING_KEY,
         att: { scheduleId: scheduleId, userId: userId },
+        tokenTTLSeconds: EDITOR_TOKEN_TTL_SECONDS,
       })
     } catch (err) {
       console.error('streamDraftWS error', err)

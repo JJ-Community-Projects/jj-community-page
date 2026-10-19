@@ -9,8 +9,10 @@ import {
   upsertScheduleMetaContract,
 } from './contract.ts'
 import { scheduleOwnerOrEditorMiddleware } from '../middleware.ts'
-import { ensureDraftInitialized } from '../utils.ts'
-import { and, eq, inArray, sql } from 'drizzle-orm'
+import { draftCopyStatements, ensureDraftInitialized } from '../utils.ts'
+import { and, eq, exists, not, notExists, or, sql, type SQL } from 'drizzle-orm'
+import { alias, type SQLiteColumn, type SQLiteTable } from 'drizzle-orm/sqlite-core'
+import type { JJDrizzleDatabase } from '../../../../db/db.ts'
 import {
   schedulesTable,
   streamParticipantsTable,
@@ -30,19 +32,6 @@ const os = implement({
   publishDraftContract,
   discardDraftContract,
 }).use(dbMiddleware)
-
-// Helper: chunk an array into subarrays of size `size`
-function chunk<T>(arr: T[], size: number): T[][] {
-  if (size <= 0) return [arr]
-  const out: T[][] = []
-  for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size))
-  return out
-}
-
-// Safe limits to avoid SQLite bound-parameter limit (~999)
-const DELETE_MAX_IDS = 3 // 1 var per id + a few extras for other predicates
-const PARTS_MAX_ROWS = 3 // ~3 vars per row
-const TAGS_MAX_ROWS = 3  // ~4 vars per row
 
 function getScheduleEditingStub(env: Env, scheduleId: number) {
   const channelId = scheduleEditingChannels.edit(scheduleId)
@@ -72,302 +61,391 @@ const upsertScheduleMeta = os.upsertScheduleMetaContract
     const editorId = context.userId
     const { scheduleId, title, slug, year, visible } = input
 
-    await db
-      .insert(editSchedulesTable)
-      .values({ scheduleId, editorId })
-      .onConflictDoNothing()
-      .run()
-
     const patch: Record<string, any> = {}
     if (title !== undefined) patch.title = title
     if (slug !== undefined) patch.slug = slug
     if (year !== undefined) patch.year = year
     if (visible !== undefined) patch.visible = visible
-    const sqlPatch: Record<string, any> = {
-      editorId,
-      updatedAt: sql`(unixepoch()
-                               )`,
-      ...patch,
-    }
 
-    console.log('upsertScheduleMeta', 'patch', patch)
-
-    await db
-      .update(editSchedulesTable)
-      .set(sqlPatch)
-      .where(eq(editSchedulesTable.scheduleId, scheduleId))
-      .run()
+    // One round trip: the draft is created (or reopened) first if needed, so the draft row
+    // never exists without its copied streams; then only the given fields are written.
+    // `editor_id` is rewritten only when another editor made the last change. The four draft
+    // statements come first, the meta update is the fifth.
+    const [, , , , updated] = await db.batch([
+      ...draftCopyStatements(db, scheduleId, editorId),
+      db
+        .update(editSchedulesTable)
+        .set({ ...patch, updatedAt: sql`(unixepoch())` })
+        .where(eq(editSchedulesTable.scheduleId, scheduleId))
+        .returning({ updatedAt: editSchedulesTable.updatedAt }),
+    ])
 
     // WS publish schedule meta change
     const stub = getScheduleEditingStub(context.env as any, scheduleId)
     // @ts-ignore
     await stub.publishScheduleUpdated(scheduleId, editorId, { patch })
 
-    const row = await db
-      .select({ updatedAt: editSchedulesTable.updatedAt })
-      .from(editSchedulesTable)
-      .where(eq(editSchedulesTable.scheduleId, scheduleId))
-      .get()
-
-    return { updatedAt: row?.updatedAt ?? new Date() }
+    return { updatedAt: updated[0]?.updatedAt ?? new Date() }
   })
+
+// The stream columns publish compares and copies (never id or schedule_id: they are the key).
+const STREAM_COLUMNS = [
+  'createdBy',
+  'title',
+  'visible',
+  'subtitle',
+  'description',
+  'youtubeVodUrl',
+  'twitchVodUrl',
+  'start',
+  'end',
+] as const
+type StreamColumns = Record<(typeof STREAM_COLUMNS)[number], SQLiteColumn>
+const streamRow = (t: StreamColumns) =>
+  sql`(${sql.join(
+    STREAM_COLUMNS.map((c) => t[c]),
+    sql`, `,
+  )})`
+
+/** A draft meta field that is set and differs from the published one. */
+const metaDiffers = (draftColumn: SQLiteColumn, column: SQLiteColumn) =>
+  sql`(${draftColumn} is not null and ${draftColumn} is not ${column})`
+
+/**
+ * The statements that copy the draft's differences into the published tables, for one
+ * `db.batch()` after the draft copy. Only rows that differ are written:
+ *
+ * 1. `updated_at` (and the title) when anything differs. It must run first: once the other
+ *    statements ran, nothing differs any more.
+ * 2. slug, then year and visible, each only when it changed: setting a column to its own value
+ *    still writes its index entries (the slug has a unique index, year and visible are in two).
+ * 3. Removed tags and participants, then removed streams. Their own deletes come before the
+ *    stream delete, so their counts include the rows of deleted streams (a foreign key cascade
+ *    is not counted in `changes`).
+ * 4. Changed streams, then new streams, tags and participants (streams first: foreign keys).
+ *
+ * Every statement filters by `schedule_id`, a prefix of each table's primary key.
+ */
+function publishStatements(db: JJDrizzleDatabase, scheduleId: number) {
+  const m = alias(editSchedulesTable, 'm')
+  const d = alias(editStreamsTable, 'd')
+  const p = alias(streamsTable, 'p')
+  const dt = alias(editStreamTagsTable, 'dt')
+  const dp = alias(editStreamParticipantsTable, 'dp')
+  const one = { one: sql`1` }
+
+  const draftHas = {
+    stream: (t: { id: SQLiteColumn }) =>
+      exists(
+        db
+          .select(one)
+          .from(d)
+          .where(and(eq(d.scheduleId, scheduleId), eq(d.id, t.id))),
+      ),
+    tag: (t: { streamId: SQLiteColumn; tagId: SQLiteColumn }) =>
+      exists(
+        db
+          .select(one)
+          .from(dt)
+          .where(
+            and(
+              eq(dt.scheduleId, scheduleId),
+              eq(dt.streamId, t.streamId),
+              eq(dt.tagId, t.tagId),
+            ),
+          ),
+      ),
+    participant: (t: { streamId: SQLiteColumn; userId: SQLiteColumn }) =>
+      exists(
+        db
+          .select(one)
+          .from(dp)
+          .where(
+            and(
+              eq(dp.scheduleId, scheduleId),
+              eq(dp.streamId, t.streamId),
+              eq(dp.userId, t.userId),
+            ),
+          ),
+      ),
+  }
+  // Rows of one side that the other side lacks (a stream also counts when a column differs).
+  const onlyIn = (
+    table: SQLiteTable,
+    scheduleColumn: SQLiteColumn,
+    missing: SQL,
+  ) =>
+    exists(
+      db
+        .select(one)
+        .from(table)
+        .where(and(eq(scheduleColumn, scheduleId), missing)),
+    )
+  const pt = alias(streamTagsTable, 'pt')
+  const pp = alias(streamParticipantsTable, 'pp')
+  const anythingDiffers = or(
+    exists(
+      db
+        .select(one)
+        .from(m)
+        .where(
+          and(
+            eq(m.scheduleId, scheduleId),
+            or(
+              metaDiffers(m.title, schedulesTable.title),
+              metaDiffers(m.slug, schedulesTable.slug),
+              metaDiffers(m.year, schedulesTable.year),
+              metaDiffers(m.visible, schedulesTable.visible),
+            ),
+          ),
+        ),
+    ),
+    onlyIn(
+      d,
+      d.scheduleId,
+      notExists(
+        db
+          .select(one)
+          .from(p)
+          .where(
+            and(
+              eq(p.scheduleId, scheduleId),
+              eq(p.id, d.id),
+              sql`${streamRow(p)} is ${streamRow(d)}`,
+            ),
+          ),
+      ),
+    ),
+    onlyIn(p, p.scheduleId, not(draftHas.stream(p))),
+    onlyIn(
+      dt,
+      dt.scheduleId,
+      notExists(
+        db
+          .select(one)
+          .from(pt)
+          .where(
+            and(
+              eq(pt.scheduleId, scheduleId),
+              eq(pt.streamId, dt.streamId),
+              eq(pt.tagId, dt.tagId),
+            ),
+          ),
+      ),
+    ),
+    onlyIn(pt, pt.scheduleId, not(draftHas.tag(pt))),
+    onlyIn(
+      dp,
+      dp.scheduleId,
+      notExists(
+        db
+          .select(one)
+          .from(pp)
+          .where(
+            and(
+              eq(pp.scheduleId, scheduleId),
+              eq(pp.streamId, dp.streamId),
+              eq(pp.userId, dp.userId),
+            ),
+          ),
+      ),
+    ),
+    onlyIn(pp, pp.scheduleId, not(draftHas.participant(pp))),
+  )
+
+  return [
+    db
+      .update(schedulesTable)
+      .set({
+        title: sql`coalesce(${db
+          .select({ title: m.title })
+          .from(m)
+          .where(eq(m.scheduleId, scheduleId))}, ${schedulesTable.title})`,
+        updatedAt: sql`(unixepoch())`,
+      })
+      .where(and(eq(schedulesTable.id, scheduleId), anythingDiffers)),
+    db
+      .update(schedulesTable)
+      .set({ slug: sql`${m.slug}` })
+      .from(m)
+      .where(
+        and(
+          eq(schedulesTable.id, scheduleId),
+          eq(m.scheduleId, scheduleId),
+          metaDiffers(m.slug, schedulesTable.slug),
+        ),
+      ),
+    db
+      .update(schedulesTable)
+      .set({
+        year: sql`coalesce(${m.year}, ${schedulesTable.year})`,
+        visible: sql`coalesce(${m.visible}, ${schedulesTable.visible})`,
+      })
+      .from(m)
+      .where(
+        and(
+          eq(schedulesTable.id, scheduleId),
+          eq(m.scheduleId, scheduleId),
+          or(
+            metaDiffers(m.year, schedulesTable.year),
+            metaDiffers(m.visible, schedulesTable.visible),
+          ),
+        ),
+      ),
+    db
+      .delete(streamTagsTable)
+      .where(
+        and(
+          eq(streamTagsTable.scheduleId, scheduleId),
+          not(draftHas.tag(streamTagsTable)),
+        ),
+      ),
+    db
+      .delete(streamParticipantsTable)
+      .where(
+        and(
+          eq(streamParticipantsTable.scheduleId, scheduleId),
+          not(draftHas.participant(streamParticipantsTable)),
+        ),
+      ),
+    db
+      .delete(streamsTable)
+      .where(
+        and(
+          eq(streamsTable.scheduleId, scheduleId),
+          not(draftHas.stream(streamsTable)),
+        ),
+      ),
+    db
+      .update(streamsTable)
+      .set(
+        Object.fromEntries(
+          STREAM_COLUMNS.map((c) => [c, sql`${d[c]}`]),
+        ) as Record<(typeof STREAM_COLUMNS)[number], SQL>,
+      )
+      .from(d)
+      .where(
+        and(
+          eq(streamsTable.scheduleId, scheduleId),
+          eq(d.scheduleId, scheduleId),
+          eq(d.id, streamsTable.id),
+          sql`${streamRow(streamsTable)} is not ${streamRow(d)}`,
+        ),
+      ),
+    db
+      .insert(streamsTable)
+      .select(
+        db
+          .select({
+            id: editStreamsTable.id,
+            scheduleId: editStreamsTable.scheduleId,
+            createdBy: editStreamsTable.createdBy,
+            title: editStreamsTable.title,
+            visible: editStreamsTable.visible,
+            subtitle: editStreamsTable.subtitle,
+            description: editStreamsTable.description,
+            youtubeVodUrl: editStreamsTable.youtubeVodUrl,
+            twitchVodUrl: editStreamsTable.twitchVodUrl,
+            start: editStreamsTable.start,
+            end: editStreamsTable.end,
+          })
+          .from(editStreamsTable)
+          .where(eq(editStreamsTable.scheduleId, scheduleId)),
+      )
+      .onConflictDoNothing(),
+    // A tag kept across the publish keeps its published added_at.
+    db
+      .insert(streamTagsTable)
+      .select(
+        db
+          .select({
+            streamId: editStreamTagsTable.streamId,
+            scheduleId: editStreamTagsTable.scheduleId,
+            tagId: editStreamTagsTable.tagId,
+            addedAt: editStreamTagsTable.addedAt,
+          })
+          .from(editStreamTagsTable)
+          .where(eq(editStreamTagsTable.scheduleId, scheduleId)),
+      )
+      .onConflictDoNothing(),
+    db
+      .insert(streamParticipantsTable)
+      .select(
+        db
+          .select({
+            scheduleId: editStreamParticipantsTable.scheduleId,
+            streamId: editStreamParticipantsTable.streamId,
+            userId: editStreamParticipantsTable.userId,
+          })
+          .from(editStreamParticipantsTable)
+          .where(eq(editStreamParticipantsTable.scheduleId, scheduleId)),
+      )
+      .onConflictDoNothing(),
+    db
+      .update(editSchedulesTable)
+      .set({ status: 'published', updatedAt: sql`(unixepoch())` })
+      .where(eq(editSchedulesTable.scheduleId, scheduleId)),
+  ] as const
+}
+
+const changesOf = (result: unknown) =>
+  (result as { meta: { changes: number } }).meta.changes
 
 const publishDraft = os.publishDraftContract
   .use(authMiddleware)
   .use(scheduleOwnerOrEditorMiddleware)
   .handler(async ({ context, input }) => {
+    const db = context.db
+    const editorId = context.userId
+    const { scheduleId } = input
+
     try {
-      // Establish DB handle and identity of the editor performing the publish
-      const db = context.db
-      const editorId = context.userId
-      const { scheduleId } = input
+      // One atomic batch: the draft copy first (a schedule without a draft publishes itself,
+      // unchanged), then the differences. A failure leaves the published schedule untouched.
+      // The copy is the plain one: an empty published draft here means its streams were deleted.
+      const [
+        ,
+        ,
+        ,
+        ,
+        ,
+        ,
+        ,
+        tagsRemoved,
+        participantsRemoved,
+        streamsDeleted,
+        streamsUpdated,
+        streamsCreated,
+        tagsAdded,
+        participantsAdded,
+      ] = await db.batch([
+        ...draftCopyStatements(db, scheduleId, editorId),
+        ...publishStatements(db, scheduleId),
+      ])
 
-      await ensureDraftInitialized(db, scheduleId, editorId)
-
-      // 1) Apply schedule-level metadata from the draft to the canonical schedule, if any fields were edited
-      const draftMeta = await db
-        .select()
-        .from(editSchedulesTable)
-        .where(eq(editSchedulesTable.scheduleId, scheduleId))
-        .get()
-      if (draftMeta) {
-        // Build a patch with only the non-null fields from the draft
-        const metaPatch: Record<string, any> = {}
-        if (draftMeta.title != null) metaPatch.title = draftMeta.title
-        if (draftMeta.slug != null) metaPatch.slug = draftMeta.slug
-        if (draftMeta.year != null) metaPatch.year = draftMeta.year
-        if (draftMeta.visible != null) metaPatch.visible = draftMeta.visible
-        // Write patched fields to canonical schedules table if there is anything to update
-        if (Object.keys(metaPatch).length > 0) {
-          await db
-            .update(schedulesTable)
-            .set(metaPatch as any)
-            .where(eq(schedulesTable.id, scheduleId))
-            .run()
-        }
-      }
-
-      // 2) Compute the final set of streams by reconciling draft streams with canonical streams
-      const draftStreams = await db
-        .select()
-        .from(editStreamsTable)
-        .where(eq(editStreamsTable.scheduleId, scheduleId))
-        .all()
-      const canonStreams = await db
-        .select()
-        .from(streamsTable)
-        .where(eq(streamsTable.scheduleId, scheduleId))
-        .all()
-
-      // Keep fast lookup of existing canonical IDs and the current max ID to allocate IDs for new streams
-      const canonIdSet = new Set(canonStreams.map((s) => s.id))
-      const maxCanonId = canonStreams.reduce((m, s) => Math.max(m, s.id), 0)
-
-      // Map draft stream IDs to their final canonical IDs
-      // Negative/zero IDs in draft indicate new streams → allocate new incremental IDs
-      const idMap = new Map<number, number>()
-      let nextId = maxCanonId + 1
-      for (const ds of draftStreams) {
-        if (ds.id <= 0) {
-          idMap.set(ds.id, nextId++)
-        } else {
-          idMap.set(ds.id, ds.id)
-        }
-      }
-
-      // Set of IDs that will exist after publish; used to identify deletions
-      const finalIds = new Set(Array.from(idMap.values()))
-
-      // Counters for summary
-      let created = 0,
-        updated = 0,
-        deleted = 0
-
-      // 2a) Upsert all draft streams into canonical table (update if exists, insert if new)
-      for (const ds of draftStreams) {
-        const finalId = idMap.get(ds.id)!
-        const exists = canonIdSet.has(finalId)
-        const values = {
-          id: finalId,
-          scheduleId,
-          createdBy: ds.createdBy,
-          title: ds.title,
-          visible: ds.visible,
-          subtitle: ds.subtitle ?? null,
-          description: ds.description ?? null,
-          youtubeVodUrl: ds.youtubeVodUrl ?? null,
-          twitchVodUrl: ds.twitchVodUrl ?? null,
-          start: ds.start,
-          end: ds.end,
-        }
-        if (exists) {
-          // Update existing canonical stream row
-          const res = await db
-            .update(streamsTable)
-            .set(values as any)
-            .where(
-              and(
-                eq(streamsTable.scheduleId, scheduleId),
-                eq(streamsTable.id, finalId),
-              ),
-            )
-            .run()
-          if ((res as any).rowsAffected > 0) updated++
-        } else {
-          // Insert new canonical stream row
-          await db
-            .insert(streamsTable)
-            .values(values as any)
-            .run()
-          canonIdSet.add(finalId)
-          created++
-        }
-      }
-
-      // 2b) Delete any canonical streams that are not present in the final draft
-      const toDelete = canonStreams
-        .filter((s) => !finalIds.has(s.id))
-        .map((s) => s.id)
-      if (toDelete.length > 0) {
-        for (const ids of chunk(toDelete, DELETE_MAX_IDS)) {
-          await db
-            .delete(streamsTable)
-            .where(
-              and(
-                eq(streamsTable.scheduleId, scheduleId),
-                inArray(streamsTable.id, ids),
-              ),
-            )
-            .run()
-        }
-        deleted += toDelete.length
-      }
-
-      // 3) Sync stream participants: replace canonical set with the draft set
-      // Count removals by inspecting current canonical rows, then delete them all
-      const prevParticipants = await db
-        .select({ u: streamParticipantsTable.userId })
-        .from(streamParticipantsTable)
-        .where(eq(streamParticipantsTable.scheduleId, scheduleId))
-        .all()
-      let removedParticipants = prevParticipants.length
-
-      await db
-        .delete(streamParticipantsTable)
-        .where(eq(streamParticipantsTable.scheduleId, scheduleId))
-        .run()
-
-      // Insert draft participants mapped to their final stream IDs
-      const draftParts = await db
-        .select()
-        .from(editStreamParticipantsTable)
-        .where(eq(editStreamParticipantsTable.scheduleId, scheduleId))
-        .all()
-      let addedParticipants = 0
-      if (draftParts.length > 0) {
-        const values = draftParts.map((p) => ({
-          scheduleId,
-          streamId: idMap.get(p.streamId)!,
-          userId: p.userId,
-        }))
-        for (const rows of chunk(values, PARTS_MAX_ROWS)) {
-          if (rows.length > 0) {
-            await db
-              .insert(streamParticipantsTable)
-              .values(rows as any)
-              .run()
-            addedParticipants += rows.length
-          }
-        }
-      }
-
-      // 4) Sync stream tags similarly: replace canonical tags with draft tags
-      const prevTags = await db
-        .select({ t: streamTagsTable.tagId })
-        .from(streamTagsTable)
-        .where(eq(streamTagsTable.scheduleId, scheduleId))
-        .all()
-      let removedTags = prevTags.length
-
-      await db
-        .delete(streamTagsTable)
-        .where(eq(streamTagsTable.scheduleId, scheduleId))
-        .run()
-
-      const draftTags = await db
-        .select()
-        .from(editStreamTagsTable)
-        .where(eq(editStreamTagsTable.scheduleId, scheduleId))
-        .all()
-      let addedTags = 0
-      if (draftTags.length > 0) {
-        const tagValues = draftTags.map((t) => ({
-          scheduleId,
-          streamId: idMap.get(t.streamId)!,
-          tagId: t.tagId,
-          addedAt: t.addedAt,
-        }))
-        for (const rows of chunk(tagValues, TAGS_MAX_ROWS)) {
-          if (rows.length > 0) {
-            await db.insert(streamTagsTable).values(rows as any).run()
-            addedTags += rows.length
-          }
-        }
-      }
-
-      // 5) Touch canonical schedule updatedAt to reflect content changes
-      await db
-        .update(schedulesTable)
-        .set({
-          updatedAt: sql`(unixepoch()
-                     )`,
-        } as any)
-        .where(eq(schedulesTable.id, scheduleId))
-        .run()
-
-      // 6) Mark draft schedule as published and remove draft working tables for this schedule
-
-      await db
-        .update(editSchedulesTable)
-        .set({
-          status: 'published',
-          updatedAt: sql`(unixepoch()
-                                          )`,
-        } as any)
-        .where(eq(editSchedulesTable.scheduleId, scheduleId))
-        .run()
-      /*
-      await db
-        .delete(editStreamParticipantsTable)
-        .where(eq(editStreamParticipantsTable.scheduleId, scheduleId))
-        .run()
-      await db
-        .delete(editStreamTagsTable)
-        .where(eq(editStreamTagsTable.scheduleId, scheduleId))
-        .run()
-      await db
-        .delete(editStreamsTable)
-        .where(eq(editStreamsTable.scheduleId, scheduleId))
-        .run()
-      */
-
-      // 7) Emit WebSocket event notifying collaborators that the draft was published
       const publishedAt = new Date()
 
+      // Tell the other editors the draft was published.
       const stub = getScheduleEditingStub(context.env as any, scheduleId)
       // @ts-ignore
       await stub.publishDraftPublished(scheduleId, editorId, {})
 
-      // 8) Return a publish summary including counts of created/updated/deleted items
       return {
         publishedAt,
         changes: {
-          streams: { created, updated, deleted },
-          participants: {
-            added: addedParticipants,
-            removed: removedParticipants,
+          streams: {
+            created: changesOf(streamsCreated),
+            updated: changesOf(streamsUpdated),
+            deleted: changesOf(streamsDeleted),
           },
-          tags: { added: addedTags, removed: removedTags },
+          participants: {
+            added: changesOf(participantsAdded),
+            removed: changesOf(participantsRemoved),
+          },
+          tags: {
+            added: changesOf(tagsAdded),
+            removed: changesOf(tagsRemoved),
+          },
         },
       }
     } catch (e) {
@@ -384,27 +462,17 @@ const discardDraft = os.discardDraftContract
     const editorId = context.userId
     const { scheduleId } = input
 
-    await db
-      .delete(editStreamParticipantsTable)
-      .where(eq(editStreamParticipantsTable.scheduleId, scheduleId))
-      .run()
-    await db
-      .delete(editStreamTagsTable)
-      .where(eq(editStreamTagsTable.scheduleId, scheduleId))
-      .run()
-    await db
-      .delete(editStreamsTable)
-      .where(eq(editStreamsTable.scheduleId, scheduleId))
-      .run()
-    await db
-      .update(editSchedulesTable)
-      .set({
-        status: 'discarded',
-        updatedAt: sql`(unixepoch()
-                                          )`,
-      } as any)
-      .where(eq(editSchedulesTable.scheduleId, scheduleId))
-      .run()
+    // One atomic batch. Deleting the draft streams also deletes their draft tags and
+    // participants (ON DELETE CASCADE). The next open copies the schedule again.
+    await db.batch([
+      db
+        .delete(editStreamsTable)
+        .where(eq(editStreamsTable.scheduleId, scheduleId)),
+      db
+        .update(editSchedulesTable)
+        .set({ status: 'discarded', updatedAt: sql`(unixepoch())` })
+        .where(eq(editSchedulesTable.scheduleId, scheduleId)),
+    ])
 
     const stub = getScheduleEditingStub(context.env as any, scheduleId)
     // @ts-ignore

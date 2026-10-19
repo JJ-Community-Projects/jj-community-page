@@ -18,11 +18,27 @@ import type {
 } from '../scheduleEditingTypes.ts'
 import { normalizeInitPayloadDates } from '../scheduleEditingTypes.ts'
 import { getDB } from '../../../../db/db.ts'
-import { loadDraftSnapshot } from '../utils.ts'
+import { loadDraftSnapshotFor } from '../utils.ts'
+
+/** Close code (private range) for a socket whose user may no longer edit the schedule. */
+const ACCESS_REVOKED_CLOSE_CODE = 4403
+
+type SocketAttachment = { allowed?: boolean }
+
+/** Only sockets whose access was checked on subscribe get broadcasts. */
+const notAllowed = (websocket: WebSocket) =>
+  (websocket.deserializeAttachment() as SocketAttachment | null)?.allowed !==
+  true
 
 /**
  * Durable Object for Schedule Editing WebSocket stream.
  * Stores latest init snapshot and publishes events to connected clients via DEI.
+ *
+ * Access: every subscribe, including each reconnect with a still-valid token, checks in
+ * D1 that the token's user may still edit the schedule. Without access the socket gets one
+ * `access_revoked` event, no snapshot, and is closed. Tokens live 5 minutes (`streamDraftWS`)
+ * and the client renews them through the same access check, so an open socket of a removed
+ * editor stops receiving events at the latest when its token expires.
  */
 export class ScheduleEditingObject extends DurableIteratorObject<EditChannelMessage> {
   constructor(state: DurableObjectState, env: Env) {
@@ -35,7 +51,21 @@ export class ScheduleEditingObject extends DurableIteratorObject<EditChannelMess
         if (!scheduleId || !userId) return
 
         const db = getDB(env)
-        const snapshot = await loadDraftSnapshot(db, scheduleId)
+        const snapshot = await loadDraftSnapshotFor(db, scheduleId, userId)
+        if (!snapshot) {
+          this.publishEvent(
+            {
+              scheduleId,
+              editorId: userId,
+              event: 'access_revoked',
+              payload: {},
+            },
+            { targets: [websocket] },
+          )
+          websocket.close(ACCESS_REVOKED_CLOSE_CODE, 'Access revoked')
+          return
+        }
+        websocket.serializeAttachment({ allowed: true } satisfies SocketAttachment)
         const initPayload = normalizeInitPayloadDates({
           ...snapshot,
           // Ensure streams include lock metadata required by DraftStreamSchema
@@ -44,7 +74,6 @@ export class ScheduleEditingObject extends DurableIteratorObject<EditChannelMess
             lockedBy: s.lockedBy ?? null,
           })),
         } as any)
-        console.log('ScheduleEditingObject', 'onSubscribed', initPayload)
         this.publishEvent(
           { scheduleId, editorId: userId, event: 'init', payload: initPayload },
           {
@@ -114,6 +143,24 @@ export class ScheduleEditingObject extends DurableIteratorObject<EditChannelMess
       event: 'stream_updated_with_details',
       payload,
     })
+  }
+
+  /** One `stream_updated_with_details` event per payload, in order (one RPC for a bulk save). */
+  async publishStreamsUpdatedWithDetails(
+    scheduleId: number,
+    editorId: number,
+    payloads: StreamUpdatedWithDetailPayload[],
+  ) {
+    let response = new Response('ok')
+    for (const payload of payloads) {
+      const res = await this.publishStreamUpdatedWithDetails(
+        scheduleId,
+        editorId,
+        payload,
+      )
+      if (!res.ok) response = res
+    }
+    return response
   }
 
   async publishStreamDeleted(
@@ -223,7 +270,7 @@ export class ScheduleEditingObject extends DurableIteratorObject<EditChannelMess
 
   private async publish(event: EditChannelMessage): Promise<Response> {
     try {
-      this.publishEvent(event)
+      this.publishEvent(event, { exclude: notAllowed })
       return new Response('ok')
     } catch (err) {
       console.warn('[ScheduleEditingObject] publish failed', err)

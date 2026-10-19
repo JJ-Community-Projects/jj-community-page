@@ -15,7 +15,17 @@ interface IScheduleEditingObject
  * Real-time stream for schedule draft editing channel (authenticated + authorized)
  */
 const streamDraftWSContract = oc
-  .input(z.object({ scheduleId: z.number().int().positive() }))
+  .input(
+    z.object({
+      scheduleId: z.number().int().positive(),
+      /**
+       * A token renewal of an open editor (sent by the client before the token expires): checks
+       * access only and leaves the draft alone. Without it, opening the editor makes sure the
+       * draft copy exists.
+       */
+      renew: z.boolean().optional(),
+    }),
+  )
   .output(type<ClientDurableIterator<IScheduleEditingObject, never>>())
 
 export const privateScheduleEditingWSContract = {

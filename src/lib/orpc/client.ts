@@ -5,6 +5,11 @@ import type { PrivateRouter } from './privateRouter'
 import type { PublicRouter } from './publicRouter'
 import type { RouterClient } from '@orpc/server'
 import { DurableIteratorLinkPlugin } from '@orpc/experimental-durable-iterator/client'
+import {
+  renewTokenBeforeExpiry,
+  type TokenRenewalContext,
+  TokenRenewalPlugin,
+} from './tokenRenewal.ts'
 
 declare module '@orpc/experimental-durable-iterator/client' {
   interface ClientDurableIteratorRpcContext {
@@ -27,7 +32,9 @@ const linkPublic = new RPCLink({
   method: 'GET'
 })
 
-const linkPrivate = new RPCLink({
+type PrivateClientContext = TokenRenewalContext
+
+const linkPrivate = new RPCLink<PrivateClientContext>({
   url: () => {
     if (typeof window === 'undefined') {
       throw new Error('RPCLink is not allowed on the server side.')
@@ -51,13 +58,20 @@ const linkPrivate = new RPCLink({
         console.log('linkPrivateWS', 'url', url)
         return url
       },
+      // Only subscriptions that set `context.tokenRenewal` (the schedule editor) renew their
+      // token; the friends and teams feeds keep their first one.
+      refreshTokenBeforeExpireInSeconds: renewTokenBeforeExpiry,
     }),
+    new TokenRenewalPlugin(),
   ],
 })
 
 // Create separate clients for public and private routers
 // const publicClient = createORPCClient<RouterClient<PublicRouter>>(linkPublic)
-const privateClient = createORPCClient<RouterClient<PrivateRouter>>(linkPrivate)
+const privateClient =
+  createORPCClient<RouterClient<PrivateRouter, PrivateClientContext>>(
+    linkPrivate,
+  )
 const publicClient = createORPCClient<RouterClient<PublicRouter>>(linkPublic)
 // const privateClient = createORPCClient<any>(linkPrivate)
 

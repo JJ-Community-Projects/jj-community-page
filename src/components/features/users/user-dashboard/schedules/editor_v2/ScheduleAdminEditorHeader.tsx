@@ -12,6 +12,7 @@ import { UserDashboardFeedback } from '../../UserDashboardFeedback.tsx'
 export const ScheduleAdminEditorHeader: Component = () => {
   const {
     state,
+    noAccess,
     publishDraft,
     publishDraftMutation,
     deleteSchedule,
@@ -136,6 +137,15 @@ export const ScheduleAdminEditorHeader: Component = () => {
             {state.schedule?.visible ? 'Schedule Visible' : 'Schedule Hidden'}
           </div>
         </div>
+
+        <Show when={noAccess()}>
+          <div class="mt-2 rounded-lg bg-red-50 p-2 text-sm text-red-700">
+            <p>
+              You no longer have access to edit this schedule. Live updates
+              have stopped and changes can't be saved.
+            </p>
+          </div>
+        </Show>
 
         {/* Action status feedback */}
         <Show when={publishDraftMutation.isPending}>

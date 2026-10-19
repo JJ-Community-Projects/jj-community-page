@@ -109,6 +109,43 @@ export async function checkCanAddStreamOnDate(
   return { canAdd: streams < STREAMS_PER_DATE, streams, date, maxStreams: STREAMS_PER_DATE } as const
 }
 
+/** Same answer as `checkCanAddStreamOnDate`, from the start times of the draft's streams. */
+export function streamDateLimitFromStarts(starts: Date[], date: Date) {
+  const y = date.getUTCFullYear()
+  const m = date.getUTCMonth()
+  const d = date.getUTCDate()
+  const startOfDay = Date.UTC(y, m, d, 0, 0, 0, 0)
+  const endOfDay = Date.UTC(y, m, d + 1, 0, 0, 0, 0)
+  const streams = starts.filter(
+    (s) => s.getTime() >= startOfDay && s.getTime() < endOfDay,
+  ).length
+  return { canAdd: streams < STREAMS_PER_DATE, streams, date, maxStreams: STREAMS_PER_DATE } as const
+}
+
+/**
+ * The per-date limit for streams that move. `current` holds the start of every draft stream of the
+ * schedule, `moves` the new start of each moved stream. Each moved stream is checked like a new
+ * one (`streamDateLimitFromStarts`) against the other streams after all moves, so it doesn't count
+ * against its own day twice. A day that doesn't gain streams is never refused (a move within a day,
+ * or a swap). Returns the limit of the first refused move, or null.
+ */
+export function movedStreamsDateLimit(
+  current: Map<number, Date>,
+  moves: Map<number, Date>,
+) {
+  const final = new Map(current)
+  for (const [id, start] of moves) final.set(id, start)
+  const startsOf = (streams: Map<number, Date>, except?: number) =>
+    [...streams].filter(([id]) => id !== except).map(([, start]) => start)
+  for (const [id, start] of moves) {
+    const limit = streamDateLimitFromStarts(startsOf(final, id), start)
+    if (limit.canAdd) continue
+    const before = streamDateLimitFromStarts(startsOf(current), start).streams
+    if (limit.streams + 1 > before) return limit
+  }
+  return null
+}
+
 /**
  * Compute whether the user can create another schedule for the given year.
  */

@@ -104,6 +104,8 @@ export const DraftPublishedPayloadSchema = z.object({
   idMap: z.record(z.string(), z.number()).optional(),
 })
 export const DraftDiscardedPayloadSchema = z.object({})
+/** Sent to one socket before the editing object closes it: its user may no longer edit. */
+export const AccessRevokedPayloadSchema = z.object({})
 
 export const LockPayloadSchema = z.object({
   streamId: z.number(),
@@ -133,6 +135,7 @@ export const EditChannelMessageSchema = z
     z.object({event: z.literal('draft_discarded'), payload: DraftDiscardedPayloadSchema}),
     z.object({event: z.literal('lock'), payload: LockPayloadSchema}),
     z.object({event: z.literal('unlock'), payload: UnlockPayloadSchema}),
+    z.object({event: z.literal('access_revoked'), payload: AccessRevokedPayloadSchema}),
   ])
   .and(
     z.object({

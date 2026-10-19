@@ -7,7 +7,7 @@ import {
   removeTagFromStreamContract,
 } from './contract.ts'
 import { scheduleOwnerOrEditorMiddleware } from '../middleware.ts'
-import { ensureDraftInitialized, resolveTag } from '../utils.ts'
+import { ensureDraftCopied, resolveTag } from '../utils.ts'
 import { assertStreamLockAvailableOrOwned } from '../streamEditingLock.ts'
 import { and, eq } from 'drizzle-orm'
 import { editStreamTagsTable } from '../../../../db/schema/edit-stream-tags-schema.ts'
@@ -40,7 +40,7 @@ export const addTagToStream = os.addTagToStreamContract
       streamId,
       editorId,
     )
-    await ensureDraftInitialized(db, scheduleId, editorId)
+    await ensureDraftCopied(db, scheduleId, editorId)
 
     const t = await resolveTag(db, tag)
 
@@ -96,8 +96,8 @@ export const removeTagFromStream = os.removeTagFromStreamContract
       )
       .run()
 
-    if ((res as any).rowsAffected === 0) {
-      throw new Error('Draft stream tag not found')
+    if (res.meta.changes === 0) {
+      throw new ORPCError('NOT_FOUND', { message: 'Draft stream tag not found' })
     }
 
     const stub = getScheduleEditingStub(context.env as any, scheduleId)

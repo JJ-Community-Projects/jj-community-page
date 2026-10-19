@@ -1,5 +1,5 @@
 import { createContext, createEffect, createSignal, on, type ParentComponent, useContext, } from 'solid-js'
-import { useMutation, useQuery } from '@tanstack/solid-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/solid-query'
 import { orpcPrivate } from '../../../../../../lib/orpc/client.ts'
 import { createStore } from 'solid-js/store'
 import type {
@@ -40,6 +40,19 @@ const initialState: ScheduleDraftState = {
   isReady: false,
 }
 
+/** The server refused the editor: no edit rights (any more), or the schedule is gone. */
+const isAccessError = (error: unknown) => {
+  const code = (error as { code?: string } | null)?.code
+  return code === 'FORBIDDEN' || code === 'NOT_FOUND'
+}
+
+/** Same ids, ignoring order and duplicates. */
+const sameIds = (a: number[], b: number[]) => {
+  const left = new Set(a)
+  const right = new Set(b)
+  return left.size === right.size && [...left].every((id) => right.has(id))
+}
+
 const useScheduleEditor2Hook = (scheduleId: number) => {
   const [state, setState] = createStore<ScheduleDraftState>(initialState)
   const [events, setEvents] = createSignal<EditChannelMessage[]>([])
@@ -51,11 +64,38 @@ const useScheduleEditor2Hook = (scheduleId: number) => {
 
   const scheduleEditing = orpcPrivate.scheduleEditingWS
   const users = orpcPrivate.users
+  const queryClient = useQueryClient()
+
+  // Access lost while the editor is open: the server refused a token renewal, or the
+  // socket's reconnect got `access_revoked`. The live feed is stopped for good: cancelling the
+  // query aborts the subscription, which ends the socket's reconnects and the renewal retries.
+  const [accessLost, setAccessLost] = createSignal(false)
+  const loseAccess = () => {
+    if (accessLost()) return
+    setAccessLost(true)
+    void queryClient.cancelQueries({
+      queryKey: scheduleEditing.streamDraftWS.experimental_liveKey({
+        input: { scheduleId },
+      }),
+    })
+  }
   const sse = useQuery(() =>
     scheduleEditing.streamDraftWS.experimental_liveOptions({
       input: { scheduleId },
+      // The token lives 5 minutes; renewals check access again and leave the draft alone.
+      context: {
+        tokenRenewal: {
+          input: { scheduleId, renew: true },
+          onRefused: loseAccess,
+        },
+      },
+      enabled: !accessLost(),
+      retry: (failureCount, error) =>
+        !isAccessError(error) && failureCount < 3,
     }),
   )
+  /** No access to the editor: lost while open, or refused when the page opened. */
+  const noAccess = () => accessLost() || isAccessError(sse.error)
 
   const ensureArray = <T,>(v: T[] | undefined) => v ?? []
   const ensureMap = <T,>(m: Record<string, T[]> | undefined) => m ?? {}
@@ -243,6 +283,10 @@ const useScheduleEditor2Hook = (scheduleId: number) => {
         }
         break
       }
+      case 'access_revoked': {
+        loseAccess()
+        break
+      }
       default:
         break
     }
@@ -274,9 +318,14 @@ const useScheduleEditor2Hook = (scheduleId: number) => {
   const updateMetaMutation = useMutation(() =>
     scheduleEditing.upsertScheduleMeta.mutationOptions(),
   )
-  // @ts-ignore
-  const updateMeta = (input: EditScheduleMetaPatch) =>
-    updateMetaMutation.mutateAsync(input)
+  // Applies the saved fields locally too, so an edited field doesn't show the old value until
+  // the schedule_updated event arrives (the event applies the same patch again).
+  const updateMeta = async (input: EditScheduleMetaPatch) => {
+    const result = await updateMetaMutation.mutateAsync(input)
+    const { scheduleId: _scheduleId, ...patch } = input
+    setState('schedule', (prev) => (prev ? { ...prev, ...patch } : prev))
+    return result
+  }
 
   const startEditingSessionMutation = useMutation(() =>
     scheduleEditing.startEditingSession.mutationOptions(),
@@ -413,8 +462,25 @@ const useScheduleEditor2Hook = (scheduleId: number) => {
       }))
     }
     console.log('updateStream', input)
+    // Tags and participants are only sent when they changed: an unchanged set costs the server
+    // reads and changes nothing (the server compares sets too, so the order doesn't matter).
+    const { tags, participants, ...rest } = input
+    const tagsChanged =
+      tags !== undefined &&
+      !sameIds(tags, (state.tagsByStream[input.id] ?? []).map((t) => t.id))
+    const participantsChanged =
+      participants !== undefined &&
+      !sameIds(
+        participants,
+        (state.participantsByStream[input.id] ?? []).map((p) => p.userId),
+      )
     // @ts-ignore
-    return updateStreamMutation.mutateAsync({ scheduleId, ...input })
+    return updateStreamMutation.mutateAsync({
+      scheduleId,
+      ...rest,
+      ...(tagsChanged && { tags }),
+      ...(participantsChanged && { participants }),
+    })
   }
 
   const updateStreamsMutation = useMutation(() =>
@@ -507,14 +573,11 @@ const useScheduleEditor2Hook = (scheduleId: number) => {
   const unlockStream = (streamId: number) =>
     unlockStreamMutation.mutateAsync({ scheduleId, streamId })
 
-  createEffect(() => {
-    void startEditingSession()
-  })
-
   const relations = useQuery(() => users.getRelations.queryOptions())
 
   return {
     state,
+    noAccess,
     deleteSchedule,
     deleteMutation,
     // meta

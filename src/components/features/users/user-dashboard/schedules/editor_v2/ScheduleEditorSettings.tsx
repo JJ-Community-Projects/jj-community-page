@@ -15,20 +15,20 @@ export const ScheduleEditorSettings: Component = () => {
   // Identity accessor so the helpers know when we’re looking at a different schedule
   const scheduleId = () => state.schedule?.id;
 
-  // Title field managed by useEditableField
+  // Title field managed by useEditableField: saved on blur or Enter, only when it changed
   const titleField = useEditableField<string>({
     source: () => state.schedule?.title,
     identity: scheduleId,
     commit: async (title) => {
       if (!state.schedule) return;
       const trimmed = typeof title === "string" ? title.trim() : (title as unknown as string);
-      if (!trimmed) return;
+      if (!trimmed || trimmed === state.schedule.title) return;
       await updateMeta({ scheduleId: state.schedule.id, title: trimmed });
     },
-    debounceMs: 250,
+    commitOn: "blur",
   });
 
-  // Year field with parse/format
+  // Year field with parse/format, saved on blur or Enter
   const yearField = useEditableField<number>({
     source: () => state.schedule?.year,
     identity: scheduleId,
@@ -39,10 +39,10 @@ export const ScheduleEditorSettings: Component = () => {
     format: (v) => (typeof v === "number" && Number.isFinite(v) ? String(v) : ""),
     commit: async (year) => {
       if (!state.schedule) return;
-      if (!Number.isFinite(year)) return;
+      if (!Number.isFinite(year) || year === state.schedule.year) return;
       await updateMeta({ scheduleId: state.schedule.id, year });
     },
-    debounceMs: 250,
+    commitOn: "blur",
   });
 
   // Slug field and separate debounced value for validation
@@ -179,8 +179,9 @@ export const ScheduleEditorSettings: Component = () => {
                   class="border border-gray-300 rounded-lg px-3 py-2 w-full disabled:opacity-50 disabled:cursor-not-allowed"
                   value={titleField.inputValue()}
                   onInput={(e) => titleField.onInput(e.currentTarget.value)}
+                  onKeyDown={(e) => titleField.onKeyDown(e)}
                   onFocus={() => titleField.setFocused(true)}
-                  onBlur={() => titleField.setFocused(false)}
+                  onBlur={() => titleField.onBlur()}
                 />
                 <Show when={updateMetaMutation.isPending}>
                   <div class="absolute right-3 top-1/2 transform -translate-y-1/2">
@@ -197,8 +198,9 @@ export const ScheduleEditorSettings: Component = () => {
                 class="border border-gray-300 rounded-lg px-3 py-2"
                 value={yearField.inputValue()}
                 onInput={(e) => yearField.onInput(e.currentTarget.value)}
+                onKeyDown={(e) => yearField.onKeyDown(e)}
                 onFocus={() => yearField.setFocused(true)}
-                onBlur={() => yearField.setFocused(false)}
+                onBlur={() => yearField.onBlur()}
                 inputmode="numeric"
               />
             </TextField>

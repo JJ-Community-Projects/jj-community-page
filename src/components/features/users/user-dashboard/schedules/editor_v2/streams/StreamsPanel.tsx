@@ -6,7 +6,7 @@ import {AddStreamDialogProvider} from "./dialog/add/AddStreamDialogContext.tsx";
 import {AddStreamDialog} from "./dialog/add/AddStreamDialog.tsx";
 
 export const StreamsPanel: Component = () => {
-  const {state, addStreamMutation} = useScheduleEditor2();
+  const {state, noAccess, addStreamMutation} = useScheduleEditor2();
   const year = () => state.schedule?.year ?? new Date().getFullYear();
   const minDate = () => new Date(year(), 0, 1, 0, 0, 0, 0);
   const maxDate = () => new Date(year(), 11, 31, 23, 59, 0, 0);
@@ -15,7 +15,7 @@ export const StreamsPanel: Component = () => {
     <div class="bg-white rounded-2xl shadow-xl p-6">
       <h2 class="text-xl font-bold mb-4">Streams</h2>
 
-      <Show when={state.isReady} fallback={<div class="text-sm text-gray-600">Loading streams…</div>}>
+      <Show when={state.isReady} fallback={<div class="text-sm text-gray-600">{noAccess() ? 'No access to this schedule.' : 'Loading streams…'}</div>}>
         <AddStreamDialogProvider start={minDate()} end={maxDate()}>
           <div class="space-y-4">
             {/* Week 1 */}
