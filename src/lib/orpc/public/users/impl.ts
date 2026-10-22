@@ -5,15 +5,15 @@ import { userDisplayView, usersSearchView, } from '../../../db/schema/views-sche
 import { twitchChannelSchema } from '../../../db/schema/twitch-channel-schema.ts'
 import { asc, eq, like, or, sql } from 'drizzle-orm'
 import {
+  assemblePrimaryStreams,
   getUserBySlug as getUserBySlugUtil,
-  getUserFriends,
-  getUserOwnStreams,
-  getUserParticipatingStreams,
-  getUserPrimaryStreams,
-  getUserSchedules,
-  getUserSocials,
-  getUserTags,
-  getUserTeams,
+  primarySchedule,
+  primaryStreamsQueries,
+  userFriendsQuery,
+  userSchedulesQuery,
+  userSocialsQuery,
+  userTagsQuery,
+  userTeamsQuery,
 } from './util.ts'
 import { users } from '../../../db/schema/auth-schema.ts'
 import { userSchedulesRouter } from './schedules/impl.ts'
@@ -147,33 +147,27 @@ const getUserFullProfileBySlug = os.getUserFullProfileBySlugContract
     const user = await getUserBySlugUtil(db, input.slug)
     const userId = user.userId
 
-    // Fetch all user-related data in parallel for optimal performance
-    const [tags, socials, friends, teams, scheduleResult] = await Promise.all([
-      getUserTags(db, userId),
-      getUserSocials(db, userId),
-      getUserFriends(db, userId),
-      getUserTeams(db, userId),
-      getUserSchedules(db, userId),
+    // Everything else in one batch; related users come from KV in parallel (a miss adds one
+    // statement)
+    const [
+      [tags, socials, friends, teams, schedules, ...primaryStreamResults],
+      related,
+    ] = await Promise.all([
+      db.batch([
+        userTagsQuery(db, userId),
+        userSocialsQuery(db, userId),
+        userFriendsQuery(db, userId),
+        userTeamsQuery(db, userId),
+        userSchedulesQuery(db, userId),
+        ...primaryStreamsQueries(db, userId, new Date()),
+      ]),
+      findRelatedUsersWithJaccard(
+        db,
+        context.env,
+        userId,
+        PROFILE_RELATED_USERS_LIMIT,
+      ),
     ])
-
-    // Extract schedules and primary schedule from result
-    const { schedules, primarySchedule } = scheduleResult
-    const userScheduleIds = schedules.map((s) => s.id)
-
-    // Fetch streams data in parallel
-    const [nextStreams, nextStreamsOthers, nextPrimaryStreams] =
-      await Promise.all([
-        getUserOwnStreams(db, userScheduleIds),
-        getUserParticipatingStreams(db, userId),
-        getUserPrimaryStreams(db, primarySchedule?.id),
-      ])
-
-    const related = await findRelatedUsersWithJaccard(
-      db,
-      context.env,
-      userId,
-      PROFILE_RELATED_USERS_LIMIT,
-    )
 
     return {
       user,
@@ -186,11 +180,9 @@ const getUserFullProfileBySlug = os.getUserFullProfileBySlugContract
       friends,
       related,
       teams,
-      primarySchedule,
+      primarySchedule: primarySchedule(schedules),
       schedules,
-      nextStreams,
-      nextStreamsOthers,
-      nextPrimaryStreams,
+      nextPrimaryStreams: assemblePrimaryStreams(primaryStreamResults),
     }
   },
 )

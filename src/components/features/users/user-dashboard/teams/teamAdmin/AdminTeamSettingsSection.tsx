@@ -30,6 +30,7 @@ export const AdminTeamSettingsSection: Component = () => {
       tiltifyName: team.data?.name
     },
     enabled: () => team.data !== undefined && slug().length > 0 && slug() !== team.data?.slug,
+    staleTime: 30 * 1000,
   }))
 
   // Initialize form with team data

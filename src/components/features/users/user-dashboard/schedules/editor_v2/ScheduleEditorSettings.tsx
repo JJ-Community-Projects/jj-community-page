@@ -71,12 +71,11 @@ export const ScheduleEditorSettings: Component = () => {
   const validateSlug = useQuery(() =>
     orpcPrivate.schedules.validateSlug.queryOptions({
       input: {
-        id: state.schedule?.id ?? 0,
         slug: slugForValidation(),
-        title: state.schedule?.title ?? "",
       },
       enabled: () =>
         Boolean(state.schedule) && !!slugForValidation() && slugForValidation() !== (state.schedule?.slug ?? ""),
+      staleTime: 30 * 1000,
     })
   );
 

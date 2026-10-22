@@ -11,10 +11,7 @@ import {
 import { users } from '../../../db/schema/auth-schema.ts'
 import { userDisplayView } from '../../../db/schema/views-schema.ts'
 import { and, count, eq, not } from 'drizzle-orm'
-import {
-  createSlug,
-  generateTeamSlugAlternativesLocals,
-} from '../../../../functions/slug.ts'
+import { createSlug, validateSlugFor } from '../../../../functions/slug.ts'
 import {
   publishTeamAdminInvitesUpdate,
   publishTeamAdminMembersUpdate,
@@ -177,73 +174,19 @@ const deleteTeam = os.deleteContract
   })
 
 /**
- * Validate slug availability and generate suggestions
- * Uses existing slug generation functions
+ * Validate slug availability and generate suggestions (one round trip, see validateSlugFor)
  */
 const validateSlug = os.validateSlugContract
   .use(authMiddleware)
   .handler(async ({ context, input }) => {
     const { slug, tiltifyName } = input
-    const user = context.user
 
     if (!slug) {
       throw new ORPCError('BAD_REQUEST', { message: 'Slug is required' })
     }
 
     try {
-      // Get alternatives using the generateTeamSlugAlternatives function
-      // If it returns alternatives, the slug is not valid
-      const alternatives = await generateTeamSlugAlternativesLocals(
-        context.locals,
-        slug,
-        3,
-      )
-
-      // If alternatives is empty, the slug is valid
-      if (alternatives.length === 0) {
-        return {
-          isValid: true,
-          suggestions: [],
-        }
-      }
-
-      // Add tiltifyName as a suggestion if provided and different from slug
-      let allAlternatives = [...alternatives]
-
-      if (tiltifyName && tiltifyName.toLowerCase() !== slug.toLowerCase()) {
-        const tiltifySlug = createSlug(tiltifyName)
-        // Check if this slug is valid using generateTeamSlugAlternatives
-        // If it returns an empty array, the slug is valid
-        const tiltifyAlternatives = await generateTeamSlugAlternativesLocals(
-          context.locals,
-          tiltifySlug,
-          0,
-        )
-        if (tiltifyAlternatives.length === 0) {
-          allAlternatives.push(tiltifySlug)
-        }
-      } else if (
-        user.tiltifyName &&
-        user.tiltifyName.toLowerCase() !== slug.toLowerCase()
-      ) {
-        const userTiltifySlug = createSlug(user.tiltifyName)
-        // Check if this slug is valid using generateTeamSlugAlternatives
-        // If it returns an empty array, the slug is valid
-        const userTiltifyAlternatives =
-          await generateTeamSlugAlternativesLocals(
-            context.locals,
-            userTiltifySlug,
-            0,
-          )
-        if (userTiltifyAlternatives.length === 0) {
-          allAlternatives.push(userTiltifySlug)
-        }
-      }
-
-      return {
-        isValid: false,
-        suggestions: allAlternatives,
-      }
+      return await validateSlugFor('team', context.user, slug, tiltifyName)
     } catch (error) {
       console.error('Error validating slug:', error)
       throw new ORPCError('INTERNAL_SERVER_ERROR', {

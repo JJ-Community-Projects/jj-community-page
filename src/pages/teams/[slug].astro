@@ -17,18 +17,19 @@ if (slug !== slugLower) {
 
 const context = { context: { locals: Astro.locals, request: Astro.request } } as const;
 
-const { data: team, error: teamError } = await serverClientPublic.teams.getBySlug({ slug }, context);
+// All three in parallel; members and streams are only shown when the team was found.
+const [t, m, s] = await Promise.all([
+  serverClientPublic.teams.getBySlug({ slug }, context),
+  serverClientPublic.teams.getMembers({ slug }, context),
+  serverClientPublic.teams.getTeamNextStreams({ slug, limit: 6, unique: true }, context),
+]);
+const { data: team, error: teamError } = t;
 if (teamError || !team) {
   console.error('Team fetch error:', teamError);
 }
 
-let members, membersError, nextStreams, streamsError;
-if (team) {
-  const m = await serverClientPublic.teams.getMembers({ slug }, context);
-  members = m.data; membersError = m.error;
-  const s = await serverClientPublic.teams.getTeamNextStreams({ slug, limit: 6, unique: true }, context);
-  nextStreams = s.data; streamsError = s.error;
-}
+const { data: members, error: membersError } = m;
+const { data: nextStreams, error: streamsError } = s;
 
 // Semantic DS tokens with safe fallbacks; keep island prop contract (strings)
 const teamColors = {

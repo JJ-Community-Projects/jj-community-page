@@ -90,10 +90,6 @@ export const UserProfileDataSchema = z.object({
   primarySchedule: ScheduleInfoSchema.optional(),
   /** Array of schedules this user has created or participates in */
   schedules: z.array(ScheduleInfoSchema),
-  /** The next 3 streams belonging to a schedule of this user */
-  nextStreams: z.array(StreamSchema).max(3),
-  /** The next 3 streams belonging to schedules from other users where this user is part of */
-  nextStreamsOthers: z.array(StreamSchema).max(3),
   /** The next 3 streams from the primary schedule of this user */
   nextPrimaryStreams: z.array(StreamSchema).max(3),
 })

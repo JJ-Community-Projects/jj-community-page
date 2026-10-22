@@ -2,7 +2,8 @@ import {ORPCError} from '@orpc/server';
 import {accounts} from "../../../db/schema/auth-schema.ts";
 import {schedulesTable, streamParticipantsTable, streamsTable} from "../../../db/schema/jj-schema.ts";
 import {userDisplayView} from "../../../db/schema/views-schema.ts";
-import {and, eq, asc, gt, or} from "drizzle-orm";
+import {and, eq, asc, gt, or, type SQLWrapper} from "drizzle-orm";
+import type {BatchResponse} from "drizzle-orm/batch";
 import {ScheduleDaySchema, ScheduleWeekSchema, StreamSchema, type Stream} from "../schemas/schedules.ts";
 import {z} from "zod/v4";
 import type {JJDrizzleDatabase} from "../../../db/db.ts";
@@ -27,11 +28,20 @@ export async function findUserBySlug(db: JJDrizzleDatabase, userSlug: string): P
 }
 
 /**
- * Helper function to get streams for a schedule with their tags and participants
+ * Helper function to get streams for a schedule with their tags and participants, in one round trip
  */
 export async function getScheduleStreams(db: JJDrizzleDatabase, scheduleId: number) {
+  return assembleScheduleStreams(await db.batch(scheduleStreamsQueries(db, scheduleId)))
+}
+
+/**
+ * The three reads behind `getScheduleStreams`, for one `db.batch()`: visible streams, their tags and
+ * their participants. `scheduleId` may be a scalar subquery, so callers can batch these with the
+ * statement that finds the schedule; a subquery that finds nothing reads no stream.
+ */
+export function scheduleStreamsQueries(db: JJDrizzleDatabase, scheduleId: number | SQLWrapper) {
   // Get all streams for the schedule
-  const streams = await db.select({
+  const streams = db.select({
     id: streamsTable.id,
     scheduleId: streamsTable.scheduleId,
     createdBy: streamsTable.createdBy,
@@ -48,11 +58,10 @@ export async function getScheduleStreams(db: JJDrizzleDatabase, scheduleId: numb
     .where(and(
       eq(streamsTable.scheduleId, scheduleId),
       eq(streamsTable.visible, true)
-    ))
-    .all();
+    ));
 
   // Get tags for all streams
-  const streamTags = await db.select({
+  const streamTags = db.select({
     streamId: streamTagsTable.streamId,
     name: tags.name,
     slug: tags.slug,
@@ -60,11 +69,10 @@ export async function getScheduleStreams(db: JJDrizzleDatabase, scheduleId: numb
   })
     .from(streamTagsTable)
     .innerJoin(tags, eq(streamTagsTable.tagId, tags.id))
-    .where(eq(streamTagsTable.scheduleId, scheduleId))
-    .all();
+    .where(eq(streamTagsTable.scheduleId, scheduleId));
 
   // Get participants for all streams
-  const streamParticipants = await db.select({
+  const streamParticipants = db.select({
     streamId: streamParticipantsTable.streamId,
     userId: userDisplayView.userId,
     primaryLiveStream: userDisplayView.primaryLiveStream,
@@ -79,9 +87,15 @@ export async function getScheduleStreams(db: JJDrizzleDatabase, scheduleId: numb
   })
     .from(streamParticipantsTable)
     .innerJoin(userDisplayView, eq(streamParticipantsTable.userId, userDisplayView.userId))
-    .where(eq(streamParticipantsTable.scheduleId, scheduleId))
-    .all();
+    .where(eq(streamParticipantsTable.scheduleId, scheduleId));
 
+  return [streams, streamTags, streamParticipants] as const;
+}
+
+/** Streams with their tags and participants, from the results of `scheduleStreamsQueries`. */
+export function assembleScheduleStreams(
+  [streams, streamTags, streamParticipants]: BatchResponse<ReturnType<typeof scheduleStreamsQueries>>,
+) {
   // Group tags and participants by stream
   const streamTagsMap = new Map<number, Array<{ name: string; slug: string; color: string }>>();
   const streamParticipantsMap = new Map<number, Array<{

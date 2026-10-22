@@ -13,12 +13,25 @@ import {
   tags as tagsTable,
 } from '../../../db/schema/tags-schema.ts'
 import { userDisplayView } from '../../../db/schema/views-schema.ts'
-import { and, count, eq, gte, inArray, or } from 'drizzle-orm'
+import { and, asc, count, eq, gte, inArray, sql, type Column } from 'drizzle-orm'
+import type { JJDrizzleDatabase } from '../../../db/db.ts'
+import type { UserDisplay } from '../users/util.ts'
 import { byInput, cached } from '../../middleware/cached.ts'
+import { CACHE_POLICY } from '../../../services/cachePolicy.ts'
 
 const os = implement(publicTeamsContract).use(dbMiddleware)
 
 const bySlug = (input: { slug: string }) => input.slug
+
+/**
+ * The id of the visible team with this slug: a statement of its own (no row: missing or hidden), or
+ * a scalar subquery that keys the other statements of the same batch.
+ */
+const visibleTeamId = (db: JJDrizzleDatabase, slug: string) =>
+  db
+    .select({ id: teamsTable.id })
+    .from(teamsTable)
+    .where(and(eq(teamsTable.slug, slug), eq(teamsTable.visible, true)))
 
 /**
  * Find all visible teams with member counts
@@ -74,6 +87,7 @@ const getBySlug = os.getBySlugContract
   const db = context.db
   const { slug } = input
 
+  // One statement: the team and its member count
   const team = await db
     .select({
       id: teamsTable.id,
@@ -82,6 +96,10 @@ const getBySlug = os.getBySlugContract
       description: teamsTable.description,
       visible: teamsTable.visible,
       ownerId: teamsTable.ownerId,
+      memberCount: db.$count(
+        teamMembersTable,
+        eq(teamMembersTable.teamId, teamsTable.id),
+      ),
     })
     .from(teamsTable)
     .where(eq(teamsTable.slug, slug))
@@ -95,15 +113,7 @@ const getBySlug = os.getBySlugContract
     throw new ORPCError('FORBIDDEN', { message: 'Team is private' })
   }
 
-  const teamMembers = await db
-    .select({
-      count: count(),
-    })
-    .from(teamMembersTable)
-    .where(eq(teamMembersTable.teamId, team.id))
-    .get()
-
-  return { ...team, memberCount: teamMembers?.count ?? 0 }
+  return team
 })
 
 /**
@@ -117,41 +127,37 @@ const getMembers = os.getMembersContract
   const { slug } = input
 
   try {
-    // First check if team exists and is visible
-    const team = await db
-      .select()
-      .from(teamsTable)
-      .where(and(eq(teamsTable.slug, slug), eq(teamsTable.visible, true)))
-      .get()
+    // One round trip: whether the team exists and is visible, and its members in user display
+    // format
+    const [team, members] = await db.batch([
+      visibleTeamId(db, slug),
+      db
+        .select({
+          userId: userDisplayView.userId,
+          primaryLiveStream: userDisplayView.primaryLiveStream,
+          role: userDisplayView.role,
+          createdAt: userDisplayView.createdAt,
+          username: userDisplayView.username,
+          profileImage: userDisplayView.profileImage,
+          twitchLogin: userDisplayView.twitchLogin,
+          tiltifySlug: userDisplayView.tiltifySlug,
+          tiltifyUrl: userDisplayView.tiltifyUrl,
+          primaryColor: userDisplayView.primaryColor,
+          accentColor: userDisplayView.accentColor,
+        })
+        .from(teamMembersTable)
+        .innerJoin(
+          userDisplayView,
+          eq(teamMembersTable.userId, userDisplayView.userId),
+        )
+        .where(eq(teamMembersTable.teamId, visibleTeamId(db, slug))),
+    ])
 
-    if (!team) {
+    if (team.length === 0) {
       throw new ORPCError('NOT_FOUND', {
         message: 'Team not found or not visible',
       })
     }
-
-    // Get team members in user display format
-    const members = await db
-      .select({
-        userId: userDisplayView.userId,
-        primaryLiveStream: userDisplayView.primaryLiveStream,
-        role: userDisplayView.role,
-        createdAt: userDisplayView.createdAt,
-        username: userDisplayView.username,
-        profileImage: userDisplayView.profileImage,
-        twitchLogin: userDisplayView.twitchLogin,
-        tiltifySlug: userDisplayView.tiltifySlug,
-        tiltifyUrl: userDisplayView.tiltifyUrl,
-        primaryColor: userDisplayView.primaryColor,
-        accentColor: userDisplayView.accentColor,
-      })
-      .from(teamMembersTable)
-      .innerJoin(
-        userDisplayView,
-        eq(teamMembersTable.userId, userDisplayView.userId),
-      )
-      .where(eq(teamMembersTable.teamId, team.id))
-      .all()
 
     return { members }
   } catch (error) {
@@ -243,8 +249,14 @@ const getTeamSchedulesByYear = os.getTeamSchedulesByYearContract
  * Get next n streams from all team member schedules
  * Returns upcoming streams from all team members with optional uniqueness filtering
  */
+// Its NOT_FOUND means "no such visible team": cached like the team's own (the team page asks all
+// three team procedures at once).
 const getTeamNextStreams = os.getTeamNextStreamsContract
-  .use(cached('upcoming', byInput))
+  .use(
+    cached('upcoming', byInput, {
+      negativeTtl: CACHE_POLICY.team.negativeTtl,
+    }),
+  )
   .handler(
   async ({ context, input }) => {
     const db = context.db
@@ -256,66 +268,54 @@ const getTeamNextStreams = os.getTeamNextStreamsContract
     const currentYear = new Date().getUTCFullYear()
 
     try {
-      // First check if team exists and is visible
-      const team = await db
-        .select()
-        .from(teamsTable)
-        .where(and(eq(teamsTable.slug, slug), eq(teamsTable.visible, true)))
-        .get()
+      // 1) One round trip: whether the team exists and is visible, and the upcoming streams of the
+      //    members' primary schedules of this year
+      const currentTime = new Date()
+      const [team, streams] = await db.batch([
+        visibleTeamId(db, slug),
+        db
+          .select({
+            id: streamsTable.id,
+            scheduleId: streamsTable.scheduleId,
+            createdBy: streamsTable.createdBy,
+            title: streamsTable.title,
+            visible: streamsTable.visible,
+            subtitle: streamsTable.subtitle,
+            description: streamsTable.description,
+            youtubeVodUrl: streamsTable.youtubeVodUrl,
+            twitchVodUrl: streamsTable.twitchVodUrl,
+            start: streamsTable.start,
+            end: streamsTable.end,
+          })
+          .from(streamsTable)
+          .innerJoin(
+            schedulesTable,
+            eq(streamsTable.scheduleId, schedulesTable.id),
+          )
+          .where(
+            and(
+              inArray(
+                schedulesTable.ownerId,
+                db
+                  .select({ userId: teamMembersTable.userId })
+                  .from(teamMembersTable)
+                  .where(eq(teamMembersTable.teamId, visibleTeamId(db, slug))),
+              ),
+              eq(streamsTable.visible, true),
+              eq(schedulesTable.visible, true),
+              eq(schedulesTable.primary, true),
+              eq(schedulesTable.year, currentYear),
+              gte(streamsTable.start, currentTime),
+            ),
+          )
+          .orderBy(streamsTable.start),
+      ])
 
-      if (!team) {
+      if (team.length === 0) {
         throw new ORPCError('NOT_FOUND', {
           message: 'Team not found or not visible',
         })
       }
-
-      // Get all team member user IDs
-      const teamMembers = await db
-        .select({
-          userId: teamMembersTable.userId,
-        })
-        .from(teamMembersTable)
-        .where(eq(teamMembersTable.teamId, team.id))
-        .all()
-
-      if (teamMembers.length === 0) {
-        return []
-      }
-
-      const memberUserIds = teamMembers.map((member) => member.userId)
-      const currentTime = new Date()
-      // Get all upcoming streams from team member schedules
-      const streams = await db
-        .select({
-          id: streamsTable.id,
-          scheduleId: streamsTable.scheduleId,
-          createdBy: streamsTable.createdBy,
-          title: streamsTable.title,
-          visible: streamsTable.visible,
-          subtitle: streamsTable.subtitle,
-          description: streamsTable.description,
-          youtubeVodUrl: streamsTable.youtubeVodUrl,
-          twitchVodUrl: streamsTable.twitchVodUrl,
-          start: streamsTable.start,
-          end: streamsTable.end,
-        })
-        .from(streamsTable)
-        .innerJoin(
-          schedulesTable,
-          eq(streamsTable.scheduleId, schedulesTable.id),
-        )
-        .where(
-          and(
-            inArray(schedulesTable.ownerId, memberUserIds),
-            eq(streamsTable.visible, true),
-            eq(schedulesTable.visible, true),
-            eq(schedulesTable.primary, true),
-            eq(schedulesTable.year, currentYear),
-            gte(streamsTable.start, currentTime),
-          ),
-        )
-        .orderBy(streamsTable.start)
-        .all()
 
       if (streams.length === 0) {
         return []
@@ -340,11 +340,22 @@ const getTeamNextStreams = os.getTeamNextStreamsContract
       // Early return if none
       if (limitedStreams.length === 0) return []
 
-      // Get stream participants for each selected stream
-      const participantsByStream = new Map<string, any[]>()
-      for (const stream of limitedStreams) {
-        const participantsData = await db
+      // 2) Participants and tags of the selected streams in one batch, keyed by the (schedule_id,
+      //    stream_id) pairs passed as one JSON parameter (as in jj.upcomingStreams)
+      const selected = sql`json_each(${JSON.stringify(
+        limitedStreams.map((s) => [s.scheduleId, s.id]),
+      )}) as "selected"`
+      const isSelected = (scheduleId: Column, streamId: Column) =>
+        and(
+          eq(scheduleId, sql`"selected"."value" ->> 0`),
+          eq(streamId, sql`"selected"."value" ->> 1`),
+        )
+
+      const [participantRows, tagRows] = await db.batch([
+        db
           .select({
+            scheduleId: streamParticipantsTable.scheduleId,
+            streamId: streamParticipantsTable.streamId,
             userId: userDisplayView.userId,
             primaryLiveStream: userDisplayView.primaryLiveStream,
             createdAt: userDisplayView.createdAt,
@@ -356,35 +367,24 @@ const getTeamNextStreams = os.getTeamNextStreamsContract
             primaryColor: userDisplayView.primaryColor,
             accentColor: userDisplayView.accentColor,
           })
-          .from(streamParticipantsTable)
+          .from(selected)
+          .innerJoin(
+            streamParticipantsTable,
+            isSelected(
+              streamParticipantsTable.scheduleId,
+              streamParticipantsTable.streamId,
+            ),
+          )
           .innerJoin(
             userDisplayView,
             eq(streamParticipantsTable.userId, userDisplayView.userId),
           )
-          .where(
-            and(
-              eq(streamParticipantsTable.scheduleId, stream.scheduleId),
-              eq(streamParticipantsTable.streamId, stream.id),
-            ),
-          )
-          .all()
-        const key = `${stream.scheduleId}-${stream.id}`
-        participantsByStream.set(key, participantsData)
-      }
-
-      // Fetch tags for selected streams (batch OR of composite keys)
-      const tagWhereClauses = limitedStreams.map((s) =>
-        and(
-          eq(streamTagsTable.scheduleId, s.scheduleId),
-          eq(streamTagsTable.streamId, s.id),
-        ),
-      )
-      const tagsByStream = new Map<
-        string,
-        { name: string; slug: string; color: string }[]
-      >()
-      if (tagWhereClauses.length > 0) {
-        const tagRows = await db
+          .orderBy(
+            asc(streamParticipantsTable.scheduleId),
+            asc(streamParticipantsTable.streamId),
+            asc(streamParticipantsTable.userId),
+          ),
+        db
           .select({
             scheduleId: streamTagsTable.scheduleId,
             streamId: streamTagsTable.streamId,
@@ -392,26 +392,44 @@ const getTeamNextStreams = os.getTeamNextStreamsContract
             slug: tagsTable.slug,
             color: tagsTable.color,
           })
-          .from(streamTagsTable)
+          .from(selected)
+          .innerJoin(
+            streamTagsTable,
+            isSelected(streamTagsTable.scheduleId, streamTagsTable.streamId),
+          )
           .innerJoin(
             tagsTable,
             and(
               eq(streamTagsTable.tagId, tagsTable.id),
-              eq(tagsTable.visible, true),
+              // Unary + keeps the planner off idx_tags_visible: it started the join from every
+              // visible tag (seed: 302 rows instead of a few)
+              sql`+${tagsTable.visible} = 1`,
             ),
           )
-          .where(
-            tagWhereClauses.length === 1
-              ? tagWhereClauses[0]
-              : or(...tagWhereClauses),
-          )
-          .all()
-        for (const row of tagRows) {
-          const key = `${row.scheduleId}-${row.streamId}`
-          const list = tagsByStream.get(key) ?? []
-          list.push({ name: row.name, slug: row.slug, color: row.color })
-          tagsByStream.set(key, list)
-        }
+          .orderBy(
+            asc(streamTagsTable.scheduleId),
+            asc(streamTagsTable.streamId),
+            asc(streamTagsTable.tagId),
+          ),
+      ])
+
+      const participantsByStream = new Map<string, UserDisplay[]>()
+      for (const { scheduleId, streamId, ...participant } of participantRows) {
+        const key = `${scheduleId}-${streamId}`
+        const list = participantsByStream.get(key) ?? []
+        list.push(participant)
+        participantsByStream.set(key, list)
+      }
+
+      const tagsByStream = new Map<
+        string,
+        { name: string; slug: string; color: string }[]
+      >()
+      for (const row of tagRows) {
+        const key = `${row.scheduleId}-${row.streamId}`
+        const list = tagsByStream.get(key) ?? []
+        list.push({ name: row.name, slug: row.slug, color: row.color })
+        tagsByStream.set(key, list)
       }
 
       // Shape final output to comply with StreamSchema

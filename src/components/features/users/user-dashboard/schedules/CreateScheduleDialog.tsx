@@ -21,13 +21,13 @@ export const CreateScheduleDialog: Component<{
   const [primary, setPrimary] = createSignal(false);
   const [year, setYear] = createSignal(DateTime.now().year);
 
-  // Slug validation query - we'll need a scheduleId for this, so we'll use 0 for new schedules
+  // Slug validation query, on the slug 500 ms after the last keystroke in the name or slug field
   const validateSlug = useQuery(() => orpcPrivate.schedules.validateSlug.queryOptions({
     input: {
       slug: debounceSlug(),
-      title: name()
     },
     enabled: () => debounceSlug().length > 0,
+    staleTime: 30 * 1000,
   }));
 
   // oRPC mutations
@@ -38,6 +38,8 @@ export const CreateScheduleDialog: Component<{
         // Reset form
         setName("");
         setSlug("");
+        setSlugDebounce.clear();
+        setDebounceSlug("");
         setPrimary(false);
         setYear(DateTime.now().year);
         // Call the onSuccess callback if provided
@@ -50,11 +52,11 @@ export const CreateScheduleDialog: Component<{
 
   // Validation helper functions
   const isCheckingSlug = () => {
-    return validateSlug.isPending;
+    return validateSlug.isPending || debounceSlug() !== slug();
   };
 
   const slugValid = () => {
-    if (!validateSlug.data) {
+    if (!validateSlug.data || debounceSlug() !== slug()) {
       return false;
     }
     return validateSlug.data.isValid;
@@ -71,23 +73,21 @@ export const CreateScheduleDialog: Component<{
     return validateSlug.data.suggestions;
   };
 
-  // Create debounced function for slug setting
-  const setSlugDebounce = debounce((slugValue: string) => {
-    const sanitizedSlug = slugValue.toLowerCase().replace(/[^a-z0-9-]/g, "-");
-    setDebounceSlug(sanitizedSlug);
-  }, 500);
+  // Create debounced function for the checked slug
+  const setSlugDebounce = debounce(setDebounceSlug, 500);
 
   const handleNameChange = (value: string) => {
     setName(value);
     // Auto-generate slug from name if user hasn't manually edited the slug
     const generatedSlug = value.toLowerCase().replace(/[^a-z0-9]/g, "-");
     setSlug(generatedSlug);
-    setDebounceSlug(generatedSlug);
+    setSlugDebounce(generatedSlug);
   };
 
   const handleSlugChange = (value: string) => {
-    setSlug(value);
-    setSlugDebounce(value);
+    const sanitizedSlug = value.toLowerCase().replace(/[^a-z0-9-]/g, "-");
+    setSlug(sanitizedSlug);
+    setSlugDebounce(sanitizedSlug);
   };
 
   const handleYearChange = (value: string) => {
@@ -178,6 +178,7 @@ export const CreateScheduleDialog: Component<{
                               class="px-2 py-1 text-sm bg-accent/10 text-accent hover:bg-accent/20 rounded-md transition-colors"
                               onClick={() => {
                                 setSlug(suggestion);
+                                setSlugDebounce.clear();
                                 setDebounceSlug(suggestion);
                               }}
                             >

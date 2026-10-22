@@ -3,7 +3,8 @@ import {dbMiddleware} from "../../middleware/dbMiddleware.ts";
 import {contracts} from "./contract.ts";
 import {schedulesTable} from "../../../db/schema/jj-schema.ts";
 import {and, eq} from "drizzle-orm";
-import {getNextStreams as getNextStreamsFromList, getScheduleStreams, organizeStreamsByTime, getNextStreamsAcrossPublicPrimarySchedules} from "./util.ts";
+import type {SQLiteColumn} from "drizzle-orm/sqlite-core";
+import {getNextStreams as getNextStreamsFromList, assembleScheduleStreams, scheduleStreamsQueries, organizeStreamsByTime, getNextStreamsAcrossPublicPrimarySchedules} from "./util.ts";
 import {userDisplayView} from "../../../db/schema/views-schema.ts";
 import {byInput, cached} from "../../middleware/cached.ts";
 
@@ -15,10 +16,34 @@ const getFullScheduleBySlug = os.getFullScheduleBySlugContract
   .handler(async ({context, input}) => {
     const db = context.db
 
+    // One round trip: the schedule, its owner, and its streams with tags and participants, all
+    // keyed on the slug. The visible-schedule subquery finds nothing for a private schedule, so
+    // that costs no stream rows.
+    const bySlug = (selection: { value: SQLiteColumn }) => db.select(selection).from(schedulesTable)
+      .where(and(eq(schedulesTable.slug, input.slug), eq(schedulesTable.visible, true)))
+
+    const [schedules, owners, ...streamResults] = await db.batch([
+      db.select().from(schedulesTable)
+        .where(eq(schedulesTable.slug, input.slug)),
+      db.select({
+        userId: userDisplayView.userId,
+        primaryLiveStream: userDisplayView.primaryLiveStream,
+        createdAt: userDisplayView.createdAt,
+        username: userDisplayView.username,
+        profileImage: userDisplayView.profileImage,
+        twitchLogin: userDisplayView.twitchLogin,
+        tiltifySlug: userDisplayView.tiltifySlug,
+        tiltifyUrl: userDisplayView.tiltifyUrl,
+        primaryColor: userDisplayView.primaryColor,
+        accentColor: userDisplayView.accentColor,
+      })
+        .from(userDisplayView)
+        .where(eq(userDisplayView.userId, bySlug({value: schedulesTable.ownerId}))),
+      ...scheduleStreamsQueries(db, bySlug({value: schedulesTable.id})),
+    ])
+
     // Find the schedule by slug
-    const schedule = await db.select().from(schedulesTable)
-      .where(eq(schedulesTable.slug, input.slug))
-      .get()
+    const schedule = schedules[0]
 
     if (!schedule) {
       throw new ORPCError('NOT_FOUND', {message: 'Schedule not found'})
@@ -28,30 +53,14 @@ const getFullScheduleBySlug = os.getFullScheduleBySlugContract
       throw new ORPCError('FORBIDDEN', {message: 'The schedule is private'})
     }
 
-
-
-    const owner = await db.select({
-      userId: userDisplayView.userId,
-      primaryLiveStream: userDisplayView.primaryLiveStream,
-      createdAt: userDisplayView.createdAt,
-      username: userDisplayView.username,
-      profileImage: userDisplayView.profileImage,
-      twitchLogin: userDisplayView.twitchLogin,
-      tiltifySlug: userDisplayView.tiltifySlug,
-      tiltifyUrl: userDisplayView.tiltifyUrl,
-      primaryColor: userDisplayView.primaryColor,
-      accentColor: userDisplayView.accentColor,
-    })
-      .from(userDisplayView)
-      .where(eq(userDisplayView.userId, schedule.ownerId))
-      .get()
+    const owner = owners[0]
 
     if (!owner) {
       throw new ORPCError('NOT_FOUND', {message: 'Schedule owner not found'})
     }
 
     // Get all streams for this schedule
-    const streams = await getScheduleStreams(db, schedule.id)
+    const streams = assembleScheduleStreams(streamResults)
 
     // Get the next 3 future streams
     const nextStreams = getNextStreamsFromList(streams)

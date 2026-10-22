@@ -9,15 +9,18 @@ export const CreateTeamDialog: Component<{ isOpen: () => boolean, setIsOpen: (op
   // Form state signals
   const [name, setName] = createSignal("");
   const [slug, setSlug] = createSignal("");
+  // What the server checks: slug and name 500 ms after the last keystroke in either field
+  const [checked, setChecked] = createSignal({slug: "", name: ""});
   const client = useQueryClient()
 
   // Slug validation query
   const validateSlug = useQuery(() => orpcPrivate.teams.validateSlug.queryOptions({
     input: {
-      slug: slug(),
-      tiltifyName: name()
+      slug: checked().slug,
+      tiltifyName: checked().name
     },
-    enabled: () => slug().length > 0,
+    enabled: () => checked().slug.length > 0,
+    staleTime: 30 * 1000,
   }));
 
   // oRPC mutations
@@ -28,6 +31,7 @@ export const CreateTeamDialog: Component<{ isOpen: () => boolean, setIsOpen: (op
         // Reset form
         setName("");
         setSlug("");
+        setCheckedNow("");
         await client.invalidateQueries({
           queryKey:orpcPrivate.teams.canCreateTeam.queryKey(),
         })
@@ -40,11 +44,11 @@ export const CreateTeamDialog: Component<{ isOpen: () => boolean, setIsOpen: (op
 
   // Validation helper functions
   const isCheckingSlug = () => {
-    return validateSlug.isPending;
+    return validateSlug.isPending || checked().slug !== slug();
   };
 
   const slugValid = () => {
-    if (!validateSlug.data) {
+    if (!validateSlug.data || checked().slug !== slug()) {
       return false;
     }
     return validateSlug.data.isValid;
@@ -61,21 +65,26 @@ export const CreateTeamDialog: Component<{ isOpen: () => boolean, setIsOpen: (op
     return validateSlug.data.suggestions;
   };
 
-  // Create debounced function for slug setting
-  const setSlugDebounce = debounce((slugValue: string) => {
-    const sanitizedSlug = slugValue.toLowerCase().replace(/[^a-z0-9-]/g, "-");
-    setSlug(sanitizedSlug);
-  }, 500);
+  // Create debounced function for the checked slug and name
+  const setCheckedDebounce = debounce(setChecked, 500);
+
+  const setCheckedNow = (slugValue: string) => {
+    setCheckedDebounce.clear();
+    setChecked({slug: slugValue, name: name()});
+  };
 
   const handleNameChange = (value: string) => {
     setName(value);
     // Auto-generate slug from name if user hasn't manually edited the slug
     const generatedSlug = value.toLowerCase().replace(/[^a-z0-9]/g, "-");
     setSlug(generatedSlug);
+    setCheckedDebounce({slug: generatedSlug, name: value});
   };
 
   const handleSlugChange = (value: string) => {
-    setSlugDebounce(value);
+    const sanitizedSlug = value.toLowerCase().replace(/[^a-z0-9-]/g, "-");
+    setSlug(sanitizedSlug);
+    setCheckedDebounce({slug: sanitizedSlug, name: name()});
   };
 
   const handleSubmit = async (e: Event) => {
@@ -152,6 +161,7 @@ export const CreateTeamDialog: Component<{ isOpen: () => boolean, setIsOpen: (op
                               class="px-2 py-1 text-sm bg-accent/10 text-accent hover:bg-accent/20 rounded-md transition-colors"
                               onClick={() => {
                                 setSlug(suggestion);
+                                setCheckedNow(suggestion);
                               }}
                             >
                               {suggestion}
