@@ -21,12 +21,15 @@ export async function checkCanCreateTeam(
   db: JJDrizzleDatabase,
   userId: number,
 ) {
-  const res = await (db as any)
-  .select({ c: count() })
-  .from(teamsTable)
-  .where(eq(teamsTable.ownerId, userId))
-  .get()
-  const teams = res?.c ?? 0
+  return canCreateTeamFrom(await ownedTeamsCount(db, userId))
+}
+
+/** The owned-team count as a statement, so it can run inside a `db.batch` (see `canCreateTeamFrom`). */
+export const ownedTeamsCount = (db: JJDrizzleDatabase, userId: number) =>
+  db.select({ c: count() }).from(teamsTable).where(eq(teamsTable.ownerId, userId))
+
+export const canCreateTeamFrom = (rows: { c: number }[]) => {
+  const teams = rows[0]?.c ?? 0
   return { canCreate: teams < TEAM_OWNER_PER_USER, teams, maxOwnedTeams: TEAM_OWNER_PER_USER } as const
 }
 
@@ -54,12 +57,15 @@ export async function checkCanAddTagToUser(
   db: JJDrizzleDatabase,
   userId: number,
 ) {
-  const res = await (db as any)
-  .select({ c: count() })
-  .from(userTagsTable)
-  .where(eq(userTagsTable.userId, userId))
-  .get()
-  const tags = res?.c ?? 0
+  return canAddTagFrom(await userTagsCount(db, userId))
+}
+
+/** The user's tag count as a statement, so it can run inside a `db.batch` (see `canAddTagFrom`). */
+export const userTagsCount = (db: JJDrizzleDatabase, userId: number) =>
+  db.select({ c: count() }).from(userTagsTable).where(eq(userTagsTable.userId, userId))
+
+export const canAddTagFrom = (rows: { c: number }[]) => {
+  const tags = rows[0]?.c ?? 0
   return { canAdd: tags < TAGS_PER_USER, tags, maxTags: TAGS_PER_USER } as const
 }
 
@@ -154,14 +160,17 @@ export async function checkCanCreateSchedule(
   userId: number,
   year: number,
 ) {
-  const res = await (db as any)
-  .select({ c: count() })
-  .from(schedulesTable)
-  .where(and(
+  return canCreateScheduleFrom(await yearSchedulesCount(db, userId, year), year)
+}
+
+/** The user's schedule count for `year` as a statement, for a `db.batch` (see `canCreateScheduleFrom`). */
+export const yearSchedulesCount = (db: JJDrizzleDatabase, userId: number, year: number) =>
+  db.select({ c: count() }).from(schedulesTable).where(and(
     eq(schedulesTable.ownerId, userId),
     eq(schedulesTable.year, year),
   ))
-  .get()
-  const schedules = res?.c ?? 0
+
+export const canCreateScheduleFrom = (rows: { c: number }[], year: number) => {
+  const schedules = rows[0]?.c ?? 0
   return { canCreate: schedules < SCHEDULES_PER_USER_PER_YEAR, schedules, year, maxSchedules: SCHEDULES_PER_USER_PER_YEAR } as const
 }

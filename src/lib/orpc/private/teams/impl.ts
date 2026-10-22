@@ -10,15 +10,25 @@ import {
 } from '../../../db/schema/jj-schema.ts'
 import { users } from '../../../db/schema/auth-schema.ts'
 import { userDisplayView } from '../../../db/schema/views-schema.ts'
-import { and, count, eq, not } from 'drizzle-orm'
-import { createSlug, validateSlugFor } from '../../../../functions/slug.ts'
+import { and, count, eq, not, sql } from 'drizzle-orm'
+import {
+  createSlug,
+  slugFreeFrom,
+  slugLookups,
+  validateSlugFor,
+} from '../../../../functions/slug.ts'
 import {
   publishTeamAdminInvitesUpdate,
   publishTeamAdminMembersUpdate,
   publishUserInvitesUpdate,
   publishUserTeamsUpdate,
 } from '../teamsWS/publisher.ts'
-import { checkCanCreateTeam, checkCanInviteUser } from '../util/limits.ts'
+import {
+  canCreateTeamFrom,
+  checkCanCreateTeam,
+  checkCanInviteUser,
+  ownedTeamsCount,
+} from '../util/limits.ts'
 
 const os = implement(privateTeamsContract).use(dbMiddleware)
 
@@ -37,8 +47,16 @@ const create = os.createContract
     const userId = context.userId
     const { name, slug } = input
 
-    const teamLimit = await checkCanCreateTeam(db, userId)
+    // The slug as it will be stored; the dialog checks the same normalised slug (F-59)
+    const validSlug = createSlug(slug)
 
+    // One round trip: the owner limit, and whether the slug is another user's username or taken
+    const [ownedRows, ...slugRows] = await db.batch([
+      ownedTeamsCount(db, userId),
+      ...(validSlug ? slugLookups(db, 'team', userId, [validSlug]) : []),
+    ])
+
+    const teamLimit = canCreateTeamFrom(ownedRows)
     if (!teamLimit.canCreate) {
       throw new ORPCError('FORBIDDEN', {
         message: 'Team owner limit reached',
@@ -46,41 +64,38 @@ const create = os.createContract
       })
     }
 
-    // Create a proper slug using the createSlug function
-    const validSlug = createSlug(slug)
     if (!validSlug) {
       throw new ORPCError('BAD_REQUEST', { message: 'Invalid slug format' })
     }
 
+    if (!slugFreeFrom(slugRows)(validSlug)) {
+      throw new ORPCError('CONFLICT', { message: 'Slug is already in use' })
+    }
+
     try {
-      const existingTeam = await db
-        .select()
-        .from(teamsTable)
-        .where(eq(teamsTable.slug, validSlug))
-        .get()
-
-      if (existingTeam) {
-        throw new ORPCError('CONFLICT', { message: 'Slug is already in use' })
-      }
-
-      // Create team
-      const [team] = await db
-        .insert(teamsTable)
-        .values({
-          name: name,
-          slug: validSlug,
-          ownerId: userId,
-          visible: false,
-        })
-        .returning()
+      // The team and its owner's membership in one atomic batch (SOC-02)
+      const [[team]] = await db.batch([
+        db
+          .insert(teamsTable)
+          .values({
+            name: name,
+            slug: validSlug,
+            ownerId: userId,
+            visible: false,
+          })
+          .returning(),
+        db.insert(teamMembersTable).select(
+          db
+            .select({
+              teamId: teamsTable.id,
+              userId: sql<number>`${userId}`.as('user_id'),
+            })
+            .from(teamsTable)
+            .where(eq(teamsTable.slug, validSlug)),
+        ),
+      ])
 
       const teamId = team.id
-
-      // Add creator as member
-      await db.insert(teamMembersTable).values({
-        teamId: team.id,
-        userId: userId,
-      })
 
       // Publish WS updates for team creation (user becomes owner/member)
       await Promise.all([

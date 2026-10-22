@@ -5,6 +5,7 @@ import {TextField} from "@kobalte/core/text-field";
 import {Checkbox} from "@kobalte/core/checkbox";
 import {useMutation, useQuery} from "@tanstack/solid-query";
 import {orpcPrivate} from "../../../../../lib/orpc/client.ts";
+import {createSlug} from "../../../../../lib/createSlug.ts";
 import {DateTime} from "luxon";
 import { FaSolidCheck } from 'solid-icons/fa'
 
@@ -17,6 +18,8 @@ export const CreateScheduleDialog: Component<{
   const [name, setName] = createSignal("");
   const [slug, setSlug] = createSignal("");
   const [debounceSlug, setDebounceSlug] = createSignal<string>('')
+  // The slug as the server stores it (F-59): what gets checked, created and shown in the URL
+  const normalizedSlug = () => createSlug(slug());
 
   const [primary, setPrimary] = createSignal(false);
   const [year, setYear] = createSignal(DateTime.now().year);
@@ -52,11 +55,11 @@ export const CreateScheduleDialog: Component<{
 
   // Validation helper functions
   const isCheckingSlug = () => {
-    return validateSlug.isPending || debounceSlug() !== slug();
+    return validateSlug.isPending || debounceSlug() !== normalizedSlug();
   };
 
   const slugValid = () => {
-    if (!validateSlug.data || debounceSlug() !== slug()) {
+    if (!validateSlug.data || debounceSlug() !== normalizedSlug()) {
       return false;
     }
     return validateSlug.data.isValid;
@@ -79,15 +82,16 @@ export const CreateScheduleDialog: Component<{
   const handleNameChange = (value: string) => {
     setName(value);
     // Auto-generate slug from name if user hasn't manually edited the slug
-    const generatedSlug = value.toLowerCase().replace(/[^a-z0-9]/g, "-");
+    const generatedSlug = createSlug(value);
     setSlug(generatedSlug);
     setSlugDebounce(generatedSlug);
   };
 
   const handleSlugChange = (value: string) => {
+    // Typing keeps hyphens where they are; the check and the URL use the normalised slug
     const sanitizedSlug = value.toLowerCase().replace(/[^a-z0-9-]/g, "-");
     setSlug(sanitizedSlug);
-    setSlugDebounce(sanitizedSlug);
+    setSlugDebounce(createSlug(sanitizedSlug));
   };
 
   const handleYearChange = (value: string) => {
@@ -107,7 +111,7 @@ export const CreateScheduleDialog: Component<{
     try {
       await createScheduleMutation.mutateAsync({
         name: name(),
-        slug: slug(),
+        slug: normalizedSlug(),
         primary: primary(),
         year: year()
       });
@@ -192,7 +196,7 @@ export const CreateScheduleDialog: Component<{
                 </Show>
 
                 <p class="text-xs text-gray-500 mt-1">
-                  This will be used in URLs: jj.ostof.dev/schedules/{slug() || "your-schedule-slug"}
+                  This will be used in URLs: jj.ostof.dev/schedules/{normalizedSlug() || "your-schedule-slug"}
                 </p>
               </TextField>
 

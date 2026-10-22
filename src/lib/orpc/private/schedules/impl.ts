@@ -5,10 +5,19 @@ import { authMiddleware } from '../../middleware/authMiddleware.ts'
 import { schedulesTable, streamsTable } from '../../../db/schema/jj-schema.ts'
 import { editSchedulesTable } from '../../../db/schema/edit-schedules-schema.ts'
 import { accounts, users } from '../../../db/schema/auth-schema.ts'
-import { and, eq, not } from 'drizzle-orm'
+import { and, eq, ne, not, sql } from 'drizzle-orm'
 import { DateTime } from 'luxon'
-import { createSlug, validateSlugFor } from '../../../../functions/slug.ts'
-import { checkCanCreateSchedule } from '../util/limits.ts'
+import {
+  createSlug,
+  slugFreeFrom,
+  slugLookups,
+  validateSlugFor,
+} from '../../../../functions/slug.ts'
+import {
+  canCreateScheduleFrom,
+  checkCanCreateSchedule,
+  yearSchedulesCount,
+} from '../util/limits.ts'
 
 const os = implement(privateSchedulesContract).use(dbMiddleware)
 
@@ -101,52 +110,28 @@ const createWithDetails = os.createWithDetails
   .handler(async ({ context, input }) => {
     const db = context.db
     const user = context.user
-    const { name, slug, primary, year } = input
+    const { name, primary, year } = input
+    // The slug as it will be stored; the dialog checks the same normalised slug (F-59)
+    const slug = createSlug(input.slug)
+    if (!slug) {
+      throw new ORPCError('BAD_REQUEST', { message: 'Invalid slug format' })
+    }
 
     try {
-      // Check if slug already exists for this user
-      const existingSchedule = await db
-        .select()
-        .from(schedulesTable)
-        .where(
-          and(
-            eq(schedulesTable.ownerId, user.id),
-            eq(schedulesTable.slug, slug),
-          ),
-        )
-        .get()
+      // One round trip: is the slug another user's username or any schedule's slug, and the
+      // yearly limit
+      const [blockedRows, takenRows, yearRows] = await db.batch([
+        ...slugLookups(db, 'schedule', user.id, [slug]),
+        yearSchedulesCount(db, user.id, year),
+      ])
 
-      if (existingSchedule) {
+      if (!slugFreeFrom([blockedRows, takenRows])(slug)) {
         throw new ORPCError('CONFLICT', {
           message: 'A schedule with this slug already exists',
         })
       }
 
-      // If setting as primary, check if there's already a primary schedule for this year
-      if (primary) {
-        const existingPrimary = await db
-          .select()
-          .from(schedulesTable)
-          .where(
-            and(
-              eq(schedulesTable.ownerId, user.id),
-              eq(schedulesTable.year, year),
-              eq(schedulesTable.primary, true),
-            ),
-          )
-          .get()
-
-        if (existingPrimary) {
-          // Unset the existing primary schedule
-          await db
-            .update(schedulesTable)
-            .set({ primary: false })
-            .where(eq(schedulesTable.id, existingPrimary.id))
-        }
-      }
-
-      // Enforce per-year schedule limit
-      const createLimit = await checkCanCreateSchedule(db, user.id, year)
+      const createLimit = canCreateScheduleFrom(yearRows, year)
       if (!createLimit.canCreate) {
         throw new ORPCError('FORBIDDEN', {
           message: 'Yearly schedule limit reached',
@@ -154,32 +139,58 @@ const createWithDetails = os.createWithDetails
         })
       }
 
-      // Create schedule using provided parameters
-      const [schedule] = await db
-        .insert(schedulesTable)
-        .values({
-          ownerId: user.id,
-          title: name,
-          year: year,
-          slug: slug,
-          visible: false, // Default to private
-          primary: primary,
-        })
-        .returning()
-
-      // Seed edit_schedules with initial draft meta
-      await db
-        .insert(editSchedulesTable)
-        .values({
-          scheduleId: schedule.id,
-          editorId: user.id,
-          title: schedule.title,
-          slug: schedule.slug,
-          year: schedule.year,
-          visible: schedule.visible,
-        })
-        .onConflictDoNothing()
-        .run()
+      // One atomic batch (EDT-14): a new primary replaces the year's old one only together with
+      // the insert (it used to be unset before the limit check), and edit_schedules is seeded
+      // with the draft meta.
+      const [[schedule]] = await db.batch([
+        db
+          .insert(schedulesTable)
+          .values({
+            ownerId: user.id,
+            title: name,
+            year: year,
+            slug: slug,
+            visible: false, // Default to private
+            primary: primary,
+          })
+          .returning(),
+        ...(primary
+          ? [
+              db
+                .update(schedulesTable)
+                .set({ primary: false })
+                .where(
+                  and(
+                    eq(schedulesTable.ownerId, user.id),
+                    eq(schedulesTable.year, year),
+                    eq(schedulesTable.primary, true),
+                    ne(schedulesTable.slug, slug),
+                  ),
+                ),
+            ]
+          : []),
+        db
+          .insert(editSchedulesTable)
+          .select(
+            db
+              .select({
+                scheduleId: schedulesTable.id,
+                editorId: sql<number>`${user.id}`.as('editor_id'),
+                title: schedulesTable.title,
+                slug: schedulesTable.slug,
+                year: schedulesTable.year,
+                visible: schedulesTable.visible,
+                // insert … select needs every column; these are the table defaults
+                status: sql<'active'>`'active'`.as('status'),
+                version: sql<number>`1`.as('version'),
+                createdAt: sql<Date>`(unixepoch())`.as('created_at'),
+                updatedAt: sql<Date>`(unixepoch())`.as('updated_at'),
+              })
+              .from(schedulesTable)
+              .where(eq(schedulesTable.slug, slug)),
+          )
+          .onConflictDoNothing(),
+      ])
 
       return { schedule }
     } catch (error) {

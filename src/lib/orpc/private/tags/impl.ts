@@ -19,7 +19,12 @@ import {
   getTotalUsageExpression,
   getVisibleTagsCondition,
 } from './util.ts'
-import { checkCanAddTagToUser } from '../util/limits.ts'
+import {
+  canAddTagFrom,
+  checkCanAddTagToUser,
+  TAGS_PER_USER,
+  userTagsCount,
+} from '../util/limits.ts'
 
 const os = implement(privateTagsContract).use(dbMiddleware)
 
@@ -35,55 +40,60 @@ const addUserTag = os.addUserTag
     const userId = context.userId
 
     try {
-      // Check if tag exists and is visible
-      const tag = await db
-        .select()
-        .from(tags)
-        .where(and(eq(tags.id, input.tagId), eq(tags.visible, true)))
-        .get()
+      const visibleTag = and(eq(tags.id, input.tagId), eq(tags.visible, true))
+      const ownRow = and(
+        eq(userTagsTable.userId, userId),
+        eq(userTagsTable.tagId, input.tagId),
+      )
+      // One round trip (TAG-07). The insert checks visibility and the limit itself, so two adds
+      // at once can't pass the limit together. Only a refused insert costs a second one, to say why.
+      const [inserted, [tag]] = await db.batch([
+        db
+          .insert(userTagsTable)
+          .select(
+            db
+              .select({
+                userId: sql<number>`${userId}`.as('user_id'),
+                tagId: tags.id,
+                addedAt: sql<Date>`(unixepoch())`.as('added_at'),
+              })
+              .from(tags)
+              .where(
+                and(
+                  visibleTag,
+                  sql`(select count(*) from ${userTagsTable} where ${userTagsTable.userId} = ${userId}) < ${TAGS_PER_USER}`,
+                ),
+              ),
+          )
+          .onConflictDoNothing()
+          .returning(),
+        db.select().from(tags).where(visibleTag),
+      ])
+      const newUserTag = inserted[0]
 
-      if (!tag) {
-        throw new ORPCError('NOT_FOUND', {
-          message: 'Tag not found or not visible',
-        })
-      }
-
-      // Check if user already has this tag
-      const existingUserTag = await db
-        .select()
-        .from(userTagsTable)
-        .where(
-          and(
-            eq(userTagsTable.userId, userId),
-            eq(userTagsTable.tagId, input.tagId),
-          ),
-        )
-        .get()
-
-      if (existingUserTag) {
-        throw new ORPCError('CONFLICT', {
-          message: 'User already has this tag',
-        })
-      }
-
-      // Enforce per-user tag limit
-      const tagLimit = await checkCanAddTagToUser(db, userId)
-      if (!tagLimit.canAdd) {
+      if (!newUserTag) {
+        if (!tag) {
+          throw new ORPCError('NOT_FOUND', {
+            message: 'Tag not found or not visible',
+          })
+        }
+        const [owned, countRows] = await db.batch([
+          db
+            .select({ tagId: userTagsTable.tagId })
+            .from(userTagsTable)
+            .where(ownRow),
+          userTagsCount(db, userId),
+        ])
+        if (owned.length > 0) {
+          throw new ORPCError('CONFLICT', {
+            message: 'User already has this tag',
+          })
+        }
         throw new ORPCError('FORBIDDEN', {
           message: 'Profile tag limit reached',
-          ...tagLimit,
+          ...canAddTagFrom(countRows),
         })
       }
-
-      // Insert new user tag
-      const newUserTag = await db
-        .insert(userTagsTable)
-        .values({
-          userId: userId,
-          tagId: input.tagId,
-        })
-        .returning()
-        .get()
 
       // Return with tag information
       return {
@@ -116,26 +126,8 @@ const removeUserTag = os.removeUserTag
     const userId = context.userId
 
     try {
-      // Check if user has this tag
-      const existingUserTag = await db
-        .select()
-        .from(userTagsTable)
-        .where(
-          and(
-            eq(userTagsTable.userId, userId),
-            eq(userTagsTable.tagId, input.tagId),
-          ),
-        )
-        .get()
-
-      if (!existingUserTag) {
-        throw new ORPCError('NOT_FOUND', {
-          message: 'User does not have this tag',
-        })
-      }
-
-      // Delete user tag
-      await db
+      // One round trip (TAG-08): nothing deleted means the user doesn't have the tag
+      const deleted = await db
         .delete(userTagsTable)
         .where(
           and(
@@ -143,6 +135,13 @@ const removeUserTag = os.removeUserTag
             eq(userTagsTable.tagId, input.tagId),
           ),
         )
+        .returning({ tagId: userTagsTable.tagId })
+
+      if (deleted.length === 0) {
+        throw new ORPCError('NOT_FOUND', {
+          message: 'User does not have this tag',
+        })
+      }
 
       return { success: true }
     } catch (error) {

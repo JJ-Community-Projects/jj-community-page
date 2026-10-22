@@ -5,7 +5,9 @@ import { getDB } from '../../../db/db.ts'
 import { twitchChannelSchema, twitchStreamSchema, } from '../../../db/schema/twitch-channel-schema.ts'
 import { TwitchLiveCheckQueue } from '../../../../queues/TwitchLiveCheckQueue.ts'
 import { getToken, getTwitchDataByLogins } from '../../../twitchAPIFuncs.ts'
-import { and, eq, inArray } from 'drizzle-orm'
+import { and, eq, getTableColumns, inArray } from 'drizzle-orm'
+import type { SQLiteTable } from 'drizzle-orm/sqlite-core'
+import { chunk } from '../../../../do/utils/chunk.ts'
 import type { TwitchUser } from '../../../model/TwitchAPIModel.ts'
 import { accounts, userSocials } from '../../../db/schema/auth-schema.ts'
 import { schedulesTable, streamParticipantsTable, streamsTable, } from '../../../db/schema/jj-schema.ts'
@@ -674,6 +676,11 @@ const exportSchedule = os.exportScheduleContract.handler(
   },
 )
 
+// D1 allows 100 bound parameters per statement; each row binds at most one per column.
+const MAX_BOUND_PARAMS = 100
+const rowsPerStatement = (table: SQLiteTable) =>
+  Math.floor(MAX_BOUND_PARAMS / Object.keys(getTableColumns(table)).length)
+
 // Import schedule from JSON
 const importSchedule = os.importScheduleContract.handler(
   async ({ context, input }) => {
@@ -706,24 +713,77 @@ const importSchedule = os.importScheduleContract.handler(
     }
     const streams = parsed.streams as Array<any>
 
-    // 1) Check if schedule with same id exists
-    const existing = await db
-      .select({ id: schedulesTable.id })
-      .from(schedulesTable)
-      .where(eq(schedulesTable.id, schedule.id))
-      .get()
-    if (existing) {
-      // requirement: check if exists. We'll throw conflict
+    const streamSlugs = (s: any): string[] =>
+      Array.isArray(s.tags) ? [...new Set(s.tags as string[])] : []
+    const allSlugs = [...new Set(streams.flatMap(streamSlugs))]
+
+    // 1) One round trip: does the id exist, and the ids of every tag slug
+    const [existing, ...tagChunks] = await db.batch([
+      db
+        .select({ id: schedulesTable.id })
+        .from(schedulesTable)
+        .where(eq(schedulesTable.id, schedule.id)),
+      ...chunk(allSlugs, MAX_BOUND_PARAMS).map((slugs) =>
+        db
+          .select({ id: tags.id, slug: tags.slug })
+          .from(tags)
+          .where(inArray(tags.slug, slugs)),
+      ),
+    ])
+    if (existing.length > 0) {
       throw new ORPCError('CONFLICT', {
         message: `Schedule with id ${schedule.id} already exists`,
       })
     }
+    const slugToId = new Map(tagChunks.flat().map((r) => [r.slug, r.id]))
 
-    // 2) Insert schedule with explicit id
+    // 2) Check every stream before anything is written: a bad date is a BAD_REQUEST, not a
+    //    half-imported schedule
+    const toDate = (v: any): Date => {
+      const d = v instanceof Date ? v : typeof v === 'number' || typeof v === 'string' ? new Date(v) : null
+      if (!d || isNaN(d.getTime())) {
+        throw new ORPCError('BAD_REQUEST', { message: 'Invalid stream start/end in import JSON' })
+      }
+      return d
+    }
+    const streamRows = streams.map((s) => ({
+      id: s.id,
+      scheduleId: schedule.id,
+      createdBy: s.createdBy,
+      title: s.title,
+      visible: s.visible ?? false,
+      subtitle: s.subtitle ?? null,
+      description: s.description ?? null,
+      youtubeVodUrl: s.youtubeVodUrl ?? null,
+      twitchVodUrl: s.twitchVodUrl ?? null,
+      start: toDate(s.start),
+      end: toDate(s.end),
+    }))
+
+    const participantRows = streams.flatMap((s) =>
+      Array.isArray(s.participants)
+        ? (s.participants as number[]).map((userId) => ({
+            scheduleId: schedule.id,
+            streamId: s.id,
+            userId,
+          }))
+        : [],
+    )
+    // Unknown slugs are skipped, as before
+    const tagRows = streams.flatMap((s) =>
+      streamSlugs(s)
+        .filter((slug) => slugToId.has(slug))
+        .map((slug) => ({
+          scheduleId: schedule.id,
+          streamId: s.id,
+          tagId: slugToId.get(slug)!,
+        })),
+    )
+
+    // 3) Everything in one atomic batch (ADM-07): a failing row leaves no partial schedule
     try {
-      await db
-        .insert(schedulesTable)
-        .values({
+      await db.batch([
+        db.insert(schedulesTable).values({
           id: schedule.id,
           title: schedule.title,
           slug: schedule.slug,
@@ -731,102 +791,21 @@ const importSchedule = os.importScheduleContract.handler(
           visible: schedule.visible,
           primary: schedule.primary,
           ownerId: schedule.ownerId,
-        })
-        .run()
+        }),
+        ...chunk(streamRows, rowsPerStatement(streamsTable)).map((rows) =>
+          db.insert(streamsTable).values(rows),
+        ),
+        ...chunk(participantRows, rowsPerStatement(streamParticipantsTable)).map(
+          (rows) => db.insert(streamParticipantsTable).values(rows),
+        ),
+        ...chunk(tagRows, rowsPerStatement(streamTagsTable)).map((rows) =>
+          db.insert(streamTagsTable).values(rows),
+        ),
+      ])
     } catch (e) {
       console.error(e)
       throw new ORPCError('INTERNAL_SERVER_ERROR', {
-        message: 'Failed to insert schedule',
-      })
-    }
-
-    try {
-      // 3) Insert streams
-      if (streams.length > 0) {
-        for (const s of streams) {
-          // Coerce start/end to Date objects to accept ISO strings or epoch numbers
-          let startVal: Date
-          let endVal: Date
-          try {
-            const toDate = (v: any): Date => {
-              if (v instanceof Date) return v
-              if (typeof v === 'number') {
-                const d = new Date(v)
-                if (isNaN(d.getTime())) throw new Error('Invalid date number')
-                return d
-              }
-              if (typeof v === 'string') {
-                const d = new Date(v)
-                if (isNaN(d.getTime())) throw new Error('Invalid date string')
-                return d
-              }
-              throw new Error('Unsupported date type')
-            }
-            startVal = toDate(s.start)
-            endVal = toDate(s.end)
-          } catch (e) {
-            throw new ORPCError('BAD_REQUEST', { message: 'Invalid stream start/end in import JSON' })
-          }
-
-          await db
-            .insert(streamsTable)
-            .values({
-              id: s.id,
-              scheduleId: schedule.id,
-              createdBy: s.createdBy,
-              title: s.title,
-              visible: s.visible ?? false,
-              subtitle: s.subtitle ?? null,
-              description: s.description ?? null,
-              youtubeVodUrl: s.youtubeVodUrl ?? null,
-              twitchVodUrl: s.twitchVodUrl ?? null,
-              start: startVal,
-              end: endVal,
-            })
-            .run()
-
-          // participants
-          if (Array.isArray(s.participants) && s.participants.length > 0) {
-            for (const userId of s.participants) {
-              await db
-                .insert(streamParticipantsTable)
-                .values({
-                  scheduleId: schedule.id,
-                  streamId: s.id,
-                  userId,
-                })
-                .run()
-            }
-          }
-
-          // tags: resolve slugs to IDs
-          if (Array.isArray(s.tags) && s.tags.length > 0) {
-            const uniqueSlugs = [...new Set(s.tags as string[])]
-            const tagRows = await db
-              .select({ id: tags.id, slug: tags.slug })
-              .from(tags)
-              .where(inArray(tags.slug, uniqueSlugs))
-              .all()
-            const slugToId = new Map(tagRows.map((r) => [r.slug, r.id]))
-            for (const slug of uniqueSlugs) {
-              const tagId = slugToId.get(slug)
-              if (!tagId) continue
-              await db
-                .insert(streamTagsTable)
-                .values({
-                  scheduleId: schedule.id,
-                  streamId: s.id,
-                  tagId,
-                })
-                .run()
-            }
-          }
-        }
-      }
-    } catch (e) {
-      console.error(e)
-      throw new ORPCError('INTERNAL_SERVER_ERROR', {
-        message: 'Failed to insert stream',
+        message: 'Failed to import schedule',
       })
     }
 

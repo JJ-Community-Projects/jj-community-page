@@ -4,11 +4,14 @@ import {Dialog} from "@kobalte/core/dialog";
 import {TextField} from "@kobalte/core/text-field";
 import { useMutation, useQuery, useQueryClient } from '@tanstack/solid-query'
 import {orpcPrivate} from "../../../../../../lib/orpc/client.ts";
+import {createSlug} from "../../../../../../lib/createSlug.ts";
 
 export const CreateTeamDialog: Component<{ isOpen: () => boolean, setIsOpen: (open: boolean) => void }> = (props) => {
   // Form state signals
   const [name, setName] = createSignal("");
   const [slug, setSlug] = createSignal("");
+  // The slug as the server stores it (F-59): what gets checked, created and shown in the URL
+  const normalizedSlug = () => createSlug(slug());
   // What the server checks: slug and name 500 ms after the last keystroke in either field
   const [checked, setChecked] = createSignal({slug: "", name: ""});
   const client = useQueryClient()
@@ -44,11 +47,11 @@ export const CreateTeamDialog: Component<{ isOpen: () => boolean, setIsOpen: (op
 
   // Validation helper functions
   const isCheckingSlug = () => {
-    return validateSlug.isPending || checked().slug !== slug();
+    return validateSlug.isPending || checked().slug !== normalizedSlug();
   };
 
   const slugValid = () => {
-    if (!validateSlug.data || checked().slug !== slug()) {
+    if (!validateSlug.data || checked().slug !== normalizedSlug()) {
       return false;
     }
     return validateSlug.data.isValid;
@@ -76,15 +79,16 @@ export const CreateTeamDialog: Component<{ isOpen: () => boolean, setIsOpen: (op
   const handleNameChange = (value: string) => {
     setName(value);
     // Auto-generate slug from name if user hasn't manually edited the slug
-    const generatedSlug = value.toLowerCase().replace(/[^a-z0-9]/g, "-");
+    const generatedSlug = createSlug(value);
     setSlug(generatedSlug);
     setCheckedDebounce({slug: generatedSlug, name: value});
   };
 
   const handleSlugChange = (value: string) => {
+    // Typing keeps hyphens where they are; the check and the URL use the normalised slug
     const sanitizedSlug = value.toLowerCase().replace(/[^a-z0-9-]/g, "-");
     setSlug(sanitizedSlug);
-    setCheckedDebounce({slug: sanitizedSlug, name: name()});
+    setCheckedDebounce({slug: createSlug(sanitizedSlug), name: name()});
   };
 
   const handleSubmit = async (e: Event) => {
@@ -97,7 +101,7 @@ export const CreateTeamDialog: Component<{ isOpen: () => boolean, setIsOpen: (op
     try {
       await createTeamMutation.mutateAsync({
         name: name(),
-        slug: slug()
+        slug: normalizedSlug()
       });
     } catch (error) {
       console.error("Failed to create team:", error);
@@ -174,7 +178,7 @@ export const CreateTeamDialog: Component<{ isOpen: () => boolean, setIsOpen: (op
                 </Show>
 
                 <p class="text-xs text-gray-500 mt-1">
-                  This will be used in URLs: jj.ostof.dev/teams/{slug() || "your-team-slug"}
+                  This will be used in URLs: jj.ostof.dev/teams/{normalizedSlug() || "your-team-slug"}
                 </p>
               </TextField>
 

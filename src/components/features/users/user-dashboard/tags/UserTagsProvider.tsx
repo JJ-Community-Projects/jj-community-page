@@ -43,8 +43,12 @@ const useUserTagsHook = () => {
 
   const removeTagMutation = useMutation(() =>
     t.removeUserTag.mutationOptions({
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: t.getUserTags.key() })
+      onSuccess: async () => {
+        await queryClient.invalidateQueries({ queryKey: t.getUserTags.key() })
+        // A removal frees a slot: at the limit, adding is possible again
+        await queryClient.invalidateQueries({
+          queryKey: t.canAddTagToUser.key(),
+        })
       },
       onError: (error) => {
         console.error('Failed to remove tag:', error)

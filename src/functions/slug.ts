@@ -1,37 +1,11 @@
 import { env } from 'cloudflare:workers'
-import {getDB} from "../lib/db/db";
+import {getDB, type JJDrizzleDatabase} from "../lib/db/db";
 import {schedulesTable, teamsTable} from "../lib/db/schema/schema";
 import {accounts} from "../lib/db/schema/auth-schema";
 import {and, inArray, ne, sql} from "drizzle-orm";
+import {createSlug} from "../lib/createSlug";
 
-/**
- * Converts a name into a URL-friendly slug.
- *
- * @param name - The name to convert to a slug
- * @returns A URL-friendly slug containing only alphanumeric characters and hyphens
- *
- * @example
- * // returns "hello-world"
- * createSlug("Hello World")
- *
- * @example
- * // returns "john-doe-123"
- * createSlug("John Doe 123!")
- */
-export function createSlug(name: string): string {
-  if (!name) return '';
-
-  return name
-    .toLowerCase()                     // Convert to lowercase
-    .trim()                            // Remove leading/trailing whitespace
-    .normalize('NFD')                  // Normalize to decomposed form
-    .replace(/[\u0300-\u036f]/g, '')   // Remove diacritical marks
-    .replace(/\s+/g, '-')              // Replace spaces with hyphens
-    .replace(/[^\w\-]+/g, '')          // Remove all non-word chars (except hyphens)
-    .replace(/\-\-+/g, '-')            // Replace multiple hyphens with single hyphen
-    .replace(/^-+/, '')                // Remove leading hyphens
-    .replace(/-+$/, '');               // Remove trailing hyphens
-}
+export {createSlug};
 
 /**
  * Sanitizes a tag for internal use.
@@ -91,22 +65,8 @@ export async function validateSlugFor(
   if (suggestedName) alternatives.push(createSlug(suggestedName));
 
   const candidates = [...new Set([slug, ...alternatives].filter(Boolean))];
-  const lowerUsername = sql<string>`lower(${accounts.providerUsername})`;
-  const slugColumn = kind === 'team' ? teamsTable.slug : schedulesTable.slug;
-
   const db = getDB(env);
-  const [blockedRows, takenRows] = await db.batch([
-    db.select({ name: lowerUsername })
-      .from(accounts)
-      .where(and(inArray(lowerUsername, candidates.map((c) => c.toLowerCase())), ne(accounts.userId, user.id))),
-    db.select({ slug: slugColumn })
-      .from(kind === 'team' ? teamsTable : schedulesTable)
-      .where(inArray(slugColumn, candidates)),
-  ]);
-
-  const blocked = new Set([...RESERVED_NAMES, ...blockedRows.map((row) => row.name)]);
-  const taken = new Set(takenRows.map((row) => row.slug));
-  const isFree = (candidate: string) => !blocked.has(candidate.toLowerCase()) && !taken.has(candidate);
+  const isFree = slugFreeFrom(await db.batch(slugLookups(db, kind, user.id, candidates)));
 
   if (isFree(slug)) {
     return { isValid: true, suggestions: [] };
@@ -115,4 +75,30 @@ export async function validateSlugFor(
     isValid: false,
     suggestions: [...new Set(alternatives)].filter((alternative) => alternative && alternative !== slug && isFree(alternative)),
   };
+}
+
+/**
+ * The two statements that find which `candidates` are another user's username (case-insensitive)
+ * or a taken team / schedule slug. They go into a `db.batch` (with other statements, as the create
+ * calls do); `slugFreeFrom` reads their results.
+ */
+export function slugLookups(db: JJDrizzleDatabase, kind: 'team' | 'schedule', userId: number, candidates: string[]) {
+  const lowerUsername = sql<string>`lower(${accounts.providerUsername})`;
+  const slugColumn = kind === 'team' ? teamsTable.slug : schedulesTable.slug;
+  return [
+    db.select({ name: lowerUsername })
+      .from(accounts)
+      .where(and(inArray(lowerUsername, candidates.map((c) => c.toLowerCase())), ne(accounts.userId, userId))),
+    db.select({ slug: slugColumn })
+      .from(kind === 'team' ? teamsTable : schedulesTable)
+      .where(inArray(slugColumn, candidates)),
+  ] as const;
+}
+
+/** Whether a candidate is free, from the results of `slugLookups` (reserved names are never free). */
+export function slugFreeFrom(rows: readonly unknown[]) {
+  const [blockedRows, takenRows] = rows as [{ name: string }[], { slug: string }[]];
+  const blocked = new Set([...RESERVED_NAMES, ...blockedRows.map((row) => row.name)]);
+  const taken = new Set(takenRows.map((row) => row.slug));
+  return (candidate: string) => !blocked.has(candidate.toLowerCase()) && !taken.has(candidate);
 }
