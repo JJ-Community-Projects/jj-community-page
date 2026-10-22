@@ -35,17 +35,9 @@ const getSendUserFriendRequestsWSContract =
 const getUserFriendsWSContract =
   oc.output(type<ClientDurableIterator<IFriendsListObject, never>>())
 
-/**
- * Real-time stream of user friend requests count (authenticated user)
- * NOTE: Implementation currently returns iterator bound to FriendsListObject channel.
- */
-const getUserFriendRequestsCountWSContract =
-  oc.output(type<ClientDurableIterator<IFriendsListObject, never>>())
-
 export const privateFriendsWSContract = {
   /// Friends WS Endpoints
   getUserFriendRequestsWS: getUserFriendRequestsWSContract,
   getSendUserFriendRequestsWS: getSendUserFriendRequestsWSContract,
   getUserFriendsWS: getUserFriendsWSContract,
-  getUserFriendRequestsCountWS: getUserFriendRequestsCountWSContract,
 }

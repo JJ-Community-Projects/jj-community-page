@@ -13,6 +13,7 @@ import {
   FaSolidUsers,
 } from 'solid-icons/fa'
 import { orpcPrivate } from '../../../../../lib/orpc/client.ts'
+import { feedRenewal } from '../../../../../lib/orpc/tokenRenewal.ts'
 import { QueryComponent } from '../../../../common/QueryComponent.tsx'
 import {
   QueryClientProvider,
@@ -101,6 +102,8 @@ const TeamsHeader: Component = () => {
 
 const OwnedTeamsList: Component = () => {
   const { user } = useUser()
+  const queryClient = useQueryClient()
+  const userTeams = orpcPrivate.teamsWS.getUserTeamsWS
 
   const canCreateTeam = useQuery(() =>
     orpcPrivate.teams.canCreateTeam.queryOptions(),
@@ -122,7 +125,9 @@ const OwnedTeamsList: Component = () => {
 
         <QueryComponent
           queryOptions={() =>
-            orpcPrivate.teamsWS.getUserTeamsWS.experimental_liveOptions()
+            userTeams.experimental_liveOptions({
+              context: feedRenewal(queryClient, userTeams),
+            })
           }
           loading={() => (
             <div class="space-y-3">
@@ -201,6 +206,8 @@ const OwnedTeamsList: Component = () => {
 
 const MemberTeamsList: Component = () => {
   const { user } = useUser()
+  const queryClient = useQueryClient()
+  const userTeams = orpcPrivate.teamsWS.getUserTeamsWS
 
   const canInviteCurrentUser = useQuery(() =>
     orpcPrivate.teams.canInviteCurrentUser.queryOptions(),
@@ -225,7 +232,9 @@ const MemberTeamsList: Component = () => {
 
         <QueryComponent
           queryOptions={() =>
-            orpcPrivate.teamsWS.getUserTeamsWS.experimental_liveOptions()
+            userTeams.experimental_liveOptions({
+              context: feedRenewal(queryClient, userTeams),
+            })
           }
           loading={() => (
             <div class="space-y-3">
@@ -376,7 +385,12 @@ const InvitesList: Component = () => {
         <QueryComponent
           // queryOptions={() => orpcPrivate.teams.getUserInvites.queryOptions()}
           queryOptions={() =>
-            orpcPrivate.teamsWS.getUserTeamInvitesWS.experimental_liveOptions()
+            orpcPrivate.teamsWS.getUserTeamInvitesWS.experimental_liveOptions({
+              context: feedRenewal(
+                client,
+                orpcPrivate.teamsWS.getUserTeamInvitesWS,
+              ),
+            })
           }
           loading={() => (
             <div class="space-y-3">

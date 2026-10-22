@@ -58,8 +58,8 @@ const linkPrivate = new RPCLink<PrivateClientContext>({
         console.log('linkPrivateWS', 'url', url)
         return url
       },
-      // Only subscriptions that set `context.tokenRenewal` (the schedule editor) renew their
-      // token; the friends and teams feeds keep their first one.
+      // Only subscriptions that set `context.tokenRenewal` renew their token: the schedule
+      // editor and the friends and teams feeds (`feedRenewal`).
       refreshTokenBeforeExpireInSeconds: renewTokenBeforeExpiry,
     }),
     new TokenRenewalPlugin(),

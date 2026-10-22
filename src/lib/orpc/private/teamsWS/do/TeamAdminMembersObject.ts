@@ -1,3 +1,4 @@
+import { env } from 'cloudflare:workers'
 import { DurableIteratorObject } from '@orpc/experimental-durable-iterator/durable-object'
 import type { UserDisplay } from '../../schemas/users.ts'
 import { onError } from '@orpc/client'
@@ -27,16 +28,10 @@ export class TeamAdminMembersObject extends DurableIteratorObject<{
     })
   }
 
-  async publishChange(members: UserDisplay[]): Promise<Response> {
-    try {
-      this.publishEvent({
-        members,
-        event: 'update',
-      })
-      return new Response('ok')
-    } catch (err) {
-      console.warn('[TeamAdminMembersObject] publishChange failed', err)
-      return new Response('error', { status: 500 })
-    }
+  /** After a mutation: sends the team's members to the open sockets; with none open, no D1 query. */
+  async refresh(teamId: number): Promise<void> {
+    if (this.ctx.getWebSockets().length === 0) return
+    const members = await getTeamMembers(getDB(env), teamId)
+    this.publishEvent({ members, event: 'update' })
   }
 }

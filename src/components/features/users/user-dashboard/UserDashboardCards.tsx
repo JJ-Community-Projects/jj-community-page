@@ -1,7 +1,8 @@
 import { type Component, Show } from 'solid-js'
 import './UserAdminDashboardPage.css'
 import { orpcPrivate } from '../../../../lib/orpc/client.ts'
-import { useQuery } from '@tanstack/solid-query'
+import { feedRenewal } from '../../../../lib/orpc/tokenRenewal.ts'
+import { useQuery, useQueryClient } from '@tanstack/solid-query'
 import {
   FaRegularPenToSquare,
   FaSolidCalendarDays,
@@ -52,8 +53,11 @@ const ScheduleCard: Component = () => {
 }
 
 const TeamCard: Component = () => {
+  const queryClient = useQueryClient()
+  const invites = orpcPrivate.teamsWS.getUserTeamInvitesWS
   const inviteCountData = useQuery(() =>
-    orpcPrivate.teamsWS.getUserTeamInvitesWS.experimental_liveOptions({
+    invites.experimental_liveOptions({
+      context: feedRenewal(queryClient, invites),
       staleTime: 30 * 1000,
     }),
   )
@@ -158,8 +162,11 @@ const PrefsCard: Component = () => {
 }
 
 const FriendsCard: Component = () => {
+  const queryClient = useQueryClient()
+  const requests = orpcPrivate.friendsWS.getUserFriendRequestsWS
   const friendsData = useQuery(() =>
-    orpcPrivate.friendsWS.getUserFriendRequestsWS.experimental_liveOptions({
+    requests.experimental_liveOptions({
+      context: feedRenewal(queryClient, requests),
       staleTime: 30 * 1000,
     }),
   )

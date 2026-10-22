@@ -1,3 +1,4 @@
+import { env } from 'cloudflare:workers'
 import { DurableIteratorObject } from '@orpc/experimental-durable-iterator/durable-object'
 import type { UserDisplay } from '../../schemas/users.ts'
 import { onError } from '@orpc/client'
@@ -14,14 +15,11 @@ export class FriendRequestSentObject extends DurableIteratorObject<{
       interceptors: [onError((e) => console.error(e))],
       onSubscribed: async (websocket, _lastEventId) => {
         const att = websocket['~orpc'].deserializeTokenPayload().att
-        console.log('FriendRequestSentObject', 'onSubscribed', att)
         if (!att) return
         const { userId } = att as any
         if (!userId) return
         const db = getDB(env)
         const users = await getSendUserFriendRequests(db, userId)
-        // await this.publishChange(users)
-
         this.publishEvent(
           {
             users,
@@ -35,20 +33,10 @@ export class FriendRequestSentObject extends DurableIteratorObject<{
     })
   }
 
-  async publishChange(users: UserDisplay[]): Promise<Response> {
-    try {
-      this.publishEvent({
-        users,
-        event: 'update',
-      })
-      console.log(
-        'FriendRequestSentObject',
-        `Received ${JSON.stringify(users)}`,
-      )
-      return new Response('ok')
-    } catch (err) {
-      console.warn('[FriendRequestSentObject] publishChange failed', err)
-      return new Response('error', { status: 500 })
-    }
+  /** After a mutation: sends the user's sent friend requests to the open sockets; with none open, no D1 query. */
+  async refresh(userId: number): Promise<void> {
+    if (this.ctx.getWebSockets().length === 0) return
+    const users = await getSendUserFriendRequests(getDB(env), userId)
+    this.publishEvent({ users, event: 'update' })
   }
 }

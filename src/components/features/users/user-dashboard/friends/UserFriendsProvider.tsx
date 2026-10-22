@@ -7,6 +7,7 @@ import {
 } from 'solid-js'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/solid-query'
 import { orpcPrivate } from '../../../../../lib/orpc/client.ts'
+import { feedRenewal } from '../../../../../lib/orpc/tokenRenewal.ts'
 import { useUserSearch } from '../../../../../lib/useUserSearch'
 
 const useUserFriendsHook = () => {
@@ -23,6 +24,7 @@ const useUserFriendsHook = () => {
   // Real-time friend requests using WS
   const friendRequestsQuery = useQuery(() =>
     friendsWS.getUserFriendRequestsWS.experimental_liveOptions({
+      context: feedRenewal(queryClient, friendsWS.getUserFriendRequestsWS),
       staleTime: 30 * 1000, // 30 seconds
     }),
   )
@@ -30,6 +32,7 @@ const useUserFriendsHook = () => {
   // Real-time sent friend requests using WS
   const sentFriendRequestsQuery = useQuery(() =>
     friendsWS.getSendUserFriendRequestsWS.experimental_liveOptions({
+      context: feedRenewal(queryClient, friendsWS.getSendUserFriendRequestsWS),
       staleTime: 30 * 1000, // 30 seconds
     }),
   )
@@ -54,6 +57,7 @@ const useUserFriendsHook = () => {
   // Real-time friends list using WS
   const friendsListQuery = useQuery(() =>
     friendsWS.getUserFriendsWS.experimental_liveOptions({
+      context: feedRenewal(queryClient, friendsWS.getUserFriendsWS),
       staleTime: 30 * 1000, // 30 seconds
     }),
   )

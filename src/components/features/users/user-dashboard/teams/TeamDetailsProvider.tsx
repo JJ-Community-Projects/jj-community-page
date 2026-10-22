@@ -1,6 +1,7 @@
 import {createContext, type ParentComponent, useContext} from "solid-js";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/solid-query";
 import {orpcPrivate} from "../../../../../lib/orpc/client.ts";
+import {feedRenewal} from "../../../../../lib/orpc/tokenRenewal.ts";
 
 const useTeamDetailsHook = (teamId: number) => {
   const queryClient = useQueryClient();
@@ -15,24 +16,11 @@ const useTeamDetailsHook = (teamId: number) => {
     })
   );
 
+  // A member who leaves or is removed loses the feed at the next token renewal.
   const teamMembersQuery = useQuery(() =>
     teamsWS.getTeamAdminMembersWS.experimental_liveOptions({
       input: {teamId},
-      staleTime: 30 * 1000,
-    })
-  );
-
-  // User team data queries with SSE for real-time updates
-  const userInvitesQuery = useQuery(() =>
-    teamsWS.getTeamAdminInvitesWS.experimental_liveOptions({
-      input: {teamId},
-      staleTime: 30 * 1000, // 30 seconds
-    })
-  );
-
-  const userTeamsQuery = useQuery(() =>
-    teamsWS.getTeamAdminMembersWS.experimental_liveOptions({
-      input: {teamId},
+      context: feedRenewal(queryClient, teamsWS.getTeamAdminMembersWS, {teamId}),
       staleTime: 30 * 1000,
     })
   );
@@ -110,9 +98,6 @@ const useTeamDetailsHook = (teamId: number) => {
     // Team-specific data queries
     team: teamQuery,
     members: teamMembersQuery,
-    // User-level data queries
-    userInvites: userInvitesQuery,
-    userTeams: userTeamsQuery,
   };
 };
 

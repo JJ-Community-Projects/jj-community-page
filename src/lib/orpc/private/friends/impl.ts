@@ -104,8 +104,10 @@ const sendFriendRequest = os.sendFriendRequestContract
       })
 
       // Publish event for real-time updates via Durable Objects
-      await publishFriendRequestIncomingUpdate(context.env, toUserId)
-      await publishFriendRequestSentUpdate(context.env, userId)
+      await Promise.all([
+        publishFriendRequestIncomingUpdate(context.env, toUserId),
+        publishFriendRequestSentUpdate(context.env, userId),
+      ])
 
       return { success: true }
     } catch (e) {
@@ -161,10 +163,12 @@ const acceptFriendRequest = os.acceptFriendRequestContract
     ])
 
     // Publish event for real-time updates via Durable Objects
-    await publishFriendRequestIncomingUpdate(context.env, userId)
-    await publishFriendRequestSentUpdate(context.env, fromUserId)
-    await publishFriendsListUpdate(context.env, userId)
-    await publishFriendsListUpdate(context.env, fromUserId)
+    await Promise.all([
+      publishFriendRequestIncomingUpdate(context.env, userId),
+      publishFriendRequestSentUpdate(context.env, fromUserId),
+      publishFriendsListUpdate(context.env, userId),
+      publishFriendsListUpdate(context.env, fromUserId),
+    ])
 
     return { success: true }
   })
@@ -204,8 +208,10 @@ const declineFriendRequest = os.declineFriendRequestContract
       )
 
     // Publish event for real-time updates via Durable Objects
-    await publishFriendRequestIncomingUpdate(context.env, userId)
-    await publishFriendRequestSentUpdate(context.env, fromUserId)
+    await Promise.all([
+      publishFriendRequestIncomingUpdate(context.env, userId),
+      publishFriendRequestSentUpdate(context.env, fromUserId),
+    ])
 
     return { success: true }
   })
@@ -245,8 +251,10 @@ const cancelFriendRequest = os.cancelFriendRequestContract
       )
 
     // Publish event for real-time updates via Durable Objects
-    await publishFriendRequestIncomingUpdate(context.env, toUserId)
-    await publishFriendRequestSentUpdate(context.env, userId)
+    await Promise.all([
+      publishFriendRequestIncomingUpdate(context.env, toUserId),
+      publishFriendRequestSentUpdate(context.env, userId),
+    ])
 
     return { success: true }
   })
@@ -298,8 +306,10 @@ const removeFriend = os.removeFriendContract
       )
 
     // Publish event for real-time updates via Durable Objects
-    await publishFriendsListUpdate(context.env, userId)
-    await publishFriendsListUpdate(context.env, friendUserId)
+    await Promise.all([
+      publishFriendsListUpdate(context.env, userId),
+      publishFriendsListUpdate(context.env, friendUserId),
+    ])
 
     return { success: true }
   })

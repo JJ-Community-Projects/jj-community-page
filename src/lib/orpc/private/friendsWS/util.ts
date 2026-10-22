@@ -1,7 +1,7 @@
 import type {JJDrizzleDatabase} from "../../../db/db.ts";
 import {userDisplayView} from "../../../db/schema/views-schema.ts";
 import {friendRequests, friendsTable} from "../../../db/schema/auth-schema.ts";
-import {and, eq, or} from "drizzle-orm";
+import {eq} from "drizzle-orm";
 
 /**
  * Helper function to fetch pending friend requests for a specific user.
@@ -83,10 +83,8 @@ export function getUserFriends(db: JJDrizzleDatabase, userId: number) {
     accentColor: userDisplayView.accentColor,
   })
     .from(friendsTable)
-    .innerJoin(userDisplayView, or(
-      and(eq(friendsTable.fromUserId, userId), eq(userDisplayView.userId, friendsTable.toUserId)),
-      and(eq(friendsTable.toUserId, userId), eq(userDisplayView.userId, friendsTable.fromUserId))
-    ))
+    // Friendships are stored in both directions, so the user's own rows name every friend.
+    .innerJoin(userDisplayView, eq(userDisplayView.userId, friendsTable.toUserId))
     .where(eq(friendsTable.fromUserId, userId))
     .all();
 }

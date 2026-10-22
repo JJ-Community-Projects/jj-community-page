@@ -1,6 +1,7 @@
 import {createContext, type ParentComponent, useContext} from "solid-js";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/solid-query";
 import {orpcPrivate} from "../../../../../../lib/orpc/client.ts";
+import {feedRenewal} from "../../../../../../lib/orpc/tokenRenewal.ts";
 
 const useAdminTeamDetailsHook = (teamId: number) => {
   const queryClient = useQueryClient();
@@ -18,12 +19,14 @@ const useAdminTeamDetailsHook = (teamId: number) => {
   const membersQuery = useQuery(() =>
     teamsWS.getTeamAdminMembersWS.experimental_liveOptions({
       input: {teamId},
+      context: feedRenewal(queryClient, teamsWS.getTeamAdminMembersWS, {teamId}),
       staleTime: 30 * 1000,
     })
   );
 
   const inviteQuery = useQuery(() => teamsWS.getTeamAdminInvitesWS.experimental_liveOptions({
     input: {teamId},
+    context: feedRenewal(queryClient, teamsWS.getTeamAdminInvitesWS, {teamId}),
     staleTime: 30 * 1000,
   }))
 

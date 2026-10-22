@@ -3,6 +3,7 @@ import type {
   StandardLinkOptions,
   StandardLinkPlugin,
 } from '@orpc/client/standard'
+import type { QueryClient, QueryKey } from '@tanstack/solid-query'
 
 /** How long before expiry a subscription that sets `tokenRenewal` renews its WS token. */
 export const RENEW_TOKEN_BEFORE_EXPIRY_SECONDS = 60
@@ -32,6 +33,26 @@ export const renewTokenBeforeExpiry = (
   options: { context: TokenRenewalContext },
 ) =>
   options.context.tokenRenewal ? RENEW_TOKEN_BEFORE_EXPIRY_SECONDS : Number.NaN
+
+/**
+ * Context for a live feed (friends, teams lists) that renews its token. A refused renewal (logged
+ * out, removed from the team) cancels the feed's query, which closes its socket and ends the
+ * renewal retries.
+ */
+export function feedRenewal(
+  queryClient: QueryClient,
+  procedure: { experimental_liveKey: (...options: any[]) => QueryKey },
+  input?: unknown,
+): TokenRenewalContext {
+  const queryKey = procedure.experimental_liveKey(
+    input === undefined ? undefined : { input },
+  )
+  return {
+    tokenRenewal: {
+      onRefused: () => void queryClient.cancelQueries({ queryKey }),
+    },
+  }
+}
 
 /**
  * The token renewals of the subscriptions that set `context.tokenRenewal`.
