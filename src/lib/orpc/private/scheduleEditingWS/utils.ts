@@ -256,7 +256,11 @@ export async function ensureDraftCopied(
 /**
  * The draft snapshot an editor gets when the socket subscribes, if `userId` may still edit the
  * schedule (`access.ts`); null when not, or when the schedule doesn't exist. One round trip: the
- * access statement also reads the schedule row the snapshot needs, so it costs no extra statement.
+ * access statement also reads the schedule row the snapshot needs.
+ *
+ * Title, slug, year and visible are the draft's where it set them, else the published ones: the
+ * values `publishDraft` applies. A discarded draft counts as none, as in `draftCopyStatements`,
+ * which clears its fields before a publish (F-67).
  */
 export async function loadDraftSnapshotFor(
   db: JJDrizzleDatabase,
@@ -265,8 +269,22 @@ export async function loadDraftSnapshotFor(
 ): Promise<LoadDraftSnapshotResult | null> {
   // Orders: streams by id, tags and participants by (stream, tag / user), the order the
   // primary-key indexes gave before the ORDER BYs were added.
-  const [accessRows, streams, tagRows, partRows] = await db.batch([
+  const [accessRows, draftRows, streams, tagRows, partRows] = await db.batch([
     scheduleAccessQuery(db, scheduleId, userId),
+    db
+      .select({
+        title: editSchedulesTable.title,
+        slug: editSchedulesTable.slug,
+        year: editSchedulesTable.year,
+        visible: editSchedulesTable.visible,
+      })
+      .from(editSchedulesTable)
+      .where(
+        and(
+          eq(editSchedulesTable.scheduleId, scheduleId),
+          ne(editSchedulesTable.status, 'discarded'),
+        ),
+      ),
     db
       .select()
       .from(editStreamsTable)
@@ -315,7 +333,15 @@ export async function loadDraftSnapshotFor(
   const access = scheduleAccess(accessRows[0], userId)
   if (access.status !== 'ok') return null
   const { id, title, slug, year, visible, updatedAt } = access.schedule
-  const schedule = { id, title, slug, year, visible, updatedAt }
+  const draft = draftRows[0]
+  const schedule = {
+    id,
+    title: draft?.title ?? title,
+    slug: draft?.slug ?? slug,
+    year: draft?.year ?? year,
+    visible: draft?.visible ?? visible,
+    updatedAt,
+  }
 
   const tagsByStream: Record<
     string,
