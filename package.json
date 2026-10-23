@@ -28,6 +28,7 @@
     "openapi-generator-cli:tiltify": "openapi-generator-cli generate -i ./src/lib/externalAPI/tiltify/spec.json -g typescript-fetch -o ./src/lib/externalAPI/tiltify/api/ --additional-properties=npmName=tiltify",
     "test": "vitest run --project unit --project workers --project workers-ws",
     "test:e2e": "astro build && vitest run --project e2e",
+    "test:browser": "astro build && playwright test -c test/browser/playwright.config.ts",
     "test:update": "npm run test -- -u",
     "verify": "npm run test && astro build"
   },
@@ -92,6 +93,7 @@
     "@drzl/generator-zod": "^0.1.0",
     "@drzl/template-orpc-service": "^0.1.0",
     "@msw/cloudflare": "^0.2.0",
+    "@playwright/test": "^1.64.1",
     "@types/luxon": "^3.6.2",
     "autoprefixer": "^10.6.1",
     "drizzle-kit": "^0.31.11",
