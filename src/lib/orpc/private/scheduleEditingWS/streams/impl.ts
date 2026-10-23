@@ -399,7 +399,9 @@ export const lockStream = os.lockStreamContract
   .handler(async ({ context, input }) => {
     const { scheduleId, streamId } = input
     const userId = context.userId
-    await lockStreamEditing(context.env as any, scheduleId, streamId, userId)
+    const { acquired } = await lockStreamEditing(context.env as any, scheduleId, streamId, userId)
+    // A renewal by the holder (the open dialog, every minute) changes nothing for the others
+    if (!acquired) return { ok: true as const }
     const stub = getScheduleEditingStub(context.env as any, scheduleId)
     // @ts-ignore
     await stub.publishLock(scheduleId, userId, { streamId, userId })

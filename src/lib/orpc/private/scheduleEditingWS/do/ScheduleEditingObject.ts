@@ -1,4 +1,7 @@
-import { DurableIteratorObject } from '@orpc/experimental-durable-iterator/durable-object'
+import {
+  DurableIteratorObject,
+  toDurableIteratorWebsocket,
+} from '@orpc/experimental-durable-iterator/durable-object'
 import type {
   DraftDiscardedPayload,
   DraftPublishedPayload,
@@ -29,6 +32,27 @@ type SocketAttachment = { allowed?: boolean }
 const notAllowed = (websocket: WebSocket) =>
   (websocket.deserializeAttachment() as SocketAttachment | null)?.allowed !==
   true
+
+/** A stream edit lock: held by one user, renewed by the holder's lockStream and saves (F-64). */
+type StreamLock = { userId: number; scheduleId: number; renewedAt: number }
+
+/**
+ * A lock nobody renewed for this long is released by the next lock call on the schedule (KV-30).
+ * The open Edit dialog renews it every minute; a closed tab releases it at once (`webSocketClose`).
+ * Lazy, not an alarm: tests freeze `Date.now()`, so an alarm set from it would lie in the past.
+ */
+export const STREAM_LOCK_TTL_MS = 3 * 60_000
+const LOCK_PREFIX = 'lock:'
+
+/** The user a socket's token was issued to (`streamDraftWS` att), or null. */
+const socketUserId = (websocket: WebSocket) => {
+  try {
+    const att = toDurableIteratorWebsocket(websocket)['~orpc'].deserializeTokenPayload().att
+    return (att as { userId?: number } | undefined)?.userId ?? null
+  } catch {
+    return null
+  }
+}
 
 /**
  * Durable Object for Schedule Editing WebSocket stream.
@@ -66,12 +90,14 @@ export class ScheduleEditingObject extends DurableIteratorObject<EditChannelMess
           return
         }
         websocket.serializeAttachment({ allowed: true } satisfies SocketAttachment)
+        // The locks held right now, so a new editor sees who is editing what (F-64)
+        const locks = await this.liveLocks()
         const initPayload = normalizeInitPayloadDates({
           ...snapshot,
           // Ensure streams include lock metadata required by DraftStreamSchema
           streams: snapshot.streams.map((s: any) => ({
             ...s,
-            lockedBy: s.lockedBy ?? null,
+            lockedBy: locks.get(s.id)?.userId ?? s.lockedBy ?? null,
           })),
         } as any)
         this.publishEvent(
@@ -258,6 +284,113 @@ export class ScheduleEditingObject extends DurableIteratorObject<EditChannelMess
     payload: UnlockPayload,
   ) {
     return this.publish({ scheduleId, editorId, event: 'unlock', payload })
+  }
+
+  // Stream edit locks (F-64, KV-30). The object is single-threaded and its storage strongly
+  // consistent, so each method below is atomic; storage calls don't let other requests in.
+
+  /**
+   * Takes the lock, or renews it when the user holds it already. Another user's lock is
+   * reported as `held` with its holder.
+   */
+  async acquireStreamLock(
+    scheduleId: number,
+    streamId: number,
+    userId: number,
+  ): Promise<{ status: 'acquired' | 'renewed' } | { status: 'held'; holder: number }> {
+    const lock = (await this.liveLocks()).get(streamId)
+    if (lock && lock.userId !== userId) return { status: 'held', holder: lock.userId }
+    await this.storage.put<StreamLock>(LOCK_PREFIX + streamId, {
+      userId,
+      scheduleId,
+      renewedAt: Date.now(),
+    })
+    return { status: lock ? 'renewed' : 'acquired' }
+  }
+
+  /** Releases the user's lock: `none` when the stream is unlocked, `held` when another user has it. */
+  async releaseStreamLock(
+    streamId: number,
+    userId: number,
+  ): Promise<'released' | 'none' | 'held'> {
+    const lock = (await this.liveLocks()).get(streamId)
+    if (!lock) return 'none'
+    if (lock.userId !== userId) return 'held'
+    await this.storage.delete(LOCK_PREFIX + streamId)
+    return 'released'
+  }
+
+  /** The user holding the stream's lock, or null. A check by the holder (a save) renews it. */
+  async streamLockHolder(streamId: number, userId: number): Promise<number | null> {
+    const lock = (await this.liveLocks()).get(streamId)
+    if (!lock) return null
+    if (lock.userId === userId)
+      await this.storage.put<StreamLock>(LOCK_PREFIX + streamId, {
+        ...lock,
+        renewedAt: Date.now(),
+      })
+    return lock.userId
+  }
+
+  /** A closed tab: the user's last socket releases their locks at once (KV-30). */
+  async webSocketClose(
+    websocket: WebSocket,
+    code: number,
+    reason: string,
+    wasClean: boolean,
+  ) {
+    super.webSocketClose(websocket, code, reason, wasClean)
+    await this.releaseLocksOfClosed(websocket)
+  }
+
+  async webSocketError(websocket: WebSocket) {
+    await this.releaseLocksOfClosed(websocket)
+  }
+
+  private get storage() {
+    return this.ctx['~orpc'].original.storage
+  }
+
+  /** The unexpired locks by stream id. Expired ones are released, each with an `unlock` event. */
+  private async liveLocks() {
+    const now = Date.now()
+    const locks = new Map<number, StreamLock>()
+    for (const [key, lock] of await this.storage.list<StreamLock>({
+      prefix: LOCK_PREFIX,
+    })) {
+      const streamId = Number(key.slice(LOCK_PREFIX.length))
+      if (now - lock.renewedAt >= STREAM_LOCK_TTL_MS)
+        await this.releaseWithEvent(streamId, lock)
+      else locks.set(streamId, lock)
+    }
+    return locks
+  }
+
+  private async releaseWithEvent(streamId: number, lock: StreamLock) {
+    await this.storage.delete(LOCK_PREFIX + streamId)
+    await this.publish({
+      scheduleId: lock.scheduleId,
+      editorId: lock.userId,
+      event: 'unlock',
+      payload: { streamId, userId: lock.userId },
+    })
+  }
+
+  /** Releases the locks of the closed socket's user, unless they still have another socket open. */
+  private async releaseLocksOfClosed(closed: WebSocket) {
+    const userId = socketUserId(closed)
+    if (userId === null) return
+    const stillOpen = this.ctx
+      .getWebSockets()
+      .some(
+        (ws) =>
+          ws['~orpc'].original !== closed &&
+          ws.readyState === WebSocket.OPEN &&
+          socketUserId(ws) === userId,
+      )
+    if (stillOpen) return
+    for (const [streamId, lock] of await this.liveLocks())
+      if (lock.userId === userId) await this.releaseWithEvent(streamId, lock)
   }
 
   private async writeSnapshot(snapshot: InitPayload) {

@@ -7,14 +7,29 @@ export const StreamDialogControls: Component<{ streamId: number; onClose: () => 
   const dialog = useStreamEditorDialog();
   const stream = () => state.streams.find((s) => s.id === props.streamId);
 
+  // A refused save or delete keeps the dialog open with the server's message (F-66)
+  const errorMessage = (error: unknown) => error instanceof Error ? error.message : String(error);
+
   const handleDelete = async () => {
     if (!confirm("Delete this stream? This cannot be undone.")) return;
-    await deleteStream(props.streamId);
+    dialog.setError(null);
+    try {
+      await deleteStream(props.streamId);
+    } catch (error) {
+      dialog.setError(errorMessage(error));
+      return;
+    }
     props.onClose();
   };
 
   const handleSave = async () => {
-    await dialog.save();
+    dialog.setError(null);
+    try {
+      await dialog.save();
+    } catch (error) {
+      dialog.setError(errorMessage(error));
+      return;
+    }
     props.onClose();
   };
 

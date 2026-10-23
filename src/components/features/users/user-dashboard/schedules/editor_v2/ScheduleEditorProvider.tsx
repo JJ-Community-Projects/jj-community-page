@@ -56,6 +56,8 @@ const sameIds = (a: number[], b: number[]) => {
 const useScheduleEditor2Hook = (scheduleId: number) => {
   const [state, setState] = createStore<ScheduleDraftState>(initialState)
   const [events, setEvents] = createSignal<EditChannelMessage[]>([])
+  // The signed-in editor's user id, from the `init` event (F-64)
+  const [selfId, setSelfId] = createSignal<number | null>(null)
   const addEvent = (event: EditChannelMessage) => {
     setEvents((prevState) => {
       return [...prevState, event]
@@ -105,6 +107,8 @@ const useScheduleEditor2Hook = (scheduleId: number) => {
     switch (msg.event) {
       case 'init': {
         const snap = normalizeInitPayloadDates(msg.payload as any)
+        // The object sends `init` to the subscribing socket only, as its user (F-64)
+        setSelfId(msg.editorId)
         setState((prev) => ({
           ...prev,
           schedule: snap.schedule ?? null,
@@ -439,6 +443,26 @@ const useScheduleEditor2Hook = (scheduleId: number) => {
     return res.id
   }
 
+  // Applies a stream patch locally before its save. The returned undo restores the fields the
+  // patch touched after a refused save, except those a live update changed meanwhile (F-66).
+  const applyStreamPatch = (id: number, patch: Partial<DraftStream> | undefined) => {
+    const idx = state.streams.findIndex((s) => s.id === id)
+    if (!patch || idx < 0) return () => {}
+    const keys = Object.keys(patch) as (keyof DraftStream)[]
+    const before = Object.fromEntries(keys.map((k) => [k, state.streams[idx][k]]))
+    setState('streams', idx, (prev) => ({ ...prev, ...patch }))
+    return () => {
+      const i = state.streams.findIndex((s) => s.id === id)
+      if (i < 0) return
+      const restore = Object.fromEntries(
+        keys
+          .filter((k) => state.streams[i][k] === patch[k])
+          .map((k) => [k, before[k]]),
+      )
+      setState('streams', i, (prev) => ({ ...prev, ...restore }))
+    }
+  }
+
   const updateStreamMutation = useMutation(() =>
     scheduleEditing.updateStreamWithDetails.mutationOptions(),
   )
@@ -457,14 +481,6 @@ const useScheduleEditor2Hook = (scheduleId: number) => {
     participants?: number[]
     tags?: number[]
   }) => {
-    const idx = state.streams.findIndex((s) => s.id === input.id)
-    // local-only patch for temporary streams
-    if (input.patch) {
-      setState('streams', idx, (prev) => ({
-        ...(prev as DraftStream),
-        ...(input.patch as any),
-      }))
-    }
     console.log('updateStream', input)
     // Tags and participants are only sent when they changed: an unchanged set costs the server
     // reads and changes nothing (the server compares sets too, so the order doesn't matter).
@@ -484,6 +500,11 @@ const useScheduleEditor2Hook = (scheduleId: number) => {
       ...rest,
       ...(tagsChanged && { tags }),
       ...(participantsChanged && { participants }),
+    }).then((result: unknown) => {
+      // Applied once the server accepts it, not before (F-66): an optimistic move to another day
+      // would unmount the card, and with it the open Edit dialog that has to show a refusal
+      applyStreamPatch(input.id, input.patch)
+      return result
     })
   }
 
@@ -508,29 +529,38 @@ const useScheduleEditor2Hook = (scheduleId: number) => {
       tags?: number[]
     }[],
   ) => {
-    for (const input of inputs) {
-      const idx = state.streams.findIndex((s) => s.id === input.id)
-      // local-only patch for temporary streams
-      if (input.patch) {
-        setState('streams', idx, (prev) => ({
-          ...(prev as DraftStream),
-          ...(input.patch as any),
-        }))
-      }
+    const undos = inputs.map((input) => {
       console.log('updateStream', input)
-    }
+      return applyStreamPatch(input.id, input.patch)
+    })
 
-    return updateStreamsMutation.mutateAsync({ scheduleId, streams: inputs })
+    // The server refuses the whole save, so all patches are undone (F-66)
+    return updateStreamsMutation
+      .mutateAsync({ scheduleId, streams: inputs })
+      .catch((error: unknown) => {
+        undos.forEach((undo) => undo())
+        throw error
+      })
   }
 
   const deleteStreamMutation = useMutation(() =>
     scheduleEditing.deleteStream.mutationOptions(),
   )
   const deleteStream = (id: number) => {
+    const found = state.streams.find((s) => s.id === id)
+    const removed = found && { ...found }
     // remove locally
     setState('streams', (prev) => prev.filter((s) => s.id !== id))
     // @ts-ignore
-    return deleteStreamMutation.mutateAsync({ scheduleId, id })
+    return deleteStreamMutation.mutateAsync({ scheduleId, id }).catch((error: unknown) => {
+      // Refused: put the stream back, unless it's gone on the server too (F-66)
+      if (removed && (error as { code?: string } | null)?.code !== 'NOT_FOUND') {
+        setState('streams', (prev) =>
+          prev.some((s) => s.id === id) ? prev : [...prev, removed],
+        )
+      }
+      throw error
+    })
   }
 
   // Tags
@@ -579,6 +609,16 @@ const useScheduleEditor2Hook = (scheduleId: number) => {
 
   const relations = useQuery(() => users.getRelations.queryOptions())
 
+  /** The name to show for a lock holder: the user's friends, team mates and participants know names (F-64). */
+  const lockHolderName = (userId: number) => {
+    const known = [
+      ...(relations.data?.friends ?? []),
+      ...(relations.data?.teamMates ?? []),
+      ...Object.values(state.participantsByStream).flat(),
+    ].find((u) => u.userId === userId)
+    return known?.username || 'another editor'
+  }
+
   return {
     state,
     noAccess,
@@ -624,6 +664,8 @@ const useScheduleEditor2Hook = (scheduleId: number) => {
 
     // relations
     relations,
+    selfId,
+    lockHolderName,
   }
 }
 
