@@ -13,6 +13,7 @@ import {socialUrlRegex} from "./socialUrlRegex.ts";
 import { tiltifyMetadataView } from '../lib/db/schema/views-schema.ts'
 import { CACHE_POLICY, ttlFor } from '../lib/services/cachePolicy.ts'
 import { putCache } from '../lib/services/kvCache.ts'
+import { loggableError } from '../lib/db/loggableError.ts'
 
 /**
  * Saves social media information from Tiltify to the userSocials table
@@ -89,7 +90,7 @@ async function saveTiltifySocials(db: JJDrizzleDatabase, userId: number, social:
 
     console.log('Saved social media information for user', userId);
   } catch (error) {
-    console.error('Error saving social media information:', error);
+    console.error('Error saving social media information:', loggableError(error)); // F-32
   }
 }
 
@@ -325,7 +326,6 @@ export async function invalidateSession(ctx: AstroContext, sessionId: string): P
   // Parse the user's session list
   let sessionIds: string[] = [];
   try {
-    console.log('invalidateSession', rawSessionIds);
     sessionIds = JSON.parse(rawSessionIds);
   } catch (error) {
     console.error('Failed to parse rawSessionIds JSON:', error);
@@ -398,7 +398,6 @@ export async function invalidateUserSessions(ctx: AstroContext, userId: number):
   if (rawSessionIds) {
     let sessionIds: string[] = [];
     try {
-      console.log('invalidateUserSessions', rawSessionIds);
       sessionIds = JSON.parse(rawSessionIds);
     } catch (error) {
       console.error('Failed to parse user sessions JSON:', error);
@@ -469,7 +468,6 @@ export async function createSession(context: AstroContext, token: string, userId
   let sessionIds: string[] = [];
   if (existingSessions) {
     try {
-      console.log('createSession', existingSessions);
       sessionIds = JSON.parse(existingSessions);
     } catch (error) {
       console.error('Failed to parse existing sessions JSON:', error);
@@ -574,7 +572,7 @@ export async function createNewUserSession(
         .run();
       console.log('Default user styles set for user', user.id);
     } catch (error) {
-      console.error('Error setting default user styles:', error);
+      console.error('Error setting default user styles:', loggableError(error)); // F-32
       // Continue even if setting styles fails
     }
 
@@ -585,7 +583,8 @@ export async function createNewUserSession(
 
     return session;
   } catch (error) {
-    console.error('createNewUserSession', error);
+    // A failed tokens insert would log the user's Tiltify tokens (F-32)
+    console.error('createNewUserSession', loggableError(error));
     return null;
   }
 }

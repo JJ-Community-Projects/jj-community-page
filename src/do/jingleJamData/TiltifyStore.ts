@@ -11,6 +11,7 @@ import { jjCampaign, jjCauses } from '../../lib/db/schema/jj-api-schema.ts'
 import type { BatchItem } from 'drizzle-orm/batch'
 import { and, eq, getTableColumns } from 'drizzle-orm'
 import { accounts } from '../../lib/db/schema/auth-schema.ts'
+import { loggableError } from '../../lib/db/loggableError.ts'
 import {
   normalizeTwitchLogin,
   tiltifySlugToTwitchLoginMap,
@@ -500,7 +501,7 @@ export class TiltifyStore {
       const [first, ...rest] = updates
       await db.batch([first, ...rest])
     } catch (e) {
-      console.error('updateTiltifyProfiles', 'error', e)
+      console.error('updateTiltifyProfiles', 'error', loggableError(e)) // F-32
     }
   }
 

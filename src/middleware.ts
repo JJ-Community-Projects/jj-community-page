@@ -1,5 +1,6 @@
 import {defineMiddleware} from "astro:middleware";
 import {deleteSessionTokenCookie, setSessionTokenCookie, validateSessionToken} from "./functions/session.ts";
+import {loggableError} from "./lib/db/loggableError.ts";
 
 /** API routes that never read `locals.user` / `locals.session`. */
 const SESSIONLESS_PREFIXES = [
@@ -83,7 +84,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
     context.locals.session = session;
     context.locals.user = user;
   } catch (e) {
-    console.error('middleware', e);
+    console.error('middleware', loggableError(e)); // F-32
     // Ensure locals are set to null in case of error
     context.locals.session = null;
     context.locals.user = null;

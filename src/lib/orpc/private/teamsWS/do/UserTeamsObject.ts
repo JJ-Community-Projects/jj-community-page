@@ -3,6 +3,7 @@ import { DurableIteratorObject } from '@orpc/experimental-durable-iterator/durab
 import type { Team } from '../../../public/schemas/teams.ts'
 import { onError } from '@orpc/client'
 import { getDB } from '../../../../db/db.ts'
+import { loggableError } from '../../../../db/loggableError.ts'
 import { getUserTeams } from '../util.ts'
 
 export class UserTeamsObject extends DurableIteratorObject<{
@@ -12,7 +13,7 @@ export class UserTeamsObject extends DurableIteratorObject<{
   constructor(state: DurableObjectState, env: Env) {
     super(state, env, {
       signingKey: env.ORPC_DEI_SIGNING_KEY,
-      interceptors: [onError((e) => console.error(e))],
+      interceptors: [onError((e) => console.error(loggableError(e)))],
       onSubscribed: async (websocket, _lastEventId) => {
         const att = websocket['~orpc'].deserializeTokenPayload().att
         if (!att) return

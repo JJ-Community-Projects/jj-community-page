@@ -7,6 +7,7 @@ import { TwitchAPI } from '../../../twitchAPI.ts'
 import { twitchChannelSchema, twitchStreamSchema, } from '../../../db/schema/twitch-channel-schema.ts'
 import { userSocials } from '../../../db/schema/auth-schema.ts'
 import { TiltifyAPI } from '../../../TiltifyAPI.ts'
+import { loggableError } from '../../../db/loggableError.ts'
 
 const os = implement(platformsContract).use(dbMiddleware)
 
@@ -82,7 +83,7 @@ const addSocial = os.addSocialContract
 
       return result
     } catch (e) {
-      console.error(e)
+      console.error(loggableError(e)) // F-32
       throw new ORPCError('INTERNAL_SERVER_ERROR', {
         message: `Failed to add social`,
       })
@@ -177,14 +178,13 @@ const importFromTiltify = os.importFromTiltifyContract
     let tiltifyToken: string | null
     try {
       tiltifyToken = await tiltifyAPI.getTokenFromLocals(context.locals)
-      console.log('importFromTiltify', 'tiltifyToken', tiltifyToken)
       if (!tiltifyToken) {
         throw new ORPCError('UNAUTHORIZED', {
           message: 'No Tiltify token found for user',
         })
       }
     } catch (error) {
-      console.error('Error getting Tiltify token:', error)
+      console.error('Error getting Tiltify token:', loggableError(error)) // F-32
       throw new ORPCError('INTERNAL_SERVER_ERROR', {
         message: 'Failed to get Tiltify token',
       })
@@ -195,7 +195,7 @@ const importFromTiltify = os.importFromTiltifyContract
     try {
       tiltifyUser = await tiltifyAPI.getUser(tiltifyToken)
     } catch (error) {
-      console.error('Error getting Tiltify user data:', error)
+      console.error('Error getting Tiltify user data:', loggableError(error)) // F-32
       throw new ORPCError('INTERNAL_SERVER_ERROR', {
         message: 'Failed to get Tiltify user data',
       })
@@ -275,7 +275,7 @@ const importFromTiltify = os.importFromTiltifyContract
                   },
                 })
             } catch (e) {
-              console.error('twitchChannelSchema', channel, e)
+              console.error('twitchChannelSchema', channel, loggableError(e)) // F-32
               throw e
             }
           }
@@ -300,14 +300,14 @@ const importFromTiltify = os.importFromTiltifyContract
                 provider: platform,
                 url,
               },
-              e,
+              loggableError(e), // F-32
             )
             throw e
           }
 
           results.push({ provider: platform, success: true })
         } catch (error) {
-          console.error(`Error adding ${platform} social:`, error)
+          console.error(`Error adding ${platform} social:`, loggableError(error)) // F-32
           results.push({ provider: platform, success: false })
         }
       }

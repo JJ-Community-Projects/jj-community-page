@@ -7,6 +7,7 @@ import { SmartCoercionPlugin } from '@orpc/json-schema'
 import { ZodToJsonSchemaConverter } from '@orpc/zod/zod4'
 import { publicRouter } from '../../../lib/orpc/public/publicRouter.ts'
 import { onError } from '@orpc/client'
+import { loggableError } from '../../../lib/db/loggableError.ts'
 import {
   TwitchChannelSchema,
   UserPaginationSchema,
@@ -24,7 +25,8 @@ import { UserDisplaySchema } from '../../../lib/orpc/public/schemas/UserDisplayS
 
 const handler = new OpenAPIHandler(publicRouter, {
   interceptors: [
-    onError((error) => {
+    onError((raw) => {
+      const error = loggableError(raw) // F-32
       console.error('OpenAPIHandler', error)
       const cause = (error as any).cause
       if (cause) {

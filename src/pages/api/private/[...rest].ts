@@ -5,6 +5,7 @@ import { onError } from '@orpc/client'
 import { RPCHandler } from '@orpc/server/fetch'
 import { DurableIteratorHandlerPlugin } from '@orpc/experimental-durable-iterator'
 import { HibernationPlugin } from '@orpc/server/hibernation'
+import { loggableError } from '../../../lib/db/loggableError.ts'
 
 const handler = new RPCHandler(privateRouter, {
   plugins: [
@@ -16,7 +17,8 @@ const handler = new RPCHandler(privateRouter, {
   ],
   interceptors: [
     onError((error) => {
-      console.error(JSON.stringify(error, null, 2))
+      // A DrizzleQueryError serializes its bound params (F-32)
+      console.error(JSON.stringify(loggableError(error), null, 2))
     }),
   ],
 })

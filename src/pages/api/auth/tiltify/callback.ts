@@ -12,6 +12,7 @@ import {
   setSessionTokenCookie,
 } from '../../../../functions/session.ts'
 import { getDB } from '../../../../lib/db/db.ts'
+import { loggableError } from '../../../../lib/db/loggableError.ts'
 
 export const GET: APIRoute = async (ctx) => {
   const { locals, request } = ctx
@@ -41,7 +42,7 @@ export const GET: APIRoute = async (ctx) => {
       return ctx.redirect('/auth-error?error=token-exchange-failed')
     }
   } catch (e) {
-    console.error('api/auth/tiltify/callback', e)
+    console.error('api/auth/tiltify/callback', loggableError(e)) // F-32
     return ctx.redirect('/auth-error?error=token-exchange-failed')
   }
 
@@ -53,7 +54,7 @@ export const GET: APIRoute = async (ctx) => {
     }
     tiltifyUser = resp
   } catch (e) {
-    console.error('api/auth/tiltify/callback', e)
+    console.error('api/auth/tiltify/callback', loggableError(e)) // F-32
     return ctx.redirect('/auth-error?error=user-fetch-failed')
   }
   // endregion
@@ -173,7 +174,7 @@ export const GET: APIRoute = async (ctx) => {
     console.error(
       'api/auth/tiltify/callback',
       'Tiltify signup Twitch handling failed',
-      e,
+      loggableError(e), // F-32
     )
     // Do not block signup on Twitch enrichment failure
   }
