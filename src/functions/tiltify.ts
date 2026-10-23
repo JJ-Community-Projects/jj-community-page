@@ -94,7 +94,6 @@ export async function getTiltifyTokenFromContext(ctx: AstroContext): Promise<str
     "refresh_token": tokenFromDB.refreshToken,
     "grant_type": "refresh_token"
   }
-  console.log(body)
   const refreshResponse = await fetch('https://v5api.tiltify.com/oauth/token', {
     method: 'POST',
     headers: {"Content-Type": "application/json"},
@@ -108,7 +107,6 @@ export async function getTiltifyTokenFromContext(ctx: AstroContext): Promise<str
     return null;
   }
   const tiltifyToken: any = await refreshResponse.json();
-  console.log('tiltifyToken', tiltifyToken);
   await db.insert(tokens)
     .values({
       userId: user.id,
