@@ -8,7 +8,11 @@ import { type CachePolicy, ttlFor } from './cachePolicy.ts'
 // Values go through oRPC's serializer, so Dates, Maps, Sets and undefined come back as they went in.
 // Note: the Cache API is a no-op on *.workers.dev; it works on the custom domains.
 
-export type EdgeEntry<T> = { value: T } | { notFound: true; message?: string }
+// `forbidden` (a private schedule or team) is never stored; see put().
+export type EdgeEntry<T> =
+  | { value: T }
+  | { notFound: true; message?: string }
+  | { forbidden: true; message?: string }
 
 const STORED_AT = 'x-edge-stored-at'
 const TTL = 'x-edge-ttl'
@@ -50,6 +54,24 @@ export function edgeCacheKey(requestUrl: string, parts: string[]) {
   return new URL(`/__edge-cache/v1/${path}`, requestUrl).toString()
 }
 
+/** Key from the whole input (object keys sorted), for answers that depend on every field. */
+export const byInput = (input: unknown) => stableJson(input) ?? ''
+
+function stableJson(value: unknown): string | undefined {
+  return JSON.stringify(value, (_, v) =>
+    v && typeof v === 'object' && !Array.isArray(v)
+      ? Object.fromEntries(
+          Object.entries(v).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)),
+        )
+      : v,
+  )
+}
+
+/** Deletes the entries (in this data center only: the Cache API has no global delete). Never throws. */
+export async function forgetEdgeCached(keys: string[]) {
+  await Promise.all(keys.map(forget))
+}
+
 export async function edgeCached<T>({
   key,
   policy,
@@ -71,7 +93,7 @@ export async function edgeCached<T>({
         refreshing.add(key)
         waitUntil(
           load()
-            .then((entry) => put(key, entry, policy))
+            .then((entry) => put(key, entry, policy, true))
             .catch((e) => console.error('edge cache refresh failed', key, e))
             .finally(() => refreshing.delete(key)),
         )
@@ -105,8 +127,9 @@ async function read<T>(response: Response): Promise<EdgeEntry<T>> {
 }
 
 /**
- * Stores `entry`; a NOT_FOUND only when the policy has a negativeTtl. On a refresh, a NOT_FOUND that
- * can't be stored deletes the entry instead, so an older answer isn't served on. Never throws.
+ * Stores `entry`; a NOT_FOUND only when the policy has a negativeTtl, a FORBIDDEN never. On a refresh
+ * (a logged-in request, or the background refresh of a stale entry), an answer that can't be stored
+ * deletes the entry instead, so an older answer isn't served on (a hidden schedule). Never throws.
  */
 async function put<T>(
   key: string,
@@ -115,7 +138,7 @@ async function put<T>(
   refresh = false,
 ) {
   const isNotFound = 'notFound' in entry
-  if (isNotFound && policy.negativeTtl === undefined) {
+  if ('forbidden' in entry || (isNotFound && policy.negativeTtl === undefined)) {
     if (refresh) await forget(key)
     return
   }

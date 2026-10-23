@@ -23,6 +23,7 @@ import {
   publishUserInvitesUpdate,
   publishUserTeamsUpdate,
 } from '../teamsWS/publisher.ts'
+import { forgetPublicTeam } from '../../../services/visibilityCache.ts'
 import {
   canCreateTeamFrom,
   checkCanCreateTeam,
@@ -155,6 +156,10 @@ const update = os.updateContract
           }),
         })
         .where(eq(teamsTable.id, input.teamId))
+
+      if (visible !== undefined && visible !== team.visible) {
+        await forgetPublicTeam(db, context.request.url, team)
+      }
 
       return { success: true }
     } catch (error) {

@@ -18,6 +18,7 @@ import {
   checkCanCreateSchedule,
   yearSchedulesCount,
 } from '../util/limits.ts'
+import { forgetPublicSchedule } from '../../../services/visibilityCache.ts'
 
 const os = implement(privateSchedulesContract).use(dbMiddleware)
 
@@ -356,6 +357,9 @@ const toggleVisibility = os.toggleVisibility
           visible: !schedule.visible,
         })
         .where(eq(editSchedulesTable.scheduleId, scheduleId))
+
+      // The owner is the caller (checked above)
+      await forgetPublicSchedule(context.request.url, schedule, user.tiltifySlug)
 
       return { message: 'Schedule visibility toggled successfully' }
     } catch (error) {

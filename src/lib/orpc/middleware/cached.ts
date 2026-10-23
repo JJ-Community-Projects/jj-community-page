@@ -7,6 +7,8 @@ import {
 } from '../../services/cachePolicy.ts'
 import { edgeCached, edgeCacheKey } from '../../services/edgeCache.ts'
 
+export { byInput } from '../../services/edgeCache.ts'
+
 interface ORPCContext extends ResponseHeadersPluginContext {
   locals?: App.Locals
   request?: Request
@@ -20,7 +22,9 @@ interface ORPCContext extends ResponseHeadersPluginContext {
  * gets stored is the anonymous answer. A logged-in request skips the read and stores a fresh answer:
  * a creator sees their own edit at once and refreshes the entry for their data center.
  * NOT_FOUND answers are cached for the policy's `negativeTtl` (none: not cached) and rethrown
- * with the same message; any other error is not cached.
+ * with the same message. FORBIDDEN (a private schedule or team) is never cached, but a logged-in
+ * request that gets it drops the stored answer, so the owner's visit after a hide ends the public
+ * copy in their data center. Any other error is not cached.
  */
 export const cached = <TInput>(
   entity: CacheEntity,
@@ -52,6 +56,9 @@ export const cached = <TInput>(
             if (e instanceof ORPCError && e.code === 'NOT_FOUND') {
               return { notFound: true, message: e.message }
             }
+            if (e instanceof ORPCError && e.code === 'FORBIDDEN') {
+              return { forbidden: true, message: e.message }
+            }
             throw e
           }
         },
@@ -59,21 +66,11 @@ export const cached = <TInput>(
       if ('notFound' in entry) {
         throw new ORPCError('NOT_FOUND', { message: entry.message })
       }
+      if ('forbidden' in entry) {
+        throw new ORPCError('FORBIDDEN', { message: entry.message })
+      }
       return output(entry.value)
     })
-}
-
-/** Key from the whole input (object keys sorted), for answers that depend on every field. */
-export const byInput = (input: unknown) => stableJson(input) ?? ''
-
-function stableJson(value: unknown): string | undefined {
-  return JSON.stringify(value, (_, v) =>
-    v && typeof v === 'object' && !Array.isArray(v)
-      ? Object.fromEntries(
-          Object.entries(v).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)),
-        )
-      : v,
-  )
 }
 
 // The request's locals with the viewer hidden. A prototype instead of a copy, so Astro's own
