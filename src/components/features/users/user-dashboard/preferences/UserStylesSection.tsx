@@ -43,9 +43,10 @@ export const UserStyle: Component<UserStyleProps> = (props) => {
     }),
   )
   // Handle saving user styles
+  // Close only once saved; on failure the dialog stays open with the error
   const handleSaveStyles = async () => {
     try {
-      updateStyle.mutate({
+      await updateStyle.mutateAsync({
         primaryColor: primaryColor(),
         accentColor: accentColor(),
       })
@@ -65,8 +66,10 @@ export const UserStyle: Component<UserStyleProps> = (props) => {
     console.log('onOpenChange', v)
     modal.setOpen(v)
     if (!v) {
+      // Closed without saving: drop the edits and any failed save's error
       setPrimaryColor(props.primaryColor)
       setAccentColor(props.accentColor)
+      updateStyle.reset()
     }
   }
 
@@ -174,7 +177,7 @@ export const UserStyle: Component<UserStyleProps> = (props) => {
                 <button
                   type="button"
                   class="rounded-md border border-gray-300 px-4 py-2 hover:bg-gray-50"
-                  onClick={modal.close}
+                  onClick={() => onOpenChange(false)}
                   disabled={updateStyle.isPending}
                 >
                   Cancel

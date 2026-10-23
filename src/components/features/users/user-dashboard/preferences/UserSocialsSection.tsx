@@ -82,6 +82,17 @@ const useHook = () => {
   }
 }
 
+// Error text for a failed mutation, with the server's message when it sent one
+const MutationError: Component<{ error: Error | null; fallback: string }> = (
+  props,
+) => (
+  <Show when={props.error}>
+    <p class="mt-1 text-sm text-red-500">
+      {props.error?.message || props.fallback}
+    </p>
+  </Show>
+)
+
 // Twitch Social Component
 const TwitchSocial: Component = () => {
   const { twitchChannelQuery, addMutation, removeMutation, socialsQuery } =
@@ -112,7 +123,7 @@ const TwitchSocial: Component = () => {
     }
 
     try {
-      await addMutation.mutate({ provider: 'twitch', url: url() })
+      await addMutation.mutateAsync({ provider: 'twitch', url: url() })
       setUrl('')
       setError('')
     } catch (error) {
@@ -132,24 +143,30 @@ const TwitchSocial: Component = () => {
       <Show
         when={!social()}
         fallback={
-          <div class="flex items-center justify-between rounded-md p-3">
-            <a
-              href={social()?.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              class="text-purple-600 hover:underline"
-            >
-              {social()?.url}
-            </a>
-            <button
-              type="button"
-              onClick={() => removeMutation.mutate({ provider: 'twitch' })}
-              class="text-red-500 hover:text-red-700"
-              disabled={removeMutation.isPending}
-            >
-              <FaSolidTrash />
-            </button>
-          </div>
+          <>
+            <div class="flex items-center justify-between rounded-md p-3">
+              <a
+                href={social()?.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="text-purple-600 hover:underline"
+              >
+                {social()?.url}
+              </a>
+              <button
+                type="button"
+                onClick={() => removeMutation.mutate({ provider: 'twitch' })}
+                class="text-red-500 hover:text-red-700"
+                disabled={removeMutation.isPending}
+              >
+                <FaSolidTrash />
+              </button>
+            </div>
+            <MutationError
+              error={removeMutation.error}
+              fallback="Failed to remove link"
+            />
+          </>
         }
       >
         <div class="flex flex-col space-y-2">
@@ -223,7 +240,7 @@ const YouTubeSocial: Component = () => {
     }
 
     try {
-      await addMutation.mutate({ provider: 'youtube', url: url() })
+      await addMutation.mutateAsync({ provider: 'youtube', url: url() })
       setUrl('')
       setError('')
     } catch (error) {
@@ -243,24 +260,30 @@ const YouTubeSocial: Component = () => {
       <Show
         when={!social()}
         fallback={
-          <div class="flex items-center justify-between rounded-md p-3">
-            <a
-              href={social()?.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              class="text-red-600 hover:underline"
-            >
-              {social()?.url}
-            </a>
-            <button
-              type="button"
-              onClick={() => removeMutation.mutate({ provider: 'youtube' })}
-              class="text-red-500 hover:text-red-700 disabled:cursor-not-allowed disabled:bg-neutral"
-              disabled={removeMutation.isPending}
-            >
-              <FaSolidTrash />
-            </button>
-          </div>
+          <>
+            <div class="flex items-center justify-between rounded-md p-3">
+              <a
+                href={social()?.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="text-red-600 hover:underline"
+              >
+                {social()?.url}
+              </a>
+              <button
+                type="button"
+                onClick={() => removeMutation.mutate({ provider: 'youtube' })}
+                class="text-red-500 hover:text-red-700 disabled:cursor-not-allowed disabled:bg-neutral"
+                disabled={removeMutation.isPending}
+              >
+                <FaSolidTrash />
+              </button>
+            </div>
+            <MutationError
+              error={removeMutation.error}
+              fallback="Failed to remove link"
+            />
+          </>
         }
       >
         <div class="flex flex-col space-y-2">
@@ -321,7 +344,7 @@ const BlueSkySocial: Component = () => {
     }
 
     try {
-      await addMutation.mutate({ provider: 'bsky', url: url() })
+      await addMutation.mutateAsync({ provider: 'bsky', url: url() })
       setUrl('')
       setError('')
     } catch (error) {
@@ -341,24 +364,30 @@ const BlueSkySocial: Component = () => {
       <Show
         when={!social()}
         fallback={
-          <div class="flex items-center justify-between rounded-md p-3">
-            <a
-              href={social()?.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              class="text-sky-500 hover:underline"
-            >
-              {social()?.url}
-            </a>
-            <button
-              type="button"
-              onClick={() => removeMutation.mutate({ provider: 'bsky' })}
-              class="text-red-500 hover:text-red-700 disabled:cursor-not-allowed disabled:bg-neutral"
-              disabled={removeMutation.isPending}
-            >
-              <FaSolidTrash />
-            </button>
-          </div>
+          <>
+            <div class="flex items-center justify-between rounded-md p-3">
+              <a
+                href={social()?.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="text-sky-500 hover:underline"
+              >
+                {social()?.url}
+              </a>
+              <button
+                type="button"
+                onClick={() => removeMutation.mutate({ provider: 'bsky' })}
+                class="text-red-500 hover:text-red-700 disabled:cursor-not-allowed disabled:bg-neutral"
+                disabled={removeMutation.isPending}
+              >
+                <FaSolidTrash />
+              </button>
+            </div>
+            <MutationError
+              error={removeMutation.error}
+              fallback="Failed to remove link"
+            />
+          </>
         }
       >
         <div class="flex flex-col space-y-2">
@@ -419,7 +448,7 @@ const TwitterSocial: Component = () => {
     }
 
     try {
-      await addMutation.mutate({ provider: 'twitter', url: url() })
+      await addMutation.mutateAsync({ provider: 'twitter', url: url() })
       setUrl('')
       setError('')
     } catch (error) {
@@ -439,24 +468,30 @@ const TwitterSocial: Component = () => {
       <Show
         when={!social()}
         fallback={
-          <div class="flex items-center justify-between rounded-md p-3">
-            <a
-              href={social()?.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              class="text-blue-500 hover:underline"
-            >
-              {social()?.url}
-            </a>
-            <button
-              type="button"
-              onClick={() => removeMutation.mutate({ provider: 'twitter' })}
-              class="text-red-500 hover:text-red-700 disabled:cursor-not-allowed disabled:bg-neutral"
-              disabled={removeMutation.isPending}
-            >
-              <FaSolidTrash />
-            </button>
-          </div>
+          <>
+            <div class="flex items-center justify-between rounded-md p-3">
+              <a
+                href={social()?.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="text-blue-500 hover:underline"
+              >
+                {social()?.url}
+              </a>
+              <button
+                type="button"
+                onClick={() => removeMutation.mutate({ provider: 'twitter' })}
+                class="text-red-500 hover:text-red-700 disabled:cursor-not-allowed disabled:bg-neutral"
+                disabled={removeMutation.isPending}
+              >
+                <FaSolidTrash />
+              </button>
+            </div>
+            <MutationError
+              error={removeMutation.error}
+              fallback="Failed to remove link"
+            />
+          </>
         }
       >
         <div class="flex flex-col space-y-2">
@@ -517,7 +552,7 @@ const TikTokSocial: Component = () => {
     }
 
     try {
-      await addMutation.mutate({ provider: 'tiktok', url: url() })
+      await addMutation.mutateAsync({ provider: 'tiktok', url: url() })
       setUrl('')
       setError('')
     } catch (error) {
@@ -537,24 +572,30 @@ const TikTokSocial: Component = () => {
       <Show
         when={!social()}
         fallback={
-          <div class="flex items-center justify-between rounded-md p-3">
-            <a
-              href={social()?.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              class="text-black hover:underline"
-            >
-              {social()?.url}
-            </a>
-            <button
-              type="button"
-              onClick={() => removeMutation.mutate({ provider: 'tiktok' })}
-              class="text-red-500 hover:text-red-700 disabled:cursor-not-allowed disabled:bg-neutral"
-              disabled={removeMutation.isPending}
-            >
-              <FaSolidTrash />
-            </button>
-          </div>
+          <>
+            <div class="flex items-center justify-between rounded-md p-3">
+              <a
+                href={social()?.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="text-black hover:underline"
+              >
+                {social()?.url}
+              </a>
+              <button
+                type="button"
+                onClick={() => removeMutation.mutate({ provider: 'tiktok' })}
+                class="text-red-500 hover:text-red-700 disabled:cursor-not-allowed disabled:bg-neutral"
+                disabled={removeMutation.isPending}
+              >
+                <FaSolidTrash />
+              </button>
+            </div>
+            <MutationError
+              error={removeMutation.error}
+              fallback="Failed to remove link"
+            />
+          </>
         }
       >
         <div class="flex flex-col space-y-2">
@@ -615,7 +656,7 @@ const InstagramSocial: Component = () => {
     }
 
     try {
-      await addMutation.mutate({ provider: 'instagram', url: url() })
+      await addMutation.mutateAsync({ provider: 'instagram', url: url() })
       setUrl('')
       setError('')
     } catch (error) {
@@ -635,24 +676,30 @@ const InstagramSocial: Component = () => {
       <Show
         when={!social()}
         fallback={
-          <div class="flex items-center justify-between rounded-md p-3">
-            <a
-              href={social()?.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              class="text-pink-600 hover:underline"
-            >
-              {social()?.url}
-            </a>
-            <button
-              type="button"
-              onClick={() => removeMutation.mutate({ provider: 'instagram' })}
-              class="text-red-500 hover:text-red-700 disabled:cursor-not-allowed disabled:bg-neutral"
-              disabled={removeMutation.isPending}
-            >
-              <FaSolidTrash />
-            </button>
-          </div>
+          <>
+            <div class="flex items-center justify-between rounded-md p-3">
+              <a
+                href={social()?.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="text-pink-600 hover:underline"
+              >
+                {social()?.url}
+              </a>
+              <button
+                type="button"
+                onClick={() => removeMutation.mutate({ provider: 'instagram' })}
+                class="text-red-500 hover:text-red-700 disabled:cursor-not-allowed disabled:bg-neutral"
+                disabled={removeMutation.isPending}
+              >
+                <FaSolidTrash />
+              </button>
+            </div>
+            <MutationError
+              error={removeMutation.error}
+              fallback="Failed to remove link"
+            />
+          </>
         }
       >
         <div class="flex flex-col space-y-2">
@@ -697,7 +744,7 @@ export const UserSocialsSection: Component = () => {
 
   return (
     <div class="bg-white p-6">
-      <div class="mb-4 flex justify-end">
+      <div class="mb-4 flex flex-col items-end">
         <button
           type="button"
           onClick={() => importFromTiltify.mutate()}
@@ -710,6 +757,10 @@ export const UserSocialsSection: Component = () => {
           />
           <span>Import from Tiltify</span>
         </button>
+        <MutationError
+          error={importFromTiltify.error}
+          fallback="Failed to import from Tiltify"
+        />
       </div>
 
       <div class="space-y-6">

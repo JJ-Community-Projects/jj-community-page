@@ -54,6 +54,7 @@ export const AvailableUsersList: Component = () => {
     sendFriendRequestErrorMessage,
     friendsList,
     friendRequests,
+    sentFriendRequests,
   } = useFriends();
   const hasUsers = () => searchResults().length > 0;
 
@@ -82,7 +83,8 @@ export const AvailableUsersList: Component = () => {
 
   // Check if friend request already sent or received
   const hasPendingRequest = (userId: number) => {
-    return friendRequests().some(request => request.userId === userId);
+    return friendRequests().some(request => request.userId === userId)
+      || sentFriendRequests().some(request => request.userId === userId);
   };
 
   const handleSendRequest = async (userId: number) => {
