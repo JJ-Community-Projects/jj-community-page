@@ -614,18 +614,19 @@ export class TwitchAPI {
    */
   private async getNewAppToken(): Promise<TokenData | null> {
     try {
-      const url =
-        'https://id.twitch.tv/oauth2/token?' +
-        'client_id=' +
-        this.env.TWITCH_CLIENT_ID +
-        '&client_secret=' +
-        this.env.TWITCH_CLIENT_SECRET +
-        '&grant_type=client_credentials'
-
-      const response = await fetch(url, { method: 'POST' })
+      // The credentials go in the form body, never in the URL (F-02 for Twitch)
+      const response = await fetch('https://id.twitch.tv/oauth2/token', {
+        method: 'POST',
+        body: new URLSearchParams({
+          client_id: this.env.TWITCH_CLIENT_ID,
+          client_secret: this.env.TWITCH_CLIENT_SECRET,
+          grant_type: 'client_credentials',
+        }),
+      })
 
       if (!response.ok) {
-        console.error('getNewAppToken', response)
+        // Not the Response: its url carries the client secret (F-32)
+        console.error('getNewAppToken', response.status, response.statusText)
         return null
       }
       const body = (await response.json()) as TokenData

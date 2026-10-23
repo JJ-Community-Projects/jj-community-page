@@ -10,11 +10,9 @@ export interface TwitchCredentials {
  * @return {Promise}
  */
 export function getToken({clientId, clientSecret}: TwitchCredentials): Promise<TokenData> {
-  const url = "https://id.twitch.tv/oauth2/token?" +
-    "client_id=" + clientId +
-    "&client_secret=" + clientSecret +
-    "&grant_type=client_credentials";
-  return fetch(url, {method: "POST"}).then(res => res.json())
+  // The credentials go in the form body, never in the URL (F-02 for Twitch)
+  const body = new URLSearchParams({client_id: clientId, client_secret: clientSecret, grant_type: "client_credentials"});
+  return fetch("https://id.twitch.tv/oauth2/token", {method: "POST", body}).then(res => res.json())
 }
 
 export async function getTwitchData(channelId: string, access_token: string, clientId: string) {
