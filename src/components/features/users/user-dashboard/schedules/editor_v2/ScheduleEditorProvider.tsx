@@ -130,11 +130,14 @@ const useScheduleEditor2Hook = (scheduleId: number) => {
         break
       }
       case 'stream_added': {
-        const stream = msg.payload as DraftStream
+        const { tags, ...stream } = msg.payload
         if (stream && typeof (stream as any).id === 'number') {
           setState('streams', (prev) =>
-            prev.some((s) => s.id === stream.id) ? prev : [...prev, stream],
+            prev.some((s) => s.id === stream.id) ? prev : [...prev, stream as DraftStream],
           )
+          if (tags) {
+            setState('tagsByStream', stream.id, tags)
+          }
         }
         break
       }
@@ -360,6 +363,7 @@ const useScheduleEditor2Hook = (scheduleId: number) => {
     description?: string
     youtubeVodUrl?: string
     twitchVodUrl?: string
+    tags?: number[]
   }) => addStreamMutation.mutateAsync({ scheduleId, ...input })
 
   /*

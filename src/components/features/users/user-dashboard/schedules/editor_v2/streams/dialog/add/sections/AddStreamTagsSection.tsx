@@ -7,10 +7,9 @@ import {useAddStreamDialog} from "../AddStreamDialogContext.tsx";
 // Minimal suggestion shape returned by useTagSearch queries
 // Avoids any and captures the fields we actually use
 export type TagSuggestion = {
-  id?: number;
-  slug?: string;
-  name?: string;
-  label?: string;
+  id: number;
+  name: string;
+  slug: string;
 };
 
 export const AddStreamTagsSection: Component = () => {
@@ -20,48 +19,19 @@ export const AddStreamTagsSection: Component = () => {
   // Use dialog-local draft tags for immediate UI feedback and local-only editing
   const tags = () => draft.tags ?? [];
 
-  // Create temporary negative IDs for tags that don't have a backend ID yet
-  let tempTagIdCounter = -1;
-  const nextTempTagId = () => tempTagIdCounter--;
-
-  const addLabelAsLocalTag = (label: string) => {
-    const trimmed = label.trim();
-    if (!trimmed) return;
-    // Prevent duplicates by slug or name (case-sensitive match to mirror provider logic)
-    const exists = tags().some((t) => t.slug === trimmed || t.name === trimmed);
-    if (exists) return;
-    const newTag: DraftTag = {id: nextTempTagId(), slug: trimmed, name: trimmed};
-    addTagLocal(newTag);
-    tagSearch.handleSearchInput("");
-  };
-
-  const onAdd = () => {
-    const v = (tagSearch.searchInput?.() ?? "").trim();
-    if (!v) return;
-    addLabelAsLocalTag(v);
-  };
-
   const onRemove = (tagId: number) => {
     removeTagLocal(tagId);
   };
 
-  const onKeyDown = (e: KeyboardEvent) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      onAdd();
-    }
-  };
-
+  // Only catalog tags can be picked (as in the Edit dialog): the stream is saved with their ids
   const onAddSuggestion = (t: TagSuggestion) => {
-    const label = String(t.slug ?? t.name ?? t.label ?? "");
-    if (!label) return;
     // Skip if already present (id or slug/name match)
     const exists = tags().some((et) => (t.id != null && et.id === t.id) || (t.slug && et.slug === t.slug) || (t.name && et.name === t.name));
     if (exists) return;
     const newTag: DraftTag = {
-      id: t.id ?? nextTempTagId(),
-      slug: t.slug ?? label,
-      name: t.name ?? label,
+      id: t.id,
+      slug: t.slug,
+      name: t.name,
     };
     addTagLocal(newTag);
     tagSearch.handleSearchInput("");
@@ -73,8 +43,7 @@ export const AddStreamTagsSection: Component = () => {
 
       <TextField value={tagSearch.searchInput?.() ?? ""} onChange={tagSearch.handleSearchInput}>
         <TextField.Label class="text-xs font-medium mb-1">Add tag</TextField.Label>
-        <TextField.Input class="w-full px-3 py-2 border rounded" placeholder="Search or type a tag, then press Enter"
-                         onKeyDown={onKeyDown}/>
+        <TextField.Input class="w-full px-3 py-2 border rounded" placeholder="Search tag"/>
       </TextField>
 
       {/* Suggestions */}
@@ -87,7 +56,7 @@ export const AddStreamTagsSection: Component = () => {
       <Show when={!tagSearch.isLoadingTags?.() && (tagSearch.availableTags?.() ?? []).length > 0}>
         <div class="flex flex-wrap gap-2">
           <For each={tagSearch.availableTags!()}>{(t: TagSuggestion) => {
-            const label: string = String(t.slug ?? t.name ?? t.label ?? "");
+            const label: string = String(t.slug ?? t.name ?? "");
             const isAlready = tags().some(et => (t.id != null && et.id === t.id) || (t.slug && et.slug === t.slug) || (t.name && et.name === t.name));
             return (
               <button

@@ -63,7 +63,10 @@ export const ScheduleUpdatedPayloadSchema = z.object({
   draftCreated: z.boolean().optional(),
 })
 
-export const StreamAddedPayloadSchema = DraftStreamSchema
+// `tags`: only when the stream was added with tags
+export const StreamAddedPayloadSchema = DraftStreamSchema.extend({
+  tags: z.array(TagSchema).optional(),
+})
 export const StreamUpdatedPayloadSchema = z.object({
   id: z.number(),
   patch: EditStreamSchema.partial(),

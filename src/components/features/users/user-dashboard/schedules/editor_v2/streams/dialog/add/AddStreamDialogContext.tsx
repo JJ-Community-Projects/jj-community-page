@@ -82,6 +82,7 @@ const useAddStreamDialogHook = (start: Date, end: Date) => {
         description: (d as any).description ?? undefined,
         youtubeVodUrl: (d as any).youtubeVodUrl ?? undefined,
         twitchVodUrl: (d as any).twitchVodUrl ?? undefined,
+        tags: draft.tags.map(t => t.id),
       });
       setIsOpen(false);
       setDraft({

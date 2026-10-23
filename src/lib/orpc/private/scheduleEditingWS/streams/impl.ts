@@ -106,6 +106,26 @@ async function draftStreamStarts(db: JJDrizzleDatabase, scheduleId: number) {
   return startsById(await draftStreamStartsQuery(db, scheduleId).all())
 }
 
+/** The tags with these ids, ordered by id: the tags a save sets, as its WS event lists them. */
+const tagsByIdQuery = (db: JJDrizzleDatabase, ids: number[]) =>
+  db
+    .select({
+      id: tagsTable.id,
+      name: tagsTable.name,
+      slug: tagsTable.slug,
+    })
+    .from(tagsTable)
+    .where(inArray(tagsTable.id, ids))
+    .orderBy(asc(tagsTable.id))
+
+/** Fails when `ids` has a tag id that `known` (rows of `tagsByIdQuery`) lacks. */
+function assertKnownTags(known: { id: number }[], ids: number[]) {
+  const knownIds = new Set(known.map((t) => t.id))
+  const unknown = [...new Set(ids)].filter((id) => !knownIds.has(id))
+  if (unknown.length > 0)
+    throw new Error(`Unknown tag IDs: ${unknown.join(', ')}`)
+}
+
 export const addStream = os.addStreamContract
   .use(authMiddleware)
   .use(scheduleOwnerOrEditorMiddleware)
@@ -122,14 +142,18 @@ export const addStream = os.addStreamContract
       description,
       youtubeVodUrl,
       twitchVodUrl,
+      tags,
     } = input
+    const tagIds = [...new Set(tags ?? [])]
 
     // One batch: the draft copy, then the draft's streams (ids and start times), which give both
-    // the per-date limit and the smallest free id.
-    const [, , , , draftStreams] = await db.batch([
+    // the per-date limit and the smallest free id, and the tags to set (only when given).
+    const [, , , , draftStreams, desiredTags = []] = await db.batch([
       ...draftCopyStatements(db, scheduleId, editorId),
       draftStreamStartsQuery(db, scheduleId),
+      ...(tagIds.length > 0 ? [tagsByIdQuery(db, tagIds)] : []),
     ] as const)
+    assertKnownTags(desiredTags, tagIds)
 
     // Enforce per-date stream limit for the day of `start`
     const dateLimit = streamDateLimitFromStarts(
@@ -167,11 +191,23 @@ export const addStream = os.addStreamContract
       twitchVodUrl: twitchVodUrl ?? null,
       lockedBy: null,
     }
-    await db.insert(editStreamsTable).values(stream).run()
+    const insertStream = db.insert(editStreamsTable).values(stream)
+    // The stream and its tags in one batch (atomic)
+    if (desiredTags.length > 0)
+      await db.batch([
+        insertStream,
+        db
+          .insert(editStreamTagsTable)
+          .values(desiredTags.map((t) => ({ scheduleId, streamId: id, tagId: t.id }))),
+      ])
+    else await insertStream.run()
 
     const stub = getScheduleEditingStub(context.env as any, scheduleId)
     // @ts-ignore
-    await stub.publishStreamAdded(scheduleId, editorId, stream)
+    await stub.publishStreamAdded(scheduleId, editorId, {
+      ...stream,
+      ...(desiredTags.length > 0 && { tags: desiredTags }),
+    })
     return { id }
   })
 
@@ -489,16 +525,7 @@ async function saveStreamsWithDetails(
           ),
         )
     const desiredTagsQuery =
-      desiredTagIds.length > 0 &&
-      db
-        .select({
-          id: tagsTable.id,
-          name: tagsTable.name,
-          slug: tagsTable.slug,
-        })
-        .from(tagsTable)
-        .where(inArray(tagsTable.id, desiredTagIds))
-        .orderBy(asc(tagsTable.id))
+      desiredTagIds.length > 0 && tagsByIdQuery(db, desiredTagIds)
     const displayQuery =
       desiredUserIds.length > 0 &&
       db
@@ -537,12 +564,7 @@ async function saveStreamsWithDetails(
     const desiredTags = resultOf(desiredTagsQuery)
     const displayRows = resultOf(displayQuery)
 
-    const knownTags = new Set(desiredTags.map((t) => t.id))
-    for (const s of withTags) {
-      const unknown = [...new Set(s.tags)].filter((id) => !knownTags.has(id))
-      if (unknown.length > 0)
-        throw new Error(`Unknown tag IDs: ${unknown.join(', ')}`)
-    }
+    for (const s of withTags) assertKnownTags(desiredTags, s.tags!)
 
     // The days after all moves together: the whole save is refused if one is over the limit.
     const dateLimit = moves.size > 0 && movedStreamsDateLimit(current, moves)

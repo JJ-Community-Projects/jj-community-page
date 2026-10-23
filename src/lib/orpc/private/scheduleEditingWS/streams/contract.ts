@@ -14,6 +14,8 @@ export const addStreamContract = oc
     description: z.string().optional(),
     youtubeVodUrl: z.string().optional(),
     twitchVodUrl: z.string().optional(),
+    // Tag ids, as in updateStreamWithDetails: saved with the stream (unknown ids fail the add)
+    tags: z.array(z.number().int().positive()).optional(),
   }))
   .output(z.object({id: z.number()}))
 
