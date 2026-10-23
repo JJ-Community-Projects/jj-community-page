@@ -1,5 +1,5 @@
 import {teamMembersTable, teamsTable} from "../../../../db/schema/jj-schema.ts";
-import {eq} from "drizzle-orm";
+import {and, eq} from "drizzle-orm";
 import {implement} from "@orpc/server";
 import {dbMiddleware} from "../../../middleware/dbMiddleware.ts";
 import {usersTeamsContracts} from "./contract.ts";
@@ -11,7 +11,7 @@ const os = implement(usersTeamsContracts)
 
 /**
  * Get teams by user ID
- * Returns all teams that the specified user is a member of
+ * Returns all visible teams that the specified user is a member of (F-71)
  * This includes teams where the user is either a member or owner
  */
 export const getTeamsByUserSlug = os.getTeamsByUserSlugContract
@@ -35,7 +35,10 @@ export const getTeamsByUserSlug = os.getTeamsByUserSlugContract
     })
       .from(teamMembersTable)
       .innerJoin(teamsTable, eq(teamMembersTable.teamId, teamsTable.id))
-      .where(eq(teamMembersTable.userId, userId))
+      .where(and(
+        eq(teamMembersTable.userId, userId),
+        eq(teamsTable.visible, true)
+      ))
       .all();
 
     return {teams};

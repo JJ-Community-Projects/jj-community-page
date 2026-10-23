@@ -231,7 +231,8 @@ const save = os.save.use(authMiddleware).handler(async ({ context, input }) => {
       .where(eq(users.id, user.id))
       .get()
 
-    if (schedule.ownerId !== user.id || admin?.role !== 'admin') {
+    // The owner or an admin (F-18)
+    if (schedule.ownerId !== user.id && admin?.role !== 'admin') {
       throw new ORPCError('FORBIDDEN', {
         message: 'You do not have permission to edit this schedule',
       })
@@ -284,14 +285,36 @@ const deleteSchedule = os.delete
         .get()
       console.log('role', admin)
 
-      if (schedule.ownerId !== user.id || admin?.role !== 'admin') {
+      // The owner or an admin (EDT-15)
+      if (schedule.ownerId !== user.id && admin?.role !== 'admin') {
         throw new ORPCError('FORBIDDEN', {
           message: 'You do not have permission to edit this schedule',
         })
       }
 
+      // The owner's slug for the cache purge; an admin may delete someone else's schedule
+      const ownerSlug =
+        schedule.ownerId === user.id
+          ? user.tiltifySlug
+          : (
+              await db
+                .select({ slug: accounts.tiltifySlug })
+                .from(accounts)
+                .where(
+                  and(
+                    eq(accounts.userId, schedule.ownerId),
+                    eq(accounts.provider, 'tiltify'),
+                  ),
+                )
+                .get()
+            )?.slug
+
       // Delete from database
       await db.delete(schedulesTable).where(eq(schedulesTable.id, scheduleId))
+
+      // Drop the cached public answers that still show it
+      if (ownerSlug)
+        await forgetPublicSchedule(context.request.url, schedule, ownerSlug)
 
       /*
       // Remove from UserDO
