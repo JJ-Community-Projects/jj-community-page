@@ -6,6 +6,11 @@ import {blockedUsers, friendRequests, friendsTable} from '../../../db/schema/aut
 import {userDisplayView} from '../../../db/schema/views-schema.ts';
 import {and, eq, or} from 'drizzle-orm';
 import {forgetRelatedUsers} from '../../../services/relatedUsersCache.ts';
+import {
+  publishFriendRequestIncomingUpdate,
+  publishFriendRequestSentUpdate,
+  publishFriendsListUpdate,
+} from '../friendsWS/publisher.ts';
 
 const os = implement(blockContract)
   .use(dbMiddleware);
@@ -39,7 +44,7 @@ const blockUser = os.blockUserContract
     }
 
     // Remove any existing friendship and friend requests, then block user
-    await db.batch([
+    const [removedFriendship, removedRequests] = await db.batch([
       // Remove friendship if exists
       db.delete(friendsTable)
         .where(
@@ -64,6 +69,21 @@ const blockUser = os.blockUserContract
         })
     ]);
     await forgetRelatedUsers(context.env, [userId, blockedUserId]);
+
+    // Live updates for what the block removed, as removeFriend / cancelFriendRequest (F-09).
+    // A request may have gone either way, so both users' request lists are refreshed.
+    const users = [userId, blockedUserId];
+    await Promise.all([
+      ...(removedFriendship.meta.changes > 0
+        ? users.map((id) => publishFriendsListUpdate(context.env, id))
+        : []),
+      ...(removedRequests.meta.changes > 0
+        ? users.flatMap((id) => [
+            publishFriendRequestIncomingUpdate(context.env, id),
+            publishFriendRequestSentUpdate(context.env, id),
+          ])
+        : []),
+    ]);
 
     return { success: true };
   });
