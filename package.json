@@ -29,6 +29,7 @@
     "test": "vitest run --project unit --project workers --project workers-ws",
     "test:e2e": "astro build && vitest run --project e2e",
     "test:browser": "astro build && playwright test -c test/browser/playwright.config.ts",
+    "test:browser:headed": "astro build && BROWSER_SLOWMO=${BROWSER_SLOWMO:-300} playwright test -c test/browser/playwright.config.ts --headed --workers=1",
     "test:update": "npm run test -- -u",
     "verify": "npm run test && astro build"
   },
