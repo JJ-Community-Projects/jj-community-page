@@ -1,4 +1,4 @@
-import { type Component, For, Show } from 'solid-js'
+import { type Component, createSignal, For, Show } from 'solid-js'
 import { useScheduleEditor2 } from '../ScheduleEditorProvider.tsx'
 import { byDay } from './utils/streamFilters.ts'
 import { StreamCard } from './StreamCard.tsx'
@@ -31,25 +31,24 @@ export const DayColumn: Component<{ date: Date; dayIndex: number }> = (
     return streamsToday().some((s) => s.visible)
   }
 
-  const setAllVisible = () => {
+  // The server's message when it refused showing / hiding the day's streams; the cards revert (F-66)
+  const [error, setError] = createSignal<string | null>(null)
+
+  const setAllVisibility = (visible: boolean) => {
     const updates = streamsToday().map((s) => ({
       id: s.id,
       patch: {
-        visible: true,
+        visible,
       },
     }))
-    updateStreams(updates)
+    setError(null)
+    updateStreams(updates).catch((e: unknown) =>
+      setError(e instanceof Error ? e.message : String(e)),
+    )
   }
 
-  const setAllInvisible = () => {
-    const updates = streamsToday().map((s) => ({
-      id: s.id,
-      patch: {
-        visible: false,
-      },
-    }))
-    updateStreams(updates)
-  }
+  const setAllVisible = () => setAllVisibility(true)
+  const setAllInvisible = () => setAllVisibility(false)
 
   const addNew = () => {
     // Compute start as the end of the last stream on this day; fallback to 18:00
@@ -107,6 +106,14 @@ export const DayColumn: Component<{ date: Date; dayIndex: number }> = (
           <FaSolidPlus />
         </button>
       </div>
+
+      <Show when={error()}>
+        {(message) => (
+          <div role="alert" class="rounded border border-red-400 bg-red-100 px-2 py-1 text-xs text-red-700">
+            {message()}
+          </div>
+        )}
+      </Show>
 
       <Show
         when={streamsToday().length > 0}
