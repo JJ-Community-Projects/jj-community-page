@@ -23,30 +23,6 @@ import { Scheduler } from './jingleJamData/Scheduler.ts'
 //   DisplayBuilder  — TV/display projections
 //   DonationMatchStore — per-campaign active donation-match state (rolling sweep)
 //   Scheduler       — alarm-driven task runner
-// TEMPORARY (prod → beta migration, delete with the block below).
-// The transport is JSON, so Date fields arrive as ISO strings. The community
-// schedule is the one imported value that carries Dates and cannot be rebuilt
-// after the event year (ScheduleBuilder filters on the current year), so it is
-// revived here instead of being refused.
-function reviveScheduleDates(value: unknown) {
-  type StreamEntry = { stream?: { start: unknown; end: unknown } }
-  const schedule = value as {
-    days?: { day: unknown; streams?: StreamEntry[] }[]
-    streams?: StreamEntry[]
-  }
-  const reviveStream = (entry: StreamEntry) => {
-    if (!entry?.stream) return
-    entry.stream.start = new Date(entry.stream.start as string)
-    entry.stream.end = new Date(entry.stream.end as string)
-  }
-  for (const day of schedule.days ?? []) {
-    day.day = new Date(day.day as string)
-    for (const entry of day.streams ?? []) reviveStream(entry)
-  }
-  for (const entry of schedule.streams ?? []) reviveStream(entry)
-  return schedule
-}
-
 export class JingleJamData extends DurableObject<Env> {
   private currency: CurrencyStore
   private tiltify: TiltifyStore
@@ -292,57 +268,6 @@ export class JingleJamData extends DurableObject<Env> {
   }
   ensureAlarm() {
     return this.scheduler.ensureAlarm()
-  }
-  getNextAlarmStr() {
-    return this.scheduler.getNextAlarmStr()
-  }
-
-  // --- Temporary: prod → beta storage migration --------------------------
-  // Delete this block once the beta copy is done.
-  //
-  // Values travel as JSON and land in storage unmodified, so Date-bearing
-  // projections (`campaigns:display*`, `community:campaigns:display*`,
-  // `campaign:display:*`) are NOT imported — they are rebuilt locally by
-  // `buildDisplayData()`, and `loadStorage` refuses them so a mistake fails
-  // loudly instead of storing ISO strings where consumers expect Dates.
-  // `full-community-schedule` is the exception: it cannot be rebuilt for a past
-  // event year, so it is imported with its Dates revived (`reviveScheduleDates`).
-  async dumpStorage(startAfter: string | undefined, limit: number) {
-    const page = await this.ctx.storage.list({ startAfter, limit })
-    const entries: [string, unknown][] = []
-    for (const [key, value] of page) entries.push([key, value])
-    const last = entries.length > 0 ? entries[entries.length - 1][0] : null
-    return { entries, cursor: entries.length === limit ? last : null }
-  }
-
-  async loadStorage(entries: [string, unknown][]) {
-    const dateBearing = entries
-      .map(([key]) => key)
-      .filter(
-        (key) =>
-          key !== 'full-community-schedule' &&
-          (key.startsWith('campaigns:display') ||
-            key.startsWith('community:campaigns:display') ||
-            key.startsWith('campaign:display:')),
-      )
-    if (dateBearing.length > 0) {
-      throw new Error(
-        `loadStorage refusing date-bearing keys (rebuild locally instead): ${dateBearing
-          .slice(0, 5)
-          .join(', ')}`,
-      )
-    }
-
-    let written = 0
-    for (let i = 0; i < entries.length; i += 100) {
-      const batch: Record<string, unknown> = {}
-      for (const [key, value] of entries.slice(i, i + 100)) {
-        batch[key] = key === 'full-community-schedule' ? reviveScheduleDates(value) : value
-      }
-      await this.ctx.storage.put(batch)
-      written += Object.keys(batch).length
-    }
-    return written
   }
 
   // --- Storage lifecycle ---

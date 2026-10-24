@@ -117,13 +117,7 @@ const initHookState: HookActions = {
   removeParticipant: {
     actionInProgress: false,
   },
-  saveSchedule: {
-    actionInProgress: false,
-  },
   deleteSchedule: {
-    actionInProgress: false,
-  },
-  fetchTags: {
     actionInProgress: false,
   },
 };
@@ -153,18 +147,8 @@ const useScheduleEditorHook = (id: number, userId: number,
   const {store, addListener} = useScheduleEditorConnection()
   const queryClient = useQueryClient()
   const schedules = orpcPrivate.schedules
-  const tags = orpcPrivate.tags
 
   // Schedule mutations
-  const saveScheduleMutation = useMutation(() =>
-    schedules.save.mutationOptions({
-      onSuccess: async () => {
-        // Invalidate related queries if needed
-        await queryClient.invalidateQueries({queryKey: schedules.getSchedules.queryKey()});
-      },
-    })
-  );
-
   const deleteScheduleMutation = useMutation(() =>
     schedules.delete.mutationOptions({
       onSuccess: async () => {
@@ -172,15 +156,6 @@ const useScheduleEditorHook = (id: number, userId: number,
         await queryClient.invalidateQueries({queryKey: schedules.getSchedules.queryKey()});
       },
     })
-  );
-
-  // Tag mutations
-  const searchTagsMutation = useMutation(() =>
-    tags.searchTags.mutationOptions()
-  );
-
-  const getPopularTagsMutation = useMutation(() =>
-    tags.getPopularTags.mutationOptions()
   );
 
   const {
@@ -1177,70 +1152,7 @@ const useScheduleEditorHook = (id: number, userId: number,
   // endregion
 
 
-  // region Tag API Operations
-  // Fetch tags from the server based on the request parameters
-  const fetchTags = async (
-    request?: {
-      searchTag?: string,
-      stream: {
-        streamId: number, scheduleId: number
-      },
-      exclude?: string[]
-    }) => {
-    console.log('fetchTags', request);
-    startAction('fetchTags');
-
-    try {
-      let data;
-
-      // If both stream and searchTag are provided, use searchTags as fallback
-      if (request?.stream && request?.searchTag) {
-        data = await searchTagsMutation.mutateAsync({
-          query: request.searchTag,
-          limit: 5
-        });
-      }
-      // If only stream is provided, use searchTags with empty query to get suggestions
-      else if (request?.stream) {
-        data = await searchTagsMutation.mutateAsync({
-          query: '',
-          limit: 5
-        });
-      }
-      // If neither stream nor searchTag is provided, use getPopularTags
-      else {
-        const result = await getPopularTagsMutation.mutateAsync({limit:5});
-        data = result.tags
-      }
-
-      stopAction('fetchTags');
-      // Transform the data to match expected format
-      return {
-        tags: data || [],
-        defaultTags: [],
-        charityTags: []
-      };
-    } catch (error) {
-      console.error("Error fetching tags:", error);
-      const errorMsg = error instanceof Error ? error.message : 'An unknown error occurred';
-      setLastError('fetchTags', errorMsg);
-      stopAction('fetchTags');
-      return {tags: [], defaultTags: [], charityTags: []};
-    }
-  };
-  // endregion
-
   // region Schedule API Operations
-  const saveSchedule = async () => {
-    try {
-      const result = await saveScheduleMutation.mutateAsync(local.id);
-      return { data: result };
-    } catch (error) {
-      console.error("Error saving schedule:", error);
-      throw error;
-    }
-  };
-
   const deleteSchedule = async () => {
     try {
       const result = await deleteScheduleMutation.mutateAsync(local.id);
@@ -1271,17 +1183,11 @@ const useScheduleEditorHook = (id: number, userId: number,
     updateDefaultStreamLength,
     getStreamsByDay,
     getAllDays,
-    fetchTags,
-    saveSchedule,
-    saveScheduleMutation,
     deleteSchedule,
     deleteScheduleMutation,
     hideStreams,
     showStreams,
     deleteStreams,
-    // Tag mutations
-    searchTagsMutation,
-    getPopularTagsMutation,
     // Action state
     action: action
   }

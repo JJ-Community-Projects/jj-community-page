@@ -1,17 +1,15 @@
 import type { APIRoute } from 'astro'
-import { CORSPlugin } from '@orpc/server/plugins'
 import { privateRouter } from '../../../lib/orpc/private/privateRouter.ts'
 import { onError } from '@orpc/client'
 import { RPCHandler } from '@orpc/server/fetch'
 import { DurableIteratorHandlerPlugin } from '@orpc/experimental-durable-iterator'
 import { HibernationPlugin } from '@orpc/server/hibernation'
 import { loggableError } from '../../../lib/db/loggableError.ts'
+import { rejectCrossOrigin } from '../../../lib/sameOrigin.ts'
 
+// No CORSPlugin: only same-origin requests get through, and they need no CORS headers.
 const handler = new RPCHandler(privateRouter, {
   plugins: [
-    new CORSPlugin({
-      exposeHeaders: ['x-orpc-durable-iterator'],
-    }),
     new DurableIteratorHandlerPlugin(),
     new HibernationPlugin(),
   ],
@@ -24,6 +22,8 @@ const handler = new RPCHandler(privateRouter, {
 })
 
 export const ALL: APIRoute = async (context) => {
+  const rejected = rejectCrossOrigin(context.request)
+  if (rejected) return rejected
   console.log('/api/private', context.request.url)
   const { response } = await handler.handle(context.request, {
     prefix: '/api/private',

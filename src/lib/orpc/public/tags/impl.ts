@@ -2,7 +2,6 @@ import { implement } from '@orpc/server'
 import { count, desc, eq, sql } from 'drizzle-orm'
 import { publicTagsContract } from './contract.ts'
 import { dbMiddleware } from '../../middleware/dbMiddleware.ts'
-import { cacheMiddleware } from '../../middleware/cacheControl.ts'
 import { cached } from '../../middleware/cached.ts'
 import {
   streamTagsTable,
@@ -15,16 +14,10 @@ const os = implement(publicTagsContract).use(dbMiddleware)
 
 /**
  * The tag catalog: one statement, the per-tag counts aggregated once (not a correlated
- * subquery per tag), edge-cached for everybody (`tagCatalog`).
+ * subquery per tag), edge-cached for everybody (`tagCatalog`). Pages load it in-process and pass it
+ * to the tag pickers; no HTTP route.
  */
 const catalog = os.catalog
-  .use(
-    cacheMiddleware({
-      maxAge: 300,
-      sMaxAge: 1800,
-      staleWhileRevalidate: 1800,
-    }),
-  )
   .use(cached('tagCatalog', () => ''))
   .handler(async ({ context }) => {
     const db = context.db

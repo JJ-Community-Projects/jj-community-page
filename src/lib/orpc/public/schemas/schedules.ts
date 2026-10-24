@@ -12,15 +12,6 @@ export const ScheduleSlugInputSchema = z.object({
   slug: ScheduleSlugSchema
 })
 
-export const UserSlugWithYearSchema = z.object({
-  slug: ScheduleSlugSchema,
-  year: z.number(),
-})
-
-export const YearInputSchema = z.object({
-  year: z.number().int().min(2020).max(2030)
-})
-
 /**
  * Schema for basic schedule information based on the schedulesTable structure.
  * Represents a single schedule event (e.g., JingleJam 2024) with metadata.
@@ -197,14 +188,6 @@ export const FullScheduleSchema = z.object({
   /** Array of all unique users participating in streams */
   participants: z.array(UserDisplaySchema),
 });
-
-// Input schema for next streams query
-// Defaults are applied in the handler, not here, to avoid dynamic defaults in Zod
-export const NextStreamsInputSchema = z.object({
-  year: z.number().int().min(2010).max(2100).optional(),
-  limit: z.number().int().min(1).max(100).optional(),
-  uniqueBySchedule: z.boolean().optional(),
-})
 
 
 export type ScheduleInfo = z.infer<typeof ScheduleInfoSchema>

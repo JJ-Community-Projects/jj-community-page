@@ -9,8 +9,7 @@ import {
   teamsTable,
 } from '../../../db/schema/jj-schema.ts'
 import { users } from '../../../db/schema/auth-schema.ts'
-import { userDisplayView } from '../../../db/schema/views-schema.ts'
-import { and, count, eq, not, sql } from 'drizzle-orm'
+import { and, eq, not, sql } from 'drizzle-orm'
 import {
   createSlug,
   slugFreeFrom,
@@ -686,263 +685,6 @@ const getUserTeams = os.getTeamContract
   })
 
 /**
- * Get all teams where the current user is the owner
- */
-const getOwnedTeams = os.getOwnedTeamsContract
-  .use(authMiddleware)
-  .handler(async ({ context }) => {
-    const db = context.db
-    const userId = context.userId
-
-    try {
-      // Get teams where user is owner
-      const ownedTeams = await db
-        .select()
-        .from(teamsTable)
-        .where(eq(teamsTable.ownerId, userId))
-        .all()
-
-      return ownedTeams
-    } catch (error) {
-      console.error('Error getting owned teams for user:', error)
-      throw new ORPCError('INTERNAL_SERVER_ERROR', {
-        message: 'Failed to get owned teams',
-      })
-    }
-  })
-
-/**
- * Get all teams where the current user is not the owner (member only)
- */
-const getNonOwnedTeams = os.getNonOwnedTeamsContract
-  .use(authMiddleware)
-  .handler(async ({ context }) => {
-    const db = context.db
-    const userId = context.userId
-
-    try {
-      // Get teams where user is member but not owner
-      const memberTeams = await db
-        .select({
-          id: teamsTable.id,
-          name: teamsTable.name,
-          description: teamsTable.description,
-          slug: teamsTable.slug,
-          ownerId: teamsTable.ownerId,
-          visible: teamsTable.visible,
-        })
-        .from(teamMembersTable)
-        .innerJoin(teamsTable, eq(teamMembersTable.teamId, teamsTable.id))
-        .where(
-          and(
-            eq(teamMembersTable.userId, userId),
-            not(eq(teamsTable.ownerId, userId)),
-          ),
-        )
-        .all()
-
-      return memberTeams
-    } catch (error) {
-      console.error('Error getting non-owned teams for user:', error)
-      throw new ORPCError('INTERNAL_SERVER_ERROR', {
-        message: 'Failed to get non-owned teams',
-      })
-    }
-  })
-
-/**
- * Get all team members as UserDisplaySchema (owner only)
- */
-const getTeamMembers = os.getTeamMembersContract
-  .use(authMiddleware)
-  .use(teamsOwnerMiddleware)
-  .handler(async ({ context, input }) => {
-    const db = context.db
-    const { teamId } = input
-
-    try {
-      // Join team members with user display view to get UserDisplaySchema
-      const members = await db
-        .select({
-          userId: userDisplayView.userId,
-          primaryLiveStream: userDisplayView.primaryLiveStream,
-          role: userDisplayView.role,
-          createdAt: userDisplayView.createdAt,
-          username: userDisplayView.username,
-          profileImage: userDisplayView.profileImage,
-          twitchLogin: userDisplayView.twitchLogin,
-          tiltifySlug: userDisplayView.tiltifySlug,
-          tiltifyUrl: userDisplayView.tiltifyUrl,
-          primaryColor: userDisplayView.primaryColor,
-          accentColor: userDisplayView.accentColor,
-        })
-        .from(teamMembersTable)
-        .innerJoin(
-          userDisplayView,
-          eq(teamMembersTable.userId, userDisplayView.userId),
-        )
-        .where(eq(teamMembersTable.teamId, teamId))
-        .all()
-
-      return members
-    } catch (error) {
-      console.error('Error getting team members:', error)
-      throw new ORPCError('INTERNAL_SERVER_ERROR', {
-        message: 'Failed to get team members',
-      })
-    }
-  })
-
-/**
- * Get team member count (owner only)
- */
-const getTeamMemberCount = os.getTeamMemberCountContract
-  .use(authMiddleware)
-  .use(teamsOwnerMiddleware)
-  .handler(async ({ context, input }) => {
-    const db = context.db
-    const { teamId } = input
-
-    try {
-      const result = await db
-        .select({ count: count() })
-        .from(teamMembersTable)
-        .where(eq(teamMembersTable.teamId, teamId))
-        .get()
-
-      return { count: result?.count || 0 }
-    } catch (error) {
-      console.error('Error getting team member count:', error)
-      throw new ORPCError('INTERNAL_SERVER_ERROR', {
-        message: 'Failed to get team member count',
-      })
-    }
-  })
-
-/**
- * Get team invite count (owner only)
- */
-const getTeamInviteCount = os.getTeamInviteCountContract
-  .use(authMiddleware)
-  .use(teamsOwnerMiddleware)
-  .handler(async ({ context, input }) => {
-    const db = context.db
-    const { teamId } = input
-
-    try {
-      const result = await db
-        .select({ count: count() })
-        .from(teamInvitesTable)
-        .where(eq(teamInvitesTable.teamId, teamId))
-        .get()
-
-      return { count: result?.count || 0 }
-    } catch (error) {
-      console.error('Error getting team invite count:', error)
-      throw new ORPCError('INTERNAL_SERVER_ERROR', {
-        message: 'Failed to get team invite count',
-      })
-    }
-  })
-
-/**
- * Get user invite count (authenticated user)
- */
-const getUserInviteCount = os.getUserInviteCountContract
-  .use(authMiddleware)
-  .handler(async ({ context }) => {
-    const db = context.db
-    const userId = context.userId
-
-    try {
-      const result = await db
-        .select({ count: count() })
-        .from(teamInvitesTable)
-        .where(eq(teamInvitesTable.invitedUserId, userId))
-        .get()
-
-      return { count: result?.count || 0 }
-    } catch (error) {
-      console.error('Error getting user invite count:', error)
-      throw new ORPCError('INTERNAL_SERVER_ERROR', {
-        message: 'Failed to get user invite count',
-      })
-    }
-  })
-
-/**
- * Get user invites (authenticated user)
- */
-const getUserInvites = os.getUserInvitesContract
-  .use(authMiddleware)
-  .handler(async ({ context }) => {
-    const db = context.db
-    const userId = context.userId
-
-    try {
-      const invites = await db
-        .select({
-          teamId: teamInvitesTable.teamId,
-          name: teamsTable.name,
-        })
-        .from(teamInvitesTable)
-        .innerJoin(teamsTable, eq(teamInvitesTable.teamId, teamsTable.id))
-        .where(eq(teamInvitesTable.invitedUserId, userId))
-        .all()
-
-      return invites
-    } catch (error) {
-      console.error('Error getting user invites:', error)
-      throw new ORPCError('INTERNAL_SERVER_ERROR', {
-        message: 'Failed to get user invites',
-      })
-    }
-  })
-
-/**
- * Get all invites for a specific team (owner only)
- */
-const getTeamInvites = os.getTeamInvitesContract
-  .use(authMiddleware)
-  .use(teamsOwnerMiddleware)
-  .handler(async ({ context, input }) => {
-    const db = context.db
-    const { teamId } = input
-
-    try {
-      // Join team invites with user display view to get UserDisplaySchema
-      const invites = await db
-        .select({
-          userId: userDisplayView.userId,
-          primaryLiveStream: userDisplayView.primaryLiveStream,
-          role: userDisplayView.role,
-          createdAt: userDisplayView.createdAt,
-          username: userDisplayView.username,
-          profileImage: userDisplayView.profileImage,
-          twitchLogin: userDisplayView.twitchLogin,
-          tiltifySlug: userDisplayView.tiltifySlug,
-          tiltifyUrl: userDisplayView.tiltifyUrl,
-          primaryColor: userDisplayView.primaryColor,
-          accentColor: userDisplayView.accentColor,
-        })
-        .from(teamInvitesTable)
-        .innerJoin(
-          userDisplayView,
-          eq(teamInvitesTable.invitedUserId, userDisplayView.userId),
-        )
-        .where(eq(teamInvitesTable.teamId, teamId))
-        .all()
-
-      return invites
-    } catch (error) {
-      console.error('Error getting team invites:', error)
-      throw new ORPCError('INTERNAL_SERVER_ERROR', {
-        message: 'Failed to get team invites',
-      })
-    }
-  })
-
-/**
  * Get a specific team by ID
  * User must be either owner or member of the team
  */
@@ -1006,13 +748,6 @@ const canCreateTeam = os.canCreateTeamContract
     return checkCanCreateTeam(db, userId)
   })
 
-const canInviteUser = os.canInviteUserContract
-  .use(authMiddleware)
-  .handler(async ({ context, input }) => {
-    const { db } = context
-    return checkCanInviteUser(db, input.userId)
-  })
-
 const canInviteCurrentUser = os.canInviteCurrentUserContract
   .use(authMiddleware)
   .handler(async ({ context }) => {
@@ -1040,17 +775,8 @@ export const privateTeamsRouter = {
   // Team Query Operations
   getUserTeams,
   getTeamById,
-  getOwnedTeams,
-  getNonOwnedTeams,
-  getTeamMembers,
-  getTeamMemberCount,
-  getTeamInviteCount,
-  getTeamInvites,
-  getUserInviteCount,
-  getUserInvites,
 
   // Limit-checks
   canCreateTeam,
-  canInviteUser,
   canInviteCurrentUser,
 }

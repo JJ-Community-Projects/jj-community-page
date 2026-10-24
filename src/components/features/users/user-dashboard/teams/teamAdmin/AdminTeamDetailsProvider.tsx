@@ -34,9 +34,6 @@ const useAdminTeamDetailsHook = (teamId: number) => {
   const inviteUserMutation = useMutation(() =>
     teams.createInvite.mutationOptions({
       onSuccess: async () => {
-        // Invalidate related queries
-        await queryClient.invalidateQueries({queryKey: teams.getTeamMembers.queryKey({input: {teamId}})});
-        await queryClient.invalidateQueries({queryKey: teams.getTeamMemberCount.queryKey({input: {teamId}})});
       },
     })
   );
@@ -44,7 +41,6 @@ const useAdminTeamDetailsHook = (teamId: number) => {
   const removeUserMutation = useMutation(() =>
     teams.removeMember.mutationOptions({
       onSuccess: async () => {
-        // await queryClient.invalidateQueries({queryKey: teams.getTeamMembers.queryKey({input: {teamId}})});
       },
     })
   );

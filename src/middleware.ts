@@ -9,7 +9,6 @@ const SESSIONLESS_PREFIXES = [
   '/api/private/jj/',
   '/api/private/yogs/',
   '/api/jj-data/',
-  '/api/twitch/',
 ];
 
 /**
@@ -82,7 +81,7 @@ const session = defineMiddleware(async (context, next) => {
 
   // Routes that never read the viewer: no session lookup (KV, maybe D1) for logged-in polls.
   // The overlays keep it, so a logged-in creator's preview refreshes the edge cache.
-  if (path === '/api/cf' || SESSIONLESS_PREFIXES.some((prefix) => path.startsWith(prefix))) {
+  if (SESSIONLESS_PREFIXES.some((prefix) => path.startsWith(prefix))) {
     context.locals.session = null;
     context.locals.user = null;
     return next();

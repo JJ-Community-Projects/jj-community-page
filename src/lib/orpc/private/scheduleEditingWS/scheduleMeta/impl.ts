@@ -3,7 +3,6 @@ import { dbMiddleware } from '../../../middleware/dbMiddleware.ts'
 import { authMiddleware } from '../../../middleware/authMiddleware.ts'
 import {
   discardDraftContract,
-  getDraftSnapshotContract,
   publishDraftContract,
   startEditingSessionContract,
   upsertScheduleMetaContract,
@@ -27,7 +26,6 @@ import { scheduleEditingChannels } from '../channels.ts'
 
 const os = implement({
   startEditingSessionContract,
-  getDraftSnapshotContract,
   upsertScheduleMetaContract,
   publishDraftContract,
   discardDraftContract,

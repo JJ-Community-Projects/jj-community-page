@@ -8,11 +8,6 @@ export const TeamSlugInputSchema = z.object({
   slug: TeamSlugSchema
 })
 
-export const TeamSlugWithYearInputSchema = z.object({
-  slug: TeamSlugSchema,
-  year: z.number().int().min(2020).max(2030)
-})
-
 export const TeamNextStreamsInputSchema = z.object({
   slug: TeamSlugSchema,
   limit: z.number().int().min(1).max(50).optional().default(10),
@@ -73,15 +68,6 @@ export const TeamWithOwnerOutputSchema = z.object({
 });
 
 /**
- * Schema for user teams response.
- * Contains an array of teams that a user is a member of.
- */
-export const UserTeamsResponseSchema = z.object({
-  /** Array of teams that the user is a member of */
-  teams: z.array(TeamSchema)
-});
-
-/**
  * Schema for team schedules output.
  * Currently returns empty array as schedules are not yet implemented for teams.
  */
@@ -95,6 +81,5 @@ export type Team = z.infer<typeof TeamSchema>
 export type TeamWithMemberCount = z.infer<typeof TeamWithMemberCountSchema>
 export type TeamWithOwner = z.infer<typeof TeamWithOwnerSchema>
 export type TeamWithOwnerOutput = z.infer<typeof TeamWithOwnerOutputSchema>
-export type UserTeamsResponse = z.infer<typeof UserTeamsResponseSchema>
 export type TeamMembersOutput = z.infer<typeof TeamMembersOutputSchema>
 export type TeamSchedulesOutput = z.infer<typeof TeamSchedulesOutputSchema>

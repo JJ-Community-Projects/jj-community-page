@@ -2,9 +2,7 @@ import { oc } from '@orpc/contract'
 import { z } from 'zod/v4'
 import {
   CreateScheduleResponseSchema,
-  NextScheduleResponseSchema,
   ScheduleSchema,
-  SchedulesListSchema,
   SlugValidationSchema,
   SuccessMessageSchema,
   TablesDataSchema,
@@ -22,13 +20,6 @@ import {
 /**
  * Schedule CRUD Operations
  */
-
-/**
- * Create a new schedule
- * Input: none (creates for current year automatically)
- * Output: schedule object
- */
-const createContract = oc.input(z.void()).output(CreateScheduleResponseSchema)
 
 /**
  * Create a new schedule with custom details
@@ -49,15 +40,6 @@ const createWithDetailsContract = oc
     }),
   )
   .output(CreateScheduleResponseSchema)
-
-/**
- * Save schedule data to database
- * Input: schedule ID
- * Output: success message
- */
-const saveContract = oc
-  .input(z.number().positive('Schedule ID must be positive'))
-  .output(SuccessMessageSchema)
 
 /**
  * Delete a schedule
@@ -186,42 +168,16 @@ const getTablesContract = oc
  */
 
 /**
- * Get all schedules by Tiltify username
- * Input: Tiltify username
- * Output: array of schedules owned by the user
- */
-const getSchedulesByTiltifyUsernameContract = oc
-  .input(z.string().min(1, 'Tiltify username is required'))
-  .output(SchedulesListSchema)
-
-/**
- * Get next schedule by Tiltify username
- * Input: Tiltify username
- * Output: next upcoming schedule for the user
- */
-const getNextScheduleByTiltifyUsernameContract = oc
-  .input(z.string().min(1, 'Tiltify username is required'))
-  .output(NextScheduleResponseSchema)
-
-/**
  * Get all schedules for the authenticated user
  * Uses authMiddleware to access user ID from context
  */
 const getSchedulesContract = oc.output(z.array(ScheduleSchema))
 
-// Limit-check contract
-const canCreateScheduleContract = oc
-  .input(z.object({ year: z.number().int().min(2000).max(2100) }))
-  .output(z.object({ canCreate: z.boolean(), schedules: z.number(), year: z.number(), maxSchedules: z.number() }));
-
-
 const hasInvisibleStreamsInVisibleScheduleContract = oc.output(z.boolean());
 
 export const privateSchedulesContract = {
   // Schedule CRUD Operations
-  create: createContract,
   createWithDetails: createWithDetailsContract,
-  save: saveContract,
   delete: deleteContract,
 
   // Schedule Management Operations
@@ -239,12 +195,7 @@ export const privateSchedulesContract = {
     getSuggestedTagsForStreamBySearchTermContract,
 
   // Schedule Query Operations
-  getSchedulesByTiltifyUsername: getSchedulesByTiltifyUsernameContract,
-  getNextScheduleByTiltifyUsername: getNextScheduleByTiltifyUsernameContract,
   getSchedules: getSchedulesContract,
-
-  // Limit-checks
-  canCreateSchedule: canCreateScheduleContract,
 
   hasInvisibleStreamsInVisibleScheduleContract: hasInvisibleStreamsInVisibleScheduleContract
 }

@@ -31,9 +31,12 @@ import {
 import { CharityOverviewProvider } from '../../common/charityOverview/CharityOverviewProvider.tsx'
 import { CurrencyProvider } from '../../common/CurrencyProvider.tsx'
 import { HeadlinerTicker } from '../schedules/common/HeadlinerTicker.tsx'
+import { TagCatalogContext } from '../../../lib/useTagSearch.ts'
+import type { CatalogTag } from '../../../lib/tagCatalog.ts'
 
 export const CommunityPage: Component<{
   charitiesData?: CharitiesStatic
+  tagCatalog?: CatalogTag[]
 }> = (props) => {
   const i18n = createI18n({ language: useLocale().locale() })
   return (
@@ -42,7 +45,9 @@ export const CommunityPage: Component<{
         <CurrencyProvider>
           <CommunityPageProvider>
             <CharityOverviewProvider charitiesData={props.charitiesData}>
-              <_CommunityPage />
+              <TagCatalogContext.Provider value={props.tagCatalog}>
+                <_CommunityPage />
+              </TagCatalogContext.Provider>
             </CharityOverviewProvider>
           </CommunityPageProvider>
         </CurrencyProvider>

@@ -6,17 +6,11 @@ import {PaginationLimitSchema, SuccessSchema} from "../schemas/common.ts";
  * Admin-only oRPC contracts for centralized tag management
  * These procedures require admin authentication and are used for:
  * - Creating, updating, and deleting tags
- * - Managing tag aliases
- * - Assigning/removing tags from users and streams
+ * - Managing tag aliases and tag categories
  */
 
 // Input validation schemas
 const TagIdSchema = z.number().int().positive();
-const UserIdSchema = z.number().int().positive();
-const StreamIdentifierSchema = z.object({
-  scheduleId: z.number().int().positive(),
-  streamId: z.number().int().positive(),
-});
 
 const CreateTagInputSchema = z.object({
   name: z.string().min(1).max(50),
@@ -48,28 +42,6 @@ const AddTagAliasInputSchema = z.object({
 
 const RemoveTagAliasInputSchema = z.object({
   aliasId: z.number().int().positive(),
-});
-
-const AssignUserTagInputSchema = z.object({
-  userId: UserIdSchema,
-  tagId: TagIdSchema,
-});
-
-const RemoveUserTagInputSchema = z.object({
-  userId: UserIdSchema,
-  tagId: TagIdSchema,
-});
-
-const AssignStreamTagInputSchema = z.object({
-  scheduleId: z.number().int().positive(),
-  streamId: z.number().int().positive(),
-  tagId: TagIdSchema,
-});
-
-const RemoveStreamTagInputSchema = z.object({
-  scheduleId: z.number().int().positive(),
-  streamId: z.number().int().positive(),
-  tagId: TagIdSchema,
 });
 
 // Tag category input schemas
@@ -121,35 +93,10 @@ const TagAliasOutputSchema = z.object({
   createdAt: z.date(),
 });
 
-const TagWithAliasesOutputSchema = TagOutputSchema.extend({
-  aliases: z.array(TagAliasOutputSchema),
-});
-
-const TagWithUsageOutputSchema = TagOutputSchema.extend({
-  userCount: z.number(),
-  streamCount: z.number(),
-  totalUsage: z.number(),
-});
-
 const TagWithUsageAndAliasesOutputSchema = TagOutputSchema.extend({
   userCount: z.number(),
   streamCount: z.number(),
   aliases: z.array(TagAliasOutputSchema),
-});
-
-const UserTagOutputSchema = z.object({
-  userId: z.number(),
-  tagId: z.number(),
-  addedAt: z.date(),
-  tag: TagOutputSchema,
-});
-
-const StreamTagOutputSchema = z.object({
-  scheduleId: z.number(),
-  streamId: z.number(),
-  tagId: z.number(),
-  addedAt: z.date(),
-  tag: TagOutputSchema,
 });
 
 // Tag category output schemas
@@ -200,26 +147,6 @@ export const deleteTagContract = oc
   .output(SuccessSchema);
 
 /**
- * Get all tags for admin management
- * Returns all tags including hidden ones with usage statistics
- */
-export const getAdminTagsContract = oc
-  .input(z.object({
-    includeHidden: z.boolean().default(true),
-    includeUsage: z.boolean().default(true),
-    categoryId: z.number().int().positive().optional(),
-    limit: PaginationLimitSchema(1, 100, 50),
-  }))
-  .output(z.array(TagWithUsageOutputSchema));
-
-/**
- * Get a single tag with all its aliases (admin only)
- */
-export const getTagWithAliasesContract = oc
-  .input(z.object({ id: TagIdSchema }))
-  .output(TagWithAliasesOutputSchema);
-
-/**
  * Get all tags with usage and aliases for a specific category (admin only)
  * Returns tags with usage statistics and all their aliases for the given category
  */
@@ -255,99 +182,6 @@ export const getTagAliasesContract = oc
   .input(z.object({ tagId: TagIdSchema }))
   .output(z.array(TagAliasOutputSchema));
 
-// === User Tag Assignment Contracts ===
-
-/**
- * Assign a tag to a user (admin only)
- * Allows admins to manage user tags directly
- */
-export const assignUserTagContract = oc
-  .input(AssignUserTagInputSchema)
-  .output(UserTagOutputSchema);
-
-/**
- * Remove a tag from a user (admin only)
- */
-export const removeUserTagContract = oc
-  .input(RemoveUserTagInputSchema)
-  .output(SuccessSchema);
-
-/**
- * Get all tags for a specific user (admin view)
- * Returns detailed tag information including metadata
- */
-export const getUserTagsAdminContract = oc
-  .input(z.object({
-    userId: UserIdSchema,
-    includeHidden: z.boolean().default(false),
-  }))
-  .output(z.array(UserTagOutputSchema));
-
-/**
- * Bulk assign multiple tags to a user (admin only)
- */
-export const bulkAssignUserTagsContract = oc
-  .input(z.object({
-    userId: UserIdSchema,
-    tagIds: z.array(TagIdSchema).min(1).max(20),
-  }))
-  .output(z.array(UserTagOutputSchema));
-
-/**
- * Bulk remove multiple tags from a user (admin only)
- */
-export const bulkRemoveUserTagsContract = oc
-  .input(z.object({
-    userId: UserIdSchema,
-    tagIds: z.array(TagIdSchema).min(1).max(20),
-  }))
-  .output(SuccessSchema);
-
-// === Stream Tag Assignment Contracts ===
-
-/**
- * Assign a tag to a stream (admin only)
- */
-export const assignStreamTagContract = oc
-  .input(AssignStreamTagInputSchema)
-  .output(StreamTagOutputSchema);
-
-/**
- * Remove a tag from a stream (admin only)
- */
-export const removeStreamTagContract = oc
-  .input(RemoveStreamTagInputSchema)
-  .output(SuccessSchema);
-
-/**
- * Get all tags for a specific stream (admin view)
- */
-export const getStreamTagsAdminContract = oc
-  .input(StreamIdentifierSchema)
-  .output(z.array(StreamTagOutputSchema));
-
-/**
- * Bulk assign multiple tags to a stream (admin only)
- */
-export const bulkAssignStreamTagsContract = oc
-  .input(z.object({
-    scheduleId: z.number().int().positive(),
-    streamId: z.number().int().positive(),
-    tagIds: z.array(TagIdSchema).min(1).max(20),
-  }))
-  .output(z.array(StreamTagOutputSchema));
-
-/**
- * Bulk remove multiple tags from a stream (admin only)
- */
-export const bulkRemoveStreamTagsContract = oc
-  .input(z.object({
-    scheduleId: z.number().int().positive(),
-    streamId: z.number().int().positive(),
-    tagIds: z.array(TagIdSchema).min(1).max(20),
-  }))
-  .output(SuccessSchema);
-
 // === Tag Category Management Contracts ===
 
 /**
@@ -374,64 +208,12 @@ export const deleteTagCategoryContract = oc
   .input(DeleteTagCategoryInputSchema)
   .output(SuccessSchema);
 
-/**
- * Get all tag categories for admin management
- * Returns all categories including hidden ones with usage statistics
- */
-export const getTagCategoriesContract = oc
-  .input(z.object({
-    includeHidden: z.boolean().default(true),
-    includeUsage: z.boolean().default(true),
-    limit: PaginationLimitSchema(1, 100, 50),
-  }))
-  .output(z.array(TagCategoryWithUsageOutputSchema));
-
 export const getAllTagCategoriesContract = oc
   .input(z.object({
     includeHidden: z.boolean().default(true),
     includeUsage: z.boolean().default(true),
   }))
   .output(z.array(TagCategoryWithUsageOutputSchema));
-
-/**
- * Get a single tag category by ID (admin only)
- */
-export const getTagCategoryContract = oc
-  .input(z.object({ id: CategoryIdSchema }))
-  .output(TagCategoryOutputSchema);
-
-// === Tag Validation Contracts ===
-
-/**
- * Check if a tag slug is available (admin only)
- * Used for validation during tag creation
- */
-export const checkTagSlugAvailabilityContract = oc
-  .input(z.object({
-    slug: z.string().min(1).max(50).regex(/^[a-z0-9-]+$/),
-    excludeId: z.number().int().positive().optional(),
-  }))
-  .output(z.object({
-    available: z.boolean(),
-    slug: z.string(),
-    suggestion: z.string().optional(),
-  }));
-
-/**
- * Validate tag alias uniqueness (admin only)
- * Checks if an alias is already in use
- */
-export const checkAliasAvailabilityContract = oc
-  .input(z.object({
-    alias: z.string().min(1).max(50),
-    excludeTagId: z.number().int().positive().optional(),
-  }))
-  .output(z.object({
-    available: z.boolean(),
-    alias: z.string(),
-    existingTag: TagOutputSchema.optional(),
-  }));
-
 
 /**
  * Export all admin tag management contracts
@@ -441,8 +223,6 @@ export const adminTagsContract = {
   createTag: createTagContract,
   updateTag: updateTagContract,
   deleteTag: deleteTagContract,
-  getAdminTags: getAdminTagsContract,
-  getTagWithAliases: getTagWithAliasesContract,
   getTagsWithUsageAndAliasesByCategory: getTagsWithUsageAndAliasesByCategoryContract,
 
   // Alias management
@@ -450,29 +230,9 @@ export const adminTagsContract = {
   removeTagAlias: removeTagAliasContract,
   getTagAliases: getTagAliasesContract,
 
-  // User tag assignment
-  assignUserTag: assignUserTagContract,
-  removeUserTag: removeUserTagContract,
-  getUserTagsAdmin: getUserTagsAdminContract,
-  bulkAssignUserTags: bulkAssignUserTagsContract,
-  bulkRemoveUserTags: bulkRemoveUserTagsContract,
-
-  // Stream tag assignment
-  assignStreamTag: assignStreamTagContract,
-  removeStreamTag: removeStreamTagContract,
-  getStreamTagsAdmin: getStreamTagsAdminContract,
-  bulkAssignStreamTags: bulkAssignStreamTagsContract,
-  bulkRemoveStreamTags: bulkRemoveStreamTagsContract,
-
   // Tag category management
   createTagCategory: createTagCategoryContract,
   updateTagCategory: updateTagCategoryContract,
   deleteTagCategory: deleteTagCategoryContract,
-  getTagCategories: getTagCategoriesContract,
   getAllTagCategories: getAllTagCategoriesContract,
-  getTagCategory: getTagCategoryContract,
-
-  // Tag validation
-  checkTagSlugAvailability: checkTagSlugAvailabilityContract,
-  checkAliasAvailability: checkAliasAvailabilityContract,
 };

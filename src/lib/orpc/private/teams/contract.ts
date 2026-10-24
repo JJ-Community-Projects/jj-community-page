@@ -1,7 +1,7 @@
 import { oc } from '@orpc/contract'
 import { z } from 'zod/v4'
 import { SuccessSchema } from '../schemas/common.ts'
-import { UserDisplaySchema, UserIdSchema } from '../schemas/users.ts'
+import { UserIdSchema } from '../schemas/users.ts'
 import { SlugValidationSchema, TeamIdSchema } from '../schemas/teams.ts'
 import { TeamSchema } from '../../public/schemas/teams.ts'
 
@@ -184,106 +184,6 @@ const rejectInviteContract = oc
 const getUserTeamsContract = oc.output(z.array(TeamSchema))
 
 /**
- * Get all teams where the current user is the owner
- * Uses authMiddleware to access user ID from context
- */
-const getOwnedTeamsContract = oc.output(z.array(TeamSchema))
-
-/**
- * Get all teams where the current user is not the owner (member only)
- * Uses authMiddleware to access user ID from context
- */
-const getNonOwnedTeamsContract = oc.output(z.array(TeamSchema))
-
-/**
- * Get all team members as UserDisplaySchema (owner only)
- * Input: team ID
- * Output: array of UserDisplaySchema
- */
-const getTeamMembersContract = oc
-  .input(
-    z.object({
-      teamId: z.number().positive('Team ID must be positive'),
-    }),
-  )
-  .output(z.array(UserDisplaySchema))
-
-/**
- * Get team member count (owner only)
- * Input: team ID
- * Output: count number
- */
-const getTeamMemberCountContract = oc
-  .input(
-    z.object({
-      teamId: z.number().positive('Team ID must be positive'),
-    }),
-  )
-  .output(
-    z.object({
-      count: z.number(),
-    }),
-  )
-
-/**
- * Get team invite count (owner only)
- * Input: team ID
- * Output: count number
- */
-const getTeamInviteCountContract = oc
-  .input(
-    z.object({
-      teamId: z.number().positive('Team ID must be positive'),
-    }),
-  )
-  .output(
-    z.object({
-      count: z.number(),
-    }),
-  )
-
-/**
- * Get user invite count (authenticated user)
- * Returns the number of pending team invitations for the authenticated user
- * No input required - uses authenticated user ID from context
- * Output: count number
- */
-const getUserInviteCountContract = oc.output(
-  z.object({
-    count: z.number(),
-  }),
-)
-
-/**
- * Get user invites (authenticated user)
- * Returns detailed information about pending team invitations for the authenticated user
- * No input required - uses authenticated user ID from context
- * Output: array of invite details with team information
- */
-const getUserInvitesContract = oc.output(
-  z.array(
-    z.object({
-      teamId: z.number(),
-      name: z.string(),
-    }),
-  ),
-)
-
-/**
- * Get all invites for a specific team (owner only)
- * Returns detailed information about all pending invitations for the specified team
- * Input: team ID
- * Output: array of invite details with user information
- */
-const getTeamInvitesContract = oc
-  .input(
-    z.object({
-      teamId: z.number().positive('Team ID must be positive'),
-    }),
-  )
-  .output(z.array(UserDisplaySchema))
-
-/**
  * Get a specific team by ID
  * Input: team ID
  * Output: team schema
@@ -304,16 +204,6 @@ const canCreateTeamContract = oc.output(
     maxOwnedTeams: z.number(),
   }),
 )
-
-const canInviteUserContract = oc
-  .input(z.object({ userId: UserIdSchema }))
-  .output(
-    z.object({
-      canInvite: z.boolean(),
-      teams: z.number(),
-      maxTeams: z.number(),
-    }),
-  )
 
 // Checks if the authenticated user can be invited to another team
 const canInviteCurrentUserContract = oc.output(
@@ -344,17 +234,8 @@ export const privateTeamsContract = {
   // Team Query Operations
   getTeamContract: getUserTeamsContract,
   getTeamByIdContract,
-  getOwnedTeamsContract,
-  getNonOwnedTeamsContract,
-  getTeamMembersContract,
-  getTeamMemberCountContract,
-  getTeamInviteCountContract,
-  getTeamInvitesContract,
-  getUserInviteCountContract,
-  getUserInvitesContract,
 
   // Limit-check
   canCreateTeamContract,
-  canInviteUserContract,
   canInviteCurrentUserContract,
 }

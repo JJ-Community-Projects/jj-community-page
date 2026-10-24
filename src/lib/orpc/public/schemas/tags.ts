@@ -312,19 +312,6 @@ export const GetUserTagsInputSchema = z.object({
 });
 
 /**
- * Schema for finding users by tag input.
- * Used for discovering users who have specific tags.
- */
-export const FindUsersByTagInputSchema = z.object({
-  /** ID of the tag to search for */
-  tagId: TagIdSchema,
-  /** Maximum number of users to return */
-  limit: z.number().int().min(1).max(50).default(10),
-  /** Whether to exclude the current user from results */
-  excludeCurrentUser: z.boolean().default(true),
-});
-
-/**
  * Schema for tag recommendations request input.
  * Used for generating personalized tag suggestions for users.
  */
@@ -393,7 +380,6 @@ export const TagCategoriesInputSchema = z.object({
 })
 
 export type PublicTag = z.infer<typeof PublicTagSchema>
-export type SimplePublicTag = z.infer<typeof SimplePublicTagSchema>
 export type TagWithUsage = z.infer<typeof TagWithUsageSchema>
 export type TagSearchResult = z.infer<typeof TagSearchResultSchema>
 export type TagCategory = z.infer<typeof TagCategorySchema>

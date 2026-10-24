@@ -74,24 +74,6 @@ export const SlugValidationSchema = z.object({
 export const TablesDataSchema = z.any();
 
 /**
- * Schema for schedule list response.
- * Used for operations that return multiple schedules.
- * Used in: schedules contract for getSchedulesByTiltifyUsername operation
- */
-export const SchedulesListSchema = z.array(ScheduleSchema);
-
-/**
- * Schema for next schedule response.
- * Returns the next upcoming schedule for a user.
- * The repository returns ScheduleWithStreams which includes additional stream data.
- * Used in: schedules contract for getNextScheduleByTiltifyUsername operation
- */
-export const NextScheduleResponseSchema = z.object({
-  /** The next schedule with streams, or null if none found */
-  nextSchedule: z.any().nullable()
-});
-
-/**
  * Schema for success message responses.
  * Used for operations that return a success message.
  * Used in: schedules contract for operations that return success messages

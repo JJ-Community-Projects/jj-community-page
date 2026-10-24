@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro'
 import { ZodToJsonSchemaConverter } from '@orpc/zod/zod4'
-import { publicRouter } from '../../../lib/orpc/public/publicRouter.ts'
+import { publicHttpRouter } from '../../../lib/orpc/public/publicRouter.ts'
 import { OpenAPIGenerator } from '@orpc/openapi'
 import {
   CausesDisplaySchema,
@@ -26,7 +26,8 @@ export const ALL: APIRoute = async () => {
     schemaConverters: [new ZodToJsonSchemaConverter()],
   })
 
-  const spec = await generator.generate(publicRouter, {
+  // Generated from what /api/public serves, so it lists only the extension's routes
+  const spec = await generator.generate(publicHttpRouter, {
     info: {
       title: 'Jingle Jam Community Page Public API',
       version: '0.0.1',
@@ -65,9 +66,6 @@ export const ALL: APIRoute = async () => {
 
       // Imported in contract.ts
       UserDisplay: { schema: UserDisplaySchema },
-    },
-    filter: (v) => {
-      return v.path.includes('twitchExtension')
     },
   })
   return new Response(JSON.stringify(spec), {

@@ -19,31 +19,9 @@ export const addStreamContract = oc
   }))
   .output(z.object({id: z.number()}))
 
-export const updateStreamContract = oc
-  .input(z.object({
-    scheduleId: z.number().int().positive(),
-    id: z.number(),
-    patch: EditStreamSchema.partial().extend({id: z.never().optional(), scheduleId: z.never().optional()}),
-  }))
-  .output(z.object({updatedAt: z.date()}))
-
-export const updateStreamsContract = oc
-  .input(z.object({
-    scheduleId: z.number().int().positive(),
-    updates: z.array(z.object({
-      id: z.number(),
-      patch: EditStreamSchema.partial().extend({ id: z.never().optional(), scheduleId: z.never().optional() }),
-    })).min(1),
-  }))
-  .output(z.object({ updated: z.array(z.object({ id: z.number(), updatedAt: z.date() })) }))
-
 export const deleteStreamContract = oc
   .input(z.object({scheduleId: z.number().int().positive(), id: z.number()}))
   .output(z.object({ok: z.literal(true)}))
-
-export const deleteStreamsContract = oc
-  .input(z.object({ scheduleId: z.number().int().positive(), ids: z.array(z.number()).min(1) }))
-  .output(z.object({ ok: z.literal(true), deletedIds: z.array(z.number()) }))
 
 export const lockStreamContract = oc
   .input(z.object({ scheduleId: z.number().int().positive(), streamId: z.number() }))
@@ -108,9 +86,3 @@ export const updateStreamsWithDetailsContract = oc
   .output(z.void())
 
 // Limit-check: per-date streams cap (see util/limits)
-export const canAddStreamContract = oc
-  .input(z.object({
-    scheduleId: z.number().int().positive(),
-    date: z.date(),
-  }))
-  .output(z.object({ canAdd: z.boolean(), streams: z.number(), date: z.date(), maxStreams: z.number() }))

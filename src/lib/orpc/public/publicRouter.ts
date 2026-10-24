@@ -4,24 +4,25 @@ import { publicTeamsRouter } from './teams/impl.ts'
 import { publicSchedulesRouter } from './schedules/impl.ts'
 import { hasAstroContext } from '../middleware/hasAstroContext.ts'
 import { dbMiddleware } from '../middleware/dbMiddleware.ts'
-import { overlaysScheduleRouter } from './overlays/schedule/impl.ts'
 import { overlaysVisibilityRouter } from './overlays/visibility/impl.ts'
 import { twitchExtensionRouter } from './twitchExtension/impl.ts'
-import { publicJJDataRouter } from './jjData/impl.ts'
 import { publicTagsRouter } from './tags/impl.ts'
 
-export const publicRouter = os
-  .use(hasAstroContext)
-  .use(dbMiddleware)
-  .router({
-    users: publicUsersRouter,
-    teams: publicTeamsRouter,
-    schedules: publicSchedulesRouter,
-    overlays: {
-      schedule: overlaysScheduleRouter,
-      visibility: overlaysVisibilityRouter,
-    },
-    twitchExtension: twitchExtensionRouter,
-    jjData: publicJJDataRouter,
-    tags: publicTagsRouter,
-  })
+const base = os.use(hasAstroContext).use(dbMiddleware)
+
+/** In-process router for `serverClientPublic` (page frontmatter); not mounted over HTTP. */
+export const publicRouter = base.router({
+  users: publicUsersRouter,
+  teams: publicTeamsRouter,
+  schedules: publicSchedulesRouter,
+  overlays: {
+    visibility: overlaysVisibilityRouter,
+  },
+  twitchExtension: twitchExtensionRouter,
+  tags: publicTagsRouter,
+})
+
+/** What `/api/public` serves: only the Twitch extension, same middleware and paths. */
+export const publicHttpRouter = base.router({
+  twitchExtension: twitchExtensionRouter,
+})

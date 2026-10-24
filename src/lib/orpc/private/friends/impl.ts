@@ -8,7 +8,6 @@ import {
   friendRequests,
   friendsTable,
 } from '../../../db/schema/auth-schema.ts'
-import { userDisplayView } from '../../../db/schema/views-schema.ts'
 import {
   publishFriendRequestIncomingUpdate,
   publishFriendRequestSentUpdate,
@@ -314,52 +313,10 @@ const removeFriend = os.removeFriendContract
     return { success: true }
   })
 
-/**
- * Get all friends for the authenticated user
- */
-const getFriends = os.getFriendsContract
-  .use(authMiddleware)
-  .handler(async ({ context }) => {
-    const db = context.db
-    const userId = context.userId
-
-    // Get all friends for the authenticated user with user details from userDisplayView
-    const friendships = await db
-      .select({
-        userId: userDisplayView.userId,
-        primaryLiveStream: userDisplayView.primaryLiveStream,
-        role: userDisplayView.role,
-        createdAt: userDisplayView.createdAt,
-        username: userDisplayView.username,
-        profileImage: userDisplayView.profileImage,
-        twitchLogin: userDisplayView.twitchLogin,
-        tiltifySlug: userDisplayView.tiltifySlug,
-        tiltifyUrl: userDisplayView.tiltifyUrl,
-        primaryColor: userDisplayView.primaryColor,
-        accentColor: userDisplayView.accentColor,
-      })
-      .from(friendsTable)
-      .innerJoin(
-        userDisplayView,
-        or(
-          and(
-            eq(friendsTable.fromUserId, userId),
-            eq(userDisplayView.userId, friendsTable.toUserId),
-          ),
-          // and(eq(friendsTable.toUserId, userId), eq(userDisplayView.userId, friendsTable.fromUserId))
-        ),
-      )
-      .where(eq(friendsTable.toUserId, userId))
-      .all()
-
-    return friendships
-  })
-
 export const friendsRouter = {
   sendFriendRequest,
   acceptFriendRequest,
   declineFriendRequest,
   cancelFriendRequest,
   removeFriend,
-  getFriends,
 }

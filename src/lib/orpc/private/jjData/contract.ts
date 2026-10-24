@@ -174,14 +174,6 @@ export const UserWithInfo = UserDisplaySchema.extend({
 export type UserWithInfo = z.infer<typeof UserWithInfo>
 
 const getAllUsersWithInfoContract = oc.output(z.array(UserWithInfo))
-export const UserCampaignPairSchema = z.object({
-  user: UserWithInfo.optional(),
-  campaign: z.lazy(() => JJCampaignSchema).optional(),
-})
-
-export type UserCampaignPair = z.infer<typeof UserCampaignPairSchema>
-
-const getUserCampaignPairsContract = oc.output(z.array(UserCampaignPairSchema))
 
 const OverviewSchema = z.object({
   raised: JJRaisedSchema,
@@ -218,15 +210,6 @@ export type FullCommunitySchedule = z.infer<typeof FullScheduleSchema>
 
 const fullScheduleContract = oc.output(FullScheduleSchema)
 
-const HardcodedStreamsSchema = z.object({
-  yogs: z.array(UserStreamSchema),
-  nonYogs: z.array(UserStreamSchema),
-})
-
-export type HardcodedStreams = z.infer<typeof HardcodedStreamsSchema>
-
-const hardcodedStreamsContract = oc.output(HardcodedStreamsSchema)
-
 const headlinerContract = oc.output(z.array(UserStreamSchema))
 
 export const contracts = {
@@ -234,9 +217,7 @@ export const contracts = {
   causesContract,
   upcomingStreamsContract,
   getAllUsersWithInfoContract,
-  getUserCampaignPairsContract,
   overviewContract,
   fullScheduleContract,
-  hardcodedStreamsContract,
   headlinerContract
 }

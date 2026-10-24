@@ -211,13 +211,13 @@ export function RawQueryComponent<TData, TError>(props: RawQueryComponentProps<T
  *
  * This component internally uses useQuery with the provided options and delegates
  * all rendering logic to the existing QueryComponent. This allows you to pass
- * query options directly (e.g., from orpc.private.teams.getOwnedTeams.queryOptions)
+ * query options directly (e.g., from orpcPrivate.teams.getUserTeams.queryOptions)
  * without having to call useQuery yourself.
  *
  * @example
  * ```tsx
  * <QueryOptionsComponent
- *   queryOptions={orpc.private.teams.getOwnedTeams.queryOptions}
+ *   queryOptions={orpcPrivate.teams.getUserTeams.queryOptions}
  *   loading={() => <div class="spinner">Loading teams...</div>}
  *   error={(error, refetch, failureCount) => (
  *     <div>

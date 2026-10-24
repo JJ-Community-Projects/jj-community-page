@@ -11,39 +11,6 @@ import {
 
 const os = implement(profileContract).use(dbMiddleware)
 
-/**
- * Update user's primary color preference
- * Uses upsert pattern to insert or update the userStyles record
- */
-const updatePrimaryColor = os.updatePrimaryColorContract
-  .use(authMiddleware)
-  .handler(async ({ context, input }) => {
-    const db = context.db
-    const userId = context.userId
-
-    try {
-      await db
-        .insert(userStyles)
-        .values({
-          userId: userId,
-          primaryColor: input.primaryColor,
-        })
-        .onConflictDoUpdate({
-          target: userStyles.userId,
-          set: {
-            primaryColor: input.primaryColor,
-          },
-        })
-
-      return { success: true }
-    } catch (error) {
-      console.error('Error updating primary color:', error)
-      throw new ORPCError('INTERNAL_SERVER_ERROR', {
-        message: 'Failed to update primary color',
-      })
-    }
-  })
-
 const updateStyle = os.updateStyleContract
   .use(authMiddleware)
   .handler(async ({ context, input }) => {
@@ -74,39 +41,6 @@ const updateStyle = os.updateStyleContract
       console.error('Error updating primary color:', error)
       throw new ORPCError('INTERNAL_SERVER_ERROR', {
         message: 'Failed to update primary color',
-      })
-    }
-  })
-
-/**
- * Update user's accent color preference
- * Uses upsert pattern to insert or update the userStyles record
- */
-const updateAccentColor = os.updateAccentColorContract
-  .use(authMiddleware)
-  .handler(async ({ context, input }) => {
-    const db = context.db
-    const userId = context.userId
-
-    try {
-      await db
-        .insert(userStyles)
-        .values({
-          userId: userId,
-          accentColor: input.accentColor,
-        })
-        .onConflictDoUpdate({
-          target: userStyles.userId,
-          set: {
-            accentColor: input.accentColor,
-          },
-        })
-
-      return { success: true }
-    } catch (error) {
-      console.error('Error updating accent color:', error)
-      throw new ORPCError('INTERNAL_SERVER_ERROR', {
-        message: 'Failed to update accent color',
       })
     }
   })
@@ -190,8 +124,6 @@ const getPrimaryLiveStream = os.getPrimaryLiveStreamContract
   })
 
 export const profileRouter = {
-  updatePrimaryColor,
-  updateAccentColor,
   updateStyle,
   getStyle,
   updatePrimaryLiveStream,

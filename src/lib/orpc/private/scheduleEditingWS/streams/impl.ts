@@ -3,13 +3,9 @@ import { dbMiddleware } from '../../../middleware/dbMiddleware.ts'
 import { authMiddleware } from '../../../middleware/authMiddleware.ts'
 import {
   addStreamContract,
-  canAddStreamContract,
   deleteStreamContract,
-  deleteStreamsContract,
   lockStreamContract,
   unlockStreamContract,
-  updateStreamContract,
-  updateStreamsContract,
   updateStreamsWithDetailsContract,
   updateStreamWithDetailsContract,
 } from './contract.ts'
@@ -27,22 +23,17 @@ import type { JJDrizzleDatabase } from '../../../../db/db.ts'
 import type { StreamUpdatedWithDetailPayload } from '../scheduleEditingTypes.ts'
 import { scheduleEditingChannels } from '../channels.ts'
 import {
-  checkCanAddStreamOnDate,
   movedStreamsDateLimit,
   streamDateLimitFromStarts,
 } from '../../util/limits.ts'
 
 const os = implement({
   addStreamContract,
-  updateStreamContract,
-  updateStreamsContract,
   deleteStreamContract,
-  deleteStreamsContract,
   lockStreamContract,
   unlockStreamContract,
   updateStreamWithDetailsContract,
   updateStreamsWithDetailsContract,
-  canAddStreamContract,
 }).use(dbMiddleware)
 
 function getScheduleEditingStub(env: Env, scheduleId: number) {
@@ -101,10 +92,6 @@ const draftStreamStartsQuery = (db: JJDrizzleDatabase, scheduleId: number) =>
 
 const startsById = (rows: { id: number; start: Date }[]) =>
   new Map(rows.map((r) => [r.id, r.start]))
-
-async function draftStreamStarts(db: JJDrizzleDatabase, scheduleId: number) {
-  return startsById(await draftStreamStartsQuery(db, scheduleId).all())
-}
 
 /** The tags with these ids, ordered by id: the tags a save sets, as its WS event lists them. */
 const tagsByIdQuery = (db: JJDrizzleDatabase, ids: number[]) =>
@@ -211,78 +198,6 @@ export const addStream = os.addStreamContract
     return { id }
   })
 
-/** Checks the per-date limit when `fields` moves the stream, then updates it; null when missing. */
-async function updateDraftStream(
-  db: JJDrizzleDatabase,
-  scheduleId: number,
-  id: number,
-  fields: Record<string, unknown>,
-  limitMessage: (date: Date, limit: { streams: number; maxStreams: number }) => string,
-) {
-  // If changing start, enforce per-date stream limit for the new date (the stream itself is not
-  // counted twice: a move within its day is allowed)
-  if (fields.start) {
-    const newDate = new Date(fields.start as Date)
-    const current = await draftStreamStarts(db, scheduleId)
-    if (!current.has(id)) return null
-    const limit = movedStreamsDateLimit(current, new Map([[id, newDate]]))
-    if (limit) {
-      throw new ORPCError('FORBIDDEN', {
-        message: limitMessage(newDate, limit),
-        ...limit,
-      } as any)
-    }
-  }
-
-  const row = await db
-    .update(editStreamsTable)
-    .set({ ...fields, updatedAt: sql`(unixepoch())` })
-    .where(
-      and(
-        eq(editStreamsTable.scheduleId, scheduleId),
-        eq(editStreamsTable.id, id),
-      ),
-    )
-    .returning({ updatedAt: editStreamsTable.updatedAt })
-    .get()
-  return row ?? null
-}
-
-export const updateStream = os.updateStreamContract
-  .use(authMiddleware)
-  .use(scheduleOwnerOrEditorMiddleware)
-  .handler(async ({ context, input }) => {
-    const db = context.db
-    const editorId = context.userId
-    const { scheduleId, id, patch } = input
-
-    await assertStreamLockAvailableOrOwned(
-      context.env as any,
-      scheduleId,
-      id,
-      editorId,
-    )
-
-    const fields = patchFields(patch, false)
-    const row = await updateDraftStream(
-      db,
-      scheduleId,
-      id,
-      fields,
-      () => 'Daily stream limit reached',
-    )
-    if (!row) throw streamNotFound()
-
-    const stub = getScheduleEditingStub(context.env as any, scheduleId)
-    // @ts-ignore
-    await stub.publishStreamUpdated(scheduleId, editorId, {
-      id,
-      patch: fields,
-    })
-
-    return { updatedAt: row.updatedAt ?? new Date() }
-  })
-
 export const deleteStream = os.deleteStreamContract
   .use(authMiddleware)
   .use(scheduleOwnerOrEditorMiddleware)
@@ -314,83 +229,6 @@ export const deleteStream = os.deleteStreamContract
     // @ts-ignore
     await stub.publishStreamDeleted(scheduleId, editorId, { id })
     return { ok: true as const }
-  })
-
-export const updateStreams = os.updateStreamsContract
-  .use(authMiddleware)
-  .use(scheduleOwnerOrEditorMiddleware)
-  .handler(async ({ context, input }) => {
-    const db = context.db
-    const editorId = context.userId
-    const { scheduleId, updates } = input
-
-    const results: { id: number; updatedAt: Date }[] = []
-
-    for (const { id, patch } of updates) {
-      await assertStreamLockAvailableOrOwned(
-        context.env as any,
-        scheduleId,
-        id,
-        editorId,
-      )
-      const fields = patchFields(patch, false)
-      const row = await updateDraftStream(
-        db,
-        scheduleId,
-        id,
-        fields,
-        (newDate, limit) =>
-          `Daily stream limit reached for ${newDate.toISOString().slice(0, 10)} (${limit.streams}/${limit.maxStreams}).`,
-      )
-      if (!row) throw streamNotFound()
-
-      const stub = getScheduleEditingStub(context.env as any, scheduleId)
-      // @ts-ignore
-      await stub.publishStreamUpdated(scheduleId, editorId, {
-        id,
-        patch: fields,
-      })
-
-      results.push({ id, updatedAt: row.updatedAt ?? new Date() })
-    }
-
-    return { updated: results }
-  })
-
-export const deleteStreams = os.deleteStreamsContract
-  .use(authMiddleware)
-  .use(scheduleOwnerOrEditorMiddleware)
-  .handler(async ({ context, input }) => {
-    const db = context.db
-    const editorId = context.userId
-    const { scheduleId, ids } = input
-
-    const deletedIds: number[] = []
-
-    for (const id of ids) {
-      await assertStreamLockAvailableOrOwned(
-        context.env as any,
-        scheduleId,
-        id,
-        editorId,
-      )
-      const res = await db
-        .delete(editStreamsTable)
-        .where(
-          and(
-            eq(editStreamsTable.scheduleId, scheduleId),
-            eq(editStreamsTable.id, id),
-          ),
-        )
-        .run()
-      if (changesOf(res) === 0) throw streamNotFound()
-      const stub = getScheduleEditingStub(context.env as any, scheduleId)
-      // @ts-ignore
-      await stub.publishStreamDeleted(scheduleId, editorId, { id })
-      deletedIds.push(id)
-    }
-
-    return { ok: true as const, deletedIds }
   })
 
 export const lockStream = os.lockStreamContract
@@ -752,25 +590,11 @@ export const updateStreamsWithDetails = os.updateStreamsWithDetailsContract
     await stub.publishStreamsUpdatedWithDetails(scheduleId, editorId, payloads)
   })
 
-export const canAddStream = os.canAddStreamContract
-  .use(authMiddleware)
-  .use(scheduleOwnerOrEditorMiddleware)
-  .handler(async ({ context, input }) => {
-    const { db } = context
-    const { scheduleId, date } = input
-    return checkCanAddStreamOnDate(db, scheduleId, date)
-  })
-
 export const streamsRouter = {
   addStream,
-  updateStream,
-  updateStreams,
   deleteStream,
-  deleteStreams,
   lockStream,
   unlockStream,
   updateStreamWithDetails,
   updateStreamsWithDetails,
-  // Limit-checks
-  canAddStream,
 }

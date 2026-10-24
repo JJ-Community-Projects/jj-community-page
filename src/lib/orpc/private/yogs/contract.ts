@@ -97,8 +97,6 @@ export const YogsScheduleSchema = z.object({
   updatedAt: z.date().optional(),
 })
 
-export type YogsConfig = z.infer<typeof ConfigSchema>
-
 export type YogsCreator = z.infer<typeof CreatorSchema>
 export type YogsVOD = z.infer<typeof VOD>
 export type YogsStream = z.infer<typeof StreamSchema>

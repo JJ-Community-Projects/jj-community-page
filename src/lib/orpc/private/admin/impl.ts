@@ -399,39 +399,6 @@ const clearJingleJamData = os.clearJingleJamDataContract.handler(
   },
 )
 
-// --- Temporary: JJ DO data migration (prod → beta) ---
-// Delete alongside the JingleJamData.dumpStorage/loadStorage block.
-const exportJJData = os.exportJJDataContract.handler(
-  async ({ context, input }) => {
-    const DO = context.env.JingleJamData
-    const stub = DO.get(DO.idFromName('JJ_API_CACHE'))
-    return stub.dumpStorage(input.startAfter, input.limit)
-  },
-)
-
-const importJJData = os.importJJDataContract.handler(
-  async ({ context, input }) => {
-    const environment = String(context.env.ENVIRONMENT ?? '').toUpperCase()
-    if (environment !== 'BETA') {
-      throw new ORPCError('FORBIDDEN', {
-        message: `JJ data import is beta-only (ENVIRONMENT=${environment || 'unset'})`,
-      })
-    }
-    const DO = context.env.JingleJamData
-    const stub = DO.get(DO.idFromName('JJ_API_CACHE'))
-    try {
-      const written = await stub.loadStorage(input.entries)
-      if (input.rebuildDisplays) await stub.buildDisplayData()
-      return { written, displaysRebuilt: input.rebuildDisplays }
-    } catch (e) {
-      console.error('importJJData', e)
-      throw new ORPCError('INTERNAL_SERVER_ERROR', {
-        message: e instanceof Error ? e.message : 'import failed',
-      })
-    }
-  },
-)
-
 // New admin handlers for Twitch/channel data
 const getAllTwitchChannels = os.getAllTwitchChannelsContract.handler(
   async ({ context }) => {
@@ -848,7 +815,4 @@ export const adminRouter = {
   runSchedulerTask,
   runOverdueTasksNow,
   setSchedulerPaused,
-  // jj data migration (temporary)
-  exportJJData,
-  importJJData,
 }

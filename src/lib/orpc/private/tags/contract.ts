@@ -20,11 +20,6 @@ const RemoveUserTagInputSchema = z.object({
   tagId: TagIdSchema,
 })
 
-const FindUsersByTagInputSchema = z.object({
-  tagId: TagIdSchema,
-  limit: PaginationLimitSchema(1, 50, 10),
-})
-
 const BulkUpdateUserTagsInputSchema = z.object({
   addTagIds: z.array(TagIdSchema).max(20).default([]),
   removeTagIds: z.array(TagIdSchema).max(20).default([]),
@@ -59,23 +54,6 @@ const TagWithUsageSchema = PublicTagSchema.extend({
   totalUsage: z.number(),
 })
 
-const TagWithUsageAndCategorySchema = TagWithUsageSchema.extend({
-  category: z
-    .object({
-      id: z.number(),
-      slug: z.string(),
-      name: z.string(),
-    })
-    .nullable(),
-})
-
-const PopularTagsResponseSchema = z.object({
-  tags: z.array(TagWithUsageSchema),
-  totalTags: z.number(),
-  timeRange: z.string(),
-  lastUpdated: z.date(),
-})
-
 const TagRecommendationSchema = z.object({
   tag: PublicTagSchema,
   score: z.number().min(0).max(1),
@@ -97,14 +75,6 @@ const BulkUpdateResultSchema = z.object({
       error: z.string(),
     }),
   ),
-})
-
-const UserDisplaySchema = z.object({
-  userId: z.number(),
-  username: z.string(),
-  profileImage: z.string().nullable(),
-  tags: z.array(PublicTagSchema),
-  tagCount: z.number(),
 })
 
 // === User Tag Management Contracts ===
@@ -147,58 +117,6 @@ const listAvailableTagsContract = oc
   .output(z.array(TagWithUsageSchema))
 
 /**
- * Find users who have a specific admin-created tag
- * Discovers users with similar interests based on shared tags
- */
-const findUsersByTagContract = oc
-  .input(FindUsersByTagInputSchema)
-  .output(z.array(UserDisplaySchema))
-
-/**
- * Get popular admin-created tags across the platform
- * Returns most commonly used tags with usage statistics
- */
-const getPopularTagsContract = oc
-  .input(
-    z.object({
-      limit: PaginationLimitSchema(1, 50, 10),
-      categoryId: z.number().int().positive().optional(),
-      timeRange: z.enum(['7d', '30d', '90d', 'all']).default('30d'),
-    }),
-  )
-  .output(PopularTagsResponseSchema)
-
-/**
- * Search admin-created tags by name or alias
- * Provides fuzzy search with alias resolution for tag discovery
- */
-const searchTagsContract = oc
-  .input(
-    z.object({
-      query: z.string().min(1).max(100),
-      limit: PaginationLimitSchema(1, 50, 10),
-      categoryId: z.number().int().positive().optional(),
-    }),
-  )
-  .output(z.array(TagWithUsageSchema))
-
-/**
- * Enhanced search for admin-created tags including category names
- * Searches in tag names, slugs, descriptions, AND category names
- * Supports filtering by multiple category IDs
- * Returns tags with category information when available
- */
-const fullTagsSearchContract = oc
-  .input(
-    z.object({
-      query: z.string().min(1).max(100),
-      limit: PaginationLimitSchema(1, 50, 10),
-      categoryIds: z.array(z.number().int().positive()).max(10).default([]),
-    }),
-  )
-  .output(z.array(TagWithUsageAndCategorySchema))
-
-/**
  * Get available tag categories for browsing
  * Returns category list with metadata for filtered tag discovery
  */
@@ -238,16 +156,8 @@ export const privateTagsContract = {
 
   // Tag discovery
   listAvailableTags: listAvailableTagsContract,
-  findUsersByTag: findUsersByTagContract,
-  getPopularTags: getPopularTagsContract,
-  searchTags: searchTagsContract,
-  fullTagsSearch: fullTagsSearchContract,
   getTagCategories: getTagCategoriesContract,
 
   // Limit-checks
   canAddTagToUser: canAddTagToUserContract,
 }
-
-export type TagWithUsageAndCategory = z.infer<
-  typeof TagWithUsageAndCategorySchema
->

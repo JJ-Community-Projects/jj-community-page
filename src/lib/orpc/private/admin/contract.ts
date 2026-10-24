@@ -172,37 +172,6 @@ const getAllCampaignsContract = oc.output(
   }),
 )
 
-// --- Temporary: JJ DO data migration (prod → beta) ---
-// Delete alongside the JingleJamData.dumpStorage/loadStorage block.
-const exportJJDataContract = oc
-  .input(
-    z.object({
-      startAfter: z.string().optional(),
-      limit: z.number().int().min(1).max(500).default(200),
-    }),
-  )
-  .output(
-    z.object({
-      entries: z.array(z.tuple([z.string(), z.unknown()])),
-      cursor: z.string().nullable(),
-    }),
-  )
-
-const importJJDataContract = oc
-  .input(
-    z.object({
-      entries: z.array(z.tuple([z.string(), z.unknown()])).max(400).default([]),
-      rebuildDisplays: z.boolean().default(false),
-      confirm: z.literal('IMPORT-JJ-DATA-BETA'),
-    }),
-  )
-  .output(
-    z.object({
-      written: z.number(),
-      displaysRebuilt: z.boolean(),
-    }),
-  )
-
 export const contracts = {
   refreshJJAPIDataContract,
   addStringConfigContract,
@@ -241,7 +210,4 @@ export const contracts = {
   setSchedulerPausedContract,
   // campaigns
   getAllCampaignsContract,
-  // jj data migration (temporary)
-  exportJJDataContract,
-  importJJDataContract,
 }

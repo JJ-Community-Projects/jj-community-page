@@ -1,7 +1,7 @@
 import {oc} from '@orpc/contract'
 import {z} from "zod/v4";
 import {SuccessSchema} from "../schemas/common.ts";
-import {UserDisplaySchema, UserIdSchema} from "../schemas/users.ts";
+import {UserIdSchema} from "../schemas/users.ts";
 
 // Send friend request contract
 export const sendFriendRequestContract = oc
@@ -38,15 +38,7 @@ export const removeFriendContract = oc
   }))
   .output(SuccessSchema);
 
-/**
- * Get all friends for the authenticated user
- * Uses authMiddleware to access user ID from context
- */
-export const getFriendsContract = oc
-  .output(z.array(UserDisplaySchema))
-
 export const friendsContract = {
-  getFriendsContract,
   sendFriendRequestContract,
   acceptFriendRequestContract,
   declineFriendRequestContract,

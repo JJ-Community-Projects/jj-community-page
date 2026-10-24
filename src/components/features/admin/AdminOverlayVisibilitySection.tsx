@@ -10,8 +10,7 @@ import { orpcPrivate } from '../../../lib/orpc/client'
 export const AdminOverlayVisibilitySection: Component = () => {
   const qc = useQueryClient()
 
-  // Read/write both go through the private RPC router. `/api/public` is served
-  // by an OpenAPIHandler, which the `orpcPublic` (RPCLink) client cannot talk to.
+  // Read/write both go through the private RPC router.
   const hiddenQuery = useQuery(() =>
     orpcPrivate.admin.getContentVisibility.queryOptions(),
   )

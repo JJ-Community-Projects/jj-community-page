@@ -320,15 +320,7 @@ export type HookActions = {
     actionInProgress: boolean,
     lastErrorMessage?: string
   },
-  saveSchedule: {
-    actionInProgress: boolean,
-    lastErrorMessage?: string
-  },
   deleteSchedule: {
-    actionInProgress: boolean,
-    lastErrorMessage?: string
-  },
-  fetchTags: {
     actionInProgress: boolean,
     lastErrorMessage?: string
   },

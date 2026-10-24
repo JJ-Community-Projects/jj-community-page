@@ -225,11 +225,6 @@ export class Scheduler {
     }
   }
 
-  // Stringified next alarm timestamp (consumed by /api/jj-data/nextAlarm)
-  public async getNextAlarmStr() {
-    return String(await this.storage.getAlarm())
-  }
-
   // Storage keys
   private keyLastRun(name: string) {
     return `task:lastRun:${name}`

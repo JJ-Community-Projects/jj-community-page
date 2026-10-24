@@ -1,6 +1,13 @@
 ---
 import PWABaseLayout from "../../layouts/PWABaseLayout.astro";
 import {CommunityPage} from "../../components/features/community/CommunityPage";
+import {serverClientPublic} from "../../lib/orpc/serverClient";
+
+// The tag search gets the catalog from the page (no public HTTP route)
+const {data: tagCatalog} = await serverClientPublic.tags.catalog(
+  {},
+  {context: {locals: Astro.locals, request: Astro.request}},
+);
 ---
 <PWABaseLayout
   title="The Jingle Jam Community"
@@ -8,5 +15,5 @@ import {CommunityPage} from "../../components/features/community/CommunityPage";
   canonical="https://jinglejam.ostof.dev/community"
 >
     <p class="text-white ~text-2xl/4xl">Community</p>
-    <CommunityPage client:only="solid-js"/>
+    <CommunityPage client:only="solid-js" tagCatalog={tagCatalog?.tags}/>
 </PWABaseLayout>

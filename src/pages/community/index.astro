@@ -27,6 +27,16 @@ const HIDE_CONTENT = contentHidden ?? true
 const year = upcomingJJYear(configYear, HIDE_CONTENT)
 
 const charityData = await getEntry('charities', '2025')
+
+// The tag search gets the catalog from the page (no public HTTP route)
+const tagCatalog = HIDE_CONTENT
+  ? undefined
+  : (
+      await serverClientPublic.tags.catalog(
+        {},
+        { context: { locals: Astro.locals, request: Astro.request } },
+      )
+    ).data?.tags
 ---
 
 <BaseLayout
@@ -59,6 +69,7 @@ const charityData = await getEntry('charities', '2025')
       <h1 class="w-full text-center text-white ~text-2xl/4xl">Jingle Jam {year} Community Fundraisers & Streams</h1>
       <CommunityPage
         charitiesData={charityData?.data}
+        tagCatalog={tagCatalog}
         client:only="solid-js" />
     </div>
   )}

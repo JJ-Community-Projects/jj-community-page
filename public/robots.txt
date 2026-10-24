@@ -2,7 +2,6 @@ User-agent: *
 Allow: /
 Disallow: /api/
 # Data the client-rendered pages fetch: crawlers that render them need it.
-Allow: /api/public/
 Allow: /api/private/jj/
 Allow: /api/private/yogs/
 Disallow: /overlays$

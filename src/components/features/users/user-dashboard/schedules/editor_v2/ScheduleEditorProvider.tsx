@@ -563,36 +563,6 @@ const useScheduleEditor2Hook = (scheduleId: number) => {
     })
   }
 
-  // Tags
-  const addTagToStreamMutation = useMutation(() =>
-    scheduleEditing.addTagToStream.mutationOptions(),
-  )
-  const addTagToStream = (input: { streamId: number; tag: string }) =>
-    addTagToStreamMutation.mutateAsync({ scheduleId, ...input })
-
-  const removeTagFromStreamMutation = useMutation(() =>
-    scheduleEditing.removeTagFromStream.mutationOptions(),
-  )
-  const removeTagFromStream = (input: { streamId: number; tagId: number }) =>
-    removeTagFromStreamMutation.mutateAsync({
-      scheduleId,
-      streamId: input.streamId,
-      id: input.tagId,
-    })
-
-  // Participants
-  const addParticipantMutation = useMutation(() =>
-    scheduleEditing.addParticipant.mutationOptions(),
-  )
-  const addParticipant = (input: { streamId: number; userId: number }) =>
-    addParticipantMutation.mutateAsync({ scheduleId, ...input })
-
-  const removeParticipantMutation = useMutation(() =>
-    scheduleEditing.removeParticipant.mutationOptions(),
-  )
-  const removeParticipant = (input: { streamId: number; userId: number }) =>
-    removeParticipantMutation.mutateAsync({ scheduleId, ...input })
-
   // Stream editing lock
   const lockStreamMutation = useMutation(() =>
     scheduleEditing.lockStream.mutationOptions(),
@@ -645,16 +615,6 @@ const useScheduleEditor2Hook = (scheduleId: number) => {
     updateStreamsMutation,
     deleteStream,
     deleteStreamMutation,
-    // tags
-    addTagToStream,
-    addTagToStreamMutation,
-    removeTagFromStream,
-    removeTagFromStreamMutation,
-    // participants
-    addParticipant,
-    addParticipantMutation,
-    removeParticipant,
-    removeParticipantMutation,
     // locks
     lockStream,
     lockStreamMutation,

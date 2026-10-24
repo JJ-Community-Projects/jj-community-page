@@ -2,6 +2,7 @@
 import { env } from 'cloudflare:workers'
 import type { APIRoute } from 'astro'
 import { upgradeDurableIteratorRequest } from '@orpc/experimental-durable-iterator/durable-object'
+import { rejectCrossOrigin } from '../../../../lib/sameOrigin.ts'
 
 function resolveNamespaceByChannel(
   env: Env,
@@ -24,6 +25,8 @@ function resolveNamespaceByChannel(
 }
 
 export const ALL: APIRoute = async (context) => {
+  const rejected = rejectCrossOrigin(context.request)
+  if (rejected) return rejected
   try {
     const url = new URL(context.request.url)
     const signingKey = env.ORPC_DEI_SIGNING_KEY

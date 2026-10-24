@@ -1,8 +1,6 @@
-import { and, count, eq, gte, lt } from 'drizzle-orm'
+import { and, count, eq } from 'drizzle-orm'
 import { teamMembersTable, teamsTable, schedulesTable } from '../../../db/schema/jj-schema.ts'
 import { userTagsTable } from '../../../db/schema/tags-schema.ts'
-import { editStreamTagsTable } from '../../../db/schema/edit-stream-tags-schema.ts'
-import { editStreamsTable } from '../../../db/schema/edit-streams-schema.ts'
 import type { JJDrizzleDatabase } from '../../../db/db.ts'
 
 // Centralized limits used across private procedures
@@ -10,7 +8,6 @@ export const SCHEDULES_PER_USER_PER_YEAR = 3
 export const TAGS_PER_USER = 10
 export const TEAMS_PER_USER = 10 // Max teams a user can be a member of
 export const TEAM_OWNER_PER_USER = 5 // Max teams a user can own
-export const TAGS_PER_STREAM = 10
 export const STREAMS_PER_DATE = 8
 
 /**
@@ -69,53 +66,7 @@ export const canAddTagFrom = (rows: { c: number }[]) => {
   return { canAdd: tags < TAGS_PER_USER, tags, maxTags: TAGS_PER_USER } as const
 }
 
-/**
- * Compute whether a stream can accept another tag in the draft editing table.
- */
-export async function checkCanAddTagToStream(
-  db: JJDrizzleDatabase,
-  scheduleId: number,
-  streamId: number,
-) {
-  const res = await (db as any)
-  .select({ c: count() })
-  .from(editStreamTagsTable)
-  .where(and(
-    eq(editStreamTagsTable.scheduleId, scheduleId),
-    eq(editStreamTagsTable.streamId, streamId),
-  ))
-  .get()
-  const tags = res?.c ?? 0
-  return { canAdd: tags < TAGS_PER_STREAM, tags, maxTags: TAGS_PER_STREAM } as const
-}
-
-/**
- * Compute whether another stream can be added on the given date for a schedule in draft editing.
- */
-export async function checkCanAddStreamOnDate(
-  db: JJDrizzleDatabase,
-  scheduleId: number,
-  date: Date,
-) {
-  const y = date.getUTCFullYear()
-  const m = date.getUTCMonth()
-  const d = date.getUTCDate()
-  const startOfDay = new Date(Date.UTC(y, m, d, 0, 0, 0, 0))
-  const endOfDay = new Date(Date.UTC(y, m, d + 1, 0, 0, 0, 0))
-  const res = await (db as any)
-  .select({ c: count() })
-  .from(editStreamsTable)
-  .where(and(
-    eq(editStreamsTable.scheduleId, scheduleId),
-    gte(editStreamsTable.start, startOfDay as any),
-    lt(editStreamsTable.start, endOfDay as any),
-  ))
-  .get()
-  const streams = res?.c ?? 0
-  return { canAdd: streams < STREAMS_PER_DATE, streams, date, maxStreams: STREAMS_PER_DATE } as const
-}
-
-/** Same answer as `checkCanAddStreamOnDate`, from the start times of the draft's streams. */
+/** Whether another stream fits on `date` (STREAMS_PER_DATE), from the start times of the draft's streams. */
 export function streamDateLimitFromStarts(starts: Date[], date: Date) {
   const y = date.getUTCFullYear()
   const m = date.getUTCMonth()
@@ -150,17 +101,6 @@ export function movedStreamsDateLimit(
     if (limit.streams + 1 > before) return limit
   }
   return null
-}
-
-/**
- * Compute whether the user can create another schedule for the given year.
- */
-export async function checkCanCreateSchedule(
-  db: JJDrizzleDatabase,
-  userId: number,
-  year: number,
-) {
-  return canCreateScheduleFrom(await yearSchedulesCount(db, userId, year), year)
 }
 
 /** The user's schedule count for `year` as a statement, for a `db.batch` (see `canCreateScheduleFrom`). */

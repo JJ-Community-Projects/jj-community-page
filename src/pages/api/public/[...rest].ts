@@ -2,28 +2,15 @@ import { env } from 'cloudflare:workers'
 import type { APIRoute } from 'astro'
 import { CORSPlugin, ResponseHeadersPlugin } from '@orpc/server/plugins'
 import { OpenAPIHandler } from '@orpc/openapi/fetch'
-import { OpenAPIReferencePlugin } from '@orpc/openapi/plugins'
 import { SmartCoercionPlugin } from '@orpc/json-schema'
 import { ZodToJsonSchemaConverter } from '@orpc/zod/zod4'
-import { publicRouter } from '../../../lib/orpc/public/publicRouter.ts'
+import { publicHttpRouter } from '../../../lib/orpc/public/publicRouter.ts'
 import { onError } from '@orpc/client'
 import { loggableError } from '../../../lib/db/loggableError.ts'
-import {
-  TwitchChannelSchema,
-  UserPaginationSchema,
-  UserProfileDataSchema,
-} from '../../../lib/orpc/public/schemas/users.ts'
-import {
-  FullScheduleSchema,
-  ScheduleInfoSchema,
-  ScheduleSlugInputSchema,
-  UserSlugWithYearSchema,
-} from '../../../lib/orpc/public/schemas/schedules.ts'
-import { TeamSchema, TeamWithMemberCountSchema, } from '../../../lib/orpc/public/schemas/teams.ts'
-import { UserSlugInputSchema, UserSlugSchema, } from '../../../lib/orpc/public/schemas/common.ts'
-import { UserDisplaySchema } from '../../../lib/orpc/public/schemas/UserDisplaySchema.ts'
 
-const handler = new OpenAPIHandler(publicRouter, {
+// Only the Twitch extension's routes; the other public procedures are called in-process
+// (serverClientPublic). CORS stays open: the extension runs on *.ext-twitch.tv.
+const handler = new OpenAPIHandler(publicHttpRouter, {
   interceptors: [
     onError((raw) => {
       const error = loggableError(raw) // F-32
@@ -40,50 +27,6 @@ const handler = new OpenAPIHandler(publicRouter, {
     new ResponseHeadersPlugin(),
     new SmartCoercionPlugin({
       schemaConverters: [new ZodToJsonSchemaConverter()],
-    }),
-    new OpenAPIReferencePlugin({
-      docsProvider: 'swagger',
-      schemaConverters: [new ZodToJsonSchemaConverter()],
-      specGenerateOptions: {
-        info: {
-          title: 'Jingle Jam Community Page Public API',
-          version: '0.0.1',
-        },
-        servers: [
-          {
-            description: 'Dev',
-            url: 'http://localhost:3000/api/public',
-          },
-          {
-            description: 'Beta',
-            url: 'https://beta.jinglejam.ostof.dev/api/public',
-          },
-          {
-            description: 'Prod',
-            url: 'https://jinglejam.ostof.dev/api/public',
-          },
-        ],
-        commonSchemas: {
-          // User Schemas
-          UserSlugInputSchema: { schema: UserSlugInputSchema },
-
-          TwitchChannel: { schema: TwitchChannelSchema },
-          UserDisplay: { schema: UserDisplaySchema },
-          UserSlug: { schema: UserSlugSchema },
-          UserPagination: { schema: UserPaginationSchema },
-          UserProfileData: { schema: UserProfileDataSchema },
-
-          // Schedule Schemas
-          ScheduleInfo: { schema: ScheduleInfoSchema },
-          ScheduleSlug: { schema: ScheduleSlugInputSchema },
-          UserSlugWithYear: { schema: UserSlugWithYearSchema },
-          FullSchedule: { schema: FullScheduleSchema },
-
-          // Team Schemas
-          Team: { schema: TeamSchema },
-          TeamWithMemberCount: { schema: TeamWithMemberCountSchema },
-        },
-      },
     }),
   ],
 })

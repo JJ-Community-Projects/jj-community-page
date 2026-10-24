@@ -6,10 +6,9 @@ import {
   TeamSchema,
   TeamsListInputSchema,
   TeamSlugInputSchema,
-  TeamSlugWithYearInputSchema,
   TeamWithMemberCountSchema
 } from "../schemas/teams.ts";
-import {FullScheduleSchema, SchedulesListSchema, StreamSchema} from "../schemas/schedules.ts";
+import {StreamSchema} from "../schemas/schedules.ts";
 
 /**
  * Public teams contracts for retrieving team information without authentication.
@@ -81,27 +80,6 @@ const getMembersContract = oc
   });
 
 /**
- * Get all primary schedules of team members for a given year
- * @path /teams/{slug}/schedules/{year}
- * @description Retrieve all primary schedules from team members for a specific year
- * @Input TeamSlugWithYearInputSchema - contains slug (string) and year (number) to identify the team and year
- * @Output SchedulesListSchema array containing all primary schedules of team members for the specified year
- */
-const getTeamSchedulesByYearContract = oc
-  .input(TeamSlugWithYearInputSchema)
-  .output(SchedulesListSchema)
-  .route({
-    path: '/teams/{slug}/schedules/{year}',
-    method: 'GET',
-    operationId: 'getTeamSchedulesByYear',
-    summary: 'Get team member schedules by year',
-    description: 'Retrieve all primary schedules from team members for a specific year',
-    tags: ['teams'],
-    successDescription: 'Team member schedules retrieved successfully',
-    deprecated: false
-  });
-
-/**
  * Get next n streams from all team member schedules
  * @path /teams/{slug}/next-streams/
  * @description Retrieve the next upcoming streams from all team members with optional uniqueness filtering
@@ -122,33 +100,9 @@ const getTeamNextStreamsContract = oc
     deprecated: false
   });
 
-/**
- * Get team's full schedule for a given year
- * @path /teams/{slug}/full-schedule/{year}
- * @description Retrieve complete schedule information with all streams from all team members' primary schedules for a specific year
- * @Input TeamSlugWithYearInputSchema - contains slug (string) and year (number) to identify the team and year
- * @Output FullScheduleSchema object containing complete aggregated schedule information with all streams, participants, and organized data
- */
-const getTeamFullScheduleByYearContract = oc
-  .input(TeamSlugWithYearInputSchema)
-  .output(FullScheduleSchema)
-  .route({
-    path: '/teams/{slug}/full-schedule/{year}',
-    method: 'GET',
-    operationId: 'getTeamFullScheduleByYear',
-    summary: 'Get team full schedule by year',
-    description: 'Retrieve complete schedule information with all streams from all team members primary schedules for a specific year',
-    tags: ['teams'],
-    successDescription: 'Team full schedule retrieved successfully',
-    deprecated: false
-  });
-
-
 export const publicTeamsContract = {
   findVisibleTeamsContract,
   getBySlugContract,
   getMembersContract,
-  getTeamSchedulesByYearContract,
   getTeamNextStreamsContract,
-  getTeamFullScheduleByYearContract,
 };

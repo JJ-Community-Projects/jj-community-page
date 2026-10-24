@@ -62,30 +62,6 @@ const useUserFriendsHook = () => {
     }),
   )
 
-  /*
-    const friendsSSE = orpcPrivate.friendsSSE;
-    // Real-time friend requests using SSE
-    const friendRequestsQuery = useQuery(() =>
-      friendsSSE.getUserFriendRequestsSSE.experimental_liveOptions({
-        staleTime: 30 * 1000, // 30 seconds
-      })
-    );
-
-    // Real-time sent friend requests using SSE
-    const sentFriendRequestsQuery = useQuery(() =>
-      friendsSSE.getSendUserFriendRequestsSSE.experimental_liveOptions({
-        staleTime: 30 * 1000, // 30 seconds
-      })
-    );
-
-    // Real-time friends list using SSE
-    const friendsListQuery = useQuery(() =>
-      friendsSSE.getUserFriendsSSE.experimental_liveOptions({
-        staleTime: 30 * 1000, // 30 seconds
-      })
-    );
-    */
-
   // TanStack Mutations
 
   // Send friend request mutation

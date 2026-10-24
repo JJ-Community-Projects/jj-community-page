@@ -7,18 +7,23 @@ import {QueryClientProvider} from "@tanstack/solid-query";
 import {QueryClient} from "@tanstack/query-core";
 import {UserTagsProvider} from "./UserTagsProvider.tsx";
 import { UserDashboardFeedback } from '../UserDashboardFeedback.tsx'
+import {TagCatalogContext} from "../../../../../lib/useTagSearch.ts";
+import type {CatalogTag} from "../../../../../lib/tagCatalog.ts";
 
 interface UserTagsPageProps {
   user: User
+  tagCatalog?: CatalogTag[]
 }
 
 export const UserTagsPage: Component<UserTagsPageProps> = (props) => {
   return (
     <QueryClientProvider client={new QueryClient()}>
       <UserProvider user={props.user}>
-        <UserTagsProvider>
-          <UserTagsPageContent/>
-        </UserTagsProvider>
+        <TagCatalogContext.Provider value={props.tagCatalog}>
+          <UserTagsProvider>
+            <UserTagsPageContent/>
+          </UserTagsProvider>
+        </TagCatalogContext.Provider>
       </UserProvider>
     </QueryClientProvider>
   );

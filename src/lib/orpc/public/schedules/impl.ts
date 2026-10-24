@@ -4,9 +4,9 @@ import {contracts} from "./contract.ts";
 import {schedulesTable} from "../../../db/schema/jj-schema.ts";
 import {and, eq} from "drizzle-orm";
 import type {SQLiteColumn} from "drizzle-orm/sqlite-core";
-import {getNextStreams as getNextStreamsFromList, assembleScheduleStreams, scheduleStreamsQueries, organizeStreamsByTime, getNextStreamsAcrossPublicPrimarySchedules} from "./util.ts";
+import {getNextStreams as getNextStreamsFromList, assembleScheduleStreams, scheduleStreamsQueries, organizeStreamsByTime} from "./util.ts";
 import {userDisplayView} from "../../../db/schema/views-schema.ts";
-import {byInput, cached} from "../../middleware/cached.ts";
+import {cached} from "../../middleware/cached.ts";
 
 const os = implement(contracts)
   .use(dbMiddleware);
@@ -86,40 +86,6 @@ const getFullScheduleBySlug = os.getFullScheduleBySlugContract
     }
   })
 
-const getVisiblePrimarySchedulesByYear = os.getVisiblePrimarySchedulesByYearContract
-  .use(cached('schedule', byInput))
-  .handler(async ({context, input}) => {
-    const db = context.db
-
-    // Find all visible primary schedules for the given year
-    const schedules = await db.select().from(schedulesTable)
-      .where(and(
-        eq(schedulesTable.year, input.year),
-        eq(schedulesTable.visible, true),
-        eq(schedulesTable.primary, true)
-      ))
-      .all()
-
-    return schedules
-  })
-
-const getNextStreamsAcrossSchedules = os.getNextStreamsContract
-  .use(cached('upcoming', byInput))
-  .handler(async ({context, input}) => {
-    const db = context.db
-    const nowSec = Math.floor(Date.now() / 1000)
-    const year = input.year ?? new Date().getUTCFullYear()
-    const limit = input.limit ?? 10
-    const uniqueBySchedule = input.uniqueBySchedule ?? false
-    try {
-      return await getNextStreamsAcrossPublicPrimarySchedules(db, {year, limit, uniqueBySchedule, nowSec})
-    } catch (_err) {
-      throw new ORPCError('INTERNAL_SERVER_ERROR', {message: 'Failed to load next streams'})
-    }
-  })
-
 export const publicSchedulesRouter = {
   getFullScheduleBySlug,
-  getVisiblePrimarySchedulesByYear,
-  getNextStreams: getNextStreamsAcrossSchedules,
 }

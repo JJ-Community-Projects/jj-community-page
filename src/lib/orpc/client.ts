@@ -2,7 +2,6 @@ import { RPCLink } from '@orpc/client/fetch'
 import { createORPCClient, onError } from '@orpc/client'
 import { createTanstackQueryUtils } from '@orpc/tanstack-query'
 import type { PrivateRouter } from './privateRouter'
-import type { PublicRouter } from './publicRouter'
 import type { RouterClient } from '@orpc/server'
 import { DurableIteratorLinkPlugin } from '@orpc/experimental-durable-iterator/client'
 import {
@@ -16,21 +15,6 @@ declare module '@orpc/experimental-durable-iterator/client' {
     // Custom client context
   }
 }
-const linkPublic = new RPCLink({
-  url: () => {
-    if (typeof window === 'undefined') {
-      throw new Error('RPCLink is not allowed on the server side.')
-    }
-
-    return `${window.location.origin}/api/public`
-  },
-  interceptors: [
-    onError((error) => {
-      console.error(error)
-    }),
-  ],
-  method: 'GET'
-})
 
 type PrivateClientContext = TokenRenewalContext
 
@@ -66,14 +50,12 @@ const linkPrivate = new RPCLink<PrivateClientContext>({
   ],
 })
 
-// Create separate clients for public and private routers
-// const publicClient = createORPCClient<RouterClient<PublicRouter>>(linkPublic)
+// The public router has no browser client: pages call it in-process (`serverClientPublic`) and
+// `/api/public` serves only the Twitch extension.
 const privateClient =
   createORPCClient<RouterClient<PrivateRouter, PrivateClientContext>>(
     linkPrivate,
   )
-const publicClient = createORPCClient<RouterClient<PublicRouter>>(linkPublic)
 // const privateClient = createORPCClient<any>(linkPrivate)
 
-export const orpcPublic = createTanstackQueryUtils(publicClient)
 export const orpcPrivate = createTanstackQueryUtils(privateClient)

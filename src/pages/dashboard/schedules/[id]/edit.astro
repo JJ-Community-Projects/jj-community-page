@@ -3,6 +3,7 @@ import BaseLayout from "../../../../layouts/BaseLayout.astro";
 import {
   ScheduleAdminComponent
 } from '../../../../components/features/users/user-dashboard/schedules/editor_v2/ScheduleAdminComponent'
+import { serverClientPublic } from '../../../../lib/orpc/serverClient'
 
 const {session, user} = Astro.locals;
 if (session === null) {
@@ -17,10 +18,16 @@ if (!id) {
 // Check if the user owns this schedule or has edit permissions
 // This is a simplified check - in a real app, you'd want to verify ownership in the database
 // For now, we'll assume the user has permission if they're logged in
+
+// The stream tag pickers get the catalog from the page (no public HTTP route)
+const { data: tagCatalog } = await serverClientPublic.tags.catalog(
+  {},
+  { context: { locals: Astro.locals, request: Astro.request } },
+);
 ---
 
 <BaseLayout>
   <div class="container mx-auto px-4 py-8">
-      <ScheduleAdminComponent client:only="solid-js" scheduleId={parseInt(id)}/>
+      <ScheduleAdminComponent client:only="solid-js" scheduleId={parseInt(id)} tagCatalog={tagCatalog?.tags}/>
   </div>
 </BaseLayout>

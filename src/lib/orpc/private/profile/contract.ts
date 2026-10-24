@@ -1,6 +1,6 @@
 import { oc } from '@orpc/contract'
 import z from 'zod/v4'
-import { HexColorSchema, SuccessSchema } from '../schemas/common.ts'
+import { HexColorSchema } from '../schemas/common.ts'
 import { StreamingPlatformSchema } from '../schemas/users.ts' /**
  * Profile management contracts for user style and streaming preferences.
  * These endpoints handle direct database operations for user profile customization.
@@ -12,34 +12,8 @@ import { StreamingPlatformSchema } from '../schemas/users.ts' /**
  */
 
 /**
- * Update user's primary color preference
- * Input: primaryColor (hex color string)
- * Output: success flag
- */
-const updatePrimaryColorContract = oc
-  .input(
-    z.object({
-      primaryColor: HexColorSchema,
-    }),
-  )
-  .output(SuccessSchema)
-
-/**
- * Update user's accent color preference
- * Input: accentColor (hex color string)
- * Output: success flag
- */
-const updateAccentColorContract = oc
-  .input(
-    z.object({
-      accentColor: HexColorSchema,
-    }),
-  )
-  .output(SuccessSchema)
-/**
- * Update user's accent color preference
- * Input: accentColor (hex color string)
- * Output: success flag
+ * Update user's primary and accent colors
+ * Output: the saved colors
  */
 const updateStyleContract = oc
   .input(
@@ -90,8 +64,6 @@ const getStyleContract = oc.output(
 )
 
 export const profileContract = {
-  updatePrimaryColorContract,
-  updateAccentColorContract,
   getStyleContract,
   updateStyleContract,
   updatePrimaryLiveStreamContract,

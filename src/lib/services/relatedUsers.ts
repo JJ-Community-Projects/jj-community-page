@@ -1,15 +1,15 @@
-import type { JJDrizzleDatabase } from '../../../../db/db.ts'
+import type { JJDrizzleDatabase } from '../db/db.ts'
 import { and, asc, count, desc, eq, inArray, ne, notInArray, sql } from 'drizzle-orm'
 import { alias, type SQLiteColumn } from 'drizzle-orm/sqlite-core'
-import { userTagsTable } from '../../../../db/schema/tags-schema.ts'
-import { userDisplayView } from '../../../../db/schema/views-schema.ts'
-import { blockedUsers } from '../../../../db/schema/auth-schema.ts'
-import { UserDisplaySchema } from '../../../private/schemas/users.ts'
+import { userTagsTable } from '../db/schema/tags-schema.ts'
+import { userDisplayView } from '../db/schema/views-schema.ts'
+import { blockedUsers } from '../db/schema/auth-schema.ts'
+import { UserDisplaySchema } from '../orpc/private/schemas/users.ts'
 import { z } from 'zod/v4'
 import {
   getCachedRelatedUsers,
   setCachedRelatedUsers,
-} from '../../../../services/relatedUsersCache.ts'
+} from './relatedUsersCache.ts'
 
 const UserSchema = UserDisplaySchema.extend({
   sharedTags: z.number(),

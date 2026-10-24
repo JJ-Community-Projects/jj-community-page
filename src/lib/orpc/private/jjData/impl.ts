@@ -1,7 +1,6 @@
 import {
   contracts,
   type Currencies,
-  type JJCampaignType,
   type Overview,
   type Stream,
   type UserDisplay,
@@ -39,11 +38,6 @@ import {
 } from '../../../db/schema/views-schema.ts'
 import { UserDisplaySchema } from '../../public/schemas/UserDisplaySchema.ts'
 import type { JJDrizzleDatabase } from '../../../db/db.ts'
-import {
-  getHardCodedEvents,
-  getHardCodedEventsJustYogs,
-  getHardCodedEventsNoYogs,
-} from './getHardCodedEvents.ts'
 import { cached } from '../../middleware/cached.ts'
 import { alias } from 'drizzle-orm/sqlite-core'
 import { getUpcomingStreamsFromSchedule } from '../../../../content/getYogsScheduleFromContent.ts'
@@ -550,84 +544,6 @@ const getAllUsersWithInfo = os.getAllUsersWithInfoContract
   .use(cached('userDirectory', () => ''))
   .handler(async ({ context }) => getUsers(context.db))
 
-const getUserCampaignPairs = os.getUserCampaignPairsContract.handler(
-  async ({ context }) => {
-    const cache = await context.env.KV.get('getUserCampaignPairs', { cacheTtl: 60 })
-
-    if (cache) {
-      return JSON.parse(cache)
-    }
-
-    const users: UserWithInfo[] = await getUsers(context.db)
-
-    const DO = context.env.JingleJamData
-    const stubID = DO.idFromName('JJ_API_CACHE')
-    const stub = DO.get(stubID)
-    const data = await stub.getCommunityCampaignsDisplay()
-    if (!data) {
-      throw new ORPCError('NOT_FOUND', {
-        message: 'No campaigns found',
-      })
-    }
-    const campaignList: JJCampaignType[] = data.list
-
-    const usersBySlug = new Map<string, UserWithInfo>()
-    for (const u of users) {
-      const slug = u.tiltifySlug
-      usersBySlug.set(slug, u)
-    }
-    const campaignsBySlug = new Map<string, JJCampaignType>()
-    for (const c of campaignList) {
-      const slug = c.tiltifySlug
-      campaignsBySlug.set(slug, c)
-    }
-
-    const slugs = new Set([...usersBySlug.keys(), ...campaignsBySlug.keys()])
-
-    const pairs: Array<{ user?: UserWithInfo; campaign?: JJCampaignType }> = []
-
-    for (const slug of slugs) {
-      const user = usersBySlug.get(slug)
-      const campaign = campaignsBySlug.get(slug)
-      pairs.push({ user, campaign })
-    }
-
-    // Sort pairs by priority:
-    // 1) live channel (campaign.isTwitchLive)
-    // 2) user is defined
-    // 3) campaign.twitch is defined
-    // 4) user.scheduleUrl is defined
-    // 5) campaign.raised.gbp (descending)
-    pairs.sort((a, b) => {
-      const aLive = a.campaign?.isTwitchLive === true
-      const bLive = b.campaign?.isTwitchLive === true
-      if (aLive !== bLive) return aLive ? -1 : 1
-
-      const aHasUser = !!a.user
-      const bHasUser = !!b.user
-      if (aHasUser !== bHasUser) return aHasUser ? -1 : 1
-
-      const aHasTwitch = !!a.campaign?.twitch
-      const bHasTwitch = !!b.campaign?.twitch
-      if (aHasTwitch !== bHasTwitch) return aHasTwitch ? -1 : 1
-
-      const aHasSchedule = !!a.user?.scheduleUrl
-      const bHasSchedule = !!b.user?.scheduleUrl
-      if (aHasSchedule !== bHasSchedule) return aHasSchedule ? -1 : 1
-
-      const aRaised = a.campaign?.raised?.gbp ?? 0
-      const bRaised = b.campaign?.raised?.gbp ?? 0
-      return bRaised - aRaised
-    })
-
-    await putCache(context.env.KV, 'getUserCampaignPairs', JSON.stringify(pairs), {
-      expirationTtl: 180,
-    })
-
-    return pairs
-  },
-)
-
 async function loadOverview(kv: KVNamespace): Promise<Overview | null> {
   const data = await getJSON<any>(kv, 'twitch-extension:overview')
   if (!data) return null
@@ -749,17 +665,6 @@ const fullSchedule = os.fullScheduleContract.handler(async ({ context }) => {
   }
 })
 
-const hardcodedStreams = os.hardcodedStreamsContract.handler(
-  async ({ context }) => {
-    const hardcodedNonYogs = await getHardCodedEventsNoYogs()
-    const hardcodedYogs = await getHardCodedEventsJustYogs()
-    return {
-      yogs: hardcodedYogs,
-      nonYogs: hardcodedNonYogs,
-    }
-  },
-)
-
 // Local helpers to map Yogs creators to UserDisplay shape
 function twitchLoginFromUrl(url?: string): string | null {
   if (!url) return null
@@ -833,11 +738,9 @@ export const jjRouter = {
   causes,
   upcomingStreams,
   getAllUsersWithInfo,
-  getUserCampaignPairs,
   overview,
   campaignsAll,
   fullSchedule,
-  hardcodedStreams,
   headliner,
   /*
   causeById,

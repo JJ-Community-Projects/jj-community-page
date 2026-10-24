@@ -1,5 +1,5 @@
 ---
-import { serverClientPrivate } from '../../lib/orpc/serverClient.ts'
+import { serverClientPrivate, serverClientPublic } from '../../lib/orpc/serverClient.ts'
 import BaseLayout from '../../layouts/BaseLayout.astro'
 import { CommunityPage } from '../../components/features/community-ssr/CommunityPage.tsx'
 
@@ -26,11 +26,14 @@ const [
   { data: causes },
   { data: upcomingStreams },
   { data: users },
+  { data: tagCatalog },
 ] = await Promise.all([
   campaignsFn({}, ctx),
   causesFn({}, ctx),
   upcomingStreamsFn({}, ctx),
   usersFn({}, ctx),
+  // The tag search gets the catalog from the page (no public HTTP route)
+  serverClientPublic.tags.catalog({}, ctx),
 ])
 ---
 
@@ -40,6 +43,6 @@ const [
   canonical="https://jinglejam.ostof.dev/community"
 >
   <div class="w-full flex flex-col justify-center items-stretch gap-4">
-    <CommunityPage initial={{ community, causes, upcomingStreams, users }} client:idle />
+    <CommunityPage initial={{ community, causes, upcomingStreams, users }} tagCatalog={tagCatalog?.tags} client:idle />
   </div>
 </BaseLayout>

@@ -319,10 +319,6 @@ const InvitesList: Component = () => {
     orpcPrivate.teams.acceptInvite.mutationOptions({
       onSuccess: async () => {
         await client.invalidateQueries({
-          queryKey: orpcPrivate.teams.getUserInvites.key(),
-        })
-
-        await client.invalidateQueries({
           queryKey: orpcPrivate.teams.canCreateTeam.queryKey(),
         })
         await client.invalidateQueries({
@@ -334,10 +330,6 @@ const InvitesList: Component = () => {
   const rejectInviteMutation = useMutation(() =>
     orpcPrivate.teams.rejectInvite.mutationOptions({
       onSuccess: async () => {
-        await client.invalidateQueries({
-          queryKey: orpcPrivate.teams.getUserInvites.key(),
-        })
-
         await client.invalidateQueries({
           queryKey: orpcPrivate.teams.canCreateTeam.queryKey(),
         })
@@ -383,7 +375,6 @@ const InvitesList: Component = () => {
         </h3>
 
         <QueryComponent
-          // queryOptions={() => orpcPrivate.teams.getUserInvites.queryOptions()}
           queryOptions={() =>
             orpcPrivate.teamsWS.getUserTeamInvitesWS.experimental_liveOptions({
               context: feedRenewal(

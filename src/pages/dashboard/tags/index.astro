@@ -1,12 +1,19 @@
 ---
 import BaseLayout from "../../../layouts/BaseLayout.astro";
 import {UserTagsPage} from "../../../components/features/users/user-dashboard/tags/UserTagsPage";
+import {serverClientPublic} from "../../../lib/orpc/serverClient";
 
 const {session, user} = Astro.locals
 if (session === null) {
   return Astro.redirect("/");
 }
+
+// The tag pickers get the catalog from the page (no public HTTP route)
+const {data: tagCatalog} = await serverClientPublic.tags.catalog(
+  {},
+  {context: {locals: Astro.locals, request: Astro.request}},
+);
 ---
 <BaseLayout>
-    <UserTagsPage client:only="solid-js" user={user} />
+    <UserTagsPage client:only="solid-js" user={user} tagCatalog={tagCatalog?.tags} />
 </BaseLayout>

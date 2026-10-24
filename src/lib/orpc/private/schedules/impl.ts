@@ -6,7 +6,6 @@ import { schedulesTable, streamsTable } from '../../../db/schema/jj-schema.ts'
 import { editSchedulesTable } from '../../../db/schema/edit-schedules-schema.ts'
 import { accounts, users } from '../../../db/schema/auth-schema.ts'
 import { and, eq, ne, not, sql } from 'drizzle-orm'
-import { DateTime } from 'luxon'
 import {
   createSlug,
   slugFreeFrom,
@@ -15,7 +14,6 @@ import {
 } from '../../../../functions/slug.ts'
 import {
   canCreateScheduleFrom,
-  checkCanCreateSchedule,
   yearSchedulesCount,
 } from '../util/limits.ts'
 import { forgetPublicSchedule } from '../../../services/visibilityCache.ts'
@@ -25,83 +23,6 @@ const os = implement(privateSchedulesContract).use(dbMiddleware)
 /**
  * Schedule CRUD Operations
  */
-
-/**
- * Create a new schedule for the authenticated user
- * Creates a schedule for the current year with auto-generated title/slug
- */
-const create = os.create.use(authMiddleware).handler(async ({ context }) => {
-  const db = context.db
-  const user = context.user
-  const currentYear = DateTime.now().year
-
-  try {
-    // Enforce per-year schedule limit
-    const createLimit = await checkCanCreateSchedule(db, user.id, currentYear)
-    if (!createLimit.canCreate) {
-      throw new ORPCError('FORBIDDEN', {
-        message: 'Yearly schedule limit reached',
-        ...createLimit,
-      })
-    }
-
-    // Check existing schedules for title generation
-    const existingSchedules = await db
-      .select()
-      .from(schedulesTable)
-      .where(eq(schedulesTable.ownerId, user.id))
-      .all()
-    const allSchedulesWithCurrentYear = existingSchedules.filter(
-      (schedule) => schedule.year === currentYear,
-    )
-    const existingSchedule = existingSchedules.find(
-      (schedule) => schedule.year === currentYear,
-    )
-    const shouldBePrimary = allSchedulesWithCurrentYear.length === 0
-
-    // Generate title and slug
-    let title = `${context.tiltifyName}'s Schedule ${currentYear}`
-    if (existingSchedule) {
-      title += ` ${existingSchedules.length}`
-    }
-    const slug = createSlug(title)
-
-    // Create schedule using direct database query
-    const [schedule] = await db
-      .insert(schedulesTable)
-      .values({
-        ownerId: user.id,
-        title: title,
-        year: currentYear,
-        slug: slug,
-        visible: false,
-        primary: shouldBePrimary,
-      })
-      .returning()
-    console.log('schedule', schedule)
-    // Seed edit_schedules with initial draft meta
-    await db
-      .insert(editSchedulesTable)
-      .values({
-        scheduleId: schedule.id,
-        editorId: user.id,
-        title: schedule.title,
-        slug: schedule.slug,
-        year: schedule.year,
-        visible: schedule.visible,
-      })
-      .onConflictDoNothing()
-      .run()
-
-    return { schedule }
-  } catch (error) {
-    if (error instanceof ORPCError) throw error
-    console.error('Error creating schedule:', error)
-    throw new ORPCError('INTERNAL_SERVER_ERROR', {
-      message: 'Failed to create schedule',
-    })
-  }
-})
 
 /**
  * Create a new schedule with custom details
@@ -202,57 +123,6 @@ const createWithDetails = os.createWithDetails
       })
     }
   })
-
-/**
- * Save schedule data to database via ScheduleEditorDO
- */
-const save = os.save.use(authMiddleware).handler(async ({ context, input }) => {
-  const db = context.db
-  const user = context.user
-  const scheduleId = input
-
-  try {
-    // Verify ownership
-    const schedule = await db
-      .select()
-      .from(schedulesTable)
-      .where(eq(schedulesTable.id, scheduleId))
-      .get()
-
-    if (!schedule) {
-      throw new ORPCError('NOT_FOUND', { message: 'Schedule not found' })
-    }
-
-    const admin = await db
-      .select({
-        role: users.role,
-      })
-      .from(users)
-      .where(eq(users.id, user.id))
-      .get()
-
-    // The owner or an admin (F-18)
-    if (schedule.ownerId !== user.id && admin?.role !== 'admin') {
-      throw new ORPCError('FORBIDDEN', {
-        message: 'You do not have permission to edit this schedule',
-      })
-    }
-
-    const DO = context.env.ScheduleEditingObject
-
-    const stubID = DO.idFromName(`${scheduleId}`)
-
-    const stub = DO.get(stubID)
-
-    return { message: 'Schedule saved successfully' }
-  } catch (error) {
-    if (error instanceof ORPCError) throw error
-    console.error('Error saving schedule:', error)
-    throw new ORPCError('INTERNAL_SERVER_ERROR', {
-      message: 'Failed to save schedule',
-    })
-  }
-})
 
 /**
  * Delete a schedule owned by the authenticated user
@@ -524,69 +394,6 @@ const validateSlug = os.validateSlug
  */
 
 /**
- * Get all schedules by Tiltify username
- */
-const getSchedulesByTiltifyUsername = os.getSchedulesByTiltifyUsername.handler(
-  async ({ context, input }) => {
-    const db = context.db
-    const account = await db
-      .select()
-      .from(accounts)
-      .where(
-        and(
-          eq(accounts.provider, 'tiltify'),
-          eq(accounts.providerUsername, input),
-        ),
-      )
-      .get()
-    if (!account) {
-      throw new ORPCError('NOT_FOUND', { message: 'User not found' })
-    }
-    try {
-      const schedules = await db
-        .select({
-          schedule: schedulesTable,
-        })
-        .from(schedulesTable)
-        .innerJoin(users, eq(schedulesTable.ownerId, users.id))
-        .where(
-          and(eq(users.id, account.userId), eq(schedulesTable.visible, true)),
-        )
-        .orderBy(schedulesTable.id)
-        .all()
-
-      return schedules.map((row) => row.schedule)
-    } catch (error) {
-      console.error('Error getting schedules by tiltify username:', error)
-      throw new ORPCError('INTERNAL_SERVER_ERROR', {
-        message: 'Failed to get schedules by tiltify username',
-      })
-    }
-  },
-)
-
-/**
- * Get next schedule by Tiltify username
- */
-const getNextScheduleByTiltifyUsername =
-  os.getNextScheduleByTiltifyUsername.handler(async ({ context, input }) => {
-    const db = context.db
-    const tiltifyUsername = input
-
-    try {
-      // This is a complex query that would need the streams table and time logic
-      // For now, return null as this functionality might need to be implemented differently
-      const nextSchedule = null
-      return { nextSchedule }
-    } catch (error) {
-      console.error('Error getting next schedule by tiltify username:', error)
-      throw new ORPCError('INTERNAL_SERVER_ERROR', {
-        message: 'Failed to get next schedule by tiltify username',
-      })
-    }
-  })
-
-/**
  * Get all schedules for the authenticated user
  */
 const getSchedules = os.getSchedules
@@ -611,18 +418,6 @@ const getSchedules = os.getSchedules
         message: 'Failed to get schedules',
       })
     }
-  })
-
-/**
- * Private schedules router with all implemented procedures
- */
-// Limit-checks
-const canCreateSchedule = os.canCreateSchedule
-  .use(authMiddleware)
-  .handler(async ({ context, input }) => {
-    const { db, userId } = context
-    const { year } = input
-    return checkCanCreateSchedule(db, userId, year)
   })
 
 const hasInvisibleStreamsInVisibleSchedule =
@@ -679,9 +474,7 @@ const hasInvisibleStreamsInVisibleSchedule =
 
 export const privateSchedulesRouter = {
   // Schedule CRUD Operations
-  create,
   createWithDetails,
-  save,
   delete: deleteSchedule,
 
   // Schedule Management Operations
@@ -700,12 +493,7 @@ export const privateSchedulesRouter = {
   */
 
   // Schedule Query Operations
-  getSchedulesByTiltifyUsername,
-  getNextScheduleByTiltifyUsername,
   getSchedules,
-
-  // Limit-checks
-  canCreateSchedule,
 
   hasInvisibleStreamsInVisibleSchedule,
 }

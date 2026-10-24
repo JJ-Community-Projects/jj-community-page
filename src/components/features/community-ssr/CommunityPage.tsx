@@ -10,9 +10,12 @@ import { FaSolidHeart } from 'solid-icons/fa'
 import { UpcomingStreams } from './UpcomingStreams.tsx'
 import CommunityTagSearch from './CommunityTagSearch.tsx'
 import { CommunityCampaignGrid } from './CommunityCampaignGrid.tsx'
+import { TagCatalogContext } from '../../../lib/useTagSearch.ts'
+import type { CatalogTag } from '../../../lib/tagCatalog.ts'
 
 export interface CommunityPageProps {
   initial?: CommunityInitialData
+  tagCatalog?: CatalogTag[]
 }
 
 export const CommunityPage: Component<CommunityPageProps> = (props) => {
@@ -21,7 +24,9 @@ export const CommunityPage: Component<CommunityPageProps> = (props) => {
     <QueryClientProvider client={new QueryClient()}>
       <I18nProvider i18n={i18n}>
         <CommunityPageProvider initial={props.initial}>
-          <_CommunityPage />
+          <TagCatalogContext.Provider value={props.tagCatalog}>
+            <_CommunityPage />
+          </TagCatalogContext.Provider>
         </CommunityPageProvider>
       </I18nProvider>
     </QueryClientProvider>
