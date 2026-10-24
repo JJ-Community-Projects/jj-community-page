@@ -8,11 +8,17 @@ import UserTeamsSection from '../../components/features/users/public/UserTeamsSe
 import OtherSchedulesSection from '../../components/features/users/public/OtherSchedulesSection.astro'
 import { ORPCError, ValidationError } from '@orpc/server'
 import BaseLayout4xl from '../../layouts/BaseLayout4xl.astro'
+import { isNotFoundError } from '../../lib/utils/notFound'
 
 const { username } = Astro.params
 
 if (!username) {
   return Astro.redirect('/user-not-found')
+}
+
+// The catch-all also gets every unmatched path; a slug never contains a slash.
+if (username.includes('/')) {
+  return Astro.rewrite('/404')
 }
 
 const usernameLower = username.toLowerCase()
@@ -34,7 +40,13 @@ const { data: user, error } = await getUserFullProfileBySlug(
   },
 )
 
+// Unknown, invalid or hidden user: a real 404, not a 200 with the error shown.
+if (isNotFoundError(error)) {
+  return Astro.rewrite('/404')
+}
+
 if (error) {
+  Astro.response.status = 500
   console.error(error)
   if (error instanceof ORPCError) {
     console.error('ORPCError')

@@ -7,6 +7,7 @@ import {
 } from '../../components/features/schedules/UserSchedulePage'
 import { DebugJSONView } from '../../components/common/DebugJSONView'
 import { FaSolidPlay } from 'solid-icons/fa'
+import { isNotFoundError } from '../../lib/utils/notFound'
 
 const { slug } = Astro.params
 
@@ -25,7 +26,13 @@ const { data: schedule, error } =
     }
   )
 
+// Unknown or hidden schedule: a real 404, not a 200 with the error card.
+if (isNotFoundError(error)) {
+  return Astro.rewrite('/404')
+}
+
 if (error) {
+  Astro.response.status = 500
   console.error(error)
 }
 

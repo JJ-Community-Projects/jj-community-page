@@ -1,3 +1,30 @@
 ---
-return Astro.redirect('/')
+import BaseLayout4xl from '../layouts/BaseLayout4xl.astro'
+
+// Unmatched paths and the pages that rewrite here (unknown user, team, schedule) answer 404.
+export const prerender = false
+
+const links = [
+  { href: '/', label: 'Home' },
+  { href: '/yogs', label: 'Yogscast schedule' },
+  { href: '/community', label: 'Community' },
+  { href: '/teams', label: 'Teams' },
+]
 ---
+
+<BaseLayout4xl
+  title="Page not found | Jingle Jam Community"
+  description="This page doesn't exist on the Jingle Jam Community site."
+>
+  <div class="flex w-full flex-col items-center gap-4 rounded-xl border border-white/10 bg-white/5 p-6 text-center text-white">
+    <h1 class="~text-2xl/4xl">Page not found</h1>
+    <p class="text-white/90">
+      The page, creator, team or schedule you're looking for doesn't exist.
+    </p>
+    <nav class="flex flex-wrap justify-center gap-4">
+      {links.map(({ href, label }) => (
+        <a href={href} class="underline hover:text-accent">{label}</a>
+      ))}
+    </nav>
+  </div>
+</BaseLayout4xl>

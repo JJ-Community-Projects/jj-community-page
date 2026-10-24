@@ -5,6 +5,7 @@ import { TeamHeader } from "../../components/features/teams/public/TeamHeader";
 import { TeamMembersSection } from "../../components/features/teams/public/TeamMembersSection";
 import { TeamNextStreamsSection } from "../../components/features/teams/public/TeamNextStreamsSection";
 import { TeamNotFoundState } from "../../components/features/teams/public/TeamErrorState";
+import { isNotFoundError } from "../../lib/utils/notFound";
 
 const { slug } = Astro.params;
 if (!slug) {
@@ -24,7 +25,12 @@ const [t, m, s] = await Promise.all([
   serverClientPublic.teams.getTeamNextStreams({ slug, limit: 6, unique: true }, context),
 ]);
 const { data: team, error: teamError } = t;
-if (teamError || !team) {
+// Unknown or hidden team: a real 404, not a 200 with the "not found" state.
+if ((!teamError && !team) || isNotFoundError(teamError)) {
+  return Astro.rewrite('/404');
+}
+if (teamError) {
+  Astro.response.status = 500;
   console.error('Team fetch error:', teamError);
 }
 
