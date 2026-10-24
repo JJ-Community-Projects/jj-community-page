@@ -1,4 +1,5 @@
-import {defineMiddleware} from "astro:middleware";
+import {defineMiddleware, sequence} from "astro:middleware";
+import {env} from "cloudflare:workers";
 import {deleteSessionTokenCookie, setSessionTokenCookie, validateSessionToken} from "./functions/session.ts";
 import {loggableError} from "./lib/db/loggableError.ts";
 
@@ -10,6 +11,26 @@ const SESSIONLESS_PREFIXES = [
   '/api/jj-data/',
   '/api/twitch/',
 ];
+
+/**
+ * Keeps non-prod deployments (beta, dev) out of search indexes: every response that passes through
+ * here gets `X-Robots-Tag: noindex, nofollow`, including redirects, error pages and API routes.
+ * Prod responses are unchanged. Asset-layer files (prerendered pages, robots.txt) never reach it.
+ */
+const robotsTag = defineMiddleware(async (_context, next) => {
+  const response = await next();
+  // WebSocket upgrades (101) can't be copied, and the header means nothing on them.
+  if (env.ENVIRONMENT === 'PROD' || response.status === 101) return response;
+  try {
+    response.headers.set('X-Robots-Tag', 'noindex, nofollow');
+    return response;
+  } catch {
+    // Immutable headers (`Response.redirect()`, a passed-through fetch): set it on a copy.
+    const copy = new Response(response.body, response);
+    copy.headers.set('X-Robots-Tag', 'noindex, nofollow');
+    return copy;
+  }
+});
 
 /**
  * Middleware that handles session validation and user authentication.
@@ -24,7 +45,7 @@ const SESSIONLESS_PREFIXES = [
  * @param {Function} next - The function to call to continue to the next middleware or route handler
  * @returns {Promise<Response>} The response from the next middleware or route handler
  */
-export const onRequest = defineMiddleware(async (context, next) => {
+const session = defineMiddleware(async (context, next) => {
   const path = new URL(context.request.url).pathname;
   if (
     path.startsWith('/_astro/') ||
@@ -93,3 +114,5 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
   return next();
 });
+
+export const onRequest = sequence(robotsTag, session);

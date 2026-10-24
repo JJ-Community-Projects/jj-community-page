@@ -6,6 +6,9 @@ import cloudflare from '@astrojs/cloudflare'
 
 import sitemap from '@astrojs/sitemap'
 
+import { existsSync } from 'node:fs'
+import { readFile, writeFile } from 'node:fs/promises'
+
 /**
  * vite-plugin-solid excludes Solid source packages (e.g. solid-icons) only from the client dep optimizer.
  * In the workerd SSR environment Vite 8 would pre-bundle them with Rolldown's default React JSX runtime
@@ -26,6 +29,26 @@ function excludeSolidDepsFromSsrOptimizer() {
   }
 }
 
+/**
+ * Non-prod builds (beta, local) send `X-Robots-Tag: noindex` on asset-layer files too: prerendered
+ * archive pages, robots.txt and the sitemap never reach the Worker middleware that sets it elsewhere.
+ * The deploy scripts build per environment, so prod's `_headers` stays as it is.
+ */
+function noindexAssetsOutsideProd() {
+  return {
+    name: 'noindex-assets-outside-prod',
+    hooks: {
+      'astro:build:done': async ({ dir }) => {
+        if (process.env.CLOUDFLARE_ENV === 'prod') return
+        const file = new URL('_headers', dir)
+        const current = existsSync(file) ? await readFile(file, 'utf8') : ''
+        const rule = '/*\n  X-Robots-Tag: noindex, nofollow\n'
+        await writeFile(file, current ? `${current.trimEnd()}\n\n${rule}` : rule)
+      },
+    },
+  }
+}
+
 // https://astro.build/config
 export default defineConfig({
   site: 'https://jinglejam.ostof.dev',
@@ -41,6 +64,7 @@ export default defineConfig({
   // Astro 7 defaults to 'jsx', which strips whitespace between inline elements. Keep the v6 output for now.
   compressHTML: true,
   integrations: [
+    noindexAssetsOutsideProd(),
     solidJs(),
     sitemap({
       filenameBase: 'sitemap',
