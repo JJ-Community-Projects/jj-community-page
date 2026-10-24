@@ -92,7 +92,7 @@ const accentColor = /^#[0-9a-f]{3,8}$/i.test(userAccentColor)
   : '#3584BF'
 ---
 
-<BaseLayout4xl title={pageTitle} description={pageDescription}>
+<BaseLayout4xl title={pageTitle} description={pageDescription} robots="noindex,follow">
   {error && <pre>ERROR: {JSON.stringify(error, null, 2)}</pre>}
 
   {

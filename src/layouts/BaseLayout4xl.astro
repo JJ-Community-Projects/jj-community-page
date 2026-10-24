@@ -12,6 +12,8 @@ interface Props {
   title?: string
   description?: string
   canonical?: string
+  /** `<meta name="robots">`; omitted when unset (indexable). */
+  robots?: string
   og?: {
     title?: string;
     description?: string;
@@ -23,7 +25,7 @@ interface Props {
 
 }
 
-const { title, description, canonical: propCanonical, og: propOg } = Astro.props
+const { title, description, canonical: propCanonical, robots, og: propOg } = Astro.props
 const t = title || 'Jingle Jam Community'
 const canonical = propCanonical ?? canonicalUrl(Astro.url)
 
@@ -43,6 +45,7 @@ const og = {
     <link rel="sitemap" type="application/xml" href="/sitemap-index.xml" />
     <meta charset="UTF-8" />
     {description && <meta name="description" content={description} />}
+    {robots && <meta name="robots" content={robots} />}
     <meta name="viewport" content="width=device-width" />
     <Fonts />
     <link rel="icon" type="image/svg+xml" href="/jj-favicon.svg" />
