@@ -6,6 +6,15 @@ import BaseLayoutYogs from '../../layouts/BaseLayoutYogs.astro'
 import { getYogsScheduleFromContent } from '../../content/getYogsScheduleFromContent.ts'
 import { YogsCurrentScheduleLoader } from '../../components/yogs-pages/schedule/YogsCurrentScheduleLoader.tsx'
 import { serverClientPublic } from '../../lib/orpc/serverClient'
+import { getCollection } from 'astro:content'
+import { DateTime } from 'luxon'
+import { YogsScheduleComponent } from '../../components/yogs-pages/schedule/YogsScheduleComponent.tsx'
+import { MobileYogsScheduleComponent } from '../../components/yogs-pages/schedule/mobile/MobileYogsScheduleComponent.tsx'
+import { YogsCreatorPill } from '../../components/yogs-pages/creators/YogsCreatorPill.tsx'
+import {
+  MainCountdownSimple,
+  MainJJStartTimes,
+} from '../../components/common/ui/MainHeader.tsx'
 
 const { data: contentHidden } = await serverClientPublic.overlays.visibility.getHidden(
   {},
@@ -18,20 +27,49 @@ const { data: contentHidden } = await serverClientPublic.overlays.visibility.get
 )
 const HIDE_CONTENT = contentHidden ?? true
 
-if (HIDE_CONTENT) {
-  return Astro.redirect('/yogs/archive/2025')
-}
-
-
 const ConfigDO = env.ConfigDO
 const stubId = ConfigDO.idFromName('ConfigDO')
 const stub = ConfigDO.get(stubId)
 
 const year = (await stub.getNumberConfig('web:config.year')) ?? 2025
 
-const fallbackSchedule = await getYogsScheduleFromContent(2023)
-const currentSchedule = await getYogsScheduleFromContent(year)
-const creators = currentSchedule.creators
+// Years with a visible schedule in the content collection, newest first
+const contentYears = (await getCollection('schedules'))
+  .filter((schedule) => schedule.data.visible && /^\d{4}$/.test(schedule.id))
+  .map((schedule) => Number(schedule.id))
+  .sort((a, b) => b - a)
+
+// The new schedule is shown once content is visible and the configured year has a schedule.
+// Until then /yogs is a hub with the countdown and last year's schedule (no redirect).
+const scheduleAvailable = !HIDE_CONTENT && contentYears.includes(year)
+
+// Same rule as useNextJJStartDate: after 15 Dec (London) the next Jingle Jam is next year's
+const londonNow = DateTime.now().setZone('Europe/London')
+const nextJJYear =
+  londonNow.month === 12 && londonNow.day >= 15
+    ? londonNow.year + 1
+    : londonNow.year
+const upcomingYear = scheduleAvailable ? year : Math.max(year, nextJJYear)
+const archiveYears = contentYears.filter((y) => y < upcomingYear)
+const lastYear = scheduleAvailable ? undefined : archiveYears.at(0)
+
+const fallbackSchedule = scheduleAvailable
+  ? await getYogsScheduleFromContent(2023)
+  : undefined
+const currentSchedule = scheduleAvailable
+  ? await getYogsScheduleFromContent(year)
+  : undefined
+const lastSchedule = lastYear
+  ? await getYogsScheduleFromContent(lastYear)
+  : undefined
+const creators = (currentSchedule ?? lastSchedule)?.creators ?? []
+const scheduleYear = scheduleAvailable ? year : (lastYear ?? year)
+
+const yogs = creators.filter(
+  (creator) => creator.type === 'yogs' || creator.type === 'staff',
+)
+const bestOf = creators.filter((creator) => creator.type === 'best_of')
+const friends = creators.filter((creator) => creator.type === 'friend')
 
 const filter = Astro.url.searchParams.get('filter') || ''
 
@@ -79,6 +117,18 @@ if (filteredCreators && filteredCreators.length > 0) {
     const list = joinNamesGrammatically(names, 4)
     title = `Yogscast Jingle Jam ${year} Schedule - ${list}`
     description = `Schedule with ${list} - Yogscast Jingle Jam 2025 schedule with streams, participants, and VODs - maintained by the community.`
+  }
+}
+
+// Hub until the new schedule is announced: title/description target the upcoming year
+if (!scheduleAvailable) {
+  title = `Yogscast Jingle Jam ${upcomingYear} Schedule`
+  description = lastYear
+    ? `Yogscast Jingle Jam ${upcomingYear} schedule: countdown to the start and the ${lastYear} schedule until the new one is announced - maintained by the community.`
+    : `Yogscast Jingle Jam ${upcomingYear} schedule: countdown to the start until the new schedule is announced - maintained by the community.`
+  if (filteredCreators && filteredCreators.length > 0) {
+    const names = filteredCreators.map((c) => c.name)
+    title = `${title} - ${joinNamesGrammatically(names, 4)}`
   }
 }
 
@@ -147,7 +197,7 @@ const preRenderdImageExists =
 
 const siteUrl = 'https://jinglejam.ostof.dev'
 const notFilterImage = `${siteUrl}/jj-og-yogs.png`
-const filterImage = `${siteUrl}/api/public/img/yogs-schedule-preview?filter=${filter}&year=${year}`
+const filterImage = `${siteUrl}/api/public/img/yogs-schedule-preview?filter=${filter}&year=${scheduleYear}`
 const preRenderedFilterImage = `${siteUrl}/yogs-schedule-preview/${preRenderedImgName}`
 
 const ogImage = preRenderdImageExists
@@ -290,11 +340,129 @@ const ogImage = preRenderdImageExists
 >
   <YogsBanner/>
 
-  <div class={'min-h-32'}>
-    <YogsCurrentScheduleLoader
-      client:only="solid-js"
-      creators={creators}
-      fallbackSchedule={fallbackSchedule!}
-    />
-  </div>
+  {scheduleAvailable ? (
+    <div class={'min-h-32'}>
+      <YogsCurrentScheduleLoader
+        client:only="solid-js"
+        creators={creators}
+        fallbackSchedule={fallbackSchedule!}
+      />
+    </div>
+  ) : (
+    <div class="flex w-full flex-col items-center gap-4">
+      <div class="flex w-full flex-col items-center gap-1 rounded-xl border border-white/10 bg-white/5 p-4 text-center text-white/90 sm:p-4">
+        <h1 class="w-full text-center ~text-2xl/4xl">
+          Yogscast Jingle Jam {upcomingYear} Schedule
+        </h1>
+        <h2 class="text-center ~text-lg/xl">
+          The Yogscast Jingle Jam in your timezone with links to participants,
+          VODs and more.
+        </h2>
+        <div class="w-full">
+          <MainCountdownSimple client:only="solid-js" />
+        </div>
+        <div class="w-full">
+          <MainJJStartTimes client:only="solid-js" />
+        </div>
+        <p>
+          The <span class="font-bold">Yogscast Jingle Jam {upcomingYear} Schedule</span>
+          will appear here once it is announced.
+          {lastYear && ` Until then you can browse the ${lastYear} schedule below.`}
+        </p>
+      </div>
+
+      {lastSchedule && (
+        <section class="flex w-full flex-col items-center gap-2">
+          <h2 class="text-center text-white ~text-xl/2xl">
+            Jingle Jam {lastYear} Schedule
+          </h2>
+          <p class="text-center text-white/90">
+            Last year's Yogscast Jingle Jam schedule with links to participants
+            and VODs.
+          </p>
+
+          <div class="desktop-schedule w-full">
+            <YogsScheduleComponent
+              schedule={lastSchedule}
+              creators={creators}
+              client:only="solid-js"
+            />
+          </div>
+
+          <div class="mobile-schedule w-full">
+            <MobileYogsScheduleComponent
+              schedule={lastSchedule}
+              creators={creators}
+              client:only="solid-js"
+            />
+          </div>
+          <p class="text-white text-center mt-4">
+            This Yogscast Jingle Jam schedule is maintained by the community. If
+            you find errors or see that a stream is missing use the contact info
+            below. Streams that appear here are not guaranteed to happen or might
+            be delayed. For more information visit the Jingle Jam Twitter page.
+            This schedule is a fan Project and not associated with the Jingle
+            Jam, the Yogscast or their partners.
+          </p>
+        </section>
+      )}
+
+      {creators.length > 0 && (
+        <div class="flex flex-col justify-center items-center p-4 gap-2">
+          <p class="text-2xl text-white text-center">Yogs & Friends</p>
+          <div class="flex flex-col items-center gap-2">
+            {
+              yogs.length > 0 && (
+                <p class="text-xl text-white mb-1">Yogs</p>
+                <div class="flex flex-wrap gap-2 items-center justify-center">
+                  {yogs.map((creator) => (
+                    <YogsCreatorPill creator={creator} client:only="solid-js" />
+                  ))}
+                </div>
+              )
+            }
+            {
+              bestOf.length > 0 && (
+                <p class="text-xl text-white mb-1">Best Of</p>
+                <div class="flex flex-wrap gap-2 items-center justify-center">
+                  {bestOf.map((creator) => (
+                    <YogsCreatorPill creator={creator} client:only="solid-js" />
+                  ))}
+                </div>
+              )
+            }
+            {
+              friends.length > 0 && (
+                <p class="text-xl text-white mb-1">Friends</p>
+                <div class="flex flex-wrap gap-2 items-center justify-center">
+                  {friends.map((creator) => (
+                    <YogsCreatorPill creator={creator} client:only="solid-js" />
+                  ))}
+                </div>
+              )
+            }
+          </div>
+        </div>
+      )}
+
+      {archiveYears.length > 0 && (
+        <nav
+          aria-label="Yogscast Jingle Jam schedule archive"
+          class="flex flex-col items-center gap-2 p-4 text-white"
+        >
+          <h2 class="text-2xl text-center">Schedule Archive</h2>
+          <div class="flex flex-wrap gap-2 items-center justify-center">
+            {archiveYears.map((archiveYear) => (
+              <a
+                class="rounded-full bg-accent/95 px-3 py-1 hover:brightness-105"
+                href={`/yogs/archive/${archiveYear}`}
+              >
+                Jingle Jam {archiveYear}
+              </a>
+            ))}
+          </div>
+        </nav>
+      )}
+    </div>
+  )}
 </BaseLayoutYogs>
