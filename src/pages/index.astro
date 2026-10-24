@@ -3,21 +3,34 @@ import {
   MainCountdownSimple,
   MainJJStartTimes,
 } from '../components/common/ui/MainHeader.tsx'
-const prerender = true
+// Rendered on demand: the year comes from the config and the visibility flag
+export const prerender = false
 import BaseLayout4xl from '../layouts/BaseLayout4xl.astro'
 import ShareBanner from '../components/shared/ShareBanner.astro'
+import { serverClientPublic } from '../lib/orpc/serverClient'
+import { getConfigYear } from '../lib/utils/configYear'
+import { upcomingJJYear } from '../lib/utils/jjYear'
+
+const [{ data: contentHidden }, configYear] = await Promise.all([
+  serverClientPublic.overlays.visibility.getHidden(
+    {},
+    { context: { locals: Astro.locals, request: Astro.request } },
+  ),
+  getConfigYear(),
+])
+const year = upcomingJJYear(configYear, contentHidden ?? true)
 ---
 
 <BaseLayout4xl
-  title="Jingle Jam Community - Fundraising, Streams & Schedule"
-  description="Discover Jingle Jam 2025 streams, creators, and fundraising tools - interactive schedule in your timezone and resources for streamers."
+  title={`Jingle Jam ${year} Schedule & Timetable (Yogscast + Community)`}
+  description={`Jingle Jam ${year} schedule and timetable in your timezone: Yogscast and community streams, fundraisers and stream overlays. Community-run, not official.`}
   canonical="https://jinglejam.ostof.dev"
 >
   <div
     class={'flex w-full flex-col items-center gap-1 rounded-xl border border-white/10 bg-white/5 p-4 text-center text-white text-white/90 sm:p-4'}
   >
     <div class="flex flex-col items-center justify-center text-white">
-      <h1 class="w-full text-center ~text-2xl/4xl">The Jingle Jam Community</h1>
+      <h1 class="w-full text-center ~text-2xl/4xl">The Jingle Jam {year} Community</h1>
       <h2 class="text-center ~text-lg/xl">
         A central place to showcase the streams of the Jingle Jam!
       </h2>
@@ -70,7 +83,7 @@ import ShareBanner from '../components/shared/ShareBanner.astro'
       <p>Tools available without an account:</p>
       <ul class="mt-3 grid gap-x-4 gap-2 sm:grid-cols-2 list-disc pl-5">
         <li>
-          <b>Fundraiser overview page</b> - If you have a <a class="underline" href="https://jinglejam.tiltify.com">Jingle Jam Fundraiser</a> your fundraiser will automatically appear on the <a class="underline" href="/fundraisers">Fundraisers page</a> and <a class="underline" href="/stream-resources">Twitch extension</a> once the Jingle Jam has started.</li>
+          <b>Fundraiser overview page</b> - If you have a <a class="underline" href="https://jinglejam.tiltify.com">Jingle Jam Fundraiser</a> your fundraiser will automatically appear on the <a class="underline" href="/community">Fundraisers page</a> and <a class="underline" href="/twitch-extension">Twitch extension</a> once the Jingle Jam has started.</li>
         <li>
           <b>OBS Overlays</b> - drop-in overlays for donations and schedules.
         </li>

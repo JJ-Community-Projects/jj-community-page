@@ -1,4 +1,4 @@
-import {type BarSeriesOption, type EChartsOption} from "echarts";
+import type {BarSeriesOption, EChartsOption} from "echarts";
 import type {RegisteredSeriesOption} from "echarts/types/dist/echarts";
 
 export interface Stats {

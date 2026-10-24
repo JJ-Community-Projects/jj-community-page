@@ -7,7 +7,7 @@ import {
   StatsValueTypeCreator,
   type XAxis
 } from "../../../../lib/model/Stats.ts";
-import {type EChartsOption} from "echarts";
+import type {EChartsOption} from "echarts";
 import {useCreatorStatsSettings} from "./CreatorStatsSettings.tsx";
 import {useCreator} from "./CreatorProvider.tsx";
 

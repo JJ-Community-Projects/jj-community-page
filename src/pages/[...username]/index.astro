@@ -1,6 +1,6 @@
 ---
 import { serverClientPublic } from '../../lib/orpc/serverClient'
-import { UserHeader } from '../../components/features/users/public/UserHeader'
+import { UserHeaderLinks } from '../../components/features/users/public/UserHeader'
 import { NextStreamsSection } from '../../components/features/users/public/NextStreamsSection'
 import { FriendsSection } from '../../components/features/users/public/FriendsSection'
 import { RelatedSection } from '../../components/features/users/public/RelatedSection'
@@ -70,15 +70,49 @@ if (user !== undefined) {
 
 // Fetch the user's primary schedule for the ActiveSchedule component
 // const { data: primarySchedule, error: scheduleError } = await Astro.callAction(actions.ui.users.schedules.getCurrentPrimaryByTiltifyUsername, username);
+
+// Title and description from the profile; the year is the one of the user's primary schedule
+const name = user?.user.username
+const scheduleYear = user?.primarySchedule?.year
+const pageTitle = !name
+  ? 'Profile | Jingle Jam Community'
+  : scheduleYear
+    ? `${name} - Jingle Jam ${scheduleYear} Schedule | Jingle Jam Community`
+    : `${name} - Jingle Jam Streams | Jingle Jam Community`
+const pageDescription = !name
+  ? undefined
+  : scheduleYear
+    ? `${name} on the Jingle Jam Community site: Jingle Jam ${scheduleYear} stream schedule, upcoming streams, Tiltify fundraiser and social links.`
+    : `${name} on the Jingle Jam Community site: Tiltify fundraiser, social links, friends and teams for the Jingle Jam.`
+
+// Avatar border in the server-rendered header: only a hex colour goes into the style attribute
+const userAccentColor = user?.style.accentColor ?? ''
+const accentColor = /^#[0-9a-f]{3,8}$/i.test(userAccentColor)
+  ? userAccentColor
+  : '#3584BF'
 ---
 
-<BaseLayout4xl title={`${user?.user.username} | Jingle Jam Community`}>
+<BaseLayout4xl title={pageTitle} description={pageDescription}>
   {error && <pre>ERROR: {JSON.stringify(error, null, 2)}</pre>}
 
   {
     !error && user && (
       <div class="w-full flex flex-col justify-center items-stretch gap-4">
-        <UserHeader client:only="solid-js" user={user} />
+        <div class="w-full rounded-xl border-2 bg-white shadow-md transition-all duration-300 hover:shadow-lg">
+          <div class="p-4">
+            <div class="flex flex-col items-center text-center">
+              <div class="relative size-24 overflow-hidden rounded-full border-4" style={`border-color: ${accentColor}`}>
+                <img
+                  src={user.user.profileImage}
+                  alt={`${user.user.username}'s profile`}
+                  class="h-full w-full object-cover"
+                />
+              </div>
+              <h1 class="font-babas text-black ~text-xl/2xl">{user.user.username}</h1>
+              <UserHeaderLinks client:only="solid-js" user={user} />
+            </div>
+          </div>
+        </div>
         {user.primarySchedule && user.nextPrimaryStreams.length > 0 && (
           <NextStreamsSection
             client:only="solid-js"

@@ -8,7 +8,7 @@ import {
   type XAxis
 } from '../../../../lib/model/Stats.ts'
 import { useStatsSettings } from './StatsSettings.tsx'
-import { type EChartsOption } from 'echarts'
+import type { EChartsOption } from 'echarts'
 import { useTooltipFormatter } from './useTooltipFormatter.ts'
 import { DateTime } from 'luxon'
 

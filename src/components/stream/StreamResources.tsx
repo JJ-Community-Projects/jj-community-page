@@ -102,13 +102,8 @@ export const StreamResources: Component<{ user: User | null }> = (props) => {
 
   return (
     <div class="w-full">
+      {/* The h1 and intro text above are rendered by the page */}
       <div class="mx-auto flex w-fit flex-col items-center p-1 text-center text-base text-white md:w-[70%] md:text-2xl">
-        <p class="p-2 text-2xl font-bold md:text-4xl">Stream Resources</p>
-        <p class="text-base text-white/90 md:text-xl">
-          Everything you need to integrate Jingle Jam into your stream: Twitch
-          Extension and OBS Overlays.
-        </p>
-
         <Feedback />
       </div>
 

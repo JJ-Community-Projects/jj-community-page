@@ -1,8 +1,8 @@
 import { type Component, For } from 'solid-js'
 import { YogsStreamTile } from './YogsStreamTile.tsx'
-import { DateTime } from 'luxon'
 import type { YogsScheduleDay as Day } from '../../../lib/orpc/private/yogs/contract.ts'
 import { rangeFromData } from '../../../lib/utils/rangeFromData.ts'
+import { useYogsSchedule } from './provider/YogsScheduleProvider.tsx'
 
 
 interface YogsScheduleDayProps {
@@ -34,13 +34,14 @@ interface ScheduleDayHeaderProps {
 }
 
 const ScheduleDayHeader: Component<ScheduleDayHeaderProps> = props => {
+  const { toDateTime } = useYogsSchedule()
 
   const dateString = () => {
     const range = rangeFromData(props.day.streams)
     if (range) {
-      return DateTime.fromJSDate(range.start).toFormat("EEE',' MMM d")
+      return toDateTime(range.start).toFormat("EEE',' MMM d")
     }
-    return DateTime.fromJSDate(props.day.start).toFormat("EEE',' MMM d")
+    return toDateTime(props.day.start).toFormat("EEE',' MMM d")
   }
 
   return (

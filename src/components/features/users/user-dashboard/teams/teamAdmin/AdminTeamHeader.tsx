@@ -59,7 +59,7 @@ export const AdminTeamHeader: Component = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  jj.ostof.dev/teams/{team.data?.slug} ↗
+                  jinglejam.ostof.dev/teams/{team.data?.slug} ↗
                 </a>
               </div>
             </Show>

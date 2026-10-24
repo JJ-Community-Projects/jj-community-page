@@ -216,7 +216,7 @@ export const AdminTeamSettingsSection: Component = () => {
         <p class="text-xs text-gray-500 flex items-center gap-1">
           <span>Preview:</span>
           <span class="font-mono bg-gray-100 px-2 py-1 rounded">
-            jj.ostof.dev/teams/{slug() || "your-team-slug"}
+            jinglejam.ostof.dev/teams/{slug() || "your-team-slug"}
           </span>
         </p>
       </TextField>

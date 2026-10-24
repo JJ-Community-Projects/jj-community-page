@@ -6,6 +6,7 @@ import YogsScheduleNavigation from './YogsScheduleNavigation.astro'
 import CommunityNavigation from './CommunityNavigation.astro'
 import { MobileNav } from './MobileNav'
 import { getCollection } from 'astro:content'
+import { SITE_URL } from '../../../lib/utils/canonical.ts'
 
 const ENV = env.ENVIRONMENT
 
@@ -30,7 +31,7 @@ const showDonationLink = now > jjStart && now < jjEnd
 
 <div class="flex flex-col gap-2 w-full items-center">
   <div class="items-center flex flex-row justify-center">
-    <Image src={jj_image} alt="Jingle Jam Logo" height="96" fetchpriority="high" />
+    <Image src={jj_image} alt="Jingle Jam Logo" height="96" loading="eager" fetchpriority="high" />
   </div>
   {
     showBetaDisclaimer && (
@@ -41,8 +42,8 @@ const showDonationLink = now > jjStart && now < jjEnd
         </p>
         <p class="text-base font-bold">
           The final version is live at
-          <a href="https://jj.ostof.dev" class="underline text-base">
-            jj.ostof.dev
+          <a href={SITE_URL} class="underline text-base">
+            {new URL(SITE_URL).host}
           </a>.
         </p>
       </div>

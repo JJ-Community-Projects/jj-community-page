@@ -3,17 +3,40 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import {loadAllCreatorsFromContent} from "../../content/loadCreatorsFromContent";
 import {type FullCreator} from "../../lib/model/ContentTypes";
 import {StatsPageRoot} from "../../components/yogs-pages/stats/StatsPage";
+import YogsJsonLd from "../../components/yogs-pages/common/YogsJsonLd.astro";
+import {getBreadcrumbList} from "../../content/getJingleJamEventSeries";
 const creators = await loadAllCreatorsFromContent();
 const creatorMap: { [key: string]: FullCreator } = {}
 for (const creator of creators) {
   creatorMap[creator.id] = creator
 }
+
+// Years with a stats file (src/stats/<year>.json), for the intro text
+const statsYears = Object.keys(import.meta.glob('../../stats/*.json'))
+  .map((file) => Number(file.match(/(\d{4})\.json$/)?.[1]))
+  .filter((year) => !Number.isNaN(year))
+  .sort((a, b) => a - b)
+const yearRange = statsYears.length > 0 ? `${statsYears[0]} to ${statsYears.at(-1)}` : ''
+
+const jsonLd = [
+  getBreadcrumbList([
+    { name: 'Home', url: '/' },
+    { name: 'Yogscast Jingle Jam Schedule', url: '/yogs' },
+    { name: 'Statistics', url: '/yogs/stats' },
+  ]),
+]
 ---
 <BaseLayout
-        title="Jingle Jam Statistics"
-        description="Jingle Jam Donation Statistics and more"
+        title="Yogscast Jingle Jam Statistics: Streams, Creators & Donations"
+        description={`Statistics for every Yogscast Jingle Jam${yearRange && ` from ${yearRange}`}: donations per stream and per hour, and how often each creator appeared - maintained by the community.`}
 >
-    <p class="~text-2xl/4xl w-full text-center text-white">Statistics</p>
+    <YogsJsonLd data={jsonLd}/>
+    <h1 class="~text-2xl/4xl w-full text-center text-white">Yogscast Jingle Jam Statistics</h1>
+    <p class="mb-2 max-w-3xl text-center text-white/90">
+        Stream and donation statistics for the Yogscast Jingle Jam{yearRange && ` from ${yearRange}`}: what each
+        stream and each hour raised, and how often and how long each creator appeared. Pick a year to see
+        its charts.
+    </p>
     <StatsPageRoot client:only="solid-js" creatorMap={creatorMap}>
         <div slot="fallback" class="text-white text-center">Loading</div>
     </StatsPageRoot>

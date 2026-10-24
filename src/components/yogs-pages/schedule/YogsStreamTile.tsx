@@ -18,6 +18,7 @@ import type { YogsStream } from '../../../lib/orpc/private/yogs/contract.ts'
 
 import { logSlotClick } from '../../../lib/analytics.ts'
 import { createModalSignal } from '../../../lib/createModalSignal.ts'
+import { useYogsSchedule } from './provider/YogsScheduleProvider.tsx'
 
 interface YogsStreamTileProps {
   stream: YogsStream
@@ -27,6 +28,7 @@ export const YogsStreamTile: Component<YogsStreamTileProps> = (props) => {
   const modal = createModalSignal()
 
   const { isSlotPartOfFilter } = useCreatorFilter()
+  const { mounted } = useYogsSchedule()
 
   const stream = () => props.stream
   const title = () => stream().title
@@ -53,13 +55,13 @@ export const YogsStreamTile: Component<YogsStreamTileProps> = (props) => {
   const now = useNow()
 
   const showCountdown = () => {
-    return YogsStreamUtils.isBefore(stream(), now())
+    return mounted() && YogsStreamUtils.isBefore(stream(), now())
   }
 
   const isLive = () => {
     const start = DateTime.fromJSDate(stream().start)
     const end = DateTime.fromJSDate(stream().end)
-    return start < now() && end > now()
+    return mounted() && start < now() && end > now()
   }
 
   const diff = () => {
@@ -201,32 +203,33 @@ export const Indicator: Component<IndicatorProps> = (props) => {
     return vodTypes().includes('twitch')
   }
 
-  return (
-    <>
-      <div class={'hidden w-full flex-row justify-around xl:flex'}>
-        <Show when={hasTwitchVod()}>
-          <BiLogosTwitch size={14} />
-        </Show>
-        <Show when={hasYoutubeVod()}>
-          <BiLogosYoutube size={14} />
-        </Show>
-        <Show when={(props.stream.creators?.length ?? 0) > 0}>
-          <BsPeopleFill size={14} />
-        </Show>
-      </div>
+  const hasCreators = () => (props.stream.creators?.length ?? 0) > 0
 
-      <div class={'flex w-full flex-row justify-around xl:hidden'}>
+  // One set of icons sized by breakpoint. They are drawn after hydration only: as inline SVGs in
+  // every tile they were a sixth of the server-rendered page. The row keeps its height meanwhile.
+  // Below xl the people icon keeps the 1em it always had (`size={0}` fell back to 1em).
+  const { mounted } = useYogsSchedule()
+  return (
+    <div
+      class={twMerge(
+        'flex w-full flex-row justify-around',
+        hasCreators()
+          ? 'min-h-[1em] xl:min-h-3.5'
+          : (props.stream.vods?.length ?? 0) > 0 && 'min-h-2.5 xl:min-h-3.5',
+      )}
+    >
+      <Show when={mounted()}>
         <Show when={hasTwitchVod()}>
-          <BiLogosTwitch size={10} />
+          <BiLogosTwitch class={'size-2.5 xl:size-3.5'} />
         </Show>
         <Show when={hasYoutubeVod()}>
-          <BiLogosYoutube size={10} />
+          <BiLogosYoutube class={'size-2.5 xl:size-3.5'} />
         </Show>
-        <Show when={(props.stream.creators?.length ?? 0) > 0}>
-          <BsPeopleFill size={0} />
+        <Show when={hasCreators()}>
+          <BsPeopleFill class={'size-[1em] xl:size-3.5'} />
         </Show>
-      </div>
-    </>
+      </Show>
+    </div>
   )
 }
 
@@ -237,11 +240,12 @@ interface LivePulseProps {
 const LivePulse: ParentComponent<LivePulseProps> = (props) => {
   const stream = () => props.stream
   const now = useNow()
+  const { mounted } = useYogsSchedule()
 
   const isLive = () => {
     const start = DateTime.fromJSDate(stream().start)
     const end = DateTime.fromJSDate(stream().end)
-    return start < now() && end > now()
+    return mounted() && start < now() && end > now()
   }
   return (
     <Switch>

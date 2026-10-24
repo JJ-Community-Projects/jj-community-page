@@ -1,5 +1,4 @@
 import { type Component, Show } from 'solid-js'
-import { DateTime } from 'luxon'
 import { useYogsSchedule } from '../provider/YogsScheduleProvider.tsx'
 import { rangeFromData } from '../../../../lib/utils/rangeFromData.ts'
 import { createModalSignal } from '../../../../lib/createModalSignal.ts'
@@ -21,7 +20,7 @@ export const MobileScheduleHeader: Component<MobileScheduleHeaderProps> = (
   )
 }
 const MobileTitle: Component = () => {
-  const { schedule, day } = useYogsSchedule()
+  const { schedule, day, toDateTime } = useYogsSchedule()
 
   const start = () => {
     const d = day()
@@ -41,7 +40,7 @@ const MobileTitle: Component = () => {
       >
         <h3 class={'text-2xl'}>{schedule.title}</h3>
         <p class={'text-day-header flex-1 text-center text-base'}>
-          {DateTime.fromJSDate(start()).toFormat("EEE',' MMM d")}
+          {toDateTime(start()).toFormat("EEE',' MMM d")}
         </p>
       </div>
     </div>

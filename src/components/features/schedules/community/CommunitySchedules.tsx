@@ -42,7 +42,7 @@ const Header: Component<{
         <div class="flex flex-col items-center text-center md:items-start md:text-left">
           <div class="flex items-center gap-2">
             <FaSolidCalendarWeek class="h-8 w-8 text-neutral-600" />
-            <h1 class="font-bold text-black ~text-2xl/4xl">Full Schedule</h1>
+            <h2 class="font-bold text-black ~text-2xl/4xl">Full Schedule</h2>
           </div>
           <Show when={props.schedule}>
             {(schedule) => {

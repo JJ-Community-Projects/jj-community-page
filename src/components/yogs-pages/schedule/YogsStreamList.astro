@@ -1,0 +1,88 @@
+---
+import { DateTime } from 'luxon'
+import type { YogsSchedule } from '../../../lib/orpc/private/yogs/contract.ts'
+import { rangeFromData } from '../../../lib/utils/rangeFromData.ts'
+
+/**
+ * Every stream of a schedule as a plain list (no JavaScript): the interactive schedule shows one
+ * week or day at a time and keeps participants and VODs in dialogs. Times are UK time (the event
+ * is in December, so GMT), the schedule's own timezone: the server render needs no viewer timezone.
+ */
+interface Props {
+  schedule: YogsSchedule
+}
+
+const { schedule } = Astro.props
+const zone = 'Europe/London'
+const london = (date: Date) =>
+  DateTime.fromJSDate(date, { zone }).setLocale('en-GB')
+
+const joinNames = (names: string[]) =>
+  names.length <= 1
+    ? names.join('')
+    : `${names.slice(0, -1).join(', ')} and ${names.at(-1)}`
+
+const days = schedule.days
+  .filter((day) => day.streams.length > 0)
+  .map((day) => {
+    const start = rangeFromData(day.streams)?.start ?? day.start
+    return { date: london(start), streams: day.streams }
+  })
+---
+
+{days.length > 0 && (
+  <section class="w-full max-w-3xl text-white">
+    <details class="rounded-xl border border-white/10 bg-white/5 p-4">
+      <summary class="cursor-pointer text-center">
+        <h2 class="inline text-xl">
+          All {schedule.streams.length} streams of the {schedule.title}
+        </h2>
+      </summary>
+      <p class="mt-2 text-center text-sm text-white/70">
+        Times are UK time (GMT).
+      </p>
+      {days.map((day) => (
+        <div class="mt-4">
+          <h3 class="text-lg font-semibold">
+            <time datetime={day.date.toISODate()}>
+              {day.date.toFormat('cccc d LLLL yyyy')}
+            </time>
+          </h3>
+          <ul class="mt-1 flex flex-col gap-1">
+            {day.streams.map((stream) => (
+              <li>
+                <time datetime={stream.start.toISOString()}>
+                  {london(stream.start).toFormat('HH:mm')}
+                </time>
+                –
+                <time datetime={stream.end.toISOString()}>
+                  {london(stream.end).toFormat('HH:mm')}
+                </time>{' '}
+                <strong>{stream.title}</strong>
+                {stream.subtitle && <span>({stream.subtitle})</span>}
+                {stream.creators && stream.creators.length > 0 && (
+                  <span>
+                    with {joinNames(stream.creators.map((c) => c.name))}
+                  </span>
+                )}
+                {stream.vods?.map((vod) => (
+                  <>
+                    {' · '}
+                    <a
+                      class="underline"
+                      href={vod.link}
+                      target="_blank"
+                      rel="noopener"
+                    >
+                      {vod.label ?? `${vod.type} VOD`}
+                    </a>
+                  </>
+                ))}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </details>
+  </section>
+)}

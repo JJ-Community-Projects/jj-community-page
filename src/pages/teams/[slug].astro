@@ -37,6 +37,13 @@ if (teamError) {
 const { data: members, error: membersError } = m;
 const { data: nextStreams, error: streamsError } = s;
 
+// Title and description from the team; a long team description is cut to snippet length
+const pageTitle = team ? `${team.name} - Jingle Jam Team | Jingle Jam Community` : 'Team | Jingle Jam Community';
+const teamDescription = team?.description?.replace(/\s+/g, ' ').trim() || undefined;
+const pageDescription = teamDescription
+  ? teamDescription.length > 155 ? `${teamDescription.slice(0, 154).trimEnd()}…` : teamDescription
+  : team ? `${team.name} is a Jingle Jam community team: see its members and their upcoming streams.` : undefined;
+
 // Semantic DS tokens with safe fallbacks; keep island prop contract (strings)
 const teamColors = {
   primaryColor: 'var(--jj-color-primary-500, #E30E50)',
@@ -44,7 +51,7 @@ const teamColors = {
 };
 ---
 
-<BaseLayout4xl title={team ? `${team.name} | Jingle Jam Community` : 'Team | Jingle Jam Community'}>
+<BaseLayout4xl title={pageTitle} description={pageDescription}>
   <main class="w-full flex flex-col justify-center items-stretch gap-4">
     {(!team || teamError) ? (
       <div class="w-full">
@@ -52,8 +59,8 @@ const teamColors = {
       </div>
     ) : (
       <>
-        {/* Hero/Header */}
-        <TeamHeader client:only="solid-js" team={team} memberCount={members?.members.length ?? 0} teamColors={teamColors} />
+        {/* Hero/Header: static, so the h1 is in the server HTML */}
+        <TeamHeader team={team} memberCount={members?.members.length ?? 0} teamColors={teamColors} />
 
         {(!membersError && members) ? (
           <TeamMembersSection client:only="solid-js" members={members.members} teamColors={teamColors} />

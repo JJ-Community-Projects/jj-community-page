@@ -1,15 +1,14 @@
 ---
 import '../styles/global.css'
-import { env } from 'cloudflare:workers'
+import GoogleAnalytics from '../components/layout/head/GoogleAnalytics.astro'
+import Fonts from '../components/layout/head/Fonts.astro'
 import Navigation from '../components/layout/navigation/Navigation.astro'
 import Footer from '../components/layout/footer/Footer.astro'
 import AdminNavigation from '../components/layout/navigation/AdminNavigation.astro'
-import type { YogsSchedule } from '../lib/orpc/private/yogs/contract.ts'
-import { getJingleJamEventSeries } from '../content/getJingleJamEventSeries.ts'
+import type { JsonLd } from '../content/getJingleJamEventSeries.ts'
+import YogsJsonLd from '../components/yogs-pages/common/YogsJsonLd.astro'
 import FeedbackBanner from "../components/features/feedback/FeedbackBanner.astro";
 import { canonicalUrl, SITE_URL } from '../lib/utils/canonical'
-
-const isProd = env.ENVIRONMENT === 'PROD'
 
 interface Props {
   title?: string
@@ -26,7 +25,8 @@ interface Props {
     imageHeight?: string
   }
 
-  schedule?: YogsSchedule
+  /** Structured data (EventSeries, BreadcrumbList); undefined entries are skipped. */
+  jsonLd?: (JsonLd | undefined)[]
 }
 
 const {
@@ -35,10 +35,9 @@ const {
   canonical: propCanonical,
   robots = 'index,follow',
   og: propOg,
-  schedule,
+  jsonLd,
 } = Astro.props
 const t = title || 'Jingle Jam Community'
-const baseCanonical = canonicalUrl('/yogs')
 const canonical = propCanonical ?? canonicalUrl(Astro.url)
 
 const og = {
@@ -49,59 +48,16 @@ const og = {
   imageWidth: propOg?.imageWidth ?? '1200',
   imageHeight: propOg?.imageHeight ?? '630',
 }
-
-
-
-// Structured data: EventSeries for the Jingle Jam schedule
-const eventSeriesJsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'EventSeries',
-  name: 'Yogscast Jingle Jam 2025',
-  url: baseCanonical,
-  startDate: '2025-12-01',
-  endDate: '2025-12-14',
-  eventAttendanceMode: 'https://schema.org/OnlineEventAttendanceMode',
-  organizer: {
-    '@type': 'Organization',
-    name: 'Yogscast',
-    url: 'https://twitch.tv/yogscast',
-  },
-}
-
-const eventsSeriesJsonLd = schedule ?getJingleJamEventSeries(schedule): undefined
-const eventSeriesJsonLdStr = JSON.stringify(eventsSeriesJsonLd)
 ---
 
 <html lang="en">
   <head>
-    <!-- Google tag (gtag.js) -->
-    {
-      isProd && (
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-P6MYGN62FW"/>
-        <script is:inline>
-          window.dataLayer = window.dataLayer || [];
-
-          function gtag() {
-            dataLayer.push(arguments);
-          }
-
-          gtag('js', new Date());
-          gtag("consent", "default", {
-            ad_storage: "denied",
-            ad_user_data: "denied",
-            ad_personalization: "denied",
-            analytics_storage: "granted",
-            functionality_storage: "granted",
-          });
-          gtag('config', 'G-P6MYGN62FW', {anonymize_ip: true, cookie_flags: 'max-age=7200;secure;samesite=none'});
-          window.gtag = gtag;
-          </script>
-      )
-    }
+    <GoogleAnalytics />
     <link rel="sitemap" type="application/xml" href="/sitemap-index.xml" />
     <meta charset="UTF-8" />
-    <meta name="description" content=`${description || ''}` />
+    {description && <meta name="description" content={description} />}
     <meta name="viewport" content="width=device-width" />
+    <Fonts />
     <link rel="icon" type="image/svg+xml" href="/jj-favicon.svg" />
     <link rel="shortcut icon" href="/favicon.ico" />
     <meta name="apple-mobile-web-app-title" content="Jingle Jam" />
@@ -117,7 +73,7 @@ const eventSeriesJsonLdStr = JSON.stringify(eventsSeriesJsonLd)
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Jingle Jam Community" />
     <meta property="og:title" content={og.title} />
-    <meta property="og:description" content={og.description} />
+    {og.description && <meta property="og:description" content={og.description} />}
     <meta property="og:url" content={og.url} />
     <meta property="og:image" content={og.image} />
     <meta property="og:image:width" content={og.imageWidth} />
@@ -126,12 +82,12 @@ const eventSeriesJsonLdStr = JSON.stringify(eventsSeriesJsonLd)
     {/* Twitter Card */}
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={og.title} />
-    <meta name="twitter:description" content={og.description} />
+    {og.description && <meta name="twitter:description" content={og.description} />}
     <meta name="twitter:image" content={og.image} />
 
-    <script type="application/ld+json" set:html={eventSeriesJsonLdStr} />
+    <YogsJsonLd data={jsonLd} />
 
-    <script is:inline src="/script.js"></script>
+    <script is:inline src="/script.js" defer></script>
     <link rel="canonical" href={canonical} />
     <meta name="generator" content={Astro.generator} />
     <title>{t}</title>
@@ -156,142 +112,3 @@ const eventSeriesJsonLdStr = JSON.stringify(eventsSeriesJsonLd)
     </div>
   </body>
 </html>
-
-<style is:global>
-  @font-face {
-    font-family: 'Bebas';
-    src: url('../fonts/BebasNeues/BebasNeue-Regular.ttf');
-    font-style: normal;
-    font-weight: 400;
-  }
-
-  @font-face {
-    font-family: 'Poppins';
-    src: url('../fonts/Poppins/Poppins-Bold.ttf');
-    font-style: normal;
-    font-weight: 700;
-  }
-
-  @font-face {
-    font-family: 'Poppins';
-    src: url('../fonts/Poppins/Poppins-BoldItalic.ttf');
-    font-style: italic;
-    font-weight: 700;
-  }
-
-  @font-face {
-    font-family: 'Poppins';
-    src: url('../fonts/Poppins/Poppins-ExtraBold.ttf');
-    font-style: normal;
-    font-weight: 800;
-  }
-
-  @font-face {
-    font-family: 'Poppins';
-    src: url('../fonts/Poppins/Poppins-ExtraBoldItalic.ttf');
-    font-style: italic;
-    font-weight: 800;
-  }
-
-  @font-face {
-    font-family: 'Poppins';
-    src: url('../fonts/Poppins/Poppins-ExtraLight.ttf');
-    font-style: normal;
-    font-weight: 300;
-  }
-
-  @font-face {
-    font-family: 'Poppins';
-    src: url('../fonts/Poppins/Poppins-ExtraLightItalic.ttf');
-    font-style: italic;
-    font-weight: 300;
-  }
-
-  @font-face {
-    font-family: 'Poppins';
-    src: url('../fonts/Poppins/Poppins-Italic.ttf');
-    font-style: italic;
-    font-weight: 400;
-  }
-
-  @font-face {
-    font-family: 'Poppins';
-    src: url('../fonts/Poppins/Poppins-Light.ttf');
-    font-style: normal;
-    font-weight: 300;
-  }
-
-  @font-face {
-    font-family: 'Poppins';
-    src: url('../fonts/Poppins/Poppins-LightItalic.ttf');
-    font-style: italic;
-    font-weight: 300;
-  }
-
-  @font-face {
-    font-family: 'Poppins';
-    src: url('../fonts/Poppins/Poppins-Medium.ttf');
-    font-style: normal;
-    font-weight: 500;
-  }
-
-  @font-face {
-    font-family: 'Poppins';
-    src: url('../fonts/Poppins/Poppins-MediumItalic.ttf');
-    font-style: italic;
-    font-weight: 500;
-  }
-
-  @font-face {
-    font-family: 'Poppins';
-    src: url('../fonts/Poppins/Poppins-Regular.ttf');
-    font-style: normal;
-    font-weight: 400;
-  }
-
-  @font-face {
-    font-family: 'Poppins';
-    src: url('../fonts/Poppins/Poppins-SemiBold.ttf');
-    font-style: normal;
-    font-weight: 700;
-  }
-
-  @font-face {
-    font-family: 'Poppins';
-    src: url('../fonts/Poppins/Poppins-SemiBoldItalic.ttf');
-    font-style: italic;
-    font-weight: 700;
-  }
-
-  @font-face {
-    font-family: 'Poppins';
-    src: url('../fonts/Poppins/Poppins-Thin.ttf');
-    font-style: normal;
-    font-weight: 100;
-  }
-
-  @font-face {
-    font-family: 'Poppins';
-    src: url('../fonts/Poppins/Poppins-ThinItalic.ttf');
-    font-style: italic;
-    font-weight: 100;
-  }
-
-  @font-face {
-    font-family: 'Poppins';
-    src: url('../fonts/Poppins/Poppins-Black.ttf');
-    font-style: normal;
-    font-weight: 900;
-  }
-
-  @font-face {
-    font-family: 'Poppins';
-    src: url('../fonts/Poppins/Poppins-BlackItalic.ttf');
-    font-style: italic;
-    font-weight: 900;
-  }
-
-  body {
-    font-family: 'Poppins', sans-serif;
-  }
-</style>

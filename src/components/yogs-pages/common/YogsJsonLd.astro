@@ -1,0 +1,19 @@
+---
+import {
+  type JsonLd,
+  jsonLdScript,
+} from '../../../content/getJingleJamEventSeries.ts'
+
+interface Props {
+  /** One script per entry; undefined entries (no data) emit nothing. */
+  data?: (JsonLd | undefined)[]
+}
+
+const items = (Astro.props.data ?? []).filter(
+  (item): item is JsonLd => item !== undefined,
+)
+---
+
+{items.map((item) => (
+  <script type="application/ld+json" set:html={jsonLdScript(item)} />
+))}

@@ -8,33 +8,44 @@ import {
   MainJJStartTimes,
 } from '../../components/common/ui/MainHeader.tsx'
 import { serverClientPublic } from '../../lib/orpc/serverClient'
+import { getConfigYear } from '../../lib/utils/configYear'
+import { upcomingJJYear } from '../../lib/utils/jjYear'
 
-const { data: contentHidden } = await serverClientPublic.overlays.visibility.getHidden(
-  {},
-  {
-    context: {
-      locals: Astro.locals,
-      request: Astro.request,
+const [{ data: contentHidden }, configYear] = await Promise.all([
+  serverClientPublic.overlays.visibility.getHidden(
+    {},
+    {
+      context: {
+        locals: Astro.locals,
+        request: Astro.request,
+      },
     },
-  },
-)
+  ),
+  getConfigYear(),
+])
 const HIDE_CONTENT = contentHidden ?? true
+const year = upcomingJJYear(configYear, HIDE_CONTENT)
 
 const charityData = await getEntry('charities', '2025')
 ---
 
 <BaseLayout
-  title="The Jingle Jam Community - Schedule"
-  description="Explore the upcoming streams for Jingle Jam 2025"
+  title={`Jingle Jam ${year} Community Schedule - Streams in Your Timezone`}
+  description={`The full community stream schedule for Jingle Jam ${year}: every stream from streamers on this site, day by day in your timezone. Community-run, not official.`}
   canonical="https://jinglejam.ostof.dev/community/schedule"
 >
   {HIDE_CONTENT ? (
     <div class="flex w-full flex-col items-center gap-1 rounded-xl border border-white/10 bg-white/5 p-4 text-center text-white text-white/90 sm:p-4">
       <div class="flex flex-col items-center justify-center text-white">
-        <h1 class="w-full text-center ~text-2xl/4xl">Community Schedule</h1>
+        <h1 class="w-full text-center ~text-2xl/4xl">Jingle Jam {year} Community Schedule</h1>
         <h2 class="text-center ~text-lg/xl">
           The schedule will be available when the Jingle Jam starts!
         </h2>
+        <p class="mt-2 max-w-2xl text-center text-white/90">
+          From the start of Jingle Jam {year} on 1 December this page shows the full schedule of community
+          streams: every stream from streamers who use this site, day by day and in your timezone. The
+          Yogscast streams are on the <a class="underline" href="/yogs">Yogscast Jingle Jam schedule</a>.
+        </p>
       </div>
       <div class="w-full">
         <MainCountdownSimple client:only="solid-js" />
@@ -45,6 +56,7 @@ const charityData = await getEntry('charities', '2025')
     </div>
   ) : (
     <div class="w-full flex flex-col justify-center items-stretch gap-4">
+      <h1 class="w-full text-center text-white ~text-2xl/4xl">Jingle Jam {year} Community Schedule</h1>
       <CommunitySchedulesPage
         charitiesData={charityData?.data}
         client:only="solid-js" />

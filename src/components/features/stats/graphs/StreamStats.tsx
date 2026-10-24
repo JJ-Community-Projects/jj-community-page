@@ -2,7 +2,7 @@ import {type Component} from "solid-js";
 import type {Stats} from "../../../../lib/model/Stats.ts";
 import {StatsSettingsProvider} from "../provider/StatsSettings.tsx";
 import {StatsProvider, useStats} from "../provider/StatsProvider.tsx";
-import {ECharts} from "echarts-solid";
+import {StatsChart} from "./StatsChart.tsx";
 import {StatsControls} from "../controls/StatsControls.tsx";
 
 interface StreamStatsProps {
@@ -25,7 +25,7 @@ const Chart: Component = () => {
     <div>
       <StatsControls/>
       <div class={'bg-white'}>
-        <ECharts height={400} width={1000} option={chartOptions()}/>
+        <StatsChart height={400} width={1000} option={chartOptions()}/>
       </div>
     </div>
   );

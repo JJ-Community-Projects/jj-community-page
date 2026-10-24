@@ -78,7 +78,7 @@ const ProfileCard: Component = () => {
               class="font-poppins font-medium text-primary transition-colors duration-200 hover:text-primary-600"
               href={`/${user.data?.username}`}
             >
-              jj.ostof.dev/{user.data?.username}
+              jinglejam.ostof.dev/{user.data?.username}
             </a>
           </div>
           <form action="/api/auth/logout" method="post">

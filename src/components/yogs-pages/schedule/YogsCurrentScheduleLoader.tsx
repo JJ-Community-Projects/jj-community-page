@@ -262,79 +262,7 @@ const Body: Component<BodyProps> = (props) => {
             <Feedback />
           </div>
           <Creators creators={props.creators} />
-          <div
-            class={
-              'flex flex-col items-center justify-center gap-1 text-pretty text-center text-white'
-            }
-          >
-            <p>
-              The schedule is subject to change and not all participants are
-              confirmed. For more information visit the Yogscast's social media.
-            </p>
-
-            <div
-              class={
-                'flex w-full flex-row items-center justify-center gap-4 p-2'
-              }
-            >
-              <a
-                class={'transition-all hover:scale-110'}
-                href={'https://twitch.tv/yogscast'}
-                target={'_blank'}
-                aria-label={'Yogscast Twitch channel'}
-              >
-                <TwitchIcon class={'size-4'} />
-              </a>
-              <a
-                class={'transition-all hover:scale-110'}
-                href={'https://www.youtube.com/yogscast'}
-                target={'_blank'}
-                aria-label={'Yogscast Youtube channel'}
-              >
-                <YoutubeIcon class={'size-4'} />
-              </a>
-              <a
-                class={'transition-all hover:scale-110'}
-                target={'_blank'}
-                href={'https://bsky.app/profile/yogscast.com'}
-                aria-label={'Yogscast Blue sky'}
-              >
-                <BskyIcon class={'size-4'} />
-              </a>
-              <a
-                class={'transition-all hover:scale-110'}
-                target={'_blank'}
-                href={'https://www.tiktok.com/@yogscastofficial'}
-                aria-label={'Jingle Jam Tiktok'}
-              >
-                <TiktokIcon class={'size-4'} />
-              </a>
-              <a
-                class={'transition-all hover:scale-110'}
-                target={'_blank'}
-                href={'https://www.instagram.com/officialyogscast/'}
-                aria-label={'Yogscast Instagram'}
-              >
-                <InstagramIcon class={'size-4'} />
-              </a>
-              <a
-                class={'transition-all hover:scale-110'}
-                target={'_blank'}
-                href={'https://x.com/yogscast'}
-                aria-label={'Yogscast Twitter'}
-              >
-                <TwitterIcon class={'size-4'} />
-              </a>
-            </div>
-            <p>
-              This Yogscast Jingle Jam schedule is maintained by the community.
-              If you find errors or see that a stream is missing use the contact
-              info below. Streams that appear here are not guaranteed to happen
-              or might be delayed. For more information visit the Jingle Jam
-              Twitter page. This schedule is a fan Project and not associated
-              with the Jingle Jam, the Yogscast or their partners.
-            </p>
-          </div>
+          <ScheduleNotice />
         </div>
       </Match>
       <Match when={schedule.isPending}>
@@ -349,7 +277,7 @@ const Body: Component<BodyProps> = (props) => {
   )
 }
 
-const Creators: Component<{
+export const Creators: Component<{
   creators: YogsCreator[]
 }> = (props) => {
   const yogs = props.creators.filter(
@@ -391,7 +319,7 @@ const Creators: Component<{
   )
 }
 
-const Feedback: Component = () => {
+export const Feedback: Component = () => {
   return (
     <div
       class={'flex flex-col items-center justify-start gap-1 p-2 text-white'}
@@ -431,6 +359,85 @@ const Feedback: Component = () => {
           <RedditIcon class={'size-5'} />
         </a>
       </div>
+    </div>
+  )
+}
+
+/** Disclaimer and Yogscast social links below the schedule. */
+export const ScheduleNotice: Component = () => {
+  return (
+    <div
+      class={
+        'flex flex-col items-center justify-center gap-1 text-pretty text-center text-white'
+      }
+    >
+      <p>
+        The schedule is subject to change and not all participants are
+        confirmed. For more information visit the Yogscast's social media.
+      </p>
+
+      <div
+        class={
+          'flex w-full flex-row items-center justify-center gap-4 p-2'
+        }
+      >
+        <a
+          class={'transition-all hover:scale-110'}
+          href={'https://twitch.tv/yogscast'}
+          target={'_blank'}
+          aria-label={'Yogscast Twitch channel'}
+        >
+          <TwitchIcon class={'size-4'} />
+        </a>
+        <a
+          class={'transition-all hover:scale-110'}
+          href={'https://www.youtube.com/yogscast'}
+          target={'_blank'}
+          aria-label={'Yogscast Youtube channel'}
+        >
+          <YoutubeIcon class={'size-4'} />
+        </a>
+        <a
+          class={'transition-all hover:scale-110'}
+          target={'_blank'}
+          href={'https://bsky.app/profile/yogscast.com'}
+          aria-label={'Yogscast Blue sky'}
+        >
+          <BskyIcon class={'size-4'} />
+        </a>
+        <a
+          class={'transition-all hover:scale-110'}
+          target={'_blank'}
+          href={'https://www.tiktok.com/@yogscastofficial'}
+          aria-label={'Jingle Jam Tiktok'}
+        >
+          <TiktokIcon class={'size-4'} />
+        </a>
+        <a
+          class={'transition-all hover:scale-110'}
+          target={'_blank'}
+          href={'https://www.instagram.com/officialyogscast/'}
+          aria-label={'Yogscast Instagram'}
+        >
+          <InstagramIcon class={'size-4'} />
+        </a>
+        <a
+          class={'transition-all hover:scale-110'}
+          target={'_blank'}
+          href={'https://x.com/yogscast'}
+          aria-label={'Yogscast Twitter'}
+        >
+          <TwitterIcon class={'size-4'} />
+        </a>
+      </div>
+      <p>
+        This Yogscast Jingle Jam schedule is maintained by the community.
+        If you find errors or see that a stream is missing use the contact
+        info below. Streams that appear here are not guaranteed to happen
+        or might be delayed. For more information visit the Jingle Jam
+        Twitter page. This schedule is a fan Project and not associated
+        with the Jingle Jam, the Yogscast or their partners.
+      </p>
     </div>
   )
 }

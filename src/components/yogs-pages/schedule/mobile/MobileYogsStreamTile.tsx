@@ -10,6 +10,7 @@ import { BsPeopleFill } from 'solid-icons/bs'
 import { YogsScheduleDetailDialog } from '../YogsScheduleDetailDialog.tsx'
 import { logSlotClick } from '../../../../lib/analytics.ts'
 import { createModalSignal } from '../../../../lib/createModalSignal.ts'
+import { useYogsSchedule } from '../provider/YogsScheduleProvider.tsx'
 
 interface MobileScheduleBodyProps {
   stream: YogsStream
@@ -20,6 +21,7 @@ export const MobileYogsStreamTile: Component<MobileScheduleBodyProps> = (
 ) => {
   const stream = props.stream
   const now = useNow()
+  const { mounted } = useYogsSchedule()
 
   const diff = () => {
     return DateTime.fromJSDate(stream.start).diff(now())
@@ -37,13 +39,13 @@ export const MobileYogsStreamTile: Component<MobileScheduleBodyProps> = (
   }
 
   const showCountdown = () => {
-    return YogsStreamUtils.isBefore(stream, now())
+    return mounted() && YogsStreamUtils.isBefore(stream, now())
   }
 
   const isLive = () => {
     const start = DateTime.fromJSDate(stream.start)
     const end = DateTime.fromJSDate(stream.end)
-    return start < now() && end > now()
+    return mounted() && start < now() && end > now()
   }
 
   function textColor(background: string) {
@@ -113,15 +115,24 @@ export const MobileYogsStreamTile: Component<MobileScheduleBodyProps> = (
         <Show when={!showCountdown() && isLive()}>
           <p class={'~text-md/lg font-bold tracking-wide text-white'}>LIVE</p>
         </Show>
-        <div class={'flex w-full flex-row justify-around'}>
-          <Show when={hasTwitchVod()}>
-            <BiLogosTwitch size={12} />
-          </Show>
-          <Show when={hasYoutubeVod()}>
-            <BiLogosYoutube size={12} />
-          </Show>
-          <Show when={(props.stream.creators?.length ?? 0) > 0}>
-            <BsPeopleFill size={12} />
+        {/* Icons after hydration only (see Indicator in YogsStreamTile); the row keeps its height */}
+        <div
+          class={
+            hasTwitchVod() || hasYoutubeVod() || (props.stream.creators?.length ?? 0) > 0
+              ? 'flex min-h-3 w-full flex-row justify-around'
+              : 'flex w-full flex-row justify-around'
+          }
+        >
+          <Show when={mounted()}>
+            <Show when={hasTwitchVod()}>
+              <BiLogosTwitch size={12} />
+            </Show>
+            <Show when={hasYoutubeVod()}>
+              <BiLogosYoutube size={12} />
+            </Show>
+            <Show when={(props.stream.creators?.length ?? 0) > 0}>
+              <BsPeopleFill size={12} />
+            </Show>
           </Show>
         </div>
       </div>

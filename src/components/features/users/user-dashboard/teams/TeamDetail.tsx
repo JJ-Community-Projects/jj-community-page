@@ -79,7 +79,7 @@ const TeamDetailContent: Component<{ teamId: number }> = (props) => {
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    jj.ostof.dev/teams/{team.data?.slug}
+                    jinglejam.ostof.dev/teams/{team.data?.slug}
                     <FaSolidArrowUpRightFromSquare class="h-3 w-3" />
                   </a>
                 </div>

@@ -1,4 +1,21 @@
 User-agent: *
 Allow: /
+Disallow: /api/
+# Data the client-rendered pages fetch: crawlers that render them need it.
+Allow: /api/public/
+Allow: /api/private/jj/
+Allow: /api/private/yogs/
+Disallow: /overlays$
+Disallow: /overlays/
+Disallow: /embed/
+Disallow: /dashboard$
+Disallow: /dashboard/
+Disallow: /admin$
+Disallow: /admin/
+Disallow: /pwa$
+Disallow: /pwa/
+Disallow: /login$
+Disallow: /auth-error
+Disallow: /yogs/placeholder
 
 Sitemap: https://jinglejam.ostof.dev/sitemap-index.xml

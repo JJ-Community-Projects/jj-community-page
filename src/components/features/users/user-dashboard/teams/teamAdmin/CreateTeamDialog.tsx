@@ -178,7 +178,7 @@ export const CreateTeamDialog: Component<{ isOpen: () => boolean, setIsOpen: (op
                 </Show>
 
                 <p class="text-xs text-gray-500 mt-1">
-                  This will be used in URLs: jj.ostof.dev/teams/{normalizedSlug() || "your-team-slug"}
+                  This will be used in URLs: jinglejam.ostof.dev/teams/{normalizedSlug() || "your-team-slug"}
                 </p>
               </TextField>
 

@@ -1,11 +1,17 @@
 ---
-import { YogsCreatorPill } from '../../../components/yogs-pages/creators/YogsCreatorPill.tsx'
 export const prerender = true
 import { getYogsScheduleFromContent } from '../../../content/getYogsScheduleFromContent.ts'
-import { YogsScheduleComponent } from '../../../components/yogs-pages/schedule/YogsScheduleComponent.jsx'
 import { type CollectionEntry, getCollection } from 'astro:content'
 import BaseLayout from '../../../layouts/BaseLayout.astro'
-import { MobileYogsScheduleComponent } from '../../../components/yogs-pages/schedule/mobile/MobileYogsScheduleComponent.jsx'
+import { YogsResponsiveSchedule } from '../../../components/yogs-pages/schedule/YogsResponsiveSchedule.tsx'
+import YogsStreamList from '../../../components/yogs-pages/schedule/YogsStreamList.astro'
+import YogsJsonLd from '../../../components/yogs-pages/common/YogsJsonLd.astro'
+import { compactYogsSchedule } from '../../../lib/utils/compactYogsSchedule.ts'
+import {
+  getBreadcrumbList,
+  getJingleJamEventSeries,
+} from '../../../content/getJingleJamEventSeries.ts'
+import { canonicalUrl } from '../../../lib/utils/canonical.ts'
 
 export async function getStaticPaths() {
   const schedules = await getCollection('schedules')
@@ -30,14 +36,15 @@ const year = Astro.params.year
 
 const schedule = await getYogsScheduleFromContent(Number(year))
 
-const creators = schedule.creators
-
-const yogs = creators.filter(
-  (creator) => creator.type === 'yogs' || creator.type === 'staff',
-)
-const bestOf = creators.filter((creator) => creator.type === 'best_of')
-const friends = creators.filter((creator) => creator.type === 'friend')
-
+const canonical = canonicalUrl(`/yogs/archive/${year}`)
+const jsonLd = [
+  getJingleJamEventSeries(schedule, canonical),
+  getBreadcrumbList([
+    { name: 'Home', url: '/' },
+    { name: 'Yogscast Jingle Jam Schedule', url: '/yogs' },
+    { name: `${year}`, url: canonical },
+  ]),
+]
 ---
 
 <style is:global>
@@ -131,75 +138,33 @@ const friends = creators.filter((creator) => creator.type === 'friend')
 </style>
 
 <BaseLayout
-  title={`The Yogscast Jingle Jam ${year} Schedule`}
-  description={`The Yogscast Jingle Jam ${year} Interactive Schedule made by the Community`}
-  canonical={`https://jinglejam.ostof.dev/yogs/archive/${year}`}
+  title={`Yogscast Jingle Jam ${year} Schedule & VODs`}
+  description={`The full Yogscast Jingle Jam ${year} schedule: every stream with date, time, participants and VOD links, in your timezone - maintained by the community.`}
+  canonical={canonical}
 >
-  <!--Show MobileYogsScheduleComponent on mobile screens-->
-
-  <div class="desktop-schedule w-full">
-    <YogsScheduleComponent
-      schedule={schedule}
-      creators={creators}
-      client:only="solid-js"
-    />
+  <YogsJsonLd data={jsonLd} />
+  <div class="mb-4 flex w-full flex-col items-center gap-1 text-center text-white">
+    <h1 class="~text-2xl/4xl">Yogscast Jingle Jam {year} Schedule</h1>
+    <p class="text-white/90">
+      Every stream of the Yogscast Jingle Jam {year} with participants and VODs.
+      <a class="underline" href="/yogs">Current Yogscast Jingle Jam schedule</a>
+    </p>
   </div>
 
-  <div class="mobile-schedule w-full">
-    <MobileYogsScheduleComponent
-      schedule={schedule}
-      creators={creators}
-      client:only="solid-js"
-    />
-  </div>
-  <p class="text-white text-center mt-4">
-    This Yogscast Jingle Jam schedule is maintained by the community. If you
-    find errors or see that a stream is missing use the contact info below.
-    Streams that appear here are not guaranteed to happen or might be delayed.
-    For more information visit the Jingle Jam Twitter page. This schedule is a
-    fan Project and not associated with the Jingle Jam, the Yogscast or their
-    partners.
-  </p>
+  <YogsResponsiveSchedule
+    schedule={compactYogsSchedule(schedule)}
+    showCreators
+    client:load
+  >
+    <p class="text-white text-center mt-4">
+      This Yogscast Jingle Jam schedule is maintained by the community. If you
+      find errors or see that a stream is missing use the contact info below.
+      Streams that appear here are not guaranteed to happen or might be delayed.
+      For more information visit the Jingle Jam Twitter page. This schedule is a
+      fan Project and not associated with the Jingle Jam, the Yogscast or their
+      partners.
+    </p>
+  </YogsResponsiveSchedule>
 
-  {creators.length > 0 && (  <div class="flex flex-col justify-center items-center p-4 gap-2">
-      <p class="text-2xl text-white text-center">Yogs & Friends</p>
-      <div class="flex flex-col items-center gap-2">
-        {
-          yogs.length > 0 && (
-            <p class="text-xl text-white mb-1">Yogs</p>
-            <div class="flex flex-wrap gap-2 items-center justify-center">
-              {
-                yogs &&
-                yogs.map((creator) => (
-                  <YogsCreatorPill creator={creator} client:only="solid-js" />
-                ))
-              }
-            </div>
-          )
-        }
-        {
-          bestOf.length > 0 && (
-            <p class="text-xl text-white mb-1">Best Of</p>
-            <div class="flex flex-wrap gap-2 items-center justify-center">
-              {bestOf &&
-                bestOf.map((creator) => (
-                  <YogsCreatorPill creator={creator} client:only="solid-js" />
-                ))}
-            </div>
-          )
-        }
-        {
-          friends.length > 0 && (
-            <p class="text-xl text-white mb-1">Friends</p>
-            <div class="flex flex-wrap gap-2 items-center justify-center">
-              {friends &&
-                friends.map((creator) => (
-                  <YogsCreatorPill creator={creator} client:only="solid-js" />
-                ))}
-            </div>
-          )
-        }
-      </div>
-    </div>
-  )}
+  <YogsStreamList schedule={schedule} />
 </BaseLayout>

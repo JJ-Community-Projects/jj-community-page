@@ -13,14 +13,36 @@ const SESSIONLESS_PREFIXES = [
 ];
 
 /**
+ * Login, dashboards and fragments (overlays, embeds, PWA shell, schedule placeholder): noindex on
+ * prod too. The same paths are disallowed in robots.txt.
+ */
+const NOINDEX_PREFIXES = [
+  '/login',
+  '/auth-error',
+  '/dashboard',
+  '/admin',
+  '/overlays',
+  '/embed',
+  '/pwa',
+  '/yogs/placeholder',
+];
+
+function isNoindexPath(path: string) {
+  // Whole segments only: `/loginator` is a profile.
+  return NOINDEX_PREFIXES.some((prefix) => path === prefix || path.startsWith(`${prefix}/`));
+}
+
+/**
  * Keeps non-prod deployments (beta, dev) out of search indexes: every response that passes through
  * here gets `X-Robots-Tag: noindex, nofollow`, including redirects, error pages and API routes.
- * Prod responses are unchanged. Asset-layer files (prerendered pages, robots.txt) never reach it.
+ * On prod only the NOINDEX_PREFIXES paths get it. Asset-layer files (prerendered pages, robots.txt)
+ * never reach it.
  */
-const robotsTag = defineMiddleware(async (_context, next) => {
+const robotsTag = defineMiddleware(async (context, next) => {
   const response = await next();
   // WebSocket upgrades (101) can't be copied, and the header means nothing on them.
-  if (env.ENVIRONMENT === 'PROD' || response.status === 101) return response;
+  if (response.status === 101) return response;
+  if (env.ENVIRONMENT === 'PROD' && !isNoindexPath(new URL(context.request.url).pathname)) return response;
   try {
     response.headers.set('X-Robots-Tag', 'noindex, nofollow');
     return response;

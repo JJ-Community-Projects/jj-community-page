@@ -196,7 +196,7 @@ export const CreateScheduleDialog: Component<{
                 </Show>
 
                 <p class="text-xs text-gray-500 mt-1">
-                  This will be used in URLs: jj.ostof.dev/schedules/{normalizedSlug() || "your-schedule-slug"}
+                  This will be used in URLs: jinglejam.ostof.dev/schedules/{normalizedSlug() || "your-schedule-slug"}
                 </p>
               </TextField>
 

@@ -38,13 +38,21 @@ if (error) {
 
 const isDebug = Astro.url.searchParams.get('debug') === '1'
 const pageTitleBase = schedule?.data?.title ?? 'Schedule'
-const pageTitle = `${pageTitleBase} | Jingle Jam Community`
 
 const ownerName = schedule?.owner?.username ?? ''
 const ownerSlug = schedule?.owner?.tiltifySlug ?? ''
+
+// Title and description from the schedule and its owner
+const pageTitle = ownerName
+  ? `${pageTitleBase} by ${ownerName} | Jingle Jam Community`
+  : `${pageTitleBase} | Jingle Jam Community`
+const streamCount = schedule?.streams.length ?? 0
+const pageDescription = schedule
+  ? `${ownerName ? `${ownerName}'s ` : ''}Jingle Jam ${schedule.data.year} stream schedule "${pageTitleBase}": ${streamCount} ${streamCount === 1 ? 'stream' : 'streams'} with times in your timezone and the next streams coming up.`
+  : undefined
 ---
 
-<BaseLayout4xl title={pageTitle}>
+<BaseLayout4xl title={pageTitle} description={pageDescription}>
   <div class="w-full flex flex-col justify-center items-stretch gap-4">
     <!-- Hero / Header (centered H1) -->
     <div

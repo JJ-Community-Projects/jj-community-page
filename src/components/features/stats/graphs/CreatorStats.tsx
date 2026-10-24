@@ -1,6 +1,6 @@
 import {type Component} from "solid-js";
 import type {Stats} from "../../../../lib/model/Stats.ts";
-import {ECharts} from "echarts-solid";
+import {StatsChart} from "./StatsChart.tsx";
 import {CreatorStatsControls} from "../controls/CreatorStatsControls.tsx";
 import {CreatorStatsSettingsProvider} from "../provider/CreatorStatsSettings.tsx";
 import {CreatorStatsProvider, useCreatorStats} from "../provider/CreatorStatsProvider.tsx";
@@ -25,7 +25,7 @@ const Chart: Component = () => {
     <div>
       <CreatorStatsControls/>
       <div class={'bg-white'}>
-        <ECharts height={400} width={1000} option={chartOptions()}/>
+        <StatsChart height={400} width={1000} option={chartOptions()}/>
       </div>
     </div>
   );

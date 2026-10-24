@@ -7,6 +7,7 @@ import {
 } from '../../../lib/utils/jjDates.ts'
 import { MainJJStartTimes } from '../../common/ui/MainHeader.tsx'
 
+// The card and its h1 ("Is the collection live?") are rendered by the page; this fills in the answer.
 export const CollectionCountdown = () => {
   const isJJ = useIsJJ()
 
@@ -27,12 +28,7 @@ export const CollectionCountdown = () => {
 const Countdown = () => {
   const jjStartCountdown = useJJStartCountdown()
   return (
-    <div
-      class={
-        'flex w-full flex-col items-center gap-1 rounded-xl border border-white/10 bg-white/5 p-4 text-center text-white text-white/90 sm:p-4'
-      }
-    >
-      <p class={'text-xl'}>Is the collection live?</p>
+    <>
       <p class={'text-6xl'}>No</p>
       <p>
         Checkout the{' '}
@@ -53,20 +49,15 @@ const Countdown = () => {
         </p>
       </div>
       <MainJJStartTimes />
-    </div>
+    </>
   )
 }
 
 const JJIsLive = () => {
   return (
-    <div
-      class={
-        'flex w-full flex-col items-center gap-1 rounded-xl border border-white/10 bg-white/5 p-4 text-center text-white text-white/90 sm:p-4'
-      }
-    >
-      <p class={'text-xl'}>Is the collection live?</p>
+    <>
       <p class={'text-6xl'}>YES</p>
       <a href={'https://jinglejam.tiltify.com'} class={'underline'}>Donate to the Jingle Jam</a>
-    </div>
+    </>
   )
 }

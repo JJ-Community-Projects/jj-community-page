@@ -6,6 +6,7 @@ import cloudflare from '@astrojs/cloudflare'
 
 import sitemap from '@astrojs/sitemap'
 
+import { execFileSync } from 'node:child_process'
 import { existsSync } from 'node:fs'
 import { readFile, writeFile } from 'node:fs/promises'
 
@@ -49,9 +50,52 @@ function noindexAssetsOutsideProd() {
   }
 }
 
+const SITE_URL = 'https://jinglejam.ostof.dev'
+
+/**
+ * The pages the sitemap lists: canonical, indexable and 200 for everyone. All other routes stay out
+ * (login, dashboard, admin, overlays, embeds, PWA, SSR/CSR variants, redirects, error pages).
+ * Profiles, teams and schedules are dynamic routes the sitemap never sees; indexing them is undecided.
+ */
+const SITEMAP_PAGES = {
+  '/': { changefreq: 'weekly', priority: 1 },
+  '/yogs': { changefreq: 'daily', priority: 0.9 },
+  '/community': { changefreq: 'daily', priority: 0.9 },
+  '/community/schedule': { changefreq: 'daily', priority: 0.8 },
+  '/teams': { changefreq: 'weekly', priority: 0.5 },
+  '/yogs/stats': {},
+  '/stream-resources': {},
+  '/faq': {},
+  '/about': {},
+  '/twitch-extension': {},
+  '/is-the-collection-live': {},
+}
+// Prerendered archive pages, one per visible schedule year.
+const SITEMAP_ARCHIVE = /^\/yogs\/archive\/(\d{4})$/
+const BUILD_TIME = new Date()
+
+/** Path of a sitemap URL without a trailing slash (the root stays `/`). */
+function sitemapPath(url) {
+  return new URL(url).pathname.replace(/(.)\/$/, '$1')
+}
+
+/** Date of the last commit that touched an archive year's schedule; the build time without git. */
+function archiveLastmod(year) {
+  try {
+    const date = execFileSync(
+      'git',
+      ['log', '-1', '--format=%cI', '--', `src/content/schedules/${year}.yaml`, `src/content/scheduleDays/${year}`],
+      { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] },
+    ).trim()
+    return new Date(date || BUILD_TIME).toISOString()
+  } catch {
+    return BUILD_TIME.toISOString()
+  }
+}
+
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://jinglejam.ostof.dev',
+  site: SITE_URL,
   // One URL form: no trailing slash. Requests with a slash get a 301 to the form without it, and
   // prerendered pages are written as `<path>.html`, which the asset layer serves at `<path>`.
   trailingSlash: 'never',
@@ -68,58 +112,20 @@ export default defineConfig({
     solidJs(),
     sitemap({
       filenameBase: 'sitemap',
-      /*
-      customPages: [
-        'https://jinglejam.ostof.dev',
-        'https://jinglejam.ostof.dev/yogs',
-        'https://jinglejam.ostof.dev/community',
-        'https://jinglejam.ostof.dev/stream-resources',
-        'https://jinglejam.ostof.dev/teams',
-      ],*/
+      lastmod: BUILD_TIME,
+      // Astro passes `https://jinglejam.ostof.dev/` for the root and slashless URLs for the rest
+      // (static routes plus the prerendered archive years).
       filter: (page) => {
-        return (
-          page !== 'https://jinglejam.ostof.dev/login/' &&
-          page !== 'https://jinglejam.ostof.dev/admin/' &&
-          page !== 'https://jinglejam.ostof.dev/faq' &&
-          page !== 'https://jinglejam.ostof.dev/about' &&
-          page !== 'https://jinglejam.ostof.dev/community-ssr/' &&
-          page !== 'https://jinglejam.ostof.dev/twitch-extension/' &&
-          page !== 'https://jinglejam.ostof.dev/fundraisers/' &&
-          page !== 'https://jinglejam.ostof.dev/users/' &&
-          page !== 'https://jinglejam.ostof.dev/yogs/placeholder/' &&
-          !page.includes('404') &&
-          !page.includes('/ssr') &&
-          !page.includes('/csr') &&
-          !page.includes('error') &&
-          !page.includes('/overlays/') &&
-          !page.includes('/dashboard/') &&
-          !page.includes('not-found') &&
-          !page.includes('/api/') &&
-          !page.includes('embed') &&
-          page !==
-            'https://jinglejam.ostof.dev/yogs/privacy/twitch-extension/' &&
-          !page.includes('pwa')
-        )
+        const path = sitemapPath(page)
+        return Object.hasOwn(SITEMAP_PAGES, path) || SITEMAP_ARCHIVE.test(path)
       },
       serialize: (item) => {
-        let url = item.url
-        if (url.endsWith("/")) {
-          url = url.slice(0, -1);
-          item.url = url
-        }
-        if (url === 'https://jinglejam.ostof.dev/yogs') {
-          item.changefreq = 'daily'
-          item.priority = 0.9
-        }
-        if (url === 'https://jinglejam.ostof.dev/community') {
-          item.changefreq = 'daily'
-          item.priority = 0.9
-        }
-        if (url === 'https://jinglejam.ostof.dev/teams/') {
-          item.changefreq = 'weekly'
-          item.priority = 0.5
-        }
-        return item
+        const path = sitemapPath(item.url)
+        const year = SITEMAP_ARCHIVE.exec(path)?.[1]
+        const entry = year
+          ? { changefreq: 'yearly', priority: 0.7, lastmod: archiveLastmod(year) }
+          : SITEMAP_PAGES[path]
+        return { ...item, ...entry, url: `${SITE_URL}${path}` }
       },
     }),
   ],
@@ -142,9 +148,6 @@ export default defineConfig({
       alias: {
         // debug: 'debug/src/browser.js', // Force the correct ESM file
       },
-    },
-    build: {
-      minify: false,
     },
   },
 })

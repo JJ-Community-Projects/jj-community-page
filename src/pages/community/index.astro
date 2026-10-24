@@ -8,33 +8,44 @@ import {
   MainJJStartTimes,
 } from '../../components/common/ui/MainHeader.tsx'
 import { serverClientPublic } from '../../lib/orpc/serverClient'
+import { getConfigYear } from '../../lib/utils/configYear'
+import { upcomingJJYear } from '../../lib/utils/jjYear'
 
-const { data: contentHidden } = await serverClientPublic.overlays.visibility.getHidden(
-  {},
-  {
-    context: {
-      locals: Astro.locals,
-      request: Astro.request,
+const [{ data: contentHidden }, configYear] = await Promise.all([
+  serverClientPublic.overlays.visibility.getHidden(
+    {},
+    {
+      context: {
+        locals: Astro.locals,
+        request: Astro.request,
+      },
     },
-  },
-)
+  ),
+  getConfigYear(),
+])
 const HIDE_CONTENT = contentHidden ?? true
+const year = upcomingJJYear(configYear, HIDE_CONTENT)
 
 const charityData = await getEntry('charities', '2025')
 ---
 
 <BaseLayout
-  title="The Jingle Jam Community - Fundraisers & Upcoming Streams"
-  description="Explore community fundraisers and upcoming streams for Jingle Jam 2025 - discover creators and donate."
+  title={`Jingle Jam ${year} Community Fundraisers & Upcoming Streams`}
+  description={`Community fundraisers and upcoming streams for Jingle Jam ${year}: fundraiser totals, who is streaming next, and links to donate. Community-run, not official.`}
   canonical="https://jinglejam.ostof.dev/community"
 >
   {HIDE_CONTENT ? (
     <div class="flex w-full flex-col items-center gap-1 rounded-xl border border-white/10 bg-white/5 p-4 text-center text-white text-white/90 sm:p-4">
       <div class="flex flex-col items-center justify-center text-white">
-        <h1 class="w-full text-center ~text-2xl/4xl">Community Fundraisers & Streams</h1>
+        <h1 class="w-full text-center ~text-2xl/4xl">Jingle Jam {year} Community Fundraisers & Streams</h1>
         <h2 class="text-center ~text-lg/xl">
           Coming soon for the next Jingle Jam!
         </h2>
+        <p class="mt-2 max-w-2xl text-center text-white/90">
+          On the first day of Jingle Jam {year} (1 December) this page starts listing the community
+          fundraisers with their totals and the community streams coming up next. Until then, see the{' '}
+          <a class="underline" href="/yogs">Yogscast Jingle Jam schedule</a>.
+        </p>
       </div>
       <div class="w-full">
         <MainCountdownSimple client:only="solid-js" />
@@ -45,6 +56,7 @@ const charityData = await getEntry('charities', '2025')
     </div>
   ) : (
     <div class="w-full flex flex-col justify-center items-stretch gap-4">
+      <h1 class="w-full text-center text-white ~text-2xl/4xl">Jingle Jam {year} Community Fundraisers & Streams</h1>
       <CommunityPage
         charitiesData={charityData?.data}
         client:only="solid-js" />

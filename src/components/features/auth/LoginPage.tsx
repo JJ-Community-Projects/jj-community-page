@@ -21,7 +21,7 @@ export const LoginPage: Component = () => {
           <h1 class="font-babas font-bold text-white ~text-2xl/4xl">Login</h1>
           <p class="font-poppins text-white/80 ~text-base/lg">
             Join the JJ community page to access more community features. Accounts are <b>not required</b> to use the JJ community page. Your fundraiser will automatically
-            appear on the <a class={'underline'} href={'/fundraisers'}> community fundraiser page</a>. Accounts are only needed if you want to create your own schedule.
+            appear on the <a class={'underline'} href={'/community'}> community fundraiser page</a>. Accounts are only needed if you want to create your own schedule.
           </p>
         </div>
 

@@ -1,17 +1,36 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro'
 import { StreamResources } from '../../components/stream/StreamResources'
+import { serverClientPublic } from '../../lib/orpc/serverClient'
+import { getConfigYear } from '../../lib/utils/configYear'
+import { upcomingJJYear } from '../../lib/utils/jjYear'
 
 const user = Astro.locals.user
+
+const [{ data: contentHidden }, configYear] = await Promise.all([
+  serverClientPublic.overlays.visibility.getHidden(
+    {},
+    { context: { locals: Astro.locals, request: Astro.request } },
+  ),
+  getConfigYear(),
+])
+const year = upcomingJJYear(configYear, contentHidden ?? true)
 ---
 
 <BaseLayout
-  title="Community Stream Resources for Jingle Jam 2025 - Twitch Extension & OBS Overlays"
-  description="All Jingle Jam community stream resources in one place. OBS Overlays configurator and Twitch Extension"
+  title={`Jingle Jam ${year} Stream Resources: Twitch Extension & Overlays`}
+  description={`Community tools for Jingle Jam ${year} streamers: the Jingle Jam Community Twitch extensions and OBS overlays for donations and schedules. Not official.`}
   canonical="https://jinglejam.ostof.dev/stream-resources"
   og={{
     image: 'https://jinglejam.ostof.dev/jj-og-stream.png',
   }}
 >
+  <div class="mx-auto flex w-fit flex-col items-center p-1 text-center text-base text-white md:w-[70%] md:text-2xl">
+    <h1 class="p-2 text-2xl font-bold md:text-4xl">Jingle Jam Stream Resources</h1>
+    <p class="text-base text-white/90 md:text-xl">
+      Everything you need to integrate Jingle Jam into your stream: Twitch
+      Extension and OBS Overlays.
+    </p>
+  </div>
   <StreamResources client:only="solid-js" user={user} />
 </BaseLayout>
