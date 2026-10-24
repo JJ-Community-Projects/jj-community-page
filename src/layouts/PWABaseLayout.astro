@@ -3,6 +3,7 @@ import '../styles/global.css'
 import { env } from 'cloudflare:workers'
 import Footer from "../components/layout/footer/Footer.astro";
 import PWANavigation from "../components/layout/navigation/PWANavigation.astro";
+import { canonicalUrl } from '../lib/utils/canonical';
 
 const isProd = env.ENVIRONMENT === 'PROD'
 
@@ -12,8 +13,9 @@ interface Props {
   canonical?: string;
 }
 
-const {title, description, canonical} = Astro.props;
+const {title, description, canonical: propCanonical} = Astro.props;
 const t = title || 'Jingle Jam Community';
+const canonical = propCanonical ?? canonicalUrl(Astro.url)
 ---
 <html lang="en">
 <head>
@@ -53,10 +55,7 @@ const t = title || 'Jingle Jam Community';
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="manifest" href="/site.webmanifest">
     <script is:inline src="/script.js"/>
-  {
-    canonical &&
-          <link rel="canonical" href={canonical}/>
-  }
+    <link rel="canonical" href={canonical}/>
     <meta name="generator" content={Astro.generator}/>
     <title>{t}</title>
 </head>

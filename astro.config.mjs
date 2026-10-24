@@ -29,6 +29,12 @@ function excludeSolidDepsFromSsrOptimizer() {
 // https://astro.build/config
 export default defineConfig({
   site: 'https://jinglejam.ostof.dev',
+  // One URL form: no trailing slash. Requests with a slash get a 301 to the form without it, and
+  // prerendered pages are written as `<path>.html`, which the asset layer serves at `<path>`.
+  trailingSlash: 'never',
+  build: {
+    format: 'file',
+  },
   security: {
     checkOrigin: true,
   },

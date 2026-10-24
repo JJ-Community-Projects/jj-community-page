@@ -7,6 +7,7 @@ import AdminNavigation from '../components/layout/navigation/AdminNavigation.ast
 import type { YogsSchedule } from '../lib/orpc/private/yogs/contract.ts'
 import { getJingleJamEventSeries } from '../content/getJingleJamEventSeries.ts'
 import FeedbackBanner from "../components/features/feedback/FeedbackBanner.astro";
+import { canonicalUrl, SITE_URL } from '../lib/utils/canonical'
 
 const isProd = env.ENVIRONMENT === 'PROD'
 
@@ -31,22 +32,20 @@ interface Props {
 const {
   title,
   description,
-  canonical,
+  canonical: propCanonical,
   robots = 'index,follow',
   og: propOg,
   schedule,
 } = Astro.props
 const t = title || 'Jingle Jam Community'
-const siteUrl = 'https://jinglejam.ostof.dev'
-const basePath = '/yogs'
-const baseCanonical = `${siteUrl}${basePath}`
-const currentUrl = Astro.url.toString() // includes query params for OG url
+const baseCanonical = canonicalUrl('/yogs')
+const canonical = propCanonical ?? canonicalUrl(Astro.url)
 
 const og = {
   title: propOg?.title ?? title,
   description: propOg?.description ?? description,
-  url: propOg?.url ?? currentUrl,
-  image: propOg?.image ?? `${siteUrl}/jj-og-yogs.png`,
+  url: propOg?.url ?? canonical,
+  image: propOg?.image ?? `${SITE_URL}/jj-og-yogs.png`,
   imageWidth: propOg?.imageWidth ?? '1200',
   imageHeight: propOg?.imageHeight ?? '630',
 }
@@ -133,7 +132,7 @@ const eventSeriesJsonLdStr = JSON.stringify(eventsSeriesJsonLd)
     <script type="application/ld+json" set:html={eventSeriesJsonLdStr} />
 
     <script is:inline src="/script.js"></script>
-    {canonical && <link rel="canonical" href={canonical} />}
+    <link rel="canonical" href={canonical} />
     <meta name="generator" content={Astro.generator} />
     <title>{t}</title>
   </head>
