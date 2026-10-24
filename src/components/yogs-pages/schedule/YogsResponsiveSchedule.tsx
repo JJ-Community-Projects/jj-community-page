@@ -28,7 +28,7 @@ export const YogsResponsiveSchedule: ParentComponent<
   return (
     <YogsScheduleProvider schedule={schedule} creators={schedule.creators}>
       <CreatorFilterProvider>
-        <div class="desktop-schedule w-full">
+        <div class="desktop-schedule flex w-full flex-col items-center">
           <YogsScheduleWeek />
         </div>
         <div class="mobile-schedule w-full">
