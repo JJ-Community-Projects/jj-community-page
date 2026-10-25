@@ -24,7 +24,7 @@ import {
 import { userDisplayView } from '../../../db/schema/views-schema.ts'
 import { friendsTable } from '../../../db/schema/auth-schema.ts'
 import {
-  getHardCodedEventsNoYogsForExtension,
+  type CreatorType,
   getUserIdByTwitchChannelId,
   isCachedNotFound,
   loadCause,
@@ -34,7 +34,6 @@ import {
   loadUserRelatedSchedule,
   loadUserRelations,
   loadUserSchedule,
-  loadYogsSchedule,
   notFoundError,
   storeCause,
   storeChannelOverview,
@@ -44,14 +43,15 @@ import {
   storeUserRelatedSchedule,
   storeUserRelations,
   storeUserSchedule,
-  storeYogsSchedule,
   type OverviewVariant,
+  type StreamType,
   type UserExtensionTab,
   valueToCurrencies,
+  type YogsScheduleOutput,
 } from './util.ts'
 import { CACHE_POLICY } from '../../../services/cachePolicy.ts'
 import { putCache } from '../../../services/kvCache.ts'
-import { getScheduleFromContent, getScheduleFromContentForCreator } from '../../../../content/getYogsScheduleFromContent.ts'
+import { getScheduleFromContentForCreator } from '../../../../content/getYogsScheduleFromContent.ts'
 import type {
   ContentCreator,
   ContentTwitchUser,
@@ -202,6 +202,9 @@ const extensionConfig = os.extensionConfigContract
     const showYogsSchedule = await stub.getBooleanConfig(
       'twitch-extension:config.showYogsSchedule',
     )
+    const showHeadlinerSchedule = await stub.getBooleanConfig(
+      'twitch-extension:config.showHeadlinerSchedule',
+    )
     const showCharities = await stub.getBooleanConfig(
       'twitch-extension:config.showCharities',
     )
@@ -243,6 +246,7 @@ const extensionConfig = os.extensionConfigContract
     const config: ExtensionConfigTVType = {
       year: year ?? 2024,
       showYogsSchedule: showYogsSchedule ?? false,
+      showHeadlinerSchedule: showHeadlinerSchedule ?? false,
       showCharities: showCharities ?? false,
       showFundraisers: showFundraisers ?? false,
       showUserFundraiser: showUserFundraiser ?? false,
@@ -652,6 +656,130 @@ const overview = os.overviewContract
     return overview
   })
 
+const emptySchedule = (title: string): YogsScheduleOutput => {
+  const now = new Date()
+  return {
+    title,
+    start: now,
+    end: now,
+    initialDayIndex: 0,
+    days: [],
+    streams: [],
+  }
+}
+
+// Maps a schedule from the `schedules` content collection to the extension's schedule shape.
+// Built on every call (no KV): the content only changes on deploy and the edge cache sits in front.
+// Empty when there is no schedule with that id.
+async function scheduleForExtension(
+  scheduleId: string,
+  title: string,
+): Promise<YogsScheduleOutput> {
+  const schedule = await getEntry('schedules', scheduleId)
+  if (!schedule) return emptySchedule(title)
+
+  const outStreams: StreamType[] = []
+  const days: YogsScheduleOutput['days'] = []
+
+  // Traverse weeks -> days -> streams, resolving referenced entries via getEntry
+  for (const week of schedule.data.weeks ?? []) {
+    for (const dayRef of week.days ?? []) {
+      const dayEntry = await getEntry(dayRef)
+      if (!dayEntry) continue
+      const day = dayEntry.data
+
+      const dayStreams = day.streams ?? []
+      const dayOutStreams: StreamType[] = []
+
+      for (const s of dayStreams) {
+        // Resolve creators referenced by the stream (if any)
+        let creators: CreatorType[] | undefined
+        if (Array.isArray(s.creators) && s.creators.length > 0) {
+          const list: CreatorType[] = []
+          for (const cRef of s.creators) {
+            const cEntry = await getEntry(cRef)
+            if (!cEntry) continue
+            const cd = cEntry.data
+            const imageUrl: string | undefined =
+              cd?.profileImage?.medium ||
+              cd?.profileImage?.large ||
+              cd?.profileImage?.small
+            const links = cd.links?.filter((c) => c.type === 'twitch').at(0)
+            const url: string = links?.url ?? ''
+            const color: string = cd?.style?.primaryColor || '#000000'
+            list.push({
+              id: cEntry.id,
+              name: cd?.name ?? '',
+              url,
+              imageUrl,
+              color,
+            })
+          }
+          creators = list.toSorted((a, b) => a.name.localeCompare(b.name))
+        }
+
+        // Map VODs if present
+        const vods = Array.isArray(s.vods)
+          ? s.vods
+              .filter((v) => v.type === 'twitch')
+              .map((v) => ({ label: v?.label, link: v?.link }))
+          : undefined
+
+        // Colour of the stream from its start date
+        const colorMap = getStreamColors(DateTime.fromJSDate(s.start))
+
+        const mapped = {
+          title: s.title,
+          subtitle: s.subtitle,
+          description: s.description,
+          markdownDescription: s.markdownDescription,
+          start: s.start,
+          end: s.end,
+          creators,
+          vods,
+          color: colorMap['500'],
+        }
+        dayOutStreams.push(mapped)
+        outStreams.push(mapped)
+      }
+      const range = rangeFromData(dayOutStreams) || {
+        start: dayOutStreams[0]?.start ?? new Date(),
+        end: dayOutStreams[dayOutStreams.length - 1]?.end ?? new Date(),
+      }
+      dayOutStreams.sort((a, b) => a.start.getTime() - b.start.getTime())
+
+      days.push({
+        start: range.start,
+        end: range.end,
+        streams: dayOutStreams,
+      })
+    }
+  }
+
+  const range = rangeFromData(outStreams) || {
+    start: new Date(),
+    end: new Date(),
+  }
+  // The extension groups this list by day and expects it in start order
+  outStreams.sort((a, b) => a.start.getTime() - b.start.getTime())
+
+  // initialDayIndex: first day that hasn't fully ended yet; fallback to last day or 0
+  const now = new Date()
+  let initialDayIndex = days.findIndex((d) => now <= d.end)
+  if (initialDayIndex === -1) {
+    initialDayIndex = Math.max(0, days.length - 1)
+  }
+
+  return {
+    title,
+    start: range.start,
+    end: range.end,
+    initialDayIndex,
+    days,
+    streams: outStreams,
+  }
+}
+
 const yogsSchedule = os.yogsScheduleContract
   .use(
     cacheMiddleware({
@@ -663,227 +791,40 @@ const yogsSchedule = os.yogsScheduleContract
   .use(cached('config', () => ''))
   .use(rateLimit)
   .handler(async ({ context }) => {
-    const yogsSchedule = await loadYogsSchedule(context.env.KV)
-
-    if (yogsSchedule) {
-      return yogsSchedule
-    }
-
-    // Determine initialDayIndex: first day that hasn't fully ended yet; fallback to last day or 0
-    const now = new Date()
     // Resolve the current schedule year from the Config Durable Object
     const ConfigDO = context.env.ConfigDO
     const stubId = ConfigDO.idFromName('ConfigDO')
     const stub = ConfigDO.get(stubId)
     const year = await stub.getNumberConfig('twitch-extension:config.year')
 
-    // Load the schedule entry for the given year from Astro content collections
-    const schedule = await getEntry('schedules', `${year ?? 2024}`)
-    if (!schedule) {
-      const now = new Date()
-      return {
-        title: `Yogscast Jingle Jam ${year ?? 2024}`,
-        start: now,
-        end: now,
-        initialDayIndex: 0,
-        days: [],
-        streams: [],
-      }
-    }
-    const outStreams: Array<{
-      title: string
-      subtitle?: string
-      description?: string
-      markdownDescription?: string
-      start: Date
-      end: Date
-      creators?: Array<{
-        id: string
-        name: string
-        url: string
-        imageUrl?: string
-        color: string
-      }>
-      vods?: Array<{ label?: string; link: string }>
-      color: string
-    }> = []
+    return scheduleForExtension(
+      `${year ?? 2024}`,
+      `Yogscast Jingle Jam ${year ?? 2024}`,
+    )
+  })
 
-    const days: Array<{
-      start: Date
-      end: Date
-      streams: typeof outStreams
-    }> = []
+// Headliner schedule of the current year: content schedule `<year>-headliner`, same shape as the yogs schedule.
+const headlinerSchedule = os.headlinerScheduleContract
+  .use(
+    cacheMiddleware({
+      maxAge: 60,
+      sMaxAge: 60,
+      staleWhileRevalidate: 120,
+    }),
+  )
+  .use(cached('config', () => ''))
+  .use(rateLimit)
+  .handler(async ({ context }) => {
+    // Resolve the current schedule year from the Config Durable Object
+    const ConfigDO = context.env.ConfigDO
+    const stubId = ConfigDO.idFromName('ConfigDO')
+    const stub = ConfigDO.get(stubId)
+    const year = await stub.getNumberConfig('twitch-extension:config.year')
 
-    const enableHardCoded = true
-
-    const hardcodedSchedule = await getScheduleFromContent('2025-headliner')
-
-    const hardcodedStreams = hardcodedSchedule.streams
-      .filter(s => s.start > now)
-      .toSorted((a, b) => a.start.getTime() - b.start.getTime())
-
-    // Group hardcoded streams by ISO date (YYYY-MM-DD) of their start time for quick lookup
-    const hardcodedByDay = new Map<string, typeof hardcodedStreams[number]>()
-    for (const hs of hardcodedStreams ?? []) {
-      // Use UTC date (YYYY-MM-DD) to avoid timezone mismatches when grouping
-      const key = hs.start?.toISOString?.().slice(0, 10)
-      if (!key) continue
-      const s = hardcodedByDay.get(key)
-      if (!s) {
-        hardcodedByDay.set(key, hs)
-      }
-    }
-
-    // Traverse weeks -> days -> streams, resolving referenced entries via getEntry
-    for (const week of schedule.data.weeks ?? []) {
-      for (const dayRef of week.days ?? []) {
-        const dayEntry = await getEntry(dayRef)
-        if (!dayEntry) continue
-        const day = dayEntry.data
-
-        const dayStreams = day.streams ?? []
-        const dayOutStreams: typeof outStreams = []
-
-        for (const s of dayStreams) {
-          // Resolve creators referenced by the stream (if any)
-          let creators:
-            | Array<{
-                id: string
-                name: string
-                url: string
-                imageUrl?: string
-                color: string
-              }>
-            | undefined
-          if (Array.isArray(s.creators) && s.creators.length > 0) {
-            const list: Array<{
-              id: string
-              name: string
-              url: string
-              imageUrl?: string
-              color: string
-            }> = []
-            for (const cRef of s.creators) {
-              const cEntry = await getEntry(cRef)
-              if (!cEntry) continue
-              const cd = cEntry.data
-              const imageUrl: string | undefined =
-                cd?.profileImage?.medium ||
-                cd?.profileImage?.large ||
-                cd?.profileImage?.small
-              const links = cd.links?.filter((c) => c.type === 'twitch').at(0)
-              const url: string = links?.url ?? '' // cd?.link || (Array.isArray(cd?.links) && cd.links[0]?.url) || ''
-              const color: string = cd?.style?.primaryColor || '#000000'
-              list.push({
-                id: cEntry.id,
-                name: cd?.name ?? '',
-                url,
-                imageUrl,
-                color,
-              })
-            }
-            creators = list.toSorted((a,b) => a.name.localeCompare(b.name))
-          }
-
-          // Map VODs if present
-          const vods = Array.isArray(s.vods)
-            ? s.vods
-                .filter((v) => v.type === 'twitch')
-                .map((v) => ({ label: v?.label, link: v?.link }))
-            : undefined
-
-          // Choose a representative color for the stream from its background style (fallback to black)
-          const colorMap = getStreamColors(DateTime.fromJSDate(s.start))
-
-          const mapped = {
-            title: s.title,
-            subtitle: s.subtitle,
-            description: s.description,
-            markdownDescription: s.markdownDescription,
-            start: s.start,
-            end: s.end,
-            creators,
-            vods,
-            color: colorMap['500'],
-          }
-          dayOutStreams.push(mapped)
-          outStreams.push(mapped)
-        }
-        const range = rangeFromData(dayOutStreams) || {
-          start: dayOutStreams[0]?.start ?? new Date(),
-          end: dayOutStreams[dayOutStreams.length - 1]?.end ?? new Date(),
-        }
-        dayOutStreams.sort((a, b) => a.start.getTime() - b.start.getTime())
-
-
-        // Prepend hardcoded streams matching this day (must appear at the beginning)
-        const dayDateISO = day.date.toISOString().slice(0, 10)
-
-        let finalDaysStream = []
-        if (enableHardCoded) {
-          const hs = hardcodedByDay.get(dayDateISO)
-          if (hs) {
-            const lst = []
-            if (hs.subtitle) {
-              lst.push(hs.subtitle)
-            }
-            if (hs.description) {
-              lst.push(hs.description)
-            }
-            const desc = lst.join(' - ')
-            const mapped = {
-              title: hs.title,
-              subtitle: 'Headliner', // hs.subtitle,
-              description: desc,
-              markdownDescription: hs.markdownDescription,
-              start: hs.start,
-              end: hs.end,
-              creators: hs.creators?.toSorted((a,b) => a.name.localeCompare(b.name)),
-              vods: hs.vods,
-              color: '#E30E50',
-              // hs.color ||
-              // getStreamColors(DateTime.fromJSDate(hs.start))['500'],
-            }
-            outStreams.push(mapped)
-            finalDaysStream = [
-              mapped,
-              ...dayOutStreams
-            ]
-          } else {
-            finalDaysStream = [...dayOutStreams]
-          }
-        } else {
-          finalDaysStream = [...dayOutStreams]
-        }
-
-        days.push({
-          start: range.start,
-          end: range.end,
-          streams: finalDaysStream,
-        })
-      }
-    }
-
-    const range = rangeFromData(outStreams) || {
-      start: new Date(),
-      end: new Date(),
-    }
-
-    let initialDayIndex = days.findIndex((d) => now <= d.end)
-    if (initialDayIndex === -1) {
-      initialDayIndex = Math.max(0, days.length - 1)
-    }
-
-    const result = {
-      title: `Yogscast Jingle Jam ${year ?? 2024}`,
-      start: range.start,
-      end: range.end,
-      initialDayIndex,
-      days,
-      streams: outStreams,
-    }
-    await storeYogsSchedule(context.env.KV, result, 180)
-    return result
+    return scheduleForExtension(
+      `${year ?? 2024}-headliner`,
+      `Yogscast Jingle Jam ${year ?? 2024} Headliners`,
+    )
   })
 
 // Resolve user by Twitch channel, return JJ campaign for current year
@@ -1501,6 +1442,7 @@ export const twitchExtensionRouter = {
   causes,
   overview,
   yogsSchedule,
+  headlinerSchedule,
   userData,
   userSchedule,
   userRelations,

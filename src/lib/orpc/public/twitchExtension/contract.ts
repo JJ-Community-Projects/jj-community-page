@@ -114,6 +114,7 @@ export type StreamTVType = z.infer<typeof StreamSchema>
 export const ExtensionConfigSchema = z.object({
   year: z.number(),
   showYogsSchedule: z.boolean(),
+  showHeadlinerSchedule: z.boolean(),
   showCharities: z.boolean(),
   showFundraisers: z.boolean(),
   showUserFundraiser: z.boolean(),
@@ -332,6 +333,24 @@ const yogsScheduleContract = oc
     successDescription: 'Yogs schedule retrieved successfully',
   })
 
+const headlinerScheduleContract = oc
+  .input(
+    z.object({
+      channelId: z.string(),
+      userId: z.string(),
+    }),
+  )
+  .output(YogsScheduleSchema)
+  .route({
+    path: '/twitch-extension/headliner-schedule',
+    method: 'GET',
+    operationId: 'getHeadlinerSchedule',
+    summary: 'Get the headliner schedule',
+    description: 'Get the headliner schedule',
+    tags: ['twitch-extension'],
+    successDescription: 'Headliner schedule retrieved successfully',
+  })
+
 const userDataContract = oc
   .input(
     z.object({
@@ -422,6 +441,7 @@ export const contracts = {
   causesContract,
   overviewContract,
   yogsScheduleContract,
+  headlinerScheduleContract,
   userDataContract,
   userScheduleContract,
   userRelationsContract,
