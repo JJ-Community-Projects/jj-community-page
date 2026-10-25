@@ -13,13 +13,14 @@ import type {
   UserScheduleTVType,
 } from './contract.ts'
 import { getStreamColors } from '../../../../functions/jjDatesToColors.ts'
-import { valueToCurrencies } from './util.ts'
+import { valueToCurrencies, type YogsScheduleOutput } from './util.ts'
 import campaignsJson from './demo/2025/campaigns.json'
 import causesJson from './demo/2025/causes.json'
 import overviewJson from './demo/2025/overview.json'
 
 // Demo channel for the Twitch extension review: every extension procedure answers this channel
-// with last year's data (saved from the live API after Jingle Jam 2025) instead of live data.
+// with last year's data (saved from the live API after Jingle Jam 2025) instead of live data,
+// with the schedules moved to this year's dates.
 export const DEMO_CHANNEL_ID = '96860795'
 export const DEMO_YEAR = 2025
 
@@ -111,22 +112,58 @@ export const demoUserData = (): UserDataType => ({
   cause: demoCause,
 })
 
-// Made-up community schedule during Jingle Jam 2025, times in UTC.
-const demoStreams: [title: string, start: string, hours: number][] = [
-  ['Jingle Jam Kick-off', '2025-12-01T18:00:00Z', 3],
-  ['Cosy Building Night', '2025-12-03T19:00:00Z', 3],
-  ['Community Game Night', '2025-12-06T17:00:00Z', 4],
-  ['Charity Speedruns', '2025-12-09T19:00:00Z', 3],
-  ['Viewer Choice', '2025-12-12T19:00:00Z', 3],
-  ['Grand Finale', '2025-12-14T17:00:00Z', 5],
+// Schedules move to this year's event: the extension only shows live and upcoming streams, so
+// 2025 dates would hide them. The money data keeps its 2025 date ("Raised in 2025").
+const toThisYear = (date: Date) =>
+  DateTime.fromJSDate(date, { zone: 'utc' })
+    .plus({ years: DateTime.utc().year - DEMO_YEAR })
+    .toJSDate()
+
+export const demoSchedule = (
+  schedule: YogsScheduleOutput,
+): YogsScheduleOutput => {
+  if (schedule.streams.length === 0) return schedule
+  const stream = (s: StreamTVType): StreamTVType => ({
+    ...s,
+    start: toThisYear(s.start),
+    end: toThisYear(s.end),
+  })
+  const days = schedule.days.map((d) => ({
+    start: toThisYear(d.start),
+    end: toThisYear(d.end),
+    streams: d.streams.map(stream),
+  }))
+  // Same rule as scheduleForExtension: first day that hasn't ended, else the last day.
+  const now = new Date()
+  const initialDayIndex = days.findIndex((d) => now <= d.end)
+  return {
+    ...schedule,
+    start: toThisYear(schedule.start),
+    end: toThisYear(schedule.end),
+    initialDayIndex:
+      initialDayIndex === -1 ? Math.max(0, days.length - 1) : initialDayIndex,
+    days,
+    streams: schedule.streams.map(stream),
+  }
+}
+
+// Made-up community schedule, 2025 times in UTC (moved to this year like the other schedules).
+const demoStreams: [start: string, hours: number][] = [
+  ['2025-12-01T18:00:00Z', 3],
+  ['2025-12-03T19:00:00Z', 3],
+  ['2025-12-06T17:00:00Z', 4],
+  ['2025-12-09T19:00:00Z', 3],
+  ['2025-12-12T19:00:00Z', 3],
+  ['2025-12-14T17:00:00Z', 5],
 ]
 
 export const demoUserSchedule = (): UserScheduleTVType => {
-  const streams: StreamTVType[] = demoStreams.map(([title, start, hours]) => {
-    const from = DateTime.fromISO(start, { zone: 'utc' })
+  const streams: StreamTVType[] = demoStreams.map(([start, hours], i) => {
+    const from = DateTime.fromJSDate(toThisYear(new Date(start)), {
+      zone: 'utc',
+    })
     return {
-      title,
-      subtitle: 'Jingle Jam 2025 fundraiser stream',
+      title: `Stream ${i + 1}`,
       start: from.toJSDate(),
       end: from.plus({ hours }).toJSDate(),
       creators: [
@@ -141,7 +178,7 @@ export const demoUserSchedule = (): UserScheduleTVType => {
     }
   })
   return {
-    title: 'ostof Jingle Jam 2025',
+    title: 'Demo Schedule',
     start: streams[0]!.start,
     end: streams[streams.length - 1]!.end,
     streams,

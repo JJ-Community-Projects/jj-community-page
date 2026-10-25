@@ -57,6 +57,7 @@ import {
   demoCauses,
   demoConfig,
   demoOverview,
+  demoSchedule,
   demoUserConfig,
   demoUserData,
   demoUserSchedule,
@@ -804,8 +805,13 @@ const yogsSchedule = os.yogsScheduleContract
     }),
   )
   .use(
-    demo(() =>
-      scheduleForExtension(`${DEMO_YEAR}`, `Yogscast Jingle Jam ${DEMO_YEAR}`),
+    demo(async () =>
+      demoSchedule(
+        await scheduleForExtension(
+          `${DEMO_YEAR}`,
+          `Yogscast Jingle Jam ${DEMO_YEAR}`,
+        ),
+      ),
     ),
   )
   .use(cached('config', () => ''))
@@ -833,10 +839,12 @@ const headlinerSchedule = os.headlinerScheduleContract
     }),
   )
   .use(
-    demo(() =>
-      scheduleForExtension(
-        `${DEMO_YEAR}-headliner`,
-        `Yogscast Jingle Jam ${DEMO_YEAR} Headliners`,
+    demo(async () =>
+      demoSchedule(
+        await scheduleForExtension(
+          `${DEMO_YEAR}-headliner`,
+          `Yogscast Jingle Jam ${DEMO_YEAR} Headliners`,
+        ),
       ),
     ),
   )
