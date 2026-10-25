@@ -1,0 +1,133 @@
+{
+  "count": 8,
+  "causes": [
+    {
+      "id": "18cb6ffd-3067-4ca8-8414-74eb733d79fd",
+      "name": "War Child",
+      "logo": "https://assets.jinglejam.no1mann.com/jingle-jam-2025/causes/war-child.webp",
+      "description": "Protecting, educating, and advocating for the rights of children impacted by the ongoing conflicts in Gaza, Ukraine and worldwide.",
+      "url": "https://www.warchild.org.uk/",
+      "donateUrl": "https://jinglejam.tiltify.com/campaigns?regionId=18cb6ffd-3067-4ca8-8414-74eb733d79fd",
+      "raised": {
+        "gbp": 467566.85,
+        "gbpFormatted": "£467,566.85",
+        "usd": 621751.72,
+        "usdFormatted": "$621,751.72",
+        "euro": 534148.37,
+        "euroFormatted": "534.148,37 €"
+      }
+    },
+    {
+      "id": "1b61ce0a-d32c-4dde-bf0a-4849317cce65",
+      "name": "Become",
+      "logo": "https://assets.jinglejam.no1mann.com/jingle-jam-2025/causes/become.webp",
+      "description": "Helping young people with experience of foster and residential care get the guidance, support, and community that everyone needs.",
+      "url": "https://becomecharity.org.uk/",
+      "donateUrl": "https://jinglejam.tiltify.com/campaigns?regionId=1b61ce0a-d32c-4dde-bf0a-4849317cce65",
+      "raised": {
+        "gbp": 361153.64,
+        "gbpFormatted": "£361,153.64",
+        "usd": 480247.68,
+        "usdFormatted": "$480,247.68",
+        "euro": 412581.92,
+        "euroFormatted": "412.581,92 €"
+      }
+    },
+    {
+      "id": "3d4fb356-891f-4f1e-9374-984aa5fdfdf5",
+      "name": "CALM",
+      "logo": "https://assets.jinglejam.no1mann.com/jingle-jam-2025/causes/calm.webp",
+      "description": "Hosting a life-saving suicide prevention helpline and vital online mental health resources for anyone who needs them.",
+      "url": "https://www.thecalmzone.net/",
+      "donateUrl": "https://jinglejam.tiltify.com/campaigns?regionId=3d4fb356-891f-4f1e-9374-984aa5fdfdf5",
+      "raised": {
+        "gbp": 492400.17,
+        "gbpFormatted": "£492,400.17",
+        "usd": 654774.07,
+        "usdFormatted": "$654,774.07",
+        "euro": 562517.95,
+        "euroFormatted": "562.517,95 €"
+      }
+    },
+    {
+      "id": "5350a34a-8b94-4513-bb1d-22becc2df6e4",
+      "name": "Make-A-Wish",
+      "logo": "https://assets.jinglejam.no1mann.com/jingle-jam-2025/causes/make-a-wish.webp",
+      "description": "Granting wishes to children with critical illnesses to inspire hope and celebrate culture and belonging.",
+      "url": "https://worldwish.org/",
+      "donateUrl": "https://jinglejam.tiltify.com/campaigns?regionId=5350a34a-8b94-4513-bb1d-22becc2df6e4",
+      "raised": {
+        "gbp": 468736.87,
+        "gbpFormatted": "£468,736.87",
+        "usd": 623307.56,
+        "usdFormatted": "$623,307.56",
+        "euro": 535485,
+        "euroFormatted": "535.485,00 €"
+      }
+    },
+    {
+      "id": "5cff6632-f97a-4f6e-96f1-7cd1c3fdb259",
+      "name": "The Grand Appeal",
+      "logo": "https://assets.jinglejam.no1mann.com/jingle-jam-2025/causes/the-grand-appeal.webp",
+      "description": "Creating 'Jingle Jam Building', a unique facility that will help sick children and their families at Bristol Children's Hospital.",
+      "url": "https://www.grandappeal.org.uk/",
+      "donateUrl": "https://jinglejam.tiltify.com/campaigns?regionId=5cff6632-f97a-4f6e-96f1-7cd1c3fdb259",
+      "raised": {
+        "gbp": 459432.7,
+        "gbpFormatted": "£459,432.70",
+        "usd": 610935.25,
+        "usdFormatted": "$610,935.25",
+        "euro": 524855.92,
+        "euroFormatted": "524.855,92 €"
+      }
+    },
+    {
+      "id": "809dfb7b-faef-4e2d-b78d-d5e197975dac",
+      "name": "The Trevor Project",
+      "logo": "https://assets.jinglejam.no1mann.com/jingle-jam-2025/causes/the-trevor-project.webp",
+      "description": "Providing 24/7 crisis intervention services to LGBTQ+ young people—backed by research, education, advocacy, and peer support.",
+      "url": "https://www.thetrevorproject.org/",
+      "donateUrl": "https://jinglejam.tiltify.com/campaigns?regionId=809dfb7b-faef-4e2d-b78d-d5e197975dac",
+      "raised": {
+        "gbp": 488597.6,
+        "gbpFormatted": "£488,597.60",
+        "usd": 649717.57,
+        "usdFormatted": "$649,717.57",
+        "euro": 558173.9,
+        "euroFormatted": "558.173,90 €"
+      }
+    },
+    {
+      "id": "974be205-3c5f-4f8c-9dd4-892b6b1e53d2",
+      "name": "Autistica",
+      "logo": "https://assets.jinglejam.no1mann.com/jingle-jam-2025/causes/autistica.webp",
+      "description": "Building evidence-based solutions for young autistic people to make society more inclusive by 2030.",
+      "url": "https://www.autistica.org.uk/",
+      "donateUrl": "https://jinglejam.tiltify.com/campaigns?regionId=974be205-3c5f-4f8c-9dd4-892b6b1e53d2",
+      "raised": {
+        "gbp": 303339.31,
+        "gbpFormatted": "£303,339.31",
+        "usd": 403368.5,
+        "usdFormatted": "$403,368.50",
+        "euro": 346534.83,
+        "euroFormatted": "346.534,83 €"
+      }
+    },
+    {
+      "id": "d02de896-6904-4f80-9755-253afddac343",
+      "name": "WWF",
+      "logo": "https://assets.jinglejam.no1mann.com/jingle-jam-2025/causes/wwf.webp",
+      "description": "Leading the fight against climate change for a world where nature and wildlife can thrive for future generations.",
+      "url": "https://www.wwf.org.uk/",
+      "donateUrl": "https://jinglejam.tiltify.com/campaigns?regionId=d02de896-6904-4f80-9755-253afddac343",
+      "raised": {
+        "gbp": 384017.98,
+        "gbpFormatted": "£384,017.98",
+        "usd": 510651.77,
+        "usdFormatted": "$510,651.77",
+        "euro": 438702.14,
+        "euroFormatted": "438.702,14 €"
+      }
+    }
+  ]
+}

@@ -50,6 +50,17 @@ import {
   type YogsScheduleOutput,
 } from './util.ts'
 import { CACHE_POLICY } from '../../../services/cachePolicy.ts'
+import {
+  DEMO_YEAR,
+  demo,
+  demoCampaigns,
+  demoCauses,
+  demoConfig,
+  demoOverview,
+  demoUserConfig,
+  demoUserData,
+  demoUserSchedule,
+} from './demo.ts'
 import { putCache } from '../../../services/kvCache.ts'
 import { getScheduleFromContentForCreator } from '../../../../content/getYogsScheduleFromContent.ts'
 import type {
@@ -107,7 +118,6 @@ const yogsMembers = [
 ]
 const yogsId = '20786541'
 const ostofbot = '960814823'
-const ostof = '96860795'
 
 interface ORPCContext extends ResponseHeadersPluginContext {
   locals?: App.Locals
@@ -182,6 +192,7 @@ const extensionConfig = os.extensionConfigContract
       staleWhileRevalidate: 30,
     }),
   )
+  .use(demo(demoConfig))
   .use(cached('config', () => ''))
   .use(rateLimit)
   .handler(async ({ context, input }) => {
@@ -285,6 +296,7 @@ const userExtensionConfig = os.userExtensionConfigContract
       staleWhileRevalidate: 120,
     }),
   )
+  .use(demo(demoUserConfig))
   .use(cached('schedule', (i: ExtensionInput) => i.channelId))
   .use(rateLimit)
   .use(dbMiddleware)
@@ -307,7 +319,7 @@ const userExtensionConfig = os.userExtensionConfigContract
       }
     }
 
-    const isYogs = input.channelId === yogsId || input.channelId === ostof
+    const isYogs = input.channelId === yogsId
     if (isYogs) {
       return {
         hasCampaign: false,
@@ -435,6 +447,7 @@ const campaigns = os.campaignsContract
       staleWhileRevalidate: 30,
     }),
   )
+  .use(demo(demoCampaigns))
   .use(cached('jjLive', () => ''))
   .use(rateLimit)
   .handler(async ({ context }) => {
@@ -515,6 +528,7 @@ const causes = os.causesContract
       staleWhileRevalidate: 30,
     }),
   )
+  .use(demo(demoCauses))
   .use(cached('jjLive', (i: ExtensionInput) => i.channelId))
   .use(rateLimit)
   .handler(async ({ context, input }) => {
@@ -590,6 +604,7 @@ const overview = os.overviewContract
       staleWhileRevalidate: 30,
     }),
   )
+  .use(demo(demoOverview))
   .use(cached('jjLive', (i: ExtensionInput) => overviewVariant(i.channelId)))
   .use(rateLimit)
   .handler(async ({ context, input }) => {
@@ -788,6 +803,11 @@ const yogsSchedule = os.yogsScheduleContract
       staleWhileRevalidate: 120,
     }),
   )
+  .use(
+    demo(() =>
+      scheduleForExtension(`${DEMO_YEAR}`, `Yogscast Jingle Jam ${DEMO_YEAR}`),
+    ),
+  )
   .use(cached('config', () => ''))
   .use(rateLimit)
   .handler(async ({ context }) => {
@@ -811,6 +831,14 @@ const headlinerSchedule = os.headlinerScheduleContract
       sMaxAge: 60,
       staleWhileRevalidate: 120,
     }),
+  )
+  .use(
+    demo(() =>
+      scheduleForExtension(
+        `${DEMO_YEAR}-headliner`,
+        `Yogscast Jingle Jam ${DEMO_YEAR} Headliners`,
+      ),
+    ),
   )
   .use(cached('config', () => ''))
   .use(rateLimit)
@@ -836,6 +864,7 @@ const userData = os.userDataContract
       staleWhileRevalidate: 30,
     }),
   )
+  .use(demo(demoUserData))
   .use(cached('jjLive', (i: ExtensionInput) => i.channelId, { negativeTtl: CACHE_POLICY.channelMap.negativeTtl }))
   .use(rateLimit)
   .use(dbMiddleware)
@@ -1042,6 +1071,7 @@ const userSchedule = os.userScheduleContract
       staleWhileRevalidate: 30,
     }),
   )
+  .use(demo(demoUserSchedule))
   .use(cached('schedule', (i: ExtensionInput) => i.channelId))
   .use(rateLimit)
   .use(dbMiddleware)

@@ -1,0 +1,34 @@
+{
+  "raised": {
+    "yogscast": {
+      "gbp": 1745312.28,
+      "gbpFormatted": "£1,745,312.28",
+      "usd": 2320846.54,
+      "usdFormatted": "$2,320,846.54",
+      "euro": 1745312.28,
+      "euroFormatted": "1.745.312,28 €"
+    },
+    "fundraisers": {
+      "gbp": 1680648.45,
+      "gbpFormatted": "£1,680,648.45",
+      "usd": 2234859.17,
+      "usdFormatted": "$2,234,859.17",
+      "euro": 1680648.45,
+      "euroFormatted": "1.680.648,45 €"
+    },
+    "total": {
+      "gbp": 3425960.73,
+      "gbpFormatted": "£3,425,960.73",
+      "usd": 4555705.71,
+      "usdFormatted": "$4,555,705.71",
+      "euro": 3425960.73,
+      "euroFormatted": "3.425.960,73 €"
+    }
+  },
+  "collections": {
+    "redeemed": 54923,
+    "total": 98000
+  },
+  "donations": 71154,
+  "date": "2025-12-21T22:54:27.560Z"
+}

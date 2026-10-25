@@ -1,0 +1,3082 @@
+{
+  "count": 603,
+  "campaigns": [
+    {
+      "tiltifySlug": "hjune",
+      "campaignName": "Trust in Rust 6",
+      "tiltifyUrl": "https://tiltify.com/+trust-in-rust/six",
+      "tiltifyName": "hJune",
+      "tiltifyDescription": "Join us in supporting Jingle Jam 2025 by participating in an exciting livestream event to make a positive impact.",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/85116/52075912-2ec3-4399-8fad-6c7a625a61b8.jpeg",
+      "raised": {
+        "gbp": 224321.1,
+        "gbpFormatted": "£224,321.10",
+        "usd": 298293.24,
+        "usdFormatted": "$298,293.24",
+        "euro": 256264.42,
+        "euroFormatted": "256.264,42 €"
+      },
+      "goal": {
+        "gbp": 225000,
+        "gbpFormatted": "£225,000.00",
+        "usd": 299196.01,
+        "usdFormatted": "$299,196.01",
+        "euro": 257040,
+        "euroFormatted": "257.040,00 €"
+      },
+      "twitch": {
+        "name": "hJune",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/7610c39060476845-profile_image-300x300.png",
+        "isLive": true,
+        "url": "https://twitch.tv/hjune"
+      }
+    },
+    {
+      "tiltifySlug": "hrry",
+      "campaignName": "BLEBJAM - CALM x War Child - Jingle Jam 2025",
+      "tiltifyUrl": "https://tiltify.com/@hrry/blebjam",
+      "tiltifyName": "hrry",
+      "tiltifyDescription": "Donations to this campaign will be split between CALM & War Child!\n\nThis year the Blebs are coming together to support 2? amazing causes! \n\nWe're continuing the fight against living miserably, and showing our love again for CALM - the brilliant mental health charity. It's only together we can help people end their misery, not their lives. And we're also supporting War Child! They do amazing work around the world helping children who have been affected by conflict. <3\n\nPlease donate generously!",
+      "tiltifyCauseId": "3d4fb356-891f-4f1e-9374-984aa5fdfdf5",
+      "avatar": "https://assets.tiltify.com/assets/default-avatar.png",
+      "raised": {
+        "gbp": 15186.51,
+        "gbpFormatted": "£15,186.51",
+        "usd": 20194.41,
+        "usdFormatted": "$20,194.41",
+        "euro": 17349.07,
+        "euroFormatted": "17.349,07 €"
+      },
+      "goal": {
+        "gbp": 15151.51,
+        "gbpFormatted": "£15,151.51",
+        "usd": 20147.87,
+        "usdFormatted": "$20,147.87",
+        "euro": 17309.09,
+        "euroFormatted": "17.309,09 €"
+      },
+      "twitch": {
+        "name": "Hrry",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/b96b5bdb-7ae0-420e-b8ed-2410b14ed01e-profile_image-300x300.png",
+        "isLive": true,
+        "url": "https://twitch.tv/hrry"
+      }
+    },
+    {
+      "tiltifySlug": "mousie",
+      "campaignName": "Mousie & Friends for War Child",
+      "tiltifyUrl": "https://tiltify.com/@mousie/mousies-for-warchild",
+      "tiltifyName": "mousie",
+      "tiltifyDescription": "I am supporting Jingle Jam 2025 to aid remarkable charities like WarChild, who do incredible work for children affected by war. I truly believe that childhood is such a magical and delicate time in life, and it hurts my heart to see that magic ripped away. Kids should just get to be kids and not worry about the horrors happening around them. War Child do such incredible work to help kids.  I hope we can see you at our special stream on the 13th at 8pm GMT!",
+      "tiltifyCauseId": "18cb6ffd-3067-4ca8-8414-74eb733d79fd",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/62690/blob-bdf51e2e-d040-401f-b4a8-846f9a705fee.png",
+      "raised": {
+        "gbp": 12955,
+        "gbpFormatted": "£12,955.00",
+        "usd": 17227.04,
+        "usdFormatted": "$17,227.04",
+        "euro": 14799.79,
+        "euroFormatted": "14.799,79 €"
+      },
+      "goal": {
+        "gbp": 6750,
+        "gbpFormatted": "£6,750.00",
+        "usd": 8975.88,
+        "usdFormatted": "$8,975.88",
+        "euro": 7711.2,
+        "euroFormatted": "7.711,20 €"
+      },
+      "twitch": {
+        "name": "Mousie",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/2c3ead1b-d850-4d1d-a274-dcadbaabe17f-profile_image-300x300.png",
+        "isLive": true,
+        "url": "https://twitch.tv/mousie"
+      }
+    },
+    {
+      "tiltifySlug": "inthelittlewood",
+      "campaignName": "InTheLittleWood - Jingle Jam 2025",
+      "tiltifyUrl": "https://tiltify.com/@inthelittlewood/inthelittlewood-jingle-jam-2025",
+      "tiltifyName": "InTheLittleWood",
+      "tiltifyDescription": "Hello everybody! This year we're going again for Jingle Jam and raising as much money as we can for 8 amazing charities\n\nLet's show them the power of the MCYT community and all the good we can do :)",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/178431/blob-993807dd-d98c-45a0-abb7-2273a3d0dd0f.jpeg",
+      "raised": {
+        "gbp": 12696.29,
+        "gbpFormatted": "£12,696.29",
+        "usd": 16883.02,
+        "usdFormatted": "$16,883.02",
+        "euro": 14504.24,
+        "euroFormatted": "14.504,24 €"
+      },
+      "goal": {
+        "gbp": 15000,
+        "gbpFormatted": "£15,000.00",
+        "usd": 19946.4,
+        "usdFormatted": "$19,946.40",
+        "euro": 17136,
+        "euroFormatted": "17.136,00 €"
+      },
+      "twitch": {
+        "name": "InTheLittleWood",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/5c2bddb9-11e6-4ee4-8025-abc565891340-profile_image-300x300.png",
+        "isLive": true,
+        "url": "https://twitch.tv/inthelittlewood"
+      }
+    },
+    {
+      "tiltifySlug": "rinpenrose",
+      "campaignName": "Rin CALMrose (Jingle Jam 2025)",
+      "tiltifyUrl": "https://tiltify.com/@rinpenrose/rin-calmrose-jingle-jam-2025",
+      "tiltifyName": "rinpenrose",
+      "tiltifyDescription": "We are once again fundraising for CALM this Jingle Jam, because I think having good mental health might be a good thing actually. Together, we can raise AT LEAST five dollars. I believe in us",
+      "tiltifyCauseId": "3d4fb356-891f-4f1e-9374-984aa5fdfdf5",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/767306/blob-e0d91f6b-810f-4ae9-8dee-76406ffbbf98.png",
+      "raised": {
+        "gbp": 11798.47,
+        "gbpFormatted": "£11,798.47",
+        "usd": 15689.13,
+        "usdFormatted": "$15,689.13",
+        "euro": 13478.57,
+        "euroFormatted": "13.478,57 €"
+      },
+      "goal": {
+        "gbp": 10000,
+        "gbpFormatted": "£10,000.00",
+        "usd": 13297.6,
+        "usdFormatted": "$13,297.60",
+        "euro": 11424,
+        "euroFormatted": "11.424,00 €"
+      },
+      "twitch": {
+        "name": "RinPenrose",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/09983ba6-1853-4d90-9806-c9390a51c609-profile_image-300x300.png",
+        "isLive": true,
+        "url": "https://twitch.tv/rinpenrose"
+      }
+    },
+    {
+      "tiltifySlug": "ginauz",
+      "campaignName": "Jingle Jam 2025 - Team WWF - Ginauz",
+      "tiltifyUrl": "https://tiltify.com/@ginauz/jinglejam",
+      "tiltifyName": "Ginauz",
+      "tiltifyDescription": "Join us in raising funds for Jingle Jam 2025, combining the power of livestreams to make a positive impact for this incredible cause.",
+      "tiltifyCauseId": "d02de896-6904-4f80-9755-253afddac343",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/970002/blob-3cf19a92-5587-4ed6-8c44-32e30bcdeddc.png",
+      "raised": {
+        "gbp": 6146.69,
+        "gbpFormatted": "£6,146.69",
+        "usd": 8173.62,
+        "usdFormatted": "$8,173.62",
+        "euro": 7021.98,
+        "euroFormatted": "7.021,98 €"
+      },
+      "goal": {
+        "gbp": 6000,
+        "gbpFormatted": "£6,000.00",
+        "usd": 7978.56,
+        "usdFormatted": "$7,978.56",
+        "euro": 6854.4,
+        "euroFormatted": "6.854,40 €"
+      },
+      "twitch": {
+        "name": "Ginauz",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/830f006e-24f7-4c42-ae9d-ee0fea8c1b2d-profile_image-300x300.png",
+        "isLive": true,
+        "url": "https://twitch.tv/ginauz"
+      }
+    },
+    {
+      "tiltifySlug": "esamarathon",
+      "campaignName": "ESA for Jingle Jam 2025",
+      "tiltifyUrl": "https://tiltify.com/@esamarathon/esa-for-jingle-jam-2025",
+      "tiltifyName": "esamarathon",
+      "tiltifyDescription": "Join us in supporting Jingle Jam 2025, an initiative making a difference through livestream events. Together, we can contribute to an amazing cause this holiday season.",
+      "tiltifyCauseId": "5350a34a-8b94-4513-bb1d-22becc2df6e4",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/119257/450b2391-edaf-4aff-ba6b-f0e9ceb5a8c4.jpeg",
+      "raised": {
+        "gbp": 2820.23,
+        "gbpFormatted": "£2,820.23",
+        "usd": 3750.23,
+        "usdFormatted": "$3,750.23",
+        "euro": 3221.83,
+        "euroFormatted": "3.221,83 €"
+      },
+      "goal": {
+        "gbp": 10000,
+        "gbpFormatted": "£10,000.00",
+        "usd": 13297.6,
+        "usdFormatted": "$13,297.60",
+        "euro": 11424,
+        "euroFormatted": "11.424,00 €"
+      },
+      "twitch": {
+        "name": "ESAMarathon",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/21df6206-6be7-4a70-937d-e4853b99c475-profile_image-300x300.png",
+        "isLive": true,
+        "url": "https://twitch.tv/esamarathon"
+      }
+    },
+    {
+      "tiltifySlug": "lilylikesrocks",
+      "campaignName": "Lily Likes Jingle Jam 2025",
+      "tiltifyUrl": "https://tiltify.com/@lilylikesrocks/lily-likes-jingle-jam-25",
+      "tiltifyName": "lilylikesrocks",
+      "tiltifyDescription": "I'm fundraising for Autistica during this year's Jingle Jam >:)",
+      "tiltifyCauseId": "974be205-3c5f-4f8c-9dd4-892b6b1e53d2",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/230016/blob-309fc089-1138-434d-9065-5d54e59c5901.png",
+      "raised": {
+        "gbp": 2650,
+        "gbpFormatted": "£2,650.00",
+        "usd": 3523.86,
+        "usdFormatted": "$3,523.86",
+        "euro": 3027.36,
+        "euroFormatted": "3.027,36 €"
+      },
+      "goal": {
+        "gbp": 2500,
+        "gbpFormatted": "£2,500.00",
+        "usd": 3324.4,
+        "usdFormatted": "$3,324.40",
+        "euro": 2856,
+        "euroFormatted": "2.856,00 €"
+      },
+      "twitch": {
+        "name": "lilylikesrocks",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/ee30f08d-88d4-4731-af72-b3fa913e18ec-profile_image-300x300.png",
+        "isLive": true,
+        "url": "https://twitch.tv/lilylikesrocks"
+      }
+    },
+    {
+      "tiltifySlug": "saithsfuff",
+      "campaignName": "Fuff X Jingle Jam",
+      "tiltifyUrl": "https://tiltify.com/@saithsfuff/fuff-x-jingle-jam",
+      "tiltifyName": "Saithsfuff",
+      "tiltifyDescription": "Join me in supporting Jingle Jam 2025, a fantastic charity initiative using livestreams and social media to bring people together for a great cause. Let's make a difference together!",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/7877/blob-2dda4194-8e53-4540-ac85-c645e991afbc.png",
+      "raised": {
+        "gbp": 2000.69,
+        "gbpFormatted": "£2,000.69",
+        "usd": 2660.44,
+        "usdFormatted": "$2,660.44",
+        "euro": 2285.59,
+        "euroFormatted": "2.285,59 €"
+      },
+      "goal": {
+        "gbp": 2000,
+        "gbpFormatted": "£2,000.00",
+        "usd": 2659.52,
+        "usdFormatted": "$2,659.52",
+        "euro": 2284.8,
+        "euroFormatted": "2.284,80 €"
+      },
+      "twitch": {
+        "name": "saithsfuff",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/364ca196-72db-45da-887a-8368a94d446b-profile_image-300x300.png",
+        "isLive": true,
+        "url": "https://twitch.tv/saithsfuff"
+      }
+    },
+    {
+      "tiltifySlug": "mysta-gaming",
+      "campaignName": "Stream2Smile",
+      "tiltifyUrl": "https://tiltify.com/@mysta-gaming/stream2smile",
+      "tiltifyName": "Mysta Gaming",
+      "tiltifyDescription": "Για άλλη μια χρονιά ήμαστε εδώ να χαρίσουμε χαμόγελα στις γιορτές για αυτούς που τα χρειάζονται περισσότερο! :)",
+      "tiltifyCauseId": "5350a34a-8b94-4513-bb1d-22becc2df6e4",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/54158/blob-266d2f2e-ec2a-4038-bcc1-c9f59a1e7fb5.png",
+      "raised": {
+        "gbp": 1605,
+        "gbpFormatted": "£1,605.00",
+        "usd": 2134.26,
+        "usdFormatted": "$2,134.26",
+        "euro": 1833.55,
+        "euroFormatted": "1.833,55 €"
+      },
+      "goal": {
+        "gbp": 2000,
+        "gbpFormatted": "£2,000.00",
+        "usd": 2659.52,
+        "usdFormatted": "$2,659.52",
+        "euro": 2284.8,
+        "euroFormatted": "2.284,80 €"
+      },
+      "twitch": {
+        "name": "MystaGaming",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/46005417-030e-43a4-8745-650618105f66-profile_image-300x300.png",
+        "isLive": true,
+        "url": "https://twitch.tv/mystagaming"
+      }
+    },
+    {
+      "tiltifySlug": "ghostfawx",
+      "campaignName": "GhostFawx JingleJam 2025!",
+      "tiltifyUrl": "https://tiltify.com/@ghostfawx/ghostfawx-jinglejam-2025",
+      "tiltifyName": "ghostfawx",
+      "tiltifyDescription": "In 2018, I lost someone near and dear to me. Nothing can quite prepare you for the untimely loss of someone who was such a role model and support network.\nFor a while I sent him games on steam still, they would repeatedly come back to me when they weren't accepted, it felt wrong not getting him a Christmas Present, and so I do this! \nEvery year, I hope to raise money for CALM with him at the forefront of my mind.\nTogether, we can assure there's no empty chairs at the Christmas table.",
+      "tiltifyCauseId": "3d4fb356-891f-4f1e-9374-984aa5fdfdf5",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/789501/blob-5a57265d-02e6-4811-b367-825e8850815c.png",
+      "raised": {
+        "gbp": 1040,
+        "gbpFormatted": "£1,040.00",
+        "usd": 1382.95,
+        "usdFormatted": "$1,382.95",
+        "euro": 1188.1,
+        "euroFormatted": "1.188,10 €"
+      },
+      "goal": {
+        "gbp": 1000,
+        "gbpFormatted": "£1,000.00",
+        "usd": 1329.76,
+        "usdFormatted": "$1,329.76",
+        "euro": 1142.4,
+        "euroFormatted": "1.142,40 €"
+      },
+      "twitch": {
+        "name": "GhostFawx",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/51f82c3f-e7a2-45ee-9057-570dc7d784da-profile_image-300x300.png",
+        "isLive": true,
+        "url": "https://twitch.tv/ghostfawx"
+      }
+    },
+    {
+      "tiltifySlug": "grumblesthedwarf",
+      "campaignName": "Grumbles Fundraiser for Jingle Jam 2025",
+      "tiltifyUrl": "https://tiltify.com/@grumblesthedwarf/grumbles-fundraiser-for-jingle-jam-2025",
+      "tiltifyName": "grumblesthedwarf",
+      "tiltifyDescription": "Join me in supporting Jingle Jam 2025 by participating in this exciting online initiative. Together, we can make a meaningful impact through social media and livestreaming efforts.\n\nWe're supporting autistica once more, raising awareness and support for a better life for people with autism.",
+      "tiltifyCauseId": "974be205-3c5f-4f8c-9dd4-892b6b1e53d2",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/203440/a77b9d95-283f-4982-9f36-d9a8f57aa61f.jpeg",
+      "raised": {
+        "gbp": 794.69,
+        "gbpFormatted": "£794.69",
+        "usd": 1056.75,
+        "usdFormatted": "$1,056.75",
+        "euro": 907.85,
+        "euroFormatted": "907,85 €"
+      },
+      "goal": {
+        "gbp": 750.69,
+        "gbpFormatted": "£750.69",
+        "usd": 998.24,
+        "usdFormatted": "$998.24",
+        "euro": 857.59,
+        "euroFormatted": "857,59 €"
+      },
+      "twitch": {
+        "name": "GrumblesTheDwarf",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/395749c6-f9dd-414e-a86b-86aff0818a7d-profile_image-300x300.png",
+        "isLive": true,
+        "url": "https://twitch.tv/grumblesthedwarf"
+      }
+    },
+    {
+      "tiltifySlug": "howtobequiet",
+      "campaignName": "Kweet helps Kids by helping Fireshine help Corekeeper help Crowd Control help JJ's Make-A-Wish",
+      "tiltifyUrl": "https://tiltify.com/@howtobequiet/kweet-helps-fireshine-help-jingle-jam-2025",
+      "tiltifyName": "howtobequiet",
+      "tiltifyDescription": "I am raising money for Jingle Jam to support children in need. They rely on our kindness and support, making this an easy and meaningful cause to contribute to.",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/457119/blob-70e26ce9-e0ad-4c08-9b07-f34e639bf5fc.png",
+      "raised": {
+        "gbp": 620,
+        "gbpFormatted": "£620.00",
+        "usd": 824.45,
+        "usdFormatted": "$824.45",
+        "euro": 708.29,
+        "euroFormatted": "708,29 €"
+      },
+      "goal": {
+        "gbp": 750,
+        "gbpFormatted": "£750.00",
+        "usd": 997.32,
+        "usdFormatted": "$997.32",
+        "euro": 856.8,
+        "euroFormatted": "856,80 €"
+      },
+      "twitch": {
+        "name": "HowToBeQuiet",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/howtobequiet-profile_image-9522752080495bad-300x300.png",
+        "isLive": true,
+        "url": "https://twitch.tv/howtobequiet"
+      }
+    },
+    {
+      "tiltifySlug": "chiotails",
+      "campaignName": "Chiotails x Autistica for Jingle Jam 2025!",
+      "tiltifyUrl": "https://tiltify.com/@chiotails/chiotails-x-autistica-for-jingle-jam-2025",
+      "tiltifyName": "Chiotails",
+      "tiltifyDescription": "Join me in supporting Jingle Jam 2025! Let's come together to make a positive impact and raise funds for this wonderful cause.",
+      "tiltifyCauseId": "974be205-3c5f-4f8c-9dd4-892b6b1e53d2",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/267274/blob-e33e96fa-f331-4f73-a41f-f0735886e08d.png",
+      "raised": {
+        "gbp": 527,
+        "gbpFormatted": "£527.00",
+        "usd": 700.78,
+        "usdFormatted": "$700.78",
+        "euro": 602.04,
+        "euroFormatted": "602,04 €"
+      },
+      "goal": {
+        "gbp": 100,
+        "gbpFormatted": "£100.00",
+        "usd": 132.98,
+        "usdFormatted": "$132.98",
+        "euro": 114.24,
+        "euroFormatted": "114,24 €"
+      },
+      "twitch": {
+        "name": "Chiotails",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/a611659f-3d44-4e26-a3ea-67570d65a3e8-profile_image-300x300.png",
+        "isLive": true,
+        "url": "https://twitch.tv/chiotails"
+      }
+    },
+    {
+      "tiltifySlug": "ruthberry",
+      "campaignName": "Ruth’s Jingle Jam Fundraiser",
+      "tiltifyUrl": "https://tiltify.com/@ruthberry/ruths-jingle-jam-fundraiser",
+      "tiltifyName": "Ruthberry",
+      "tiltifyDescription": "Join me in raising money for Jingle Jam 2025. Together, we can make an impact by coming together on social media and livestreaming to support this incredible cause.",
+      "tiltifyCauseId": "5cff6632-f97a-4f6e-96f1-7cd1c3fdb259",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/357365/blob-385fa7f3-791a-4d87-ae47-63499eca05f1.png",
+      "raised": {
+        "gbp": 500,
+        "gbpFormatted": "£500.00",
+        "usd": 664.88,
+        "usdFormatted": "$664.88",
+        "euro": 571.2,
+        "euroFormatted": "571,20 €"
+      },
+      "goal": {
+        "gbp": 500,
+        "gbpFormatted": "£500.00",
+        "usd": 664.88,
+        "usdFormatted": "$664.88",
+        "euro": 571.2,
+        "euroFormatted": "571,20 €"
+      },
+      "twitch": {
+        "name": "Ruthberry",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/c16f327d-78c6-4cad-9d7e-03c4a53397b4-profile_image-300x300.png",
+        "isLive": true,
+        "url": "https://twitch.tv/ruthberry"
+      }
+    },
+    {
+      "tiltifySlug": "itslokiluck",
+      "campaignName": "Loki's Fundraiser for Jingle Jam 2025",
+      "tiltifyUrl": "https://tiltify.com/@itslokiluck/onyx-and-lokis-fundraiser-for-jingle-jam-2025",
+      "tiltifyName": "itslokiluck",
+      "tiltifyDescription": "Join us in supporting Jingle Jam 2025, a cause dedicated to making a positive impact through social media and livestream events. Your contributions will help create meaningful change.",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/977532/blob-b38200b2-ce52-4cba-9196-d9d6b80a5266.png",
+      "raised": {
+        "gbp": 305,
+        "gbpFormatted": "£305.00",
+        "usd": 405.58,
+        "usdFormatted": "$405.58",
+        "euro": 348.43,
+        "euroFormatted": "348,43 €"
+      },
+      "goal": {
+        "gbp": 350,
+        "gbpFormatted": "£350.00",
+        "usd": 465.42,
+        "usdFormatted": "$465.42",
+        "euro": 399.84,
+        "euroFormatted": "399,84 €"
+      },
+      "twitch": {
+        "name": "itslokiluck",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/077b2bb6-4672-41c1-8382-518845fc5677-profile_image-300x300.png",
+        "isLive": true,
+        "url": "https://twitch.tv/itslokiluck"
+      }
+    },
+    {
+      "tiltifySlug": "davexmachina",
+      "campaignName": "davexmachina Fundraiser for Jingle Jam 2025",
+      "tiltifyUrl": "https://tiltify.com/@davexmachina-fcc1c7/davexmachina-fundraiser-for-jingle-jam-2025",
+      "tiltifyName": "davexmachina_",
+      "tiltifyDescription": "Jingle Jam 2025 - Campaign Against Living Miserably (CALM)",
+      "tiltifyCauseId": "3d4fb356-891f-4f1e-9374-984aa5fdfdf5",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/994802/blob-8fb81079-eba6-4312-8db2-425e001d27a9.png",
+      "raised": {
+        "gbp": 276,
+        "gbpFormatted": "£276.00",
+        "usd": 367.01,
+        "usdFormatted": "$367.01",
+        "euro": 315.3,
+        "euroFormatted": "315,30 €"
+      },
+      "goal": {
+        "gbp": 100,
+        "gbpFormatted": "£100.00",
+        "usd": 132.98,
+        "usdFormatted": "$132.98",
+        "euro": 114.24,
+        "euroFormatted": "114,24 €"
+      },
+      "twitch": {
+        "name": "davexmachinaTV",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/53a1860c-2a4b-46ec-8390-055feae4d320-profile_image-300x300.png",
+        "isLive": true,
+        "url": "https://twitch.tv/davexmachinatv"
+      }
+    },
+    {
+      "tiltifySlug": "saithsfuff",
+      "campaignName": "Fuff X Jingle Jam Auction",
+      "tiltifyUrl": "https://tiltify.com/@saithsfuff/auctions/fuff-x-jingle-jam-auction",
+      "tiltifyName": "Saithsfuff",
+      "tiltifyDescription": "The Fuff X Jingle Jam auction house will contain items that have been made during Fuffs charity fundraiser streams on twitch.tv/saithsfuff (plus more) !!",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/7877/blob-2dda4194-8e53-4540-ac85-c645e991afbc.png",
+      "raised": {
+        "gbp": 228.34,
+        "gbpFormatted": "£228.34",
+        "usd": 303.64,
+        "usdFormatted": "$303.64",
+        "euro": 260.86,
+        "euroFormatted": "260,86 €"
+      },
+      "goal": {
+        "gbp": 100,
+        "gbpFormatted": "£100.00",
+        "usd": 132.98,
+        "usdFormatted": "$132.98",
+        "euro": 114.24,
+        "euroFormatted": "114,24 €"
+      },
+      "twitch": {
+        "name": "saithsfuff",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/364ca196-72db-45da-887a-8368a94d446b-profile_image-300x300.png",
+        "isLive": true,
+        "url": "https://twitch.tv/saithsfuff"
+      }
+    },
+    {
+      "tiltifySlug": "jambo-xl",
+      "campaignName": "#KeepingCalm",
+      "tiltifyUrl": "https://tiltify.com/@jambo-xl/keepingcalm",
+      "tiltifyName": "jambo_xl",
+      "tiltifyDescription": "I'm raising money through Jingle Jam 2025 to support mental health awareness. This cause is deeply important to me as I want to ensure others know they're never alone, no matter how tough things may seem. Through this event, I aim to help provide tools and support for those in need and start essential conversations about mental health.",
+      "tiltifyCauseId": "3d4fb356-891f-4f1e-9374-984aa5fdfdf5",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/577972/blob-e4730216-b672-4475-880a-4d53ce209727.jpeg",
+      "raised": {
+        "gbp": 215,
+        "gbpFormatted": "£215.00",
+        "usd": 285.9,
+        "usdFormatted": "$285.90",
+        "euro": 245.62,
+        "euroFormatted": "245,62 €"
+      },
+      "goal": {
+        "gbp": 150,
+        "gbpFormatted": "£150.00",
+        "usd": 199.46,
+        "usdFormatted": "$199.46",
+        "euro": 171.36,
+        "euroFormatted": "171,36 €"
+      },
+      "twitch": {
+        "name": "jambo_xl",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/02096c81-d76a-478f-98a0-8a92198d5f64-profile_image-300x300.png",
+        "isLive": true,
+        "url": "https://twitch.tv/jambo_xl"
+      }
+    },
+    {
+      "tiltifySlug": "ghostlytuna",
+      "campaignName": "JJ for CALM 2025",
+      "tiltifyUrl": "https://tiltify.com/@ghostlytuna/jj-for-calm-2025",
+      "tiltifyName": "ghostlytuna",
+      "tiltifyDescription": "Join us in supporting Jingle Jam 2025 through a livestream event to make a positive impact for charitable causes this holiday season.",
+      "tiltifyCauseId": "3d4fb356-891f-4f1e-9374-984aa5fdfdf5",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/68590/blob-4d35d89f-940d-4872-ba1c-bbd715efe426.png",
+      "raised": {
+        "gbp": 200.07,
+        "gbpFormatted": "£200.07",
+        "usd": 266.05,
+        "usdFormatted": "$266.05",
+        "euro": 228.56,
+        "euroFormatted": "228,56 €"
+      },
+      "goal": {
+        "gbp": 250,
+        "gbpFormatted": "£250.00",
+        "usd": 332.44,
+        "usdFormatted": "$332.44",
+        "euro": 285.6,
+        "euroFormatted": "285,60 €"
+      },
+      "twitch": {
+        "name": "GhostlyTuna",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/9ebffd3b-ce9a-455e-be0a-43fa561b1c9c-profile_image-300x300.png",
+        "isLive": true,
+        "url": "https://twitch.tv/ghostlytuna"
+      }
+    },
+    {
+      "tiltifySlug": "indelacio",
+      "campaignName": "Indelacio Jams the Jingles For WWF",
+      "tiltifyUrl": "https://tiltify.com/@indelacio/indelacio-jams-the-jingles-for-wwf",
+      "tiltifyName": "Indelacio",
+      "tiltifyDescription": "I am supporting WWF raising funds for charity as part of jingle jam, the annual yogscast charity fundraising event. I will be doing various fund raising efforts and you can support charity and get access to your very own collection of games for supporting charity, this year I will be raising funds to help the endangered animals.  All part of jingle jam this xmas, happy jinglemas.",
+      "tiltifyCauseId": "d02de896-6904-4f80-9755-253afddac343",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/761879/blob-eb127171-d42f-4663-a8e1-48f4cac5980b.jpeg",
+      "raised": {
+        "gbp": 35,
+        "gbpFormatted": "£35.00",
+        "usd": 46.54,
+        "usdFormatted": "$46.54",
+        "euro": 39.98,
+        "euroFormatted": "39,98 €"
+      },
+      "goal": {
+        "gbp": 300,
+        "gbpFormatted": "£300.00",
+        "usd": 398.93,
+        "usdFormatted": "$398.93",
+        "euro": 342.72,
+        "euroFormatted": "342,72 €"
+      },
+      "twitch": {
+        "name": "Indelacio_co_uk",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/indelacio_co_uk-profile_image-435277fad758b157-300x300.jpeg",
+        "isLive": true,
+        "url": "https://twitch.tv/indelacio_co_uk"
+      }
+    },
+    {
+      "tiltifySlug": "summerrejects",
+      "campaignName": "SummerRejects' Jingle Jam 2025 Fundraiser",
+      "tiltifyUrl": "https://tiltify.com/@summerrejects/summerrejects-jingle-jam-2025-fundraiser",
+      "tiltifyName": "summerrejects",
+      "tiltifyDescription": "Support the festive spirit of giving with Jingle Jam 2025! Join us in helping raise money to benefit important causes through engaging livestreams and social media events.",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/216023/blob-2e6cc84c-1e2f-40cc-b601-05ca231943ae.png",
+      "raised": {
+        "gbp": 35,
+        "gbpFormatted": "£35.00",
+        "usd": 46.54,
+        "usdFormatted": "$46.54",
+        "euro": 39.98,
+        "euroFormatted": "39,98 €"
+      },
+      "goal": {
+        "gbp": 150,
+        "gbpFormatted": "£150.00",
+        "usd": 199.46,
+        "usdFormatted": "$199.46",
+        "euro": 171.36,
+        "euroFormatted": "171,36 €"
+      },
+      "twitch": {
+        "name": "SummerRejects",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/f600f3f3-6866-4bf8-87d6-f8d9d55275b5-profile_image-300x300.png",
+        "isLive": true,
+        "url": "https://twitch.tv/summerrejects"
+      }
+    },
+    {
+      "tiltifySlug": "corruptden",
+      "campaignName": "Corruptmas - Jingle Jam 2025",
+      "tiltifyUrl": "https://tiltify.com/@corruptden/copy-corruptmas2024-37797855-d480-4be1-82eb-e40eac53c757",
+      "tiltifyName": "Corruptden",
+      "tiltifyDescription": "Hii! We are back at it again for my 3rd year of Jingle Jam and raising as much money as we can for the amazing charities.\nI may not be the largest creator but let's show them what smaller creators and the MCYT community as a whole can do! ^^",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/579691/blob-ce8b6ddc-a050-4294-9140-cfec5556b02e.png",
+      "raised": {
+        "gbp": 0,
+        "gbpFormatted": "£0.00",
+        "usd": 0,
+        "usdFormatted": "$0.00",
+        "euro": 0,
+        "euroFormatted": "0,00 €"
+      },
+      "goal": {
+        "gbp": 500,
+        "gbpFormatted": "£500.00",
+        "usd": 664.88,
+        "usdFormatted": "$664.88",
+        "euro": 571.2,
+        "euroFormatted": "571,20 €"
+      },
+      "twitch": {
+        "name": "Corruptden",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/2fe2a3e2-9487-4d7f-8332-04fc3412ff54-profile_image-300x300.jpeg",
+        "isLive": true,
+        "url": "https://twitch.tv/corruptden"
+      }
+    },
+    {
+      "tiltifySlug": "rtgamecrowd",
+      "campaignName": "RTGame Jingles Your Jam for The Trevor Project",
+      "tiltifyUrl": "https://tiltify.com/@rtgamecrowd/rtgame-jingles-your-jam-for-the-trevor-project",
+      "tiltifyName": "rtgamecrowd",
+      "tiltifyDescription": "They used to call me The Charity King back in college, you know. Let's do some good for young LGBTQ+ people!\n\nJoin me in supporting Jingle Jam 2025 as we harness the power of social media, livestreams, video series, and live events to make a meaningful impact for this remarkable cause.\n\nIf you want to receive the games collection as thanks for donating, PLEASE MAKE SURE YOU SELECT IT WHEN DONATING! You have to select the reward, or you won't receive it. It's very important! Thank you.",
+      "tiltifyCauseId": "809dfb7b-faef-4e2d-b78d-d5e197975dac",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/95507/blob-b13bc679-2370-41b5-a6bc-1ff7a98c66b2.png",
+      "raised": {
+        "gbp": 138109.93,
+        "gbpFormatted": "£138,109.93",
+        "usd": 183653.07,
+        "usdFormatted": "$183,653.07",
+        "euro": 157776.78,
+        "euroFormatted": "157.776,78 €"
+      },
+      "goal": {
+        "gbp": 50000,
+        "gbpFormatted": "£50,000.00",
+        "usd": 66488,
+        "usdFormatted": "$66,488.00",
+        "euro": 57120,
+        "euroFormatted": "57.120,00 €"
+      },
+      "twitch": {
+        "name": "RTGame",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/30ca5339-22d8-4f93-b202-0944111a8535-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/rtgame"
+      }
+    },
+    {
+      "tiltifySlug": "zentreya",
+      "campaignName": "Zentreya's Jolly Make-A-Wish Campaign",
+      "tiltifyUrl": "https://tiltify.com/@zentreya-0e4824/zentreyas-jolly-make-a-wish-campaign",
+      "tiltifyName": "Zentreya_",
+      "tiltifyDescription": "Join me in supporting Jingle Jam 2025 by engaging through livestreams and social media to make a meaningful impact.",
+      "tiltifyCauseId": "5350a34a-8b94-4513-bb1d-22becc2df6e4",
+      "avatar": "https://assets.tiltify.com/assets/default-avatar.png",
+      "raised": {
+        "gbp": 80132.43,
+        "gbpFormatted": "£80,132.43",
+        "usd": 106556.9,
+        "usdFormatted": "$106,556.90",
+        "euro": 91543.29,
+        "euroFormatted": "91.543,29 €"
+      },
+      "goal": {
+        "gbp": 74937.24,
+        "gbpFormatted": "£74,937.24",
+        "usd": 99648.55,
+        "usdFormatted": "$99,648.55",
+        "euro": 85608.3,
+        "euroFormatted": "85.608,30 €"
+      },
+      "twitch": {
+        "name": "Zentreya",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/767defd6-91f1-480a-be7a-b278022a2de0-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/zentreya"
+      }
+    },
+    {
+      "tiltifySlug": "aliona-and-jen",
+      "campaignName": "Jennifer & Aliona Auction & Stream for War Child",
+      "tiltifyUrl": "https://tiltify.com/@aliona-and-jen/jennifer-aliona-stream-for-war-child",
+      "tiltifyName": "Aliona & Jen",
+      "tiltifyDescription": "!!!AUCTION: <https://tinyurl.com/3nu3aa7e>!\n\nJoin Clair Obscur stars Jennifer English & Aliona Baranova as they carve a path to the Monolith to fight the Paintress! With special guests Ben Starr and Kirsty Rider. Every penny will help support children affected by war. \n\nA huge thank you to DHL, who are kindly providing logistical support to facilitate the delivery of the amazing prizes and auction items.\n\nDonate to win a videocall with Aliona & Jen. T&Cs: https://tinyurl.com/59f5vhfz",
+      "tiltifyCauseId": "18cb6ffd-3067-4ca8-8414-74eb733d79fd",
+      "avatar": "https://assets.tiltify.com/assets/default-avatar.png",
+      "raised": {
+        "gbp": 53590.23,
+        "gbpFormatted": "£53,590.23",
+        "usd": 71262.15,
+        "usdFormatted": "$71,262.15",
+        "euro": 61221.48,
+        "euroFormatted": "61.221,48 €"
+      },
+      "goal": {
+        "gbp": 45000,
+        "gbpFormatted": "£45,000.00",
+        "usd": 59839.2,
+        "usdFormatted": "$59,839.20",
+        "euro": 51408,
+        "euroFormatted": "51.408,00 €"
+      },
+      "twitch": {
+        "name": "JenandAliona",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/46d24a55-a2a1-47b9-89c8-8446e69657fc-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/jenandaliona"
+      }
+    },
+    {
+      "tiltifySlug": "highrollersdnd",
+      "campaignName": "Rolling High for CALM!",
+      "tiltifyUrl": "https://tiltify.com/@highrollersdnd/rolling-high-for-calm",
+      "tiltifyName": "highrollersdnd",
+      "tiltifyDescription": "You can help people struggling with life choose to stay by donating to the High Rollers fundraiser for Campaign Against Living Miserably (CALM). One in four of us have suicidal thoughts in our lifetime. CALM's services, including their suicide prevention helpline,  spark hope for people who can't see a way forward. Play your part in preventing suicide by donating now!",
+      "tiltifyCauseId": "3d4fb356-891f-4f1e-9374-984aa5fdfdf5",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/482422/blob-4cea84ec-89ad-4994-a4ce-6ed9cc3c6c26.png",
+      "raised": {
+        "gbp": 28124.5,
+        "gbpFormatted": "£28,124.50",
+        "usd": 37398.84,
+        "usdFormatted": "$37,398.84",
+        "euro": 32129.43,
+        "euroFormatted": "32.129,43 €"
+      },
+      "goal": {
+        "gbp": 26000,
+        "gbpFormatted": "£26,000.00",
+        "usd": 34573.76,
+        "usdFormatted": "$34,573.76",
+        "euro": 29702.4,
+        "euroFormatted": "29.702,40 €"
+      },
+      "twitch": {
+        "name": "highrollersdnd",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/9005fcb8-2b5a-4c86-a625-e865a816f5cd-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/highrollersdnd"
+      }
+    },
+    {
+      "tiltifySlug": "viztee",
+      "campaignName": "G&G for Jingle Jam 2025",
+      "tiltifyUrl": "https://tiltify.com/+the-goblins-and-gremlins-team/gng-jj25",
+      "tiltifyName": "viztee",
+      "tiltifyDescription": "We're raising money for eight amazing charities this Jingle Jam!",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/348512/blob-c629cae5-26f4-4b36-a62f-66ce293d1970.png",
+      "raised": {
+        "gbp": 21838.43,
+        "gbpFormatted": "£21,838.43",
+        "usd": 29039.87,
+        "usdFormatted": "$29,039.87",
+        "euro": 24948.22,
+        "euroFormatted": "24.948,22 €"
+      },
+      "goal": {
+        "gbp": 22000,
+        "gbpFormatted": "£22,000.00",
+        "usd": 29254.72,
+        "usdFormatted": "$29,254.72",
+        "euro": 25132.8,
+        "euroFormatted": "25.132,80 €"
+      },
+      "twitch": {
+        "name": "Viztee",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/b7bbc044-cc89-423b-9bd1-b96cab5c369a-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/viztee"
+      }
+    },
+    {
+      "tiltifySlug": "zealand",
+      "campaignName": "Zealand's Raising Money For War Child",
+      "tiltifyUrl": "https://tiltify.com/@zealand/zealand-war-child",
+      "tiltifyName": "Zealand",
+      "tiltifyDescription": "I am raising money for war child because no child should ever have to grow up in a war zone. Football brings all of humanity together - we need to use it to help those who are most vulnerable now.",
+      "tiltifyCauseId": "18cb6ffd-3067-4ca8-8414-74eb733d79fd",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/981735/blob-028328ff-6df8-4aa7-a535-496bccdbd1d6.png",
+      "raised": {
+        "gbp": 20116.69,
+        "gbpFormatted": "£20,116.69",
+        "usd": 26750.37,
+        "usdFormatted": "$26,750.37",
+        "euro": 22981.31,
+        "euroFormatted": "22.981,31 €"
+      },
+      "goal": {
+        "gbp": 20000,
+        "gbpFormatted": "£20,000.00",
+        "usd": 26595.2,
+        "usdFormatted": "$26,595.20",
+        "euro": 22848,
+        "euroFormatted": "22.848,00 €"
+      },
+      "twitch": {
+        "name": "ZeaIand",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/97eab8e6-7c73-4c57-8982-03af8a0d83df-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/zeaiand"
+      }
+    },
+    {
+      "tiltifySlug": "taliamar1",
+      "campaignName": "Talia Mar - Jingle Jam 2025",
+      "tiltifyUrl": "https://tiltify.com/@taliamar1/talia-mar-jingle-jam-2025",
+      "tiltifyName": "taliamar1",
+      "tiltifyDescription": "Jingle Jam 2025 - I'm raising for Campaign Against Living Miserably (CALM) - A few years ago I unfortunately lost a friend to suicide, and I often think about how life could've potentially been different for her if she knew CALM had existed. I know so many people who have been saved by phoning for help and I rally hope we can make some what of a difference with this stream! no matter how big or small, every donation counts <3",
+      "tiltifyCauseId": "3d4fb356-891f-4f1e-9374-984aa5fdfdf5",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/752443/blob-75b1fb2a-4253-4c90-b440-e3b094dd05fe.jpeg",
+      "raised": {
+        "gbp": 18500,
+        "gbpFormatted": "£18,500.00",
+        "usd": 24600.56,
+        "usdFormatted": "$24,600.56",
+        "euro": 21134.4,
+        "euroFormatted": "21.134,40 €"
+      },
+      "goal": {
+        "gbp": 15000,
+        "gbpFormatted": "£15,000.00",
+        "usd": 19946.4,
+        "usdFormatted": "$19,946.40",
+        "euro": 17136,
+        "euroFormatted": "17.136,00 €"
+      },
+      "twitch": {
+        "name": "TaliaMar",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/05a2f862-6ea4-4e31-901f-0ff846d173eb-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/taliamar"
+      }
+    },
+    {
+      "tiltifySlug": "beccasomething",
+      "campaignName": "Rust RP Armada Event for Jingle Jam 2025",
+      "tiltifyUrl": "https://tiltify.com/@beccasomething/copy-rust-community-for-jingle-jam-fa7f7ba9-efc1-4ca2-b07d-9bc0415357e5",
+      "tiltifyName": "beccasomething",
+      "tiltifyDescription": "The Rust community banding together to raise money for Jingle Jam Charities!",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/468087/blob-fa27cc59-435b-42b0-be72-68927bb55e03.png",
+      "raised": {
+        "gbp": 15200,
+        "gbpFormatted": "£15,200.00",
+        "usd": 20212.35,
+        "usdFormatted": "$20,212.35",
+        "euro": 17364.48,
+        "euroFormatted": "17.364,48 €"
+      },
+      "goal": {
+        "gbp": 16000,
+        "gbpFormatted": "£16,000.00",
+        "usd": 21276.16,
+        "usdFormatted": "$21,276.16",
+        "euro": 18278.4,
+        "euroFormatted": "18.278,40 €"
+      },
+      "twitch": {
+        "name": "BeccaSomething",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/6a2cc645-b53e-448c-975b-0657aaf19e2b-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/beccasomething"
+      }
+    },
+    {
+      "tiltifySlug": "jackmanifoldtv",
+      "campaignName": "Jack's BIG CALM 24hr Stream",
+      "tiltifyUrl": "https://tiltify.com/@jackmanifoldtv/jacks-big-calm-24hr-stream",
+      "tiltifyName": "JackManifoldTV",
+      "tiltifyDescription": "I'll be live for a 24hr stream extravaganza to try and raise as much money as possible for CALM!",
+      "tiltifyCauseId": "3d4fb356-891f-4f1e-9374-984aa5fdfdf5",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/555931/blob-0cdb85b3-89a1-4a72-a457-fd8ad4630e14.jpeg",
+      "raised": {
+        "gbp": 13943.59,
+        "gbpFormatted": "£13,943.59",
+        "usd": 18541.63,
+        "usdFormatted": "$18,541.63",
+        "euro": 15929.16,
+        "euroFormatted": "15.929,16 €"
+      },
+      "goal": {
+        "gbp": 15000,
+        "gbpFormatted": "£15,000.00",
+        "usd": 19946.4,
+        "usdFormatted": "$19,946.40",
+        "euro": 17136,
+        "euroFormatted": "17.136,00 €"
+      },
+      "twitch": {
+        "name": "JackManifoldTV",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/f7bfa0ca-e9ec-4ca6-935a-a9b6c5c8f651-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/jackmanifoldtv"
+      }
+    },
+    {
+      "tiltifySlug": "mudkipninja",
+      "campaignName": "Kip & Ivy's Jingle Jam 2025!",
+      "tiltifyUrl": "https://tiltify.com/@mudkipninja/copy-kip-ivys-jingle-jam-d07fce7f-a624-46c4-adfd-5731102f9121",
+      "tiltifyName": "Mudkipninja",
+      "tiltifyDescription": "Kip and Ivy's contribution to the wholesome chaos that is the best charity event of the year! Lots of fun traditions, great streamers, and all going to an amazing cause!",
+      "tiltifyCauseId": "3d4fb356-891f-4f1e-9374-984aa5fdfdf5",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/488675/blob-8ae3794a-1737-44be-8961-c9936e1c44e2.png",
+      "raised": {
+        "gbp": 11122.11,
+        "gbpFormatted": "£11,122.11",
+        "usd": 14789.74,
+        "usdFormatted": "$14,789.74",
+        "euro": 12705.9,
+        "euroFormatted": "12.705,90 €"
+      },
+      "goal": {
+        "gbp": 11000,
+        "gbpFormatted": "£11,000.00",
+        "usd": 14627.36,
+        "usdFormatted": "$14,627.36",
+        "euro": 12566.4,
+        "euroFormatted": "12.566,40 €"
+      },
+      "twitch": {
+        "name": "Mudkipninja",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/3432b4ae-f48c-4e95-a4f3-b697f6e50a18-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/mudkipninja"
+      }
+    },
+    {
+      "tiltifySlug": "bobawitch",
+      "campaignName": "Boba & Friends for Autistica",
+      "tiltifyUrl": "https://tiltify.com/@bobawitch/boba-friends-for-autistica",
+      "tiltifyName": "bobawitch",
+      "tiltifyDescription": "Join me in supporting Jingle Jam 2025, a fundraising campaign that spreads positivity and helps make a difference through engaging social media and livestream activities.",
+      "tiltifyCauseId": "974be205-3c5f-4f8c-9dd4-892b6b1e53d2",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/73376/blob-f3732a67-212f-4629-929c-3f6907647b5d.jpeg",
+      "raised": {
+        "gbp": 10042.5,
+        "gbpFormatted": "£10,042.50",
+        "usd": 13354.12,
+        "usdFormatted": "$13,354.12",
+        "euro": 11472.55,
+        "euroFormatted": "11.472,55 €"
+      },
+      "goal": {
+        "gbp": 10000,
+        "gbpFormatted": "£10,000.00",
+        "usd": 13297.6,
+        "usdFormatted": "$13,297.60",
+        "euro": 11424,
+        "euroFormatted": "11.424,00 €"
+      },
+      "twitch": {
+        "name": "boba",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/e29551ad-15ef-4461-b709-220a8d374d3d-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/boba"
+      }
+    },
+    {
+      "tiltifySlug": "sorrey",
+      "campaignName": "Viperous x Sorrey Jingle Jam 2025",
+      "tiltifyUrl": "https://tiltify.com/+viperoussorrey/viperous-x-sorrey-jingle-jam-2025",
+      "tiltifyName": "Sorrey",
+      "tiltifyDescription": "Join Viperous and Sorrey as they unite to raise funds for charity during this festive season. Together, we can make a meaningful impact through the power of livestreams and holiday spirit!",
+      "tiltifyCauseId": "5350a34a-8b94-4513-bb1d-22becc2df6e4",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/62282/fa59da27-652c-4c37-8e42-05f914dff0d2.jpeg",
+      "raised": {
+        "gbp": 10035,
+        "gbpFormatted": "£10,035.00",
+        "usd": 13344.14,
+        "usdFormatted": "$13,344.14",
+        "euro": 11463.98,
+        "euroFormatted": "11.463,98 €"
+      },
+      "goal": {
+        "gbp": 10000,
+        "gbpFormatted": "£10,000.00",
+        "usd": 13297.6,
+        "usdFormatted": "$13,297.60",
+        "euro": 11424,
+        "euroFormatted": "11.424,00 €"
+      },
+      "twitch": {
+        "name": "Sorrey",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/6a3edc5b-c2ae-4933-bc17-f51633cf3a2b-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/sorrey"
+      }
+    },
+    {
+      "tiltifySlug": "imseanbean",
+      "campaignName": "Sean x WarChild '25",
+      "tiltifyUrl": "https://tiltify.com/@imseanbean/sean-x-warchild-25",
+      "tiltifyName": "ImSeanBean",
+      "tiltifyDescription": "Join the effort to support Jingle Jam 2025 through livestreams and help raise money for incredible causes.",
+      "tiltifyCauseId": "18cb6ffd-3067-4ca8-8414-74eb733d79fd",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/183365/blob-68a077b2-0545-4675-bf68-a2eecc279770.png",
+      "raised": {
+        "gbp": 8371,
+        "gbpFormatted": "£8,371.00",
+        "usd": 11131.42,
+        "usdFormatted": "$11,131.42",
+        "euro": 9563.03,
+        "euroFormatted": "9.563,03 €"
+      },
+      "goal": {
+        "gbp": 9000,
+        "gbpFormatted": "£9,000.00",
+        "usd": 11967.84,
+        "usdFormatted": "$11,967.84",
+        "euro": 10281.6,
+        "euroFormatted": "10.281,60 €"
+      },
+      "twitch": {
+        "name": "ImSeanBean",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/bcbdfd96-7457-4223-a678-eee1f3e60945-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/imseanbean"
+      }
+    },
+    {
+      "tiltifySlug": "aliona-and-jen",
+      "campaignName": "Aliona & Jennifer Auction for War Child",
+      "tiltifyUrl": "https://tiltify.com/@aliona-and-jen/auctions/aliona-jennifer-auction",
+      "tiltifyName": "Aliona & Jen",
+      "tiltifyDescription": "Jennifer English & Aliona Baranova have gifted a selection of posters, cards and fan-made items to War Child UK for auction. Get bidding now to get exclusive signed items from Baldur's Gate 3, Calire Obscur and so much more. Every penny will help support children affected by war. \n\nA huge thank you to DHL, who are kindly providing logistical support to facilitate the delivery of the amazing prizes and auction items.\nPlease note items will be shipped in January 2026.",
+      "avatar": "https://assets.tiltify.com/assets/default-avatar.png",
+      "raised": {
+        "gbp": 8227.61,
+        "gbpFormatted": "£8,227.61",
+        "usd": 10940.75,
+        "usdFormatted": "$10,940.75",
+        "euro": 9399.22,
+        "euroFormatted": "9.399,22 €"
+      },
+      "goal": {
+        "gbp": 1000,
+        "gbpFormatted": "£1,000.00",
+        "usd": 1329.76,
+        "usdFormatted": "$1,329.76",
+        "euro": 1142.4,
+        "euroFormatted": "1.142,40 €"
+      },
+      "twitch": {
+        "name": "JenandAliona",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/46d24a55-a2a1-47b9-89c8-8446e69657fc-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/jenandaliona"
+      }
+    },
+    {
+      "tiltifySlug": "sips-yogscast",
+      "campaignName": "Sips Jingle Jam Fundraising Jamboree 2025",
+      "tiltifyUrl": "https://tiltify.com/@sips-yogscast/sips-jingle-jam-fundraising-jamboree-2025",
+      "tiltifyName": "sips_yogscast",
+      "tiltifyDescription": "I'm fundraising for Jingle Jam 2025.",
+      "tiltifyCauseId": "3d4fb356-891f-4f1e-9374-984aa5fdfdf5",
+      "avatar": "https://assets.tiltify.com/assets/default-avatar.png",
+      "raised": {
+        "gbp": 8019,
+        "gbpFormatted": "£8,019.00",
+        "usd": 10663.35,
+        "usdFormatted": "$10,663.35",
+        "euro": 9160.91,
+        "euroFormatted": "9.160,91 €"
+      },
+      "goal": {
+        "gbp": 100,
+        "gbpFormatted": "£100.00",
+        "usd": 132.98,
+        "usdFormatted": "$132.98",
+        "euro": 114.24,
+        "euroFormatted": "114,24 €"
+      },
+      "twitch": {
+        "name": "sips_",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/46d1aba3-9341-4ead-ae27-81621feba921-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/sips_"
+      }
+    },
+    {
+      "tiltifySlug": "freyzplayz",
+      "campaignName": "FreyzPlayz x WWF x JINGLE JAM!",
+      "tiltifyUrl": "https://tiltify.com/@freyzplayz/freyzplayz-x-wwf-x-jingle-jam",
+      "tiltifyName": "freyzplayz",
+      "tiltifyDescription": "Join me in raising money through social media and livestreaming for the amazing Jingle Jam charity initiative, supporting incredible causes worldwide!",
+      "tiltifyCauseId": "d02de896-6904-4f80-9755-253afddac343",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/129843/blob-3341e9bd-de58-4a39-8709-92f8499fb3c6.jpeg",
+      "raised": {
+        "gbp": 8007.44,
+        "gbpFormatted": "£8,007.44",
+        "usd": 10647.97,
+        "usdFormatted": "$10,647.97",
+        "euro": 9147.7,
+        "euroFormatted": "9.147,70 €"
+      },
+      "goal": {
+        "gbp": 7000,
+        "gbpFormatted": "£7,000.00",
+        "usd": 9308.32,
+        "usdFormatted": "$9,308.32",
+        "euro": 7996.8,
+        "euroFormatted": "7.996,80 €"
+      },
+      "twitch": {
+        "name": "freyzplayz",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/9759eaca-fc5b-40b6-ba93-1e9c5173a15f-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/freyzplayz"
+      }
+    },
+    {
+      "tiltifySlug": "zoeyp",
+      "campaignName": "zoey's jingloey jamoey",
+      "tiltifyUrl": "https://tiltify.com/@zoeyp/zoey-jingloey-jamoey",
+      "tiltifyName": "Zoeyp",
+      "tiltifyDescription": "there are so many amazing causes this year for jingle jam 2025, it's hard to pick just one, so let's just throw money at everything and help to make a positive difference for those in need",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/57482/blob-bea0ef27-c19c-4450-b369-fbb53a8f81f8.png",
+      "raised": {
+        "gbp": 7159.2,
+        "gbpFormatted": "£7,159.20",
+        "usd": 9520.02,
+        "usdFormatted": "$9,520.02",
+        "euro": 8178.67,
+        "euroFormatted": "8.178,67 €"
+      },
+      "goal": {
+        "gbp": 7000,
+        "gbpFormatted": "£7,000.00",
+        "usd": 9308.32,
+        "usdFormatted": "$9,308.32",
+        "euro": 7996.8,
+        "euroFormatted": "7.996,80 €"
+      },
+      "twitch": {
+        "name": "zoey",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/d9756118-3566-4136-a961-40d8cec09820-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/zoey"
+      }
+    },
+    {
+      "tiltifySlug": "ravs",
+      "campaignName": "Ravs CALM | WarChild Campaign",
+      "tiltifyUrl": "https://tiltify.com/@ravs/ravs-calm-warchild",
+      "tiltifyName": "Ravs",
+      "tiltifyDescription": "This year, something that has greatly affected me mentally has been all of the harrowing news from across the world & especially that of what is happening to innocent families and their children & as such this Jingle Jam I'm going to be fundraising for both CALM & WarChild splitting the funds evenly between both charities to help get vital funds to both of their wonderful life saving causes.",
+      "tiltifyCauseId": "18cb6ffd-3067-4ca8-8414-74eb733d79fd",
+      "avatar": "https://assets.tiltify.com/assets/default-avatar.png",
+      "raised": {
+        "gbp": 7127.03,
+        "gbpFormatted": "£7,127.03",
+        "usd": 9477.24,
+        "usdFormatted": "$9,477.24",
+        "euro": 8141.92,
+        "euroFormatted": "8.141,92 €"
+      },
+      "goal": {
+        "gbp": 7000,
+        "gbpFormatted": "£7,000.00",
+        "usd": 9308.32,
+        "usdFormatted": "$9,308.32",
+        "euro": 7996.8,
+        "euroFormatted": "7.996,80 €"
+      },
+      "twitch": {
+        "name": "Ravs_",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/25ac5f35-34ce-451a-a688-fe0fc9e630eb-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/ravs_"
+      }
+    },
+    {
+      "tiltifySlug": "sarahsera",
+      "campaignName": "jingle jammies for jaguars",
+      "tiltifyUrl": "https://tiltify.com/@sarahsera/jingle-jammies",
+      "tiltifyName": "sarahsera",
+      "tiltifyDescription": "It's a pajama party for WWF! Join me for an evening stream (TBC when) to raise funds combating global warming, preserving the rainforest, and helping our animal friends worldwide. Thank you for your support!",
+      "tiltifyCauseId": "d02de896-6904-4f80-9755-253afddac343",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/574978/blob-06c2c60d-ec2b-4a34-a2a6-a682a020780f.png",
+      "raised": {
+        "gbp": 6357,
+        "gbpFormatted": "£6,357.00",
+        "usd": 8453.28,
+        "usdFormatted": "$8,453.28",
+        "euro": 7262.24,
+        "euroFormatted": "7.262,24 €"
+      },
+      "goal": {
+        "gbp": 6000,
+        "gbpFormatted": "£6,000.00",
+        "usd": 7978.56,
+        "usdFormatted": "$7,978.56",
+        "euro": 6854.4,
+        "euroFormatted": "6.854,40 €"
+      },
+      "twitch": {
+        "name": "sarahsera_",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/1379b8af-4a95-4123-a2ed-05afcad0ae8e-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/sarahsera_"
+      }
+    },
+    {
+      "tiltifySlug": "mrbeardstone",
+      "campaignName": "Just Create SMP - Jingle Jam 2025",
+      "tiltifyUrl": "https://tiltify.com/@mrbeardstone/justcreatejj",
+      "tiltifyName": "MrBeardstone",
+      "tiltifyDescription": "Join the Just Create SMP for a weekend of hanging out and fundraising for Jingle Jam on behalf of CALM!",
+      "tiltifyCauseId": "3d4fb356-891f-4f1e-9374-984aa5fdfdf5",
+      "avatar": "https://assets.tiltify.com/assets/default-avatar.png",
+      "raised": {
+        "gbp": 6310.22,
+        "gbpFormatted": "£6,310.22",
+        "usd": 8391.08,
+        "usdFormatted": "$8,391.08",
+        "euro": 7208.8,
+        "euroFormatted": "7.208,80 €"
+      },
+      "goal": {
+        "gbp": 7500,
+        "gbpFormatted": "£7,500.00",
+        "usd": 9973.2,
+        "usdFormatted": "$9,973.20",
+        "euro": 8568,
+        "euroFormatted": "8.568,00 €"
+      },
+      "twitch": {
+        "name": "MrBeardstone",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/a7e0d921-78cb-4496-9f2f-c16e2df6204d-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/mrbeardstone"
+      }
+    },
+    {
+      "tiltifySlug": "mscupcakes",
+      "campaignName": "mscupcakes JINGLE JAM 2025",
+      "tiltifyUrl": "https://tiltify.com/@mscupcakes/mscupcakes-jingle-jam-2025",
+      "tiltifyName": "mscupcakes",
+      "tiltifyDescription": "I'm fundraising for Campaign Against Living Miserably (CALM) for Jingle Jam.\n\nCALM is a suicide prevention charity that runs a free, confidential and anonymous helpline as well as a web chat service, offering help, advice and information to anyone who is struggling or in crisis.\nYou can learn more about CALM here: https://www.thecalmzone.net/what-we-do",
+      "tiltifyCauseId": "3d4fb356-891f-4f1e-9374-984aa5fdfdf5",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/414709/blob-5a7b2435-21f0-42d9-8bbd-23321994dd75.png",
+      "raised": {
+        "gbp": 5230.69,
+        "gbpFormatted": "£5,230.69",
+        "usd": 6955.56,
+        "usdFormatted": "$6,955.56",
+        "euro": 5975.54,
+        "euroFormatted": "5.975,54 €"
+      },
+      "goal": {
+        "gbp": 4000,
+        "gbpFormatted": "£4,000.00",
+        "usd": 5319.04,
+        "usdFormatted": "$5,319.04",
+        "euro": 4569.6,
+        "euroFormatted": "4.569,60 €"
+      },
+      "twitch": {
+        "name": "mscupcakes",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/092c7d00-f25a-473e-b3ce-8d2bdd867a72-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/mscupcakes"
+      }
+    },
+    {
+      "tiltifySlug": "geestargames",
+      "campaignName": "Geestargames Jingle Jam CALM",
+      "tiltifyUrl": "https://tiltify.com/@geestargames/geestargames-jingle-jam-calm",
+      "tiltifyName": "Geestargames",
+      "tiltifyDescription": "Join the effort to raise funds for Jingle Jam 2025 through engaging livestreams and social media campaigns. Together, we can make a positive impact for this incredible cause!",
+      "tiltifyCauseId": "3d4fb356-891f-4f1e-9374-984aa5fdfdf5",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/41633/89357823-0fbc-451f-b697-846aa4224511.jpeg",
+      "raised": {
+        "gbp": 5085.9,
+        "gbpFormatted": "£5,085.90",
+        "usd": 6763.03,
+        "usdFormatted": "$6,763.03",
+        "euro": 5810.13,
+        "euroFormatted": "5.810,13 €"
+      },
+      "goal": {
+        "gbp": 5000,
+        "gbpFormatted": "£5,000.00",
+        "usd": 6648.8,
+        "usdFormatted": "$6,648.80",
+        "euro": 5712,
+        "euroFormatted": "5.712,00 €"
+      },
+      "twitch": {
+        "name": "Geestargames",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/e251378d-0e07-43b9-b832-fb8950b9d848-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/geestargames"
+      }
+    },
+    {
+      "tiltifySlug": "crustydoggo",
+      "campaignName": "Kirsty for WWF!",
+      "tiltifyUrl": "https://tiltify.com/@crustydoggo/kirsty-for-wwf",
+      "tiltifyName": "crustydoggo",
+      "tiltifyDescription": "Help me this Jingle Jam in supporting WWF!",
+      "tiltifyCauseId": "d02de896-6904-4f80-9755-253afddac343",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/132386/blob-785b1a8c-2bdf-49f7-aa24-63d0035ddb4f.png",
+      "raised": {
+        "gbp": 4322.25,
+        "gbpFormatted": "£4,322.25",
+        "usd": 5747.56,
+        "usdFormatted": "$5,747.56",
+        "euro": 4937.74,
+        "euroFormatted": "4.937,74 €"
+      },
+      "goal": {
+        "gbp": 4000,
+        "gbpFormatted": "£4,000.00",
+        "usd": 5319.04,
+        "usdFormatted": "$5,319.04",
+        "euro": 4569.6,
+        "euroFormatted": "4.569,60 €"
+      },
+      "twitch": {
+        "name": "Kirsty",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/cf380da9-8a5b-4b2c-bedf-9bc2e19f59ed-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/kirsty"
+      }
+    },
+    {
+      "tiltifySlug": "breeh",
+      "campaignName": "Jingle Breeh",
+      "tiltifyUrl": "https://tiltify.com/+jingle-breeh/breehlievers",
+      "tiltifyName": "Breeh",
+      "tiltifyDescription": "Breeh & Friends campaign for Jingle Jam 2025",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/64084/blob-a20ae6c9-4e56-4db5-917e-64d0ffadad53.png",
+      "raised": {
+        "gbp": 3704.98,
+        "gbpFormatted": "£3,704.98",
+        "usd": 4926.73,
+        "usdFormatted": "$4,926.73",
+        "euro": 4232.57,
+        "euroFormatted": "4.232,57 €"
+      },
+      "goal": {
+        "gbp": 3000,
+        "gbpFormatted": "£3,000.00",
+        "usd": 3989.28,
+        "usdFormatted": "$3,989.28",
+        "euro": 3427.2,
+        "euroFormatted": "3.427,20 €"
+      },
+      "twitch": {
+        "name": "Breeh",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/32e623ba-5231-433a-95b8-77df8afea65a-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/breeh"
+      }
+    },
+    {
+      "tiltifySlug": "thedementedsalad",
+      "campaignName": "Jingle Jam 2025 x Wallace & Gromit's Grand Appeal",
+      "tiltifyUrl": "https://tiltify.com/@thedementedsalad/jj2025grandappeal",
+      "tiltifyName": "TheDementedSalad",
+      "tiltifyDescription": "This year we're raising money for The Grand Appeal, they're an amazing charity that provide care and support to children and families at Bristol Children's Hospital. The money donated will go towards building the Jingle Jam Building - The UK's first ever patient holtel. It will provide therapy, rehabilitation and family accomodation for the long term patients of the hospital.",
+      "tiltifyCauseId": "5cff6632-f97a-4f6e-96f1-7cd1c3fdb259",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/172884/blob-c3c8f96e-0630-4ef6-bfbc-1fdd80e21272.jpeg",
+      "raised": {
+        "gbp": 3660,
+        "gbpFormatted": "£3,660.00",
+        "usd": 4866.92,
+        "usdFormatted": "$4,866.92",
+        "euro": 4181.18,
+        "euroFormatted": "4.181,18 €"
+      },
+      "goal": {
+        "gbp": 4000,
+        "gbpFormatted": "£4,000.00",
+        "usd": 5319.04,
+        "usdFormatted": "$5,319.04",
+        "euro": 4569.6,
+        "euroFormatted": "4.569,60 €"
+      },
+      "twitch": {
+        "name": "TheDementedSalad",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/53bda7b7-4832-42c4-a7b0-becd93e761f8-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/thedementedsalad"
+      }
+    },
+    {
+      "tiltifySlug": "dazunlocked",
+      "campaignName": "Jingle Jam 2025: DazUnlocked's WWF Conservation Fundraiser",
+      "tiltifyUrl": "https://tiltify.com/@dazunlocked/jingle-jam-2025-planet-zoo-conservation-fundraiser",
+      "tiltifyName": "DazUnlocked",
+      "tiltifyDescription": "Join me as I stream in support of WWF during Jingle Jam 2025! With a passion for animal conservation showcased throughout my many years of streaming Planet Zoo, I'm excited to contribute towards real-world efforts to protect wildlife and their habitats. Whether we are playing Zoo or the other games on our schedule, feel free to stop by, chat/lurk, or donate towards this amazing cause. Me and my community can't wait to share in this event with everyone!",
+      "tiltifyCauseId": "d02de896-6904-4f80-9755-253afddac343",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/965753/blob-a1a5e5dd-5e17-4afa-8b25-635845bbed43.png",
+      "raised": {
+        "gbp": 3501.78,
+        "gbpFormatted": "£3,501.78",
+        "usd": 4656.53,
+        "usdFormatted": "$4,656.53",
+        "euro": 4000.43,
+        "euroFormatted": "4.000,43 €"
+      },
+      "goal": {
+        "gbp": 3500,
+        "gbpFormatted": "£3,500.00",
+        "usd": 4654.16,
+        "usdFormatted": "$4,654.16",
+        "euro": 3998.4,
+        "euroFormatted": "3.998,40 €"
+      },
+      "twitch": {
+        "name": "DazUnlocked",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/c6d5a610-5f9e-45c6-945a-1018bb0bd18b-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/dazunlocked"
+      }
+    },
+    {
+      "tiltifySlug": "cakejumper",
+      "campaignName": "cake bakes for Make-a-Wish Ireland!",
+      "tiltifyUrl": "https://tiltify.com/@cakejumper/cakejumper-make-a-wish",
+      "tiltifyName": "cakejumper",
+      "tiltifyDescription": "Join the Jingle Jam 2025 livestream event to support charitable causes and make a positive impact during the festive season.",
+      "tiltifyCauseId": "5350a34a-8b94-4513-bb1d-22becc2df6e4",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/133845/blob-3b00eb1a-87f0-4872-9e62-f55eee2beffb.png",
+      "raised": {
+        "gbp": 3200.69,
+        "gbpFormatted": "£3,200.69",
+        "usd": 4256.15,
+        "usdFormatted": "$4,256.15",
+        "euro": 3656.47,
+        "euroFormatted": "3.656,47 €"
+      },
+      "goal": {
+        "gbp": 3000,
+        "gbpFormatted": "£3,000.00",
+        "usd": 3989.28,
+        "usdFormatted": "$3,989.28",
+        "euro": 3427.2,
+        "euroFormatted": "3.427,20 €"
+      },
+      "twitch": {
+        "name": "cakejumper",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/c2abb8da-fd3a-4fe0-a836-01195c02032e-profile_image-300x300.jpeg",
+        "isLive": false,
+        "url": "https://twitch.tv/cakejumper"
+      }
+    },
+    {
+      "tiltifySlug": "pedguin",
+      "campaignName": "Autistica Fundraisathon - Jingle Jam 2025",
+      "tiltifyUrl": "https://tiltify.com/@pedguin/autistica-fundraisathon-jingle-jam-2025",
+      "tiltifyName": "Pedguin",
+      "tiltifyDescription": "Join me in supporting Jingle Jam 2025 through an exciting livestream event to make a positive impact.",
+      "tiltifyCauseId": "974be205-3c5f-4f8c-9dd4-892b6b1e53d2",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/34608/blob-64aef6af-af91-469f-bedc-15cf8ab38e6b.jpeg",
+      "raised": {
+        "gbp": 3095.69,
+        "gbpFormatted": "£3,095.69",
+        "usd": 4116.52,
+        "usdFormatted": "$4,116.52",
+        "euro": 3536.52,
+        "euroFormatted": "3.536,52 €"
+      },
+      "goal": {
+        "gbp": 2500,
+        "gbpFormatted": "£2,500.00",
+        "usd": 3324.4,
+        "usdFormatted": "$3,324.40",
+        "euro": 2856,
+        "euroFormatted": "2.856,00 €"
+      },
+      "twitch": {
+        "name": "Pedguin",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/b343d223-a90f-4c40-bdda-b90f6177b775-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/pedguin"
+      }
+    },
+    {
+      "tiltifySlug": "shine-brighter",
+      "campaignName": "Shine Brighter's 14 Days of Light",
+      "tiltifyUrl": "https://tiltify.com/@shine-brighter/shine-brighters-14-days-of-light",
+      "tiltifyName": "Shine Brighter",
+      "tiltifyDescription": "Join us in raising money for Jingle Jam 2025. Together, we can make a meaningful impact and support this wonderful cause through livestreams and social media engagement.",
+      "tiltifyCauseId": "5350a34a-8b94-4513-bb1d-22becc2df6e4",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/454682/blob-56008c2e-880e-4787-ae0a-67f41f497466.png",
+      "raised": {
+        "gbp": 3080,
+        "gbpFormatted": "£3,080.00",
+        "usd": 4095.66,
+        "usdFormatted": "$4,095.66",
+        "euro": 3518.59,
+        "euroFormatted": "3.518,59 €"
+      },
+      "goal": {
+        "gbp": 5000,
+        "gbpFormatted": "£5,000.00",
+        "usd": 6648.8,
+        "usdFormatted": "$6,648.80",
+        "euro": 5712,
+        "euroFormatted": "5.712,00 €"
+      },
+      "twitch": {
+        "name": "LynxyLiam",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/14624793-680d-4ea2-a8d2-3248c9b753cd-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/lynxyliam"
+      }
+    },
+    {
+      "tiltifySlug": "crustydoggo",
+      "campaignName": "Kirsty for Trevor Project!",
+      "tiltifyUrl": "https://tiltify.com/@crustydoggo/kirsty-for-trevor-project",
+      "tiltifyName": "crustydoggo",
+      "tiltifyDescription": "Help me this Jingle Jam in supporting Trevor Project!",
+      "tiltifyCauseId": "809dfb7b-faef-4e2d-b78d-d5e197975dac",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/132386/blob-785b1a8c-2bdf-49f7-aa24-63d0035ddb4f.png",
+      "raised": {
+        "gbp": 2734,
+        "gbpFormatted": "£2,734.00",
+        "usd": 3635.56,
+        "usdFormatted": "$3,635.56",
+        "euro": 3123.32,
+        "euroFormatted": "3.123,32 €"
+      },
+      "goal": {
+        "gbp": 2500,
+        "gbpFormatted": "£2,500.00",
+        "usd": 3324.4,
+        "usdFormatted": "$3,324.40",
+        "euro": 2856,
+        "euroFormatted": "2.856,00 €"
+      },
+      "twitch": {
+        "name": "Kirsty",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/cf380da9-8a5b-4b2c-bedf-9bc2e19f59ed-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/kirsty"
+      }
+    },
+    {
+      "tiltifySlug": "fraserirl",
+      "campaignName": "The BIG Christmas Giving Stream 2025",
+      "tiltifyUrl": "https://tiltify.com/@fraserirl/the-big-christmas-giving-stream-2025",
+      "tiltifyName": "FraserIRL",
+      "tiltifyDescription": "In this year's BIG Christmas Giving Stream, I'm raising money for CALM again! This year has been another challenging year for many. Day-to-day challenges, deep rooted problems, and with the unexpected flipping peoples mental health stability upside down with no warning, your mental health can be impacted in so many ways. Even though 1 in 4 people have mental health problems, most of us don’t get the help we need. This has to change. To find out more about CALM, please visit: https://irl.yt/calm",
+      "tiltifyCauseId": "3d4fb356-891f-4f1e-9374-984aa5fdfdf5",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/335076/blob-94fb38cd-96b9-481f-97d1-a377454b9d6b.jpeg",
+      "raised": {
+        "gbp": 2677.94,
+        "gbpFormatted": "£2,677.94",
+        "usd": 3561.02,
+        "usdFormatted": "$3,561.02",
+        "euro": 3059.28,
+        "euroFormatted": "3.059,28 €"
+      },
+      "goal": {
+        "gbp": 2602,
+        "gbpFormatted": "£2,602.00",
+        "usd": 3460.04,
+        "usdFormatted": "$3,460.04",
+        "euro": 2972.52,
+        "euroFormatted": "2.972,52 €"
+      },
+      "twitch": {
+        "name": "FraserIRL",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/338871ea-8943-48a4-bd62-00ef3204b7e0-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/fraserirl"
+      }
+    },
+    {
+      "tiltifySlug": "shadowatnoon",
+      "campaignName": "Jingle Jam 2025",
+      "tiltifyUrl": "https://tiltify.com/@shadowatnoon/copy-jingle-jam-2024-2954e37e-e491-416d-a0ad-77621b0689e6",
+      "tiltifyName": "shadowatnoon",
+      "tiltifyDescription": "This year for Jingle Jam I will be raising money for War Child",
+      "tiltifyCauseId": "18cb6ffd-3067-4ca8-8414-74eb733d79fd",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/374974/blob-f6d4ec7d-d6dc-4903-9f8d-f82f1afccdb7.png",
+      "raised": {
+        "gbp": 2500,
+        "gbpFormatted": "£2,500.00",
+        "usd": 3324.4,
+        "usdFormatted": "$3,324.40",
+        "euro": 2856,
+        "euroFormatted": "2.856,00 €"
+      },
+      "goal": {
+        "gbp": 2500,
+        "gbpFormatted": "£2,500.00",
+        "usd": 3324.4,
+        "usdFormatted": "$3,324.40",
+        "euro": 2856,
+        "euroFormatted": "2.856,00 €"
+      },
+      "twitch": {
+        "name": "shadowatnoon",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/60daf22e-15e9-47ee-a3c5-f406b9907008-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/shadowatnoon"
+      }
+    },
+    {
+      "tiltifySlug": "shaunthesheepplays",
+      "campaignName": "Jingle Jam x The Grand Appeal Charity Stream",
+      "tiltifyUrl": "https://tiltify.com/@shaunthesheepplays/shaunthesheepplays-jingle-jam-x-the-grand-appeal-8960485a-6719-428e-93de-25f37a092822",
+      "tiltifyName": "ShaunTheSheepPlays",
+      "tiltifyDescription": "This festive season, ShaunTheSheepPlays and friends are joining Jingle Jam to raise funds for Wallace & Gromit’s: The Grand Appeal, supporting Bristol Children’s Hospital. The charity provides life-saving equipment, family accommodation, and creative arts therapy to brighten young patients’ lives. Through the power of Aardman and gaming, every laugh and donation helps make a difference. Join the fun! Donate, pick a challenge, and help Shaun and friends make the world brighter this holiday season",
+      "tiltifyCauseId": "5cff6632-f97a-4f6e-96f1-7cd1c3fdb259",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/764989/blob-d93cd77a-e949-472d-8e04-9e8fcf9a6834.png",
+      "raised": {
+        "gbp": 2305.43,
+        "gbpFormatted": "£2,305.43",
+        "usd": 3065.67,
+        "usdFormatted": "$3,065.67",
+        "euro": 2633.72,
+        "euroFormatted": "2.633,72 €"
+      },
+      "goal": {
+        "gbp": 2300,
+        "gbpFormatted": "£2,300.00",
+        "usd": 3058.45,
+        "usdFormatted": "$3,058.45",
+        "euro": 2627.52,
+        "euroFormatted": "2.627,52 €"
+      },
+      "twitch": {
+        "name": "ShaunTheSheepPlays",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/42be4130-1a9b-4c99-95f3-b53bdeb6916e-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/shaunthesheepplays"
+      }
+    },
+    {
+      "tiltifySlug": "justkally",
+      "campaignName": "Kally Does Jingle Jam with Become!",
+      "tiltifyUrl": "https://tiltify.com/@justkally/copy-support-for-become-improving-the-care-system-9bafec85-840b-49f9-8bfb-1293467a2843",
+      "tiltifyName": "JustKally",
+      "tiltifyDescription": "Having experienced the start of my life in care, I am raising contributions to help Become in their efforts to improve the care system for children and young people. Join me in creating brighter futures through social media and livestream events.",
+      "tiltifyCauseId": "1b61ce0a-d32c-4dde-bf0a-4849317cce65",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/414544/blob-f0525331-a087-4c1f-92b6-f86541d806e1.jpeg",
+      "raised": {
+        "gbp": 2265,
+        "gbpFormatted": "£2,265.00",
+        "usd": 3011.91,
+        "usdFormatted": "$3,011.91",
+        "euro": 2587.54,
+        "euroFormatted": "2.587,54 €"
+      },
+      "goal": {
+        "gbp": 1500,
+        "gbpFormatted": "£1,500.00",
+        "usd": 1994.64,
+        "usdFormatted": "$1,994.64",
+        "euro": 1713.6,
+        "euroFormatted": "1.713,60 €"
+      },
+      "twitch": {
+        "name": "JustKally",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/ffbfe053-5f5f-4fc0-b699-b12f463724d9-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/justkally"
+      }
+    },
+    {
+      "tiltifySlug": "knightenator",
+      "campaignName": "KNIGHTWISH JINGLE JAM 2025",
+      "tiltifyUrl": "https://tiltify.com/@knightenator/knightwish-jingle-jam-2025",
+      "tiltifyName": "knightenator",
+      "tiltifyDescription": "Join me in supporting Jingle Jam 2025, a livestream fundraiser dedicated to making a positive impact and spreading joy during the holiday season.",
+      "tiltifyCauseId": "5350a34a-8b94-4513-bb1d-22becc2df6e4",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/102645/blob-1b056154-72b5-4d96-b349-e387f83486be.jpeg",
+      "raised": {
+        "gbp": 2134.5,
+        "gbpFormatted": "£2,134.50",
+        "usd": 2838.37,
+        "usdFormatted": "$2,838.37",
+        "euro": 2438.45,
+        "euroFormatted": "2.438,45 €"
+      },
+      "goal": {
+        "gbp": 2500,
+        "gbpFormatted": "£2,500.00",
+        "usd": 3324.4,
+        "usdFormatted": "$3,324.40",
+        "euro": 2856,
+        "euroFormatted": "2.856,00 €"
+      },
+      "twitch": {
+        "name": "knightenator",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/8b11b010-4f34-4b45-8883-73c65af0445e-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/knightenator"
+      }
+    },
+    {
+      "tiltifySlug": "the-cosy-coven",
+      "campaignName": "Cosy Coven x Jingle Jam 2025 for Autistica",
+      "tiltifyUrl": "https://tiltify.com/@the-cosy-coven/cosy-coven-x-jingle-jam-2025-for-autistica",
+      "tiltifyName": "The Cosy Coven",
+      "tiltifyDescription": "Jingle Jam unites the world's best games, creators and their communities to make the world better for children and young people by raising funds through the annual Jingle Jam event, and distributing these funds to other charities who are making a difference. \n\nThe Cosy Coven will be raising funds for Autistica, the UK’s leading autism research and campaigning charity. Autistica's mission is to create breakthroughs that enable all autistic people to live happier, healthier, longer lives.",
+      "tiltifyCauseId": "974be205-3c5f-4f8c-9dd4-892b6b1e53d2",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/612459/blob-1121e544-7732-4a38-a7f3-a7edbc88f7bc.png",
+      "raised": {
+        "gbp": 2014.69,
+        "gbpFormatted": "£2,014.69",
+        "usd": 2679.05,
+        "usdFormatted": "$2,679.05",
+        "euro": 2301.58,
+        "euroFormatted": "2.301,58 €"
+      },
+      "goal": {
+        "gbp": 100,
+        "gbpFormatted": "£100.00",
+        "usd": 132.98,
+        "usdFormatted": "$132.98",
+        "euro": 114.24,
+        "euroFormatted": "114,24 €"
+      },
+      "twitch": {
+        "name": "Cosy_Witch",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/7fcf6afe-e0df-40af-8443-876c45c26a0a-profile_image-300x300.jpeg",
+        "isLive": false,
+        "url": "https://twitch.tv/cosy_witch"
+      }
+    },
+    {
+      "tiltifySlug": "itsferno",
+      "campaignName": "24 Hours Awake For Jingle Jam!",
+      "tiltifyUrl": "https://tiltify.com/@itsferno/24-hours-awake-for-jingle-jam",
+      "tiltifyName": "ItsFerno",
+      "tiltifyDescription": "I’m taking part in Jingle Jam 2025 by running a full 24-hour charity livestream from 5pm on Sunday 7th December to 5pm on Monday 8th December, staying awake, playing games, and hosting interactive challenges to raise money for the amazing causes supported through Jingle Jam. This annual event brings together creators and communities to fund charities that support children, young people, mental health, inclusivity, and global relief efforts.",
+      "tiltifyCauseId": "1b61ce0a-d32c-4dde-bf0a-4849317cce65",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/206083/blob-f57210d8-ad01-4e5f-8fc1-f2802ad94209.jpeg",
+      "raised": {
+        "gbp": 1851.34,
+        "gbpFormatted": "£1,851.34",
+        "usd": 2461.84,
+        "usdFormatted": "$2,461.84",
+        "euro": 2114.97,
+        "euroFormatted": "2.114,97 €"
+      },
+      "goal": {
+        "gbp": 1000,
+        "gbpFormatted": "£1,000.00",
+        "usd": 1329.76,
+        "usdFormatted": "$1,329.76",
+        "euro": 1142.4,
+        "euroFormatted": "1.142,40 €"
+      },
+      "twitch": {
+        "name": "ItsFernoXD",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/ea025963-0e44-46c3-866c-8a1052b5f88b-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/itsfernoxd"
+      }
+    },
+    {
+      "tiltifySlug": "brionykay",
+      "campaignName": "Keep CALM and Jingle Jam!",
+      "tiltifyUrl": "https://tiltify.com/@brionykay/keep-calm-and-jingle-jam",
+      "tiltifyName": "brionykay",
+      "tiltifyDescription": "Join me in supporting Jingle Jam 2025 through a lively and entertaining livestream event. Let's come together to make a positive impact and support this amazing cause!",
+      "tiltifyCauseId": "3d4fb356-891f-4f1e-9374-984aa5fdfdf5",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/69300/blob-5e7c8baf-8f5c-4d0f-97ce-a8bd866ed5cb.jpeg",
+      "raised": {
+        "gbp": 1828.4,
+        "gbpFormatted": "£1,828.40",
+        "usd": 2431.33,
+        "usdFormatted": "$2,431.33",
+        "euro": 2088.76,
+        "euroFormatted": "2.088,76 €"
+      },
+      "goal": {
+        "gbp": 400,
+        "gbpFormatted": "£400.00",
+        "usd": 531.9,
+        "usdFormatted": "$531.90",
+        "euro": 456.96,
+        "euroFormatted": "456,96 €"
+      },
+      "twitch": {
+        "name": "brionykay",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/857f7224-84b2-4092-98a1-5a82f5dade99-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/brionykay"
+      }
+    },
+    {
+      "tiltifySlug": "hey-artie",
+      "campaignName": "Goldie Gang x Become 2025",
+      "tiltifyUrl": "https://tiltify.com/@hey-artie/goldie-gang-x-become25",
+      "tiltifyName": "Hey_Artie",
+      "tiltifyDescription": "We're supporting Become as part of Jingle Jam 2025! Every £ is DOUBLED to support care-experienced young people ❤️ £35 Games Collection includes 15 games such as Rusty's Retirement, Core Keeper, Spiritfall, Dungeons of Hinterberg, and more!!",
+      "tiltifyCauseId": "1b61ce0a-d32c-4dde-bf0a-4849317cce65",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/168896/blob-f8ed5f90-ed36-4675-8540-1f2c779c19c0.png",
+      "raised": {
+        "gbp": 1650,
+        "gbpFormatted": "£1,650.00",
+        "usd": 2194.1,
+        "usdFormatted": "$2,194.10",
+        "euro": 1884.96,
+        "euroFormatted": "1.884,96 €"
+      },
+      "goal": {
+        "gbp": 1500,
+        "gbpFormatted": "£1,500.00",
+        "usd": 1994.64,
+        "usdFormatted": "$1,994.64",
+        "euro": 1713.6,
+        "euroFormatted": "1.713,60 €"
+      },
+      "twitch": {
+        "name": "Hey_Artie",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/8c92c0c8-9d5f-428d-b6d1-9d5207716bbe-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/hey_artie"
+      }
+    },
+    {
+      "tiltifySlug": "breeh",
+      "campaignName": "Breehlieving in a CALM world",
+      "tiltifyUrl": "https://tiltify.com/@breeh/breehliever",
+      "tiltifyName": "Breeh",
+      "tiltifyDescription": "I'm fundraising for CALM throughout Jingle Jam!",
+      "tiltifyCauseId": "3d4fb356-891f-4f1e-9374-984aa5fdfdf5",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/64084/blob-a20ae6c9-4e56-4db5-917e-64d0ffadad53.png",
+      "raised": {
+        "gbp": 1589.69,
+        "gbpFormatted": "£1,589.69",
+        "usd": 2113.91,
+        "usdFormatted": "$2,113.91",
+        "euro": 1816.06,
+        "euroFormatted": "1.816,06 €"
+      },
+      "goal": {
+        "gbp": 1000,
+        "gbpFormatted": "£1,000.00",
+        "usd": 1329.76,
+        "usdFormatted": "$1,329.76",
+        "euro": 1142.4,
+        "euroFormatted": "1.142,40 €"
+      },
+      "twitch": {
+        "name": "Breeh",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/32e623ba-5231-433a-95b8-77df8afea65a-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/breeh"
+      }
+    },
+    {
+      "tiltifySlug": "thenyanpocalypse",
+      "campaignName": "Jingle Nyan 2025",
+      "tiltifyUrl": "https://tiltify.com/@thenyanpocalypse/copy-jinglenyan-915b4618-8348-4fe3-8213-0a5ca08d6883",
+      "tiltifyName": "TheNyanpocalypse",
+      "tiltifyDescription": "I'm fundraising for Jingle Jam 2025 for the Trevor Project! For every donation, I will draw Pistachio doing something as per your request!",
+      "tiltifyCauseId": "809dfb7b-faef-4e2d-b78d-d5e197975dac",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/175394/blob-31e3b5af-4c1d-4c48-8728-42306db99834.png",
+      "raised": {
+        "gbp": 1585.02,
+        "gbpFormatted": "£1,585.02",
+        "usd": 2107.7,
+        "usdFormatted": "$2,107.70",
+        "euro": 1810.73,
+        "euroFormatted": "1.810,73 €"
+      },
+      "goal": {
+        "gbp": 5000,
+        "gbpFormatted": "£5,000.00",
+        "usd": 6648.8,
+        "usdFormatted": "$6,648.80",
+        "euro": 5712,
+        "euroFormatted": "5.712,00 €"
+      },
+      "twitch": {
+        "name": "TheNyanpocalypse",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/b38e1691-8b3e-41db-8b97-90a0e7f92316-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/thenyanpocalypse"
+      }
+    },
+    {
+      "tiltifySlug": "radicallynx",
+      "campaignName": "The night is dark and full of embers",
+      "tiltifyUrl": "https://tiltify.com/@radicallynx/the-night-is-dark-and-full-of-embers",
+      "tiltifyName": "RadicalLynx",
+      "tiltifyDescription": "Like a bonfire needs to be kindled and tended, each person needs to be sheltered and supported. Children in care often lack the basic stability most of us rely on to face the challenges of each day.\n\nSupport this campaign to help ensure the most vulnerable kids in the UK are kindled to Become their potential.",
+      "tiltifyCauseId": "1b61ce0a-d32c-4dde-bf0a-4849317cce65",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/580061/blob-324c85a7-19d7-4591-aa9e-572c2bd23f2a.png",
+      "raised": {
+        "gbp": 1500,
+        "gbpFormatted": "£1,500.00",
+        "usd": 1994.64,
+        "usdFormatted": "$1,994.64",
+        "euro": 1713.6,
+        "euroFormatted": "1.713,60 €"
+      },
+      "goal": {
+        "gbp": 1500,
+        "gbpFormatted": "£1,500.00",
+        "usd": 1994.64,
+        "usdFormatted": "$1,994.64",
+        "euro": 1713.6,
+        "euroFormatted": "1.713,60 €"
+      },
+      "twitch": {
+        "name": "RadicalLynx",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/a7e9234a-0b79-4619-beb5-637090b36d02-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/radicallynx"
+      }
+    },
+    {
+      "tiltifySlug": "viztee",
+      "campaignName": "Viztee for Jingle Jam 2025",
+      "tiltifyUrl": "https://tiltify.com/@viztee/viztee-jj25",
+      "tiltifyName": "viztee",
+      "tiltifyDescription": "We're raising money for 8 amazing charities this year! Donate now to make a difference!",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/348512/blob-c629cae5-26f4-4b36-a62f-66ce293d1970.png",
+      "raised": {
+        "gbp": 1496.76,
+        "gbpFormatted": "£1,496.76",
+        "usd": 1990.33,
+        "usdFormatted": "$1,990.33",
+        "euro": 1709.9,
+        "euroFormatted": "1.709,90 €"
+      },
+      "goal": {
+        "gbp": 1500,
+        "gbpFormatted": "£1,500.00",
+        "usd": 1994.64,
+        "usdFormatted": "$1,994.64",
+        "euro": 1713.6,
+        "euroFormatted": "1.713,60 €"
+      },
+      "twitch": {
+        "name": "Viztee",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/b7bbc044-cc89-423b-9bd1-b96cab5c369a-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/viztee"
+      }
+    },
+    {
+      "tiltifySlug": "jortsmima",
+      "campaignName": "Jorts for War Child",
+      "tiltifyUrl": "https://tiltify.com/@jortsmima/jorts-for-war-child",
+      "tiltifyName": "jortsmima",
+      "tiltifyDescription": "This year, I felt compelled to pick War Child as my charity of choice for Jingle Jam 2025. With everything that is happening in the world, especially this year, I have felt particularly helpless. Raising money for War Child with my community feels like taking a small step to helping those in need.",
+      "tiltifyCauseId": "18cb6ffd-3067-4ca8-8414-74eb733d79fd",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/574786/blob-c948ce17-4f13-46aa-ad69-cae00e8a699b.png",
+      "raised": {
+        "gbp": 1426,
+        "gbpFormatted": "£1,426.00",
+        "usd": 1896.24,
+        "usdFormatted": "$1,896.24",
+        "euro": 1629.06,
+        "euroFormatted": "1.629,06 €"
+      },
+      "goal": {
+        "gbp": 1400,
+        "gbpFormatted": "£1,400.00",
+        "usd": 1861.66,
+        "usdFormatted": "$1,861.66",
+        "euro": 1599.36,
+        "euroFormatted": "1.599,36 €"
+      },
+      "twitch": {
+        "name": "jortsmima",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/67657dcf-a634-44d8-a5de-7256d867bce6-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/jortsmima"
+      }
+    },
+    {
+      "tiltifySlug": "mudlit",
+      "campaignName": "Muds CALM 2025",
+      "tiltifyUrl": "https://tiltify.com/@mudlit/calm2025",
+      "tiltifyName": "mudlit",
+      "tiltifyDescription": "I'm fundraising for Jingle Jam.",
+      "tiltifyCauseId": "3d4fb356-891f-4f1e-9374-984aa5fdfdf5",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/358137/blob-63d9f95e-56d9-431c-bbeb-6c70e80536b8.png",
+      "raised": {
+        "gbp": 1405,
+        "gbpFormatted": "£1,405.00",
+        "usd": 1868.31,
+        "usdFormatted": "$1,868.31",
+        "euro": 1605.07,
+        "euroFormatted": "1.605,07 €"
+      },
+      "goal": {
+        "gbp": 610,
+        "gbpFormatted": "£610.00",
+        "usd": 811.15,
+        "usdFormatted": "$811.15",
+        "euro": 696.86,
+        "euroFormatted": "696,86 €"
+      },
+      "twitch": {
+        "name": "mudlit",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/879c931a-a895-4e64-a24b-9e856616a560-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/mudlit"
+      }
+    },
+    {
+      "tiltifySlug": "kobuskobus",
+      "campaignName": "Shorpts and Kobus do a Jingle Jam",
+      "tiltifyUrl": "https://tiltify.com/+shorpty-and-kobus/shortps-and-kobus-do-a-jingle-jam",
+      "tiltifyName": "KobusKobus",
+      "tiltifyDescription": "Community is the name of the game.\nJingle Jam, and the community that surrounds it has touched and shaped us into who we are.\nReaching out, making connections, and helping others have the opportunity to do the same, feels like the right thing to do.       \n\nWe'll be live on both twitch.tv/shorpts and twitch.tv/kobuskobus respectively, our schedules wont line up perfectly even if we're co-streaming a bunch, so check both out!",
+      "tiltifyCauseId": "809dfb7b-faef-4e2d-b78d-d5e197975dac",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/348479/blob-9b0611ef-fa8f-4d82-becb-9906bddaf2a4.png",
+      "raised": {
+        "gbp": 1269.69,
+        "gbpFormatted": "£1,269.69",
+        "usd": 1688.38,
+        "usdFormatted": "$1,688.38",
+        "euro": 1450.49,
+        "euroFormatted": "1.450,49 €"
+      },
+      "goal": {
+        "gbp": 1234,
+        "gbpFormatted": "£1,234.00",
+        "usd": 1640.92,
+        "usdFormatted": "$1,640.92",
+        "euro": 1409.72,
+        "euroFormatted": "1.409,72 €"
+      },
+      "twitch": {
+        "name": "KobusKobus",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/257733f7-6628-4ba7-ab3b-0be0f3a66c35-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/kobuskobus"
+      }
+    },
+    {
+      "tiltifySlug": "rohman",
+      "campaignName": "WWF JingleJam Fun-Times!",
+      "tiltifyUrl": "https://tiltify.com/@rohman/wwf-jinglejam-funtimes",
+      "tiltifyName": "Rohman",
+      "tiltifyDescription": "Getting into the holiday spirit and trying to reaise money to save our planet!",
+      "tiltifyCauseId": "d02de896-6904-4f80-9755-253afddac343",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/14288/blob-d67fa420-c51a-45a7-b4cb-df758bf733d4.png",
+      "raised": {
+        "gbp": 1195.6,
+        "gbpFormatted": "£1,195.60",
+        "usd": 1589.86,
+        "usdFormatted": "$1,589.86",
+        "euro": 1365.85,
+        "euroFormatted": "1.365,85 €"
+      },
+      "goal": {
+        "gbp": 2000,
+        "gbpFormatted": "£2,000.00",
+        "usd": 2659.52,
+        "usdFormatted": "$2,659.52",
+        "euro": 2284.8,
+        "euroFormatted": "2.284,80 €"
+      },
+      "twitch": {
+        "name": "Rohman",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/3e948ff8-eb13-4a85-84cf-388777ea6218-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/rohman"
+      }
+    },
+    {
+      "tiltifySlug": "turtle-pixelott",
+      "campaignName": "Art for Good - Jingle Jam 2025",
+      "tiltifyUrl": "https://tiltify.com/@turtle-pixelott/jj2025",
+      "tiltifyName": "Turtle_PixelOtt",
+      "tiltifyDescription": "I am supporting CALM and the Jingle Jam 2025 to help those struggling with mental health challenges, inspired by my own journey and experiences.\n\nJoin me as I create a Jingle Jam art piece, pixel art of donators, a chimera PNGTuber that the community will be able to use, and watch me struggle completing all of the above with unlocks from The Wheel of Whimsy!",
+      "tiltifyCauseId": "3d4fb356-891f-4f1e-9374-984aa5fdfdf5",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/178099/blob-f910beb0-80d8-4a57-9494-1e33bd27eec7.png",
+      "raised": {
+        "gbp": 1018.24,
+        "gbpFormatted": "£1,018.24",
+        "usd": 1354.01,
+        "usdFormatted": "$1,354.01",
+        "euro": 1163.24,
+        "euroFormatted": "1.163,24 €"
+      },
+      "goal": {
+        "gbp": 700,
+        "gbpFormatted": "£700.00",
+        "usd": 930.83,
+        "usdFormatted": "$930.83",
+        "euro": 799.68,
+        "euroFormatted": "799,68 €"
+      },
+      "twitch": {
+        "name": "Turtle_PixelOtt",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/30300757-16c8-4441-8b36-5e8b53b87ac7-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/turtle_pixelott"
+      }
+    },
+    {
+      "tiltifySlug": "ashley-wac",
+      "campaignName": "The Doghouse supporting Jingle Jam 2025",
+      "tiltifyUrl": "https://tiltify.com/+the-doghouse/the-doghouse-supporting-jingle-jam-2025",
+      "tiltifyName": "Ashley_wac",
+      "tiltifyDescription": "Join me in supporting Jingle Jam 2025! Through activities like livestreams, social media campaigns, podcasts, and selling items, we aim to make a meaningful impact for a great cause. Your support can help bring positive change.",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/192984/blob-9b82d4e5-3568-45fe-89a4-807e2ef37853.png",
+      "raised": {
+        "gbp": 1005,
+        "gbpFormatted": "£1,005.00",
+        "usd": 1336.41,
+        "usdFormatted": "$1,336.41",
+        "euro": 1148.11,
+        "euroFormatted": "1.148,11 €"
+      },
+      "goal": {
+        "gbp": 1250,
+        "gbpFormatted": "£1,250.00",
+        "usd": 1662.2,
+        "usdFormatted": "$1,662.20",
+        "euro": 1428,
+        "euroFormatted": "1.428,00 €"
+      },
+      "twitch": {
+        "name": "Ashley_wac",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/b75d7f35-56c1-4eba-93f1-7ce1ad16578c-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/ashley_wac"
+      }
+    },
+    {
+      "tiltifySlug": "zilluzion",
+      "campaignName": "vCreatures Jingle Jam",
+      "tiltifyUrl": "https://tiltify.com/+vcreatures/vcreatures-jingle-jam",
+      "tiltifyName": "zilluzion",
+      "tiltifyDescription": "Join us in supporting Jingle Jam 2025!",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/521561/blob-f0275456-6ac8-4adf-bfe9-84aa3a2acb40.png",
+      "raised": {
+        "gbp": 1000,
+        "gbpFormatted": "£1,000.00",
+        "usd": 1329.76,
+        "usdFormatted": "$1,329.76",
+        "euro": 1142.4,
+        "euroFormatted": "1.142,40 €"
+      },
+      "goal": {
+        "gbp": 750,
+        "gbpFormatted": "£750.00",
+        "usd": 997.32,
+        "usdFormatted": "$997.32",
+        "euro": 856.8,
+        "euroFormatted": "856,80 €"
+      },
+      "twitch": {
+        "name": "zilluzion",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/4a6db4ee-d418-4078-bac2-c6f0e014a8bc-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/zilluzion"
+      }
+    },
+    {
+      "tiltifySlug": "euphoriaap",
+      "campaignName": "EUphoria AP for Jingle Jam 2025",
+      "tiltifyUrl": "https://tiltify.com/@euphoriaap/euphoria-fundraiser-for-jingle-jam-2025",
+      "tiltifyName": "EUphoriaAP",
+      "tiltifyDescription": "EUphoria AP and the European TTRPG community are supporting JINGLE JAM 2025, together raising money for 8 charities.",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/783954/blob-08fa2109-8622-45fd-8408-4ce84167df97.png",
+      "raised": {
+        "gbp": 905,
+        "gbpFormatted": "£905.00",
+        "usd": 1203.43,
+        "usdFormatted": "$1,203.43",
+        "euro": 1033.87,
+        "euroFormatted": "1.033,87 €"
+      },
+      "goal": {
+        "gbp": 750,
+        "gbpFormatted": "£750.00",
+        "usd": 997.32,
+        "usdFormatted": "$997.32",
+        "euro": 856.8,
+        "euroFormatted": "856,80 €"
+      },
+      "twitch": {
+        "name": "EUphoriaAP",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/646a2388-fe23-4184-aacc-b22d21678419-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/euphoriaap"
+      }
+    },
+    {
+      "tiltifySlug": "oddtrots",
+      "campaignName": "Trotmas 2025",
+      "tiltifyUrl": "https://tiltify.com/@oddtrots/xmas25",
+      "tiltifyName": "oddtrots",
+      "tiltifyDescription": "Join us in supporting Jingle Jam 2025! Let's come together through social media and livestreams to make a positive impact and raise much-needed funds for a great cause.",
+      "tiltifyCauseId": "3d4fb356-891f-4f1e-9374-984aa5fdfdf5",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/70669/blob-bafb8816-d8bd-48e3-a97f-cb0d66f8317a.png",
+      "raised": {
+        "gbp": 880,
+        "gbpFormatted": "£880.00",
+        "usd": 1170.19,
+        "usdFormatted": "$1,170.19",
+        "euro": 1005.31,
+        "euroFormatted": "1.005,31 €"
+      },
+      "goal": {
+        "gbp": 850,
+        "gbpFormatted": "£850.00",
+        "usd": 1130.3,
+        "usdFormatted": "$1,130.30",
+        "euro": 971.04,
+        "euroFormatted": "971,04 €"
+      },
+      "twitch": {
+        "name": "oddtrots",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/ff050d8e-8c8c-4041-b546-5acc5f1be548-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/oddtrots"
+      }
+    },
+    {
+      "tiltifySlug": "d8dungeon",
+      "campaignName": "D8Dungeon and Jingle Jam 2025",
+      "tiltifyUrl": "https://tiltify.com/@d8dungeon/d8dungeon-and-jingle-jam-2025",
+      "tiltifyName": "d8dungeon",
+      "tiltifyDescription": "Join us in supporting Jingle Jam 2025 as we spread awareness and raise funds through engaging livestreams, podcasts, and social media activities.",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/273194/blob-c994a5d6-3060-47bc-99f4-1a54d1b68844.png",
+      "raised": {
+        "gbp": 878,
+        "gbpFormatted": "£878.00",
+        "usd": 1167.53,
+        "usdFormatted": "$1,167.53",
+        "euro": 1003.03,
+        "euroFormatted": "1.003,03 €"
+      },
+      "goal": {
+        "gbp": 800,
+        "gbpFormatted": "£800.00",
+        "usd": 1063.81,
+        "usdFormatted": "$1,063.81",
+        "euro": 913.92,
+        "euroFormatted": "913,92 €"
+      },
+      "twitch": {
+        "name": "D8Dungeon",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/30fa78aa-e09b-4f6f-8da2-7cf286553854-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/d8dungeon"
+      }
+    },
+    {
+      "tiltifySlug": "sharkdog58",
+      "campaignName": "Sharkdog's crafty Jingle Jam 2025 for Warchild!",
+      "tiltifyUrl": "https://tiltify.com/@sharkdog58/sharkdogs-jingle-jam-2025-for-warchild",
+      "tiltifyName": "Sharkdog58",
+      "tiltifyDescription": "Join me in supporting Jingle Jam 2025! Through livestreams, social media, and creative mini painting, crafting, challenges and crossdressing we're coming together to make a positive impact!",
+      "tiltifyCauseId": "18cb6ffd-3067-4ca8-8414-74eb733d79fd",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/471049/blob-d281e27c-4233-461e-84af-b6cfc5302d63.png",
+      "raised": {
+        "gbp": 851.53,
+        "gbpFormatted": "£851.53",
+        "usd": 1132.33,
+        "usdFormatted": "$1,132.33",
+        "euro": 972.79,
+        "euroFormatted": "972,79 €"
+      },
+      "goal": {
+        "gbp": 750,
+        "gbpFormatted": "£750.00",
+        "usd": 997.32,
+        "usdFormatted": "$997.32",
+        "euro": 856.8,
+        "euroFormatted": "856,80 €"
+      },
+      "twitch": {
+        "name": "Sharkdog58",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/cdd879a8-5ff2-4632-ae01-b22433481faf-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/sharkdog58"
+      }
+    },
+    {
+      "tiltifySlug": "sbooskie",
+      "campaignName": "sbooskie's Jingle-a-Thon 2025",
+      "tiltifyUrl": "https://tiltify.com/@sbooskie/sbooskies-fundraiser-for-jingle-jam-2025",
+      "tiltifyName": "sbooskie",
+      "tiltifyDescription": "Join us as we raise money for the 2025 Jingle Jam!!\n\nAll donations will be distributed evenly between the 8 charities involved this year, these are:\n\n- Campaign Against Living Miserably\n- WAR Child\n- Autistica\n- BECOME\n- The Grand Appeal\n- Make-a-Wish\n- The Trevor Project\n- WWF",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/468373/blob-c265b72b-e531-45a8-9033-25167c5dd01b.jpeg",
+      "raised": {
+        "gbp": 830,
+        "gbpFormatted": "£830.00",
+        "usd": 1103.7,
+        "usdFormatted": "$1,103.70",
+        "euro": 948.19,
+        "euroFormatted": "948,19 €"
+      },
+      "goal": {
+        "gbp": 850,
+        "gbpFormatted": "£850.00",
+        "usd": 1130.3,
+        "usdFormatted": "$1,130.30",
+        "euro": 971.04,
+        "euroFormatted": "971,04 €"
+      },
+      "twitch": {
+        "name": "sbooskie",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/e6a9e6c9-bea6-440a-9aa8-0b685157e0fb-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/sbooskie"
+      }
+    },
+    {
+      "tiltifySlug": "bentopot",
+      "campaignName": "Bentopot's Jingle Jam Fundraiser",
+      "tiltifyUrl": "https://tiltify.com/@bentopot/copy-bentopots-jingle-jam-fundraiser-1843df84-8d2a-433e-bf6d-f40ac680b48b",
+      "tiltifyName": "Bentopot",
+      "tiltifyDescription": "I'm fundraising for Autistica  as part of Jingle Jam 2025 along side the other lovely members of Gobs and Grems team .",
+      "tiltifyCauseId": "974be205-3c5f-4f8c-9dd4-892b6b1e53d2",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/769288/blob-65145229-c637-4bde-82ba-554206fd9975.jpeg",
+      "raised": {
+        "gbp": 805,
+        "gbpFormatted": "£805.00",
+        "usd": 1070.46,
+        "usdFormatted": "$1,070.46",
+        "euro": 919.63,
+        "euroFormatted": "919,63 €"
+      },
+      "goal": {
+        "gbp": 850,
+        "gbpFormatted": "£850.00",
+        "usd": 1130.3,
+        "usdFormatted": "$1,130.30",
+        "euro": 971.04,
+        "euroFormatted": "971,04 €"
+      },
+      "twitch": {
+        "name": "bentopot",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/afffba46-f719-40aa-8b99-94df0afe3fd4-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/bentopot"
+      }
+    },
+    {
+      "tiltifySlug": "actuallykatie",
+      "campaignName": "GLHF Jingle Jam 2025",
+      "tiltifyUrl": "https://tiltify.com/+glhf/glhf-jingle-jam-2025",
+      "tiltifyName": "actuallykatie",
+      "tiltifyDescription": "The GLHF Jingle Jam 2025! GLHF features the dynamic personalities of ActuallyKatie, AdamBabs_, Kolkie, Lekitmelia, NotARealAccountDotCom, Station_Ben, and ThePotatoCast, this eclectic group brings a mix of fun, creativity, and gaming chaos to the table. Whether it’s epic gaming marathons or hilarious group multiplayer nights the GLHF Jingle Jam team are ready to entertain and raise funds for incredible causes!",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/215156/blob-c23d2874-4ca7-4ed0-bb46-df0205214d8e.png",
+      "raised": {
+        "gbp": 800.69,
+        "gbpFormatted": "£800.69",
+        "usd": 1064.73,
+        "usdFormatted": "$1,064.73",
+        "euro": 914.71,
+        "euroFormatted": "914,71 €"
+      },
+      "goal": {
+        "gbp": 850,
+        "gbpFormatted": "£850.00",
+        "usd": 1130.3,
+        "usdFormatted": "$1,130.30",
+        "euro": 971.04,
+        "euroFormatted": "971,04 €"
+      },
+      "twitch": {
+        "name": "ActuallyKatie",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/968015a0-3f8e-41cd-aba8-2c3a0d9bb5a6-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/actuallykatie"
+      }
+    },
+    {
+      "tiltifySlug": "the-goblin-grotto",
+      "campaignName": "Jingle Jam 2025: Goblin Grotto's Charity Livestream",
+      "tiltifyUrl": "https://tiltify.com/@the-goblin-grotto/jingle-jam-2025-goblin-grottos-charity-livestream",
+      "tiltifyName": "The Goblin Grotto",
+      "tiltifyDescription": "The Goblin Grotto Streamer Group is hosting a special charity livestream event during Jingle Jam 2025 to support Autistica, a prominent charity dedicated to advancing research and support for autistic individuals. Join us as we transform generosity into a game and rally the horde for this important cause!",
+      "tiltifyCauseId": "974be205-3c5f-4f8c-9dd4-892b6b1e53d2",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/841564/blob-ccce900f-1301-4976-a0e6-2bb2515aa864.png",
+      "raised": {
+        "gbp": 790,
+        "gbpFormatted": "£790.00",
+        "usd": 1050.51,
+        "usdFormatted": "$1,050.51",
+        "euro": 902.5,
+        "euroFormatted": "902,50 €"
+      },
+      "goal": {
+        "gbp": 500,
+        "gbpFormatted": "£500.00",
+        "usd": 664.88,
+        "usdFormatted": "$664.88",
+        "euro": 571.2,
+        "euroFormatted": "571,20 €"
+      },
+      "twitch": {
+        "name": "TheGoblinGrotto",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/8a0b50e6-4f4d-410d-9fbb-ad26bcacbb77-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/thegoblingrotto"
+      }
+    },
+    {
+      "tiltifySlug": "ceriyun",
+      "campaignName": "Corekeeper Jingle Jam: Two birds and their Gardener",
+      "tiltifyUrl": "https://tiltify.com/@ceriyun/corekeeper-jingle-jam-survive-a-thon",
+      "tiltifyName": "CeriYun",
+      "tiltifyDescription": "Support a good cause with Jingle Jam 2025, Corekeeper and Make-A-Wish!\nLet's bring some smiles, ready for the christmas time.\n\nCampaign by Auteru, CptCamille and Ceriyun",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/990576/blob-9e3eb596-bd7e-4b83-b043-4d0ed90ed5d8.png",
+      "raised": {
+        "gbp": 760,
+        "gbpFormatted": "£760.00",
+        "usd": 1010.62,
+        "usdFormatted": "$1,010.62",
+        "euro": 868.22,
+        "euroFormatted": "868,22 €"
+      },
+      "goal": {
+        "gbp": 500,
+        "gbpFormatted": "£500.00",
+        "usd": 664.88,
+        "usdFormatted": "$664.88",
+        "euro": 571.2,
+        "euroFormatted": "571,20 €"
+      },
+      "twitch": {
+        "name": "CeriYun",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/535edd39-211a-405d-8814-c9b94938fbe8-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/ceriyun"
+      }
+    },
+    {
+      "tiltifySlug": "icaruswaffles",
+      "campaignName": "IcarusWaffles' Jingle Jam 2025",
+      "tiltifyUrl": "https://tiltify.com/@icaruswaffles/copy-waffles-jingle-jam-2024-b6211404-696f-4ab3-a8ca-19fd9ed60af9",
+      "tiltifyName": "IcarusWaffles",
+      "tiltifyDescription": "Jingle Jam is back! I'm supporting The Trevor Project this year, an organization that provides crisis support for LGBTQ+ youth.",
+      "tiltifyCauseId": "809dfb7b-faef-4e2d-b78d-d5e197975dac",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/362976/blob-9c22e23a-d3c5-468c-9166-a2bd362321d3.png",
+      "raised": {
+        "gbp": 699,
+        "gbpFormatted": "£699.00",
+        "usd": 929.5,
+        "usdFormatted": "$929.50",
+        "euro": 798.54,
+        "euroFormatted": "798,54 €"
+      },
+      "goal": {
+        "gbp": 750,
+        "gbpFormatted": "£750.00",
+        "usd": 997.32,
+        "usdFormatted": "$997.32",
+        "euro": 856.8,
+        "euroFormatted": "856,80 €"
+      },
+      "twitch": {
+        "name": "genocidalwaffles",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/58a7db5b-a712-457f-9b46-a73c5b792010-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/genocidalwaffles"
+      }
+    },
+    {
+      "tiltifySlug": "nemet",
+      "campaignName": "Fist of the Jingle Jam 2: Tough Boy",
+      "tiltifyUrl": "https://tiltify.com/@nemet/fist-of-the-jingle-jam-2-tough-boy",
+      "tiltifyName": "nemet",
+      "tiltifyDescription": "Join me in supporting Jingle Jam 2025 through my streams, and make a big difference for eight amazing causes!\n\nThis year, I will be playing Fist of the North Star: Lost Paradise once again, but with a big difference.\nI'm playing on CANON DIFFICULTY.\n\nHelp me raise money while I destroy my hands, as well as Kenshiro's enemies.",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/204310/blob-fac814db-86be-403f-b955-4fa533d8c457.png",
+      "raised": {
+        "gbp": 680,
+        "gbpFormatted": "£680.00",
+        "usd": 904.24,
+        "usdFormatted": "$904.24",
+        "euro": 776.83,
+        "euroFormatted": "776,83 €"
+      },
+      "goal": {
+        "gbp": 715,
+        "gbpFormatted": "£715.00",
+        "usd": 950.78,
+        "usdFormatted": "$950.78",
+        "euro": 816.82,
+        "euroFormatted": "816,82 €"
+      },
+      "twitch": {
+        "name": "Nemet",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/b418290a-14cc-4268-8908-7ce242f0be4b-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/nemet"
+      }
+    },
+    {
+      "tiltifySlug": "touchscalytail",
+      "campaignName": "Jingle Bolds 2025",
+      "tiltifyUrl": "https://tiltify.com/@touchscalytail/jingle-bolds-2025",
+      "tiltifyName": "TouchScalyTail",
+      "tiltifyDescription": "Join me in supporting Jingle Jam 2025! I've personally watched Jingle Jam a ton over the years and actually made my Twitch account 13 years ago to follow each year~\nI never thought I'd become a streamer, let alone be able to take part in large charity events like this. So I super appreciate any and all support! 💙",
+      "tiltifyCauseId": "974be205-3c5f-4f8c-9dd4-892b6b1e53d2",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/105815/blob-f2ee3d0d-0ecb-42ae-af0f-b9adcbc3669d.png",
+      "raised": {
+        "gbp": 646,
+        "gbpFormatted": "£646.00",
+        "usd": 859.02,
+        "usdFormatted": "$859.02",
+        "euro": 737.99,
+        "euroFormatted": "737,99 €"
+      },
+      "goal": {
+        "gbp": 750,
+        "gbpFormatted": "£750.00",
+        "usd": 997.32,
+        "usdFormatted": "$997.32",
+        "euro": 856.8,
+        "euroFormatted": "856,80 €"
+      },
+      "twitch": {
+        "name": "TouchScalyTail",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/61a3ba26-95f0-4c54-a7ba-be8a13ae6ba7-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/touchscalytail"
+      }
+    },
+    {
+      "tiltifySlug": "subparfran",
+      "campaignName": "subparfran's Jingle Jam x CALM fundraiser 2025",
+      "tiltifyUrl": "https://tiltify.com/@subparfran/jinglejam-calm-2025",
+      "tiltifyName": "subparfran",
+      "tiltifyDescription": "Join me in supporting Jingle Jam and Campaign Against Living Miserably!",
+      "tiltifyCauseId": "3d4fb356-891f-4f1e-9374-984aa5fdfdf5",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/493084/blob-1f754c36-aa43-49c5-b5eb-48136c9732eb.png",
+      "raised": {
+        "gbp": 615.69,
+        "gbpFormatted": "£615.69",
+        "usd": 818.72,
+        "usdFormatted": "$818.72",
+        "euro": 703.36,
+        "euroFormatted": "703,36 €"
+      },
+      "goal": {
+        "gbp": 600,
+        "gbpFormatted": "£600.00",
+        "usd": 797.86,
+        "usdFormatted": "$797.86",
+        "euro": 685.44,
+        "euroFormatted": "685,44 €"
+      },
+      "twitch": {
+        "name": "subparfran",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/89a61de6-2d4c-496c-b581-e062f0b8a082-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/subparfran"
+      }
+    },
+    {
+      "tiltifySlug": "thomastrosci",
+      "campaignName": "TSCC Jingle Jam 2025",
+      "tiltifyUrl": "https://tiltify.com/+the-sci-comm-collective/tscc-jingle-jam-2025",
+      "tiltifyName": "ThomAstroSci",
+      "tiltifyDescription": "Join us in supporting the Jingle Jam 2025 through an exciting livestream event, bringing communities together for a great cause.",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/348229/blob-14247acb-f3d6-4c08-9555-ccd3f8040d31.jpeg",
+      "raised": {
+        "gbp": 600.34,
+        "gbpFormatted": "£600.34",
+        "usd": 798.31,
+        "usdFormatted": "$798.31",
+        "euro": 685.83,
+        "euroFormatted": "685,83 €"
+      },
+      "goal": {
+        "gbp": 600,
+        "gbpFormatted": "£600.00",
+        "usd": 797.86,
+        "usdFormatted": "$797.86",
+        "euro": 685.44,
+        "euroFormatted": "685,44 €"
+      },
+      "twitch": {
+        "name": "ThomAstroSci",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/f5044164-c532-4256-b3a1-90392734c3ff-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/thomastrosci"
+      }
+    },
+    {
+      "tiltifySlug": "secret-mode",
+      "campaignName": "Secret mode Jingle Jam 2025",
+      "tiltifyUrl": "https://tiltify.com/@secret-mode/secret-mode-jingle-jam-2025",
+      "tiltifyName": "Secret Mode",
+      "tiltifyDescription": "Join us in supporting Jingle Jam 2025, a wonderful initiative leveraging the power of livestreams and social media to make a real difference. Your generosity will help us achieve our goals and spread joy.",
+      "tiltifyCauseId": "974be205-3c5f-4f8c-9dd4-892b6b1e53d2",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/481725/blob-9730b72c-b939-4019-9e04-2f1c3c951b83.png",
+      "raised": {
+        "gbp": 600,
+        "gbpFormatted": "£600.00",
+        "usd": 797.86,
+        "usdFormatted": "$797.86",
+        "euro": 685.44,
+        "euroFormatted": "685,44 €"
+      },
+      "goal": {
+        "gbp": 850,
+        "gbpFormatted": "£850.00",
+        "usd": 1130.3,
+        "usdFormatted": "$1,130.30",
+        "euro": 971.04,
+        "euroFormatted": "971,04 €"
+      },
+      "twitch": {
+        "name": "WeAreSecretMode",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/6265d913-a853-48d4-a6a5-2b6d5635012d-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/wearesecretmode"
+      }
+    },
+    {
+      "tiltifySlug": "lauratheexplaura",
+      "campaignName": "Explorers for Jingle Jam 2025",
+      "tiltifyUrl": "https://tiltify.com/@lauratheexplaura/explorers-for-jingle-jam-2025",
+      "tiltifyName": "lauratheexplaura",
+      "tiltifyDescription": "I am teaming up with many streamers to spread awareness about wildlife. This holiday season i would love for all of us to come together, learn and support our wildlife. :)",
+      "tiltifyCauseId": "d02de896-6904-4f80-9755-253afddac343",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/400220/blob-4329b237-c87f-48b2-9b1c-117d20ce7089.png",
+      "raised": {
+        "gbp": 585,
+        "gbpFormatted": "£585.00",
+        "usd": 777.91,
+        "usdFormatted": "$777.91",
+        "euro": 668.3,
+        "euroFormatted": "668,30 €"
+      },
+      "goal": {
+        "gbp": 1000,
+        "gbpFormatted": "£1,000.00",
+        "usd": 1329.76,
+        "usdFormatted": "$1,329.76",
+        "euro": 1142.4,
+        "euroFormatted": "1.142,40 €"
+      },
+      "twitch": {
+        "name": "LauraTheExplaura_",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/9ae7798e-cd35-43e0-8236-97c02d6fb58a-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/lauratheexplaura_"
+      }
+    },
+    {
+      "tiltifySlug": "law-live",
+      "campaignName": "Support Jingle Jam 2025 Fundraiser",
+      "tiltifyUrl": "https://tiltify.com/@law-live/support-jingle-jam-2025-fundraiser",
+      "tiltifyName": "Law_live",
+      "tiltifyDescription": "Join me in raising money for Jingle Jam 2025, an incredible cause that unites people through social media and livestreams. Let's make a difference together!",
+      "tiltifyCauseId": "1b61ce0a-d32c-4dde-bf0a-4849317cce65",
+      "avatar": "https://assets.tiltify.com/assets/default-avatar.png",
+      "raised": {
+        "gbp": 575,
+        "gbpFormatted": "£575.00",
+        "usd": 764.61,
+        "usdFormatted": "$764.61",
+        "euro": 656.88,
+        "euroFormatted": "656,88 €"
+      },
+      "goal": {
+        "gbp": 500,
+        "gbpFormatted": "£500.00",
+        "usd": 664.88,
+        "usdFormatted": "$664.88",
+        "euro": 571.2,
+        "euroFormatted": "571,20 €"
+      },
+      "twitch": {
+        "name": "Law_Live",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/fccbb3b1-1fd3-446d-9f5c-eeb256123fcc-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/law_live"
+      }
+    },
+    {
+      "tiltifySlug": "tovakiin",
+      "campaignName": "Tova for Trevor! Jingle Jam 2025",
+      "tiltifyUrl": "https://tiltify.com/@tovakiin/tova-for-trevor-jingle-jam-2025",
+      "tiltifyName": "tovakiin",
+      "tiltifyDescription": "This year Tovakiin will be supporting The Trevor Project - the leading organization working to end suicide among LGBTQ+ young people in the U.S. and beyond.",
+      "tiltifyCauseId": "809dfb7b-faef-4e2d-b78d-d5e197975dac",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/128673/blob-dacea6ef-a389-48cf-8a9e-7ece27ecf944.png",
+      "raised": {
+        "gbp": 551,
+        "gbpFormatted": "£551.00",
+        "usd": 732.7,
+        "usdFormatted": "$732.70",
+        "euro": 629.46,
+        "euroFormatted": "629,46 €"
+      },
+      "goal": {
+        "gbp": 500,
+        "gbpFormatted": "£500.00",
+        "usd": 664.88,
+        "usdFormatted": "$664.88",
+        "euro": 571.2,
+        "euroFormatted": "571,20 €"
+      },
+      "twitch": {
+        "name": "Tovakiin",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/21d87624-a9f1-49a9-9421-f23e18136dad-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/tovakiin"
+      }
+    },
+    {
+      "tiltifySlug": "shine-brighter",
+      "campaignName": "Shine Brighter: Merry Merry Mania",
+      "tiltifyUrl": "https://tiltify.com/@shine-brighter/shine-brighter-merry-merry-mania",
+      "tiltifyName": "Shine Brighter",
+      "tiltifyDescription": "Join me in supporting Jingle Jam 2025, a charity initiative focused on making a positive impact through livestreams and social media engagement.",
+      "tiltifyCauseId": "5350a34a-8b94-4513-bb1d-22becc2df6e4",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/454682/blob-56008c2e-880e-4787-ae0a-67f41f497466.png",
+      "raised": {
+        "gbp": 513,
+        "gbpFormatted": "£513.00",
+        "usd": 682.17,
+        "usdFormatted": "$682.17",
+        "euro": 586.05,
+        "euroFormatted": "586,05 €"
+      },
+      "goal": {
+        "gbp": 500,
+        "gbpFormatted": "£500.00",
+        "usd": 664.88,
+        "usdFormatted": "$664.88",
+        "euro": 571.2,
+        "euroFormatted": "571,20 €"
+      },
+      "twitch": {
+        "name": "LynxyLiam",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/14624793-680d-4ea2-a8d2-3248c9b753cd-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/lynxyliam"
+      }
+    },
+    {
+      "tiltifySlug": "irishpotatooe",
+      "campaignName": "MCBC Festive 2025",
+      "tiltifyUrl": "https://tiltify.com/@irishpotatooe/mcbc-festive-2025",
+      "tiltifyName": "irishpotatooe",
+      "tiltifyDescription": "This year, Minecraft Bedrock Championship (MCBC) will be running our Christmas event 'MCBC Festive 2025' to help raise money for Jingle Jam!",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/956862/blob-8bbb3ac9-8641-4618-a3ee-0948d1bbcfba.png",
+      "raised": {
+        "gbp": 500.63,
+        "gbpFormatted": "£500.63",
+        "usd": 665.72,
+        "usdFormatted": "$665.72",
+        "euro": 571.92,
+        "euroFormatted": "571,92 €"
+      },
+      "goal": {
+        "gbp": 200,
+        "gbpFormatted": "£200.00",
+        "usd": 265.95,
+        "usdFormatted": "$265.95",
+        "euro": 228.48,
+        "euroFormatted": "228,48 €"
+      },
+      "twitch": {
+        "name": "IrishPotatooe",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/ee9cc875-7d3c-43a0-b3f1-377038de3594-profile_image-300x300.jpeg",
+        "isLive": false,
+        "url": "https://twitch.tv/irishpotatooe"
+      }
+    },
+    {
+      "tiltifySlug": "chasedbyvoices",
+      "campaignName": "Screaming Against Suicide 2025",
+      "tiltifyUrl": "https://tiltify.com/@chasedbyvoices/screaming-against-suicide-2025",
+      "tiltifyName": "ChasedByVoices",
+      "tiltifyDescription": "Motivated by my own journey through mental health struggles, I am supporting Jingle Jam 2025 fundraising for CALM. This campaign aims to make an impact and bring hope to those battling feelings of despair, reminding them that change is possible and they are not alone.",
+      "tiltifyCauseId": "3d4fb356-891f-4f1e-9374-984aa5fdfdf5",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/371499/blob-9f248513-7a43-4929-b6d2-9f9faed2f5a9.png",
+      "raised": {
+        "gbp": 500,
+        "gbpFormatted": "£500.00",
+        "usd": 664.88,
+        "usdFormatted": "$664.88",
+        "euro": 571.2,
+        "euroFormatted": "571,20 €"
+      },
+      "goal": {
+        "gbp": 1500,
+        "gbpFormatted": "£1,500.00",
+        "usd": 1994.64,
+        "usdFormatted": "$1,994.64",
+        "euro": 1713.6,
+        "euroFormatted": "1.713,60 €"
+      },
+      "twitch": {
+        "name": "ChasedByVoices",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/0f4182b8-fe18-4fa8-ba2e-1e513573a10b-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/chasedbyvoices"
+      }
+    },
+    {
+      "tiltifySlug": "lilymaidarling",
+      "campaignName": "LilyPad's Ribbiting Jingle-Jam!",
+      "tiltifyUrl": "https://tiltify.com/@lilymaidarling/lilypads-ribbiting-jingle-jam",
+      "tiltifyName": "LilyMaiDarling",
+      "tiltifyDescription": "Join me in supporting Jingle Jam 2025 by raising money through an engaging livestream. Every contribution helps support amazing causes and spreads holiday cheer!\nI have chosen CALM in memory of my cousin, who left us this June. He may be gone will never be forgotten <3",
+      "tiltifyCauseId": "3d4fb356-891f-4f1e-9374-984aa5fdfdf5",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/647857/blob-fea34acb-53db-436f-9fb9-1eab33b03331.jpeg",
+      "raised": {
+        "gbp": 480,
+        "gbpFormatted": "£480.00",
+        "usd": 638.28,
+        "usdFormatted": "$638.28",
+        "euro": 548.35,
+        "euroFormatted": "548,35 €"
+      },
+      "goal": {
+        "gbp": 400,
+        "gbpFormatted": "£400.00",
+        "usd": 531.9,
+        "usdFormatted": "$531.90",
+        "euro": 456.96,
+        "euroFormatted": "456,96 €"
+      },
+      "twitch": {
+        "name": "LilyMaiDarling",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/7f15acab-c66b-4694-9762-84a6a1ce8915-profile_image-300x300.jpeg",
+        "isLive": false,
+        "url": "https://twitch.tv/lilymaidarling"
+      }
+    },
+    {
+      "tiltifySlug": "huds601",
+      "campaignName": "Club601 2025 Jingle Jam Fundraiser",
+      "tiltifyUrl": "https://tiltify.com/@huds601/club601-2025-jingle-jam-fundraiser",
+      "tiltifyName": "huds601",
+      "tiltifyDescription": "Supporting The Grand Appeal's Jingle Jam building by buying games!",
+      "tiltifyCauseId": "5cff6632-f97a-4f6e-96f1-7cd1c3fdb259",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/287017/blob-d15621cc-6043-4f04-86a2-555c5c6e0c1b.png",
+      "raised": {
+        "gbp": 455.41,
+        "gbpFormatted": "£455.41",
+        "usd": 605.59,
+        "usdFormatted": "$605.59",
+        "euro": 520.26,
+        "euroFormatted": "520,26 €"
+      },
+      "goal": {
+        "gbp": 300,
+        "gbpFormatted": "£300.00",
+        "usd": 398.93,
+        "usdFormatted": "$398.93",
+        "euro": 342.72,
+        "euroFormatted": "342,72 €"
+      },
+      "twitch": {
+        "name": "huds601",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/7e67b98a-eae1-4301-9541-f241f4814b1e-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/huds601"
+      }
+    },
+    {
+      "tiltifySlug": "neverland126",
+      "campaignName": "Noble does JingleJam 2025",
+      "tiltifyUrl": "https://tiltify.com/+noble-intentions/noble-does-jinglejam-2025",
+      "tiltifyName": "neverland126",
+      "tiltifyDescription": "Join us in supporting Jingle Jam 2025 through an exciting livestream event. Together, we can make a meaningful impact for the causes Jingle Jam supports.",
+      "tiltifyCauseId": "3d4fb356-891f-4f1e-9374-984aa5fdfdf5",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/95176/blob-7326f5f2-1d89-42f0-a0a4-82bc3eb3acf2.png",
+      "raised": {
+        "gbp": 450,
+        "gbpFormatted": "£450.00",
+        "usd": 598.39,
+        "usdFormatted": "$598.39",
+        "euro": 514.08,
+        "euroFormatted": "514,08 €"
+      },
+      "goal": {
+        "gbp": 500,
+        "gbpFormatted": "£500.00",
+        "usd": 664.88,
+        "usdFormatted": "$664.88",
+        "euro": 571.2,
+        "euroFormatted": "571,20 €"
+      },
+      "twitch": {
+        "name": "Neverland126",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/6219e600-ae81-45b0-a2b8-f8cf499f69d2-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/neverland126"
+      }
+    },
+    {
+      "tiltifySlug": "tripodial",
+      "campaignName": "Tripodial Jingle Jam '25",
+      "tiltifyUrl": "https://tiltify.com/@tripodial/tripodial-jingle-jam-25",
+      "tiltifyName": "Tripodial",
+      "tiltifyDescription": "Join us in supporting Jingle Jam 2025! Through livestreams, video series, and social media, we're coming together to create an impact for this incredible cause. Your contributions can make a difference!",
+      "tiltifyCauseId": "3d4fb356-891f-4f1e-9374-984aa5fdfdf5",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/133662/75befb1f-f63b-440e-b5fe-da79c96cd4c1.jpeg",
+      "raised": {
+        "gbp": 450,
+        "gbpFormatted": "£450.00",
+        "usd": 598.39,
+        "usdFormatted": "$598.39",
+        "euro": 514.08,
+        "euroFormatted": "514,08 €"
+      },
+      "goal": {
+        "gbp": 500,
+        "gbpFormatted": "£500.00",
+        "usd": 664.88,
+        "usdFormatted": "$664.88",
+        "euro": 571.2,
+        "euroFormatted": "571,20 €"
+      },
+      "twitch": {
+        "name": "Tripodial",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/19ffdffb-e55f-4342-b9e4-9c2fcddbb6e9-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/tripodial"
+      }
+    },
+    {
+      "tiltifySlug": "de-boof",
+      "campaignName": "boofmas Jingle Jam - Supporting People with Autism!",
+      "tiltifyUrl": "https://tiltify.com/@de-boof/boofmas-jingle-jam-campaign-supporting-autistic-individuals",
+      "tiltifyName": "de_boof",
+      "tiltifyDescription": "My name is boof, I will be fundraising for Autistica during Jingle Jam 2025! Join me in supporting Autistica - the UK's leading autism research and campaigning charity! Let's make a difference together :)",
+      "tiltifyCauseId": "974be205-3c5f-4f8c-9dd4-892b6b1e53d2",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/994724/blob-8f2489b5-c15d-477d-aa53-647a3b2f81d1.png",
+      "raised": {
+        "gbp": 435.42,
+        "gbpFormatted": "£435.42",
+        "usd": 579,
+        "usdFormatted": "$579.00",
+        "euro": 497.42,
+        "euroFormatted": "497,42 €"
+      },
+      "goal": {
+        "gbp": 400,
+        "gbpFormatted": "£400.00",
+        "usd": 531.9,
+        "usdFormatted": "$531.90",
+        "euro": 456.96,
+        "euroFormatted": "456,96 €"
+      },
+      "twitch": {
+        "name": "de_boof",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/b4c2ba0a-4798-4c3e-9eee-487603b8ec74-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/de_boof"
+      }
+    },
+    {
+      "tiltifySlug": "larrison",
+      "campaignName": "WWF Fundraising for Jingle Jam 2025!",
+      "tiltifyUrl": "https://tiltify.com/@larrison/wwf-fundraising-for-jingle-jam-2025",
+      "tiltifyName": "larrison",
+      "tiltifyDescription": "I am supporting Jingle Jam 2025 to raise money for WWF and spread awareness about the importance of animal conservation and tackling climate change! Join our community on Twitch as we play lots of fun games in the name of charity!",
+      "tiltifyCauseId": "d02de896-6904-4f80-9755-253afddac343",
+      "avatar": "https://assets.tiltify.com/uploads/user/thumbnail/958615/blob-73499741-0a7c-4c05-b64f-d69ba1c583c8.png",
+      "raised": {
+        "gbp": 426,
+        "gbpFormatted": "£426.00",
+        "usd": 566.48,
+        "usdFormatted": "$566.48",
+        "euro": 486.66,
+        "euroFormatted": "486,66 €"
+      },
+      "goal": {
+        "gbp": 500,
+        "gbpFormatted": "£500.00",
+        "usd": 664.88,
+        "usdFormatted": "$664.88",
+        "euro": 571.2,
+        "euroFormatted": "571,20 €"
+      },
+      "twitch": {
+        "name": "larrison_",
+        "avatar": "https://static-cdn.jtvnw.net/jtv_user_pictures/e150ab87-d533-4a9c-a8f3-856af23bf106-profile_image-300x300.png",
+        "isLive": false,
+        "url": "https://twitch.tv/larrison_"
+      }
+    }
+  ],
+  "date": "2025-12-21T22:54:39.848Z"
+}
