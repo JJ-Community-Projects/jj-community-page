@@ -60,7 +60,7 @@ streams:
       - type: twitch
         label: Twitch
         link: https://www.twitch.tv/videos/2641822144?t=6h12m46s
-  - creators: [duncan,markhulmes,nilesy,osie,pedguin,rythian,zylus]
+  - creators: [duncan,maraholmes,nilesy,osie,pedguin,rythian,zylus]
     duration_hours: 3
     end: '2025-12-12T23:00:00Z'
     start: '2025-12-12T20:00:00Z'

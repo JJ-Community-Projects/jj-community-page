@@ -20,7 +20,7 @@ streams:
       - type: twitch
         label: Twitch
         link: https://www.twitch.tv/videos/2635048755?t=0h1m53s
-  - creators: [ sips, ravs, gee, rythian, markhulmes ]
+  - creators: [ sips, ravs, gee, rythian, maraholmes ]
     duration_hours: 2
     end: '2025-12-04T16:00:00Z'
     start: '2025-12-04T14:00:00Z'
@@ -58,7 +58,7 @@ streams:
       - type: twitch
         label: Twitch
         link: https://www.twitch.tv/videos/2635048755?t=5h15m46s
-  - creators: [ lewis, zylus, daltos, duncan, gee, kirsty, martyn, nilesy, osie, zoey, ben, boba, breeh, briony, markhulmes, pedguin, ravs, rythian ]
+  - creators: [ lewis, zylus, daltos, duncan, gee, kirsty, martyn, nilesy, osie, zoey, ben, boba, breeh, briony, maraholmes, pedguin, ravs, rythian ]
     duration_hours: 6
     start: '2025-12-04T17:00:00Z'
     end: '2025-12-04T23:00:00Z'

@@ -40,7 +40,7 @@ streams:
       - type: twitch
         label: Twitch
         link: https://www.twitch.tv/videos/2643599903?t=3h8m36s
-  - creators: [briony,markhulmes,ben,simon_clark,bouphe,rythian,lewis,bekkiboom,simon,zoey,lydia,boba,daf,tom,lolipopgi,nilesy,breeh,zylus,jack,kirsty,osie,mousie,ravs,daltos,shadowatnoon,hat_films,duncan,rtgame]
+  - creators: [briony,maraholmes,ben,simon_clark,bouphe,rythian,lewis,bekkiboom,simon,zoey,lydia,boba,daf,tom,lolipopgi,nilesy,breeh,zylus,jack,kirsty,osie,mousie,ravs,daltos,shadowatnoon,hat_films,duncan,rtgame]
     duration_hours: 3
     end: '2025-12-14T20:00:00Z'
     start: '2025-12-14T17:00:00Z'
@@ -61,7 +61,7 @@ streams:
       - type: twitch
         label: Twitch
         link: https://www.twitch.tv/videos/2643599903?t=6h8m48s
-  - creators: [breeh,briony,zoey,rythian,nilesy,daltos,kirsty,zylus,mousie,pedguin,jack,markhulmes]
+  - creators: [breeh,briony,zoey,rythian,nilesy,daltos,kirsty,zylus,mousie,pedguin,jack,maraholmes]
     duration_hours: 3
     end: '2025-12-15T00:00:00Z'
     start: '2025-12-14T20:00:00Z'

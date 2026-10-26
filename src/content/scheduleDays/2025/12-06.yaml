@@ -39,7 +39,7 @@ streams:
       - type: youtube
         label: Youtube Live
         link: https://www.youtube.com/watch?v=H-s1C_MyqNc
-  - creators: [boba,harry,duncan,osie,lydia,briony,bouphe,markhulmes,martyn,ben,tom,lewis,ravs,alex_the_rambler,mousie,kirsty,lolipopgi]
+  - creators: [boba,harry,duncan,osie,lydia,briony,bouphe,maraholmes,martyn,ben,tom,lewis,ravs,alex_the_rambler,mousie,kirsty,lolipopgi]
     duration_hours: 4.5
     end: '2025-12-06T20:30:00Z'
     start: '2025-12-06T17:00:00Z'

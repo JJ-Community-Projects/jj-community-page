@@ -20,7 +20,7 @@ streams:
       - type: twitch
         label: Twitch
         link: https://www.twitch.tv/videos/2634220745?t=0h3m23s
-  - creators: [ben,lewis,lydia,breeh,duncan,martyn,mini-muka,tom,markhulmes,ravs,osie,gee,boba,hat_films,briony]
+  - creators: [ben,lewis,lydia,breeh,duncan,martyn,mini-muka,tom,maraholmes,ravs,osie,gee,boba,hat_films,briony]
     duration_hours: 3
     end: '2025-12-03T17:00:00Z'
     start: '2025-12-03T14:00:00Z'
