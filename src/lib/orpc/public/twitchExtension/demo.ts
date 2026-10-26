@@ -70,13 +70,19 @@ export const demoUserConfig = (): z.infer<
   tabs: ['user-schedule', 'charities', 'fundraisers', 'yogs'],
 })
 
+// One campaign with an active donation match, so reviewers see the match indicator.
+const DEMO_MATCH_SLUG = 'mousie'
+
 export const demoCampaigns = (): JJCampaignsTVType => ({
   count: campaignsJson.count,
-  campaigns: campaignsJson.campaigns.map((c) => ({
-    ...c,
-    hasActiveDonationMatch: false,
-    donationMatchStartsAt: null,
-  })),
+  campaigns: campaignsJson.campaigns.map((c) => {
+    const matched = c.tiltifySlug === DEMO_MATCH_SLUG
+    return {
+      ...c,
+      hasActiveDonationMatch: matched,
+      donationMatchStartsAt: matched ? new Date(campaignsJson.date) : null,
+    }
+  }),
   date: new Date(campaignsJson.date),
 })
 
