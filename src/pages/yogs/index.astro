@@ -11,7 +11,6 @@ import { getCollection } from 'astro:content'
 import { YogsResponsiveSchedule } from '../../components/yogs-pages/schedule/YogsResponsiveSchedule.tsx'
 import { YogsSeasonSchedule } from '../../components/yogs-pages/schedule/YogsSeasonSchedule.tsx'
 import { ScheduleNotice } from '../../components/yogs-pages/schedule/YogsCurrentScheduleLoader.tsx'
-import YogsStreamList from '../../components/yogs-pages/schedule/YogsStreamList.astro'
 import {
   MainCountdownSimple,
   MainJJStartTimes,
@@ -362,7 +361,6 @@ const ogImage = preRenderdImageExists
             client:load
           />
         </div>
-        <YogsStreamList schedule={currentSchedule} />
       ) : (
         <div class="flex w-full flex-col items-center gap-1 rounded-xl border border-white/10 bg-white/5 p-4 text-center text-white/90 sm:p-4">
           <div class="w-full">
@@ -426,8 +424,6 @@ const ogImage = preRenderdImageExists
               Jam, the Yogscast or their partners.
             </p>
           </YogsResponsiveSchedule>
-
-          <YogsStreamList schedule={lastSchedule} />
         </section>
       )}
 

@@ -4,7 +4,6 @@ import { getYogsScheduleFromContent } from '../../../content/getYogsScheduleFrom
 import { type CollectionEntry, getCollection } from 'astro:content'
 import BaseLayout from '../../../layouts/BaseLayout.astro'
 import { YogsResponsiveSchedule } from '../../../components/yogs-pages/schedule/YogsResponsiveSchedule.tsx'
-import YogsStreamList from '../../../components/yogs-pages/schedule/YogsStreamList.astro'
 import YogsJsonLd from '../../../components/yogs-pages/common/YogsJsonLd.astro'
 import { compactYogsSchedule } from '../../../lib/utils/compactYogsSchedule.ts'
 import {
@@ -165,6 +164,4 @@ const jsonLd = [
       partners.
     </p>
   </YogsResponsiveSchedule>
-
-  <YogsStreamList schedule={schedule} />
 </BaseLayout>
