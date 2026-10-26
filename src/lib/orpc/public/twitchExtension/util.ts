@@ -547,3 +547,15 @@ export function valueToCurrencies(
     euroFormatted: EUR.format(euro),
   }
 }
+
+// Campaign order in the extension: live with a donation match, live, not live with a donation
+// match, not live, then campaigns without a Twitch channel (matched first); highest raised first
+// within each group. Channels go first so they keep their place in the top 100.
+const campaignRank = (c: JJCampaignTVType) =>
+  (c.twitch ? (c.twitch.isLive ? 0 : 2) : 4) +
+  (c.hasActiveDonationMatch ? 0 : 1)
+
+export const sortCampaigns = (campaigns: JJCampaignTVType[]) =>
+  campaigns.toSorted(
+    (a, b) => campaignRank(a) - campaignRank(b) || b.raised.gbp - a.raised.gbp,
+  )

@@ -35,6 +35,7 @@ import {
   loadUserRelations,
   loadUserSchedule,
   notFoundError,
+  sortCampaigns,
   storeCause,
   storeChannelOverview,
   storeNotFound,
@@ -483,32 +484,8 @@ const campaigns = os.campaignsContract
         return item
       })
 
-      // Sort the merged list in the following order:
-      // 1) campaigns with twitch channel that are live
-      // 2) campaigns with twitch channel that are not live
-      // 3) all other campaigns
-      // Additionally, sort by raised.gbp (descending) within each group
-      const getGroupRank = (it: any) => {
-        if (it?.twitch?.name) {
-          return it?.twitch?.isLive ? 0 : 1
-        }
-        return 2
-      }
-      const getRaisedGbp = (it: any) => {
-        const val = it?.raised?.gbp
-        return typeof val === 'number' ? val : 0
-      }
-      const sortedList = mergedList
-        .toSorted((a: any, b: any) => {
-          const ga = getGroupRank(a)
-          const gb = getGroupRank(b)
-          if (ga !== gb) return ga - gb
-          const ra = getRaisedGbp(a)
-          const rb = getRaisedGbp(b)
-          if (ra !== rb) return rb - ra // higher raised first
-          return 0
-        })
-        .slice(0, 100)
+      // Sort before the cut, so live and matched campaigns make the first 100
+      const sortedList = sortCampaigns(mergedList).slice(0, 100)
 
       return {
         count: campaignsDisplay.count ?? sortedList.length,

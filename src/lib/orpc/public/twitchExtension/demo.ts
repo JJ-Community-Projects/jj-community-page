@@ -13,7 +13,11 @@ import type {
   UserScheduleTVType,
 } from './contract.ts'
 import { getStreamColors } from '../../../../functions/jjDatesToColors.ts'
-import { valueToCurrencies, type YogsScheduleOutput } from './util.ts'
+import {
+  sortCampaigns,
+  valueToCurrencies,
+  type YogsScheduleOutput,
+} from './util.ts'
 import campaignsJson from './demo/2025/campaigns.json'
 import causesJson from './demo/2025/causes.json'
 import overviewJson from './demo/2025/overview.json'
@@ -75,14 +79,16 @@ const DEMO_MATCH_SLUG = 'mousie'
 
 export const demoCampaigns = (): JJCampaignsTVType => ({
   count: campaignsJson.count,
-  campaigns: campaignsJson.campaigns.map((c) => {
-    const matched = c.tiltifySlug === DEMO_MATCH_SLUG
-    return {
-      ...c,
-      hasActiveDonationMatch: matched,
-      donationMatchStartsAt: matched ? new Date(campaignsJson.date) : null,
-    }
-  }),
+  campaigns: sortCampaigns(
+    campaignsJson.campaigns.map((c) => {
+      const matched = c.tiltifySlug === DEMO_MATCH_SLUG
+      return {
+        ...c,
+        hasActiveDonationMatch: matched,
+        donationMatchStartsAt: matched ? new Date(campaignsJson.date) : null,
+      }
+    }),
+  ),
   date: new Date(campaignsJson.date),
 })
 
