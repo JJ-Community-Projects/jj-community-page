@@ -1,16 +1,19 @@
 name: Mark Hulmes
-link: https://www.twitch.tv/markhulmes
+link: https://www.twitch.tv/marabunny
 twitchUser: markhulmes
 profileImage:
-  large: https://static-cdn.jtvnw.net/jtv_user_pictures/3a93022e-8853-498e-b22a-2748a9da890d-profile_image-300x300.png
-  small: https://static-cdn.jtvnw.net/jtv_user_pictures/3a93022e-8853-498e-b22a-2748a9da890d-profile_image-70x70.png
+  large: https://static-cdn.jtvnw.net/jtv_user_pictures/166468ee-14f1-4c94-a2c8-9130a72a3816-profile_image-300x300.png
+  small: https://static-cdn.jtvnw.net/jtv_user_pictures/166468ee-14f1-4c94-a2c8-9130a72a3816-profile_image-70x70.png
 links:
   - name: Twitter
     type: twitter
-    url: https://twitter.com/markhulmes
+    url: https://twitter.com/MaraHolmes_
   - name: Twitch
     type: twitch
-    url: https://www.twitch.tv/markhulmes
+    url: https://www.twitch.tv/marabunny
   - name: BlueSky
     type: bsky
-    url: https://bsky.app/profile/sherlockhulmes.bsky.social
+    url: https://bsky.app/profile/maraholmes.bsky.social
+  - name: Instagram
+    type: instagram
+    url: https://www.instagram.com/maraholmes_
