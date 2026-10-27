@@ -12,7 +12,7 @@ export type CachePolicy = {
 
 export const CACHE_POLICY = {
   /** Donation totals, campaigns, causes, overview, donation matches. */
-  jjLive: { ttl: 60 * 60, eventTtl: 30, swr: 30 },
+  jjLive: { ttl: 2 * 60, eventTtl: 30, swr: 30 },
   /** "Next / live now" stream lists (time-dependent). */
   upcoming: { ttl: 15 * 60, eventTtl: 60, swr: 60 },
   /** Public schedule (page, overlays). */
@@ -31,8 +31,8 @@ export const CACHE_POLICY = {
   /** Community cards (`getAllUsersWithInfo`). */
   userDirectory: { ttl: 30 * 60, eventTtl: 10 * 60, swr: 10 * 60 },
   tagCatalog: { ttl: 30 * 60, swr: 30 * 60 },
-  /** Extension config, yogs config, content visibility. */
-  config: { ttl: 10 * 60, swr: 10 * 60 },
+  /** Extension config (global and per channel), yogs config, content visibility. */
+  config: { ttl: 5 * 60, swr: 60 },
   /** Deploy-only content (yogs schedule); the key must include the build. */
   staticContent: { ttl: 24 * 60 * 60 },
   /** Twitch channel id → user. */

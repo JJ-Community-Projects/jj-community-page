@@ -299,7 +299,7 @@ const userExtensionConfig = os.userExtensionConfigContract
     }),
   )
   .use(demo(demoUserConfig))
-  .use(cached('schedule', (i: ExtensionInput) => i.channelId))
+  .use(cached('config', (i: ExtensionInput) => i.channelId))
   .use(rateLimit)
   .use(dbMiddleware)
   .handler(async ({ context, input }) => {
@@ -792,7 +792,7 @@ const yogsSchedule = os.yogsScheduleContract
       ),
     ),
   )
-  .use(cached('config', () => ''))
+  .use(cached('schedule', () => ''))
   .use(rateLimit)
   .handler(async ({ context }) => {
     // Resolve the current schedule year from the Config Durable Object
@@ -826,7 +826,7 @@ const headlinerSchedule = os.headlinerScheduleContract
       ),
     ),
   )
-  .use(cached('config', () => ''))
+  .use(cached('schedule', () => ''))
   .use(rateLimit)
   .handler(async ({ context }) => {
     // Resolve the current schedule year from the Config Durable Object
