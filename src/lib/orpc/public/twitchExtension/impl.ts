@@ -578,9 +578,8 @@ const overview = os.overviewContract
       staleWhileRevalidate: 30,
     }),
   )
-  .use(demo(demoOverview))
-  // Only yogs members see the Yogscast / Fundraisers split; every other channel gets the total.
-  // Before `cached`, so all channels still share one edge cache and KV entry.
+  // Only yogs members see the Yogscast / Fundraisers split; every other channel (the demo channel
+  // too) gets the total. Before `cached`, so all channels still share one edge cache and KV entry.
   .use(async ({ next }, input, output) => {
     const result = await next()
     if (yogsMembers.includes(input.channelId)) return result
@@ -589,6 +588,7 @@ const overview = os.overviewContract
       raised: { total: result.output.raised.total },
     })
   })
+  .use(demo(demoOverview))
   .use(cached('jjLive', () => ''))
   .use(rateLimit)
   .handler(async ({ context }) => {
