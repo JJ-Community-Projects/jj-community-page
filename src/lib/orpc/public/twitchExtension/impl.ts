@@ -28,7 +28,7 @@ import {
   getUserIdByTwitchChannelId,
   isCachedNotFound,
   loadCause,
-  loadChannelOverview,
+  loadOverview,
   loadUserData,
   loadUserExtensionConfig,
   loadUserRelatedSchedule,
@@ -37,14 +37,13 @@ import {
   notFoundError,
   sortCampaigns,
   storeCause,
-  storeChannelOverview,
+  storeOverview,
   storeNotFound,
   storeUserData,
   storeUserExtensionConfig,
   storeUserRelatedSchedule,
   storeUserRelations,
   storeUserSchedule,
-  type OverviewVariant,
   type StreamType,
   type UserExtensionTab,
   valueToCurrencies,
@@ -182,9 +181,6 @@ const originCheck = server.$context<ORPCContext>().middleware(
 const os = implement(contracts).use(hasAstroContext)
 
 type ExtensionInput = { channelId: string; userId: string }
-
-const overviewVariant = (channelId: string): OverviewVariant =>
-  yogsMembers.includes(channelId) ? 'yogs' : 'default'
 
 const extensionConfig = os.extensionConfigContract
   .use(
@@ -583,13 +579,11 @@ const overview = os.overviewContract
     }),
   )
   .use(demo(demoOverview))
-  .use(cached('jjLive', (i: ExtensionInput) => overviewVariant(i.channelId)))
+  .use(cached('jjLive', () => ''))
   .use(rateLimit)
-  .handler(async ({ context, input }) => {
-    // Yogs members get the total only; every other channel the same split overview.
-    const variant = overviewVariant(input.channelId)
-    // Try KV cache first
-    const cached = await loadChannelOverview(context.env.KV, variant)
+  .handler(async ({ context }) => {
+    // The same overview for every channel. Try KV cache first
+    const cached = await loadOverview(context.env.KV)
     if (cached) {
       return cached
     }
@@ -604,25 +598,6 @@ const overview = os.overviewContract
     const collections = await stub.getCollections()
     const donations = await stub.getDonations()
     const dateStr = await stub.getDate()
-
-    /*
-    if (variant === 'yogs') {
-      const overview = {
-        raised: {
-          total: valueToCurrencies(raised, usdRate, eurRate),
-        },
-        collections: collections,
-        donations: donations,
-        date: new Date(dateStr),
-      }
-      await storeChannelOverview(
-        context.env.KV,
-        overview,
-        variant,
-        CACHE_POLICY.extensionOverview.ttl,
-      )
-      return overview
-    }*/
 
     const yogs = await stub.getCampaignByUserSlug('yogscast')
     const overview = {
@@ -640,10 +615,9 @@ const overview = os.overviewContract
       date: new Date(dateStr),
     }
 
-    await storeChannelOverview(
+    await storeOverview(
       context.env.KV,
       overview,
-      variant,
       CACHE_POLICY.extensionOverview.ttl,
     )
 

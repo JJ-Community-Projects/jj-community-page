@@ -197,23 +197,13 @@ export async function storeCause(
   return putJSON(kv, makeKey(`${data.id}`, 'causes'), data, ttlSeconds)
 }
 
+// The overview is the same for every channel: one KV entry.
 export async function storeOverview(
   kv: KVNamespace,
   data: OverviewOutput,
   ttlSeconds: number = 60,
 ) {
   return putJSON(kv, 'twitch-extension:overview', data, ttlSeconds)
-}
-// The overview is the same for every channel except the yogs members' variant (total only).
-export type OverviewVariant = 'default' | 'yogs'
-
-export async function storeChannelOverview(
-  kv: KVNamespace,
-  data: OverviewOutput,
-  variant: OverviewVariant,
-  ttlSeconds: number = 60,
-) {
-  return putJSON(kv, `twitch-extension:overview:${variant}`, data, ttlSeconds)
 }
 
 export async function storeUserData(
@@ -361,20 +351,6 @@ export async function loadOverview(
   kv: KVNamespace,
 ): Promise<OverviewOutput | null> {
   const data = await getJSON<any>(kv, 'twitch-extension:overview')
-  if (!data) return null
-  const revived: OverviewOutput = {
-    raised: data.raised,
-    collections: data.collections,
-    donations: Number(data.donations ?? 0),
-    date: new Date(data.date),
-  }
-  return revived
-}
-export async function loadChannelOverview(
-  kv: KVNamespace,
-  variant: OverviewVariant,
-): Promise<OverviewOutput | null> {
-  const data = await getJSON<any>(kv, `twitch-extension:overview:${variant}`)
   if (!data) return null
   const revived: OverviewOutput = {
     raised: data.raised,

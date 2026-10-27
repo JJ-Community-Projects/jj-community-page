@@ -40,7 +40,7 @@ export const CACHE_POLICY = {
   liveStatus: { ttl: 60 },
   /** The logged-in user kept inside the KV session value; D1 is read again when it is older. */
   sessionUser: { ttl: 60 * 60 },
-  /** Twitch extension overview (JJ totals) in KV: one entry per variant, the same for every channel. */
+  /** Twitch extension overview (JJ totals) in KV: one entry, the same for every channel. */
   extensionOverview: { ttl: 60 },
   /** Twitch extension: a channel's fundraiser (`userData`) in KV. */
   extensionUserData: { ttl: 60, negativeTtl: 5 * 60 },
