@@ -253,7 +253,7 @@ const extensionConfig = os.extensionConfigContract
     )
 
     const config: ExtensionConfigTVType = {
-      year: year ?? 2024,
+      year: year ?? 2025,
       showYogsSchedule: showYogsSchedule ?? false,
       showHeadlinerSchedule: showHeadlinerSchedule ?? false,
       showCharities: showCharities ?? false,
@@ -261,9 +261,9 @@ const extensionConfig = os.extensionConfigContract
       showUserFundraiser: showUserFundraiser ?? false,
       showUserSchedule: showUserSchedule ?? false,
       refreshInterval: {
-        yogsSchedule: refreshIntervalYogsSchedule ?? 1000 * 60 * 10,
-        charities: refreshIntervalCharities ?? 1000 * 60,
-        fundraisers: refreshIntervalFundraisers ?? 1000 * 60,
+        yogsSchedule: refreshIntervalYogsSchedule ?? 1000 * 60 * 15,
+        charities: refreshIntervalCharities ?? 1000 * 60 * 2,
+        fundraisers: refreshIntervalFundraisers ?? 1000 * 60 * 2,
       },
       donationLink: {
         url: donationLinkUrl ?? '',
