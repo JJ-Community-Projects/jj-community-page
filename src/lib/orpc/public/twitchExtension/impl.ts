@@ -579,6 +579,16 @@ const overview = os.overviewContract
     }),
   )
   .use(demo(demoOverview))
+  // Only yogs members see the Yogscast / Fundraisers split; every other channel gets the total.
+  // Before `cached`, so all channels still share one edge cache and KV entry.
+  .use(async ({ next }, input, output) => {
+    const result = await next()
+    if (yogsMembers.includes(input.channelId)) return result
+    return output({
+      ...result.output,
+      raised: { total: result.output.raised.total },
+    })
+  })
   .use(cached('jjLive', () => ''))
   .use(rateLimit)
   .handler(async ({ context }) => {
