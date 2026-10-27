@@ -605,6 +605,7 @@ const overview = os.overviewContract
     const donations = await stub.getDonations()
     const dateStr = await stub.getDate()
 
+    /*
     if (variant === 'yogs') {
       const overview = {
         raised: {
@@ -621,7 +622,7 @@ const overview = os.overviewContract
         CACHE_POLICY.extensionOverview.ttl,
       )
       return overview
-    }
+    }*/
 
     const yogs = await stub.getCampaignByUserSlug('yogscast')
     const overview = {
