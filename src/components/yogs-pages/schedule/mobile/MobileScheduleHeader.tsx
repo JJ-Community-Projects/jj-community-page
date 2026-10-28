@@ -14,7 +14,7 @@ export const MobileScheduleHeader: Component<MobileScheduleHeaderProps> = (
   props,
 ) => {
   return (
-    <div class={'schedule-header flex flex-col gap-2'}>
+    <div class={'flex flex-col gap-2'}>
       <MobileTitle />
     </div>
   )
@@ -39,7 +39,7 @@ const MobileTitle: Component = () => {
         }
       >
         <h3 class={'text-2xl'}>{schedule.title}</h3>
-        <p class={'text-day-header flex-1 text-center text-base'}>
+        <p class={'flex-1 text-center text-base'}>
           {toDateTime(start()).toFormat("EEE',' MMM d")}
         </p>
       </div>

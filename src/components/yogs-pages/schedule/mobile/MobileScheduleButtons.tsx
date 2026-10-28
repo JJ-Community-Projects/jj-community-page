@@ -11,11 +11,11 @@ export const MobileScheduleControlButtons: Component = () => {
   return (
     <Show when={isEmpty()}>
       <div
-        class={'h-data flex flex-row items-center justify-between gap-2 p-2'}
+        class={'flex flex-row items-center justify-between gap-2 p-2'}
       >
         <button
           class={
-            'ripple flex h-8 w-12 flex-col items-center justify-center rounded-2xl bg-accent-500 text-white shadow-xl'
+            'flex h-8 w-12 flex-col items-center justify-center rounded-2xl bg-accent-500 text-white shadow-xl'
           }
           onclick={prevDay}
         >
@@ -35,7 +35,7 @@ export const MobileScheduleControlButtons: Component = () => {
         </button>
         <button
           class={
-            'ripple flex h-8 w-12 flex-col items-center justify-center rounded-2xl bg-accent-500 text-white shadow-xl'
+            'flex h-8 w-12 flex-col items-center justify-center rounded-2xl bg-accent-500 text-white shadow-xl'
           }
           onclick={nextDay}
         >
@@ -54,7 +54,7 @@ export const MobileScheduleFilteredButtons: Component = () => {
     <Show when={!isEmpty()}>
       <div
         class={
-          'h-data flex flex-row items-center justify-around rounded-2xl bg-accent-500 p-2 text-white shadow-xl'
+          'flex flex-row items-center justify-around rounded-2xl bg-accent-500 p-2 text-white shadow-xl'
         }
       >
         <button

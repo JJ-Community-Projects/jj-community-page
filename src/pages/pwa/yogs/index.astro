@@ -1,21 +1,18 @@
 ---
-import {YogsCreatorPill} from "../../../components/yogs-pages/creators/YogsCreatorPill.tsx";
 export const prerender = false;
 import {loadScheduleFromContent} from "../../../content/loadScheduleFromContent";
 import {loadAllCreatorsFromContent} from "../../../content/loadCreatorsFromContent";
 import {YogsCurrentScheduleLoader} from "../../../components/yogs-pages/schedule/YogsCurrentScheduleLoader";
 
 import PageShell from '../../../layouts/PageShell.astro'
+import { getConfigYear } from '../../../lib/utils/configYear.ts'
 
 const creators = await loadAllCreatorsFromContent();
 
-const yogs = creators.filter(creator => creator.type === 'yogs' || creator.type === 'staff');
-const bestOf = creators.filter(creator => creator.type === 'best_of');
-const friends = creators.filter(creator => creator.type === 'friend');
+const year = await getConfigYear();
 
 const fallbackSchedule = await loadScheduleFromContent('2024')
 const filter = Astro.url.searchParams.get('filter') || '';
-console.log(filter)
 const filterCreators = () => {
   if (filter === '') {
     return null;
@@ -26,11 +23,11 @@ const filterCreators = () => {
 
 const filteredCreators = filterCreators();
 
-let description = 'Yogscast Jingle Jam 2024 Interactive Schedule with additional information made by the Community.'
+let description = `Yogscast Jingle Jam ${year} Interactive Schedule with additional information made by the Community.`
 
 if (filteredCreators) {
   if (filteredCreators.length === 1) {
-    description = `The Yogscast Jingle Jam 2024 Schedule for ${filteredCreators[0].name}`
+    description = `The Yogscast Jingle Jam ${year} Schedule for ${filteredCreators[0].name}`
   } else if (filteredCreators.length <= 3) {
     let nameStr = ''
     const filteredCreatorsLastIndex = filteredCreators.length - 1
@@ -42,7 +39,7 @@ if (filteredCreators) {
         nameStr += ' and '
       }
     }
-    description = `The Yogscast Jingle Jam 2024 Schedule for ${nameStr}`
+    description = `The Yogscast Jingle Jam ${year} Schedule for ${nameStr}`
   } else {
     let nameStr = ''
     for (let i = 0; i < 3; i++) {
@@ -53,7 +50,7 @@ if (filteredCreators) {
         nameStr += ' and more'
       }
     }
-    description = `The Yogscast Jingle Jam 2024 Schedule for ${nameStr}`
+    description = `The Yogscast Jingle Jam ${year} Schedule for ${nameStr}`
   }
 }
 ---
@@ -141,41 +138,11 @@ if (filteredCreators) {
     }
 </style>
 <PageShell width="full" nav="pwa" og={false}
-        title="The Yogscast Jingle Jam 2024 Schedule"
+        title={`The Yogscast Jingle Jam ${year} Schedule`}
         description={description}
         canonical="https://jinglejam.ostof.dev/yogs"
 >
     <div class={'min-h-32'}>
         <YogsCurrentScheduleLoader client:only="solid-js" creators={creators} fallbackSchedule={fallbackSchedule!}/>
     </div>
-
-    <div class="flex flex-col justify-center items-center p-4 gap-2">
-        <h2 class="text-on-canvas text-center text-xl font-bold">Yogs & Friends</h2>
-        <div class="flex flex-col items-center gap-2">
-            <h3 class="text-on-canvas-muted mt-2 text-sm font-semibold">Yogs</h3>
-            <div class="flex flex-wrap gap-2 items-center justify-center">
-              {
-                yogs && yogs.map(creator =>
-                              <YogsCreatorPill creator={creator} client:only="solid-js"/>)
-              }
-            </div>
-            <h3 class="text-on-canvas-muted mt-2 text-sm font-semibold">Best Of</h3>
-            <div class="flex flex-wrap gap-2 items-center justify-center">
-              {
-                bestOf && bestOf.map(creator =>
-                              <YogsCreatorPill creator={creator} client:only="solid-js"/>
-                )
-              }
-            </div>
-            <h3 class="text-on-canvas-muted mt-2 text-sm font-semibold">Friends</h3>
-            <div class="flex flex-wrap gap-2 items-center justify-center">
-              {
-                friends && friends.map(creator =>
-                              <YogsCreatorPill creator={creator} client:only="solid-js"/>
-                )
-              }
-            </div>
-        </div>
-    </div>
-
 </PageShell>

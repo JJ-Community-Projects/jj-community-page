@@ -1,8 +1,4 @@
 {
-  "src/components/common/QueryComponent.tsx": {
-    "unknown": 4,
-    "raw-palette": 5
-  },
   "src/components/features/admin/tags/tag/AddTagPanel.tsx": {
     "hex": 2
   },
@@ -36,24 +32,10 @@
   "src/components/features/users/user-dashboard/preferences/UserStylesSection.tsx": {
     "hex": 2
   },
-  "src/components/yogs-pages/schedule/header/YogsScheduleHeader.tsx": {
-    "unknown": 2
-  },
-  "src/components/yogs-pages/schedule/mobile/MobileScheduleButtons.tsx": {
-    "unknown": 4
-  },
-  "src/components/yogs-pages/schedule/mobile/MobileScheduleHeader.tsx": {
-    "unknown": 2
-  },
-  "src/components/yogs-pages/schedule/mobile/MobileYogsStreamTile.tsx": {
-    "unknown": 2
-  },
   "src/components/yogs-pages/schedule/provider/ScheduleCalendarExportButton.tsx": {
-    "unknown": 3,
     "raw-palette": 3
   },
   "src/components/yogs-pages/schedule/provider/ScheduleCreatorFilterButton.tsx": {
-    "unknown": 2,
     "raw-palette": 7
   },
   "src/components/yogs-pages/schedule/YogsScheduleDetailDialog.tsx": {

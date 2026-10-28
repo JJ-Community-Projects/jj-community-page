@@ -107,13 +107,21 @@ const accentColor = /^#[0-9a-f]{3,8}$/i.test(userAccentColor)
         <Tile class="flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-4">
           {/* A border (not a ring) in the user's accent colour */}
           <div
-            class="shadow-tile size-24 shrink-0 overflow-hidden rounded-full border-4"
+            class="shadow-tile relative size-24 shrink-0 overflow-hidden rounded-full border-4 bg-neutral-200"
             style={`border-color: ${accentColor}`}
           >
+            {/* Shows through when the image fails; the img stays in place (and in the a11y tree), just transparent */}
+            <span
+              aria-hidden="true"
+              class="text-fg-muted absolute inset-0 flex items-center justify-center text-3xl font-semibold"
+            >
+              {user.user.username.charAt(0).toUpperCase()}
+            </span>
             <img
               src={user.user.profileImage}
               alt={`${user.user.username}'s profile`}
-              class="size-full object-cover"
+              class="relative size-full object-cover"
+              onerror="this.style.opacity='0'"
             />
           </div>
           <div class="flex min-w-0 flex-1 flex-col gap-2">

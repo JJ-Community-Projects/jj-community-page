@@ -2,6 +2,9 @@ import type {UseQueryResult} from "@tanstack/solid-query";
 import {useQuery} from "@tanstack/solid-query";
 import {type Accessor, createMemo, type JSX, Match, Show, Switch} from "solid-js";
 import type {QueryOptionsBase} from "@orpc/tanstack-query";
+import { Alert, Spinner } from "../ui/Status";
+import { Button } from "../ui/Button";
+import { Chip } from "../ui/Labels";
 
 /**
  * Props for the QueryComponent
@@ -149,7 +152,7 @@ export function RawQueryComponent<TData, TError>(props: RawQueryComponentProps<T
     <Switch>
       {/* Initial loading state - no data available yet */}
       <Match when={props.query.isPending}>
-        {props.loading?.() ?? <div class="query-loading">Loading...</div>}
+        {props.loading?.() ?? <Spinner label="Loading…" class="text-fg-muted" />}
       </Match>
 
       {/* Error state - query failed */}
@@ -159,31 +162,30 @@ export function RawQueryComponent<TData, TError>(props: RawQueryComponentProps<T
           refetch(),
           props.query.failureCount
         ) ?? (
-          <div class="query-error">
-            <p>An error occurred while loading data.</p>
+          <Alert
+            tone="danger"
+            action={
+              <Button size="sm" onClick={refetch()}>
+                Retry
+              </Button>
+            }
+          >
+            An error occurred while loading data.
             <Show when={props.query.failureCount > 1}>
-              <p class="text-sm text-gray-600">
-                Failed {props.query.failureCount} times
-              </p>
+              {' '}Failed {props.query.failureCount} times.
             </Show>
-            <button
-              onClick={refetch()}
-              class="mt-2 px-3 py-1 bg-blue-500 text-white rounded-sm hover:bg-blue-600"
-            >
-              Retry
-            </button>
-          </div>
+          </Alert>
         )}
       </Match>
 
       {/* Success state - data is available */}
       <Match when={props.query.isSuccess && props.query.data !== undefined}>
-        <div class="query-success">
+        <div>
           {/* Show stale indicator if enabled and data is stale */}
           <Show when={props.showStaleIndicator && props.query.isStale}>
-            <div class="stale-indicator text-xs text-amber-600 mb-2">
-              ⚠️ This data may be outdated
-            </div>
+            <Alert tone="warning" role="status" class="mb-2">
+              This data may be outdated.
+            </Alert>
           </Show>
 
           {/* Handle background refetching */}
@@ -194,9 +196,9 @@ export function RawQueryComponent<TData, TError>(props: RawQueryComponentProps<T
             {props.refetching?.(props.query.data!) ?? (
               <div class="relative">
                 {props.children(props.query.data!)}
-                <div class="absolute top-0 right-0 bg-blue-500 text-white text-xs px-2 py-1 rounded-sm">
-                  Updating...
-                </div>
+                <Chip class="absolute top-0 right-0">
+                  <Spinner label="Updating…" class="text-xs" />
+                </Chip>
               </div>
             )}
           </Show>

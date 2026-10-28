@@ -214,16 +214,17 @@ const MemberTeamsList: Component = () => {
   return (
     <Column
       icon={<FaSolidUsers />}
-      title={
-        <Show when={canInviteCurrentUser.data} fallback={<>Teams You're In</>}>
-          {(data) => (
-            <>
-              Teams You're In ({data().teams}/{data().maxTeams})
-            </>
-          )}
-        </Show>
-      }
+      title={<>Teams You're In</>}
     >
+      {/* The limit counts every team, owned ones included; this list leaves those out */}
+      <Show when={canInviteCurrentUser.data}>
+        {(data) => (
+          <p class="text-fg-muted -mt-2 mb-3 text-xs">
+            {data().teams} of {data().maxTeams} team slots used, owned teams
+            included
+          </p>
+        )}
+      </Show>
       <TeamRows
         filter={(t) => t.ownerId !== user.id}
         empty={{

@@ -86,10 +86,10 @@ export const JJStartTimes: Component<{ class?: string }> = (props) => {
   const isLocalTimeZoneUK = () =>
     nextJJStartDate().toLocal().zoneName === nextJJStartDate().zoneName
   const zones = () => [
-    { label: 'Your local time', date: nextJJStartDate().toLocal() },
+    { label: 'Starts, your time', date: nextJJStartDate().toLocal() },
     ...(isLocalTimeZoneUK()
       ? []
-      : [{ label: 'UK time', date: nextJJStartDate() }]),
+      : [{ label: 'Starts, UK time', date: nextJJStartDate() }]),
   ]
   return (
     <div

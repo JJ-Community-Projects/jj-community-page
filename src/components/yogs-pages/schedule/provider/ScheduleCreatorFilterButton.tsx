@@ -97,7 +97,7 @@ export const FilterDialog: Component<FilterDialogProps> = props => {
   return (
     <Dialog.Root open={modalSignal.isOpen()} onOpenChange={modalSignal.setOpen}>
       <Dialog.Portal>
-        <Dialog.Overlay class={'fixed inset-0 z-50 bg-black bg-opacity-20'}/>
+        <Dialog.Overlay class={'fixed inset-0 z-50 bg-black/20'}/>
         <div class={'fixed inset-0 z-50 flex items-center justify-center'}>
           <Dialog.Content class={'h-full max-sm:h-[70vh] w-full max-w-[500px] p-2 lg:w-[min(calc(100vw-16px),500px)] lg:p-16'}>
             <FilterDialogBody onClose={modalSignal.close}/>
@@ -168,7 +168,7 @@ const FilterDialogBody: Component<FilterDialogBodyProps> = props => {
                 Search
               </label>
               <input
-                class="focus:shadow-outline w-full appearance-none rounded-sm border px-3 py-2 leading-tight text-gray-700 shadow-sm focus:outline-hidden"
+                class="w-full appearance-none rounded-sm border px-3 py-2 leading-tight text-gray-700 shadow-sm focus:outline-hidden"
                 id="search"
                 type="text"
                 placeholder="Search"

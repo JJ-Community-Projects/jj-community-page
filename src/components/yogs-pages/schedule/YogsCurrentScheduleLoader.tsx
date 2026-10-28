@@ -11,11 +11,11 @@ import { orpcPrivate } from '../../../lib/orpc/client.ts'
 import { QueryClient } from '@tanstack/query-core'
 import { Countdown, JJStartCountdown, JJStartTimes } from '../../ui/Countdown'
 import { Tile } from '../../ui/Tile'
+import { Alert } from '../../ui/Status'
+import { cn } from '../../ui/cn'
 import {
   BskyIcon,
-  DiscordIcon,
   InstagramIcon,
-  RedditIcon,
   TiktokIcon,
   TwitchIcon,
   TwitterIcon,
@@ -23,7 +23,6 @@ import {
 } from '../../common/icons/JJIcons.tsx'
 import { DateTime } from 'luxon'
 import { YogsCreatorPill } from '../creators/YogsCreatorPill.tsx'
-import { FaSolidEnvelope } from 'solid-icons/fa'
 import {
   useIsAfterJJEnd,
   useIsBeforeJJ,
@@ -218,7 +217,6 @@ const Body: Component<BodyProps> = (props) => {
                 )
               }}
             </Show>
-            <Feedback />
           </div>
           <div class={'max-w-[80vw]'}>
             <HeadlinerTicker />
@@ -244,10 +242,9 @@ const Body: Component<BodyProps> = (props) => {
                 )
               }}
             </Show>
-            <Feedback />
           </div>
           <Creators creators={props.creators} />
-          <ScheduleNotice />
+          <ScheduleNotice class="text-on-canvas-muted" />
         </div>
       </Match>
       <Match when={schedule.isPending}>
@@ -256,7 +253,9 @@ const Body: Component<BodyProps> = (props) => {
         </div>
       </Match>
       <Match when={schedule.error}>
-        <p>{schedule.error?.message}</p>
+        <Alert tone="danger" class="mx-auto max-w-2xl">
+          {schedule.error?.message}
+        </Alert>
       </Match>
     </Switch>
   )
@@ -304,57 +303,14 @@ export const Creators: Component<{
   )
 }
 
-export const Feedback: Component = () => {
-  return (
-    <div
-      class={'flex flex-col items-center justify-start gap-1 p-2 text-white'}
-    >
-      <p class={'text-base font-bold'}>Send Feedback</p>
-      <div class={'flex flex-row gap-4'}>
-        <a
-          class={
-            'rounded-full transition-all hover:scale-110 hover:bg-white/10'
-          }
-          href={'https://discord.gg/hBdKXkB'}
-        >
-          <DiscordIcon class={'size-5'} />
-        </a>
-        <a
-          class={
-            'rounded-full transition-all hover:scale-110 hover:bg-white/10'
-          }
-          href={'https://bsky.app/profile/ostof.bsky.social'}
-        >
-          <BskyIcon class={'size-5'} />
-        </a>
-        <a
-          class={
-            'rounded-full transition-all hover:scale-110 hover:bg-white/10'
-          }
-          href={'mailto:ostof13@gmail.com'}
-        >
-          <FaSolidEnvelope class={'size-5'} />
-        </a>
-        <a
-          class={
-            'rounded-full transition-all hover:scale-110 hover:bg-white/10'
-          }
-          href={'https://old.reddit.com/message/compose/?to=Ostof'}
-        >
-          <RedditIcon class={'size-5'} />
-        </a>
-      </div>
-    </div>
-  )
-}
-
 /** Disclaimer and Yogscast social links below the schedule. */
-export const ScheduleNotice: Component = () => {
+export const ScheduleNotice: Component<{ class?: string }> = (props) => {
   return (
     <div
-      class={
-        'flex flex-col items-center justify-center gap-1 text-pretty text-center text-sm'
-      }
+      class={cn(
+        'flex flex-col items-center justify-center gap-1 text-pretty text-center text-sm',
+        props.class,
+      )}
     >
       <p>
         The schedule is subject to change and not all participants are

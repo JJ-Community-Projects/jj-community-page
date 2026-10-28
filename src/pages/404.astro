@@ -21,9 +21,10 @@ const links = [
   code="404"
 >
   The page, creator, team or schedule you're looking for doesn't exist.
-  <Fragment slot="actions">
+  <!-- Four links: 2×2 on phones (a row wraps 3 + 1), one centred row from sm up -->
+  <div slot="actions" class="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:flex-wrap sm:justify-center">
     {links.map(({ href, label }, i) => (
       <Button href={href} size="sm" variant={i === 0 ? 'primary' : 'secondary'}>{label}</Button>
     ))}
-  </Fragment>
+  </div>
 </ErrorPage>

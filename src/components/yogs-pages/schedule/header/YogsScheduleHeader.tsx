@@ -63,7 +63,7 @@ export const YogsScheduleHeader: Component = () => {
           <Tooltip.Root openDelay={300} closeDelay={300}>
             <Tooltip.Trigger
               class={
-                'bg-accent-500 text-white hover:brightness-105 ripple flex flex-1 flex-col items-center justify-center rounded-l-2xl transition-all hover:scale-105 h-full'
+                'bg-accent-500 text-white hover:brightness-105 flex flex-1 flex-col items-center justify-center rounded-l-2xl transition-all hover:scale-105 h-full'
               }
               onClick={prevWeek}
             >
@@ -79,7 +79,7 @@ export const YogsScheduleHeader: Component = () => {
           <Tooltip.Root openDelay={300} closeDelay={300}>
             <Tooltip.Trigger
               class={
-                'bg-accent-500 text-white hover:brightness-105 ripple flex flex-1 flex-col items-center justify-center rounded-r-2xl transition-all hover:scale-105 h-full'
+                'bg-accent-500 text-white hover:brightness-105 flex flex-1 flex-col items-center justify-center rounded-r-2xl transition-all hover:scale-105 h-full'
               }
               onClick={nextWeek}
             >

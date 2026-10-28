@@ -18,8 +18,8 @@ export const CalendarExportButton: Component = () => {
 
   return (
     <>
-      <div class={'w-slot h-data p-schedule'}>
-        <div class={'schedule-card-white flex flex-row'}>
+      <div class={'w-slot p-schedule'}>
+        <div class={'flex flex-row'}>
           <button
             class={
               'hover:bg-accent-50 flex flex-1 flex-col items-center justify-center rounded-2xl transition-all hover:scale-105'
@@ -47,7 +47,7 @@ export const CalendarDialog: Component<CalendarDialogDialogProps> = props => {
   return (
     <Dialog.Root open={modalSignal.isOpen()} onOpenChange={modalSignal.setOpen}>
       <Dialog.Portal>
-        <Dialog.Overlay class={'fixed inset-0 z-50 bg-black bg-opacity-20'}/>
+        <Dialog.Overlay class={'fixed inset-0 z-50 bg-black/20'}/>
         <div class={'fixed inset-0 z-50 flex items-center justify-center'}>
           <Dialog.Content class={'h-full max-sm:h-[70vh] w-full max-w-[500px] p-2 lg:w-[min(calc(100vw-16px),500px)] lg:p-16'}>
             <CalendarDialogDialogBody onClose={modalSignal.close}/>
@@ -168,7 +168,7 @@ const CalendarDialogDialogBody: Component<CalendarDialogDialogBodyProps> = props
             Search
           </label>
           <input
-            class="focus:shadow-outline w-full appearance-none rounded-sm border px-3 py-2 leading-tight text-gray-700 shadow-sm focus:outline-hidden"
+            class="w-full appearance-none rounded-sm border px-3 py-2 leading-tight text-gray-700 shadow-sm focus:outline-hidden"
             id="search"
             type="text"
             placeholder="Search"

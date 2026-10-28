@@ -12,7 +12,6 @@ import { YogsScheduleWeek } from './YogsScheduleWeek.tsx'
 import { MobileYogsSchedule } from './mobile/MobileYogsSchedule.tsx'
 import {
   Creators,
-  Feedback,
   ScheduleNotice,
 } from './YogsCurrentScheduleLoader.tsx'
 import { HeadlinerTicker } from '../../features/schedules/common/HeadlinerTicker.tsx'
@@ -48,16 +47,14 @@ export const YogsSeasonSchedule: Component<YogsSeasonScheduleProps> = (
           <div class="desktop-schedule flex w-full flex-col items-center justify-center gap-2">
             <YogsScheduleWeek />
             <UpdatedAt year />
-            <Feedback />
           </div>
           <Ticker />
           <div class="mobile-schedule flex w-full flex-col items-center justify-center gap-2">
             <MobileYogsSchedule />
             <UpdatedAt />
-            <Feedback />
           </div>
           <Creators creators={schedule.creators} />
-          <ScheduleNotice />
+          <ScheduleNotice class="text-on-canvas-muted" />
         </div>
       </CreatorFilterProvider>
     </YogsScheduleProvider>
