@@ -38,6 +38,8 @@ type AlertProps = {
   title?: string
   /** E.g. a retry button. */
   action?: JSX.Element
+  /** Overrides the tone's role, e.g. a warning that is a passive status rather than an interruption. */
+  role?: 'alert' | 'status'
   class?: string
 }
 
@@ -47,7 +49,8 @@ export const Alert: ParentComponent<AlertProps> = (props) => {
   return (
     <div
       role={
-        props.tone === 'danger' || props.tone === 'warning' ? 'alert' : 'status'
+        props.role ??
+        (props.tone === 'danger' || props.tone === 'warning' ? 'alert' : 'status')
       }
       class={cn(
         'rounded-group flex items-start gap-2 p-3 text-sm ring-1',

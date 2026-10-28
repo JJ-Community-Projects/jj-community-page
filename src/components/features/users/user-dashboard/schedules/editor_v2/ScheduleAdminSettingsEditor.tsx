@@ -5,7 +5,7 @@ import {StreamsPanel} from "./streams/StreamsPanel.tsx";
 
 export const ScheduleAdminSettingsEditor: Component = () => {
   return (
-    <div class="space-y-6">
+    <div class="flex flex-col gap-3">
       <ScheduleAdminEditorHeader/>
       <ScheduleEditorSettings/>
       <StreamsPanel/>

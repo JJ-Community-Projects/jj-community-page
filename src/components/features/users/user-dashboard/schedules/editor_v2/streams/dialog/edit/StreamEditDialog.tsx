@@ -1,14 +1,21 @@
-import {type Component, Show} from "solid-js";
-import {Dialog} from "@kobalte/core/dialog";
+import {type Component, createSignal, Show} from "solid-js";
 import {useScheduleEditor2} from "../../../ScheduleEditorProvider.tsx";
 import {useStreamEditorDialog} from "./StreamEditorDialogContext.tsx";
-import {StreamEditFormBody} from "./StreamEditFormBody.tsx";
-import {StreamDialogControls} from "./StreamDialogControls.tsx";
-import {FaSolidLock} from "solid-icons/fa";
+import {StreamParticipantsSection} from "./StreamParticipantsSection.tsx";
+import {
+  StreamDetailsFields,
+  StreamLinksFields,
+  StreamTagsField,
+  StreamTimeFields,
+} from "../shared/StreamFields.tsx";
+import {ConfirmDialog, Dialog} from "../../../../../../../../ui/Dialog";
+import {Button} from "../../../../../../../../ui/Button";
+import {Alert} from "../../../../../../../../ui/Status";
 
 export const StreamEditDialog: Component = () => {
-  const { state, lockHolderName } = useScheduleEditor2();
+  const { state, lockHolderName, deleteStream, deleteStreamMutation } = useScheduleEditor2();
   const dialog = useStreamEditorDialog();
+  const [confirmDelete, setConfirmDelete] = createSignal(false);
 
   const stream = () => {
     const id = dialog.streamId();
@@ -16,43 +23,94 @@ export const StreamEditDialog: Component = () => {
     return state.streams.find((s) => s.id === id) ?? null;
   };
 
+  const year = () => state.schedule?.year ?? new Date().getFullYear();
+
+  // A refused save or delete keeps the dialog open with the server's message (F-66)
+  const errorMessage = (error: unknown) => error instanceof Error ? error.message : String(error);
+
+  const handleDelete = async (streamId: number) => {
+    setConfirmDelete(false);
+    dialog.setError(null);
+    try {
+      await deleteStream(streamId);
+    } catch (error) {
+      dialog.setError(errorMessage(error));
+      return;
+    }
+    dialog.close();
+  };
+
+  const handleSave = async () => {
+    dialog.setError(null);
+    try {
+      await dialog.save();
+    } catch (error) {
+      dialog.setError(errorMessage(error));
+      return;
+    }
+    dialog.close();
+  };
+
   return (
-    <Dialog open={dialog.isOpen()} onOpenChange={(o) => (!o ? dialog.close() : void 0)}>
-      <Dialog.Portal>
-        <Dialog.Overlay class="fixed inset-0 bg-black/50 z-40" />
-        <div class="fixed inset-0 flex items-center justify-center z-50">
-          <Dialog.Content class="bg-white rounded-xl shadow-xl p-0 w-full max-w-3xl max-h-[90vh] flex flex-col">
-            <div class="px-5 py-4 border-b flex items-center justify-between">
-              <Dialog.Title class="text-lg font-bold">Edit</Dialog.Title>
-              <button class="text-sm text-gray-600 hover:text-gray-800" onClick={dialog.close}>Close</button>
-            </div>
-
-            <div class="p-5 overflow-y-auto flex-1">
-              <Show when={dialog.lockedBy()}>
-                {(holder) => (
-                  <div role="status" class="mb-4 bg-amber-100 border border-amber-400 text-amber-800 px-4 py-2 rounded-sm text-sm">
-                    <FaSolidLock class="inline mr-1" />{lockHolderName(holder())} is editing this stream. Saving is refused until they close it.
-                  </div>
-                )}
-              </Show>
-              <Show when={stream()} fallback={<div class="text-sm text-gray-600">No stream selected.</div>}>
-                {(s) => <StreamEditFormBody streamId={s().id} />}
-              </Show>
-            </div>
-
-            <div class="border-t p-4">
+    <Dialog
+      open={dialog.isOpen()}
+      onOpenChange={(o) => (!o ? dialog.close() : void 0)}
+      title="Edit"
+      size="lg"
+      footer={
+        <Show when={stream()}>
+          {(s) => (
+            <>
               <Show when={dialog.error()}>
-                {(message) => (
-                  <div role="alert" class="mb-3 bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded-sm text-sm">
-                    {message()}
-                  </div>
-                )}
+                {(message) => <Alert tone="danger" class="basis-full">{message()}</Alert>}
               </Show>
-              <Show when={stream()}>{(s) => <StreamDialogControls streamId={s().id} onClose={dialog.close} />}</Show>
-            </div>
-          </Dialog.Content>
-        </div>
-      </Dialog.Portal>
+              <Button
+                size="sm"
+                variant="danger"
+                class="mr-auto"
+                onClick={() => setConfirmDelete(true)}
+                disabled={deleteStreamMutation.isPending}
+              >
+                {deleteStreamMutation.isPending ? "Deleting…" : "Delete"}
+              </Button>
+              <Button size="sm" onClick={dialog.close}>Close</Button>
+              <Button size="sm" variant="primary" onClick={handleSave} disabled={dialog.isSaving()}>
+                {dialog.isSaving() ? "Saving…" : "Save"}
+              </Button>
+              <ConfirmDialog
+                open={confirmDelete()}
+                onOpenChange={setConfirmDelete}
+                title="Delete Stream"
+                text="Delete this stream? This cannot be undone."
+                confirmLabel="Delete"
+                pending={deleteStreamMutation.isPending}
+                onConfirm={() => handleDelete(s().id)}
+              />
+            </>
+          )}
+        </Show>
+      }
+    >
+      <div class="flex flex-col gap-6">
+        <Show when={dialog.lockedBy()}>
+          {(holder) => (
+            <Alert tone="warning" role="status">
+              {lockHolderName(holder())} is editing this stream. Saving is refused until they close it.
+            </Alert>
+          )}
+        </Show>
+        <Show when={stream()} fallback={<p class="text-fg-muted text-sm">No stream selected.</p>}>
+          <StreamDetailsFields api={dialog} />
+          <StreamTimeFields
+            api={dialog}
+            minDate={new Date(year(), 0, 1, 0, 0, 0, 0)}
+            maxDate={new Date(year(), 11, 31, 23, 59, 0, 0)}
+          />
+          <StreamParticipantsSection />
+          <StreamTagsField api={dialog} />
+          <StreamLinksFields api={dialog} />
+        </Show>
+      </div>
     </Dialog>
   );
 };

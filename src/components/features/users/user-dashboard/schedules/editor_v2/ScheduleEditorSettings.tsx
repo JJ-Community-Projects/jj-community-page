@@ -2,12 +2,14 @@ import { type Component, Show, createEffect, createSignal } from "solid-js";
 import { useScheduleEditor2 } from "./ScheduleEditorProvider.tsx";
 import { debounce } from "@solid-primitives/scheduled";
 import { TextField } from "@kobalte/core/text-field";
-import { Checkbox } from "@kobalte/core/checkbox";
 import { useQuery } from "@tanstack/solid-query";
 import { orpcPrivate } from "../../../../../../lib/orpc/client.ts";
 import { useEditableField } from "../../../../../../lib/utils/useEditableField";
-
-import { FaSolidCheck } from "solid-icons/fa";
+import { Section } from "../../../../../ui/Tile";
+import { Checkbox, fieldClass } from "../../../../../ui/Form";
+import { Alert, Spinner } from "../../../../../ui/Status";
+import { cn } from "../../../../../ui/cn";
+import { SlugField } from "../../common/SlugField";
 
 export const ScheduleEditorSettings: Component = () => {
   const { state, updateMeta, updateMetaMutation } = useScheduleEditor2();
@@ -143,58 +145,51 @@ export const ScheduleEditorSettings: Component = () => {
     setLastAppliedSlug(target);
   });
 
-  return (
-    <div class="bg-white rounded-2xl shadow-xl p-6">
-      <div class="flex items-center justify-between mb-4">
-        <h2 class="text-xl font-bold">Schedule Settings</h2>
-        <Show when={updateMetaMutation.status === 'pending'}>
-          <div class="flex items-center gap-2 text-xs text-gray-500">
-            <span class="inline-block h-2 w-2 rounded-full bg-accent animate-pulse"></span>
-            <span>Saving…</span>
-          </div>
-        </Show>
-      </div>
+  const slugError = () =>
+    !isCheckingSlug() && hasEditedSlug()
+      ? slugErrorMessage() || (!slugValid() ? "This slug is not available. Try one of these suggestions:" : undefined)
+      : undefined;
 
+  return (
+    <Section
+      title="Schedule Settings"
+      action={
+        <Show when={updateMetaMutation.status === 'pending'}>
+          <Spinner class="text-fg-muted text-xs" label="Saving…" />
+        </Show>
+      }
+    >
       <Show when={!state.schedule}>
-        <div class="text-sm text-gray-600">Loading schedule...</div>
+        <p class="text-fg-muted text-sm">Loading schedule...</p>
       </Show>
 
       {/* Important: don’t key this block by the whole schedule object; use boolean */}
       <Show when={!!state.schedule}>
-        <div class="grid grid-cols-1 gap-4">
+        <div class="flex flex-col gap-4">
           {/* Error from updateMeta */}
           <Show when={updateMetaMutation.isError}>
-            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded-sm">
-              {updateMetaMutation.error?.message}
-            </div>
+            <Alert tone="danger">{updateMetaMutation.error?.message}</Alert>
           </Show>
 
           {/* Title + Year */}
-          <div class="flex gap-4">
-            <TextField name="title" class="flex flex-col grow" validationState="valid">
-              <TextField.Label class="text-sm font-medium mb-1">Title:</TextField.Label>
-              <div class="relative">
-                <TextField.Input
-                  class="border border-gray-300 rounded-lg px-3 py-2 w-full disabled:opacity-50 disabled:cursor-not-allowed"
-                  value={titleField.inputValue()}
-                  onInput={(e) => titleField.onInput(e.currentTarget.value)}
-                  onKeyDown={(e) => titleField.onKeyDown(e)}
-                  onFocus={() => titleField.setFocused(true)}
-                  onBlur={() => titleField.onBlur()}
-                />
-                <Show when={updateMetaMutation.isPending}>
-                  <div class="absolute right-3 top-1/2 transform -translate-y-1/2">
-                    <div class="animate-spin h-4 w-4 border-2 border-accent border-t-transparent rounded-full"></div>
-                  </div>
-                </Show>
-              </div>
+          <div class="grid grid-cols-[1fr_6rem] gap-3 sm:grid-cols-[1fr_8rem]">
+            <TextField name="title" class="flex min-w-0 flex-col gap-1" validationState="valid">
+              <TextField.Label class={fieldClass.label}>Title:</TextField.Label>
+              <TextField.Input
+                class={cn(fieldClass.input, 'h-10')}
+                value={titleField.inputValue()}
+                onInput={(e) => titleField.onInput(e.currentTarget.value)}
+                onKeyDown={(e) => titleField.onKeyDown(e)}
+                onFocus={() => titleField.setFocused(true)}
+                onBlur={() => titleField.onBlur()}
+              />
             </TextField>
 
-            <TextField name="year" class="flex flex-col w-1/3" validationState="valid">
-              <TextField.Label class="text-sm font-medium mb-1">Year:</TextField.Label>
+            <TextField name="year" class="flex flex-col gap-1" validationState="valid">
+              <TextField.Label class={fieldClass.label}>Year:</TextField.Label>
               <TextField.Input
                 type="number"
-                class="border border-gray-300 rounded-lg px-3 py-2"
+                class={cn(fieldClass.input, 'h-10')}
                 value={yearField.inputValue()}
                 onInput={(e) => yearField.onInput(e.currentTarget.value)}
                 onKeyDown={(e) => yearField.onKeyDown(e)}
@@ -205,79 +200,35 @@ export const ScheduleEditorSettings: Component = () => {
             </TextField>
           </div>
 
-          {/* Slug */}
-          <TextField name="slug" class="flex flex-col" validationState={hasEditedSlug() ? (slugValid() ? "valid" : "invalid") : "valid"}>
-            <TextField.Label class="text-sm font-medium mb-1">Slug:</TextField.Label>
-            <div class="relative">
-              <TextField.Input
-                class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-hidden focus:ring-2 focus:ring-accent"
-                value={slugField.inputValue()}
-                onInput={(e) => slugField.onInput(e.currentTarget.value.toLowerCase())}
-                onFocus={() => slugField.setFocused(true)}
-                onBlur={() => slugField.setFocused(false)}
-              />
-              <Show when={isCheckingSlug() && hasEditedSlug()}>
-                <div class="absolute right-3 top-1/2 transform -translate-y-1/2">
-                  <div class="animate-spin h-4 w-4 border-2 border-accent border-t-transparent rounded-full"></div>
-                </div>
-              </Show>
-              <Show when={!isCheckingSlug() && hasEditedSlug() && slugValid()}>
-                <div class="absolute right-3 top-1/2 transform -translate-y-1/2">
-                  <FaSolidCheck class={'text-success'} size={16}/>
-                </div>
-              </Show>
-            </div>
-            <TextField.ErrorMessage class="text-red-500 text-sm mt-1">
-              {!isCheckingSlug() && hasEditedSlug() ? (slugErrorMessage() || (!slugValid() ? "This slug is not available. Try one of these suggestions:" : undefined)) : undefined}
-            </TextField.ErrorMessage>
-
-            <Show when={hasEditedSlug() && suggestions().length > 0}>
-              <div class="mt-2">
-                <ul class="flex flex-wrap gap-2">
-                  {suggestions().map((suggestion: string) => (
-                    <li>
-                      <button
-                        type="button"
-                        class="px-2 py-1 text-sm bg-accent/10 text-accent hover:bg-accent/20 rounded-md transition-colors"
-                        onClick={() => applySlug(suggestion)}
-                      >
-                        {suggestion}
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </Show>
-
-            <p class="text-xs text-gray-500 mt-1">
-              This will be used in the URL: /schedules/{slugField.value() || "your-schedule-slug"}
-            </p>
-          </TextField>
+          {/* Slug: focus is tracked on the wrapper, so live updates don't overwrite what's being typed */}
+          <div onFocusIn={() => slugField.setFocused(true)} onFocusOut={() => slugField.setFocused(false)}>
+            <SlugField
+              label="Slug:"
+              value={slugField.inputValue() ?? ""}
+              onChange={(v) => slugField.onInput(v.toLowerCase())}
+              placeholder="your-schedule-slug"
+              checking={isCheckingSlug() && hasEditedSlug()}
+              valid={!hasEditedSlug() || slugValid()}
+              error={slugError()}
+              suggestions={hasEditedSlug() ? suggestions() : []}
+              onPick={applySlug}
+              path="schedules"
+              normalized={slugField.value() ?? ""}
+            />
+          </div>
 
           {/* Visible */}
           <Checkbox
             name="visible"
-            class="items-center inline-flex cursor-pointer"
+            label="Schedule Visible"
+            description="When checked, this schedule will be publicly visible."
             checked={state.schedule!.visible}
             onChange={updateVisibleDebounced}
             disabled={updateMetaMutation.isPending}
-          >
-            <Checkbox.Input class="sr-only" />
-            <Checkbox.Control class="h-5 w-5 rounded-sm border border-gray-300 bg-white text-blue-600 focus:ring-blue-500 data-checked:bg-blue-600 data-checked:border-blue-600">
-              <Checkbox.Indicator>
-                <svg class="h-4 w-4 text-white" viewBox="0 0 8 8">
-                  <path stroke="currentColor" stroke-width="1.5" fill="none" d="M1,4 L3,6 L7,2" />
-                </svg>
-              </Checkbox.Indicator>
-            </Checkbox.Control>
-            <Checkbox.Label class="ml-2 text-sm font-medium">Schedule Visible</Checkbox.Label>
-            <Checkbox.Description class="text-xs text-gray-500 ml-2">
-              When checked, this schedule will be publicly visible.
-            </Checkbox.Description>
-          </Checkbox>
+          />
         </div>
       </Show>
-    </div>
+    </Section>
   );
 };
 
