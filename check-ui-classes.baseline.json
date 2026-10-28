@@ -1,7 +1,4 @@
 {
-  "src/components/common/dialogs/ConfirmationDialog.tsx": {
-    "raw-palette": 5
-  },
   "src/components/common/MutationDebugger.tsx": {
     "raw-palette": 11
   },
@@ -121,7 +118,7 @@
     "hex": 1
   },
   "src/components/features/users/user-dashboard/preferences/UserStylesSection.tsx": {
-    "hex": 4
+    "hex": 2
   },
   "src/components/features/users/user-dashboard/schedules/editor_v2/ScheduleAdminEditorHeader.tsx": {
     "raw-palette": 20

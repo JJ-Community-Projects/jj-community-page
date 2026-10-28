@@ -1,195 +1,98 @@
 import { type Component, For, Match, Show, Switch } from 'solid-js'
-import { createModalSignal } from '../../../../../../lib/createModalSignal.ts'
-import { ConfirmationDialog } from '../../../../../common/dialogs/ConfirmationDialog.tsx'
+import { ConfirmDialog } from '../../../../../ui/Dialog'
 import { useAdminTeamDetail } from './AdminTeamDetailsProvider.tsx'
 import { AdminTeamInviteSearchInput } from './AdminTeamInviteSearchInput.tsx'
-import {
-  FaSolidArrowUpRightFromSquare,
-  FaSolidCircleExclamation,
-  FaSolidClock,
-  FaSolidEnvelope,
-  FaSolidXmark,
-} from 'solid-icons/fa'
+import { AdminHeading } from './AdminTeamMembersSection.tsx'
+import { Tile } from '../../../../../ui/Tile'
+import { IconButton } from '../../../../../ui/Button'
+import { Chip } from '../../../../../ui/Labels'
+import { Alert, EmptyState, Skeleton } from '../../../../../ui/Status'
+import { createConfirm, type ListUser, UserRow } from '../../common/UserList.tsx'
+import { FaSolidClock, FaSolidEnvelope, FaSolidXmark } from 'solid-icons/fa'
 
-interface Invite {
-  userId: number
-  username: string
-  tiltifySlug: string
-}
+/** Invite search, then the pending invites (each can be withdrawn). */
+export const AdminTeamInvitesSection: Component = () => {
+  const { invites, cancelInvite, cancelInviteMutation } = useAdminTeamDetail()
+  const confirm = createConfirm<ListUser>()
 
-interface InviteListItemProps {
-  invite: Invite
-}
-
-const InviteListItem: Component<InviteListItemProps> = (props) => {
-  const { cancelInvite, cancelInviteMutation } = useAdminTeamDetail()
-  const cancelInviteDialog = createModalSignal()
-
-  const handleCancelClick = () => {
-    cancelInviteDialog.open()
-  }
-
-  const handleConfirmCancel = async () => {
-    try {
-      await cancelInvite(props.invite.userId)
-      cancelInviteDialog.close()
-    } catch (error) {
-      console.error('Failed to cancel invite:', error)
-    }
-  }
+  const invitesList = () => invites.data?.invites ?? []
 
   return (
     <>
-      <div class="rounded-group bg-surface-strong text-fg ring-1 ring-line group flex flex-col gap-4 p-2 transition-colors hover:bg-surface">
-        <div class="flex flex-1 items-center gap-3">
-          {/* Avatar placeholder */}
-          <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-warning-400 to-warning-500 shadow-xs">
-            <span class="text-sm font-semibold text-white">
-              {(props.invite.username || 'U')[0].toUpperCase()}
-            </span>
-          </div>
+      <Tile>
+        <AdminTeamInviteSearchInput />
+      </Tile>
 
-          {/* Invite info */}
-          <div class="min-w-0 flex-1">
-            <div class="flex items-center gap-2">
-              <p class="block truncate text-sm font-semibold text-fg">
-                {props.invite.username || 'Unknown User'}
-              </p>
-              <div class="flex items-center gap-1 rounded-full bg-warning-100 px-2 py-1 text-warning-700">
-                <FaSolidClock class="h-3 w-3" />
-                <span class="text-xs font-medium">Pending</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Cancel button */}
-          <button
-            type="button"
-            onClick={handleCancelClick}
-            disabled={cancelInviteMutation.isPending}
-            class="shrink-0 rounded-full p-2 opacity-70 outline-hidden transition-all duration-200 group-hover:opacity-100 hover:scale-110 hover:bg-danger-100 focus:bg-danger-100 focus:ring-2 focus:ring-danger-500 focus:ring-offset-2 focus:ring-offset-white active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
-            aria-label={`Cancel invitation for ${props.invite.username}`}
-            title="Cancel invitation"
-          >
-            <FaSolidXmark class="h-4 w-4 text-danger-500 hover:text-danger-600" />
-          </button>
-        </div>
-        <a
-          class="inline-flex items-center gap-1 text-sm font-medium text-primary transition-colors duration-200 hover:underline"
-          href={`/${props.invite.tiltifySlug}`}
-        >
-          {props.invite.tiltifySlug}{' '}
-          <FaSolidArrowUpRightFromSquare class="h-3 w-3" />
-        </a>
-      </div>
-
-      <ConfirmationDialog
-        isOpen={cancelInviteDialog.isOpen()}
-        onOpenChange={cancelInviteDialog.setOpen}
-        title="Cancel Invitation"
-        text={`Are you sure you want to cancel the invitation for ${props.invite.username}? They will no longer be able to join the team using this invitation.`}
-        onConfirm={handleConfirmCancel}
-        onCancel={cancelInviteDialog.close}
-      />
-    </>
-  )
-}
-
-const EmptyState = () => (
-  <div class="flex flex-col items-center justify-center px-4 py-12">
-    <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-linear-to-br from-accent-400 to-accent-500 shadow-lg">
-      <FaSolidEnvelope class="h-8 w-8 text-white" />
-    </div>
-    <h4 class="mb-2 text-xl font-semibold text-fg">No pending invites</h4>
-    <p class="mb-6 max-w-md text-center leading-relaxed text-fg-muted">
-      You don't have any pending team invitations. Use the search above to find
-      and invite users to join your team.
-    </p>
-  </div>
-)
-
-const LoadingSkeleton = () => (
-  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-    <div class="h-16 animate-pulse rounded-xl bg-black/10 shadow-xs"></div>
-    <div class="h-16 animate-pulse rounded-xl bg-black/10 shadow-xs"></div>
-    <div class="h-16 animate-pulse rounded-xl bg-black/10 shadow-xs"></div>
-  </div>
-)
-
-/**
- * AdminTeamInvitesSection Component
- *
- * Manages team invitations with user search and invite management functionality.
- * Enhanced with modern design, invite cards, and proper loading/empty states.
- */
-export const AdminTeamInvitesSection: Component = () => {
-  const { invites, cancelInviteMutation } = useAdminTeamDetail()
-
-  const invitesList = () => invites.data?.invites ?? []
-  const hasInvites = () => invitesList().length > 0
-  const isLoading = () => invites.isLoading
-  const hasError = () => !!invites.error
-
-  return (
-    <div class="space-y-6">
-      {/* User Search and Invite Section */}
-      <AdminTeamInviteSearchInput />
-
-      {/* Pending Invites Section */}
-      <div class="space-y-4">
-        {/* Section Header */}
-        <div class="flex items-center gap-3">
-          <h4 class="flex items-center gap-2 text-sm font-semibold text-fg">
-            <FaSolidEnvelope class="h-4 w-4 text-warning-600" />
-            Pending Invites
-          </h4>
-        </div>
-
-        {/* Error Message */}
-        <Show when={cancelInviteMutation.isError}>
-          <div class="rounded-xl border border-danger-200 bg-danger-50 p-4">
-            <div class="flex items-center gap-3 text-danger-600">
-              <FaSolidCircleExclamation class="h-4 w-4 shrink-0" />
-              <p class="text-sm font-medium">
+      <Tile>
+        <div>
+          <AdminHeading title="Pending Invites" icon={FaSolidEnvelope} />
+          <div class="flex flex-col gap-2">
+            <Show when={cancelInviteMutation.isError}>
+              <Alert tone="danger">
                 {cancelInviteMutation.failureReason?.message ||
                   'Failed to cancel invitation'}
-              </p>
-            </div>
+              </Alert>
+            </Show>
+            <Switch>
+              <Match when={invites.isLoading}>
+                <Skeleton class="h-14" />
+                <Skeleton class="h-14" />
+              </Match>
+              <Match when={invites.error}>
+                <Alert tone="danger" title="Error loading invites">
+                  {invites.error?.message || 'Unknown error occurred'}
+                </Alert>
+              </Match>
+              <Match when={invitesList().length === 0}>
+                <EmptyState title="No pending invites">
+                  Use the search above to invite users to your team.
+                </EmptyState>
+              </Match>
+              <Match when={invitesList().length > 0}>
+                <For each={invitesList()}>
+                  {(invite) => (
+                    <UserRow
+                      user={invite}
+                      badge={
+                        <Chip
+                          size="sm"
+                          icon={
+                            <FaSolidClock class="size-2.5" aria-hidden="true" />
+                          }
+                        >
+                          Pending
+                        </Chip>
+                      }
+                      actions={
+                        <IconButton
+                          variant="ghost"
+                          size="sm"
+                          class="text-danger-600"
+                          disabled={cancelInviteMutation.isPending}
+                          aria-label={`Cancel invitation for ${invite.username}`}
+                          title="Cancel invitation"
+                          onClick={() => confirm.ask(invite)}
+                        >
+                          <FaSolidXmark class="size-4" aria-hidden="true" />
+                        </IconButton>
+                      }
+                    />
+                  )}
+                </For>
+              </Match>
+            </Switch>
           </div>
-        </Show>
+        </div>
+      </Tile>
 
-        <Switch>
-          <Match when={isLoading()}>
-            <LoadingSkeleton />
-          </Match>
-
-          <Match when={hasError()}>
-            <div class="rounded-xl border border-danger-200 bg-danger-50 p-6">
-              <div class="flex items-center justify-center gap-3 text-danger-600">
-                <FaSolidCircleExclamation class="h-5 w-5 shrink-0" />
-                <div>
-                  <p class="text-sm font-semibold">Error loading invites</p>
-                  <p class="text-xs opacity-90">
-                    {invites.error?.message || 'Unknown error occurred'}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </Match>
-
-          <Match when={!hasInvites()}>
-            <EmptyState />
-          </Match>
-
-          <Match when={hasInvites()}>
-            <div class="grid grid-cols-1 fl-gap-3/4 sm:grid-cols-2 lg:grid-cols-3">
-              <For each={invitesList()}>
-                {(invite) => <InviteListItem invite={invite} />}
-              </For>
-            </div>
-          </Match>
-        </Switch>
-      </div>
-    </div>
+      <ConfirmDialog
+        open={confirm.isOpen()}
+        onOpenChange={confirm.onOpenChange}
+        title="Cancel Invitation"
+        text={`Are you sure you want to cancel the invitation for ${confirm.target()?.username}? They will no longer be able to join the team using this invitation.`}
+        pending={cancelInviteMutation.isPending}
+        onConfirm={() => confirm.run((row) => cancelInvite(row.userId))}
+      />
+    </>
   )
 }

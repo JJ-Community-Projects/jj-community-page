@@ -76,6 +76,8 @@ export const Alert: ParentComponent<AlertProps> = (props) => {
 type EmptyStateProps = {
   icon?: JSX.Element
   title: string
+  /** Renders the title as a heading, for empty states that stand in for a list's content. */
+  level?: 3 | 4
   action?: JSX.Element
   class?: string
   children?: JSX.Element
@@ -95,7 +97,12 @@ export const EmptyState: Component<EmptyStateProps> = (props) => {
       <Show when={icon()}>
         <div class="text-fg-muted text-2xl">{icon()}</div>
       </Show>
-      <p class="font-semibold">{props.title}</p>
+      <Dynamic
+        component={props.level ? `h${props.level}` : 'p'}
+        class="font-semibold"
+      >
+        {props.title}
+      </Dynamic>
       <Show when={content()}>
         <div class="text-fg-muted max-w-prose text-sm">{content()}</div>
       </Show>

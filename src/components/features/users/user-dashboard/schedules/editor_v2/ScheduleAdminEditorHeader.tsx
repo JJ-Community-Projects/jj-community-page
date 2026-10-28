@@ -1,7 +1,7 @@
 import { type Component, createEffect, createSignal, on, Show } from 'solid-js'
 import { useScheduleEditor2 } from './ScheduleEditorProvider.tsx'
 import { createModalSignal } from '../../../../../../lib/createModalSignal.ts'
-import { ConfirmationDialog } from '../../../../../common/dialogs/ConfirmationDialog.tsx'
+import { ConfirmDialog } from '../../../../../ui/Dialog'
 import './successAnimation.css'
 import { Transition } from 'solid-transition-group'
 import { twMerge } from 'tailwind-merge'
@@ -210,17 +210,18 @@ export const ScheduleAdminEditorHeader: Component = () => {
         <UserDashboardFeedback/>
       </div>
 
-      <ConfirmationDialog
-        isOpen={showSaveDialog.isOpen()}
+      <ConfirmDialog
+        open={showSaveDialog.isOpen()}
         onOpenChange={showSaveDialog.setOpen}
         title="Save Schedule"
         text="Are you sure you want to save this schedule? All changes will be publicly visible if the schedule is set to visible."
+        tone="primary"
         onConfirm={handleSaveSchedule}
         onCancel={showSaveDialog.close}
       />
 
-      <ConfirmationDialog
-        isOpen={showDeleteDialog.isOpen()}
+      <ConfirmDialog
+        open={showDeleteDialog.isOpen()}
         onOpenChange={showDeleteDialog.setOpen}
         title="Delete Schedule"
         text="Are you sure you want to delete this schedule? This action cannot be undone."

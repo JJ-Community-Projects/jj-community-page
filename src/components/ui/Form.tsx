@@ -17,6 +17,14 @@ const errorClass = 'text-xs font-semibold text-danger-700'
 const inputClass =
   'w-full rounded-group bg-surface-strong px-3 text-sm text-fg ring-1 ring-line-strong outline-none placeholder:text-neutral-400 focus:ring-2 focus:ring-accent disabled:opacity-50 data-invalid:ring-danger-500'
 
+/** The field look, for controls the primitives don't cover (a slug field with a status icon, a colour input). */
+export const fieldClass = {
+  label: labelClass,
+  help: helpClass,
+  error: errorClass,
+  input: inputClass,
+}
+
 type FieldProps = {
   label: string
   /** Id of the control the label points at. */

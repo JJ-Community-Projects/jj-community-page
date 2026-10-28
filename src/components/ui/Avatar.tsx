@@ -1,4 +1,4 @@
-import { type Component, Show } from 'solid-js'
+import { type Component, createSignal, Show } from 'solid-js'
 import { cn } from './cn'
 
 const sizes = {
@@ -24,6 +24,8 @@ type AvatarProps = {
 
 export const Avatar: Component<AvatarProps> = (props) => {
   const size = () => props.size ?? 'sm'
+  // An image that fails to load shows the fallback instead of its alt text
+  const [failedSrc, setFailedSrc] = createSignal<string>()
   const big = () => size() === 'lg' || size() === 'xl'
   return (
     <span
@@ -44,7 +46,7 @@ export const Avatar: Component<AvatarProps> = (props) => {
       }
     >
       <Show
-        when={props.src}
+        when={props.src !== failedSrc() && props.src}
         fallback={
           <span aria-label={props.alt}>
             {props.fallback ?? props.alt.charAt(0)}
@@ -56,6 +58,7 @@ export const Avatar: Component<AvatarProps> = (props) => {
             src={src()}
             alt={props.alt}
             loading="lazy"
+            onError={() => setFailedSrc(src())}
             class="size-full object-cover"
           />
         )}

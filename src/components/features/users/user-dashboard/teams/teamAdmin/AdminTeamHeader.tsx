@@ -1,104 +1,80 @@
-import {type Component, Show} from "solid-js";
-import {useAdminTeamDetail} from "./AdminTeamDetailsProvider.tsx";
-import {createModalSignal} from "../../../../../../lib/createModalSignal.ts";
-import {ConfirmationDialog} from "../../../../../common/dialogs/ConfirmationDialog.tsx";
-import {FaSolidTrash, FaSolidCircleInfo} from "solid-icons/fa";
+import { type Component, Show } from 'solid-js'
+import { useAdminTeamDetail } from './AdminTeamDetailsProvider.tsx'
+import { createModalSignal } from '../../../../../../lib/createModalSignal.ts'
+import { ConfirmDialog } from '../../../../../ui/Dialog'
+import { Tile } from '../../../../../ui/Tile'
+import { Button } from '../../../../../ui/Button'
+import { Alert } from '../../../../../ui/Status'
+import {
+  FaSolidArrowUpRightFromSquare,
+  FaSolidTrash,
+} from 'solid-icons/fa'
 
-/**
- * AdminTeamHeader Component
- *
- * Header section for team administration displaying team information and actions.
- * Extracted from AdminTeamSection to improve modularity and maintainability.
- *
- * Features:
- * - Team name and public URL display
- * - Delete team functionality with confirmation dialog
- * - Informational notice about team management
- * - Modern design with glass-morphism effects
- * - Responsive design with fluid typography
- * - Comprehensive accessibility support
- *
- * Uses AdminTeamDetailsProvider context for data management to avoid prop drilling.
- */
+/** Team name, public URL and the delete action. */
 export const AdminTeamHeader: Component = () => {
-  const {
-    team,
-    deleteTeam,
-    deleteTeamMutation
-  } = useAdminTeamDetail();
+  const { team, deleteTeam, deleteTeamMutation } = useAdminTeamDetail()
 
-  const showDeleteDialog = createModalSignal();
+  const showDeleteDialog = createModalSignal()
 
   const handleDeleteTeam = async () => {
     try {
-      await deleteTeam();
-      showDeleteDialog.close();
-      // Redirect to teams list
-      window.location.href = `/dashboard/teams`;
+      await deleteTeam()
+      showDeleteDialog.close()
+      window.location.href = `/dashboard/teams`
     } catch (error) {
-      console.error("Error deleting team:", error);
-      // Error is handled by the mutation state
+      // Shown by the mutation state
+      console.error('Error deleting team:', error)
     }
-  };
+  }
 
   return (
     <>
-      {/* Team Information Header */}
-      <div class="border-b border-line pb-6">
-        <div class="flex items-center justify-between">
-          <div class="flex-1">
-            <h3 class="text-lg font-semibold text-fg mb-2">Team Management</h3>
+      <Tile class="flex flex-col gap-3">
+        <div class="flex flex-wrap items-start justify-between gap-3">
+          <div class="min-w-0">
+            <h3 class="text-base font-semibold">Team Management</h3>
             <Show when={team.data}>
-              <div class="space-y-1">
-                <p class="text-sm text-fg-muted">
-                  <span class="font-medium">Team:</span> {team.data?.name}
-                </p>
+              {(data) => (
                 <a
-                  class="text-primary hover:underline text-sm font-medium"
-                  href={`/teams/${team.data?.slug}`}
+                  class="text-accent-700 inline-flex items-center gap-1 text-sm font-semibold hover:underline"
+                  href={`/teams/${data().slug}`}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  jinglejam.ostof.dev/teams/{team.data?.slug} ↗
+                  jinglejam.ostof.dev/teams/{data().slug}
+                  <FaSolidArrowUpRightFromSquare
+                    class="size-3"
+                    aria-hidden="true"
+                  />
                 </a>
-              </div>
+              )}
             </Show>
           </div>
-
-          {/* Delete Team Button */}
-          <button
+          <Button
+            size="sm"
+            variant="danger"
             onClick={showDeleteDialog.open}
-            class="flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 bg-danger-50 hover:bg-danger-100 text-danger-700 hover:text-danger-800 border border-danger-200 hover:border-danger-300 focus:ring-2 focus:ring-danger-500 focus:ring-offset-2 focus:ring-offset-white outline-hidden hover:shadow-md active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={deleteTeamMutation.isPending}
             aria-label="Delete team"
           >
-            <FaSolidTrash class="w-4 h-4" />
-            <span class="text-sm font-medium">
-              {deleteTeamMutation.isPending ? 'Deleting...' : 'Delete Team'}
-            </span>
-          </button>
+            <FaSolidTrash class="size-3" aria-hidden="true" />
+            {deleteTeamMutation.isPending ? 'Deleting...' : 'Delete Team'}
+          </Button>
         </div>
+        <Alert tone="info">
+          Manage your team details, members and invites here. Settings are
+          saved when you click Save Changes.
+        </Alert>
+      </Tile>
 
-        {/* Informational notice */}
-        <div class="mt-4 p-3 bg-accent-50 text-accent-700 rounded-lg border border-accent-200">
-          <div class="flex items-start gap-2">
-            <FaSolidCircleInfo class="w-4 h-4 mt-0.5 shrink-0" />
-            <p class="text-sm">
-              Manage your team details, members, and invites from this page.
-              Changes to team properties are saved when you click the Save button.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <ConfirmationDialog
-        isOpen={showDeleteDialog.isOpen()}
+      <ConfirmDialog
+        open={showDeleteDialog.isOpen()}
         onOpenChange={showDeleteDialog.setOpen}
         title="Delete Team"
         text="Are you sure you want to delete this team? This action cannot be undone."
+        pending={deleteTeamMutation.isPending}
         onConfirm={handleDeleteTeam}
-        onCancel={showDeleteDialog.close}
       />
     </>
-  );
-};
+  )
+}

@@ -1,17 +1,20 @@
-import { type Component, createEffect, createSignal, on, Show } from 'solid-js'
+import { type Component, createSignal, Show } from 'solid-js'
 import { TextField } from '@kobalte/core/text-field'
-import { Dialog } from '@kobalte/core/dialog'
+import { FaSolidPalette } from 'solid-icons/fa'
 import { createModalSignal } from '../../../../../lib/createModalSignal.ts'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/solid-query'
 import { orpcPrivate } from '../../../../../lib/orpc/client.ts'
+import { Section } from '../../../../ui/Tile'
+import { Button } from '../../../../ui/Button'
+import { Dialog } from '../../../../ui/Dialog'
+import { fieldClass } from '../../../../ui/Form'
+import { Alert } from '../../../../ui/Status'
 
 const DEFAULT_PRIMARY_COLOR = '#E30E50'
 const DEFAULT_ACCENT_COLOR = '#3584BF'
 
 export const UserStylesSection: Component = () => {
   const query = useQuery(() => orpcPrivate.profile.getStyle.queryOptions())
-
-  createEffect(on(() => query.data, console.log))
 
   return (
     <Show when={query.isSuccess}>
@@ -28,6 +31,41 @@ interface UserStyleProps {
   accentColor: string
 }
 
+const Swatch: Component<{ label: string; color: string }> = (props) => (
+  <div class="flex flex-col items-center gap-0.5">
+    <div
+      class="rounded-media size-14 ring-1 ring-black/10"
+      style={{ 'background-color': props.color }}
+    />
+    <span class="text-sm font-semibold">{props.label}</span>
+    <span class="text-fg-muted text-xs">{props.color}</span>
+  </div>
+)
+
+const ColorField: Component<{
+  label: string
+  value: string
+  onChange: (value: string) => void
+  placeholder: string
+  description: string
+}> = (props) => (
+  <TextField
+    value={props.value}
+    onChange={props.onChange}
+    class="flex flex-col gap-1"
+  >
+    <TextField.Label class={fieldClass.label}>{props.label}</TextField.Label>
+    <TextField.Input
+      class="rounded-group ring-line-strong bg-surface-strong h-10 w-full cursor-pointer p-1 ring-1"
+      placeholder={props.placeholder}
+      type="color"
+    />
+    <TextField.Description class={fieldClass.help}>
+      {props.description}
+    </TextField.Description>
+  </TextField>
+)
+
 export const UserStyle: Component<UserStyleProps> = (props) => {
   const [primaryColor, setPrimaryColor] = createSignal(props.primaryColor)
   const [accentColor, setAccentColor] = createSignal(props.accentColor)
@@ -42,7 +80,6 @@ export const UserStyle: Component<UserStyleProps> = (props) => {
         }),
     }),
   )
-  // Handle saving user styles
   // Close only once saved; on failure the dialog stays open with the error
   const handleSaveStyles = async () => {
     try {
@@ -56,14 +93,12 @@ export const UserStyle: Component<UserStyleProps> = (props) => {
     }
   }
 
-  // Handle resetting colors to default
   const handleResetColors = () => {
     setPrimaryColor(DEFAULT_PRIMARY_COLOR)
     setAccentColor(DEFAULT_ACCENT_COLOR)
   }
 
   const onOpenChange = (v: boolean) => {
-    console.log('onOpenChange', v)
     modal.setOpen(v)
     if (!v) {
       // Closed without saving: drop the edits and any failed save's error
@@ -74,142 +109,86 @@ export const UserStyle: Component<UserStyleProps> = (props) => {
   }
 
   return (
-    <div class="rounded-tile bg-linear-to-b from-surface to-surface-2 text-fg shadow-tile ring-1 ring-line p-4 sm:p-6">
-      <div class="mb-4 flex items-center justify-between">
-        <h3 class="text-xl font-bold">User Style</h3>
-        <button
-          type="button"
+    <Section
+      title="User Style"
+      icon={<FaSolidPalette />}
+      action={
+        <Button
+          variant="accent"
+          size="sm"
           onClick={modal.open}
-          class="rounded-lg bg-accent px-4 py-2 text-white transition-all hover:bg-accent-600"
           disabled={updateStyle.isPending}
         >
           {updateStyle.isPending ? 'Saving...' : 'Edit Colors'}
-        </button>
-      </div>
-
-      {/* Error Message */}
+        </Button>
+      }
+    >
       <Show when={updateStyle.isError}>
-        <div class="mb-4 rounded-md bg-danger-100 p-3 text-danger-800">
+        <Alert tone="danger" class="mb-3">
           Error: {updateStyle.error?.message}
-        </div>
+        </Alert>
       </Show>
 
-      {/* Current Colors Display */}
-      <div class="mt-4">
-        <p class="mb-2 text-sm font-medium text-fg-muted">Your Colors:</p>
-        <div class="flex gap-4">
-          <div class="flex flex-col items-center">
-            <div
-              class="h-16 w-16 rounded-lg shadow-md"
-              style={{ 'background-color': primaryColor() }}
-            ></div>
-            <span class="mt-1 text-sm">Primary</span>
-            <span class="text-xs text-fg-muted">{primaryColor()}</span>
-          </div>
-          <div class="flex flex-col items-center">
-            <div
-              class="h-16 w-16 rounded-lg shadow-md"
-              style={{ 'background-color': accentColor() }}
-            ></div>
-            <span class="mt-1 text-sm">Accent</span>
-            <span class="text-xs text-fg-muted">{accentColor()}</span>
-          </div>
-        </div>
+      <p class="text-fg-muted mb-2 text-sm">Your Colors:</p>
+      <div class="flex gap-4">
+        <Swatch label="Primary" color={primaryColor()} />
+        <Swatch label="Accent" color={accentColor()} />
       </div>
 
-      {/* Edit Colors Dialog */}
-      <Dialog open={modal.isOpen()} onOpenChange={onOpenChange}>
-        <Dialog.Portal>
-          <Dialog.Overlay class="fixed inset-0 z-40 bg-black/50" />
-          <div class="fixed inset-0 z-50 flex items-center justify-center">
-            <Dialog.Content class="rounded-tile bg-surface-strong text-fg shadow-tile-hover ring-1 ring-line w-full max-w-md p-6">
-              <Dialog.Title class="mb-4 text-xl font-bold">
-                Edit Your Colors
-              </Dialog.Title>
-              <Dialog.Description class="mb-4 text-fg-muted">
-                Choose your primary and accent colors for your profile.
-              </Dialog.Description>
-
-              <div class="space-y-4">
-                <TextField value={primaryColor()} onChange={setPrimaryColor}>
-                  <TextField.Label class="mb-1 block text-sm font-medium text-fg-muted">
-                    Primary Color
-                  </TextField.Label>
-                  <div class="flex items-center gap-2">
-                    <div
-                      class="h-8 w-8 rounded-md shadow-xs"
-                      style={{ 'background-color': primaryColor() }}
-                    ></div>
-                    <TextField.Input
-                      class="w-full rounded-md border border-line-strong px-3 py-2 focus:outline-hidden focus:ring-2 focus:ring-accent"
-                      placeholder="#E30E50"
-                      type="color"
-                    />
-                  </div>
-                  <TextField.Description class="mt-1 text-sm text-fg-muted">
-                    This color will be used as your primary brand color.
-                  </TextField.Description>
-                </TextField>
-
-                <TextField value={accentColor()} onChange={setAccentColor}>
-                  <TextField.Label class="mb-1 block text-sm font-medium text-fg-muted">
-                    Accent Color
-                  </TextField.Label>
-                  <div class="flex items-center gap-2">
-                    <div
-                      class="h-8 w-8 rounded-md shadow-xs"
-                      style={{ 'background-color': accentColor() }}
-                    ></div>
-                    <TextField.Input
-                      class="w-full rounded-md border border-line-strong px-3 py-2 focus:outline-hidden focus:ring-2 focus:ring-accent"
-                      placeholder="#3584BF"
-                      type="color"
-                    />
-                  </div>
-                  <TextField.Description class="mt-1 text-sm text-fg-muted">
-                    This color will be used as your accent color for highlights
-                    and secondary elements.
-                  </TextField.Description>
-                </TextField>
-              </div>
-
-              <div class="mt-6 flex justify-end gap-2">
-                <button
-                  type="button"
-                  class="rounded-md border border-line-strong px-4 py-2 hover:bg-surface"
-                  onClick={() => onOpenChange(false)}
-                  disabled={updateStyle.isPending}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  class="rounded-md border border-line-strong px-4 py-2 hover:bg-surface"
-                  onClick={handleResetColors}
-                  disabled={updateStyle.isPending}
-                >
-                  Reset to Default
-                </button>
-                <button
-                  type="button"
-                  class="rounded-md bg-accent px-4 py-2 text-white hover:bg-accent-600"
-                  onClick={handleSaveStyles}
-                  disabled={updateStyle.isPending}
-                >
-                  {updateStyle.isPending ? 'Saving...' : 'Save Colors'}
-                </button>
-              </div>
-
-              {/* Error Message */}
-              <Show when={updateStyle.isError}>
-                <div class="mt-4 rounded-md bg-danger-100 p-3 text-sm text-danger-800">
-                  Error: {updateStyle.error?.message}
-                </div>
-              </Show>
-            </Dialog.Content>
-          </div>
-        </Dialog.Portal>
+      <Dialog
+        open={modal.isOpen()}
+        onOpenChange={onOpenChange}
+        title="Edit Your Colors"
+        description="Choose your primary and accent colors for your profile."
+        footer={
+          <>
+            <Button
+              size="sm"
+              variant="ghost"
+              class="mr-auto"
+              onClick={handleResetColors}
+              disabled={updateStyle.isPending}
+            >
+              Reset to Default
+            </Button>
+            <Button
+              size="sm"
+              onClick={() => onOpenChange(false)}
+              disabled={updateStyle.isPending}
+            >
+              Cancel
+            </Button>
+            <Button
+              size="sm"
+              variant="accent"
+              onClick={handleSaveStyles}
+              disabled={updateStyle.isPending}
+            >
+              {updateStyle.isPending ? 'Saving...' : 'Save Colors'}
+            </Button>
+          </>
+        }
+      >
+        <div class="flex flex-col gap-4">
+          <ColorField
+            label="Primary Color"
+            value={primaryColor()}
+            onChange={setPrimaryColor}
+            placeholder={DEFAULT_PRIMARY_COLOR}
+            description="Your main profile colour, used for your tags."
+          />
+          <ColorField
+            label="Accent Color"
+            value={accentColor()}
+            onChange={setAccentColor}
+            placeholder={DEFAULT_ACCENT_COLOR}
+            description="Your accent colour, used for highlights such as the avatar ring."
+          />
+          <Show when={updateStyle.isError}>
+            <Alert tone="danger">Error: {updateStyle.error?.message}</Alert>
+          </Show>
+        </div>
       </Dialog>
-    </div>
+    </Section>
   )
 }

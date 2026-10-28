@@ -1,11 +1,23 @@
-import { FaRegularCircleCheck, FaRegularCircleXmark } from 'solid-icons/fa'
+import {
+  FaRegularCircleCheck,
+  FaRegularCircleXmark,
+  FaSolidGear,
+} from 'solid-icons/fa'
 import { type Component, createEffect, createSignal, For, Show } from 'solid-js'
 import { useAdminTeamDetail } from './AdminTeamDetailsProvider.tsx'
+import { AdminHeading } from './AdminTeamMembersSection.tsx'
 import { debounce } from '@solid-primitives/scheduled'
 import { TextField } from '@kobalte/core/text-field'
-import { Checkbox } from '@kobalte/core/checkbox'
 import { useQuery } from '@tanstack/solid-query'
 import { orpcPrivate } from '../../../../../../lib/orpc/client.ts'
+import {
+  Checkbox,
+  fieldClass,
+  TextField as UiTextField,
+} from '../../../../../ui/Form'
+import { Button } from '../../../../../ui/Button'
+import { Alert, Spinner } from '../../../../../ui/Status'
+import { cn } from '../../../../../ui/cn'
 
 /**
  * AdminTeamSettingsSection Component
@@ -109,81 +121,80 @@ export const AdminTeamSettingsSection: Component = () => {
   }
 
   return (
-    <div class="space-y-6">
+    <div>
+      <AdminHeading title="Team Settings" icon={FaSolidGear} />
+      <div class="flex flex-col gap-4">
+        <Show when={updateTeamMutation.isError}>
+          <Alert tone="danger">
+            {updateTeamMutation.failureReason?.message ||
+              'Failed to save team settings'}
+          </Alert>
+        </Show>
 
-      {/* Section Header */}
-      <div class="flex items-center gap-3">
-        <h4 class="text-sm font-semibold text-fg">Team Settings</h4>
-      </div>
-
-      {/* Error Message */}
-      <Show when={updateTeamMutation.isError}>
-        <div class="bg-danger-50 rounded-xl p-4 border border-danger-200">
-          <div class="flex items-center gap-3 text-danger-600">
-            <FaRegularCircleXmark class="w-4 h-4 shrink-0"/>
-            <p
-              class="text-sm font-medium">{updateTeamMutation.failureReason?.message || "Failed to save team settings"}</p>
-          </div>
-        </div>
-      </Show>
-
-      {/* Team Name Field */}
-      <TextField
-        value={name()}
-        onChange={handleNameChange}
-        class="space-y-2">
-        <TextField.Label class="block text-sm font-medium text-fg-muted">Team Name</TextField.Label>
-        <TextField.Input
-          class="w-full px-4 py-3 rounded-xl border-2 border-line focus:border-accent focus:ring-4 focus:ring-accent/20 transition-all duration-300 outline-hidden bg-white/50 backdrop-blur-xs hover:bg-white/70 text-fg font-medium shadow-xs hover:shadow-md focus:shadow-lg"
+        <UiTextField
+          label="Team Name"
+          value={name()}
+          onChange={handleNameChange}
           placeholder="Enter team name..."
         />
-      </TextField>
 
-      {/* Team Slug Field */}
-      <TextField
-        value={slug()}
-        onChange={(s) => {
-          setSlug(s);
-          setSlugDebounce(s)
-        }}
-        validationState={slugValid() ? "valid" : "invalid"}
-        class="space-y-2"
-      >
-        <TextField.Label class="block text-sm font-medium text-fg-muted">Team Slug</TextField.Label>
-        <div class="relative">
-          <TextField.Input
-            class="w-full pl-4 pr-12 py-3 rounded-xl border-2 border-line focus:border-accent focus:ring-4 focus:ring-accent/20 transition-all duration-300 outline-hidden bg-white/50 backdrop-blur-xs hover:bg-white/70 text-fg font-medium shadow-xs hover:shadow-md focus:shadow-lg"
-            placeholder="team-slug"
-          />
-
-          {/* Status Indicator */}
-          <div class="absolute inset-y-0 right-0 pr-4 flex items-center">
-            <Show when={slugChanged() && isCheckingSlug()}>
-              <div class="w-5 h-5 border-2 border-accent border-t-transparent rounded-full animate-spin"></div>
-            </Show>
-            <Show when={slugChanged() && !isCheckingSlug() && slugValid() && slug() !== ''}>
-              <FaRegularCircleCheck class="w-5 h-5 text-success"/>
-            </Show>
-            <Show when={slugChanged() && !isCheckingSlug() && !slugValid() && slug() !== ''}>
-              <FaRegularCircleXmark class="w-5 h-5 text-danger"/>
-            </Show>
+        <TextField
+          value={slug()}
+          onChange={(s) => {
+            setSlug(s)
+            setSlugDebounce(s)
+          }}
+          // Red only for a changed slug that is checked and taken; the saved slug is fine as it is
+          validationState={
+            slugChanged() && !isCheckingSlug() && !slugValid()
+              ? 'invalid'
+              : 'valid'
+          }
+          class="flex flex-col gap-1"
+        >
+          <TextField.Label class={fieldClass.label}>Team Slug</TextField.Label>
+          <div class="relative">
+            <TextField.Input
+              class={cn(fieldClass.input, 'h-10 pr-9')}
+              placeholder="team-slug"
+            />
+            <div class="absolute top-1/2 right-3 flex -translate-y-1/2">
+              <Show when={slugChanged() && isCheckingSlug()}>
+                <Spinner class="text-accent" />
+              </Show>
+              <Show
+                when={
+                  slugChanged() && !isCheckingSlug() && slug() !== ''
+                }
+              >
+                <Show
+                  when={slugValid()}
+                  fallback={
+                    <FaRegularCircleXmark
+                      class="text-danger size-4"
+                      aria-hidden="true"
+                    />
+                  }
+                >
+                  <FaRegularCircleCheck
+                    class="text-success size-4"
+                    aria-hidden="true"
+                  />
+                </Show>
+              </Show>
+            </div>
           </div>
-        </div>
-
-        <TextField.ErrorMessage class="text-danger text-sm">
-          {slugErrorMessage()}
-        </TextField.ErrorMessage>
-
-        {/* Slug Suggestions */}
-        <Show when={suggestions().length > 0}>
-          <div class="space-y-2">
-            <p class="text-xs text-fg-muted">Suggestions:</p>
-            <div class="flex flex-wrap gap-2">
+          <TextField.ErrorMessage class={fieldClass.error}>
+            {slugErrorMessage()}
+          </TextField.ErrorMessage>
+          <Show when={suggestions().length > 0}>
+            <div class="flex flex-wrap items-center gap-1.5">
+              <span class={fieldClass.help}>Suggestions:</span>
               <For each={suggestions()}>
                 {(suggestion) => (
                   <button
                     type="button"
-                    class="px-3 py-1.5 text-sm bg-accent/10 text-accent hover:bg-accent/20 rounded-lg transition-colors duration-200 border border-accent/20 hover:border-accent/30"
+                    class="bg-accent-50 text-accent-700 ring-accent-200 hover:bg-accent-100 cursor-pointer rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1"
                     onClick={() => setSlug(suggestion)}
                   >
                     {suggestion}
@@ -191,69 +202,39 @@ export const AdminTeamSettingsSection: Component = () => {
                 )}
               </For>
             </div>
-          </div>
-        </Show>
+          </Show>
+          <p class={fieldClass.help}>
+            jinglejam.ostof.dev/teams/{slug() || 'your-team-slug'}
+          </p>
+        </TextField>
 
-        {/* URL Preview */}
-        <p class="text-xs text-fg-muted flex items-center gap-1">
-          <span>Preview:</span>
-          <span class="font-mono bg-surface-2 px-2 py-1 rounded-sm">
-            jinglejam.ostof.dev/teams/{slug() || "your-team-slug"}
-          </span>
-        </p>
-      </TextField>
-
-      {/* Team Description Field */}
-      <div class="space-y-2">
-        <label class="block text-sm font-medium text-fg-muted">Team Description</label>
-        <textarea
-          class="w-full px-4 py-3 rounded-xl border-2 border-line focus:border-accent focus:ring-4 focus:ring-accent/20 transition-all duration-300 outline-hidden bg-white/50 backdrop-blur-xs hover:bg-white/70 text-fg shadow-xs hover:shadow-md focus:shadow-lg"
-          rows={5}
-          placeholder="Describe your team..."
+        <UiTextField
+          label="Team Description"
+          multiline
           value={description()}
-          onInput={(e) => setDescription((e.target as HTMLTextAreaElement).value)}
+          onChange={setDescription}
+          placeholder="Describe your team..."
+          description="Optional. A short description of your team."
         />
-        <p class="text-xs text-fg-muted">Optional. Provide a brief description of your team.</p>
-      </div>
 
-      {/* Team Visibility Toggle */}
-      <Checkbox
-        checked={visible()}
-        onChange={(checked) => setVisible(checked)}
-        class="flex items-start gap-3"
-      >
-        <Checkbox.Input class="sr-only"/>
-        <Checkbox.Control class="flex h-5 w-5 items-center justify-center rounded border-2 border-line-strong bg-white data-checked:bg-accent data-checked:border-accent transition-all duration-200 hover:border-line-strong">
-          <Checkbox.Indicator>
-            <FaRegularCircleCheck class="text-white w-3 h-3"/>
-          </Checkbox.Indicator>
-        </Checkbox.Control>
-        <div class="flex-1">
-          <Checkbox.Label class="text-sm font-medium text-fg">Public Team</Checkbox.Label>
-          <Checkbox.Description class="text-xs text-fg-muted mt-1">
-            When enabled, this team will be publicly visible in team listings and searchable by other users.
-          </Checkbox.Description>
+        <Checkbox
+          label="Public Team"
+          description="Public teams show in team listings and on member profiles."
+          checked={visible()}
+          onChange={(checked) => setVisible(checked)}
+        />
+
+        <div class="border-line flex justify-end border-t pt-3">
+          <Button
+            variant="accent"
+            onClick={save}
+            disabled={disableButton()}
+            aria-label="Save team settings"
+          >
+            {updateTeamMutation.isPending ? 'Saving...' : 'Save Changes'}
+          </Button>
         </div>
-      </Checkbox>
-
-      {/* Save Button */}
-      <div class="flex justify-end pt-4 border-t border-line">
-        <button
-          class="flex items-center gap-2 px-6 py-3 rounded-xl transition-all duration-200 bg-accent hover:bg-accent-600 text-white font-medium focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-white outline-hidden shadow-xs hover:shadow-md active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
-          onClick={save}
-          disabled={disableButton()}
-          aria-label="Save team settings"
-        >
-          {updateTeamMutation.isPending ? (
-            <>
-              <div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-              <span>Saving...</span>
-            </>
-          ) : (
-            <span>Save Changes</span>
-          )}
-        </button>
       </div>
     </div>
   )
-};
+}

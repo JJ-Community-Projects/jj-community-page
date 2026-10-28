@@ -28,6 +28,8 @@ type ListRowProps = {
   media?: JSX.Element
   /** Right column, e.g. `<Raised>`. */
   trailing?: JSX.Element
+  /** `center` for buttons; `start` (default) lines values up with the title. */
+  trailingAlign?: 'start' | 'center'
   /** Makes the whole row a link, with a chevron. */
   href?: string
   target?: string
@@ -70,7 +72,14 @@ export const ListRow: Component<ListRowProps> = (props) => {
         </Show>
       </div>
       <Show when={trailing()}>
-        <div class="shrink-0 self-start">{trailing()}</div>
+        <div
+          class={cn(
+            'shrink-0',
+            props.trailingAlign === 'center' ? 'self-center' : 'self-start',
+          )}
+        >
+          {trailing()}
+        </div>
       </Show>
       <Show when={props.href}>
         <FaSolidChevronRight

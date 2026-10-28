@@ -1,15 +1,17 @@
-// src/components/features/users/user-dashboard/PrimaryLivePlatform.tsx
 import {
   type Component,
   createEffect,
   createMemo,
   createSignal,
+  For,
   Show,
 } from 'solid-js'
 import { RadioGroup } from '@kobalte/core/radio-group'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/solid-query'
 import { orpcPrivate } from '../../../../../lib/orpc/client.ts'
 import type { StreamingPlatform } from '../../../../../lib/orpc/private/schemas/users.ts'
+import { Alert, Spinner } from '../../../../ui/Status'
+import { Button } from '../../../../ui/Button'
 
 const usePrimaryLivePlatform = () => {
   const client = useQueryClient()
@@ -88,10 +90,15 @@ const usePrimaryLivePlatform = () => {
   }
 }
 
+const platformOptions: { value: StreamingPlatform; label: string }[] = [
+  { value: 'twitch', label: 'Twitch' },
+  { value: 'youtube', label: 'YouTube' },
+  { value: 'tiktok', label: 'TikTok' },
+]
+
 export const PrimaryLivePlatform: Component = () => {
   const {
     selectedPlatform,
-    hasPlatformSocial,
     handlePlatformChange,
     primaryLiveStream,
     socials,
@@ -100,88 +107,46 @@ export const PrimaryLivePlatform: Component = () => {
   } = usePrimaryLivePlatform()
 
   return (
-    <div class="">
-      <h3 class="mb-2 text-lg font-medium">Primary Live Stream Platform</h3>
-      <p class="mb-4 text-fg-muted">
-        Select your primary live streaming platform. This will be used as your
-        default platform for live streams. The Profile picture of your primary
-        live stream platform will be used for your JJ profile.
+    <div class="flex flex-col gap-2">
+      <h3 class="text-sm font-semibold">Primary Live Stream Platform</h3>
+      <p class="text-fg-muted text-sm">
+        Your default platform for live streams. Your JJ profile uses its
+        profile picture.
       </p>
 
       <Show when={primaryLiveStream.isPending || socials.isPending}>
-        <div class="py-4 text-center text-fg-muted">
-          Loading platform settings...
-        </div>
+        <Spinner label="Loading platform settings..." class="text-fg-muted" />
       </Show>
 
       <Show when={primaryLiveStream.error || socials.error}>
-        <div class="py-4 text-center">
-          <p class="mb-2 text-danger-500">Failed to load platform settings</p>
-          <button
-            onClick={retry}
-            class="rounded-sm bg-accent-500 px-3 py-1 text-white hover:bg-accent-600"
-          >
-            Retry
-          </button>
-        </div>
+        <Alert
+          tone="danger"
+          action={
+            <Button size="sm" onClick={retry}>
+              Retry
+            </Button>
+          }
+        >
+          Failed to load platform settings
+        </Alert>
       </Show>
       <RadioGroup
         value={selectedPlatform() ?? undefined}
         onChange={(s) => handlePlatformChange(s as StreamingPlatform)}
-        class="flex flex-row gap-4"
+        class="flex flex-wrap gap-1.5"
         disabled={mutation.isPending}
       >
-        <RadioGroup.Item
-          value="twitch"
-          class="flex items-center space-x-2 rounded-md p-2 hover:bg-surface"
-        >
-          <RadioGroup.ItemInput />
-          <RadioGroup.ItemControl class="h-4 w-4 rounded-full border border-line-strong">
-            <RadioGroup.ItemIndicator class="h-2 w-2 rounded-full bg-twitch-500" />
-          </RadioGroup.ItemControl>
-          <RadioGroup.ItemLabel class="font-medium text-twitch-500">
-            Twitch
-          </RadioGroup.ItemLabel>
-        </RadioGroup.Item>
-        <RadioGroup.Item
-          value="youtube"
-          class="flex items-center space-x-2 rounded-md p-2 hover:bg-surface"
-        >
-          <RadioGroup.ItemInput />
-          <RadioGroup.ItemControl class="h-4 w-4 rounded-full border border-line-strong">
-            <RadioGroup.ItemIndicator class="h-2 w-2 rounded-full bg-danger-600" />
-          </RadioGroup.ItemControl>
-          <RadioGroup.ItemLabel class="font-medium text-danger-600">
-            YouTube
-          </RadioGroup.ItemLabel>
-        </RadioGroup.Item>
-        <RadioGroup.Item
-          value="tiktok"
-          class="flex items-center space-x-2 rounded-md p-2 hover:bg-surface"
-        >
-          <RadioGroup.ItemInput />
-          <RadioGroup.ItemControl class="h-4 w-4 rounded-full border border-line-strong">
-            <RadioGroup.ItemIndicator class="h-2 w-2 rounded-full bg-black" />
-          </RadioGroup.ItemControl>
-          <RadioGroup.ItemLabel class="font-medium text-fg">
-            TikTok
-          </RadioGroup.ItemLabel>
-        </RadioGroup.Item>
+        <For each={platformOptions}>
+          {(option) => (
+            <RadioGroup.Item value={option.value} class="relative">
+              <RadioGroup.ItemInput class="peer" />
+              <RadioGroup.ItemLabel class="bg-surface-strong text-fg ring-line-strong hover:bg-surface peer-focus-visible:outline-accent data-checked:bg-accent data-checked:ring-accent data-disabled:opacity-50 inline-flex cursor-pointer items-center rounded-full px-3.5 py-1.5 text-sm font-semibold ring-1 transition-colors peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 data-checked:text-white">
+                {option.label}
+              </RadioGroup.ItemLabel>
+            </RadioGroup.Item>
+          )}
+        </For>
       </RadioGroup>
     </div>
   )
 }
-
-/*
-
-          <Show when={!hasPlatformSocial()}>
-            <div class="mt-4 rounded-md border border-warning-300 bg-warning-50 p-3 text-warning-800">
-              <p class="text-sm font-medium">
-                Warning: You have selected {selectedPlatform()} as your primary
-                live stream platform, but you don't have a {selectedPlatform()}{' '}
-                account linked. Please add your {selectedPlatform()} account
-                below.
-              </p>
-            </div>
-          </Show>
- */
