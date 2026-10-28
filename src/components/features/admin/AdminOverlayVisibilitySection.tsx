@@ -1,6 +1,8 @@
 import { type Component, Show } from 'solid-js'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/solid-query'
 import { orpcPrivate } from '../../../lib/orpc/client'
+import { Button } from '../../ui/Button'
+import { Alert } from '../../ui/Status'
 
 /**
  * Admin toggle for the KV-backed `content:visibility` flag. When hidden, the
@@ -28,11 +30,17 @@ export const AdminOverlayVisibilitySection: Component = () => {
   const hidden = () => hiddenQuery.data ?? true
 
   return (
-    <div class="rounded-sm border border-gray-300 bg-white p-4">
-      <div class="mb-2 flex items-center justify-between">
-        <h2 class="text-lg font-semibold">Overlay &amp; community content</h2>
-        <button
-          class={`rounded-sm px-3 py-1.5 text-white ${hidden() ? 'bg-red-600 hover:bg-red-500' : 'bg-green-600 hover:bg-green-500'}`}
+    <>
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-start">
+        <p class="text-fg-muted min-w-0 flex-1 text-sm">
+          Controls the pre-event placeholder on the OBS overlays and the
+          community, teams and yogs pages. Stored in KV under{' '}
+          <code>content:visibility</code>; a missing key defaults to hidden. KV
+          is eventually consistent, so a change can take up to a minute to
+          reach every visitor.
+        </p>
+        <Button
+          variant={hidden() ? 'danger' : 'accent'}
           disabled={
             hiddenQuery.isLoading ||
             hiddenQuery.isError ||
@@ -50,19 +58,12 @@ export const AdminOverlayVisibilitySection: Component = () => {
             : hidden()
               ? 'Hidden — click to show'
               : 'Visible — click to hide'}
-        </button>
+        </Button>
       </div>
       <Show when={hiddenQuery.isError}>
-        <p class="text-sm text-red-600">Failed to load current visibility.</p>
+        <Alert tone="danger">Failed to load current visibility.</Alert>
       </Show>
-      <p class="text-sm text-gray-500">
-        Controls the pre-event placeholder on the OBS overlays and the
-        community, teams and yogs pages. Stored in KV under{' '}
-        <code>content:visibility</code>; a missing key defaults to hidden. KV is
-        eventually consistent, so a change can take up to a minute to reach
-        every visitor.
-      </p>
-    </div>
+    </>
   )
 }
 

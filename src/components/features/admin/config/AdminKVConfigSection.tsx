@@ -2,6 +2,7 @@ import {
   type Component,
   createEffect,
   createSignal,
+  createUniqueId,
   For,
   onCleanup,
   Show,
@@ -9,6 +10,11 @@ import {
 import { orpcPrivate } from '../../../../lib/orpc/client'
 import { QueryComponent } from '../../../common/QueryComponent'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/solid-query'
+import { Button } from '../../../ui/Button'
+import { ConfirmDialog } from '../../../ui/Dialog'
+import { Field, fieldClass } from '../../../ui/Form'
+import { EmptyState, Spinner } from '../../../ui/Status'
+import { cn, groupSurface } from '../../../ui/cn'
 
 // AdminKVConfigSection
 // - Debounced search by key using getKVValue
@@ -17,9 +23,12 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/solid-query'
 // - List all keys using getAllKVKeys
 
 export const AdminKVConfigSection: Component = () => {
+  const keyId = createUniqueId()
+  const valueId = createUniqueId()
   const [keyInput, setKeyInput] = createSignal('')
   const [debouncedKey, setDebouncedKey] = createSignal('')
   const [valueInput, setValueInput] = createSignal('')
+  const [confirmDelete, setConfirmDelete] = createSignal(false)
 
   const qc = useQueryClient()
 
@@ -100,7 +109,7 @@ export const AdminKVConfigSection: Component = () => {
   const onDelete = () => {
     const k = keyInput().trim()
     if (!k) return
-    if (!confirm(`Delete KV key "${k}"?`)) return
+    setConfirmDelete(false)
     deleteMut.mutate({ key: k })
   }
 
@@ -123,94 +132,104 @@ export const AdminKVConfigSection: Component = () => {
   }
 
   return (
-    <section class="space-y-4 rounded-md border bg-white p-4 shadow-md">
-      <h2 class="text-lg font-semibold">Admin KV Config</h2>
-
+    <>
       {/* Editor */}
-      <div class="flex flex-col gap-2">
-        <div class="flex items-center gap-2">
-          <input
-            class="input input-bordered w-64 rounded-sm border px-2 py-1"
-            placeholder="key"
-            value={keyInput()}
-            onInput={(e) => setKeyInput(e.currentTarget.value)}
-          />
-          <button
-            class="rounded-sm border px-2 py-1"
-            onClick={() => setKeyInput('')}
-          >
-            clear
-          </button>
-        </div>
-        <div class="flex items-start gap-2">
+      <div class="flex flex-col gap-3">
+        <Field label="Key" for={keyId}>
+          <div class="flex items-center gap-2">
+            <input
+              id={keyId}
+              class={cn(fieldClass.input, 'h-10 font-mono sm:max-w-sm')}
+              value={keyInput()}
+              onInput={(e) => setKeyInput(e.currentTarget.value)}
+            />
+            <Button size="sm" variant="ghost" onClick={() => setKeyInput('')}>
+              Clear
+            </Button>
+          </div>
+        </Field>
+        <Field label="Value" for={valueId}>
           <textarea
-            class="textarea textarea-bordered min-h-[80px] w-full rounded-sm border px-2 py-1 font-mono"
-            placeholder="value"
+            id={valueId}
+            class={cn(fieldClass.input, 'min-h-20 py-2 font-mono')}
             value={valueInput()}
             onInput={(e) => setValueInput(e.currentTarget.value)}
           />
-          <div class="flex flex-col gap-2">
-            <button
-              class="btn rounded-sm border bg-blue-600 px-3 py-1 text-white disabled:opacity-50"
-              disabled={putMut.isPending}
-              onClick={onSave}
-            >
-              {kvQuery.data ? 'Save' : 'Create'}
-            </button>
-            <button
-              class="btn rounded-sm border border-red-300 px-3 py-1 text-red-700 disabled:opacity-50"
-              disabled={!keyInput().trim() || deleteMut.isPending}
-              onClick={onDelete}
-            >
-              Delete
-            </button>
-          </div>
-        </div>
-
-        <div class="text-sm text-gray-600">
-          <Show when={debouncedKey().length > 0}>
-            <Show when={kvQuery.isLoading}>Searching…</Show>
-            <Show when={kvQuery.isError && !kvQuery.isLoading}>
-              No existing value for "{debouncedKey()}" — you can create it.
+        </Field>
+        <div class="flex flex-wrap items-center gap-2">
+          <Button
+            size="sm"
+            variant="accent"
+            disabled={putMut.isPending}
+            onClick={onSave}
+          >
+            {kvQuery.data ? 'Save' : 'Create'}
+          </Button>
+          <Button
+            size="sm"
+            variant="danger"
+            disabled={!keyInput().trim() || deleteMut.isPending}
+            onClick={() => setConfirmDelete(true)}
+          >
+            Delete
+          </Button>
+          <p class="text-fg-muted text-sm">
+            <Show when={debouncedKey().length > 0}>
+              <Show when={kvQuery.isLoading}>Searching…</Show>
+              <Show when={kvQuery.isError && !kvQuery.isLoading}>
+                No existing value for "{debouncedKey()}" — you can create it.
+              </Show>
+              <Show when={kvQuery.data && !kvQuery.isLoading}>
+                Found existing value for "{debouncedKey()}".
+              </Show>
             </Show>
-            <Show when={kvQuery.data && !kvQuery.isLoading}>
-              Found existing value for "{debouncedKey()}".
-            </Show>
-          </Show>
+          </p>
         </div>
       </div>
 
       {/* Keys list */}
-      <div class="mt-4">
-        <h3 class="text-md mb-2 font-semibold">All KV Keys</h3>
+      <div class="flex flex-col gap-2">
+        <h3 class="font-semibold">All KV Keys</h3>
         <QueryComponent
           queryOptions={() => orpcPrivate.admin.getAllKVKeys.queryOptions()}
+          loading={() => <Spinner label="Loading…" />}
         >
           {(keys) => (
-            <div class="flex max-h-64 flex-col gap-1 overflow-auto rounded-sm border bg-gray-50 p-2">
-              <Show
-                when={keys.length > 0}
-                fallback={<div class="text-sm text-gray-500">No keys</div>}
-              >
+            <Show
+              when={keys.length > 0}
+              fallback={<EmptyState title="No keys" />}
+            >
+              <ul class={cn(groupSurface, 'flex max-h-64 flex-col overflow-y-auto p-1')}>
                 <For each={keys}>
                   {(k) => (
-                    <button
-                      class="flex w-full items-center justify-between rounded-sm border bg-white px-2 py-1 text-left hover:bg-gray-100"
-                      onClick={() => selectKey(k)}
-                      title={k}
-                    >
-                      <span class="truncate font-mono text-xs text-gray-700">
-                        {k}
-                      </span>
-                      <span class="text-xs text-blue-600">select</span>
-                    </button>
+                    <li>
+                      <button
+                        type="button"
+                        class="rounded-media flex w-full cursor-pointer items-center justify-between gap-2 px-2 py-1.5 text-left hover:bg-black/5"
+                        onClick={() => selectKey(k)}
+                        title={k}
+                      >
+                        <span class="truncate font-mono text-xs">{k}</span>
+                        <span class="text-accent-700 text-xs font-semibold">select</span>
+                      </button>
+                    </li>
                   )}
                 </For>
-              </Show>
-            </div>
+              </ul>
+            </Show>
           )}
         </QueryComponent>
       </div>
-    </section>
+
+      <ConfirmDialog
+        open={confirmDelete()}
+        onOpenChange={setConfirmDelete}
+        title="Delete KV key"
+        text={<>Delete KV key "{keyInput().trim()}"?</>}
+        confirmLabel="Delete"
+        pending={deleteMut.isPending}
+        onConfirm={onDelete}
+      />
+    </>
   )
 }

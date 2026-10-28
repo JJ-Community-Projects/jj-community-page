@@ -1,95 +1,104 @@
-import { type Component, For, Show } from 'solid-js'
+import { type Component, createSignal, For, Show } from 'solid-js'
 import { QueryComponent } from '../../common/QueryComponent'
 import { orpcPrivate } from '../../../lib/orpc/client'
 import { useMutation } from '@tanstack/solid-query'
+import { Button } from '../../ui/Button'
+import { Chip } from '../../ui/Labels'
+import { Alert, EmptyState, Spinner } from '../../ui/Status'
+import { cn } from '../../ui/cn'
+import { adminTable } from './common/AdminSection'
 
+// The section trigger carries the "All schedules" heading
 export const AdminScheduleList: Component = () => {
   const exportSchedule = useMutation(() => orpcPrivate.admin.exportSchedule.mutationOptions())
+  const [exportError, setExportError] = createSignal(false)
   return (
     <QueryComponent
       queryOptions={() => orpcPrivate.admin.getAllSchedules.queryOptions()}
+      loading={() => <Spinner label="Loading…" />}
     >
       {(schedules) => (
-        <div class="mt-4">
-          <h3 class="text-lg font-semibold mb-2">All Schedules</h3>
-          <Show when={schedules.length > 0} fallback={<div class="text-sm text-gray-500">No schedules found.</div>}>
-            <div class="overflow-x-auto rounded-sm border border-gray-200">
-              <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
-                  <tr>
-                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Year</th>
-                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Owner</th>
-                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Visible</th>
-                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Primary</th>
-                    <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                  </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                  <For each={schedules}>
-                    {(s) => (
-                      <tr class="hover:bg-gray-50">
-                        <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{s.scheduleId}</td>
-                        <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{s.year}</td>
-                        <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-700">
-                          <div class="flex flex-col">
-                            <span>{s.ownerName || '—'}</span>
-                            <span class="text-xs text-gray-400">User ID: {s.ownerId}</span>
-                          </div>
-                        </td>
-                        <td class="px-4 py-2 whitespace-nowrap text-sm">
-                          <span class={`inline-flex items-center rounded-sm px-2 py-0.5 text-xs font-medium ${s.visible ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-700'}`}>
-                            {s.visible ? 'Yes' : 'No'}
-                          </span>
-                        </td>
-                        <td class="px-4 py-2 whitespace-nowrap text-sm">
-                          <span class={`inline-flex items-center rounded-sm px-2 py-0.5 text-xs font-medium ${s.primary ? 'bg-indigo-100 text-indigo-800' : 'bg-gray-100 text-gray-700'}`}>
-                            {s.primary ? 'Primary' : '—'}
-                          </span>
-                        </td>
-                        <td class="px-4 py-2 whitespace-nowrap text-sm text-right">
-                          <div class="inline-flex gap-2">
-                            <button
-                              type="button"
-                              class="px-3 py-1.5 rounded-sm border border-gray-300 text-gray-700 hover:bg-gray-50 text-xs"
-                              onClick={async () => {
-                                try {
-                                  const json = await exportSchedule.mutateAsync({ scheduleId: s.scheduleId })
-                                  const blob = new Blob([json], { type: 'application/json;charset=utf-8' })
-                                  const url = URL.createObjectURL(blob)
-                                  const a = document.createElement('a')
-                                  a.href = url
-                                  const name = `schedule-${s.scheduleId}.json`
-                                  a.download = name
-                                  document.body.appendChild(a)
-                                  a.click()
-                                  a.remove()
-                                  URL.revokeObjectURL(url)
-                                } catch (e) {
-                                  console.error('Export failed', e)
-                                  alert('Export failed')
-                                }
-                              }}
-                              title="Export schedule"
-                            >
-                              Export
-                            </button>
-                            <a
-                              href={`/dashboard/schedules/${s.scheduleId}/edit`}
-                              class="px-3 py-1.5 rounded-sm bg-indigo-600 text-white hover:bg-indigo-700 text-xs"
-                            >
-                              Edit
-                            </a>
-                          </div>
-                        </td>
-                      </tr>
-                    )}
-                  </For>
-                </tbody>
-              </table>
-            </div>
+        <Show when={schedules.length > 0} fallback={<EmptyState title="No schedules found." />}>
+          <Show when={exportError()}>
+            <Alert tone="danger" class="mb-3">Export failed</Alert>
           </Show>
-        </div>
+          <div class={adminTable.wrap}>
+            <table class={adminTable.table}>
+              <thead class={adminTable.head}>
+                <tr>
+                  <th class={adminTable.th}>ID</th>
+                  <th class={adminTable.th}>Year</th>
+                  <th class={adminTable.th}>Owner</th>
+                  <th class={adminTable.th}>Visible</th>
+                  <th class={adminTable.th}>Primary</th>
+                  <th class={cn(adminTable.th, 'text-right')}>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <For each={schedules}>
+                  {(s) => (
+                    <tr class={adminTable.row}>
+                      <td class={adminTable.td}>{s.scheduleId}</td>
+                      <td class={adminTable.td}>{s.year}</td>
+                      <td class={cn(adminTable.td, 'whitespace-nowrap')}>
+                        <div class="flex flex-col">
+                          <span>{s.ownerName || '—'}</span>
+                          <span class="text-fg-muted text-xs">User ID: {s.ownerId}</span>
+                        </div>
+                      </td>
+                      <td class={adminTable.td}>
+                        <Chip size="sm" tone={s.visible ? 'accent' : 'neutral'}>
+                          {s.visible ? 'Yes' : 'No'}
+                        </Chip>
+                      </td>
+                      <td class={adminTable.td}>
+                        <Show when={s.primary} fallback={<span class="text-fg-muted">—</span>}>
+                          <Chip size="sm" tone="primary">Primary</Chip>
+                        </Show>
+                      </td>
+                      <td class={cn(adminTable.td, 'text-right whitespace-nowrap')}>
+                        <div class="inline-flex gap-2">
+                          <Button
+                            size="sm"
+                            onClick={async () => {
+                              setExportError(false)
+                              try {
+                                const json = await exportSchedule.mutateAsync({ scheduleId: s.scheduleId })
+                                const blob = new Blob([json], { type: 'application/json;charset=utf-8' })
+                                const url = URL.createObjectURL(blob)
+                                const a = document.createElement('a')
+                                a.href = url
+                                const name = `schedule-${s.scheduleId}.json`
+                                a.download = name
+                                document.body.appendChild(a)
+                                a.click()
+                                a.remove()
+                                URL.revokeObjectURL(url)
+                              } catch (e) {
+                                console.error('Export failed', e)
+                                setExportError(true)
+                              }
+                            }}
+                            title="Export schedule"
+                          >
+                            Export
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="accent"
+                            href={`/dashboard/schedules/${s.scheduleId}/edit`}
+                          >
+                            Edit
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </For>
+              </tbody>
+            </table>
+          </div>
+        </Show>
       )}
     </QueryComponent>
   )

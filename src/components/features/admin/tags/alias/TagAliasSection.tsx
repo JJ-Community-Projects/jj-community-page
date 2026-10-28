@@ -1,6 +1,7 @@
 import {type Component, For, Show} from "solid-js";
 import {useQuery} from "@tanstack/solid-query";
 import {orpcPrivate} from "../../../../../lib/orpc/client.ts";
+import {Alert, EmptyState, Spinner} from "../../../../ui/Status";
 import {AddTagAliasPanel} from "./AddTagAliasPanel.tsx";
 import {TagAliasListItem} from "./TagAliasListItem.tsx";
 
@@ -19,32 +20,26 @@ export const TagAliasSection: Component<TagAliasSectionProps> = (props) => {
   )
 
   return (
-    <div class="space-y-4">
-      {/* Add Tag Alias Panel */}
+    <div class="flex flex-col gap-3">
       <AddTagAliasPanel tagId={props.tagId} />
 
-      {/* Loading State */}
       <Show when={aliases.isPending}>
-        <div class="text-center py-4">
-          <div class="text-sm text-gray-500">Loading aliases...</div>
-        </div>
+        <Spinner label="Loading aliases..." class="text-fg-muted" />
       </Show>
 
-      {/* Error State */}
       <Show when={aliases.error}>
-        <div class="text-red-600 text-sm bg-red-50 border border-red-200 rounded-md p-3">
+        <Alert tone="danger">
           Error loading aliases: {aliases.error?.message || 'Unknown error'}
-        </div>
+        </Alert>
       </Show>
 
-      {/* Aliases List */}
       <Show when={aliases.isSuccess}>
         <Show when={aliases.data && aliases.data.length > 0} fallback={
-          <div class="text-center py-8 text-gray-500 text-sm">
-            No aliases found for this tag. Create your first alias above.
-          </div>
+          <EmptyState title="No aliases found for this tag.">
+            Create your first alias above.
+          </EmptyState>
         }>
-          <div class="space-y-3">
+          <div class="flex flex-col gap-2">
             <For each={aliases.data}>
               {(alias) => (
                 <TagAliasListItem alias={alias} />

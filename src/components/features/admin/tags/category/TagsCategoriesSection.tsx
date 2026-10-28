@@ -2,33 +2,30 @@ import {type Component, For} from "solid-js";
 import {orpcPrivate} from "../../../../../lib/orpc/client.ts";
 import {AddTagCategoryPanel} from "./AddTagCategoryPanel.tsx";
 import {QueryComponent} from "../../../../common/QueryComponent.tsx";
+import {Spinner} from "../../../../ui/Status";
 import {TagCategoryListItem} from "./TagCategoryListItem.tsx";
 
-interface TagsCategoriesSectionProps {
-}
-
-export const TagsCategoriesSection: Component<TagsCategoriesSectionProps> = (props) => {
+export const TagsCategoriesSection: Component = () => {
 
   return (
-    <div class='flex flex-col'>
+    <>
       <AddTagCategoryPanel/>
-      <QueryComponent queryOptions={() => orpcPrivate.adminTags.getAllTagCategories.queryOptions({
-        input: {}
-      })}>
+      <QueryComponent
+        queryOptions={() => orpcPrivate.adminTags.getAllTagCategories.queryOptions({
+          input: {}
+        })}
+        loading={() => <Spinner label="Loading…" />}
+      >
         {
-          (categories) => {
-            return (
+          (categories) => (
+            <div class="flex flex-col gap-3">
               <For each={categories}>
-                {
-                  (category) => {
-                    return <TagCategoryListItem category={category}/>
-                  }
-                }
+                {(category) => <TagCategoryListItem category={category}/>}
               </For>
-            )
-          }
+            </div>
+          )
         }
       </QueryComponent>
-    </div>
+    </>
   );
 }

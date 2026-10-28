@@ -9,63 +9,8 @@
   "src/components/common/QueryDebugger.tsx": {
     "raw-palette": 12
   },
-  "src/components/features/admin/AdminCampaignsList.tsx": {
-    "raw-palette": 6
-  },
-  "src/components/features/admin/AdminOverlayVisibilitySection.tsx": {
-    "raw-palette": 7
-  },
-  "src/components/features/admin/AdminScheduleImportPanel.tsx": {
-    "raw-palette": 6
-  },
-  "src/components/features/admin/AdminScheduleList.tsx": {
-    "raw-palette": 29
-  },
-  "src/components/features/admin/AdminSchedulerSection.tsx": {
-    "raw-palette": 13
-  },
-  "src/components/features/admin/AdminTwitchSection.tsx": {
-    "raw-palette": 14
-  },
-  "src/components/features/admin/config/AdminConfigSection.tsx": {
-    "unknown": 12,
-    "raw-palette": 6
-  },
-  "src/components/features/admin/config/AdminKVConfigSection.tsx": {
-    "unknown": 7,
-    "raw-palette": 9
-  },
-  "src/components/features/admin/JJData.tsx": {
-    "raw-palette": 28
-  },
-  "src/components/features/admin/tags/alias/AddTagAliasPanel.tsx": {
-    "unknown": 1,
-    "raw-palette": 10
-  },
-  "src/components/features/admin/tags/alias/TagAliasListItem.tsx": {
-    "unknown": 1,
-    "raw-palette": 14
-  },
-  "src/components/features/admin/tags/alias/TagAliasSection.tsx": {
-    "raw-palette": 5
-  },
-  "src/components/features/admin/tags/category/AddTagCategoryPanel.tsx": {
-    "raw-palette": 24
-  },
-  "src/components/features/admin/tags/category/TagCategoryListItem.tsx": {
-    "raw-palette": 43
-  },
   "src/components/features/admin/tags/tag/AddTagPanel.tsx": {
-    "unknown": 1,
-    "raw-palette": 25,
     "hex": 2
-  },
-  "src/components/features/admin/tags/tag/TagListItem.tsx": {
-    "unknown": 1,
-    "raw-palette": 47
-  },
-  "src/components/features/admin/tags/tag/TagSection.tsx": {
-    "raw-palette": 5
   },
   "src/components/features/overlay/charities/CharitiesOverlay.tsx": {
     "hex": 2

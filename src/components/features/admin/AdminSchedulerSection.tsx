@@ -1,6 +1,10 @@
 import { type Component, For, Show } from 'solid-js'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/solid-query'
 import { orpcPrivate } from '../../../lib/orpc/client'
+import { Button } from '../../ui/Button'
+import { Alert, Spinner } from '../../ui/Status'
+import { cn } from '../../ui/cn'
+import { adminTable } from './common/AdminSection'
 
 function fmtMs(ms: number) {
   if (ms < 1000) return `${ms} ms`
@@ -51,84 +55,91 @@ export const AdminSchedulerSection: Component = () => {
   }))
 
   return (
-    <div class="rounded-sm border border-gray-300 bg-white p-4">
-      <div class="mb-2 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <h2 class="text-lg font-semibold">Background Tasks</h2>
-          <Show when={tasksQuery.data}>
-            {(data) => (
-              <button
-                class={`rounded-sm px-3 py-1.5 text-xs text-white ${data().paused ? 'bg-red-600 hover:bg-red-500' : 'bg-green-600 hover:bg-green-500'}`}
-                disabled={togglePaused.isPending}
-                onClick={() => togglePaused.mutate({ paused: !data().paused })}
-                title={data().paused ? 'Resume the alarm scheduler' : 'Pause the alarm scheduler (cron triggers still work)'}
-              >
-                {togglePaused.isPending ? '…' : data().paused ? 'Scheduler Paused' : 'Scheduler Active'}
-              </button>
-            )}
-          </Show>
-        </div>
-        <div class="flex items-center gap-2">
-          <button
-            class={`rounded-sm px-3 py-1.5 text-white ${tasksQuery.isFetching ? 'bg-gray-400' : 'bg-neutral-800 hover:bg-neutral-700'}`}
+    <>
+      <div class="flex flex-wrap items-center gap-2">
+        <Show when={tasksQuery.data}>
+          {(data) => (
+            <Button
+              size="sm"
+              variant={data().paused ? 'danger' : 'accent'}
+              disabled={togglePaused.isPending}
+              onClick={() => togglePaused.mutate({ paused: !data().paused })}
+              title={data().paused ? 'Resume the alarm scheduler' : 'Pause the alarm scheduler (cron triggers still work)'}
+            >
+              {togglePaused.isPending ? '…' : data().paused ? 'Scheduler Paused' : 'Scheduler Active'}
+            </Button>
+          )}
+        </Show>
+        <div class="ml-auto flex flex-wrap gap-2">
+          <Button
+            size="sm"
             disabled={tasksQuery.isFetching}
             onClick={() => tasksQuery.refetch()}
           >
             {tasksQuery.isFetching ? 'Refreshing…' : 'Refresh'}
-          </button>
-          <button
-            class={`rounded-sm px-3 py-1.5 text-white ${runOverdue.isPending ? 'bg-gray-400' : 'bg-accent hover:opacity-90'}`}
+          </Button>
+          <Button
+            size="sm"
+            variant="primary"
             disabled={runOverdue.isPending}
             onClick={() => runOverdue.mutate()}
           >
             {runOverdue.isPending ? 'Running…' : 'Run overdue now'}
-          </button>
+          </Button>
         </div>
       </div>
 
-      <Show when={tasksQuery.data?.tasks} fallback={<p class="text-sm text-gray-500">{tasksQuery.isLoading ? 'Loading…' : tasksQuery.isError ? 'Failed to load tasks' : ''}</p>}>
+      <Show when={tasksQuery.isLoading}>
+        <Spinner label="Loading…" />
+      </Show>
+      <Show when={tasksQuery.isError}>
+        <Alert tone="danger">Failed to load tasks</Alert>
+      </Show>
+      <Show when={tasksQuery.data?.tasks}>
         {(tasks) => (
-          <div class="overflow-x-auto">
-            <table class="min-w-full text-sm">
-              <thead>
-                <tr class="border-b">
-                  <th class="py-2 pr-4 text-left">Task</th>
-                  <th class="py-2 pr-4 text-left">Interval</th>
-                  <th class="py-2 pr-4 text-left">Enabled</th>
-                  <th class="py-2 pr-4 text-left">Last run</th>
-                  <th class="py-2 pr-4 text-left">Next due</th>
-                  <th class="py-2 pr-4 text-right">Actions</th>
+          <div class={adminTable.wrap}>
+            <table class={adminTable.table}>
+              <thead class={adminTable.head}>
+                <tr>
+                  <th class={adminTable.th}>Task</th>
+                  <th class={adminTable.th}>Interval</th>
+                  <th class={adminTable.th}>Enabled</th>
+                  <th class={adminTable.th}>Last run</th>
+                  <th class={adminTable.th}>Next due</th>
+                  <th class={cn(adminTable.th, 'text-right')}>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 <For each={tasks()}>{(t) => (
-                  <tr class="border-b last:border-0">
-                    <td class="py-2 pr-4 font-medium">{t.name}</td>
-                    <td class="py-2 pr-4">{fmtMs(t.everyMs)}</td>
-                    <td class="py-2 pr-4">
-                      <button
-                        class={`rounded-sm px-2 py-1 text-xs ${t.enabled ? 'bg-green-600 text-white' : 'bg-gray-300 text-gray-800'}`}
+                  <tr class={adminTable.row}>
+                    <td class={cn(adminTable.td, 'font-semibold')}>{t.name}</td>
+                    <td class={adminTable.td}>{fmtMs(t.everyMs)}</td>
+                    <td class={adminTable.td}>
+                      <Button
+                        size="sm"
+                        variant={t.enabled ? 'accent' : 'secondary'}
                         disabled={toggle.isPending}
                         onClick={() => toggle.mutate({ name: t.name, enabled: !t.enabled })}
                         title={t.enabled ? 'Disable' : 'Enable'}
                       >
                         {t.enabled ? 'Enabled' : 'Disabled'}
-                      </button>
+                      </Button>
                     </td>
-                    <td class="py-2 pr-4">
+                    <td class={cn(adminTable.td, 'whitespace-nowrap')}>
                       {t.lastRunMs ? fmtWhen(t.lastRunMs) : '—'}
                     </td>
-                    <td class={`py-2 pr-4 ${t.dueNow ? 'text-orange-700 font-medium' : ''}`}>
+                    <td class={cn(adminTable.td, 'whitespace-nowrap', t.dueNow && 'text-warning-700 font-semibold')}>
                       {fmtWhen(t.nextDueAtMs)}
                     </td>
-                    <td class="py-2 pr-0 text-right">
-                      <button
-                        class={`rounded-sm px-3 py-1.5 text-white text-xs ${runOne.isPending ? 'bg-gray-400' : 'bg-primary hover:bg-primary-600'}`}
+                    <td class={cn(adminTable.td, 'text-right')}>
+                      <Button
+                        size="sm"
+                        variant="primary"
                         disabled={runOne.isPending}
                         onClick={() => runOne.mutate({ name: t.name })}
                       >
                         Run now
-                      </button>
+                      </Button>
                     </td>
                   </tr>
                 )}</For>
@@ -137,7 +148,7 @@ export const AdminSchedulerSection: Component = () => {
           </div>
         )}
       </Show>
-    </div>
+    </>
   )
 }
 
