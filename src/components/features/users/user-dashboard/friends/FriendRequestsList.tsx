@@ -62,7 +62,7 @@ export const FriendRequestsListItem: Component<FriendRequestsListItemProps> = (
 
   return (
     <>
-      <div class="group flex items-center justify-between rounded-xl border-2 border-primary-200 bg-white p-4 shadow-md transition-all duration-300">
+      <div class="rounded-group bg-surface-strong text-fg ring-1 ring-line group flex items-center justify-between p-4">
         {/* User info */}
         <div class="flex items-center gap-3">
           {/* Avatar */}
@@ -100,13 +100,13 @@ export const FriendRequestsListItem: Component<FriendRequestsListItemProps> = (
             <a
               target={`_blank`}
               href={'/' + props.request.username}
-              class="flex items-center justify-start gap-2 truncate text-sm font-semibold text-gray-800 underline hover:text-accent-500"
+              class="flex items-center justify-start gap-2 truncate text-sm font-semibold text-fg underline hover:text-accent-500"
             >
               {props.request.username || 'Unknown User'}{' '}
               <FaSolidArrowUpRightFromSquare />
             </a>
             <Show when={request.twitchLogin}>
-              <p class="text-xs text-gray-600">Twitch: {request.twitchLogin}</p>
+              <p class="text-xs text-fg-muted">Twitch: {request.twitchLogin}</p>
             </Show>
           </div>
         </div>
@@ -130,7 +130,7 @@ export const FriendRequestsListItem: Component<FriendRequestsListItemProps> = (
             type="button"
             onClick={handleDeclineClick}
             disabled={isAcceptingFriendRequest() || isDecliningFriendRequest()}
-            class="flex items-center gap-1 rounded-lg bg-gray-200 px-4 py-2 text-sm font-medium text-gray-700 shadow-xs outline-hidden transition-all duration-200 hover:bg-gray-300 hover:shadow-md focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-white disabled:cursor-not-allowed disabled:opacity-50"
+            class="flex items-center gap-1 rounded-lg bg-black/10 px-4 py-2 text-sm font-medium text-fg-muted shadow-xs outline-hidden transition-all duration-200 hover:bg-black/15 hover:shadow-md focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-white disabled:cursor-not-allowed disabled:opacity-50"
             aria-label={`Decline friend request from ${request.username}`}
           >
             <FaSolidXmark class="h-4 w-4" />
@@ -155,10 +155,10 @@ const EmptyState = () => (
     <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-linear-to-br from-primary-500 to-primary-600 shadow-lg">
       <FaSolidUserPlus class="h-8 w-8 text-white" />
     </div>
-    <h3 class="mb-2 text-xl font-semibold text-gray-800">
+    <h3 class="mb-2 text-xl font-semibold text-fg">
       No pending friend requests
     </h3>
-    <p class="mb-6 max-w-md text-center leading-relaxed text-gray-600">
+    <p class="mb-6 max-w-md text-center leading-relaxed text-fg-muted">
       You don't have any pending friend requests at the moment. When someone
       sends you a friend request, it will appear here.
     </p>
@@ -167,9 +167,9 @@ const EmptyState = () => (
 
 const LoadingSkeleton = () => (
   <div class="space-y-4">
-    <div class="h-16 animate-pulse rounded-xl bg-gray-200 shadow-xs"></div>
-    <div class="h-16 animate-pulse rounded-xl bg-gray-200 shadow-xs"></div>
-    <div class="h-16 animate-pulse rounded-xl bg-gray-200 shadow-xs"></div>
+    <div class="h-16 animate-pulse rounded-xl bg-black/10 shadow-xs"></div>
+    <div class="h-16 animate-pulse rounded-xl bg-black/10 shadow-xs"></div>
+    <div class="h-16 animate-pulse rounded-xl bg-black/10 shadow-xs"></div>
   </div>
 )
 
@@ -196,7 +196,7 @@ export const FriendRequestsList: Component = () => {
   return (
     <div class="mt-6">
       <div class="mb-4 flex items-center gap-3">
-        <h3 class="flex items-center gap-2 text-sm font-semibold text-gray-800">
+        <h3 class="flex items-center gap-2 text-sm font-semibold text-fg">
           <FaSolidUserPlus class="h-4 w-4 text-primary" />
           Friend Requests
         </h3>
@@ -204,8 +204,8 @@ export const FriendRequestsList: Component = () => {
 
       {/* Error messages */}
       <Show when={hasAcceptFriendRequestError()}>
-        <div class="mb-4 rounded-xl border border-red-200 bg-red-50 p-4">
-          <div class="flex items-center gap-3 text-red-600">
+        <div class="mb-4 rounded-xl border border-danger-200 bg-danger-50 p-4">
+          <div class="flex items-center gap-3 text-danger-600">
             <FaSolidCircleExclamation class="h-4 w-4 shrink-0" />
             <p class="text-sm font-medium">
               {acceptFriendRequestErrorMessage() ||
@@ -216,8 +216,8 @@ export const FriendRequestsList: Component = () => {
       </Show>
 
       <Show when={hasDeclineFriendRequestError()}>
-        <div class="mb-4 rounded-xl border border-red-200 bg-red-50 p-4">
-          <div class="flex items-center gap-3 text-red-600">
+        <div class="mb-4 rounded-xl border border-danger-200 bg-danger-50 p-4">
+          <div class="flex items-center gap-3 text-danger-600">
             <FaSolidCircleExclamation class="h-4 w-4 shrink-0" />
             <p class="text-sm font-medium">
               {declineFriendRequestErrorMessage() ||
@@ -233,8 +233,8 @@ export const FriendRequestsList: Component = () => {
         </Match>
 
         <Match when={hasFriendRequestsError()}>
-          <div class="rounded-xl border border-red-200 bg-red-50 p-6">
-            <div class="flex items-center justify-center gap-3 text-red-600">
+          <div class="rounded-xl border border-danger-200 bg-danger-50 p-6">
+            <div class="flex items-center justify-center gap-3 text-danger-600">
               <svg
                 class="h-5 w-5 shrink-0"
                 fill="none"

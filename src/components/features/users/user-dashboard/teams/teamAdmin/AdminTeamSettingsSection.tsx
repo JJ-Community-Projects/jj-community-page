@@ -113,7 +113,7 @@ export const AdminTeamSettingsSection: Component = () => {
 
       {/* Section Header */}
       <div class="flex items-center gap-3">
-        <h4 class="text-sm font-semibold text-gray-800">Team Settings</h4>
+        <h4 class="text-sm font-semibold text-fg">Team Settings</h4>
       </div>
 
       {/* Error Message */}
@@ -132,16 +132,9 @@ export const AdminTeamSettingsSection: Component = () => {
         value={name()}
         onChange={handleNameChange}
         class="space-y-2">
-        <TextField.Label class="block text-sm font-medium text-gray-700">Team Name</TextField.Label>
+        <TextField.Label class="block text-sm font-medium text-fg-muted">Team Name</TextField.Label>
         <TextField.Input
-          class="
-            w-full px-4 py-3 rounded-xl border-2 border-gray-200
-            focus:border-accent focus:ring-4 focus:ring-accent/20
-            transition-all duration-300 outline-hidden
-            bg-white/50 backdrop-blur-xs hover:bg-white/70
-            text-gray-800 font-medium
-            shadow-xs hover:shadow-md focus:shadow-lg
-          "
+          class="w-full px-4 py-3 rounded-xl border-2 border-line focus:border-accent focus:ring-4 focus:ring-accent/20 transition-all duration-300 outline-hidden bg-white/50 backdrop-blur-xs hover:bg-white/70 text-fg font-medium shadow-xs hover:shadow-md focus:shadow-lg"
           placeholder="Enter team name..."
         />
       </TextField>
@@ -156,17 +149,10 @@ export const AdminTeamSettingsSection: Component = () => {
         validationState={slugValid() ? "valid" : "invalid"}
         class="space-y-2"
       >
-        <TextField.Label class="block text-sm font-medium text-gray-700">Team Slug</TextField.Label>
+        <TextField.Label class="block text-sm font-medium text-fg-muted">Team Slug</TextField.Label>
         <div class="relative">
           <TextField.Input
-            class="
-              w-full pl-4 pr-12 py-3 rounded-xl border-2 border-gray-200
-              focus:border-accent focus:ring-4 focus:ring-accent/20
-              transition-all duration-300 outline-hidden
-              bg-white/50 backdrop-blur-xs hover:bg-white/70
-              text-gray-800 font-medium
-              shadow-xs hover:shadow-md focus:shadow-lg
-            "
+            class="w-full pl-4 pr-12 py-3 rounded-xl border-2 border-line focus:border-accent focus:ring-4 focus:ring-accent/20 transition-all duration-300 outline-hidden bg-white/50 backdrop-blur-xs hover:bg-white/70 text-fg font-medium shadow-xs hover:shadow-md focus:shadow-lg"
             placeholder="team-slug"
           />
 
@@ -191,17 +177,13 @@ export const AdminTeamSettingsSection: Component = () => {
         {/* Slug Suggestions */}
         <Show when={suggestions().length > 0}>
           <div class="space-y-2">
-            <p class="text-xs text-gray-600">Suggestions:</p>
+            <p class="text-xs text-fg-muted">Suggestions:</p>
             <div class="flex flex-wrap gap-2">
               <For each={suggestions()}>
                 {(suggestion) => (
                   <button
                     type="button"
-                    class="
-                      px-3 py-1.5 text-sm bg-accent/10 text-accent hover:bg-accent/20
-                      rounded-lg transition-colors duration-200
-                      border border-accent/20 hover:border-accent/30
-                    "
+                    class="px-3 py-1.5 text-sm bg-accent/10 text-accent hover:bg-accent/20 rounded-lg transition-colors duration-200 border border-accent/20 hover:border-accent/30"
                     onClick={() => setSlug(suggestion)}
                   >
                     {suggestion}
@@ -213,9 +195,9 @@ export const AdminTeamSettingsSection: Component = () => {
         </Show>
 
         {/* URL Preview */}
-        <p class="text-xs text-gray-500 flex items-center gap-1">
+        <p class="text-xs text-fg-muted flex items-center gap-1">
           <span>Preview:</span>
-          <span class="font-mono bg-gray-100 px-2 py-1 rounded-sm">
+          <span class="font-mono bg-surface-2 px-2 py-1 rounded-sm">
             jinglejam.ostof.dev/teams/{slug() || "your-team-slug"}
           </span>
         </p>
@@ -223,15 +205,15 @@ export const AdminTeamSettingsSection: Component = () => {
 
       {/* Team Description Field */}
       <div class="space-y-2">
-        <label class="block text-sm font-medium text-gray-700">Team Description</label>
+        <label class="block text-sm font-medium text-fg-muted">Team Description</label>
         <textarea
-          class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-accent focus:ring-4 focus:ring-accent/20 transition-all duration-300 outline-hidden bg-white/50 backdrop-blur-xs hover:bg-white/70 text-gray-800 shadow-xs hover:shadow-md focus:shadow-lg"
+          class="w-full px-4 py-3 rounded-xl border-2 border-line focus:border-accent focus:ring-4 focus:ring-accent/20 transition-all duration-300 outline-hidden bg-white/50 backdrop-blur-xs hover:bg-white/70 text-fg shadow-xs hover:shadow-md focus:shadow-lg"
           rows={5}
           placeholder="Describe your team..."
           value={description()}
           onInput={(e) => setDescription((e.target as HTMLTextAreaElement).value)}
         />
-        <p class="text-xs text-gray-500">Optional. Provide a brief description of your team.</p>
+        <p class="text-xs text-fg-muted">Optional. Provide a brief description of your team.</p>
       </div>
 
       {/* Team Visibility Toggle */}
@@ -241,33 +223,23 @@ export const AdminTeamSettingsSection: Component = () => {
         class="flex items-start gap-3"
       >
         <Checkbox.Input class="sr-only"/>
-        <Checkbox.Control class="
-          flex h-5 w-5 items-center justify-center rounded border-2 border-gray-300
-          bg-white data-checked:bg-accent data-checked:border-accent
-          transition-all duration-200 hover:border-gray-400
-        ">
+        <Checkbox.Control class="flex h-5 w-5 items-center justify-center rounded border-2 border-line-strong bg-white data-checked:bg-accent data-checked:border-accent transition-all duration-200 hover:border-line-strong">
           <Checkbox.Indicator>
             <FaRegularCircleCheck class="text-white w-3 h-3"/>
           </Checkbox.Indicator>
         </Checkbox.Control>
         <div class="flex-1">
-          <Checkbox.Label class="text-sm font-medium text-gray-800">Public Team</Checkbox.Label>
-          <Checkbox.Description class="text-xs text-gray-600 mt-1">
+          <Checkbox.Label class="text-sm font-medium text-fg">Public Team</Checkbox.Label>
+          <Checkbox.Description class="text-xs text-fg-muted mt-1">
             When enabled, this team will be publicly visible in team listings and searchable by other users.
           </Checkbox.Description>
         </div>
       </Checkbox>
 
       {/* Save Button */}
-      <div class="flex justify-end pt-4 border-t border-gray-200">
+      <div class="flex justify-end pt-4 border-t border-line">
         <button
-          class="
-            flex items-center gap-2 px-6 py-3 rounded-xl transition-all duration-200
-            bg-accent hover:bg-accent-600 text-white font-medium
-            focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-white
-            outline-hidden shadow-xs hover:shadow-md active:scale-95
-            disabled:opacity-50 disabled:cursor-not-allowed
-          "
+          class="flex items-center gap-2 px-6 py-3 rounded-xl transition-all duration-200 bg-accent hover:bg-accent-600 text-white font-medium focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-white outline-hidden shadow-xs hover:shadow-md active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
           onClick={save}
           disabled={disableButton()}
           aria-label="Save team settings"

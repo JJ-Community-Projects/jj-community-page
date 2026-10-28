@@ -26,7 +26,7 @@ export const FriendSearchInput: Component = () => {
   return (
     <div class="mb-6">
       <div class="flex items-center gap-2 mb-3">
-        <h3 class="text-sm font-semibold text-gray-800 flex items-center gap-2">
+        <h3 class="text-sm font-semibold text-fg flex items-center gap-2">
           <FaSolidUsers class="w-4 h-4 text-primary" />
           Find Friends
         </h3>
@@ -38,21 +38,14 @@ export const FriendSearchInput: Component = () => {
           {(isLoadingSearch() || searchInput().length > 0) && searchInput().length > 0 ? (
             <div class="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
           ) : (
-            <FaSolidMagnifyingGlass class="w-5 h-5 text-gray-400 transition-colors duration-200" />
+            <FaSolidMagnifyingGlass class="w-5 h-5 text-fg-muted transition-colors duration-200" />
           )}
         </div>
 
         {/* Search input */}
         <input
           type="text"
-          class="
-            w-full pl-12 pr-12 py-3 rounded-xl border-2 border-gray-200
-            focus:border-primary focus:ring-4 focus:ring-primary/20
-            transition-all duration-300 outline-hidden
-            bg-white/50 backdrop-blur-xs hover:bg-white/70
-            placeholder-gray-500 text-gray-800 font-medium
-            shadow-xs hover:shadow-md focus:shadow-lg
-          "
+          class="w-full pl-12 pr-12 py-3 rounded-xl border-2 border-line focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all duration-300 outline-hidden bg-white/50 backdrop-blur-xs hover:bg-white/70 placeholder:text-fg-muted text-fg font-medium shadow-xs hover:shadow-md focus:shadow-lg"
           placeholder="Search for users to add as friends..."
           value={searchInput()}
           onInput={handleInput}
@@ -64,12 +57,7 @@ export const FriendSearchInput: Component = () => {
           <button
             type="button"
             onClick={clearSearch}
-            class="
-              absolute inset-y-0 right-0 pr-4 flex items-center
-              text-gray-400 hover:text-gray-600 transition-colors duration-200
-              focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-white
-              outline-hidden rounded-full p-1
-            "
+            class="absolute inset-y-0 right-0 pr-4 flex items-center text-fg-muted hover:text-fg-muted transition-colors duration-200 focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-white outline-hidden rounded-full p-1"
             aria-label="Clear search"
           >
             <FaSolidXmark class="w-5 h-5" />
@@ -82,8 +70,8 @@ export const FriendSearchInput: Component = () => {
 
       {/* Helper text */}
       <div class="mt-3 flex items-start gap-2">
-        <FaSolidCircleInfo class="w-3 h-3 text-gray-400 mt-0.5 shrink-0" />
-        <div class="text-xs text-gray-500 space-y-1">
+        <FaSolidCircleInfo class="w-3 h-3 text-fg-muted mt-0.5 shrink-0" />
+        <div class="text-xs text-fg-muted space-y-1">
           <p>Search for users by their username to send friend requests.</p>
           {searchInput().length > 0 && (
             <p class="text-primary-600 font-medium">

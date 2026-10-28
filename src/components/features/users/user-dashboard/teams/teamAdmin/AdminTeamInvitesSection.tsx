@@ -40,7 +40,7 @@ const InviteListItem: Component<InviteListItemProps> = (props) => {
 
   return (
     <>
-      <div class="group flex flex-col gap-4 rounded-xl border-2 bg-white p-2 shadow-md transition-all duration-300 hover:border-warning-100">
+      <div class="rounded-group bg-surface-strong text-fg ring-1 ring-line group flex flex-col gap-4 p-2 transition-colors hover:bg-surface">
         <div class="flex flex-1 items-center gap-3">
           {/* Avatar placeholder */}
           <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-warning-400 to-warning-500 shadow-xs">
@@ -52,7 +52,7 @@ const InviteListItem: Component<InviteListItemProps> = (props) => {
           {/* Invite info */}
           <div class="min-w-0 flex-1">
             <div class="flex items-center gap-2">
-              <p class="block truncate text-sm font-semibold text-gray-800">
+              <p class="block truncate text-sm font-semibold text-fg">
                 {props.invite.username || 'Unknown User'}
               </p>
               <div class="flex items-center gap-1 rounded-full bg-warning-100 px-2 py-1 text-warning-700">
@@ -100,8 +100,8 @@ const EmptyState = () => (
     <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-linear-to-br from-accent-400 to-accent-500 shadow-lg">
       <FaSolidEnvelope class="h-8 w-8 text-white" />
     </div>
-    <h4 class="mb-2 text-xl font-semibold text-gray-800">No pending invites</h4>
-    <p class="mb-6 max-w-md text-center leading-relaxed text-gray-600">
+    <h4 class="mb-2 text-xl font-semibold text-fg">No pending invites</h4>
+    <p class="mb-6 max-w-md text-center leading-relaxed text-fg-muted">
       You don't have any pending team invitations. Use the search above to find
       and invite users to join your team.
     </p>
@@ -110,9 +110,9 @@ const EmptyState = () => (
 
 const LoadingSkeleton = () => (
   <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-    <div class="h-16 animate-pulse rounded-xl bg-gray-200 shadow-xs"></div>
-    <div class="h-16 animate-pulse rounded-xl bg-gray-200 shadow-xs"></div>
-    <div class="h-16 animate-pulse rounded-xl bg-gray-200 shadow-xs"></div>
+    <div class="h-16 animate-pulse rounded-xl bg-black/10 shadow-xs"></div>
+    <div class="h-16 animate-pulse rounded-xl bg-black/10 shadow-xs"></div>
+    <div class="h-16 animate-pulse rounded-xl bg-black/10 shadow-xs"></div>
   </div>
 )
 
@@ -139,7 +139,7 @@ export const AdminTeamInvitesSection: Component = () => {
       <div class="space-y-4">
         {/* Section Header */}
         <div class="flex items-center gap-3">
-          <h4 class="flex items-center gap-2 text-sm font-semibold text-gray-800">
+          <h4 class="flex items-center gap-2 text-sm font-semibold text-fg">
             <FaSolidEnvelope class="h-4 w-4 text-warning-600" />
             Pending Invites
           </h4>

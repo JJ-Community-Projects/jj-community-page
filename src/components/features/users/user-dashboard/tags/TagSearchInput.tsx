@@ -36,7 +36,7 @@ export const TagSearchInput: Component = () => {
   return (
     <div class="mb-6">
       <div class="flex items-center gap-2 mb-3">
-        <h3 class="text-sm font-semibold text-gray-800 flex items-center gap-2">
+        <h3 class="text-sm font-semibold text-fg flex items-center gap-2">
           <FaSolidMagnifyingGlass class="w-4 h-4 text-accent-600" />
           Search Tags
         </h3>
@@ -51,20 +51,13 @@ export const TagSearchInput: Component = () => {
       <div class="relative">
         {/* Search icon */}
         <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-          <FaSolidMagnifyingGlass class="w-5 h-5 text-gray-400 transition-colors duration-200" />
+          <FaSolidMagnifyingGlass class="w-5 h-5 text-fg-muted transition-colors duration-200" />
         </div>
 
         {/* Search input */}
         <input
           type="text"
-          class="
-            w-full pl-12 pr-12 py-3 rounded-xl border-2 border-gray-200
-            focus:border-accent focus:ring-4 focus:ring-accent/20
-            transition-all duration-300 outline-hidden
-            bg-white/50 backdrop-blur-xs hover:bg-white/70
-            placeholder-gray-500 text-gray-800 font-medium
-            shadow-xs hover:shadow-md focus:shadow-lg
-          "
+          class="w-full pl-12 pr-12 py-3 rounded-xl border-2 border-line focus:border-accent focus:ring-4 focus:ring-accent/20 transition-all duration-300 outline-hidden bg-white/50 backdrop-blur-xs hover:bg-white/70 placeholder:text-fg-muted text-fg font-medium shadow-xs hover:shadow-md focus:shadow-lg"
           placeholder="Search for tags..."
           value={searchInput()}
           onInput={handleInput}
@@ -76,12 +69,7 @@ export const TagSearchInput: Component = () => {
           <button
             type="button"
             onClick={clearSearch}
-            class="
-              absolute inset-y-0 right-0 pr-4 flex items-center
-              text-gray-400 hover:text-gray-600 transition-colors duration-200
-              focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-white
-              outline-hidden rounded-full p-1
-            "
+            class="absolute inset-y-0 right-0 pr-4 flex items-center text-fg-muted hover:text-fg-muted transition-colors duration-200 focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-white outline-hidden rounded-full p-1"
             aria-label="Clear search"
           >
             <FaSolidXmark class="w-5 h-5" />
@@ -90,7 +78,7 @@ export const TagSearchInput: Component = () => {
 
         {/* Suggestions dropdown */}
         <Show when={showSuggestions()}>
-          <div class="absolute left-0 right-0 mt-2 z-20 rounded-xl border border-gray-200 bg-white shadow-xl overflow-hidden">
+          <div class="rounded-tile bg-surface-strong text-fg shadow-tile-hover ring-1 ring-line absolute left-0 right-0 mt-2 z-20 overflow-hidden">
             <div class="max-h-64 overflow-y-auto">
               <Switch>
                 <Match when={hasTagsError()}>
@@ -99,10 +87,10 @@ export const TagSearchInput: Component = () => {
                   </div>
                 </Match>
                 <Match when={isLoadingTags()}>
-                  <div class="p-3 text-sm text-gray-500">Searching…</div>
+                  <div class="p-3 text-sm text-fg-muted">Searching…</div>
                 </Match>
                 <Match when={(availableTags()?.length ?? 0) === 0 && debouncedInput().length > 0}>
-                  <div class="p-3 text-sm text-gray-500">No results for "{debouncedInput()}"</div>
+                  <div class="p-3 text-sm text-fg-muted">No results for "{debouncedInput()}"</div>
                 </Match>
                 <Match when={(availableTags()?.length ?? 0) > 0}>
                   <ul class="py-1">
@@ -116,13 +104,13 @@ export const TagSearchInput: Component = () => {
                             // onMouseDown to avoid input blur preventing click in some browsers
                             onMouseDown={(e) => handleSelectTag(e as unknown as Event, tag.id)}
                             disabled={disabled()}
-                            class={`w-full text-left px-4 py-2 flex items-center justify-between gap-3 hover:bg-gray-50 transition-colors ${disabled() ? 'cursor-not-allowed text-gray-400' : 'text-gray-800'}`}
+                            class={`w-full text-left px-4 py-2 flex items-center justify-between gap-3 hover:bg-surface transition-colors ${disabled() ? 'cursor-not-allowed text-fg-muted' : 'text-fg'}`}
                             aria-disabled={disabled()}
                             aria-label={`${userHasTag() ? 'Already added:' : !canAddTag() ? 'Tag limit reached:' : 'Add tag:'} ${tag.name}`}
                             style={!disabled() ? { color: tag.color } : {}}
                           >
                             <span class="font-medium truncate">{tag.name}</span>
-                            <span class="flex items-center gap-1 text-xs text-gray-500">
+                            <span class="flex items-center gap-1 text-xs text-fg-muted">
                               <FaSolidUsers class="h-3 w-3" />
                               {tag.totalUsage}
                             </span>
@@ -143,8 +131,8 @@ export const TagSearchInput: Component = () => {
 
       {/* Helper text */}
       <div class="mt-3 flex items-start gap-2">
-        <FaSolidCircleInfo class="w-3 h-3 text-gray-400 mt-0.5 shrink-0" />
-        <div class="text-xs text-gray-500 space-y-1">
+        <FaSolidCircleInfo class="w-3 h-3 text-fg-muted mt-0.5 shrink-0" />
+        <div class="text-xs text-fg-muted space-y-1">
           <p>Search for specific tags to add to your profile.</p>
           {searchInput().length > 0 && (
             <p class="text-accent-600 font-medium">

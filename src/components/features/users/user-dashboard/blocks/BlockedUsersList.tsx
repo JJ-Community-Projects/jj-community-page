@@ -45,7 +45,7 @@ const BlockedUserItem: Component<BlockedUserItemProps> = (props) => {
   }
 
   return (
-    <div class="group flex flex-col gap-4 rounded-xl border-2 bg-white p-2 shadow-md transition-all duration-300 hover:border-danger-200">
+    <div class="rounded-group bg-surface-strong text-fg ring-1 ring-line group flex flex-col gap-4 p-2 transition-colors hover:bg-surface">
       <div class="flex flex-1 items-center gap-3">
         {/* Avatar */}
         <Show
@@ -81,11 +81,11 @@ const BlockedUserItem: Component<BlockedUserItemProps> = (props) => {
 
         {/* User info */}
         <div class="min-w-0 flex-1">
-          <p class="block truncate text-sm font-semibold text-gray-800">
+          <p class="block truncate text-sm font-semibold text-fg">
             {props.user.username || 'Unknown User'}
           </p>
           <Show when={props.user.twitchLogin}>
-            <p class="block truncate text-xs text-gray-600 opacity-80">
+            <p class="block truncate text-xs text-fg-muted opacity-80">
               Twitch: {props.user.twitchLogin}
             </p>
           </Show>
@@ -96,7 +96,7 @@ const BlockedUserItem: Component<BlockedUserItemProps> = (props) => {
           type="button"
           onClick={handleUnblockClick}
           disabled={isUnblockingUser()}
-          class="flex shrink-0 items-center gap-2 rounded-lg bg-gray-200 px-3 py-2 text-sm font-medium text-gray-700 shadow-xs outline-hidden transition-all duration-200 hover:bg-gray-300 hover:shadow-md focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-white disabled:cursor-not-allowed disabled:opacity-50"
+          class="flex shrink-0 items-center gap-2 rounded-lg bg-black/10 px-3 py-2 text-sm font-medium text-fg-muted shadow-xs outline-hidden transition-all duration-200 hover:bg-black/15 hover:shadow-md focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-white disabled:cursor-not-allowed disabled:opacity-50"
           aria-label={`Unblock ${props.user.username}`}
           title="Unblock user"
         >
@@ -129,8 +129,8 @@ const EmptyState = () => (
     <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-linear-to-br from-danger-500 to-danger-600 shadow-lg">
       <FaSolidUserSlash class="h-8 w-8 text-white" />
     </div>
-    <h3 class="mb-2 text-xl font-semibold text-gray-800">No blocked users</h3>
-    <p class="mb-6 max-w-md text-center leading-relaxed text-gray-600">
+    <h3 class="mb-2 text-xl font-semibold text-fg">No blocked users</h3>
+    <p class="mb-6 max-w-md text-center leading-relaxed text-fg-muted">
       You haven't blocked anyone yet. Use the search above to find users to
       block.
     </p>
@@ -139,9 +139,9 @@ const EmptyState = () => (
 
 const LoadingSkeleton = () => (
   <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-    <div class="h-16 animate-pulse rounded-xl bg-gray-200 shadow-xs"></div>
-    <div class="h-16 animate-pulse rounded-xl bg-gray-200 shadow-xs"></div>
-    <div class="h-16 animate-pulse rounded-xl bg-gray-200 shadow-xs"></div>
+    <div class="h-16 animate-pulse rounded-xl bg-black/10 shadow-xs"></div>
+    <div class="h-16 animate-pulse rounded-xl bg-black/10 shadow-xs"></div>
+    <div class="h-16 animate-pulse rounded-xl bg-black/10 shadow-xs"></div>
   </div>
 )
 
@@ -166,7 +166,7 @@ export const BlockedUsersList: Component = () => {
   return (
     <div class="mt-6">
       <div class="mb-4 flex items-center gap-3">
-        <h3 class="flex items-center gap-2 text-sm font-semibold text-gray-800">
+        <h3 class="flex items-center gap-2 text-sm font-semibold text-fg">
           <FaSolidUserSlash class="h-4 w-4 text-danger" />
           Blocked Users
         </h3>
@@ -174,8 +174,8 @@ export const BlockedUsersList: Component = () => {
 
       {/* Error messages */}
       <Show when={hasUnblockError()}>
-        <div class="mb-4 rounded-xl border border-red-200 bg-red-50 p-4">
-          <div class="flex items-center gap-3 text-red-600">
+        <div class="mb-4 rounded-xl border border-danger-200 bg-danger-50 p-4">
+          <div class="flex items-center gap-3 text-danger-600">
             <FaSolidCircleExclamation class="h-4 w-4 shrink-0" />
             <p class="text-sm font-medium">
               {unblockErrorMessage() || 'Failed to unblock user'}
@@ -190,8 +190,8 @@ export const BlockedUsersList: Component = () => {
         </Match>
 
         <Match when={hasBlockedUsersError()}>
-          <div class="rounded-xl border border-red-200 bg-red-50 p-6">
-            <div class="flex items-center justify-center gap-3 text-red-600">
+          <div class="rounded-xl border border-danger-200 bg-danger-50 p-6">
+            <div class="flex items-center justify-center gap-3 text-danger-600">
               <FaSolidCircleExclamation class="h-5 w-5 shrink-0" />
               <div>
                 <p class="text-sm font-semibold">Error loading blocked users</p>

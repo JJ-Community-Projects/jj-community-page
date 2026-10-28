@@ -5,45 +5,48 @@ import {
   DiscordIcon,
   RedditIcon,
 } from '../../../common/icons/JJIcons.tsx'
+import { cn, focusRing } from '../../../ui/cn'
 
-export const UserDashboardFeedback: Component = () => {
-  return (
-    <div class={'flex flex-col items-start justify-start gap-1 text-black'}>
-      <p class={'font-bold text-neutral-800 '}>Send Feedback</p>
-      <div class={'flex flex-row gap-4'}>
+const links = [
+  {
+    href: 'https://discord.gg/hBdKXkB',
+    label: 'Feedback on Discord',
+    Icon: DiscordIcon,
+  },
+  {
+    href: 'https://bsky.app/profile/ostof.bsky.social',
+    label: 'Feedback on Bluesky',
+    Icon: BskyIcon,
+  },
+  {
+    href: 'mailto:ostof13@gmail.com',
+    label: 'Feedback by email',
+    Icon: FaSolidEnvelope,
+  },
+  {
+    href: 'https://old.reddit.com/message/compose/?to=Ostof',
+    label: 'Feedback on Reddit',
+    Icon: RedditIcon,
+  },
+]
+
+/** The one feedback spot in the dashboard (on the dashboard home). */
+export const UserDashboardFeedback: Component = () => (
+  <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
+    <p class="text-fg-muted text-sm font-semibold">Send Feedback</p>
+    <div class="text-fg-muted flex gap-1">
+      {links.map(({ href, label, Icon }) => (
         <a
-          class={
-            'rounded-full transition-all hover:scale-110 hover:bg-black/10'
-          }
-          href={'https://discord.gg/hBdKXkB'}
+          href={href}
+          aria-label={label}
+          class={cn(
+            'hover:text-fg rounded-full p-1.5 transition-colors hover:bg-black/5',
+            focusRing,
+          )}
         >
-          <DiscordIcon class={'size-5'} />
+          <Icon class="size-4" />
         </a>
-        <a
-          class={
-            'rounded-full transition-all hover:scale-110 hover:bg-black/10'
-          }
-          href={'https://bsky.app/profile/ostof.bsky.social'}
-        >
-          <BskyIcon class={'size-5'} />
-        </a>
-        <a
-          class={
-            'rounded-full transition-all hover:scale-110 hover:bg-black/10'
-          }
-          href={'mailto:ostof13@gmail.com'}
-        >
-          <FaSolidEnvelope class={'size-5'} />
-        </a>
-        <a
-          class={
-            'rounded-full transition-all hover:scale-110 hover:bg-black/10'
-          }
-          href={'https://old.reddit.com/message/compose/?to=Ostof'}
-        >
-          <RedditIcon class={'size-5'} />
-        </a>
-      </div>
+      ))}
     </div>
-  )
-}
+  </div>
+)

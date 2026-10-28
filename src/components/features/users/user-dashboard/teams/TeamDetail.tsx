@@ -1,12 +1,23 @@
-import { type Component, createSignal, For, Match, Show, Switch, } from 'solid-js'
+import {
+  type Component,
+  createSignal,
+  For,
+  Match,
+  Show,
+  Switch,
+} from 'solid-js'
+import { PageHeader } from '../../../../ui/PageHeader'
+import { Button } from '../../../../ui/Button'
 import { UserProvider } from '../providers/UserProvider.tsx'
 import { TeamDetailsProvider, useTeamDetails } from './TeamDetailsProvider.tsx'
 import type { User } from '../../../../../lib/auth/User.ts'
 import { Dialog } from '@kobalte/core/dialog'
-import { createModalSignal, type ModalSignal, } from '../../../../../lib/createModalSignal.ts'
+import {
+  createModalSignal,
+  type ModalSignal,
+} from '../../../../../lib/createModalSignal.ts'
 import {
   FaSolidArrowUpRightFromSquare,
-  FaSolidChevronLeft,
   FaSolidCrown,
   FaSolidUserGroup,
   FaSolidUsers,
@@ -52,66 +63,45 @@ const TeamDetailContent: Component<{ teamId: number }> = (props) => {
   const isLoading = () => members.isLoading
 
   return (
-    <div class="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-8">
-      {/* Team Header */}
-      <div class="overflow-hidden rounded-2xl border border-white/20 bg-white/95 shadow-xl backdrop-blur-lg">
-        <div class="fl-p-4/8">
-          <div class="flex flex-col gap-4">
-            <div>
-              <a
-                href={`/dashboard/teams`}
-                class="flex flex-row items-center gap-1 text-primary transition-colors duration-200 hover:underline"
-              >
-                <FaSolidChevronLeft class="h-4 w-4" />
-                <span class="text-sm font-medium">Back to Teams</span>
-              </a>
-            </div>
+    <div class="flex flex-col gap-3">
+      <PageHeader
+        title={team.data?.name ?? 'Team'}
+        back={{ href: '/dashboard/teams', label: 'Teams' }}
+        align="start"
+        subtitle={
+          <a
+            class="text-on-canvas inline-flex items-center gap-1 underline"
+            href={`/teams/${team.data?.slug}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            jinglejam.ostof.dev/teams/{team.data?.slug}
+            <FaSolidArrowUpRightFromSquare class="size-3" aria-hidden="true" />
+          </a>
+        }
+        actions={
+          <Button variant="danger" onClick={leaveDialog.open}>
+            Leave Team
+          </Button>
+        }
+      />
 
-            <div class="flex items-start justify-between">
-              <div class="flex-1 space-y-3">
-                <div>
-                  <h1 class="mb-2 text-2xl font-bold text-neutral-800">
-                    {team.data?.name}
-                  </h1>
-                  <a
-                    class="inline-flex items-center gap-1 text-sm font-medium text-primary transition-colors duration-200 hover:underline"
-                    href={`/teams/${team.data?.slug}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    jinglejam.ostof.dev/teams/{team.data?.slug}
-                    <FaSolidArrowUpRightFromSquare class="h-3 w-3" />
-                  </a>
-                </div>
-              </div>
-
-              <button
-                class="flex items-center gap-2 rounded-lg bg-danger px-4 py-2 font-medium text-white shadow-xs outline-hidden transition-all duration-200 hover:bg-danger-600 hover:shadow-md focus:ring-2 focus:ring-danger focus:ring-offset-2 focus:ring-offset-white active:scale-95"
-                onClick={leaveDialog.open}
-              >
-                <span class="text-sm font-medium">Leave Team</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="overflow-hidden rounded-2xl border border-white/20 bg-white/95 shadow-xl backdrop-blur-lg">
-        <div class="space-y-6 fl-p-4/8">
+      <div class="rounded-tile from-surface to-surface-2 text-fg shadow-tile ring-line overflow-hidden bg-linear-to-b ring-1">
+        <div class="fl-p-4/8 space-y-6">
           {/* Team Information */}
-          <div class="border-b border-neutral-200 pb-6">
-            <h3 class="mb-4 flex items-center gap-2 text-lg font-semibold text-neutral-700">
-              <FaSolidUserGroup class="h-5 w-5 text-neutral-600" />
+          <div class="border-line border-b pb-6">
+            <h3 class="text-fg-muted mb-4 flex items-center gap-2 text-lg font-semibold">
+              <FaSolidUserGroup class="text-fg-muted h-5 w-5" />
               Team Information
             </h3>
             <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
               <div class="space-y-2">
-                <h4 class="text-sm font-medium text-neutral-600">Team Name</h4>
-                <p class="font-medium text-neutral-800">{team.data?.name}</p>
+                <h4 class="text-fg-muted text-sm font-medium">Team Name</h4>
+                <p class="text-fg font-medium">{team.data?.name}</p>
               </div>
               <div class="space-y-2">
-                <h4 class="text-sm font-medium text-neutral-600">Team Slug</h4>
-                <p class="inline-block rounded-lg bg-neutral-100 px-3 py-1 font-mono text-sm text-neutral-800">
+                <h4 class="text-fg-muted text-sm font-medium">Team Slug</h4>
+                <p class="bg-surface-2 text-fg inline-block rounded-lg px-3 py-1 font-mono text-sm">
                   {team.data?.slug}
                 </p>
               </div>
@@ -121,8 +111,8 @@ const TeamDetailContent: Component<{ teamId: number }> = (props) => {
           {/* Team Members Section */}
           <div class="space-y-4">
             <div class="flex items-center gap-3">
-              <h4 class="flex items-center gap-2 text-sm font-semibold text-neutral-700">
-                <FaSolidUsers class="h-4 w-4 text-primary" />
+              <h4 class="text-fg-muted flex items-center gap-2 text-sm font-semibold">
+                <FaSolidUsers class="text-primary h-4 w-4" />
                 Team Members
               </h4>
             </div>
@@ -130,34 +120,34 @@ const TeamDetailContent: Component<{ teamId: number }> = (props) => {
             <Switch>
               <Match when={isLoading()}>
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                  <div class="h-16 animate-pulse rounded-xl bg-neutral-200 shadow-xs"></div>
-                  <div class="h-16 animate-pulse rounded-xl bg-neutral-200 shadow-xs"></div>
-                  <div class="h-16 animate-pulse rounded-xl bg-neutral-200 shadow-xs"></div>
+                  <div class="h-16 animate-pulse rounded-xl bg-black/10 shadow-xs"></div>
+                  <div class="h-16 animate-pulse rounded-xl bg-black/10 shadow-xs"></div>
+                  <div class="h-16 animate-pulse rounded-xl bg-black/10 shadow-xs"></div>
                 </div>
               </Match>
 
               <Match when={!hasMembers()}>
                 <div class="flex flex-col items-center justify-center px-4 py-12">
-                  <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-linear-to-br from-primary-400 to-primary-500 shadow-lg">
+                  <div class="from-primary-400 to-primary-500 mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-linear-to-br shadow-lg">
                     <FaSolidUsers class="h-8 w-8 text-white" />
                   </div>
-                  <h4 class="mb-2 text-xl font-semibold text-neutral-700">
+                  <h4 class="text-fg-muted mb-2 text-xl font-semibold">
                     No members yet
                   </h4>
-                  <p class="max-w-md text-center leading-relaxed text-neutral-600">
+                  <p class="text-fg-muted max-w-md text-center leading-relaxed">
                     This team doesn't have any members currently.
                   </p>
                 </div>
               </Match>
 
               <Match when={hasMembers()}>
-                <div class="grid grid-cols-1 fl-gap-3/4 sm:grid-cols-2 lg:grid-cols-3">
+                <div class="fl-gap-3/4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                   <For each={membersList()}>
                     {(member) => (
-                      <div class="group flex flex-col gap-4 rounded-xl border-2 hover:border-primary-100 bg-white p-2 shadow-md transition-all duration-300">
+                      <div class="rounded-group bg-surface-strong text-fg ring-line group hover:bg-surface flex flex-col gap-4 p-2 ring-1 transition-colors">
                         <div class="flex flex-1 items-center gap-3">
                           {/* Avatar placeholder */}
-                          <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-primary-400 to-primary-500 shadow-xs">
+                          <div class="from-primary-400 to-primary-500 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-linear-to-br shadow-xs">
                             <span class="text-sm font-semibold text-white">
                               {(member.username || 'U')[0].toUpperCase()}
                             </span>
@@ -166,11 +156,11 @@ const TeamDetailContent: Component<{ teamId: number }> = (props) => {
                           {/* Member info */}
                           <div class="min-w-0 flex-1">
                             <div class="flex items-center gap-2">
-                              <p class="block truncate text-sm font-semibold text-neutral-700">
+                              <p class="text-fg-muted block truncate text-sm font-semibold">
                                 {member.username || 'Unknown User'}
                               </p>
                               <Show when={member.userId === team.data?.ownerId}>
-                                <div class="flex items-center gap-1 rounded-full bg-warning-100 px-2 py-1 text-warning-700">
+                                <div class="bg-warning-100 text-warning-700 flex items-center gap-1 rounded-full px-2 py-1">
                                   <FaSolidCrown class="h-3 w-3" />
                                   <span class="text-xs font-medium">Owner</span>
                                 </div>
@@ -179,7 +169,7 @@ const TeamDetailContent: Component<{ teamId: number }> = (props) => {
                           </div>
                         </div>
                         <a
-                          class="inline-flex items-center gap-1 text-sm font-medium text-primary transition-colors duration-200 hover:underline"
+                          class="text-primary inline-flex items-center gap-1 text-sm font-medium transition-colors duration-200 hover:underline"
                           href={`/${member.tiltifySlug}`}
                         >
                           {member.tiltifySlug}{' '}
@@ -233,11 +223,11 @@ const LeaveTeamDialog: Component<{
       <Dialog.Portal>
         <Dialog.Overlay class="fixed inset-0 z-40 bg-black/50" />
         <div class="fixed inset-0 z-50 flex items-center justify-center">
-          <Dialog.Content class="w-full max-w-md rounded-xl bg-white p-6 shadow-xl">
+          <Dialog.Content class="rounded-tile bg-surface-strong text-fg shadow-tile-hover ring-line w-full max-w-md p-6 ring-1">
             <Dialog.Title class="mb-4 text-xl font-bold">
               Leave Team
             </Dialog.Title>
-            <Dialog.Description class="mb-4 text-neutral-600">
+            <Dialog.Description class="text-fg-muted mb-4">
               Are you sure you want to leave the team "{props.teamName}"? You
               will lose access to all team resources.
             </Dialog.Description>
@@ -245,7 +235,7 @@ const LeaveTeamDialog: Component<{
             <div class="mt-4 flex justify-end gap-2">
               <button
                 type="button"
-                class="rounded-md border border-neutral-300 px-4 py-2 hover:bg-neutral-50"
+                class="border-line-strong hover:bg-surface rounded-md border px-4 py-2"
                 onClick={props.modalSignal.close}
                 disabled={isLeaving()}
               >
@@ -253,7 +243,7 @@ const LeaveTeamDialog: Component<{
               </button>
               <button
                 type="button"
-                class="rounded-md bg-danger px-4 py-2 text-white hover:bg-danger-600 disabled:cursor-not-allowed disabled:opacity-50"
+                class="bg-danger hover:bg-danger-600 rounded-md px-4 py-2 text-white disabled:cursor-not-allowed disabled:opacity-50"
                 onClick={handleConfirm}
                 disabled={isLeaving()}
               >

@@ -6,7 +6,6 @@ import { createModalSignal } from '../../../../../lib/createModalSignal.ts'
 import { CreateTeamDialog } from './teamAdmin/CreateTeamDialog.tsx'
 import {
   FaSolidArrowUpRightFromSquare,
-  FaSolidChevronLeft,
   FaSolidCrown,
   FaSolidEnvelope,
   FaSolidPlus,
@@ -22,7 +21,8 @@ import {
   useQueryClient,
 } from '@tanstack/solid-query'
 import { QueryClient } from '@tanstack/query-core'
-import { UserDashboardFeedback } from '../UserDashboardFeedback.tsx'
+import { PageHeader } from '../../../../ui/PageHeader'
+import { Button } from '../../../../ui/Button'
 
 interface TeamsListProps {
   user: User
@@ -40,7 +40,7 @@ export const TeamsList: Component<TeamsListProps> = (props) => {
 
 const TeamsListContent: Component = () => {
   return (
-    <div class="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-8">
+    <div class="flex flex-col gap-3">
       <TeamsHeader />
       <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <OwnedTeamsList />
@@ -68,32 +68,22 @@ const TeamsHeader: Component = () => {
   }
 
   return (
-    <div class="overflow-hidden rounded-2xl border-2 border-gray-200 bg-white shadow-xl">
-      <div class="fl-p-4/8">
-        <div class="flex flex-col gap-4">
-          <div>
-            <a
-              href={`/dashboard`}
-              class="flex flex-row items-center gap-1 text-primary transition-colors duration-200 hover:underline"
-            >
-              <FaSolidChevronLeft class="h-4 w-4" />
-              <span class="text-sm font-medium">Back to Dashboard</span>
-            </a>
-          </div>
-          <div class="flex items-center justify-between">
-            <h1 class="text-2xl font-bold text-gray-900">Your Teams</h1>
-            <button
-              class="flex items-center gap-2 rounded-lg bg-accent px-4 py-2 font-medium text-white shadow-xs outline-hidden transition-all duration-200 hover:bg-accent-600 hover:shadow-md focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-white active:scale-95"
-              onClick={() => setIsOpen(true)}
-              disabled={disabled()}
-            >
-              <FaSolidPlus class="h-4 w-4" />
-              <span>Create Team</span>
-            </button>
-          </div>
-          <UserDashboardFeedback />
-        </div>
-      </div>
+    <div>
+      <PageHeader
+        title="Your Teams"
+        back={{ href: '/dashboard', label: 'Dashboard' }}
+        align="start"
+        actions={
+          <Button
+            variant="accent"
+            onClick={() => setIsOpen(true)}
+            disabled={disabled()}
+          >
+            <FaSolidPlus class="size-3.5" aria-hidden="true" />
+            Create Team
+          </Button>
+        }
+      />
 
       <CreateTeamDialog isOpen={isOpen} setIsOpen={setIsOpen} />
     </div>
@@ -110,10 +100,10 @@ const OwnedTeamsList: Component = () => {
   )
 
   return (
-    <div class="overflow-hidden rounded-2xl border-2 border-gray-200 bg-white shadow-xl">
+    <div class="rounded-tile from-surface to-surface-2 text-fg shadow-tile ring-line overflow-hidden bg-linear-to-b ring-1">
       <div class="fl-p-4/8">
-        <h3 class="mb-4 flex items-center gap-2 text-lg font-semibold text-gray-800">
-          <FaSolidCrown class="h-5 w-5 text-primary" />
+        <h3 class="text-fg mb-4 flex items-center gap-2 text-lg font-semibold">
+          <FaSolidCrown class="text-primary h-5 w-5" />
           <Show when={canCreateTeam.data} fallback={<>Teams You Own</>}>
             {(data) => (
               <>
@@ -131,13 +121,13 @@ const OwnedTeamsList: Component = () => {
           }
           loading={() => (
             <div class="space-y-3">
-              <div class="h-20 animate-pulse rounded-xl bg-gray-200 shadow-xs"></div>
-              <div class="h-20 animate-pulse rounded-xl bg-gray-200 shadow-xs"></div>
+              <div class="h-20 animate-pulse rounded-xl bg-black/10 shadow-xs"></div>
+              <div class="h-20 animate-pulse rounded-xl bg-black/10 shadow-xs"></div>
             </div>
           )}
           error={(error, refetch) => (
-            <div class="rounded-xl border border-danger-200 bg-danger-50 p-6 text-center">
-              <div class="mb-3 flex items-center justify-center gap-3 text-danger-600">
+            <div class="border-danger-200 bg-danger-50 rounded-xl border p-6 text-center">
+              <div class="text-danger-600 mb-3 flex items-center justify-center gap-3">
                 <div>
                   <p class="text-sm font-semibold">Failed to load teams</p>
                   <p class="text-xs opacity-90">
@@ -147,7 +137,7 @@ const OwnedTeamsList: Component = () => {
               </div>
               <button
                 onClick={refetch}
-                class="rounded-lg bg-danger px-4 py-2 text-white outline-hidden transition-all duration-200 hover:bg-danger-600 focus:ring-2 focus:ring-danger focus:ring-offset-2 focus:ring-offset-white"
+                class="bg-danger hover:bg-danger-600 focus:ring-danger rounded-lg px-4 py-2 text-white outline-hidden transition-all duration-200 focus:ring-2 focus:ring-offset-2 focus:ring-offset-white"
               >
                 Retry
               </button>
@@ -161,13 +151,13 @@ const OwnedTeamsList: Component = () => {
                 when={teams.length > 0}
                 fallback={
                   <div class="flex flex-col items-center justify-center px-4 py-12">
-                    <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-linear-to-br from-primary-500 to-primary-600 shadow-lg">
+                    <div class="from-primary-500 to-primary-600 mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-linear-to-br shadow-lg">
                       <FaSolidCrown class="h-8 w-8 text-white" />
                     </div>
-                    <h4 class="mb-2 text-xl font-semibold text-gray-800">
+                    <h4 class="text-fg mb-2 text-xl font-semibold">
                       No teams owned
                     </h4>
-                    <p class="max-w-md text-center leading-relaxed text-gray-600">
+                    <p class="text-fg-muted max-w-md text-center leading-relaxed">
                       You don't own any teams yet. Create your first team to get
                       started.
                     </p>
@@ -179,16 +169,16 @@ const OwnedTeamsList: Component = () => {
                     {(team) => (
                       <a
                         href={`/dashboard/teams/${team.id}`}
-                        class="group block rounded-xl border-2 bg-white p-4 shadow-md outline-hidden transition-all duration-300 hover:border-primary-200"
+                        class="rounded-group bg-surface-strong text-fg ring-line group hover:bg-surface block p-4 ring-1 transition-colors"
                       >
                         <div class="flex items-center justify-between">
                           <div class="min-w-0 flex-1">
-                            <h4 class="mb-1 truncate text-sm font-semibold text-gray-900 transition-colors group-hover:text-primary">
+                            <h4 class="text-fg group-hover:text-primary mb-1 truncate text-sm font-semibold transition-colors">
                               {team.name}
                             </h4>
                           </div>
                           <div class="ml-3 flex items-center gap-2">
-                            <FaSolidArrowUpRightFromSquare class="h-4 w-4 text-gray-400 transition-colors group-hover:text-primary" />
+                            <FaSolidArrowUpRightFromSquare class="text-fg-muted group-hover:text-primary h-4 w-4 transition-colors" />
                           </div>
                         </div>
                       </a>
@@ -214,10 +204,10 @@ const MemberTeamsList: Component = () => {
   )
 
   return (
-    <div class="overflow-hidden rounded-2xl border-2 border-gray-200 bg-white shadow-xl">
+    <div class="rounded-tile from-surface to-surface-2 text-fg shadow-tile ring-line overflow-hidden bg-linear-to-b ring-1">
       <div class="fl-p-4/8">
-        <h3 class="mb-4 flex items-center gap-2 text-lg font-semibold text-gray-800">
-          <FaSolidUsers class="h-5 w-5 text-accent" />
+        <h3 class="text-fg mb-4 flex items-center gap-2 text-lg font-semibold">
+          <FaSolidUsers class="text-accent h-5 w-5" />
           <Show
             when={canInviteCurrentUser.data}
             fallback={<>Teams You're In</>}
@@ -238,13 +228,13 @@ const MemberTeamsList: Component = () => {
           }
           loading={() => (
             <div class="space-y-3">
-              <div class="h-20 animate-pulse rounded-xl bg-gray-200 shadow-xs"></div>
-              <div class="h-20 animate-pulse rounded-xl bg-gray-200 shadow-xs"></div>
+              <div class="h-20 animate-pulse rounded-xl bg-black/10 shadow-xs"></div>
+              <div class="h-20 animate-pulse rounded-xl bg-black/10 shadow-xs"></div>
             </div>
           )}
           error={(error, refetch) => (
-            <div class="rounded-xl border border-danger-200 bg-danger-50 p-6 text-center">
-              <div class="mb-3 flex items-center justify-center gap-3 text-danger-600">
+            <div class="border-danger-200 bg-danger-50 rounded-xl border p-6 text-center">
+              <div class="text-danger-600 mb-3 flex items-center justify-center gap-3">
                 <div>
                   <p class="text-sm font-semibold">Failed to load teams</p>
                   <p class="text-xs opacity-90">
@@ -254,7 +244,7 @@ const MemberTeamsList: Component = () => {
               </div>
               <button
                 onClick={refetch}
-                class="rounded-lg bg-danger px-4 py-2 text-white outline-hidden transition-all duration-200 hover:bg-danger-600 focus:ring-2 focus:ring-danger focus:ring-offset-2 focus:ring-offset-white"
+                class="bg-danger hover:bg-danger-600 focus:ring-danger rounded-lg px-4 py-2 text-white outline-hidden transition-all duration-200 focus:ring-2 focus:ring-offset-2 focus:ring-offset-white"
               >
                 Retry
               </button>
@@ -268,13 +258,13 @@ const MemberTeamsList: Component = () => {
                 when={teams.length > 0}
                 fallback={
                   <div class="flex flex-col items-center justify-center px-4 py-12">
-                    <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-linear-to-br from-accent-500 to-accent-600 shadow-lg">
+                    <div class="from-accent-500 to-accent-600 mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-linear-to-br shadow-lg">
                       <FaSolidUsers class="h-8 w-8 text-white" />
                     </div>
-                    <h4 class="mb-2 text-xl font-semibold text-gray-800">
+                    <h4 class="text-fg mb-2 text-xl font-semibold">
                       No team memberships
                     </h4>
-                    <p class="max-w-md text-center leading-relaxed text-gray-600">
+                    <p class="text-fg-muted max-w-md text-center leading-relaxed">
                       You're not a member of any teams yet. Accept team
                       invitations to join teams.
                     </p>
@@ -286,14 +276,14 @@ const MemberTeamsList: Component = () => {
                     {(team) => (
                       <a
                         href={`/dashboard/teams/${team.id}`}
-                        class="group block rounded-xl border-2 bg-white p-4 shadow-md outline-hidden transition-all duration-300 hover:border-accent-100"
+                        class="rounded-group bg-surface-strong text-fg ring-line group hover:bg-surface block p-4 ring-1 transition-colors"
                       >
                         <div class="flex items-center justify-between">
-                          <h4 class="mb-1 flex-1 truncate text-sm font-semibold text-gray-900 transition-colors group-hover:text-accent">
+                          <h4 class="text-fg group-hover:text-accent mb-1 flex-1 truncate text-sm font-semibold transition-colors">
                             {team.name}
                           </h4>
                           <div class="ml-3 flex items-center gap-2">
-                            <FaSolidArrowUpRightFromSquare class="h-4 w-4 text-gray-400 transition-colors group-hover:text-accent" />
+                            <FaSolidArrowUpRightFromSquare class="text-fg-muted group-hover:text-accent h-4 w-4 transition-colors" />
                           </div>
                         </div>
                       </a>
@@ -367,10 +357,10 @@ const InvitesList: Component = () => {
   }
 
   return (
-    <div class="overflow-hidden rounded-2xl border-2 border-gray-200 bg-white shadow-xl">
+    <div class="rounded-tile from-surface to-surface-2 text-fg shadow-tile ring-line overflow-hidden bg-linear-to-b ring-1">
       <div class="fl-p-4/8">
-        <h3 class="mb-4 flex items-center gap-2 text-lg font-semibold text-gray-800">
-          <FaSolidEnvelope class="h-5 w-5 text-warning" />
+        <h3 class="text-fg mb-4 flex items-center gap-2 text-lg font-semibold">
+          <FaSolidEnvelope class="text-warning h-5 w-5" />
           Team Invitations
         </h3>
 
@@ -385,13 +375,13 @@ const InvitesList: Component = () => {
           }
           loading={() => (
             <div class="space-y-3">
-              <div class="h-20 animate-pulse rounded-xl bg-gray-200 shadow-xs"></div>
-              <div class="h-20 animate-pulse rounded-xl bg-gray-200 shadow-xs"></div>
+              <div class="h-20 animate-pulse rounded-xl bg-black/10 shadow-xs"></div>
+              <div class="h-20 animate-pulse rounded-xl bg-black/10 shadow-xs"></div>
             </div>
           )}
           error={(error, refetch) => (
-            <div class="rounded-xl border border-danger-200 bg-danger-50 p-6 text-center">
-              <div class="mb-3 flex items-center justify-center gap-3 text-danger-600">
+            <div class="border-danger-200 bg-danger-50 rounded-xl border p-6 text-center">
+              <div class="text-danger-600 mb-3 flex items-center justify-center gap-3">
                 <div>
                   <p class="text-sm font-semibold">
                     Failed to load invitations
@@ -403,7 +393,7 @@ const InvitesList: Component = () => {
               </div>
               <button
                 onClick={refetch}
-                class="rounded-lg bg-danger px-4 py-2 text-white outline-hidden transition-all duration-200 hover:bg-danger-600 focus:ring-2 focus:ring-danger focus:ring-offset-2 focus:ring-offset-white"
+                class="bg-danger hover:bg-danger-600 focus:ring-danger rounded-lg px-4 py-2 text-white outline-hidden transition-all duration-200 focus:ring-2 focus:ring-offset-2 focus:ring-offset-white"
               >
                 Retry
               </button>
@@ -415,13 +405,13 @@ const InvitesList: Component = () => {
               when={result.invites.length > 0}
               fallback={
                 <div class="flex flex-col items-center justify-center px-4 py-12">
-                  <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-linear-to-br from-warning-500 to-warning-600 shadow-lg">
+                  <div class="from-warning-500 to-warning-600 mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-linear-to-br shadow-lg">
                     <FaSolidEnvelope class="h-8 w-8 text-white" />
                   </div>
-                  <h4 class="mb-2 text-xl font-semibold text-gray-800">
+                  <h4 class="text-fg mb-2 text-xl font-semibold">
                     No pending invitations
                   </h4>
-                  <p class="max-w-md text-center leading-relaxed text-gray-600">
+                  <p class="text-fg-muted max-w-md text-center leading-relaxed">
                     You don't have any team invitations at the moment. Team
                     owners can invite you to join their teams.
                   </p>
@@ -431,10 +421,10 @@ const InvitesList: Component = () => {
               <div class="space-y-4">
                 <For each={result.invites}>
                   {(invite) => (
-                    <div class="flex flex-col gap-4 rounded-xl border-2 bg-white p-2 shadow-md transition-all duration-300 hover:border-warning-100">
-                      <p class="text-xs text-gray-600">
+                    <div class="rounded-group bg-surface-strong text-fg ring-line hover:bg-surface flex flex-col gap-4 p-2 ring-1 transition-colors">
+                      <p class="text-fg-muted text-xs">
                         <span>You've been invited to join: </span>
-                        <span class="truncate text-sm font-semibold text-gray-900">
+                        <span class="text-fg truncate text-sm font-semibold">
                           {invite.name}
                         </span>
                       </p>
@@ -446,7 +436,7 @@ const InvitesList: Component = () => {
                             acceptInviteMutation.isPending ||
                             rejectInviteMutation.isPending
                           }
-                          class="flex items-center gap-1 rounded-lg bg-success px-3 py-1.5 text-xs font-medium text-white outline-hidden transition-all duration-200 hover:bg-success-600 hover:shadow-xs focus:ring-2 focus:ring-success focus:ring-offset-2 focus:ring-offset-white active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+                          class="bg-success hover:bg-success-600 focus:ring-success flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium text-white outline-hidden transition-all duration-200 hover:shadow-xs focus:ring-2 focus:ring-offset-2 focus:ring-offset-white active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
                         >
                           <span>Accept</span>
                         </button>
@@ -458,7 +448,7 @@ const InvitesList: Component = () => {
                             acceptInviteMutation.isPending ||
                             rejectInviteMutation.isPending
                           }
-                          class="flex items-center gap-1 rounded-lg bg-danger px-3 py-1.5 text-xs font-medium text-white outline-hidden transition-all duration-200 hover:bg-danger-600 hover:shadow-xs focus:ring-2 focus:ring-danger focus:ring-offset-2 focus:ring-offset-white active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+                          class="bg-danger hover:bg-danger-600 focus:ring-danger flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium text-white outline-hidden transition-all duration-200 hover:shadow-xs focus:ring-2 focus:ring-offset-2 focus:ring-offset-white active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
                         >
                           <span>Reject</span>
                         </button>
@@ -496,9 +486,9 @@ const InvitesList: Component = () => {
         when={acceptInviteMutation.isPending || rejectInviteMutation.isPending}
       >
         <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/10">
-          <div class="rounded-lg bg-white p-4 shadow-xl">
+          <div class="rounded-tile from-surface to-surface-2 text-fg shadow-tile ring-line bg-linear-to-b p-4 ring-1">
             <div class="flex items-center gap-2">
-              <div class="h-5 w-5 animate-spin rounded-full border-2 border-accent border-t-transparent"></div>
+              <div class="border-accent h-5 w-5 animate-spin rounded-full border-2 border-t-transparent"></div>
               <span>
                 {isAcceptAction()
                   ? 'Accepting invitation...'

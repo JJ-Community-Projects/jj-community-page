@@ -31,7 +31,7 @@ const StatusIndicator = () => {
 }
 
 const UserSkeleton = () => (
-  <div class="h-16 w-full animate-pulse rounded-lg bg-gray-200 shadow-xs"></div>
+  <div class="h-16 w-full animate-pulse rounded-lg bg-black/10 shadow-xs"></div>
 )
 
 /**
@@ -58,13 +58,13 @@ export const AvailableUsersToBlockList: Component = () => {
 
   const EmptyState = () => (
     <div class="flex flex-col items-center justify-center px-4 py-8">
-      <div class="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-linear-to-br from-gray-400 to-gray-500">
+      <div class="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-linear-to-br from-black/20 to-black/30">
         <FaSolidUsers class="h-6 w-6 text-white" />
       </div>
-      <h4 class="mb-1 text-sm font-semibold text-gray-700">
+      <h4 class="mb-1 text-sm font-semibold text-fg-muted">
         {debouncedInput().length > 0 ? 'No users found' : 'Start searching'}
       </h4>
-      <p class="max-w-sm text-center text-xs text-gray-500">
+      <p class="max-w-sm text-center text-xs text-fg-muted">
         {debouncedInput().length > 0
           ? `No users found matching "${debouncedInput()}". Try a different search term.`
           : 'Enter a username above to search for users to block.'}
@@ -88,7 +88,7 @@ export const AvailableUsersToBlockList: Component = () => {
   return (
     <div class="mb-6">
       <div class="mb-4 flex items-center gap-3">
-        <h3 class="flex items-center gap-2 text-sm font-semibold text-gray-800">
+        <h3 class="flex items-center gap-2 text-sm font-semibold text-fg">
           <FaSolidMagnifyingGlass class="h-4 w-4 text-danger" />
           Search Results
         </h3>
@@ -97,8 +97,8 @@ export const AvailableUsersToBlockList: Component = () => {
 
       {/* Error messages */}
       <Show when={hasBlockError()}>
-        <div class="mb-4 rounded-xl border border-red-200 bg-red-50 p-4">
-          <div class="flex items-center gap-3 text-red-600">
+        <div class="mb-4 rounded-xl border border-danger-200 bg-danger-50 p-4">
+          <div class="flex items-center gap-3 text-danger-600">
             <FaSolidCircleExclamation class="h-4 w-4 shrink-0" />
             <p class="text-sm font-medium">
               {blockErrorMessage() || 'Failed to block user'}
@@ -109,8 +109,8 @@ export const AvailableUsersToBlockList: Component = () => {
 
       <Switch fallback={<EmptyState />}>
         <Match when={hasSearchError()}>
-          <div class="rounded-xl border border-red-200 bg-red-50 p-6">
-            <div class="flex items-center justify-center gap-3 text-red-600">
+          <div class="rounded-xl border border-danger-200 bg-danger-50 p-6">
+            <div class="flex items-center justify-center gap-3 text-danger-600">
               <FaSolidCircleExclamation class="h-5 w-5 shrink-0" />
               <div>
                 <p class="text-sm font-semibold">Error searching users</p>
@@ -140,7 +140,7 @@ export const AvailableUsersToBlockList: Component = () => {
                   !isAlreadyBlockedVal() && !isBlockingUser()
 
                 return (
-                  <div class="group relative overflow-hidden rounded-xl border-2 border-danger-200 bg-white p-4 shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:border-danger-300 hover:shadow-lg">
+                  <div class="rounded-group bg-surface-strong text-fg ring-1 ring-line group relative overflow-hidden p-4 transition-colors hover:bg-surface">
                     <div class="flex items-center justify-between">
                       {/* User info */}
                       <div class="flex items-center gap-3">
@@ -155,7 +155,7 @@ export const AvailableUsersToBlockList: Component = () => {
 
                         {/* User details */}
                         <div>
-                          <p class="text-sm font-semibold text-gray-800">
+                          <p class="text-sm font-semibold text-fg">
                             {user.tiltifyUsername ||
                               user.twitchUsername ||
                               'Unknown User'}
@@ -163,7 +163,7 @@ export const AvailableUsersToBlockList: Component = () => {
                           <Show
                             when={user.twitchUsername && user.tiltifyUsername}
                           >
-                            <p class="text-xs text-gray-600">
+                            <p class="text-xs text-fg-muted">
                               Twitch: {user.twitchUsername}
                             </p>
                           </Show>
@@ -175,11 +175,7 @@ export const AvailableUsersToBlockList: Component = () => {
                         type="button"
                         onClick={() => handleBlockRequest(user.userId)}
                         disabled={!canBlockUser() || isBlockingUser()}
-                        class={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium outline-hidden transition-all duration-200 focus:ring-2 focus:ring-danger focus:ring-offset-2 focus:ring-offset-white ${
-                          canBlockUser() && !isBlockingUser()
-                            ? 'bg-danger text-white shadow-xs hover:bg-danger-600 hover:shadow-md'
-                            : 'cursor-not-allowed bg-gray-100 text-gray-500'
-                        } `}
+                        class={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium outline-hidden transition-all duration-200 focus:ring-2 focus:ring-danger focus:ring-offset-2 focus:ring-offset-white ${ canBlockUser() && !isBlockingUser() ? 'bg-danger text-white shadow-xs hover:bg-danger-600 hover:shadow-md' : 'cursor-not-allowed bg-surface-2 text-fg-muted' }`}
                         aria-label={`${canBlockUser() ? 'Block' : 'Cannot block'} ${user.tiltifyUsername || user.twitchUsername}`}
                       >
                         <FaSolidBan class="h-4 w-4" />

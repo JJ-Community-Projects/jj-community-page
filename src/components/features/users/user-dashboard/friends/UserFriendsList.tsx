@@ -40,7 +40,7 @@ const FriendListItem: Component<FriendListItemProps> = (props) => {
 
   return (
     <>
-      <div class="group flex items-center gap-3 rounded-xl border-2 border-primary-100 bg-white p-4 shadow-md transition-all duration-300">
+      <div class="rounded-group bg-surface-strong text-fg ring-1 ring-line group flex items-center gap-3 p-4">
         <Show
           when={
             props.friend.profileImage && props.friend.profileImage.trim() !== ''
@@ -77,13 +77,13 @@ const FriendListItem: Component<FriendListItemProps> = (props) => {
           <a
             target={`_blank`}
             href={'/' + props.friend.username}
-            class="flex items-center justify-start gap-2 truncate text-sm font-semibold text-gray-800 underline hover:text-accent-500"
+            class="flex items-center justify-start gap-2 truncate text-sm font-semibold text-fg underline hover:text-accent-500"
           >
             {props.friend.username || 'Unknown User'}{' '}
             <FaSolidArrowUpRightFromSquare />
           </a>
           <Show when={props.friend.twitchLogin}>
-            <p class="block truncate text-xs text-gray-600 opacity-80">
+            <p class="block truncate text-xs text-fg-muted opacity-80">
               Twitch: {props.friend.twitchLogin}
             </p>
           </Show>
@@ -94,11 +94,11 @@ const FriendListItem: Component<FriendListItemProps> = (props) => {
           type="button"
           onClick={handleRemoveClick}
           disabled={isRemovingFriend()}
-          class="shrink-0 rounded-full p-2 opacity-70 outline-hidden transition-all duration-200 group-hover:opacity-100 hover:scale-110 hover:bg-red-100 focus:bg-red-100 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-white active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+          class="shrink-0 rounded-full p-2 opacity-70 outline-hidden transition-all duration-200 group-hover:opacity-100 hover:scale-110 hover:bg-danger-100 focus:bg-danger-100 focus:ring-2 focus:ring-danger-500 focus:ring-offset-2 focus:ring-offset-white active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
           aria-label={`Remove ${props.friend.username} from friends`}
           title="Remove friend"
         >
-          <FaSolidXmark class="h-4 w-4 text-red-500 hover:text-red-600" />
+          <FaSolidXmark class="h-4 w-4 text-danger-500 hover:text-danger-600" />
         </button>
       </div>
 
@@ -119,8 +119,8 @@ const EmptyState = () => (
     <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-linear-to-br from-primary-400 to-primary-500 shadow-lg">
       <FaSolidUsers class="h-8 w-8 text-white" />
     </div>
-    <h3 class="mb-2 text-xl font-semibold text-gray-800">No friends yet</h3>
-    <p class="mb-6 max-w-md text-center leading-relaxed text-gray-600">
+    <h3 class="mb-2 text-xl font-semibold text-fg">No friends yet</h3>
+    <p class="mb-6 max-w-md text-center leading-relaxed text-fg-muted">
       You haven't added any friends yet. Search for users above and send friend
       requests to start building your network.
     </p>
@@ -129,9 +129,9 @@ const EmptyState = () => (
 
 const LoadingSkeleton = () => (
   <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-    <div class="h-16 animate-pulse rounded-xl bg-gray-200 shadow-xs"></div>
-    <div class="h-16 animate-pulse rounded-xl bg-gray-200 shadow-xs"></div>
-    <div class="h-16 animate-pulse rounded-xl bg-gray-200 shadow-xs"></div>
+    <div class="h-16 animate-pulse rounded-xl bg-black/10 shadow-xs"></div>
+    <div class="h-16 animate-pulse rounded-xl bg-black/10 shadow-xs"></div>
+    <div class="h-16 animate-pulse rounded-xl bg-black/10 shadow-xs"></div>
   </div>
 )
 /**
@@ -155,7 +155,7 @@ export const UserFriendsList: Component = () => {
   return (
     <div class="mt-6">
       <div class="mb-4 flex items-center gap-3">
-        <h3 class="flex items-center gap-2 text-sm font-semibold text-gray-800">
+        <h3 class="flex items-center gap-2 text-sm font-semibold text-fg">
           <FaSolidUsers class="h-4 w-4 text-primary" />
           Your Friends
         </h3>
@@ -163,8 +163,8 @@ export const UserFriendsList: Component = () => {
 
       {/* Error messages */}
       <Show when={hasRemoveFriendError()}>
-        <div class="mb-4 rounded-xl border border-red-200 bg-red-50 p-4">
-          <div class="flex items-center gap-3 text-red-600">
+        <div class="mb-4 rounded-xl border border-danger-200 bg-danger-50 p-4">
+          <div class="flex items-center gap-3 text-danger-600">
             <FaSolidCircleExclamation class="h-4 w-4 shrink-0" />
             <p class="text-sm font-medium">
               {removeFriendErrorMessage() || 'Failed to remove friend'}
@@ -179,8 +179,8 @@ export const UserFriendsList: Component = () => {
         </Match>
 
         <Match when={hasFriendsError()}>
-          <div class="rounded-xl border border-red-200 bg-red-50 p-6">
-            <div class="flex items-center justify-center gap-3 text-red-600">
+          <div class="rounded-xl border border-danger-200 bg-danger-50 p-6">
+            <div class="flex items-center justify-center gap-3 text-danger-600">
               <FaSolidCircleExclamation class="h-5 w-5 shrink-0" />
               <div>
                 <p class="text-sm font-semibold">Error loading friends</p>

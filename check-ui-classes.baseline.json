@@ -120,45 +120,8 @@
   "src/components/features/users/public/UserHeader.tsx": {
     "hex": 1
   },
-  "src/components/features/users/user-dashboard/blocks/AvailableUsersToBlockList.tsx": {
-    "raw-palette": 16
-  },
-  "src/components/features/users/user-dashboard/blocks/BlockedUsersList.tsx": {
-    "raw-palette": 18
-  },
-  "src/components/features/users/user-dashboard/blocks/BlockSearchInput.tsx": {
-    "raw-palette": 9
-  },
-  "src/components/features/users/user-dashboard/blocks/UserBlocksSection.tsx": {
-    "raw-palette": 1
-  },
-  "src/components/features/users/user-dashboard/friends/AvailableUsersList.tsx": {
-    "raw-palette": 23
-  },
-  "src/components/features/users/user-dashboard/friends/FriendRequestsList.tsx": {
-    "raw-palette": 21
-  },
-  "src/components/features/users/user-dashboard/friends/FriendSearchInput.tsx": {
-    "raw-palette": 4
-  },
-  "src/components/features/users/user-dashboard/friends/SentFriendRequestsList.tsx": {
-    "raw-palette": 19
-  },
-  "src/components/features/users/user-dashboard/friends/UserFriendsList.tsx": {
-    "raw-palette": 19
-  },
-  "src/components/features/users/user-dashboard/preferences/PrimaryLivePlatform.tsx": {
-    "raw-palette": 18
-  },
-  "src/components/features/users/user-dashboard/preferences/UserSocialsSection.tsx": {
-    "raw-palette": 37
-  },
   "src/components/features/users/user-dashboard/preferences/UserStylesSection.tsx": {
-    "raw-palette": 18,
     "hex": 4
-  },
-  "src/components/features/users/user-dashboard/schedules/CreateScheduleDialog.tsx": {
-    "raw-palette": 14
   },
   "src/components/features/users/user-dashboard/schedules/editor_v2/ScheduleAdminEditorHeader.tsx": {
     "raw-palette": 20
@@ -210,48 +173,6 @@
   },
   "src/components/features/users/user-dashboard/schedules/editor_v2/streams/StreamsPanel.tsx": {
     "raw-palette": 3
-  },
-  "src/components/features/users/user-dashboard/schedules/ScheduleHeader.tsx": {
-    "raw-palette": 18
-  },
-  "src/components/features/users/user-dashboard/schedules/SchedulesList.tsx": {
-    "raw-palette": 11
-  },
-  "src/components/features/users/user-dashboard/tags/AvailableTagsList.tsx": {
-    "raw-palette": 9
-  },
-  "src/components/features/users/user-dashboard/tags/CategoryTagsList.tsx": {
-    "raw-palette": 17
-  },
-  "src/components/features/users/user-dashboard/tags/TagSearchInput.tsx": {
-    "raw-palette": 11
-  },
-  "src/components/features/users/user-dashboard/tags/UserTagsList.tsx": {
-    "raw-palette": 5
-  },
-  "src/components/features/users/user-dashboard/tags/UserTagsSection.tsx": {
-    "raw-palette": 1
-  },
-  "src/components/features/users/user-dashboard/teams/teamAdmin/AdminTeamHeader.tsx": {
-    "raw-palette": 3
-  },
-  "src/components/features/users/user-dashboard/teams/teamAdmin/AdminTeamInviteSearchInput.tsx": {
-    "raw-palette": 11
-  },
-  "src/components/features/users/user-dashboard/teams/teamAdmin/AdminTeamInvitesSection.tsx": {
-    "raw-palette": 7
-  },
-  "src/components/features/users/user-dashboard/teams/teamAdmin/AdminTeamMembersSection.tsx": {
-    "raw-palette": 7
-  },
-  "src/components/features/users/user-dashboard/teams/teamAdmin/AdminTeamSettingsSection.tsx": {
-    "raw-palette": 13
-  },
-  "src/components/features/users/user-dashboard/teams/teamAdmin/CreateTeamDialog.tsx": {
-    "raw-palette": 10
-  },
-  "src/components/features/users/user-dashboard/teams/TeamsList.tsx": {
-    "raw-palette": 26
   },
   "src/components/yogs-pages/schedule/header/YogsScheduleHeader.tsx": {
     "unknown": 2

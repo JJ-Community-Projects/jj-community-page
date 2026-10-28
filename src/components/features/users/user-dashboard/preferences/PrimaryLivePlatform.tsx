@@ -102,24 +102,24 @@ export const PrimaryLivePlatform: Component = () => {
   return (
     <div class="">
       <h3 class="mb-2 text-lg font-medium">Primary Live Stream Platform</h3>
-      <p class="mb-4 text-gray-600">
+      <p class="mb-4 text-fg-muted">
         Select your primary live streaming platform. This will be used as your
         default platform for live streams. The Profile picture of your primary
         live stream platform will be used for your JJ profile.
       </p>
 
       <Show when={primaryLiveStream.isPending || socials.isPending}>
-        <div class="py-4 text-center text-gray-500">
+        <div class="py-4 text-center text-fg-muted">
           Loading platform settings...
         </div>
       </Show>
 
       <Show when={primaryLiveStream.error || socials.error}>
         <div class="py-4 text-center">
-          <p class="mb-2 text-red-500">Failed to load platform settings</p>
+          <p class="mb-2 text-danger-500">Failed to load platform settings</p>
           <button
             onClick={retry}
-            class="rounded-sm bg-blue-500 px-3 py-1 text-white hover:bg-blue-600"
+            class="rounded-sm bg-accent-500 px-3 py-1 text-white hover:bg-accent-600"
           >
             Retry
           </button>
@@ -133,37 +133,37 @@ export const PrimaryLivePlatform: Component = () => {
       >
         <RadioGroup.Item
           value="twitch"
-          class="flex items-center space-x-2 rounded-md p-2 hover:bg-gray-50"
+          class="flex items-center space-x-2 rounded-md p-2 hover:bg-surface"
         >
           <RadioGroup.ItemInput />
-          <RadioGroup.ItemControl class="h-4 w-4 rounded-full border border-gray-300">
-            <RadioGroup.ItemIndicator class="h-2 w-2 rounded-full bg-purple-600" />
+          <RadioGroup.ItemControl class="h-4 w-4 rounded-full border border-line-strong">
+            <RadioGroup.ItemIndicator class="h-2 w-2 rounded-full bg-twitch-500" />
           </RadioGroup.ItemControl>
-          <RadioGroup.ItemLabel class="font-medium text-purple-600">
+          <RadioGroup.ItemLabel class="font-medium text-twitch-500">
             Twitch
           </RadioGroup.ItemLabel>
         </RadioGroup.Item>
         <RadioGroup.Item
           value="youtube"
-          class="flex items-center space-x-2 rounded-md p-2 hover:bg-gray-50"
+          class="flex items-center space-x-2 rounded-md p-2 hover:bg-surface"
         >
           <RadioGroup.ItemInput />
-          <RadioGroup.ItemControl class="h-4 w-4 rounded-full border border-gray-300">
-            <RadioGroup.ItemIndicator class="h-2 w-2 rounded-full bg-red-600" />
+          <RadioGroup.ItemControl class="h-4 w-4 rounded-full border border-line-strong">
+            <RadioGroup.ItemIndicator class="h-2 w-2 rounded-full bg-danger-600" />
           </RadioGroup.ItemControl>
-          <RadioGroup.ItemLabel class="font-medium text-red-600">
+          <RadioGroup.ItemLabel class="font-medium text-danger-600">
             YouTube
           </RadioGroup.ItemLabel>
         </RadioGroup.Item>
         <RadioGroup.Item
           value="tiktok"
-          class="flex items-center space-x-2 rounded-md p-2 hover:bg-gray-50"
+          class="flex items-center space-x-2 rounded-md p-2 hover:bg-surface"
         >
           <RadioGroup.ItemInput />
-          <RadioGroup.ItemControl class="h-4 w-4 rounded-full border border-gray-300">
+          <RadioGroup.ItemControl class="h-4 w-4 rounded-full border border-line-strong">
             <RadioGroup.ItemIndicator class="h-2 w-2 rounded-full bg-black" />
           </RadioGroup.ItemControl>
-          <RadioGroup.ItemLabel class="font-medium text-black">
+          <RadioGroup.ItemLabel class="font-medium text-fg">
             TikTok
           </RadioGroup.ItemLabel>
         </RadioGroup.Item>
@@ -175,7 +175,7 @@ export const PrimaryLivePlatform: Component = () => {
 /*
 
           <Show when={!hasPlatformSocial()}>
-            <div class="mt-4 rounded-md border border-yellow-300 bg-yellow-50 p-3 text-yellow-800">
+            <div class="mt-4 rounded-md border border-warning-300 bg-warning-50 p-3 text-warning-800">
               <p class="text-sm font-medium">
                 Warning: You have selected {selectedPlatform()} as your primary
                 live stream platform, but you don't have a {selectedPlatform()}{' '}

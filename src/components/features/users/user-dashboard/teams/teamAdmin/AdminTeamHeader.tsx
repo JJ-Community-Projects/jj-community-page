@@ -44,13 +44,13 @@ export const AdminTeamHeader: Component = () => {
   return (
     <>
       {/* Team Information Header */}
-      <div class="border-b border-gray-200 pb-6">
+      <div class="border-b border-line pb-6">
         <div class="flex items-center justify-between">
           <div class="flex-1">
-            <h3 class="text-lg font-semibold text-gray-800 mb-2">Team Management</h3>
+            <h3 class="text-lg font-semibold text-fg mb-2">Team Management</h3>
             <Show when={team.data}>
               <div class="space-y-1">
-                <p class="text-sm text-gray-600">
+                <p class="text-sm text-fg-muted">
                   <span class="font-medium">Team:</span> {team.data?.name}
                 </p>
                 <a
@@ -68,14 +68,7 @@ export const AdminTeamHeader: Component = () => {
           {/* Delete Team Button */}
           <button
             onClick={showDeleteDialog.open}
-            class="
-              flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200
-              bg-danger-50 hover:bg-danger-100 text-danger-700 hover:text-danger-800
-              border border-danger-200 hover:border-danger-300
-              focus:ring-2 focus:ring-danger-500 focus:ring-offset-2 focus:ring-offset-white
-              outline-hidden hover:shadow-md active:scale-95
-              disabled:opacity-50 disabled:cursor-not-allowed
-            "
+            class="flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 bg-danger-50 hover:bg-danger-100 text-danger-700 hover:text-danger-800 border border-danger-200 hover:border-danger-300 focus:ring-2 focus:ring-danger-500 focus:ring-offset-2 focus:ring-offset-white outline-hidden hover:shadow-md active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={deleteTeamMutation.isPending}
             aria-label="Delete team"
           >

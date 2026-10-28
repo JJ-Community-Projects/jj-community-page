@@ -126,19 +126,19 @@ export const CreateScheduleDialog: Component<{
       <Dialog.Portal>
         <Dialog.Overlay class="fixed inset-0 bg-black/50 z-40"/>
         <div class="fixed inset-0 flex items-center justify-center z-50">
-          <Dialog.Content class="bg-white rounded-xl shadow-xl p-6 w-full max-w-md">
+          <Dialog.Content class="rounded-tile bg-surface-strong text-fg shadow-tile-hover ring-1 ring-line p-6 w-full max-w-md">
             <Dialog.Title class="text-xl font-bold mb-4">Create New Schedule</Dialog.Title>
-            <Dialog.Description class="text-gray-600 mb-4">
+            <Dialog.Description class="text-fg-muted mb-4">
               Create a new schedule to organize your streams and events.
             </Dialog.Description>
 
             <form onSubmit={handleSubmit} class="flex flex-col gap-4">
               <TextField value={name()} onChange={handleNameChange}>
-                <TextField.Label class="block text-sm font-medium text-gray-700 mb-1">
+                <TextField.Label class="block text-sm font-medium text-fg-muted mb-1">
                   Schedule Name
                 </TextField.Label>
                 <TextField.Input
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-hidden focus:ring-2 focus:ring-accent"
+                  class="w-full px-3 py-2 border border-line-strong rounded-md focus:outline-hidden focus:ring-2 focus:ring-accent"
                   placeholder="My Awesome Schedule 2024"
                 />
               </TextField>
@@ -148,12 +148,12 @@ export const CreateScheduleDialog: Component<{
                 onChange={handleSlugChange}
                 validationState={slugValid() ? "valid" : "invalid"}
               >
-                <TextField.Label class="block text-sm font-medium text-gray-700 mb-1">
+                <TextField.Label class="block text-sm font-medium text-fg-muted mb-1">
                   Schedule Slug
                 </TextField.Label>
                 <div class="relative">
                   <TextField.Input
-                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-hidden focus:ring-2 focus:ring-accent"
+                    class="w-full px-3 py-2 border border-line-strong rounded-md focus:outline-hidden focus:ring-2 focus:ring-accent"
                     placeholder="my-awesome-schedule-2024"
                   />
                   <Show when={isCheckingSlug() && slug().length>0}>
@@ -167,7 +167,7 @@ export const CreateScheduleDialog: Component<{
                     </div>
                   </Show>
                 </div>
-                <TextField.ErrorMessage class="text-red-500 text-sm mt-1">
+                <TextField.ErrorMessage class="text-danger-500 text-sm mt-1">
                   {slugErrorMessage() || (!slugValid() && slug().length > 0 ? "This slug is not available. Try one of these suggestions:" : undefined)}
                 </TextField.ErrorMessage>
 
@@ -195,20 +195,20 @@ export const CreateScheduleDialog: Component<{
                   </div>
                 </Show>
 
-                <p class="text-xs text-gray-500 mt-1">
+                <p class="text-xs text-fg-muted mt-1">
                   This will be used in URLs: jinglejam.ostof.dev/schedules/{normalizedSlug() || "your-schedule-slug"}
                 </p>
               </TextField>
 
               <TextField value={year().toString()} onChange={handleYearChange}>
-                <TextField.Label class="block text-sm font-medium text-gray-700 mb-1">
+                <TextField.Label class="block text-sm font-medium text-fg-muted mb-1">
                   Year
                 </TextField.Label>
                 <TextField.Input
                   type="number"
                   min="2020"
                   max="2030"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-hidden focus:ring-2 focus:ring-accent"
+                  class="w-full px-3 py-2 border border-line-strong rounded-md focus:outline-hidden focus:ring-2 focus:ring-accent"
                   placeholder="2024"
                 />
               </TextField>
@@ -216,21 +216,21 @@ export const CreateScheduleDialog: Component<{
               <Checkbox checked={primary()} onChange={setPrimary}>
                 <div class="flex items-center gap-2">
                   <Checkbox.Input class="sr-only" />
-                  <Checkbox.Control class="w-4 h-4 border-2 border-gray-300 rounded-sm flex items-center justify-center data-checked:bg-accent data-checked:border-accent">
+                  <Checkbox.Control class="w-4 h-4 border-2 border-line-strong rounded-sm flex items-center justify-center data-checked:bg-accent data-checked:border-accent">
                     <Checkbox.Indicator>
                       <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
                       </svg>
                     </Checkbox.Indicator>
                   </Checkbox.Control>
-                  <Checkbox.Label class="text-sm font-medium text-gray-700">
+                  <Checkbox.Label class="text-sm font-medium text-fg-muted">
                     Set as primary schedule for {year()}
                   </Checkbox.Label>
                 </div>
               </Checkbox>
 
               <Show when={createScheduleMutation.isError}>
-                <div class="text-red-500 text-sm mt-2">
+                <div class="text-danger-500 text-sm mt-2">
                   {createScheduleMutation.failureReason?.message}
                 </div>
               </Show>
@@ -238,7 +238,7 @@ export const CreateScheduleDialog: Component<{
               <div class="flex justify-end gap-2 mt-4">
                 <button
                   type="button"
-                  class="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
+                  class="px-4 py-2 border border-line-strong rounded-md hover:bg-surface"
                   onClick={() => props.setIsOpen(false)}
                 >
                   Cancel

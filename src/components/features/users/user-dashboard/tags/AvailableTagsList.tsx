@@ -47,7 +47,7 @@ export const AvailableTagsList: Component = () => {
   )
 
   const TagSkeleton = () => (
-    <div class="h-10 w-24 animate-pulse rounded-lg bg-neutral-200 shadow-xs"></div>
+    <div class="h-10 w-24 animate-pulse rounded-lg bg-black/10 shadow-xs"></div>
   )
 
   const EmptyState = () => (
@@ -55,8 +55,8 @@ export const AvailableTagsList: Component = () => {
       <div class="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-linear-to-br from-accent-500 to-accent-600">
         <FaSolidMagnifyingGlass class="h-6 w-6 text-white" />
       </div>
-      <h4 class="mb-1 text-sm font-semibold text-gray-700">No tags available</h4>
-      <p class="max-w-sm text-center text-xs text-gray-500">
+      <h4 class="mb-1 text-sm font-semibold text-fg-muted">No tags available</h4>
+      <p class="max-w-sm text-center text-xs text-fg-muted">
         Check back later for available tags to add to your profile.
       </p>
     </div>
@@ -65,7 +65,7 @@ export const AvailableTagsList: Component = () => {
   return (
     <div class="mb-6">
       <div class="mb-4 flex items-center gap-3">
-        <h3 class="flex items-center gap-2 text-sm font-semibold text-gray-800">
+        <h3 class="flex items-center gap-2 text-sm font-semibold text-fg">
           <FaSolidTag class="h-4 w-4 text-accent-600" />
           Popular Tags
         </h3>
@@ -115,10 +115,10 @@ export const AvailableTagsList: Component = () => {
             <div class="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-linear-to-br from-accent-500 to-accent-600">
               <FaSolidMagnifyingGlass class="h-6 w-6 text-white" />
             </div>
-            <h4 class="mb-1 text-sm font-semibold text-gray-700">
+            <h4 class="mb-1 text-sm font-semibold text-fg-muted">
               No tags available
             </h4>
-            <p class="max-w-sm text-center text-xs text-gray-400">
+            <p class="max-w-sm text-center text-xs text-fg-muted">
               Need help with tags? Contact{' '}
               <span class="font-medium text-accent-600">Ostof</span> on Discord.
             </p>
@@ -136,11 +136,7 @@ export const AvailableTagsList: Component = () => {
                     type="button"
                     onClick={(e) => handleSelectTag(e, tag.id)}
                     disabled={userHasTag() || !canAddTag()}
-                    class={`relative rounded-full border px-3 py-2 text-sm font-medium outline-hidden transition-colors duration-200 ease-out focus:ring-2 focus:ring-accent focus:ring-offset-2 ${
-                      userHasTag() || !canAddTag()
-                        ? 'cursor-not-allowed border-gray-200 bg-gray-100 text-gray-400'
-                        : 'bg-white hover:bg-gray-50'
-                    } `}
+                    class={`relative rounded-full border px-3 py-2 text-sm font-medium outline-hidden transition-colors duration-200 ease-out focus:ring-2 focus:ring-accent focus:ring-offset-2 ${ userHasTag() || !canAddTag() ? 'cursor-not-allowed border-line bg-surface-2 text-fg-muted' : 'bg-white hover:bg-surface' }`}
                     style={
                       !userHasTag() && canAddTag()
                         ? {

@@ -26,7 +26,7 @@ import {UserFriendsList} from "./UserFriendsList.tsx";
 export const UserFriendsSection: Component = () => {
 
   return (
-    <div class="bg-white/95 backdrop-blur-lg rounded-2xl shadow-xl border border-white/20 overflow-hidden">
+    <div class="rounded-tile bg-linear-to-b from-surface to-surface-2 text-fg shadow-tile ring-1 ring-line overflow-hidden">
       <div class="fl-p-4/8">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 

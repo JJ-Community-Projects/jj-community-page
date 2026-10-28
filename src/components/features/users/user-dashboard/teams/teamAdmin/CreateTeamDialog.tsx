@@ -114,19 +114,19 @@ export const CreateTeamDialog: Component<{ isOpen: () => boolean, setIsOpen: (op
       <Dialog.Portal>
         <Dialog.Overlay class="fixed inset-0 bg-black/50 z-40"/>
         <div class="fixed inset-0 flex items-center justify-center z-50">
-          <Dialog.Content class="bg-white rounded-xl shadow-xl p-6 w-full max-w-md">
+          <Dialog.Content class="rounded-tile bg-surface-strong text-fg shadow-tile-hover ring-1 ring-line p-6 w-full max-w-md">
             <Dialog.Title class="text-xl font-bold mb-4">Create New Team</Dialog.Title>
-            <Dialog.Description class="text-gray-600 mb-4">
+            <Dialog.Description class="text-fg-muted mb-4">
               Create a new team to collaborate with others on JingleJam schedules.
             </Dialog.Description>
 
             <form onSubmit={handleSubmit} class="flex flex-col gap-4">
               <TextField value={name()} onChange={handleNameChange}>
-                <TextField.Label class="block text-sm font-medium text-gray-700 mb-1">
+                <TextField.Label class="block text-sm font-medium text-fg-muted mb-1">
                   Team Name
                 </TextField.Label>
                 <TextField.Input
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-hidden focus:ring-2 focus:ring-accent"
+                  class="w-full px-3 py-2 border border-line-strong rounded-md focus:outline-hidden focus:ring-2 focus:ring-accent"
                   placeholder="My Awesome Team"
                 />
               </TextField>
@@ -136,12 +136,12 @@ export const CreateTeamDialog: Component<{ isOpen: () => boolean, setIsOpen: (op
                 onChange={handleSlugChange}
                 validationState={slugValid() ? "valid" : "invalid"}
               >
-                <TextField.Label class="block text-sm font-medium text-gray-700 mb-1">
+                <TextField.Label class="block text-sm font-medium text-fg-muted mb-1">
                   Team Slug
                 </TextField.Label>
                 <div class="relative">
                   <TextField.Input
-                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-hidden focus:ring-2 focus:ring-accent"
+                    class="w-full px-3 py-2 border border-line-strong rounded-md focus:outline-hidden focus:ring-2 focus:ring-accent"
                     placeholder="my-awesome-team"
                   />
                   <Show when={isCheckingSlug()}>
@@ -150,7 +150,7 @@ export const CreateTeamDialog: Component<{ isOpen: () => boolean, setIsOpen: (op
                     </div>
                   </Show>
                 </div>
-                <TextField.ErrorMessage class="text-red-500 text-sm mt-1">
+                <TextField.ErrorMessage class="text-danger-500 text-sm mt-1">
                   {slugErrorMessage() || (!slugValid() ? "This slug is not available. Try one of these suggestions:" : undefined)}
                 </TextField.ErrorMessage>
 
@@ -177,13 +177,13 @@ export const CreateTeamDialog: Component<{ isOpen: () => boolean, setIsOpen: (op
                   </div>
                 </Show>
 
-                <p class="text-xs text-gray-500 mt-1">
+                <p class="text-xs text-fg-muted mt-1">
                   This will be used in URLs: jinglejam.ostof.dev/teams/{normalizedSlug() || "your-team-slug"}
                 </p>
               </TextField>
 
               <Show when={createTeamMutation.isError}>
-                <div class="text-red-500 text-sm mt-2">
+                <div class="text-danger-500 text-sm mt-2">
                   {createTeamMutation.failureReason?.message}
                 </div>
               </Show>
@@ -191,7 +191,7 @@ export const CreateTeamDialog: Component<{ isOpen: () => boolean, setIsOpen: (op
               <div class="flex justify-end gap-2 mt-4">
                 <button
                   type="button"
-                  class="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
+                  class="px-4 py-2 border border-line-strong rounded-md hover:bg-surface"
                   onClick={() => props.setIsOpen(false)}
                 >
                   Cancel

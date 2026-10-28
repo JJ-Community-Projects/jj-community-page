@@ -40,7 +40,7 @@ const MemberListItem: Component<MemberListItemProps> = (props) => {
 
   return (
     <>
-      <div class="group flex flex-col gap-4 rounded-xl border-2 bg-white p-2 shadow-md transition-all duration-300 hover:border-primary-100">
+      <div class="rounded-group bg-surface-strong text-fg ring-1 ring-line group flex flex-col gap-4 p-2 transition-colors hover:bg-surface">
         <div class="flex flex-1 items-center gap-3">
           {/* Avatar placeholder */}
           <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-primary-400 to-primary-500 shadow-xs">
@@ -52,7 +52,7 @@ const MemberListItem: Component<MemberListItemProps> = (props) => {
           {/* Member info */}
           <div class="min-w-0 flex-1">
             <div class="flex items-center gap-2">
-              <p class="block truncate text-sm font-semibold text-gray-800">
+              <p class="block truncate text-sm font-semibold text-fg">
                 {props.member.username || 'Unknown User'}
               </p>
               {props.isOwner && (
@@ -105,8 +105,8 @@ const EmptyState = () => (
     <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-linear-to-br from-primary-400 to-primary-500 shadow-lg">
       <FaSolidUsers class="h-8 w-8 text-white" />
     </div>
-    <h4 class="mb-2 text-xl font-semibold text-gray-800">No members yet</h4>
-    <p class="mb-6 max-w-md text-center leading-relaxed text-gray-600">
+    <h4 class="mb-2 text-xl font-semibold text-fg">No members yet</h4>
+    <p class="mb-6 max-w-md text-center leading-relaxed text-fg-muted">
       Your team doesn't have any members yet. Send invitations to other users to
       build your team.
     </p>
@@ -115,9 +115,9 @@ const EmptyState = () => (
 
 const LoadingSkeleton = () => (
   <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-    <div class="h-16 animate-pulse rounded-xl bg-gray-200 shadow-xs"></div>
-    <div class="h-16 animate-pulse rounded-xl bg-gray-200 shadow-xs"></div>
-    <div class="h-16 animate-pulse rounded-xl bg-gray-200 shadow-xs"></div>
+    <div class="h-16 animate-pulse rounded-xl bg-black/10 shadow-xs"></div>
+    <div class="h-16 animate-pulse rounded-xl bg-black/10 shadow-xs"></div>
+    <div class="h-16 animate-pulse rounded-xl bg-black/10 shadow-xs"></div>
   </div>
 )
 
@@ -139,7 +139,7 @@ export const AdminTeamMembersSection: Component = () => {
     <div class="space-y-6">
       {/* Section Header */}
       <div class="flex items-center gap-3">
-        <h4 class="flex items-center gap-2 text-sm font-semibold text-gray-800">
+        <h4 class="flex items-center gap-2 text-sm font-semibold text-fg">
           <FaSolidUsers class="h-4 w-4 text-primary" />
           Team Members
         </h4>

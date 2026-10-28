@@ -87,7 +87,7 @@ const MutationError: Component<{ error: Error | null; fallback: string }> = (
   props,
 ) => (
   <Show when={props.error}>
-    <p class="mt-1 text-sm text-red-500">
+    <p class="mt-1 text-sm text-danger-500">
       {props.error?.message || props.fallback}
     </p>
   </Show>
@@ -149,14 +149,14 @@ const TwitchSocial: Component = () => {
                 href={social()?.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                class="text-purple-600 hover:underline"
+                class="text-twitch-500 hover:underline"
               >
                 {social()?.url}
               </a>
               <button
                 type="button"
                 onClick={() => removeMutation.mutate({ provider: 'twitch' })}
-                class="text-red-500 hover:text-red-700"
+                class="text-danger-500 hover:text-danger-700"
                 disabled={removeMutation.isPending}
               >
                 <FaSolidTrash />
@@ -189,26 +189,26 @@ const TwitchSocial: Component = () => {
               <button
                 type="button"
                 onClick={handleAdd}
-                class="rounded-md bg-purple-600 px-4 py-2 text-white hover:bg-purple-700 disabled:cursor-not-allowed disabled:bg-neutral"
+                class="rounded-md bg-twitch-500 px-4 py-2 text-white hover:bg-twitch-600 disabled:cursor-not-allowed disabled:bg-neutral"
                 disabled={addMutation.isPending || !url()}
               >
                 Add
               </button>
             </div>
-            <TextField.ErrorMessage class="mt-1 text-sm text-red-500">
+            <TextField.ErrorMessage class="mt-1 text-sm text-danger-500">
               {error()}
             </TextField.ErrorMessage>
           </TextField>
         </div>
       </Show>
       <Show when={twitchChannelQuery.isSuccess && twitchChannelQuery.data}>
-        <div class="mt-2 flex items-center rounded-md bg-purple-50 p-3">
+        <div class="mt-2 flex items-center rounded-md bg-twitch-50 p-3">
           <img
             class="mr-2 size-5 rounded-full"
             src={twitchChannelImg()}
             alt={twitchChannel()?.displayName || 'Twitch profile'}
           />
-          <p class="text-purple-600">
+          <p class="text-twitch-500">
             Connected to {twitchChannel()?.displayName}
           </p>
         </div>
@@ -266,14 +266,14 @@ const YouTubeSocial: Component = () => {
                 href={social()?.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                class="text-red-600 hover:underline"
+                class="text-danger-600 hover:underline"
               >
                 {social()?.url}
               </a>
               <button
                 type="button"
                 onClick={() => removeMutation.mutate({ provider: 'youtube' })}
-                class="text-red-500 hover:text-red-700 disabled:cursor-not-allowed disabled:bg-neutral"
+                class="text-danger-500 hover:text-danger-700 disabled:cursor-not-allowed disabled:bg-neutral"
                 disabled={removeMutation.isPending}
               >
                 <FaSolidTrash />
@@ -306,13 +306,13 @@ const YouTubeSocial: Component = () => {
               <button
                 type="button"
                 onClick={handleAdd}
-                class="rounded-md bg-red-600 px-4 py-2 text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:bg-neutral"
+                class="rounded-md bg-danger-600 px-4 py-2 text-white hover:bg-danger-700 disabled:cursor-not-allowed disabled:bg-neutral"
                 disabled={addMutation.isPending || !url()}
               >
                 Add
               </button>
             </div>
-            <TextField.ErrorMessage class="mt-1 text-sm text-red-500">
+            <TextField.ErrorMessage class="mt-1 text-sm text-danger-500">
               {error()}
             </TextField.ErrorMessage>
           </TextField>
@@ -370,14 +370,14 @@ const BlueSkySocial: Component = () => {
                 href={social()?.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                class="text-sky-500 hover:underline"
+                class="text-bluesky-500 hover:underline"
               >
                 {social()?.url}
               </a>
               <button
                 type="button"
                 onClick={() => removeMutation.mutate({ provider: 'bsky' })}
-                class="text-red-500 hover:text-red-700 disabled:cursor-not-allowed disabled:bg-neutral"
+                class="text-danger-500 hover:text-danger-700 disabled:cursor-not-allowed disabled:bg-neutral"
                 disabled={removeMutation.isPending}
               >
                 <FaSolidTrash />
@@ -410,13 +410,13 @@ const BlueSkySocial: Component = () => {
               <button
                 type="button"
                 onClick={handleAdd}
-                class="rounded-md bg-sky-500 px-4 py-2 text-white hover:bg-sky-600 disabled:cursor-not-allowed disabled:bg-neutral"
+                class="rounded-md bg-bluesky-500 px-4 py-2 text-white hover:bg-bluesky-500 disabled:cursor-not-allowed disabled:bg-neutral"
                 disabled={addMutation.isPending || !url()}
               >
                 Add
               </button>
             </div>
-            <TextField.ErrorMessage class="mt-1 text-sm text-red-500">
+            <TextField.ErrorMessage class="mt-1 text-sm text-danger-500">
               {error()}
             </TextField.ErrorMessage>
           </TextField>
@@ -474,14 +474,14 @@ const TwitterSocial: Component = () => {
                 href={social()?.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                class="text-blue-500 hover:underline"
+                class="text-accent-500 hover:underline"
               >
                 {social()?.url}
               </a>
               <button
                 type="button"
                 onClick={() => removeMutation.mutate({ provider: 'twitter' })}
-                class="text-red-500 hover:text-red-700 disabled:cursor-not-allowed disabled:bg-neutral"
+                class="text-danger-500 hover:text-danger-700 disabled:cursor-not-allowed disabled:bg-neutral"
                 disabled={removeMutation.isPending}
               >
                 <FaSolidTrash />
@@ -514,13 +514,13 @@ const TwitterSocial: Component = () => {
               <button
                 type="button"
                 onClick={handleAdd}
-                class="rounded-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 disabled:cursor-not-allowed disabled:bg-neutral"
+                class="rounded-md bg-accent-500 px-4 py-2 text-white hover:bg-accent-600 disabled:cursor-not-allowed disabled:bg-neutral"
                 disabled={addMutation.isPending || !url()}
               >
                 Add
               </button>
             </div>
-            <TextField.ErrorMessage class="mt-1 text-sm text-red-500">
+            <TextField.ErrorMessage class="mt-1 text-sm text-danger-500">
               {error()}
             </TextField.ErrorMessage>
           </TextField>
@@ -578,14 +578,14 @@ const TikTokSocial: Component = () => {
                 href={social()?.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                class="text-black hover:underline"
+                class="text-fg hover:underline"
               >
                 {social()?.url}
               </a>
               <button
                 type="button"
                 onClick={() => removeMutation.mutate({ provider: 'tiktok' })}
-                class="text-red-500 hover:text-red-700 disabled:cursor-not-allowed disabled:bg-neutral"
+                class="text-danger-500 hover:text-danger-700 disabled:cursor-not-allowed disabled:bg-neutral"
                 disabled={removeMutation.isPending}
               >
                 <FaSolidTrash />
@@ -618,13 +618,13 @@ const TikTokSocial: Component = () => {
               <button
                 type="button"
                 onClick={handleAdd}
-                class="rounded-md bg-black px-4 py-2 text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-neutral"
+                class="rounded-md bg-black px-4 py-2 text-white hover:bg-fg disabled:cursor-not-allowed disabled:bg-neutral"
                 disabled={addMutation.isPending || !url()}
               >
                 Add
               </button>
             </div>
-            <TextField.ErrorMessage class="mt-1 text-sm text-red-500">
+            <TextField.ErrorMessage class="mt-1 text-sm text-danger-500">
               {error()}
             </TextField.ErrorMessage>
           </TextField>
@@ -682,14 +682,14 @@ const InstagramSocial: Component = () => {
                 href={social()?.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                class="text-pink-600 hover:underline"
+                class="text-instagram-500 hover:underline"
               >
                 {social()?.url}
               </a>
               <button
                 type="button"
                 onClick={() => removeMutation.mutate({ provider: 'instagram' })}
-                class="text-red-500 hover:text-red-700 disabled:cursor-not-allowed disabled:bg-neutral"
+                class="text-danger-500 hover:text-danger-700 disabled:cursor-not-allowed disabled:bg-neutral"
                 disabled={removeMutation.isPending}
               >
                 <FaSolidTrash />
@@ -722,13 +722,13 @@ const InstagramSocial: Component = () => {
               <button
                 type="button"
                 onClick={handleAdd}
-                class="rounded-md bg-pink-600 px-4 py-2 text-white hover:bg-pink-700 disabled:cursor-not-allowed disabled:bg-neutral"
+                class="rounded-md bg-instagram-500 px-4 py-2 text-white hover:bg-instagram-600 disabled:cursor-not-allowed disabled:bg-neutral"
                 disabled={addMutation.isPending || !url()}
               >
                 Add
               </button>
             </div>
-            <TextField.ErrorMessage class="mt-1 text-sm text-red-500">
+            <TextField.ErrorMessage class="mt-1 text-sm text-danger-500">
               {error()}
             </TextField.ErrorMessage>
           </TextField>
@@ -743,7 +743,7 @@ export const UserSocialsSection: Component = () => {
   const { importFromTiltify } = useHook()
 
   return (
-    <div class="bg-white p-6">
+    <div class="rounded-tile bg-linear-to-b from-surface to-surface-2 text-fg shadow-tile ring-1 ring-line p-4 sm:p-6">
       <div class="mb-4 flex flex-col items-end">
         <button
           type="button"

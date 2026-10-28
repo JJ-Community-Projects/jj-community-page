@@ -25,7 +25,7 @@ import {AdminTeamHeader} from "./AdminTeamHeader.tsx";
 export const AdminTeamSection: Component = () => {
 
   return (
-    <div class="bg-white/95 backdrop-blur-lg rounded-2xl shadow-xl border border-white/20 overflow-hidden">
+    <div class="rounded-tile bg-linear-to-b from-surface to-surface-2 text-fg shadow-tile ring-1 ring-line overflow-hidden">
       <div class="fl-p-4/8 space-y-6">
 
         {/* Team Information Header */}

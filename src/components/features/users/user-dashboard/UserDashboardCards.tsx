@@ -19,32 +19,29 @@ const ScheduleCard: Component = () => {
   return (
     <a
       href={`/dashboard/schedules`}
-      class="group relative transform overflow-hidden rounded-xl border-2 border-accent-100 bg-white px-4 py-3 shadow-md transition-all duration-300 ease-out hover:border-accent-200 hover:shadow-lg focus:ring-2 focus:ring-accent focus:ring-offset-2 active:scale-[0.98]"
+      class="rounded-tile from-surface to-surface-2 text-fg shadow-tile ring-line hover:shadow-tile-hover group focus:ring-accent relative overflow-hidden bg-linear-to-b px-4 py-3 ring-1 transition-all duration-200 hover:brightness-105 focus:ring-2 focus:ring-offset-2 active:scale-[0.98]"
     >
       <div class="flex h-full flex-col">
         <div class="mb-2 flex items-center gap-2">
-          <FaSolidCalendarDays class="h-5 w-5 text-accent-600" />
-          <h3 class="font-bold text-neutral-800 fl-text-lg/xl">
-            Schedules
-          </h3>
+          <FaSolidCalendarDays class="text-accent-600 h-5 w-5" />
+          <h2 class="text-fg text-base font-semibold">Schedules</h2>
         </div>
-        <p class="mb-4 text-neutral-600 fl-text-sm/base">
+        <p class="text-fg-muted mb-4 text-sm">
           Manage your streaming schedules for JingleJam
         </p>
         <Show when={showWarning()}>
           <div class="mb-2 flex flex-col items-start justify-start gap-2">
-            <span class="rounded-full bg-warning px-2 py-1 text-sm font-medium text-white">
+            <span class="bg-warning rounded-full px-2 py-1 text-sm font-medium text-white">
               Warning
             </span>
-            <p class="text-warning-600 fl-text-sm/base">
-              Please check if your schedule is setup correctly. If you have any issues, please contact @Ostof on Discord.
+            <p class="text-warning-600 text-sm">
+              Please check if your schedule is setup correctly. If you have any
+              issues, please contact @Ostof on Discord.
             </p>
           </div>
         </Show>
         <div class="mt-auto">
-          <span class="font-medium text-accent-600">
-            View Schedules →
-          </span>
+          <span class="text-accent-600 font-medium">View Schedules →</span>
         </div>
       </div>
     </a>
@@ -76,32 +73,28 @@ const TeamCard: Component = () => {
   return (
     <a
       href={`/dashboard/teams`}
-      class="group relative transform overflow-hidden rounded-xl border-2 border-accent-100 bg-white px-4 py-3 shadow-md transition-all duration-300 ease-out hover:border-accent-200 hover:shadow-lg focus:ring-2 focus:ring-accent focus:ring-offset-2 active:scale-[0.98]"
+      class="rounded-tile from-surface to-surface-2 text-fg shadow-tile ring-line hover:shadow-tile-hover group focus:ring-accent relative overflow-hidden bg-linear-to-b px-4 py-3 ring-1 transition-all duration-200 hover:brightness-105 focus:ring-2 focus:ring-offset-2 active:scale-[0.98]"
     >
       <div class="flex h-full flex-col">
         <div class="mb-2 flex items-center justify-between gap-2">
           <div class="flex items-center gap-2">
-            <FaSolidUserGroup class="h-5 w-5 text-accent-600" />
-            <h3 class="font-bold text-neutral-800 fl-text-lg/xl">
-              Teams
-            </h3>
+            <FaSolidUserGroup class="text-accent-600 h-5 w-5" />
+            <h2 class="text-fg text-base font-semibold">Teams</h2>
           </div>
           <Show when={hasInvites()}>
             <span class="relative flex size-5">
-              <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary-400 opacity-75"></span>
-              <span class="relative inline-flex size-5 items-center justify-center rounded-full bg-primary text-xs text-white">
+              <span class="bg-primary-400 absolute inline-flex h-full w-full animate-ping rounded-full opacity-75"></span>
+              <span class="bg-primary relative inline-flex size-5 items-center justify-center rounded-full text-xs text-white">
                 {counterText()}
               </span>
             </span>
           </Show>
         </div>
-        <p class="mb-4 text-neutral-600 fl-text-sm/base">
+        <p class="text-fg-muted mb-4 text-sm">
           Manage your teams and team invitations
         </p>
         <div class="mt-auto flex items-center justify-between">
-          <span class="font-medium text-accent-600">
-            View Teams →
-          </span>
+          <span class="text-accent-600 font-medium">View Teams →</span>
         </div>
       </div>
     </a>
@@ -112,22 +105,18 @@ const TagsCard: Component = () => {
   return (
     <a
       href={`/dashboard/tags`}
-      class="group relative transform overflow-hidden rounded-xl border-2 border-accent-100 bg-white px-4 py-3 shadow-md transition-all duration-300 ease-out hover:border-accent-200 hover:shadow-lg focus:ring-2 focus:ring-accent focus:ring-offset-2 active:scale-[0.98]"
+      class="rounded-tile from-surface to-surface-2 text-fg shadow-tile ring-line hover:shadow-tile-hover group focus:ring-accent relative overflow-hidden bg-linear-to-b px-4 py-3 ring-1 transition-all duration-200 hover:brightness-105 focus:ring-2 focus:ring-offset-2 active:scale-[0.98]"
     >
       <div class="flex h-full flex-col">
         <div class="mb-2 flex items-center gap-2">
-          <FaSolidTag class="h-5 w-5 text-accent-600" />
-          <h3 class="font-bold text-neutral-800 fl-text-lg/xl">
-            Tags
-          </h3>
+          <FaSolidTag class="text-accent-600 h-5 w-5" />
+          <h2 class="text-fg text-base font-semibold">Tags</h2>
         </div>
-        <p class="mb-4 text-neutral-600 fl-text-sm/base">
+        <p class="text-fg-muted mb-4 text-sm">
           Manage your profile tags and interests
         </p>
         <div class="mt-auto">
-          <span class="font-medium text-accent-600">
-            Manage Tags →
-          </span>
+          <span class="text-accent-600 font-medium">Manage Tags →</span>
         </div>
       </div>
     </a>
@@ -138,22 +127,16 @@ const PrefsCard: Component = () => {
   return (
     <a
       href={`/dashboard/preferences`}
-      class="group relative transform overflow-hidden rounded-xl border-2 border-accent-100 bg-white px-4 py-3 shadow-md transition-all duration-300 ease-out hover:border-accent-200 hover:shadow-lg focus:ring-2 focus:ring-accent focus:ring-offset-2 active:scale-[0.98]"
+      class="rounded-tile from-surface to-surface-2 text-fg shadow-tile ring-line hover:shadow-tile-hover group focus:ring-accent relative overflow-hidden bg-linear-to-b px-4 py-3 ring-1 transition-all duration-200 hover:brightness-105 focus:ring-2 focus:ring-offset-2 active:scale-[0.98]"
     >
       <div class="flex h-full flex-col">
         <div class="mb-2 flex items-center gap-2">
-          <FaRegularPenToSquare class="h-5 w-5 text-accent-600" />
-          <h3 class="font-bold text-neutral-800 fl-text-lg/xl">
-            Preferences
-          </h3>
+          <FaRegularPenToSquare class="text-accent-600 h-5 w-5" />
+          <h2 class="text-fg text-base font-semibold">Preferences</h2>
         </div>
-        <p class="mb-4 text-neutral-600 fl-text-sm/base">
-          Manage your Socials and Style
-        </p>
+        <p class="text-fg-muted mb-4 text-sm">Manage your Socials and Style</p>
         <div class="mt-auto">
-          <span class="font-medium text-accent-600">
-            Manage Preferences →
-          </span>
+          <span class="text-accent-600 font-medium">Manage Preferences →</span>
         </div>
       </div>
     </a>
@@ -185,32 +168,28 @@ const FriendsCard: Component = () => {
   return (
     <a
       href={`/dashboard/friends`}
-      class="group relative transform overflow-hidden rounded-xl border-2 border-accent-100 bg-white px-4 py-3 shadow-md transition-all duration-300 ease-out hover:border-accent-200 hover:shadow-lg focus:ring-2 focus:ring-accent focus:ring-offset-2 active:scale-[0.98]"
+      class="rounded-tile from-surface to-surface-2 text-fg shadow-tile ring-line hover:shadow-tile-hover group focus:ring-accent relative overflow-hidden bg-linear-to-b px-4 py-3 ring-1 transition-all duration-200 hover:brightness-105 focus:ring-2 focus:ring-offset-2 active:scale-[0.98]"
     >
       <div class="flex h-full flex-col">
         <div class="mb-2 flex items-center justify-between gap-2">
           <div class="flex items-center gap-2">
-            <FaSolidUser class="h-5 w-5 text-accent-600" />
-            <h3 class="font-bold text-neutral-800 fl-text-lg/xl">
-              Friends
-            </h3>
+            <FaSolidUser class="text-accent-600 h-5 w-5" />
+            <h2 class="text-fg text-base font-semibold">Friends</h2>
           </div>
           <Show when={hasRequests()}>
             <span class="relative flex size-5">
-              <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary-400 opacity-75"></span>
-              <span class="relative inline-flex size-5 items-center justify-center rounded-full bg-primary text-xs text-white">
+              <span class="bg-primary-400 absolute inline-flex h-full w-full animate-ping rounded-full opacity-75"></span>
+              <span class="bg-primary relative inline-flex size-5 items-center justify-center rounded-full text-xs text-white">
                 {counterText()}
               </span>
             </span>
           </Show>
         </div>
-        <p class="mb-4 text-neutral-600 fl-text-sm/base">
+        <p class="text-fg-muted mb-4 text-sm">
           Manage your friends and friend requests
         </p>
         <div class="mt-auto flex items-center justify-between">
-          <span class="font-medium text-accent-600">
-            Manage Friends →
-          </span>
+          <span class="text-accent-600 font-medium">Manage Friends →</span>
         </div>
       </div>
     </a>
@@ -239,24 +218,18 @@ const BlockedCard: Component = () => {
   return (
     <a
       href={`/dashboard/block`}
-      class="rounded-xl border-2 border-danger-200 bg-white p-4 shadow-md transition-all duration-300 focus:ring-2 focus:ring-danger focus:ring-offset-2"
+      class="rounded-tile from-surface to-surface-2 text-fg shadow-tile ring-line hover:shadow-tile-hover focus:ring-danger bg-linear-to-b p-4 ring-1 transition-all duration-200 hover:brightness-105 focus:ring-2 focus:ring-offset-2"
     >
       <div class="flex h-full flex-col">
         <div class="mb-2 flex items-center gap-2">
-          <FaSolidUserSlash class="h-5 w-5 text-danger-600" />
-          <h3 class="mb-2 font-bold text-neutral-800 fl-text-lg/xl">
-            Blocked Users
-          </h3>
+          <FaSolidUserSlash class="text-danger-600 h-5 w-5" />
+          <h2 class="text-fg mb-2 text-base font-semibold">Blocked Users</h2>
         </div>
-        <p class="mb-4 text-neutral-600 fl-text-sm/base">
-          Manage your blocked users list
-        </p>
+        <p class="text-fg-muted mb-4 text-sm">Manage your blocked users list</p>
         <div class="mt-auto flex items-center justify-between">
-          <span class="font-medium text-danger-600">
-            Manage Blocks →
-          </span>
+          <span class="text-danger-600 font-medium">Manage Blocks →</span>
           <Show when={hasBlockedUsers()}>
-            <span class="rounded-full bg-danger px-2 py-1 text-sm font-medium text-white">
+            <span class="bg-danger rounded-full px-2 py-1 text-sm font-medium text-white">
               {counterText()}
             </span>
           </Show>
@@ -268,7 +241,7 @@ const BlockedCard: Component = () => {
 
 export const UserDashboardCards: Component = () => {
   return (
-    <div class="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 lg:grid-cols-3 xl:grid-cols-4">
+    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
       <PrefsCard />
 
       <TagsCard />

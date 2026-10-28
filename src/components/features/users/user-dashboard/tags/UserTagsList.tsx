@@ -7,8 +7,8 @@ const EmptyState = () => (
     <div class="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-linear-to-br from-primary-500 to-primary-600 shadow-sm">
       <FaSolidTag class="h-6 w-6 text-white" />
     </div>
-    <h3 class="mb-1 text-lg font-semibold text-gray-800">No tags added yet</h3>
-    <p class="max-w-md text-center text-sm leading-relaxed text-gray-600">
+    <h3 class="mb-1 text-lg font-semibold text-fg">No tags added yet</h3>
+    <p class="max-w-md text-center text-sm leading-relaxed text-fg-muted">
       Start building your profile by selecting tags that represent your
       interests, games, or causes. This helps viewers discover and connect with
       your content.
@@ -18,9 +18,9 @@ const EmptyState = () => (
 
 const LoadingSkeleton = () => (
   <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-    <div class="h-16 animate-pulse rounded-xl bg-neutral-200 shadow-xs"></div>
-    <div class="h-16 animate-pulse rounded-xl bg-neutral-200 shadow-xs"></div>
-    <div class="h-16 animate-pulse rounded-xl bg-neutral-200 shadow-xs"></div>
+    <div class="h-16 animate-pulse rounded-xl bg-black/10 shadow-xs"></div>
+    <div class="h-16 animate-pulse rounded-xl bg-black/10 shadow-xs"></div>
+    <div class="h-16 animate-pulse rounded-xl bg-black/10 shadow-xs"></div>
   </div>
 )
 
@@ -46,7 +46,7 @@ export const UserTagsList: Component = () => {
   return (
     <div class="mt-6">
       <div class="mb-4 flex items-center gap-3">
-        <h3 class="flex items-center gap-2 text-sm font-semibold text-gray-800">
+        <h3 class="flex items-center gap-2 text-sm font-semibold text-fg">
           <FaSolidUser class="h-4 w-4 text-primary" />
           <Show when={canAddTagToUser.data} fallback={<>Your Tags</>}>
             {(data) => (
@@ -86,7 +86,7 @@ export const UserTagsList: Component = () => {
             <For each={userTags()}>
               {(userTag) => (
                 <div
-                  class="group relative flex items-center rounded-xl border-2 bg-white p-4 shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg"
+                  class="rounded-group bg-surface-strong text-fg ring-1 ring-line group relative flex items-center p-4 transition-colors hover:bg-surface"
                   style={{
                     'border-color': userTag.tag.color,
                     background: `linear-gradient(135deg, ${userTag.tag.color}08, ${userTag.tag.color}15)`,
@@ -101,11 +101,11 @@ export const UserTagsList: Component = () => {
 
                     {/* Tag info */}
                     <div class="min-w-0 flex-1">
-                      <span class="block truncate text-sm font-semibold text-gray-800">
+                      <span class="block truncate text-sm font-semibold text-fg">
                         {userTag.tag.name}
                       </span>
                       {userTag.tag.description && (
-                        <span class="block truncate text-xs text-gray-600 opacity-80">
+                        <span class="block truncate text-xs text-fg-muted opacity-80">
                           {userTag.tag.description}
                         </span>
                       )}

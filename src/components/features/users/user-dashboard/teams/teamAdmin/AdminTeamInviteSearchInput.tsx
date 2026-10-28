@@ -44,7 +44,7 @@ export const AdminTeamInviteSearchInput: Component = () => {
   return (
     <div class="space-y-4">
       <div class="flex items-center gap-2 mb-3">
-        <h4 class="text-sm font-semibold text-gray-800 flex items-center gap-2">
+        <h4 class="text-sm font-semibold text-fg flex items-center gap-2">
           <FaSolidUserPlus class="w-4 h-4 text-accent"/>
           Invite Users
         </h4>
@@ -56,21 +56,14 @@ export const AdminTeamInviteSearchInput: Component = () => {
           {(isLoadingSearch() || userSearch.searchInput().length > 0) && userSearch.searchInput().length > 0 ? (
             <div class="w-5 h-5 border-2 border-accent border-t-transparent rounded-full animate-spin"></div>
           ) : (
-            <FaSolidMagnifyingGlass class="w-5 h-5 text-gray-400 transition-colors duration-200"/>
+            <FaSolidMagnifyingGlass class="w-5 h-5 text-fg-muted transition-colors duration-200"/>
           )}
         </div>
 
         {/* Search input */}
         <input
           type="text"
-          class="
-            w-full pl-12 pr-12 py-3 rounded-xl border-2 border-gray-200
-            focus:border-accent focus:ring-4 focus:ring-accent/20
-            transition-all duration-300 outline-hidden
-            bg-white/50 backdrop-blur-xs hover:bg-white/70
-            placeholder-gray-500 text-gray-800 font-medium
-            shadow-xs hover:shadow-md focus:shadow-lg
-          "
+          class="w-full pl-12 pr-12 py-3 rounded-xl border-2 border-line focus:border-accent focus:ring-4 focus:ring-accent/20 transition-all duration-300 outline-hidden bg-white/50 backdrop-blur-xs hover:bg-white/70 placeholder:text-fg-muted text-fg font-medium shadow-xs hover:shadow-md focus:shadow-lg"
           placeholder="Search for users to invite..."
           value={userSearch.searchInput()}
           onInput={handleInput}
@@ -82,12 +75,7 @@ export const AdminTeamInviteSearchInput: Component = () => {
           <button
             type="button"
             onClick={clearSearch}
-            class="
-              absolute inset-y-0 right-0 pr-4 flex items-center
-              text-gray-400 hover:text-gray-600 transition-colors duration-200
-              focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-white
-              outline-hidden rounded-full p-1
-            "
+            class="absolute inset-y-0 right-0 pr-4 flex items-center text-fg-muted hover:text-fg-muted transition-colors duration-200 focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-white outline-hidden rounded-full p-1"
             aria-label="Clear search"
           >
             <FaSolidXmark class="w-5 h-5"/>
@@ -116,14 +104,14 @@ export const AdminTeamInviteSearchInput: Component = () => {
 
       {/* Search Results */}
       <Show when={searchResults().length > 0}>
-        <div class="bg-white rounded-xl border border-gray-200 shadow-xs max-h-60 overflow-y-auto">
-          <div class="p-3 border-b border-gray-200">
-            <p class="text-sm font-medium text-gray-700">Search Results</p>
+        <div class="bg-white rounded-xl border border-line shadow-xs max-h-60 overflow-y-auto">
+          <div class="p-3 border-b border-line">
+            <p class="text-sm font-medium text-fg-muted">Search Results</p>
           </div>
-          <div class="divide-y divide-gray-100">
+          <div class="divide-y divide-line">
             <For each={searchResults()}>
               {(result) => (
-                <div class="p-3 hover:bg-gray-50 transition-colors duration-150">
+                <div class="p-3 hover:bg-surface transition-colors duration-150">
                   <div class="flex items-center justify-between">
                     <div class="flex items-center gap-3">
                       {/* Avatar placeholder */}
@@ -136,11 +124,11 @@ export const AdminTeamInviteSearchInput: Component = () => {
 
                       {/* User info */}
                       <div class="min-w-0">
-                        <p class="font-medium text-gray-800 text-sm truncate">
+                        <p class="font-medium text-fg text-sm truncate">
                           {result.tiltifyUsername || 'Unknown User'}
                         </p>
                         {result.twitchUsername && (
-                          <p class="text-xs text-gray-600 truncate">
+                          <p class="text-xs text-fg-muted truncate">
                             Twitch: {result.twitchUsername}
                           </p>
                         )}
@@ -149,14 +137,7 @@ export const AdminTeamInviteSearchInput: Component = () => {
 
                     {/* Invite button */}
                     <button
-                      class="
-                        flex items-center gap-2 px-3 py-1.5 rounded-lg transition-all duration-200
-                        bg-accent-50 hover:bg-accent-100 text-accent-700 hover:text-accent-800
-                        border border-accent-200 hover:border-accent-300
-                        focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-white
-                        outline-hidden hover:shadow-xs active:scale-95
-                        disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium
-                      "
+                      class="flex items-center gap-2 px-3 py-1.5 rounded-lg transition-all duration-200 bg-accent-50 hover:bg-accent-100 text-accent-700 hover:text-accent-800 border border-accent-200 hover:border-accent-300 focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-white outline-hidden hover:shadow-xs active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
                       onClick={() => handleInvite(result.userId)}
                       disabled={inviteUserMutation.isPending}
                       aria-label={`Invite ${result.tiltifyUsername} to team`}
@@ -184,8 +165,8 @@ export const AdminTeamInviteSearchInput: Component = () => {
 
       {/* Helper text */}
       <div class="flex items-start gap-2">
-        <FaSolidCircleInfo class="w-3 h-3 text-gray-400 mt-0.5 shrink-0"/>
-        <div class="text-xs text-gray-500 space-y-1">
+        <FaSolidCircleInfo class="w-3 h-3 text-fg-muted mt-0.5 shrink-0"/>
+        <div class="text-xs text-fg-muted space-y-1">
           <p>Search for users by their username to send team invitations.</p>
           {userSearch.searchInput().length > 0 && (
             <p class="text-accent-600 font-medium">

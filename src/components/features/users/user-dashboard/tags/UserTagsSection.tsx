@@ -6,9 +6,9 @@ import { CategoryTagsList } from './CategoryTagsList.tsx'
 
 export const UserTagsSection: Component = () => {
   return (
-    <div class="overflow-visible rounded-2xl border border-white/20 bg-white/95 shadow-xl backdrop-blur-lg">
+    <div class="rounded-tile bg-linear-to-b from-surface to-surface-2 text-fg shadow-tile ring-1 ring-line overflow-visible">
       <div class="space-y-6 fl-p-4/8">
-        <div class="relative space-y-4 px-6 pb-6 leading-relaxed text-gray-700 fl-text-sm/base">
+        <div class="relative space-y-4 px-6 pb-6 leading-relaxed text-fg-muted fl-text-sm/base">
           <div class="rounded-xl border border-accent/20 bg-linear-to-br from-white to-accent/5 p-5 shadow-xs ring-1 ring-black/5">
             <ul class="list-disc space-y-1 pl-6 marker:text-accent-600">
               <li>

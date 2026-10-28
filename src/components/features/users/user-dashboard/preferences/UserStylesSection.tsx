@@ -74,7 +74,7 @@ export const UserStyle: Component<UserStyleProps> = (props) => {
   }
 
   return (
-    <div class="mb-6 rounded-2xl bg-white p-6 shadow-xl">
+    <div class="rounded-tile bg-linear-to-b from-surface to-surface-2 text-fg shadow-tile ring-1 ring-line p-4 sm:p-6">
       <div class="mb-4 flex items-center justify-between">
         <h3 class="text-xl font-bold">User Style</h3>
         <button
@@ -89,14 +89,14 @@ export const UserStyle: Component<UserStyleProps> = (props) => {
 
       {/* Error Message */}
       <Show when={updateStyle.isError}>
-        <div class="mb-4 rounded-md bg-red-100 p-3 text-red-800">
+        <div class="mb-4 rounded-md bg-danger-100 p-3 text-danger-800">
           Error: {updateStyle.error?.message}
         </div>
       </Show>
 
       {/* Current Colors Display */}
       <div class="mt-4">
-        <p class="mb-2 text-sm font-medium text-gray-700">Your Colors:</p>
+        <p class="mb-2 text-sm font-medium text-fg-muted">Your Colors:</p>
         <div class="flex gap-4">
           <div class="flex flex-col items-center">
             <div
@@ -104,7 +104,7 @@ export const UserStyle: Component<UserStyleProps> = (props) => {
               style={{ 'background-color': primaryColor() }}
             ></div>
             <span class="mt-1 text-sm">Primary</span>
-            <span class="text-xs text-gray-500">{primaryColor()}</span>
+            <span class="text-xs text-fg-muted">{primaryColor()}</span>
           </div>
           <div class="flex flex-col items-center">
             <div
@@ -112,7 +112,7 @@ export const UserStyle: Component<UserStyleProps> = (props) => {
               style={{ 'background-color': accentColor() }}
             ></div>
             <span class="mt-1 text-sm">Accent</span>
-            <span class="text-xs text-gray-500">{accentColor()}</span>
+            <span class="text-xs text-fg-muted">{accentColor()}</span>
           </div>
         </div>
       </div>
@@ -122,17 +122,17 @@ export const UserStyle: Component<UserStyleProps> = (props) => {
         <Dialog.Portal>
           <Dialog.Overlay class="fixed inset-0 z-40 bg-black/50" />
           <div class="fixed inset-0 z-50 flex items-center justify-center">
-            <Dialog.Content class="w-full max-w-md rounded-xl bg-white p-6 shadow-xl">
+            <Dialog.Content class="rounded-tile bg-surface-strong text-fg shadow-tile-hover ring-1 ring-line w-full max-w-md p-6">
               <Dialog.Title class="mb-4 text-xl font-bold">
                 Edit Your Colors
               </Dialog.Title>
-              <Dialog.Description class="mb-4 text-gray-600">
+              <Dialog.Description class="mb-4 text-fg-muted">
                 Choose your primary and accent colors for your profile.
               </Dialog.Description>
 
               <div class="space-y-4">
                 <TextField value={primaryColor()} onChange={setPrimaryColor}>
-                  <TextField.Label class="mb-1 block text-sm font-medium text-gray-700">
+                  <TextField.Label class="mb-1 block text-sm font-medium text-fg-muted">
                     Primary Color
                   </TextField.Label>
                   <div class="flex items-center gap-2">
@@ -141,18 +141,18 @@ export const UserStyle: Component<UserStyleProps> = (props) => {
                       style={{ 'background-color': primaryColor() }}
                     ></div>
                     <TextField.Input
-                      class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-hidden focus:ring-2 focus:ring-accent"
+                      class="w-full rounded-md border border-line-strong px-3 py-2 focus:outline-hidden focus:ring-2 focus:ring-accent"
                       placeholder="#E30E50"
                       type="color"
                     />
                   </div>
-                  <TextField.Description class="mt-1 text-sm text-gray-500">
+                  <TextField.Description class="mt-1 text-sm text-fg-muted">
                     This color will be used as your primary brand color.
                   </TextField.Description>
                 </TextField>
 
                 <TextField value={accentColor()} onChange={setAccentColor}>
-                  <TextField.Label class="mb-1 block text-sm font-medium text-gray-700">
+                  <TextField.Label class="mb-1 block text-sm font-medium text-fg-muted">
                     Accent Color
                   </TextField.Label>
                   <div class="flex items-center gap-2">
@@ -161,12 +161,12 @@ export const UserStyle: Component<UserStyleProps> = (props) => {
                       style={{ 'background-color': accentColor() }}
                     ></div>
                     <TextField.Input
-                      class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-hidden focus:ring-2 focus:ring-accent"
+                      class="w-full rounded-md border border-line-strong px-3 py-2 focus:outline-hidden focus:ring-2 focus:ring-accent"
                       placeholder="#3584BF"
                       type="color"
                     />
                   </div>
-                  <TextField.Description class="mt-1 text-sm text-gray-500">
+                  <TextField.Description class="mt-1 text-sm text-fg-muted">
                     This color will be used as your accent color for highlights
                     and secondary elements.
                   </TextField.Description>
@@ -176,7 +176,7 @@ export const UserStyle: Component<UserStyleProps> = (props) => {
               <div class="mt-6 flex justify-end gap-2">
                 <button
                   type="button"
-                  class="rounded-md border border-gray-300 px-4 py-2 hover:bg-gray-50"
+                  class="rounded-md border border-line-strong px-4 py-2 hover:bg-surface"
                   onClick={() => onOpenChange(false)}
                   disabled={updateStyle.isPending}
                 >
@@ -184,7 +184,7 @@ export const UserStyle: Component<UserStyleProps> = (props) => {
                 </button>
                 <button
                   type="button"
-                  class="rounded-md border border-gray-300 px-4 py-2 hover:bg-gray-50"
+                  class="rounded-md border border-line-strong px-4 py-2 hover:bg-surface"
                   onClick={handleResetColors}
                   disabled={updateStyle.isPending}
                 >
@@ -202,7 +202,7 @@ export const UserStyle: Component<UserStyleProps> = (props) => {
 
               {/* Error Message */}
               <Show when={updateStyle.isError}>
-                <div class="mt-4 rounded-md bg-red-100 p-3 text-sm text-red-800">
+                <div class="mt-4 rounded-md bg-danger-100 p-3 text-sm text-danger-800">
                   Error: {updateStyle.error?.message}
                 </div>
               </Show>

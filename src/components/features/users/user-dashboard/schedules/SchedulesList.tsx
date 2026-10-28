@@ -1,5 +1,9 @@
 import { type Component, createSignal, For, Show } from 'solid-js'
-import { QueryClientProvider, useMutation, useQueryClient, } from '@tanstack/solid-query'
+import {
+  QueryClientProvider,
+  useMutation,
+  useQueryClient,
+} from '@tanstack/solid-query'
 import { orpcPrivate } from '../../../../../lib/orpc/client.ts'
 import type { User } from '../../../../../lib/auth/User.ts'
 import { Dialog } from '@kobalte/core/dialog'
@@ -35,7 +39,7 @@ const SchedulesListContent: Component<{ user: User }> = (props) => {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = createSignal(false)
 
   return (
-    <div class="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-8">
+    <div class="flex flex-col gap-3">
       <ScheduleHeader
         schedules={schedulesQuery.data ?? []}
         onAddSchedule={() => setIsCreateDialogOpen(true)}
@@ -44,20 +48,20 @@ const SchedulesListContent: Component<{ user: User }> = (props) => {
       <Show
         when={schedulesQuery.data && schedulesQuery.data.length > 0}
         fallback={
-          <div class="rounded-xl border-2 border-accent-100 bg-white p-8 text-center shadow-md">
+          <div class="rounded-tile from-surface to-surface-2 text-fg shadow-tile ring-line bg-linear-to-b p-8 text-center ring-1">
             <Show when={schedulesQuery.isLoading}>
               <div class="flex flex-col items-center gap-4">
-                <div class="h-8 w-8 animate-spin rounded-full border-2 border-accent border-t-transparent"></div>
-                <p class="font-medium text-gray-600">
+                <div class="border-accent h-8 w-8 animate-spin rounded-full border-2 border-t-transparent"></div>
+                <p class="text-fg-muted font-medium">
                   Loading your schedules...
                 </p>
               </div>
             </Show>
             <Show when={!schedulesQuery.isLoading}>
               <div class="flex flex-col items-center gap-6">
-                <div class="flex h-16 w-16 items-center justify-center rounded-full bg-accent-100">
+                <div class="bg-accent-100 flex h-16 w-16 items-center justify-center rounded-full">
                   <svg
-                    class="h-8 w-8 text-accent-600"
+                    class="text-accent-600 h-8 w-8"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -71,16 +75,16 @@ const SchedulesListContent: Component<{ user: User }> = (props) => {
                   </svg>
                 </div>
                 <div class="space-y-2">
-                  <h3 class="font-bold text-gray-800 fl-text-lg/xl">
+                  <h3 class="text-fg fl-text-lg/xl font-bold">
                     No Schedules found
                   </h3>
-                  <p class="mx-auto max-w-md leading-relaxed text-gray-600">
+                  <p class="text-fg-muted mx-auto max-w-md leading-relaxed">
                     Create your first schedule.
                   </p>
                 </div>
                 <button
                   onClick={() => setIsCreateDialogOpen(true)}
-                  class="transform rounded-lg bg-accent px-6 py-3 font-medium text-white shadow-xs transition-all duration-200 hover:bg-accent-600 hover:shadow-md focus:ring-2 focus:ring-accent focus:ring-offset-2 active:scale-95"
+                  class="bg-accent hover:bg-accent-600 focus:ring-accent transform rounded-lg px-6 py-3 font-medium text-white shadow-xs transition-all duration-200 hover:shadow-md focus:ring-2 focus:ring-offset-2 active:scale-95"
                 >
                   Create Your First Schedule
                 </button>
@@ -121,38 +125,34 @@ const SchedulesListItem: Component<{
   }
 }> = (props) => {
   return (
-    <div class="group rounded-xl border-2 border-primary-200 bg-white p-6 shadow-md transition-all duration-300">
+    <div class="rounded-tile from-surface to-surface-2 text-fg shadow-tile ring-line group bg-linear-to-b p-6 ring-1">
       {/* Status badges */}
       <div class="mb-3 flex items-center gap-2">
         <Show when={props.schedule.primary}>
-          <span class="rounded-full bg-accent-100 px-2 py-1 text-xs font-medium text-accent-700">
+          <span class="bg-accent-100 text-accent-700 rounded-full px-2 py-1 text-xs font-medium">
             Primary {props.schedule.year}
           </span>
         </Show>
         <span
-          class={`rounded-full px-2 py-1 text-xs font-medium ${
-            props.schedule.visible
-              ? 'bg-success-100 text-success-700'
-              : 'bg-neutral-200 text-neutral-700'
-          }`}
+          class={`rounded-full px-2 py-1 text-xs font-medium ${props.schedule.visible ? 'bg-success-100 text-success-700' : 'text-fg-muted bg-black/10'}`}
         >
           {props.schedule.visible ? 'Public' : 'Private'}
         </span>
       </div>
 
       {/* Schedule title */}
-      <h3 class="mb-3 font-bold text-gray-800 transition-colors fl-text-lg/xl group-hover:text-primary-600">
+      <h3 class="text-fg fl-text-lg/xl group-hover:text-primary-600 mb-3 font-bold transition-colors">
         {props.schedule.title}
       </h3>
 
       {/* Schedule details */}
       <div class="mb-4 space-y-1">
-        <p class="text-sm text-gray-600">
+        <p class="text-fg-muted text-sm">
           <span class="font-medium">Year:</span> {props.schedule.year}
         </p>
         <a
           href={`/schedules/${props.schedule.slug}`}
-          class="block text-sm font-medium text-primary transition-colors hover:text-primary-600 hover:underline"
+          class="text-primary hover:text-primary-600 block text-sm font-medium transition-colors hover:underline"
           target="_blank"
           rel="noopener noreferrer"
         >
@@ -164,7 +164,7 @@ const SchedulesListItem: Component<{
       <div class="mt-4 flex flex-row items-center justify-center gap-2">
         <a
           href={`/dashboard/schedules/${props.schedule.id}/edit`}
-          class="transform rounded-lg bg-accent p-2 text-white shadow-xs transition-all duration-200 hover:bg-accent-600 hover:shadow-md focus:ring-2 focus:ring-accent focus:ring-offset-2 active:scale-95"
+          class="bg-accent hover:bg-accent-600 focus:ring-accent transform rounded-lg p-2 text-white shadow-xs transition-all duration-200 hover:shadow-md focus:ring-2 focus:ring-offset-2 active:scale-95"
           title="Edit Schedule"
         >
           <FaRegularPenToSquare class="h-4 w-4" />
@@ -230,7 +230,7 @@ const SchedulePrimaryButton: Component<{
     <button
       onClick={() => handleSetPrimary()}
       disabled={setPrimaryMutation.isPending || removePrimaryMutation.isPending}
-      class="transform rounded-lg bg-accent p-2 font-medium text-white shadow-xs transition-all duration-200 hover:bg-accent-600 hover:shadow-md focus:ring-2 focus:ring-accent focus:ring-offset-2 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+      class="bg-accent hover:bg-accent-600 focus:ring-accent transform rounded-lg p-2 font-medium text-white shadow-xs transition-all duration-200 hover:shadow-md focus:ring-2 focus:ring-offset-2 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
       title={
         props.schedule.primary ? 'Remove Primary Schedule' : 'Set as Primary'
       }
@@ -281,7 +281,7 @@ const ScheduleVisibilityButton: Component<{
     <button
       onClick={() => handleToggleVisibility()}
       disabled={toggleVisibilityMutation.isPending}
-      class="transform rounded-lg bg-primary p-2 font-medium text-white shadow-xs transition-all duration-200 hover:bg-primary-600 hover:shadow-md focus:ring-2 focus:ring-primary focus:ring-offset-2 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+      class="bg-primary hover:bg-primary-600 focus:ring-primary transform rounded-lg p-2 font-medium text-white shadow-xs transition-all duration-200 hover:shadow-md focus:ring-2 focus:ring-offset-2 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
       title={props.schedule.visible ? 'Make Private' : 'Make Public'}
     >
       {props.schedule.visible ? (
@@ -332,7 +332,7 @@ const ScheduleDeleteButton: Component<{
       <button
         onClick={modal.open}
         disabled={deleteScheduleMutation.isPending}
-        class="transform rounded-lg bg-danger p-2 font-medium text-white shadow-xs transition-all duration-200 hover:bg-danger-600 hover:shadow-md focus:ring-2 focus:ring-danger focus:ring-offset-2 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+        class="bg-danger hover:bg-danger-600 focus:ring-danger transform rounded-lg p-2 font-medium text-white shadow-xs transition-all duration-200 hover:shadow-md focus:ring-2 focus:ring-offset-2 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
         title="Delete Schedule"
       >
         <FaSolidTrash class="h-4 w-4" />
@@ -342,17 +342,17 @@ const ScheduleDeleteButton: Component<{
         <Dialog.Portal>
           <Dialog.Overlay class="fixed inset-0 z-40 bg-black/50" />
           <div class="fixed inset-0 z-50 flex items-center justify-center">
-            <Dialog.Content class="w-full max-w-md rounded-xl bg-white p-6 shadow-xl">
+            <Dialog.Content class="rounded-tile bg-surface-strong text-fg shadow-tile-hover ring-line w-full max-w-md p-6 ring-1">
               <Dialog.Title class="mb-4 text-xl font-bold">
                 Delete Schedule
               </Dialog.Title>
-              <Dialog.Description class="mb-4 text-gray-600">
+              <Dialog.Description class="text-fg-muted mb-4">
                 Are you sure you want to delete "{props.schedule.title}"? This
                 action cannot be undone.
               </Dialog.Description>
 
               <Show when={deleteScheduleMutation.error}>
-                <div class="mb-4 text-red-500">
+                <div class="text-danger-500 mb-4">
                   {deleteScheduleMutation.error?.message ||
                     'Failed to delete schedule'}
                 </div>
@@ -361,7 +361,7 @@ const ScheduleDeleteButton: Component<{
               <div class="mt-4 flex justify-end gap-2">
                 <button
                   type="button"
-                  class="rounded-md border border-gray-300 px-4 py-2 hover:bg-gray-50"
+                  class="border-line-strong hover:bg-surface rounded-md border px-4 py-2"
                   onClick={modal.close}
                   disabled={deleteScheduleMutation.isPending}
                 >
@@ -369,7 +369,7 @@ const ScheduleDeleteButton: Component<{
                 </button>
                 <button
                   type="button"
-                  class="rounded-md bg-red-500 px-4 py-2 text-white hover:bg-red-600"
+                  class="bg-danger-500 hover:bg-danger-600 rounded-md px-4 py-2 text-white"
                   onClick={handleDelete}
                   disabled={deleteScheduleMutation.isPending}
                 >
