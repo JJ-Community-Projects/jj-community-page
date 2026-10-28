@@ -21,15 +21,9 @@
   "src/components/features/overlay/jjRibbons/basicRibbonLabel/BasicRibbonLabelOverlay.tsx": {
     "hex": 3
   },
-  "src/components/features/overlay/jjRibbons/bigCampaignGoal/BigCampaignGoalConfigurator.tsx": {
-    "raw-palette": 4
-  },
   "src/components/features/overlay/jjRibbons/bigCampaignGoal/BigCampaignGoalOverlay.tsx": {
     "raw-palette": 3,
     "hex": 5
-  },
-  "src/components/features/overlay/jjRibbons/campaignGoal/CampaignGoalConfigurator.tsx": {
-    "raw-palette": 4
   },
   "src/components/features/overlay/jjRibbons/campaignGoal/CampaignGoalOverlay.tsx": {
     "raw-palette": 3,
@@ -37,9 +31,6 @@
   },
   "src/components/features/overlay/schedule/common/OverlayStreamCard.tsx": {
     "raw-palette": 6
-  },
-  "src/components/features/overlay/schedule/team/TeamScheduleConfigurator.tsx": {
-    "raw-palette": 3
   },
   "src/components/features/overlay/schedule/team/TeamScheduleOverlay.tsx": {
     "raw-palette": 1
@@ -51,9 +42,6 @@
     "raw-palette": 1
   },
   "src/components/features/overlay/schedule/user/UserScheduleOverlayHeader.tsx": {
-    "raw-palette": 3
-  },
-  "src/components/features/overlay/ticker/fundraisers/FundraisersByTeamConfigurator.tsx": {
     "raw-palette": 3
   },
   "src/components/features/users/public/social/TwitchLive.tsx": {

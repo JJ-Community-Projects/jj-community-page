@@ -1,15 +1,27 @@
-import { type Component, createMemo, createSignal, For } from 'solid-js'
-import { buildUrl, FieldRow, LinkPreview, PreviewDataField, type PreviewDataMode, PreviewFrame, } from '../../overview/Common.tsx'
-import { orpcPrivate } from '../../../../../lib/orpc/client.ts'
+import { type Component, createMemo, createSignal } from 'solid-js'
 import { useQuery } from '@tanstack/solid-query'
+import {
+  buildUrl,
+  ConfiguratorBody,
+  type Currency,
+  CurrencySelect,
+  NO_CHOICE,
+  PreviewDataField,
+  type PreviewDataMode,
+  titleCase,
+} from '../../overview/Common.tsx'
+import { OVERLAY_FORMATS } from '../../overview/formats.ts'
+import { orpcPrivate } from '../../../../../lib/orpc/client.ts'
+import { Checkbox } from '../../../../ui/Form'
+import { Select } from '../../../../ui/Select'
 
-export const FundraisersByCauseConfigurator: Component<{
-  visible?: boolean
-}> = (p) => {
-  const [theme, setTheme] = createSignal<'default' | 'red' | 'blue'>('default')
+type Theme = 'default' | 'red' | 'blue'
+
+export const FundraisersByCauseConfigurator: Component = () => {
+  const [theme, setTheme] = createSignal<Theme>('default')
   const [showRaised, setShowRaised] = createSignal<boolean>(true)
   const [causeId, setCauseId] = createSignal<string>('')
-  const [currency, setCurrency] = createSignal<'GBP' | 'USD' | 'EUR'>('GBP')
+  const [currency, setCurrency] = createSignal<Currency>('GBP')
   const [previewData, setPreviewData] = createSignal<PreviewDataMode>('test')
 
   // Load causes to populate selector
@@ -22,6 +34,8 @@ export const FundraisersByCauseConfigurator: Component<{
   )
 
   const causes = () => causesQ.data?.charities ?? []
+  const causeName = (id: string) =>
+    causes().find((c) => c.id === id)?.name ?? 'Choose a cause'
 
   const url = createMemo(() =>
     buildUrl('/overlays/cause-fundraiser', {
@@ -45,59 +59,36 @@ export const FundraisersByCauseConfigurator: Component<{
   )
 
   return (
-    <div class="flex flex-col gap-2 rounded-sm bg-black/30 p-3">
-      <p class="mb-2 rounded-sm border border-white/10 bg-white/5 p-2 text-sm text-white/80">
-        A horizontal scrolling ticker showing fundraisers filtered by
-        cause/charity. Choose a theme, show or hide the raised total, and select
-        a currency. Set your OBS Browser Source to 1920x80 px.
-      </p>
+    <ConfiguratorBody
+      description="A horizontal scrolling ticker of the fundraisers raising for one charity."
+      format={OVERLAY_FORMATS['cause-fundraiser']}
+      previewUrl={previewUrl()}
+      linkUrl={url()}
+    >
       <PreviewDataField value={previewData()} onChange={setPreviewData} />
-      <FieldRow label="Cause">
-        <select
-          class="w-80 rounded-sm bg-black/40 px-2 py-1"
-          value={String(causeId())}
-          onChange={(e) => {
-            const v = e.currentTarget.value
-            setCauseId(v ? (v) : '')
-          }}
-        >
-          <option value="">Select a causes</option>
-          <For each={causes()}>
-            {(c: any) => <option value={c.id}>{c.name}</option>}
-          </For>
-        </select>
-      </FieldRow>
-      <FieldRow label="Theme">
-        <select
-          value={theme()}
-          onChange={(e) => setTheme(e.currentTarget.value as any)}
-          class="w-40 rounded-sm bg-black/40 px-2 py-1"
-        >
-          <option value="default">Default</option>
-          <option value="red">Red</option>
-          <option value="blue">Blue</option>
-        </select>
-      </FieldRow>
-      <FieldRow label="Currency">
-        <select
-          value={currency()}
-          onChange={(e) => setCurrency(e.currentTarget.value as 'GBP' | 'USD' | 'EUR')}
-          class="w-40 rounded-sm bg-black/40 px-2 py-1"
-        >
-          <option value="GBP">GBP</option>
-          <option value="USD">USD</option>
-          <option value="EUR">EUR</option>
-        </select>
-      </FieldRow>
-      <FieldRow label="Show Raised">
-        <input
-          type="checkbox"
-          checked={showRaised()}
-          onChange={(e) => setShowRaised(e.currentTarget.checked)}
-        />
-      </FieldRow>
-      <LinkPreview url={url()} />
-      <PreviewFrame url={previewUrl()} visible={p.visible} />
-    </div>
+      <Select
+        label="Charity"
+        showLabel
+        options={[NO_CHOICE, ...causes().map((c) => c.id)]}
+        value={causeId() || NO_CHOICE}
+        onChange={(v) => setCauseId(v === NO_CHOICE ? '' : v)}
+        format={causeName}
+      />
+      <Select
+        label="Theme"
+        showLabel
+        options={['default', 'red', 'blue'] as Theme[]}
+        value={theme()}
+        onChange={setTheme}
+        format={titleCase}
+      />
+      <CurrencySelect value={currency()} onChange={setCurrency} />
+      <Checkbox
+        label="Show raised amounts"
+        checked={showRaised()}
+        onChange={setShowRaised}
+        class="self-end"
+      />
+    </ConfiguratorBody>
   )
 }

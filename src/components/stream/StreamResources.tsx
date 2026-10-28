@@ -1,6 +1,5 @@
-import { type Component, Show } from 'solid-js'
+import { type Component } from 'solid-js'
 import { OverlayConfiguration } from '../features/overlay/overview/OverlayConfiguration'
-import { PublicOverlayConfiguration } from '../features/overlay/overview/PublicOverlayConfiguration'
 import type { User } from '../../lib/auth/User'
 import { Button } from '../ui/Button'
 import { Accordion, AccordionItem } from '../ui/Accordion'
@@ -69,7 +68,6 @@ export const StreamResources: Component<{ user: User | null }> = (props) => (
     </AccordionItem>
 
     <AccordionItem value="overlays" title="OBS Overlays">
-      {/* The overlay configurator keeps its canvas styling until the overlays step */}
       <div class="text-on-canvas flex flex-col items-center gap-1 px-2 text-center">
         <p class="max-w-prose">
           These overlays are designed for OBS browser sources. Configure your
@@ -80,12 +78,7 @@ export const StreamResources: Component<{ user: User | null }> = (props) => (
           Jingle Jam has started. Feedback is appreciated!
         </p>
       </div>
-      <Show
-        when={props.user}
-        fallback={<PublicOverlayConfiguration user={props.user as User} />}
-      >
-        {(user) => <OverlayConfiguration user={user()} />}
-      </Show>
+      <OverlayConfiguration user={props.user} />
     </AccordionItem>
   </Accordion>
 )
