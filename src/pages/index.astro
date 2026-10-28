@@ -5,7 +5,7 @@ import {
 } from '../components/common/ui/MainHeader.tsx'
 // Rendered on demand: the year comes from the config and the visibility flag
 export const prerender = false
-import BaseLayout4xl from '../layouts/BaseLayout4xl.astro'
+import PageShell from '../layouts/PageShell.astro'
 import ShareBanner from '../components/shared/ShareBanner.astro'
 import { serverClientPublic } from '../lib/orpc/serverClient'
 import { getConfigYear } from '../lib/utils/configYear'
@@ -21,7 +21,7 @@ const [{ data: contentHidden }, configYear] = await Promise.all([
 const year = upcomingJJYear(configYear, contentHidden ?? true)
 ---
 
-<BaseLayout4xl
+<PageShell
   title={`Jingle Jam ${year} Schedule & Timetable (Yogscast + Community)`}
   description={`Jingle Jam ${year} schedule and timetable in your timezone: Yogscast and community streams, fundraisers and stream overlays. Community-run, not official.`}
   canonical="https://jinglejam.ostof.dev"
@@ -141,4 +141,4 @@ const year = upcomingJJYear(configYear, contentHidden ?? true)
       </p>
     </section>
   </div>
-</BaseLayout4xl>
+</PageShell>

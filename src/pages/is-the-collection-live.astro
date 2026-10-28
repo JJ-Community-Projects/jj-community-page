@@ -3,14 +3,14 @@ export const prerender = false
 import {
   CollectionCountdown
 } from '../components/features/collectionCountdown/CollectionCountdown.tsx'
-import BaseLayout4xl from '../layouts/BaseLayout4xl.astro'
+import PageShell from '../layouts/PageShell.astro'
 import { nextJJYear } from '../lib/utils/jjYear'
 
 // The countdown is date-driven (useNextJJStartDate), so the year follows the same date rule, not the config
 const year = nextJJYear()
 ---
 
-<BaseLayout4xl
+<PageShell
   title={`Is the Jingle Jam ${year} Collection Live? - Countdown`}
   description={`Is the Jingle Jam ${year} game collection live yet? A live countdown to the moment it goes on sale, with the start time in your timezone.`}
 >
@@ -20,4 +20,4 @@ const year = nextJJYear()
     <h1 class={'text-xl'}>Is the Jingle Jam {year} collection live?</h1>
     <CollectionCountdown client:only="solid-js"/>
   </div>
-</BaseLayout4xl>
+</PageShell>

@@ -1,5 +1,5 @@
 ---
-import PWABaseLayout from "../../../../layouts/PWABaseLayout.astro";
+import PageShell from '../../../../layouts/PageShell.astro'
 export const prerender = false;
 import {getEntry} from 'astro:content';
 import {getYogsScheduleFromContent} from "../../../../content/getYogsScheduleFromContent.ts";
@@ -103,7 +103,7 @@ const schedule = await getYogsScheduleFromContent(Number(year))
 </style>
 
 
-<PWABaseLayout
+<PageShell width="full" nav="pwa" og={false}
         title={`The Yogscast Jingle Jam ${year} Schedule`}
         description={`The Yogscast Jingle Jam ${year} Interactive Schedule made by the Community`}
         canonical={`https://jinglejam.ostof.dev/yogs/archive/${year}`}
@@ -121,4 +121,4 @@ const schedule = await getYogsScheduleFromContent(Number(year))
         </p>
     </YogsResponsiveSchedule>
 
-</PWABaseLayout>
+</PageShell>

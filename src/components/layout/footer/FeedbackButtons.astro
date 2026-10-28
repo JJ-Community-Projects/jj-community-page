@@ -5,31 +5,25 @@ import {
   DiscordIcon,
   RedditIcon,
 } from '../../common/icons/JJIcons.tsx'
+
+const links = [
+  { href: 'https://discord.gg/hBdKXkB', label: 'Feedback on Discord', Icon: DiscordIcon },
+  { href: 'https://bsky.app/profile/ostof.bsky.social', label: 'Feedback on Bluesky', Icon: BskyIcon },
+  { href: 'mailto:ostof13@gmail.com', label: 'Feedback by email', Icon: FaSolidEnvelope },
+  { href: 'https://old.reddit.com/message/compose/?to=Ostof', label: 'Feedback on Reddit', Icon: RedditIcon },
+]
 ---
 
-<div class={'flex flex-row gap-4 p-2 text-white'}>
-  <a
-    class={'rounded-full transition-all hover:scale-110 hover:bg-white/10'}
-    href={'https://discord.gg/hBdKXkB'}
-  >
-    <DiscordIcon class={'fl-size-4/6'}/>
-  </a>
-  <a
-    class={'rounded-full transition-all hover:scale-110 hover:bg-white/10'}
-    href={'https://bsky.app/profile/ostof.bsky.social'}
-  >
-    <BskyIcon class={'fl-size-4/6'}/>
-  </a>
-  <a
-    class={'rounded-full transition-all hover:scale-110/10'}
-    href={'mailto:ostof13@gmail.com'}
-  >
-    <FaSolidEnvelope class={'fl-size-4/6'}/>
-  </a>
-  <a
-    class={'rounded-full transition-all hover:scale-110 hover:bg-white/10'}
-    href={'https://old.reddit.com/message/compose/?to=Ostof'}
-  >
-    <RedditIcon class={'fl-size-4/6'}/>
-  </a>
+<div class="flex flex-row gap-1 text-on-canvas">
+  {
+    links.map(({ href, label, Icon }) => (
+      <a
+        class="rounded-full p-2 transition-colors hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+        href={href}
+        aria-label={label}
+      >
+        <Icon class="size-5" />
+      </a>
+    ))
+  }
 </div>

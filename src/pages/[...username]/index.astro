@@ -7,7 +7,7 @@ import { RelatedSection } from '../../components/features/users/public/RelatedSe
 import UserTeamsSection from '../../components/features/users/public/UserTeamsSection.astro'
 import OtherSchedulesSection from '../../components/features/users/public/OtherSchedulesSection.astro'
 import { ORPCError, ValidationError } from '@orpc/server'
-import BaseLayout4xl from '../../layouts/BaseLayout4xl.astro'
+import PageShell from '../../layouts/PageShell.astro'
 import { isNotFoundError } from '../../lib/utils/notFound'
 
 const { username } = Astro.params
@@ -92,7 +92,7 @@ const accentColor = /^#[0-9a-f]{3,8}$/i.test(userAccentColor)
   : '#3584BF'
 ---
 
-<BaseLayout4xl title={pageTitle} description={pageDescription} robots="noindex,follow">
+<PageShell title={pageTitle} description={pageDescription} robots="noindex,follow">
   {error && <pre>ERROR: {JSON.stringify(error, null, 2)}</pre>}
 
   {
@@ -162,4 +162,4 @@ const accentColor = /^#[0-9a-f]{3,8}$/i.test(userAccentColor)
       </div>
     )
   }
-</BaseLayout4xl>
+</PageShell>

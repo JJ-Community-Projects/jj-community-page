@@ -5,7 +5,7 @@ import {loadScheduleFromContent} from "../../../content/loadScheduleFromContent"
 import {loadAllCreatorsFromContent} from "../../../content/loadCreatorsFromContent";
 import {YogsCurrentScheduleLoader} from "../../../components/yogs-pages/schedule/YogsCurrentScheduleLoader";
 
-import PWABaseLayout from "../../../layouts/PWABaseLayout.astro";
+import PageShell from '../../../layouts/PageShell.astro'
 
 const creators = await loadAllCreatorsFromContent();
 
@@ -140,7 +140,7 @@ if (filteredCreators) {
         }
     }
 </style>
-<PWABaseLayout
+<PageShell width="full" nav="pwa" og={false}
         title="The Yogscast Jingle Jam 2024 Schedule"
         description={description}
         canonical="https://jinglejam.ostof.dev/yogs"
@@ -178,4 +178,4 @@ if (filteredCreators) {
         </div>
     </div>
 
-</PWABaseLayout>
+</PageShell>

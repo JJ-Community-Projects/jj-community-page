@@ -1,5 +1,5 @@
 ---
-import BaseLayout from '../../layouts/BaseLayout.astro'
+import PageShell from '../../layouts/PageShell.astro'
 import { StreamResources } from '../../components/stream/StreamResources'
 import { serverClientPublic } from '../../lib/orpc/serverClient'
 import { getConfigYear } from '../../lib/utils/configYear'
@@ -17,7 +17,7 @@ const [{ data: contentHidden }, configYear] = await Promise.all([
 const year = upcomingJJYear(configYear, contentHidden ?? true)
 ---
 
-<BaseLayout
+<PageShell
   title={`Jingle Jam ${year} Stream Resources: Twitch Extension & Overlays`}
   description={`Community tools for Jingle Jam ${year} streamers: the Jingle Jam Community Twitch extensions and OBS overlays for donations and schedules. Not official.`}
   canonical="https://jinglejam.ostof.dev/stream-resources"
@@ -33,4 +33,4 @@ const year = upcomingJJYear(configYear, contentHidden ?? true)
     </p>
   </div>
   <StreamResources client:only="solid-js" user={user} />
-</BaseLayout>
+</PageShell>

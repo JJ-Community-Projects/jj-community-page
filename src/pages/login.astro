@@ -1,5 +1,5 @@
 ---
-import BaseLayout from "../layouts/BaseLayout.astro";
+import PageShell from '../layouts/PageShell.astro'
 import LoginPage from "../components/features/auth/LoginPage";
 
 const { user, session } = Astro.locals;
@@ -8,6 +8,6 @@ if (session) {
 }
 ---
 
-<BaseLayout>
+<PageShell>
   <LoginPage client:only="solid-js" />
-</BaseLayout>
+</PageShell>

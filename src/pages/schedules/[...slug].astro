@@ -1,6 +1,6 @@
 ---
 import { serverClientPublic } from '../../lib/orpc/serverClient'
-import BaseLayout4xl from '../../layouts/BaseLayout4xl.astro'
+import PageShell from '../../layouts/PageShell.astro'
 import {
   NextStreamsIsland,
   FullScheduleIsland,
@@ -52,7 +52,7 @@ const pageDescription = schedule
   : undefined
 ---
 
-<BaseLayout4xl title={pageTitle} description={pageDescription} robots="noindex,follow">
+<PageShell title={pageTitle} description={pageDescription} robots="noindex,follow">
   <div class="w-full flex flex-col justify-center items-stretch gap-4">
     <!-- Hero / Header (centered H1) -->
     <div
@@ -118,4 +118,4 @@ const pageDescription = schedule
       )
     }
   </div>
-</BaseLayout4xl>
+</PageShell>

@@ -1,5 +1,5 @@
 ---
-import BaseLayout from '../../../layouts/BaseLayout.astro'
+import PageShell from '../../../layouts/PageShell.astro'
 import { UserPreferencesPage } from '../../../components/features/users/user-dashboard/preferences/UserPreferencesPage.tsx'
 
 const { session, user } = Astro.locals
@@ -8,6 +8,6 @@ if (session === null) {
 }
 ---
 
-<BaseLayout>
+<PageShell>
   <UserPreferencesPage client:only="solid-js" />
-</BaseLayout>
+</PageShell>

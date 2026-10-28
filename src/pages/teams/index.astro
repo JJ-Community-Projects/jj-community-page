@@ -1,7 +1,7 @@
 ---
 import { serverClientPublic } from '../../lib/orpc/serverClient'
 import { TeamsGrid } from '../../components/features/teams/public/TeamsGrid'
-import BaseLayout4xl from '../../layouts/BaseLayout4xl.astro'
+import PageShell from '../../layouts/PageShell.astro'
 import TeamsIndexCountdown from '../../components/features/teams/public/TeamsIndexHeader'
 import { FaSolidUsers } from 'solid-icons/fa'
 import {
@@ -37,7 +37,7 @@ const { data: teams, error } = await serverClientPublic.teams.findVisible(
 )
 ---
 
-<BaseLayout4xl
+<PageShell
   title={`Jingle Jam ${year} Teams | Jingle Jam Community`}
   description={`Teams of community streamers fundraising together for Jingle Jam ${year}: who is in each team and their upcoming streams. Community-run, not official.`}
 >
@@ -90,4 +90,4 @@ const { data: teams, error } = await serverClientPublic.teams.findVisible(
       )}
     </>
   )}
-</BaseLayout4xl>
+</PageShell>

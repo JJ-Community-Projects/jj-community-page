@@ -2,7 +2,7 @@
 export const prerender = true
 import { getYogsScheduleFromContent } from '../../../content/getYogsScheduleFromContent.ts'
 import { type CollectionEntry, getCollection } from 'astro:content'
-import BaseLayout from '../../../layouts/BaseLayout.astro'
+import PageShell from '../../../layouts/PageShell.astro'
 import { YogsResponsiveSchedule } from '../../../components/yogs-pages/schedule/YogsResponsiveSchedule.tsx'
 import YogsJsonLd from '../../../components/yogs-pages/common/YogsJsonLd.astro'
 import { compactYogsSchedule } from '../../../lib/utils/compactYogsSchedule.ts'
@@ -136,7 +136,7 @@ const jsonLd = [
   }
 </style>
 
-<BaseLayout
+<PageShell width="full"
   title={`Yogscast Jingle Jam ${year} Schedule & VODs`}
   description={`The full Yogscast Jingle Jam ${year} schedule: every stream with date, time, participants and VOD links, in your timezone - maintained by the community.`}
   canonical={canonical}
@@ -164,4 +164,4 @@ const jsonLd = [
       partners.
     </p>
   </YogsResponsiveSchedule>
-</BaseLayout>
+</PageShell>

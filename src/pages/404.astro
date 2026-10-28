@@ -1,5 +1,5 @@
 ---
-import BaseLayout4xl from '../layouts/BaseLayout4xl.astro'
+import PageShell from '../layouts/PageShell.astro'
 
 // Unmatched paths and the pages that rewrite here (unknown user, team, schedule) answer 404.
 export const prerender = false
@@ -12,7 +12,7 @@ const links = [
 ]
 ---
 
-<BaseLayout4xl
+<PageShell
   title="Page not found | Jingle Jam Community"
   description="This page doesn't exist on the Jingle Jam Community site."
 >
@@ -27,4 +27,4 @@ const links = [
       ))}
     </nav>
   </div>
-</BaseLayout4xl>
+</PageShell>

@@ -1,6 +1,6 @@
 ---
 import { serverClientPrivate, serverClientPublic } from '../../lib/orpc/serverClient.ts'
-import BaseLayout from '../../layouts/BaseLayout.astro'
+import PageShell from '../../layouts/PageShell.astro'
 import { CommunityPage } from '../../components/features/community-ssr/CommunityPage.tsx'
 
 export const prerender = false
@@ -37,7 +37,7 @@ const [
 ])
 ---
 
-<BaseLayout
+<PageShell width="wide"
   title="The Jingle Jam Community - Fundraisers & Upcoming Streams"
   description="Explore community fundraisers and upcoming streams for Jingle Jam 2025 - discover creators and donate."
   canonical="https://jinglejam.ostof.dev/community"
@@ -45,4 +45,4 @@ const [
   <div class="w-full flex flex-col justify-center items-stretch gap-4">
     <CommunityPage initial={{ community, causes, upcomingStreams, users }} tagCatalog={tagCatalog?.tags} client:idle />
   </div>
-</BaseLayout>
+</PageShell>

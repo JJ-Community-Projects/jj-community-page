@@ -1,6 +1,6 @@
 ---
 import {serverClientPrivate} from "../../lib/orpc/serverClient";
-import BaseLayout from "../../layouts/BaseLayout.astro";
+import PageShell from '../../layouts/PageShell.astro'
 import {UserAdminDashboardPage} from "../../components/features/users/user-dashboard/UserAdminDashboardPage.tsx";
 
 const {session, user} = Astro.locals
@@ -22,6 +22,6 @@ if (!userData) {
   return Astro.redirect("/");
 }
 ---
-<BaseLayout>
+<PageShell width="wide">
     <UserAdminDashboardPage user={user} client:only="solid-js"/>
-</BaseLayout>
+</PageShell>

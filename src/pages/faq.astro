@@ -1,9 +1,9 @@
 ---
-import BaseLayout from "../layouts/BaseLayout.astro";
+import PageShell from '../layouts/PageShell.astro'
 import FAQOther from "../components/features/faq/FAQOther.astro";
 import FAQCommunity from "../components/features/faq/FAQCommunity.astro";
 ---
-<BaseLayout
+<PageShell
     title="Jingle Jam Community FAQ - Schedule, Fundraisers & Extensions"
     description="When the Yogscast schedule and community fundraisers appear, whether you need an account, the Twitch extensions, and whether this fan-run site is official."
     canonical="https://jinglejam.ostof.dev/faq"
@@ -14,7 +14,7 @@ import FAQCommunity from "../components/features/faq/FAQCommunity.astro";
     <p class="text-white">Last updated, November 8th 2025</p>
     <FAQOther/>
     <FAQCommunity/>
-</BaseLayout>
+</PageShell>
 
 <style is:global>
     p > a {

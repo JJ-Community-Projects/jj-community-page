@@ -1,5 +1,5 @@
 ---
-import BaseLayout from "../layouts/BaseLayout.astro";
+import PageShell from '../layouts/PageShell.astro'
 
 // Get the error message from the URL query parameter
 const { searchParams } = new URL(Astro.request.url);
@@ -19,7 +19,7 @@ const errorMessages = new Map([
 const displayMessage = errorMessages.get(errorMessage) || errorMessages.get('default')
 ---
 
-<BaseLayout title="Authentication Error">
+<PageShell title="Authentication Error">
   <div class="flex flex-col items-center justify-center w-full max-w-md mx-auto mt-10 p-6 bg-red-900/30 rounded-lg shadow-lg">
     <h1 class="text-3xl font-bold text-white mb-4">Authentication Error</h1>
     <div class="text-white text-center mb-6">
@@ -34,4 +34,4 @@ const displayMessage = errorMessages.get(errorMessage) || errorMessages.get('def
       </a>
     </div>
   </div>
-</BaseLayout>
+</PageShell>

@@ -1,7 +1,7 @@
 ---
 import { getEntry } from 'astro:content'
 export const prerender = false
-import BaseLayout from '../../layouts/BaseLayout.astro'
+import PageShell from '../../layouts/PageShell.astro'
 import { CommunityPage } from '../../components/features/community/CommunityPage.tsx'
 import {
   MainCountdownSimple,
@@ -39,7 +39,7 @@ const tagCatalog = HIDE_CONTENT
     ).data?.tags
 ---
 
-<BaseLayout
+<PageShell width="wide"
   title={`Jingle Jam ${year} Community Fundraisers & Upcoming Streams`}
   description={`Community fundraisers and upcoming streams for Jingle Jam ${year}: fundraiser totals, who is streaming next, and links to donate. Community-run, not official.`}
   canonical="https://jinglejam.ostof.dev/community"
@@ -73,4 +73,4 @@ const tagCatalog = HIDE_CONTENT
         client:only="solid-js" />
     </div>
   )}
-</BaseLayout>
+</PageShell>

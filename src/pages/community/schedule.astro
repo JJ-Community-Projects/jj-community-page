@@ -2,7 +2,7 @@
 export const prerender = false
 import { CommunitySchedulesPage } from '../../components/features/schedules/community/CommunitySchedules.tsx'
 import { getEntry } from 'astro:content'
-import BaseLayout from '../../layouts/BaseLayout.astro'
+import PageShell from '../../layouts/PageShell.astro'
 import {
   MainCountdownSimple,
   MainJJStartTimes,
@@ -29,7 +29,7 @@ const year = upcomingJJYear(configYear, HIDE_CONTENT)
 const charityData = await getEntry('charities', '2025')
 ---
 
-<BaseLayout
+<PageShell width="wide"
   title={`Jingle Jam ${year} Community Schedule - Streams in Your Timezone`}
   description={`The full community stream schedule for Jingle Jam ${year}: every stream from streamers on this site, day by day in your timezone. Community-run, not official.`}
   canonical="https://jinglejam.ostof.dev/community/schedule"
@@ -62,4 +62,4 @@ const charityData = await getEntry('charities', '2025')
         client:only="solid-js" />
     </div>
   )}
-</BaseLayout>
+</PageShell>

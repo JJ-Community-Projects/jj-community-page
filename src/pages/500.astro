@@ -1,12 +1,12 @@
 ---
-import BaseLayout4xl from '../layouts/BaseLayout4xl.astro'
+import PageShell from '../layouts/PageShell.astro'
 
 // Astro renders this for any error thrown while rendering. Without it, the catch-all
 // `[...username]` would match `/500` and answer with the 404 page.
 export const prerender = false
 ---
 
-<BaseLayout4xl
+<PageShell
   title="Something went wrong | Jingle Jam Community"
   description="An error occurred on the Jingle Jam Community site."
 >
@@ -17,4 +17,4 @@ export const prerender = false
     </p>
     <a href="/" class="underline hover:text-accent">Back to the homepage</a>
   </div>
-</BaseLayout4xl>
+</PageShell>

@@ -326,27 +326,6 @@
   "src/components/features/users/user-dashboard/teams/TeamsList.tsx": {
     "raw-palette": 26
   },
-  "src/components/layout/footer/FeedbackButtons.astro": {
-    "unknown": 1
-  },
-  "src/components/layout/navigation/AdminMobileNav.tsx": {
-    "unknown": 1
-  },
-  "src/components/layout/navigation/CommunityNavigation.astro": {
-    "unknown": 3
-  },
-  "src/components/layout/navigation/MobileNav.tsx": {
-    "unknown": 2
-  },
-  "src/components/layout/navigation/PWAMobileNav.tsx": {
-    "unknown": 2
-  },
-  "src/components/layout/navigation/PWAYogsScheduleNavigation.astro": {
-    "unknown": 2
-  },
-  "src/components/layout/navigation/YogsScheduleNavigation.astro": {
-    "unknown": 3
-  },
   "src/components/yogs-pages/schedule/header/YogsScheduleHeader.tsx": {
     "unknown": 2
   },

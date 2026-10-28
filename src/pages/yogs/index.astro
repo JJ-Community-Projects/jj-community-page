@@ -1,7 +1,7 @@
 ---
 import YogsBanner from '../../components/yogs-pages/common/YogsBanner.astro'
 export const prerender = false
-import BaseLayoutYogs from '../../layouts/BaseLayoutYogs.astro'
+import PageShell from '../../layouts/PageShell.astro'
 import { getYogsScheduleFromContent } from '../../content/getYogsScheduleFromContent.ts'
 import {
   serverClientPrivate,
@@ -330,7 +330,7 @@ const ogImage = preRenderdImageExists
     }
   }
 </style>
-<BaseLayoutYogs
+<PageShell width="full"
   title={title}
   description={description}
   robots={robots}
@@ -447,4 +447,4 @@ const ogImage = preRenderdImageExists
       )}
     </div>
   )}
-</BaseLayoutYogs>
+</PageShell>

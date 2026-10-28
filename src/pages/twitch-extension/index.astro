@@ -1,5 +1,5 @@
 ---
-import BaseLayout from "../../layouts/BaseLayout.astro";
+import PageShell from '../../layouts/PageShell.astro'
 import FeedbackButtons from "../../components/layout/footer/FeedbackButtons.astro";
 import screenshot from '../../images/extension/JJCE_Banner.png';
 import ext_stats from '../../images/extension/ext_stats.png';
@@ -9,7 +9,7 @@ import overlay5 from '../../images/extension/JJ_Overlay_5.png';
 import {Image} from "astro:assets";
 ---
 
-<BaseLayout
+<PageShell
         title="Jingle Jam Community Twitch Extensions: Panel & Overlay"
         description="Twitch panel and video overlay extensions for Jingle Jam streamers: show viewers the charities, community fundraisers and the Yogscast schedule. Not official."
         canonical="https://jinglejam.ostof.dev/twitch-extension"
@@ -71,4 +71,4 @@ import {Image} from "astro:assets";
         <p class="text-center text-white">Thanks to Nairdwood for making the Extension assets. And thanks to No1mann for the access to the Jingle Jam Donation Tracker.</p>
     </div>
 
-</BaseLayout>
+</PageShell>

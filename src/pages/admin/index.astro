@@ -1,6 +1,6 @@
 ---
 import {AdminDashboard} from "../../components/features/admin/AdminDashboard";
-import BaseLayout from "../../layouts/BaseLayout.astro";
+import PageShell from '../../layouts/PageShell.astro'
 import {serverClientPrivate} from "../../lib/orpc/serverClient";
 
 
@@ -29,6 +29,6 @@ if (!data) {
 
 ---
 
-<BaseLayout>
+<PageShell width="wide">
     <AdminDashboard client:only="solid-js"/>
-</BaseLayout>
+</PageShell>

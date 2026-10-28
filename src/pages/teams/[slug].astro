@@ -1,5 +1,5 @@
 ---
-import BaseLayout4xl from "../../layouts/BaseLayout4xl.astro";
+import PageShell from '../../layouts/PageShell.astro'
 import { serverClientPublic } from "../../lib/orpc/serverClient";
 import { TeamHeader } from "../../components/features/teams/public/TeamHeader";
 import { TeamMembersSection } from "../../components/features/teams/public/TeamMembersSection";
@@ -51,8 +51,8 @@ const teamColors = {
 };
 ---
 
-<BaseLayout4xl title={pageTitle} description={pageDescription} robots="noindex,follow">
-  <main class="w-full flex flex-col justify-center items-stretch gap-4">
+<PageShell title={pageTitle} description={pageDescription} robots="noindex,follow">
+  <div class="w-full flex flex-col justify-center items-stretch gap-4">
     {(!team || teamError) ? (
       <div class="w-full">
         <TeamNotFoundState client:only="solid-js" />
@@ -79,5 +79,5 @@ const teamColors = {
         ) : null}
       </>
     )}
-  </main>
-</BaseLayout4xl>
+  </div>
+</PageShell>

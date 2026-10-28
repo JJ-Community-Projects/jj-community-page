@@ -1,5 +1,5 @@
 ---
-import BaseLayout from '../../layouts/BaseLayout.astro'
+import PageShell from '../../layouts/PageShell.astro'
 import { OverlayConfiguration } from '../../components/features/overlay/overview/OverlayConfiguration.tsx'
 import { PublicOverlayConfiguration } from '../../components/features/overlay/overview/PublicOverlayConfiguration.tsx'
 import { serverClientPublic } from '../../lib/orpc/serverClient'
@@ -20,7 +20,7 @@ const user = Astro.locals.user
 const isLoggedIn = user !== null
 ---
 
-<BaseLayout
+<PageShell width="wide"
   title="Jingle Jam Community OBS Overlays"
   description="Configure your Overlay V2 links and copy ready-to-use URLs for OBS browser sources."
   canonical="https://jinglejam.ostof.dev/overlays"
@@ -48,4 +48,4 @@ const isLoggedIn = user !== null
       {!isLoggedIn && <PublicOverlayConfiguration client:only="solid-js" user={user} />}
     </>
   )}
-</BaseLayout>
+</PageShell>

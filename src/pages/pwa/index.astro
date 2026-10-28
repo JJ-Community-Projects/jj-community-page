@@ -1,5 +1,5 @@
 ---
-import PWABaseLayout from "../../layouts/PWABaseLayout.astro";
+import PageShell from '../../layouts/PageShell.astro'
 import {CommunityPage} from "../../components/features/community/CommunityPage";
 import {serverClientPublic} from "../../lib/orpc/serverClient";
 
@@ -9,11 +9,11 @@ const {data: tagCatalog} = await serverClientPublic.tags.catalog(
   {context: {locals: Astro.locals, request: Astro.request}},
 );
 ---
-<PWABaseLayout
+<PageShell nav="pwa" og={false}
   title="The Jingle Jam Community"
   description="A central place to showcase the streams of the Jingle Jam!"
   canonical="https://jinglejam.ostof.dev/community"
 >
     <p class="text-white fl-text-2xl/4xl">Community</p>
     <CommunityPage client:only="solid-js" tagCatalog={tagCatalog?.tags}/>
-</PWABaseLayout>
+</PageShell>
