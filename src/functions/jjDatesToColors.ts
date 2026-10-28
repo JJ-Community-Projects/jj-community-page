@@ -92,35 +92,6 @@ export function getStreamColor(streamStart: DateTime, shade: number = 500): stri
 }
 
 /**
- * Returns the appropriate Tailwind color class for a stream based on its start datetime.
- *
- * This function takes a DateTime object representing the start time of a stream
- * and returns the corresponding Tailwind color class. The color is determined
- * by the day of the week the stream starts on, relative to the start of Jingle Jam
- * (December 1st of the same year).
- *
- * @param {DateTime} streamStart - The start datetime of the stream
- * @param {string} shade - The color shade to use (default: '500')
- * @returns {string} The Tailwind color class for the stream (e.g., 'bg-day-1-500')
- */
-export function getStreamColorTW(streamStart: DateTime, shade: string = '500'): string {
-  // Calculate December 1st of the same year (Jingle Jam start)
-  const jjStart = DateTime.fromObject({ month: 12, day: 1, year: streamStart.year });
-
-  // Get the color mapping based on Jingle Jam start day
-  const colorMap = jjDatesToColors(jjStart);
-
-  // Get the weekday of the stream start
-  const weekday = streamStart.weekday;
-
-  // Get the color index from the mapping
-  const colorIndex = colorMap[weekday];
-
-  // Return the appropriate Tailwind color class
-  return `bg-day-${colorIndex + 1}-${shade}`;
-}
-
-/**
  * Returns the entire color palette for a stream based on its start datetime.
  *
  * This function takes a DateTime object representing the start time of a stream

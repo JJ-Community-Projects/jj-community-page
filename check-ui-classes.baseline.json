@@ -1,13 +1,7 @@
 {
-  "src/components/common/MutationDebugger.tsx": {
-    "raw-palette": 11
-  },
   "src/components/common/QueryComponent.tsx": {
     "unknown": 4,
     "raw-palette": 5
-  },
-  "src/components/common/QueryDebugger.tsx": {
-    "raw-palette": 12
   },
   "src/components/features/admin/tags/tag/AddTagPanel.tsx": {
     "hex": 2
@@ -64,9 +58,6 @@
   },
   "src/components/yogs-pages/schedule/YogsScheduleDetailDialog.tsx": {
     "raw-palette": 2
-  },
-  "src/components/yogs-pages/schedule/YogsStreamTileDebug.tsx": {
-    "unknown": 1
   },
   "src/pages/[...username]/index.astro": {
     "hex": 1
