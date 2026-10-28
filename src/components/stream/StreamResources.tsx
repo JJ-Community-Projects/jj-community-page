@@ -1,11 +1,9 @@
-import { type Component, type JSX, Show } from 'solid-js'
-import { Accordion } from '@kobalte/core/accordion'
-import { FaSolidChevronDown } from 'solid-icons/fa'
+import { type Component, Show } from 'solid-js'
 import { OverlayConfiguration } from '../features/overlay/overview/OverlayConfiguration'
 import { PublicOverlayConfiguration } from '../features/overlay/overview/PublicOverlayConfiguration'
 import type { User } from '../../lib/auth/User'
 import { Button } from '../ui/Button'
-import { cn, focusRing, tileSurface } from '../ui/cn'
+import { Accordion, AccordionItem } from '../ui/Accordion'
 import { Tile } from '../ui/Tile'
 
 import {
@@ -16,35 +14,10 @@ import {
   panelImages,
 } from './ExtensionScreenshots'
 
-const Item: Component<{
-  value: string
-  title: string
-  children: JSX.Element
-}> = (props) => (
-  <Accordion.Item value={props.value} class="flex flex-col gap-2">
-    <Accordion.Header>
-      <Accordion.Trigger
-        class={cn(
-          tileSurface,
-          focusRing,
-          'group flex w-full items-center gap-3 px-4 py-3 text-left font-semibold',
-        )}
-      >
-        <span class="flex-1">{props.title}</span>
-        <FaSolidChevronDown
-          class="text-fg-muted size-3.5 transition-transform group-data-expanded:rotate-180"
-          aria-hidden="true"
-        />
-      </Accordion.Trigger>
-    </Accordion.Header>
-    <Accordion.Content>{props.children}</Accordion.Content>
-  </Accordion.Item>
-)
-
 export const StreamResources: Component<{ user: User | null }> = (props) => (
   // The page header and feedback links are rendered by the page
   <Accordion class="flex w-full flex-col gap-2" collapsible>
-    <Item value="twitch" title="Twitch Extension">
+    <AccordionItem value="twitch" title="Twitch Extension">
       <Tile class="flex flex-col items-center gap-4 text-center text-sm sm:text-base">
         <p class="max-w-prose">
           The extension is for everyone who participates in the Jingle Jam and
@@ -93,9 +66,9 @@ export const StreamResources: Component<{ user: User | null }> = (props) => (
           No1mann for the access to the Jingle Jam Donation Tracker.
         </p>
       </Tile>
-    </Item>
+    </AccordionItem>
 
-    <Item value="overlays" title="OBS Overlays">
+    <AccordionItem value="overlays" title="OBS Overlays">
       {/* The overlay configurator keeps its canvas styling until the overlays step */}
       <div class="text-on-canvas flex flex-col items-center gap-1 px-2 text-center">
         <p class="max-w-prose">
@@ -113,6 +86,6 @@ export const StreamResources: Component<{ user: User | null }> = (props) => (
       >
         {(user) => <OverlayConfiguration user={user()} />}
       </Show>
-    </Item>
+    </AccordionItem>
   </Accordion>
 )

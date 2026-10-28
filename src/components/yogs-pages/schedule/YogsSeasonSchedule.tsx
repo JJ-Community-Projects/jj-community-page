@@ -1,4 +1,6 @@
 import { type Component, Show } from 'solid-js'
+import { Countdown } from '../../ui/Countdown'
+import { Tile } from '../../ui/Tile'
 import { QueryClientProvider } from '@tanstack/solid-query'
 import { QueryClient } from '@tanstack/query-core'
 import {
@@ -68,14 +70,6 @@ const CollectionCountdown: Component = () => {
   const isAfterJJEnd = useIsAfterJJEnd()
   const jjStartCountdown = useJJStartCountdown()
 
-  const countdownFormat = () => {
-    const countdown = jjStartCountdown()
-    if (countdown.days === 0) {
-      return countdown.toFormat("hh'h' mm'm' ss's'")
-    }
-    return countdown.toFormat("dd'd' hh'h' mm'm' ss's'")
-  }
-
   const showCountdown = () => {
     const isNov = now().month === 11
     const isDec = now().month === 12
@@ -84,14 +78,13 @@ const CollectionCountdown: Component = () => {
 
   return (
     <Show when={showCountdown()}>
-      <div
-        class={
-          'font-bebas flex flex-col items-center gap-1 rounded-xl border border-white/10 bg-white/5 p-4 text-center font-semibold tracking-wide text-white text-white/90 sm:p-4'
-        }
-      >
-        <p>The collection goes live in</p>
-        <p class={'font-mono'}>{countdownFormat()}</p>
-      </div>
+      <Tile pad="sm" class="flex justify-center">
+        <Countdown
+          size="sm"
+          label="The collection goes live in"
+          duration={jjStartCountdown()}
+        />
+      </Tile>
     </Show>
   )
 }

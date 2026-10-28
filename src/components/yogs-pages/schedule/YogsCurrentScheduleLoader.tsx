@@ -9,10 +9,8 @@ import { MobileYogsScheduleComponent } from './mobile/MobileYogsScheduleComponen
 import { QueryClientProvider, useQuery } from '@tanstack/solid-query'
 import { orpcPrivate } from '../../../lib/orpc/client.ts'
 import { QueryClient } from '@tanstack/query-core'
-import {
-  MainCountdownSimple,
-  MainJJStartTimes,
-} from '../../common/ui/MainHeader.tsx'
+import { Countdown, JJStartCountdown, JJStartTimes } from '../../ui/Countdown'
+import { Tile } from '../../ui/Tile'
 import {
   BskyIcon,
   DiscordIcon,
@@ -60,23 +58,19 @@ const ConfigLoader: Component<ConfigLoaderProps> = (props) => {
           />
         </Show>
         <Show when={!config.data?.showSchedule}>
-          <div
-            class={
-              'flex w-full flex-col items-center justify-center gap-1 rounded-xl border border-white/10 bg-white/5 p-4 text-center text-white/90 sm:p-4'
-            }
-          >
-            <h1 class={'text-center fl-text-2xl/4xl'}>
-              Yogscast Jingle Jam Schedule 2025
+          <Tile class="flex w-full flex-col items-center gap-3 text-center">
+            <h1 class="text-xl font-bold tracking-tight sm:text-2xl">
+              Yogscast Jingle Jam Schedule
             </h1>
-            <h2 class="text-center fl-text-lg/xl">
-              The Yogscast Jingle Jam in your timezone with Links to
-              participants, vods and more.
-            </h2>
-            <MainCountdownSimple />
-            <MainJJStartTimes />
-            <p>
+            <p class="text-fg-muted text-sm sm:text-base">
+              The Yogscast Jingle Jam in your timezone with links to
+              participants, VODs and more.
+            </p>
+            <JJStartCountdown />
+            <JJStartTimes class="max-w-lg" />
+            <p class="text-sm">
               The <span class={'font-bold'}>Yogscast Jingle Jam Schedule</span>{' '}
-              will be shown once it was announced on Social Media.
+              will be shown once it is announced on social media.
             </p>
             <div
               class={
@@ -132,7 +126,7 @@ const ConfigLoader: Component<ConfigLoaderProps> = (props) => {
                 <TiktokIcon class={'size-4'} />
               </a>
             </div>
-          </div>
+          </Tile>
         </Show>
       </Match>
     </Switch>
@@ -181,14 +175,6 @@ const Body: Component<BodyProps> = (props) => {
   const isAfterJJEnd = useIsAfterJJEnd()
   const jjStartCountdown = useJJStartCountdown()
 
-  const countdownFormat = () => {
-    const countdown = jjStartCountdown()
-    if (countdown.days === 0) {
-      return countdown.toFormat("hh'h' mm'm' ss's'")
-    }
-    return countdown.toFormat("dd'd' hh'h' mm'm' ss's'")
-  }
-
   const showCountdown = () => {
     const isNov = now().month === 11
     const isDec = now().month === 12
@@ -202,14 +188,13 @@ const Body: Component<BodyProps> = (props) => {
       <Match when={schedule.data}>
         <div class={'flex flex-col items-center justify-center gap-2'}>
           <Show when={showCountdown()}>
-            <div
-              class={
-                'font-bebas flex flex-col items-center gap-1 rounded-xl border border-white/10 bg-white/5 p-4 text-center font-semibold tracking-wide text-white text-white/90 sm:p-4'
-              }
-            >
-              <p>The collection goes live in</p>
-              <p class={'font-mono'}>{countdownFormat()}</p>
-            </div>
+            <Tile pad="sm" class="flex justify-center">
+              <Countdown
+                size="sm"
+                label="The collection goes live in"
+                duration={jjStartCountdown()}
+              />
+            </Tile>
           </Show>
           <div class="desktop-schedule flex w-full flex-col items-center justify-center gap-2">
             <YogsScheduleComponent
@@ -368,7 +353,7 @@ export const ScheduleNotice: Component = () => {
   return (
     <div
       class={
-        'flex flex-col items-center justify-center gap-1 text-pretty text-center text-white'
+        'flex flex-col items-center justify-center gap-1 text-pretty text-center text-sm'
       }
     >
       <p>

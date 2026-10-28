@@ -4,7 +4,7 @@ import { getYogsScheduleFromContent } from '../../../content/getYogsScheduleFrom
 import { type CollectionEntry, getCollection } from 'astro:content'
 import PageShell from '../../../layouts/PageShell.astro'
 import { YogsResponsiveSchedule } from '../../../components/yogs-pages/schedule/YogsResponsiveSchedule.tsx'
-import YogsJsonLd from '../../../components/yogs-pages/common/YogsJsonLd.astro'
+import { PageHeader } from '../../../components/ui/PageHeader'
 import { compactYogsSchedule } from '../../../lib/utils/compactYogsSchedule.ts'
 import {
   getBreadcrumbList,
@@ -140,22 +140,21 @@ const jsonLd = [
   title={`Yogscast Jingle Jam ${year} Schedule & VODs`}
   description={`The full Yogscast Jingle Jam ${year} schedule: every stream with date, time, participants and VOD links, in your timezone - maintained by the community.`}
   canonical={canonical}
+  jsonLd={jsonLd}
 >
-  <YogsJsonLd data={jsonLd} />
-  <div class="mb-4 flex w-full flex-col items-center gap-1 text-center text-white">
-    <h1 class="fl-text-2xl/4xl">Yogscast Jingle Jam {year} Schedule</h1>
-    <p class="text-white/90">
-      Every stream of the Yogscast Jingle Jam {year} with participants and VODs.
-      <a class="underline" href="/yogs">Current Yogscast Jingle Jam schedule</a>
-    </p>
-  </div>
+  <PageHeader class="mb-4" title={`Yogscast Jingle Jam ${year} Schedule`}>
+    <span slot="subtitle">
+      Every stream of the Yogscast Jingle Jam {year} with participants and VODs.{' '}
+      <a class="text-on-canvas underline" href="/yogs">Current Yogscast Jingle Jam schedule</a>
+    </span>
+  </PageHeader>
 
   <YogsResponsiveSchedule
     schedule={compactYogsSchedule(schedule)}
     showCreators
     client:load
   >
-    <p class="text-white text-center mt-4">
+    <p class="text-on-canvas-muted mx-auto mt-4 max-w-3xl text-center text-sm">
       This Yogscast Jingle Jam schedule is maintained by the community. If you
       find errors or see that a stream is missing use the contact info below.
       Streams that appear here are not guaranteed to happen or might be delayed.

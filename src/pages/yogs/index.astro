@@ -11,10 +11,10 @@ import { getCollection } from 'astro:content'
 import { YogsResponsiveSchedule } from '../../components/yogs-pages/schedule/YogsResponsiveSchedule.tsx'
 import { YogsSeasonSchedule } from '../../components/yogs-pages/schedule/YogsSeasonSchedule.tsx'
 import { ScheduleNotice } from '../../components/yogs-pages/schedule/YogsCurrentScheduleLoader.tsx'
-import {
-  MainCountdownSimple,
-  MainJJStartTimes,
-} from '../../components/common/ui/MainHeader.tsx'
+import { JJStartCountdown, JJStartTimes } from '../../components/ui/Countdown'
+import { PageHeader } from '../../components/ui/PageHeader'
+import { Tile } from '../../components/ui/Tile'
+import { Button } from '../../components/ui/Button'
 import { compactYogsSchedule } from '../../lib/utils/compactYogsSchedule.ts'
 import {
   getBreadcrumbList,
@@ -344,15 +344,10 @@ const ogImage = preRenderdImageExists
 
   {scheduleAvailable ? (
     <div class="flex w-full flex-col items-center gap-4">
-      <div class="flex w-full flex-col items-center gap-1 text-center text-white">
-        <h1 class="w-full text-center fl-text-2xl/4xl">
-          Yogscast Jingle Jam {year} Schedule
-        </h1>
-        <p class="text-center text-white/90 fl-text-lg/xl">
-          The Yogscast Jingle Jam {year} in your timezone with links to
-          participants, VODs and more.
-        </p>
-      </div>
+      <PageHeader
+        title={`Yogscast Jingle Jam ${year} Schedule`}
+        subtitle={`The Yogscast Jingle Jam ${year} in your timezone with links to participants, VODs and more.`}
+      />
 
       {showSchedule && currentSchedule ? (
         <div class="min-h-32 w-full">
@@ -362,50 +357,39 @@ const ogImage = preRenderdImageExists
           />
         </div>
       ) : (
-        <div class="flex w-full flex-col items-center gap-1 rounded-xl border border-white/10 bg-white/5 p-4 text-center text-white/90 sm:p-4">
-          <div class="w-full">
-            <MainCountdownSimple client:only="solid-js" />
-          </div>
-          <div class="w-full">
-            <MainJJStartTimes client:only="solid-js" />
-          </div>
-          <p>
+        <Tile class="flex w-full max-w-2xl flex-col items-center gap-3 text-center">
+          <JJStartCountdown client:only="solid-js" />
+          <JJStartTimes client:only="solid-js" />
+          <p class="text-sm sm:text-base">
             The <span class="font-bold">Yogscast Jingle Jam {year} Schedule</span>
             will be shown once it is announced on social media.
           </p>
           <ScheduleNotice />
-        </div>
+        </Tile>
       )}
     </div>
   ) : (
     <div class="flex w-full flex-col items-center gap-4">
-      <div class="flex w-full flex-col items-center gap-1 rounded-xl border border-white/10 bg-white/5 p-4 text-center text-white/90 sm:p-4">
-        <h1 class="w-full text-center fl-text-2xl/4xl">
-          Yogscast Jingle Jam {upcomingYear} Schedule
-        </h1>
-        <h2 class="text-center fl-text-lg/xl">
-          The Yogscast Jingle Jam in your timezone with links to participants,
-          VODs and more.
-        </h2>
-        <div class="w-full">
-          <MainCountdownSimple client:only="solid-js" />
-        </div>
-        <div class="w-full">
-          <MainJJStartTimes client:only="solid-js" />
-        </div>
-        <p>
+      <PageHeader
+        title={`Yogscast Jingle Jam ${upcomingYear} Schedule`}
+        subtitle="The Yogscast Jingle Jam in your timezone with links to participants, VODs and more."
+      />
+      <Tile class="flex w-full max-w-2xl flex-col items-center gap-3 text-center">
+        <JJStartCountdown client:only="solid-js" />
+        <JJStartTimes client:only="solid-js" />
+        <p class="text-sm sm:text-base">
           The <span class="font-bold">Yogscast Jingle Jam {upcomingYear} Schedule</span>
           will appear here once it is announced.
           {lastYear && ` Until then you can browse the ${lastYear} schedule below.`}
         </p>
-      </div>
+      </Tile>
 
       {lastSchedule && (
         <section class="flex w-full flex-col items-center gap-2">
-          <h2 class="text-center text-white fl-text-xl/2xl">
+          <h2 class="text-on-canvas text-center text-xl font-bold">
             Jingle Jam {lastYear} Schedule
           </h2>
-          <p class="text-center text-white/90">
+          <p class="text-on-canvas-muted text-center text-sm">
             Last year's Yogscast Jingle Jam schedule with links to participants
             and VODs.
           </p>
@@ -415,7 +399,7 @@ const ogImage = preRenderdImageExists
             showCreators
             client:load
           >
-            <p class="text-white text-center mt-4">
+            <p class="text-on-canvas-muted mx-auto mt-4 max-w-3xl text-center text-sm">
               This Yogscast Jingle Jam schedule is maintained by the community. If
               you find errors or see that a stream is missing use the contact info
               below. Streams that appear here are not guaranteed to happen or might
@@ -430,17 +414,14 @@ const ogImage = preRenderdImageExists
       {archiveYears.length > 0 && (
         <nav
           aria-label="Yogscast Jingle Jam schedule archive"
-          class="flex flex-col items-center gap-2 p-4 text-white"
+          class="flex flex-col items-center gap-2 p-4"
         >
-          <h2 class="text-2xl text-center">Schedule Archive</h2>
-          <div class="flex flex-wrap gap-2 items-center justify-center">
+          <h2 class="text-on-canvas text-center text-lg font-semibold">Schedule archive</h2>
+          <div class="flex flex-wrap items-center justify-center gap-2">
             {archiveYears.map((archiveYear) => (
-              <a
-                class="rounded-full bg-accent/95 px-3 py-1 hover:brightness-105"
-                href={`/yogs/archive/${archiveYear}`}
-              >
+              <Button href={`/yogs/archive/${archiveYear}`} size="sm" variant="canvas">
                 Jingle Jam {archiveYear}
-              </a>
+              </Button>
             ))}
           </div>
         </nav>

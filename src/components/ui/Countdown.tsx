@@ -99,10 +99,16 @@ export const JJStartTimes: Component<{ class?: string }> = (props) => {
     >
       <For each={zones()}>
         {(zone) => (
-          <div class="rounded-group bg-surface-strong ring-line px-3 py-2 text-center ring-1">
-            <p class="text-fg-muted text-xs">{zone.label}</p>
-            <p class="font-semibold">{zone.date.toFormat('DDDD')}</p>
-            <p class="text-fg-muted text-sm tabular-nums">
+          // One line per zone on mobile (label · date, time), stacked from sm up
+          <div class="rounded-group bg-surface-strong ring-line flex items-baseline justify-between gap-2 px-3 py-1.5 ring-1 sm:block sm:py-2 sm:text-center">
+            <p class="text-fg-muted shrink-0 text-xs">{zone.label}</p>
+            <p class="text-right text-sm font-semibold sm:text-center sm:text-base">
+              <span class="sm:hidden">
+                {zone.date.toFormat('EEE d MMM, t')}
+              </span>
+              <span class="hidden sm:inline">{zone.date.toFormat('DDDD')}</span>
+            </p>
+            <p class="text-fg-muted hidden text-sm tabular-nums sm:block">
               {zone.date.toFormat('ttt')}
             </p>
           </div>

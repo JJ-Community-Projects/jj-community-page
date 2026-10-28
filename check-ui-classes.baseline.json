@@ -128,12 +128,6 @@
   "src/components/features/schedules/common/StreamParticipants.tsx": {
     "hex": 1
   },
-  "src/components/features/stats/controls/CreatorStatsControls.tsx": {
-    "unknown": 3
-  },
-  "src/components/features/stats/controls/StatsControls.tsx": {
-    "unknown": 4
-  },
   "src/components/features/teams/public/TeamMembersSection.tsx": {
     "hex": 2
   },
@@ -318,14 +312,8 @@
     "unknown": 2,
     "raw-palette": 7
   },
-  "src/components/yogs-pages/schedule/YogsCurrentScheduleLoader.tsx": {
-    "unknown": 1
-  },
   "src/components/yogs-pages/schedule/YogsScheduleDetailDialog.tsx": {
     "raw-palette": 2
-  },
-  "src/components/yogs-pages/schedule/YogsSeasonSchedule.tsx": {
-    "unknown": 1
   },
   "src/components/yogs-pages/schedule/YogsStreamTileDebug.tsx": {
     "unknown": 1

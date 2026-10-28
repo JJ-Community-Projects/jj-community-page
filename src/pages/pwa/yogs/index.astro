@@ -150,16 +150,16 @@ if (filteredCreators) {
     </div>
 
     <div class="flex flex-col justify-center items-center p-4 gap-2">
-        <p class="text-2xl text-white text-center">Yogs & Friends</p>
+        <h2 class="text-on-canvas text-center text-xl font-bold">Yogs & Friends</h2>
         <div class="flex flex-col items-center gap-2">
-            <p class="text-xl text-white mb-1">Yogs</p>
+            <h3 class="text-on-canvas-muted mt-2 text-sm font-semibold">Yogs</h3>
             <div class="flex flex-wrap gap-2 items-center justify-center">
               {
                 yogs && yogs.map(creator =>
                               <YogsCreatorPill creator={creator} client:only="solid-js"/>)
               }
             </div>
-            <p class="text-xl text-white mb-1">Best Of</p>
+            <h3 class="text-on-canvas-muted mt-2 text-sm font-semibold">Best Of</h3>
             <div class="flex flex-wrap gap-2 items-center justify-center">
               {
                 bestOf && bestOf.map(creator =>
@@ -167,7 +167,7 @@ if (filteredCreators) {
                 )
               }
             </div>
-            <p class="text-xl text-white mb-1">Friends</p>
+            <h3 class="text-on-canvas-muted mt-2 text-sm font-semibold">Friends</h3>
             <div class="flex flex-wrap gap-2 items-center justify-center">
               {
                 friends && friends.map(creator =>

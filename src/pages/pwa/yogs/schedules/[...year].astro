@@ -1,5 +1,6 @@
 ---
 import PageShell from '../../../../layouts/PageShell.astro'
+import { PageHeader } from '../../../../components/ui/PageHeader'
 export const prerender = false;
 import {getEntry} from 'astro:content';
 import {getYogsScheduleFromContent} from "../../../../content/getYogsScheduleFromContent.ts";
@@ -108,11 +109,12 @@ const schedule = await getYogsScheduleFromContent(Number(year))
         description={`The Yogscast Jingle Jam ${year} Interactive Schedule made by the Community`}
         canonical={`https://jinglejam.ostof.dev/yogs/archive/${year}`}
 >
+    <PageHeader class="mb-4" title={`Yogscast Jingle Jam ${year} Schedule`} />
     <YogsResponsiveSchedule
         schedule={compactYogsSchedule(schedule)}
         client:load
     >
-        <p class="text-white text-center mt-4">
+        <p class="text-on-canvas-muted mx-auto mt-4 max-w-3xl text-center text-sm">
             This Yogscast Jingle Jam schedule is maintained by the community.
             If you find errors or see that a stream is missing use the contact info below.
             Streams that appear here are not guaranteed to happen or might be delayed.

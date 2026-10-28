@@ -22,10 +22,10 @@ export const StreamStats: Component<StreamStatsProps> = (props) => {
 const Chart: Component = () => {
   const {chartOptions} = useStats()
   return (
-    <div>
+    <div class="flex flex-col gap-3">
       <StatsControls/>
-      <div class={'bg-white'}>
-        <StatsChart height={400} width={1000} option={chartOptions()}/>
+      <div class="rounded-group bg-surface-strong ring-line p-2 ring-1">
+        <StatsChart height={400} option={chartOptions()}/>
       </div>
     </div>
   );
