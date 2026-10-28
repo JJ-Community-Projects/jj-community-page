@@ -14,7 +14,7 @@ export const AdminFXRateSection: Component = () => {
       <div class="flex items-center justify-between">
         <h2 class="text-lg font-semibold">FX: GBP → EUR</h2>
         <button
-          class="rounded bg-accent px-3 py-1.5 text-sm text-white hover:opacity-90 disabled:opacity-50"
+          class="rounded-sm bg-accent px-3 py-1.5 text-sm text-white hover:opacity-90 disabled:opacity-50"
           onClick={() => rateQuery.refetch()}
           disabled={rateQuery.isFetching}
         >

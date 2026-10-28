@@ -32,8 +32,8 @@ const Body: Component<{ visible?: boolean }> = (p) => {
   const noTeams = createMemo(() => (qTeams.data?.length ?? 0) === 0)
 
   return (
-    <div class="flex flex-col gap-2 rounded bg-black/30 p-3">
-      <div class="mb-2 rounded border border-white/10 bg-white/5 p-2 text-sm text-white/80">
+    <div class="flex flex-col gap-2 rounded-sm bg-black/30 p-3">
+      <div class="mb-2 rounded-sm border border-white/10 bg-white/5 p-2 text-sm text-white/80">
         Show a selected team’s upcoming streams in a compact panel. Choose a
         theme, pick filled or striped style, and set the item limit. Set your
         OBS Browser Source to 300x450 px.
@@ -41,7 +41,7 @@ const Body: Component<{ visible?: boolean }> = (p) => {
       <div class={'flex flex-row gap-1'}>
         <div class={'flex flex-1 flex-col gap-2'}>
           <Show when={!qTeams.isLoading && noTeams()}>
-            <div class="mb-2 rounded border border-yellow-400/40 bg-yellow-500/10 p-2 text-sm text-yellow-300">
+            <div class="mb-2 rounded-sm border border-yellow-400/40 bg-yellow-500/10 p-2 text-sm text-yellow-300">
               You are not part of any team yet. Create or join a team to use the
               Team Schedule overlay.
             </div>
@@ -54,7 +54,7 @@ const Body: Component<{ visible?: boolean }> = (p) => {
                   const v = Math.floor(Number(e.currentTarget.value))
                   setTeamId(Number.isFinite(v) ? v : undefined)
                 }}
-                class="w-60 rounded bg-black/40 px-2 py-1"
+                class="w-60 rounded-sm bg-black/40 px-2 py-1"
                 disabled={noTeams()}
                 title={
                   noTeams()
@@ -73,7 +73,7 @@ const Body: Component<{ visible?: boolean }> = (p) => {
             <select
               value={theme()}
               onChange={(e) => setTheme(e.currentTarget.value as any)}
-              class="w-40 rounded bg-black/40 px-2 py-1"
+              class="w-40 rounded-sm bg-black/40 px-2 py-1"
             >
               <option value="default">Default</option>
               <option value="red">Red</option>
@@ -86,7 +86,7 @@ const Body: Component<{ visible?: boolean }> = (p) => {
               onChange={(e) =>
                 setStreamStyle(e.currentTarget.value as 'filled' | 'striped')
               }
-              class="w-40 rounded bg-black/40 px-2 py-1"
+              class="w-40 rounded-sm bg-black/40 px-2 py-1"
             >
               <option value="filled">Filled</option>
               <option value="striped">Striped</option>
@@ -99,7 +99,7 @@ const Body: Component<{ visible?: boolean }> = (p) => {
                 const v = Math.floor(Number(e.currentTarget.value))
                 if (Number.isFinite(v)) setLimit(Math.max(3, Math.min(10, v)))
               }}
-              class="w-40 rounded bg-black/40 px-2 py-1"
+              class="w-40 rounded-sm bg-black/40 px-2 py-1"
             >
               <option value="3">3</option>
               <option value="4">4</option>

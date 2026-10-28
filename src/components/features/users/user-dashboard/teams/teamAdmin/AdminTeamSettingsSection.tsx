@@ -120,7 +120,7 @@ export const AdminTeamSettingsSection: Component = () => {
       <Show when={updateTeamMutation.isError}>
         <div class="bg-danger-50 rounded-xl p-4 border border-danger-200">
           <div class="flex items-center gap-3 text-danger-600">
-            <FaRegularCircleXmark class="w-4 h-4 flex-shrink-0"/>
+            <FaRegularCircleXmark class="w-4 h-4 shrink-0"/>
             <p
               class="text-sm font-medium">{updateTeamMutation.failureReason?.message || "Failed to save team settings"}</p>
           </div>
@@ -137,10 +137,10 @@ export const AdminTeamSettingsSection: Component = () => {
           class="
             w-full px-4 py-3 rounded-xl border-2 border-gray-200
             focus:border-accent focus:ring-4 focus:ring-accent/20
-            transition-all duration-300 outline-none
-            bg-white/50 backdrop-blur-sm hover:bg-white/70
+            transition-all duration-300 outline-hidden
+            bg-white/50 backdrop-blur-xs hover:bg-white/70
             text-gray-800 font-medium
-            shadow-sm hover:shadow-md focus:shadow-lg
+            shadow-xs hover:shadow-md focus:shadow-lg
           "
           placeholder="Enter team name..."
         />
@@ -162,10 +162,10 @@ export const AdminTeamSettingsSection: Component = () => {
             class="
               w-full pl-4 pr-12 py-3 rounded-xl border-2 border-gray-200
               focus:border-accent focus:ring-4 focus:ring-accent/20
-              transition-all duration-300 outline-none
-              bg-white/50 backdrop-blur-sm hover:bg-white/70
+              transition-all duration-300 outline-hidden
+              bg-white/50 backdrop-blur-xs hover:bg-white/70
               text-gray-800 font-medium
-              shadow-sm hover:shadow-md focus:shadow-lg
+              shadow-xs hover:shadow-md focus:shadow-lg
             "
             placeholder="team-slug"
           />
@@ -215,7 +215,7 @@ export const AdminTeamSettingsSection: Component = () => {
         {/* URL Preview */}
         <p class="text-xs text-gray-500 flex items-center gap-1">
           <span>Preview:</span>
-          <span class="font-mono bg-gray-100 px-2 py-1 rounded">
+          <span class="font-mono bg-gray-100 px-2 py-1 rounded-sm">
             jinglejam.ostof.dev/teams/{slug() || "your-team-slug"}
           </span>
         </p>
@@ -225,7 +225,7 @@ export const AdminTeamSettingsSection: Component = () => {
       <div class="space-y-2">
         <label class="block text-sm font-medium text-gray-700">Team Description</label>
         <textarea
-          class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-accent focus:ring-4 focus:ring-accent/20 transition-all duration-300 outline-none bg-white/50 backdrop-blur-sm hover:bg-white/70 text-gray-800 shadow-sm hover:shadow-md focus:shadow-lg"
+          class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-accent focus:ring-4 focus:ring-accent/20 transition-all duration-300 outline-hidden bg-white/50 backdrop-blur-xs hover:bg-white/70 text-gray-800 shadow-xs hover:shadow-md focus:shadow-lg"
           rows={5}
           placeholder="Describe your team..."
           value={description()}
@@ -243,7 +243,7 @@ export const AdminTeamSettingsSection: Component = () => {
         <Checkbox.Input class="sr-only"/>
         <Checkbox.Control class="
           flex h-5 w-5 items-center justify-center rounded border-2 border-gray-300
-          bg-white data-[checked]:bg-accent data-[checked]:border-accent
+          bg-white data-checked:bg-accent data-checked:border-accent
           transition-all duration-200 hover:border-gray-400
         ">
           <Checkbox.Indicator>
@@ -265,7 +265,7 @@ export const AdminTeamSettingsSection: Component = () => {
             flex items-center gap-2 px-6 py-3 rounded-xl transition-all duration-200
             bg-accent hover:bg-accent-600 text-white font-medium
             focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-white
-            outline-none shadow-sm hover:shadow-md active:scale-95
+            outline-hidden shadow-xs hover:shadow-md active:scale-95
             disabled:opacity-50 disabled:cursor-not-allowed
           "
           onClick={save}

@@ -28,11 +28,11 @@ export const CharityItem: Component<{
   const it = props.item
   return (
     <div class="inline-block h-[96px] w-full">
-      <div class="hover:scale-101 flex h-full w-full items-center gap-3 rounded-2xl bg-gradient-to-b from-neutral-50 to-neutral-100 p-2 text-black shadow hover:brightness-105">
+      <div class="hover:scale-101 flex h-full w-full items-center gap-3 rounded-2xl bg-linear-to-b from-neutral-50 to-neutral-100 p-2 text-black shadow-sm hover:brightness-105">
         <img
           src={it.donationData?.logo}
           alt={it.donationData?.name || it.staticData.name}
-          class="h-12 w-12 flex-shrink-0 rounded object-cover"
+          class="h-12 w-12 shrink-0 rounded-sm object-cover"
           loading="lazy"
         />
         <div class="min-w-0 flex-1">
@@ -60,11 +60,11 @@ export const CharityItemClosed: Component<{
   const it = props.item
   return (
     <div class="inline-block w-full">
-      <div class="flex h-full w-full flex-col items-center justify-center gap-1 rounded-2xl bg-gradient-to-b from-neutral-50 to-neutral-100 p-2 text-black shadow hover:brightness-105">
+      <div class="flex h-full w-full flex-col items-center justify-center gap-1 rounded-2xl bg-linear-to-b from-neutral-50 to-neutral-100 p-2 text-black shadow-sm hover:brightness-105">
         <img
           src={it.donationData?.logo}
           alt={it.donationData?.name || it.staticData.name}
-          class="h-10 w-10 flex-shrink-0 rounded object-cover"
+          class="h-10 w-10 shrink-0 rounded-sm object-cover"
           loading="lazy"
         />
         <p class={'text-center text-xxs font-semibold'}>{it.staticData.name}</p>
@@ -80,7 +80,7 @@ export const CharityItemClosed: Component<{
 export const OverviewComponent: Component<{ overview: Overview }> = (props) => {
   const isJJ = useIsJJ()
   return (
-    <div class="flex w-full flex-col items-start justify-start gap-2 rounded-2xl bg-gradient-to-b from-neutral-50 to-neutral-100 p-2 text-primary-600 hover:brightness-105">
+    <div class="flex w-full flex-col items-start justify-start gap-2 rounded-2xl bg-linear-to-b from-neutral-50 to-neutral-100 p-2 text-primary-600 hover:brightness-105">
       <table class="w-full">
         <tbody>
         <tr>
@@ -125,7 +125,7 @@ export const OverviewComponent: Component<{ overview: Overview }> = (props) => {
 // Closed (collapsed) version: only show total raised
 export const OverviewComponentClosed: Component<{ overview: Overview }> = (props) => {
   return (
-    <div class="flex w-full flex-col items-center justify-center gap-1 rounded-2xl bg-gradient-to-b from-neutral-50 to-neutral-100 p-2 text-primary-600 hover:brightness-105">
+    <div class="flex w-full flex-col items-center justify-center gap-1 rounded-2xl bg-linear-to-b from-neutral-50 to-neutral-100 p-2 text-primary-600 hover:brightness-105">
       <RaisedValue
         class={'text-center text-xs font-bold text-primary-600'}
         item={props.overview.raised.total}

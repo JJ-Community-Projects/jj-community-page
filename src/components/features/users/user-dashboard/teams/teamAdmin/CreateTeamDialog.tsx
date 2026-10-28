@@ -126,7 +126,7 @@ export const CreateTeamDialog: Component<{ isOpen: () => boolean, setIsOpen: (op
                   Team Name
                 </TextField.Label>
                 <TextField.Input
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-accent"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-hidden focus:ring-2 focus:ring-accent"
                   placeholder="My Awesome Team"
                 />
               </TextField>
@@ -141,7 +141,7 @@ export const CreateTeamDialog: Component<{ isOpen: () => boolean, setIsOpen: (op
                 </TextField.Label>
                 <div class="relative">
                   <TextField.Input
-                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-accent"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-hidden focus:ring-2 focus:ring-accent"
                     placeholder="my-awesome-team"
                   />
                   <Show when={isCheckingSlug()}>

@@ -113,7 +113,7 @@ export const UserAvatar: Component<UserAvatarProps> = (props) => {
 
         {/* Username */}
         <p
-          class="text-xs font-medium font-poppins transition-all duration-300 group-hover:font-semibold group-hover:text-opacity-90 text-white px-2 py-1 rounded-full bg-black bg-opacity-40 backdrop-blur-sm"
+          class="text-xs font-medium font-poppins transition-all duration-300 group-hover:font-semibold group-hover:text-opacity-90 text-white px-2 py-1 rounded-full bg-black bg-opacity-40 backdrop-blur-xs"
         >
           {user.username}
         </p>

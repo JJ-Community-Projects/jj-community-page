@@ -80,7 +80,7 @@ const Toggle: Component = () => {
             : 'Expand charities overview'
         }
         class={
-          'flex flex-row items-start justify-center gap-2 rounded-lg bg-gradient-to-b from-neutral-50 to-neutral-100 px-2 py-1 text-xs font-semibold text-neutral-700 shadow ring-1 ring-black/5 transition hover:brightness-105'
+          'flex flex-row items-start justify-center gap-2 rounded-lg bg-linear-to-b from-neutral-50 to-neutral-100 px-2 py-1 text-xs font-semibold text-neutral-700 shadow-sm ring-1 ring-black/5 transition hover:brightness-105'
         }
         onClick={() => setCharityOpen(!charityOpen())}
       >

@@ -21,7 +21,7 @@ interface QueryDebuggerProps<TData = unknown, TError = unknown> {
  */
 export const QueryDebugger: Component<QueryDebuggerProps> = (props) => {
   return (
-    <div class="p-3 bg-gray-100 border-l-4 border-blue-500 rounded text-sm font-mono">
+    <div class="p-3 bg-gray-100 border-l-4 border-blue-500 rounded-sm text-sm font-mono">
       <div class="font-bold text-gray-700 mb-2">Query Debug State:</div>
       <Switch>
         <Match when={props.query.isPending}>

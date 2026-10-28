@@ -86,8 +86,8 @@ type Currency = 'GBP' | 'USD' | 'EUR'
   )
 
   return (
-    <div class="flex flex-col gap-2 rounded bg-black/30 p-3">
-      <p class="mb-2 rounded border border-white/10 bg-white/5 p-2 text-sm text-white/80">
+    <div class="flex flex-col gap-2 rounded-sm bg-black/30 p-3">
+      <p class="mb-2 rounded-sm border border-white/10 bg-white/5 p-2 text-sm text-white/80">
         Show a info panel. Choose a theme, pick filled or striped style, and set the item limit. Set your OBS Browser Source to 300x450 px.
       </p>
       <div class="flex flex-row gap-1">
@@ -96,7 +96,7 @@ type Currency = 'GBP' | 'USD' | 'EUR'
           <div class="flex flex-1 flex-col">
             <FieldRow label="Theme">
               <select
-                class="rounded bg-black/40 px-2 py-1"
+                class="rounded-sm bg-black/40 px-2 py-1"
                 value={theme2()}
                 onChange={(e) => setTheme2(e.currentTarget.value as Theme2)}
               >
@@ -108,7 +108,7 @@ type Currency = 'GBP' | 'USD' | 'EUR'
             </FieldRow>
             <FieldRow label="Header Theme">
               <select
-                class="rounded bg-black/40 px-2 py-1"
+                class="rounded-sm bg-black/40 px-2 py-1"
                 value={headerTheme2()}
                 onChange={(e) =>
                   setHeaderTheme2(e.currentTarget.value as HeaderTheme2)
@@ -121,7 +121,7 @@ type Currency = 'GBP' | 'USD' | 'EUR'
             </FieldRow>
             <FieldRow label="Currency">
               <select
-                class="rounded bg-black/40 px-2 py-1"
+                class="rounded-sm bg-black/40 px-2 py-1"
                 value={currency()}
                 onChange={(e) => setCurrency(e.currentTarget.value as Currency)}
               >
@@ -131,7 +131,7 @@ type Currency = 'GBP' | 'USD' | 'EUR'
               </select>
             </FieldRow>
             <FieldRow label="Header Cards">
-              <div class="flex w-[30rem] flex-col gap-1">
+              <div class="flex w-120 flex-col gap-1">
                 <For each={headerOptions as unknown as string[]}>
                   {(h) => (
                     <label class="flex cursor-pointer items-center gap-2 text-sm">
@@ -173,7 +173,7 @@ type Currency = 'GBP' | 'USD' | 'EUR'
             </FieldRow>
             <FieldRow label="QR Code">
               <select
-                class="rounded bg-black/40 px-2 py-1"
+                class="rounded-sm bg-black/40 px-2 py-1"
                 value={qrCode()}
                 onChange={(e) =>
                   setQrCode(
@@ -195,8 +195,8 @@ type Currency = 'GBP' | 'USD' | 'EUR'
             </FieldRow>
           </div>
           <FieldRow label="Select Charities">
-            <div class="flex w-[30rem] flex-col gap-2">
-              <div class="max-h-60 w-full overflow-y-auto rounded border border-accent-500/40 bg-black/20 p-2">
+            <div class="flex w-120 flex-col gap-2">
+              <div class="max-h-60 w-full overflow-y-auto rounded-sm border border-accent-500/40 bg-black/20 p-2">
                 <Show
                   when={!q.isLoading}
                   fallback={<p class="opacity-70">Loading charities…</p>}

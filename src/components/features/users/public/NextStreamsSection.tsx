@@ -26,7 +26,7 @@ export const NextStreamsSection: Component<StreamsPreviewProps> = (props) => {
       <div class="p-4">
         <div class="mb-4 flex items-center gap-2 text-lg font-semibold">
           <FaSolidPlay class="h-5 w-5 text-black transition-all duration-300 group-hover/next-stream:text-accent" />
-          <h2 class="font-babas text-black transition-all duration-300 ~text-xl/2xl group-hover/next-stream:text-accent">
+          <h2 class="font-babas text-black transition-all duration-300 fl-text-xl/2xl group-hover/next-stream:text-accent">
             Upcoming Streams
           </h2>
         </div>

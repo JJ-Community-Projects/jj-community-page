@@ -41,7 +41,7 @@ export const PreviewDataField: Component<{
   <FieldRow label="Preview Data">
     <div class="flex flex-col items-start gap-1">
       <select
-        class="rounded bg-black/40 px-2 py-1"
+        class="rounded-sm bg-black/40 px-2 py-1"
         value={p.value}
         onChange={(e) => p.onChange(e.currentTarget.value as PreviewDataMode)}
       >
@@ -67,11 +67,11 @@ export const LinkPreview: Component<{ url: string }> = (p) => {
       <a
         href={p.url}
         target="_blank"
-        class="truncate rounded bg-black/40 px-2 py-1 text-xs underline"
+        class="truncate rounded-sm bg-black/40 px-2 py-1 text-xs underline"
       >
         {p.url}
       </a>
-      <button class="rounded bg-primary-500 px-2 py-1 text-xs" onClick={copy}>
+      <button class="rounded-sm bg-primary-500 px-2 py-1 text-xs" onClick={copy}>
         Copy
       </button>
     </div>
@@ -80,13 +80,13 @@ export const LinkPreview: Component<{ url: string }> = (p) => {
 
 // Lightweight live preview frame for an overlay URL
 export const PreviewFrame: Component<{ url: string; visible?: boolean; class?: string }> = (p) => (
-  <div class="mt-3 rounded border border-accent-500/50 bg-black/50">
+  <div class="mt-3 rounded-sm border border-accent-500/50 bg-black/50">
     <iframe
       src={p.visible ? p.url : 'about:blank'}
       title="Overlay preview"
       loading="lazy"
       sandbox="allow-scripts allow-same-origin"
-      class={twMerge("h-[320px] w-full rounded", p.class)}
+      class={twMerge("h-[320px] w-full rounded-sm", p.class)}
     />
   </div>
 )

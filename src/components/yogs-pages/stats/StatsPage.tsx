@@ -63,7 +63,7 @@ const Year: Component<{ stats: Stats, key: string, title: string, expandedItem: 
       <Accordion.Header>
         <Accordion.Trigger
           class={
-            'hover:scale-102 hover:brightness-102 bg-primary-200/50 border-accent-500 border-1 group m-2 flex w-[30vw] flex-row items-center rounded p-2 text-xl text-white shadow'
+            'hover:scale-102 hover:brightness-102 bg-primary-200/50 border-accent-500 border group m-2 flex w-[30vw] flex-row items-center rounded-sm p-2 text-xl text-white shadow-sm'
           }
         >
           <p class={'flex-1 text-left'}>{props.title}</p>

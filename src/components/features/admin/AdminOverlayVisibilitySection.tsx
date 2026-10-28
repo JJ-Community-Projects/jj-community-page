@@ -28,11 +28,11 @@ export const AdminOverlayVisibilitySection: Component = () => {
   const hidden = () => hiddenQuery.data ?? true
 
   return (
-    <div class="rounded border border-gray-300 bg-white p-4">
+    <div class="rounded-sm border border-gray-300 bg-white p-4">
       <div class="mb-2 flex items-center justify-between">
         <h2 class="text-lg font-semibold">Overlay &amp; community content</h2>
         <button
-          class={`rounded px-3 py-1.5 text-white ${hidden() ? 'bg-red-600 hover:bg-red-500' : 'bg-green-600 hover:bg-green-500'}`}
+          class={`rounded-sm px-3 py-1.5 text-white ${hidden() ? 'bg-red-600 hover:bg-red-500' : 'bg-green-600 hover:bg-green-500'}`}
           disabled={
             hiddenQuery.isLoading ||
             hiddenQuery.isError ||

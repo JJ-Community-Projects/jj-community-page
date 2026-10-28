@@ -137,11 +137,11 @@ export const UserStyle: Component<UserStyleProps> = (props) => {
                   </TextField.Label>
                   <div class="flex items-center gap-2">
                     <div
-                      class="h-8 w-8 rounded-md shadow-sm"
+                      class="h-8 w-8 rounded-md shadow-xs"
                       style={{ 'background-color': primaryColor() }}
                     ></div>
                     <TextField.Input
-                      class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent"
+                      class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-hidden focus:ring-2 focus:ring-accent"
                       placeholder="#E30E50"
                       type="color"
                     />
@@ -157,11 +157,11 @@ export const UserStyle: Component<UserStyleProps> = (props) => {
                   </TextField.Label>
                   <div class="flex items-center gap-2">
                     <div
-                      class="h-8 w-8 rounded-md shadow-sm"
+                      class="h-8 w-8 rounded-md shadow-xs"
                       style={{ 'background-color': accentColor() }}
                     ></div>
                     <TextField.Input
-                      class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent"
+                      class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-hidden focus:ring-2 focus:ring-accent"
                       placeholder="#3584BF"
                       type="color"
                     />

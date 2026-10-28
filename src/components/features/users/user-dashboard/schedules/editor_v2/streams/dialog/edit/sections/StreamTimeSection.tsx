@@ -116,23 +116,23 @@ export const StreamTimeSection: Component<{ streamId: number }> = () => {
           <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
             <TextField value={toLocalDateTimeInputValue(s().start)} onChange={updateStart}>
               <TextField.Label class="text-xs font-medium mb-1">Start</TextField.Label>
-              <TextField.Input type="datetime-local" min={minAttr()} max={maxAttr()} class="w-full px-3 py-2 border rounded" />
+              <TextField.Input type="datetime-local" min={minAttr()} max={maxAttr()} class="w-full px-3 py-2 border rounded-sm" />
             </TextField>
             <TextField value={toLocalDateTimeInputValue(s().end)} onChange={updateEnd}>
               <TextField.Label class="text-xs font-medium mb-1">
                 <div class={'flex flex-row gap-1 items-start'}>
                   <span>End</span>
-                  <div class="inline-flex rounded bg-gray-200 p-0.5">
+                  <div class="inline-flex rounded-sm bg-gray-200 p-0.5">
                     <button
                       type="button"
-                      class={`${relativeEndDate() ? 'bg-white shadow' : 'hover:bg-gray-300'} rounded-l px-2 py-1 text-xxs`}
+                      class={`${relativeEndDate() ? 'bg-white shadow-sm' : 'hover:bg-gray-300'} rounded-l px-2 py-1 text-xxs`}
                       onClick={() => setRelativeEndDate(true)}
                     >
                       Relative
                     </button>
                     <button
                       type="button"
-                      class={`${!relativeEndDate() ? 'bg-white shadow' : 'hover:bg-gray-300'} rounded-r px-2 py-1 text-xxs`}
+                      class={`${!relativeEndDate() ? 'bg-white shadow-sm' : 'hover:bg-gray-300'} rounded-r px-2 py-1 text-xxs`}
                       onClick={() => setRelativeEndDate(false)}
                     >
                       Absolute
@@ -147,14 +147,14 @@ export const StreamTimeSection: Component<{ streamId: number }> = () => {
                     type="datetime-local"
                     min={minAttr()}
                     max={maxAttr()}
-                    class="w-full px-3 py-2 border rounded"
+                    class="w-full px-3 py-2 border rounded-sm"
                   />
                 }
               >
                 <div class="flex flex-wrap items-center gap-2">
                   <button
                     type="button"
-                    class="rounded bg-accent px-3 py-2 text-xxs text-white hover:bg-accent-600 disabled:cursor-not-allowed disabled:opacity-50"
+                    class="rounded-sm bg-accent px-3 py-2 text-xxs text-white hover:bg-accent-600 disabled:cursor-not-allowed disabled:opacity-50"
                     disabled={disableEndMinus30()}
                     onClick={() => updateEndByDelta(-30)}
                   >
@@ -162,7 +162,7 @@ export const StreamTimeSection: Component<{ streamId: number }> = () => {
                   </button>
                   <button
                     type="button"
-                    class="rounded bg-accent px-3 py-2 text-xxs text-white hover:bg-accent-600 disabled:cursor-not-allowed disabled:opacity-50"
+                    class="rounded-sm bg-accent px-3 py-2 text-xxs text-white hover:bg-accent-600 disabled:cursor-not-allowed disabled:opacity-50"
                     disabled={disableEndMinus15()}
                     onClick={() => updateEndByDelta(-15)}
                   >
@@ -170,14 +170,14 @@ export const StreamTimeSection: Component<{ streamId: number }> = () => {
                   </button>
                   <button
                     type="button"
-                    class="rounded bg-accent px-3 py-2 text-xxs text-white hover:bg-accent-600"
+                    class="rounded-sm bg-accent px-3 py-2 text-xxs text-white hover:bg-accent-600"
                     onClick={() => setEndToDuration(180)}
                   >
                     3h
                   </button>
                   <button
                     type="button"
-                    class="rounded bg-accent px-3 py-2 text-xxs text-white hover:bg-accent-600 disabled:cursor-not-allowed disabled:opacity-50"
+                    class="rounded-sm bg-accent px-3 py-2 text-xxs text-white hover:bg-accent-600 disabled:cursor-not-allowed disabled:opacity-50"
                     disabled={disableEndPlus15()}
                     onClick={() => updateEndByDelta(15)}
                   >
@@ -185,7 +185,7 @@ export const StreamTimeSection: Component<{ streamId: number }> = () => {
                   </button>
                   <button
                     type="button"
-                    class="rounded bg-accent px-3 py-2 text-xxs text-white hover:bg-accent-600 disabled:cursor-not-allowed disabled:opacity-50"
+                    class="rounded-sm bg-accent px-3 py-2 text-xxs text-white hover:bg-accent-600 disabled:cursor-not-allowed disabled:opacity-50"
                     disabled={disableEndPlus30()}
                     onClick={() => updateEndByDelta(30)}
                   >

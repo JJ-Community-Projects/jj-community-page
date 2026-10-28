@@ -27,7 +27,7 @@ export const AdminTwitchSection: Component = () => {
   )
 
   return (
-    <div class="flex flex-col gap-3 rounded border bg-white border-gray-300 p-4">
+    <div class="flex flex-col gap-3 rounded-sm border bg-white border-gray-300 p-4">
       <div class="flex items-center justify-between">
         <h2 class="text-lg font-semibold">Twitch Tools</h2>
         <div class="flex items-center gap-3">
@@ -116,7 +116,7 @@ export const AdminTwitchSection: Component = () => {
                       </a>
                     </td>
                     <td class="py-2 pr-4">
-                      <span class="line-clamp-2 break-words">
+                      <span class="line-clamp-2 wrap-break-word">
                         {item.title ?? ''}
                       </span>
                     </td>

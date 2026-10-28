@@ -27,7 +27,7 @@ export const RelatedSection: Component<RelatedSectionProps> = (props) => {
       <div class="p-4">
         <div class="mb-4 flex items-center gap-2 text-lg font-semibold">
           <FaSolidUserTag class="h-5 w-5 text-black transition-all duration-300 group-hover:text-accent" />
-          <h2 class="font-babas text-black transition-all duration-300 ~text-xl/2xl group-hover:text-accent">
+          <h2 class="font-babas text-black transition-all duration-300 fl-text-xl/2xl group-hover:text-accent">
             Related
           </h2>
         </div>

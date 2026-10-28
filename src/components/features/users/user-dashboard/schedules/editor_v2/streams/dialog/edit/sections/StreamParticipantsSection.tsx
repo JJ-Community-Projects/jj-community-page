@@ -60,7 +60,7 @@ export const StreamParticipantsSection: Component = () => {
                       {user.username || user.twitchLogin || user.tiltifySlug}
                     </div>
                     <button
-                      class="rounded bg-accent px-2 py-1 text-sm text-white hover:bg-accent-600"
+                      class="rounded-sm bg-accent px-2 py-1 text-sm text-white hover:bg-accent-600"
                       onClick={() => onAddLocal(user)}
                     >
                       Add
@@ -80,7 +80,7 @@ export const StreamParticipantsSection: Component = () => {
                       {user.username || user.twitchLogin || user.tiltifySlug}
                     </div>
                     <button
-                      class="rounded bg-accent px-2 py-1 text-sm text-white hover:bg-accent-600"
+                      class="rounded-sm bg-accent px-2 py-1 text-sm text-white hover:bg-accent-600"
                       onClick={() => onAddLocal(user)}
                     >
                       Add
@@ -96,7 +96,7 @@ export const StreamParticipantsSection: Component = () => {
       <Show when={participants().length > 0}>
         <div>
           <p class="mb-1 text-xs text-gray-500">Current participants</p>
-          <div class="divide-y rounded border">
+          <div class="divide-y rounded-sm border">
             <For each={participants()}>
               {(p) => {
                 return (
@@ -108,7 +108,7 @@ export const StreamParticipantsSection: Component = () => {
                         `User #${p.userId}`}
                     </div>
                     <button
-                      class="rounded bg-danger px-2 py-1 text-sm text-white hover:bg-danger-600"
+                      class="rounded-sm bg-danger px-2 py-1 text-sm text-white hover:bg-danger-600"
                       onClick={() => onRemoveLocal(p.userId)}
                     >
                       Remove

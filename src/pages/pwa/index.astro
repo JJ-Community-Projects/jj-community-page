@@ -14,6 +14,6 @@ const {data: tagCatalog} = await serverClientPublic.tags.catalog(
   description="A central place to showcase the streams of the Jingle Jam!"
   canonical="https://jinglejam.ostof.dev/community"
 >
-    <p class="text-white ~text-2xl/4xl">Community</p>
+    <p class="text-white fl-text-2xl/4xl">Community</p>
     <CommunityPage client:only="solid-js" tagCatalog={tagCatalog?.tags}/>
 </PWABaseLayout>

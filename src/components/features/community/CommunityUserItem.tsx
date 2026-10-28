@@ -21,9 +21,9 @@ export const CommunityUserItem: Component<CommunityUserItemProps> = (props) => {
   return (
     <div
       class={twMerge(
-        'w-full rounded-2xl shadow-sm transition-all duration-200 hover:shadow-md',
+        'w-full rounded-2xl shadow-xs transition-all duration-200 hover:shadow-md',
         'hover:scale-101 hover:brightness-105',
-        'bg-gradient-to-b from-neutral-50 to-neutral-100 ring-1 ring-black/5',
+        'bg-linear-to-b from-neutral-50 to-neutral-100 ring-1 ring-black/5',
       )}
     >
       <div class={'flex h-full w-full flex-col gap-2 p-2'}>

@@ -22,8 +22,8 @@ export const UserScheduleConfigurator: Component<{ visible?: boolean }> = (
   )
 
   return (
-    <div class="flex flex-col gap-2 rounded bg-black/30 p-3">
-      <div class="mb-2 rounded border border-white/10 bg-white/5 p-2 text-sm text-white/80">
+    <div class="flex flex-col gap-2 rounded-sm bg-black/30 p-3">
+      <div class="mb-2 rounded-sm border border-white/10 bg-white/5 p-2 text-sm text-white/80">
         Display your upcoming Tiltify stream slots in a compact panel. Choose a
         theme, pick filled or stripe style, and set how many items to show. Set
         your OBS Browser Source to 300x450 px.
@@ -34,7 +34,7 @@ export const UserScheduleConfigurator: Component<{ visible?: boolean }> = (
             <select
               value={theme()}
               onChange={(e) => setTheme(e.currentTarget.value as any)}
-              class="w-40 rounded bg-black/40 px-2 py-1"
+              class="w-40 rounded-sm bg-black/40 px-2 py-1"
             >
               <option value="default">Default</option>
               <option value="red">Red</option>
@@ -47,7 +47,7 @@ export const UserScheduleConfigurator: Component<{ visible?: boolean }> = (
               onChange={(e) =>
                 setStreamStyle(e.currentTarget.value as 'filled' | 'stripe')
               }
-              class="w-40 rounded bg-black/40 px-2 py-1"
+              class="w-40 rounded-sm bg-black/40 px-2 py-1"
             >
               <option value="filled">Filled</option>
               <option value="stripe">Stripe</option>
@@ -60,7 +60,7 @@ export const UserScheduleConfigurator: Component<{ visible?: boolean }> = (
                 const v = Math.floor(Number(e.currentTarget.value))
                 if (Number.isFinite(v)) setLimit(Math.max(1, Math.min(100, v)))
               }}
-              class="w-40 rounded bg-black/40 px-2 py-1"
+              class="w-40 rounded-sm bg-black/40 px-2 py-1"
             >
               <option value="1">1</option>
               <option value="2">2</option>

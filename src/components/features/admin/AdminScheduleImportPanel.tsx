@@ -40,11 +40,11 @@ export const AdminScheduleImportPanel: Component = () => {
   }
 
   return (
-    <div class="mt-4 p-4 border border-gray-200 rounded">
+    <div class="mt-4 p-4 border border-gray-200 rounded-sm">
       <h3 class="text-lg font-semibold mb-2">Import Schedule</h3>
       <p class="text-sm text-gray-600 mb-3">Paste a JSON export produced by the Export button and click Import.</p>
       <textarea
-        class="w-full min-h-[160px] p-2 border rounded font-mono text-sm"
+        class="w-full min-h-[160px] p-2 border rounded-sm font-mono text-sm"
         placeholder="Paste schedule JSON here"
         value={text()}
         onInput={(e) => setText(e.currentTarget.value)}
@@ -53,7 +53,7 @@ export const AdminScheduleImportPanel: Component = () => {
       <div class="mt-3 flex items-center gap-2">
         <button
           type="button"
-          class="px-3 py-1.5 rounded bg-green-600 text-white hover:bg-green-700 text-xs disabled:opacity-50"
+          class="px-3 py-1.5 rounded-sm bg-green-600 text-white hover:bg-green-700 text-xs disabled:opacity-50"
           onClick={handleImport}
           disabled={importSchedule.isPending}
         >

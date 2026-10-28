@@ -44,18 +44,18 @@ export const ScheduleHeader: Component<ScheduleHeaderProps> = (props) => {
         {/* Navigation - User ownership semantic (primary colors) */}
         <a
           href={`/dashboard`}
-          class="flex items-center gap-2 rounded-md font-medium text-primary transition-colors hover:text-primary-600 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+          class="flex items-center gap-2 rounded-md font-medium text-primary transition-colors hover:text-primary-600 focus:outline-hidden focus:ring-2 focus:ring-primary focus:ring-offset-2"
         >
           <FaSolidChevronLeft class="h-4 w-4" />
           <span>Back to Dashboard</span>
         </a>
 
         <div class="flex items-center justify-between">
-          <h2 class="font-bold text-gray-800 ~text-xl/2xl">Your Schedules</h2>
+          <h2 class="font-bold text-gray-800 fl-text-xl/2xl">Your Schedules</h2>
 
           {/* Add Schedule button - Discovery/Add action semantic (accent colors) */}
           <button
-            class="transform rounded-lg bg-accent px-4 py-2 font-medium text-white shadow-sm transition-all duration-200 hover:bg-accent-600 hover:shadow-md focus:ring-2 focus:ring-accent focus:ring-offset-2 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+            class="transform rounded-lg bg-accent px-4 py-2 font-medium text-white shadow-xs transition-all duration-200 hover:bg-accent-600 hover:shadow-md focus:ring-2 focus:ring-accent focus:ring-offset-2 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
             onClick={() => props.onAddSchedule()}
           >
             Add Schedule
@@ -66,10 +66,10 @@ export const ScheduleHeader: Component<ScheduleHeaderProps> = (props) => {
         <Show when={props.schedules.length > 0 && !hasPrimarySchedule()}>
           <div class="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-3 text-amber-900">
             <FaSolidTriangleExclamation
-              class="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-500"
+              class="mt-0.5 h-5 w-5 shrink-0 text-amber-500"
               aria-hidden="true"
             />
-            <p class="leading-relaxed ~text-sm/base">
+            <p class="leading-relaxed fl-text-sm/base">
               You haven't set a primary schedule yet. Your page will not
               highlight a schedule until you set one. Use the star button on a
               schedule to mark it as your primary.
@@ -81,10 +81,10 @@ export const ScheduleHeader: Component<ScheduleHeaderProps> = (props) => {
         <Show when={hasInvisibleStreamsInVisibleSchedule()}>
           <div class="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-3 text-amber-900">
             <FaSolidTriangleExclamation
-              class="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-500"
+              class="mt-0.5 h-5 w-5 shrink-0 text-amber-500"
               aria-hidden="true"
             />
-            <p class="leading-relaxed ~text-sm/base">
+            <p class="leading-relaxed fl-text-sm/base">
               All streams in your public primary schedule are hidden. Set those streams to Visible so they appear on your page.
             </p>
           </div>
@@ -94,10 +94,10 @@ export const ScheduleHeader: Component<ScheduleHeaderProps> = (props) => {
         <Show when={props.schedules.length > 0 && !hasVisibleSchedule()}>
           <div class="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-3 text-amber-900">
             <FaSolidTriangleExclamation
-              class="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-500"
+              class="mt-0.5 h-5 w-5 shrink-0 text-amber-500"
               aria-hidden="true"
             />
-            <p class="leading-relaxed ~text-sm/base">
+            <p class="leading-relaxed fl-text-sm/base">
               None of your schedules are public yet. Your page won't show a
               schedule until you make one visible. Use the eye button on a
               schedule to toggle its visibility to Public.
@@ -115,17 +115,17 @@ export const ScheduleHeader: Component<ScheduleHeaderProps> = (props) => {
         >
           <div class="flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 p-3 text-red-900">
             <FaSolidTriangleExclamation
-              class="mt-0.5 h-5 w-5 flex-shrink-0 text-red-500"
+              class="mt-0.5 h-5 w-5 shrink-0 text-red-500"
               aria-hidden="true"
             />
-            <p class="leading-relaxed ~text-sm/base">
+            <p class="leading-relaxed fl-text-sm/base">
               You don't have a public primary schedule for {now().year}. Set one of your {now().year }{' '}
               schedules as Primary and make it Public to feature it.
             </p>
           </div>
         </Show>
 
-        <p class="leading-relaxed text-gray-600 ~text-sm/base">
+        <p class="leading-relaxed text-gray-600 fl-text-sm/base">
           You can create up to 3 schedules per year. Only one can be set as your
           primary schedule for that year. In most cases, you'll only need one
           per year. Your primary schedule will be highlighted on your page,

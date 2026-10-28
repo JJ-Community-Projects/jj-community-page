@@ -85,39 +85,39 @@ export const YogsStreamTile: Component<YogsStreamTileProps> = (props) => {
     }
 
     if (tileSize() === 2 && (subtitle() === undefined || subtitle() === '')) {
-      return 'line-clamp-2 text-pretty font-bold uppercase tracking-wide ~text-base/2xl'
+      return 'line-clamp-2 text-pretty font-bold uppercase tracking-wide fl-text-base/2xl'
     } else if (
       tileSize() === 2 &&
       !(subtitle() === undefined || subtitle() === '')
     ) {
-      return 'line-clamp-2 text-pretty font-bold uppercase tracking-wide ~text-xs/base'
+      return 'line-clamp-2 text-pretty font-bold uppercase tracking-wide fl-text-xs/base'
     }
 
     if (tileSize() === 3) {
-      return 'text-pretty font-bold uppercase tracking-widest ~text-sm/2xl'
+      return 'text-pretty font-bold uppercase tracking-widest fl-text-sm/2xl'
     }
 
     if (tileSize() === 4) {
-      return 'line-clamp-3 text-pretty font-bold uppercase tracking-widest ~text-sm/2xl'
+      return 'line-clamp-3 text-pretty font-bold uppercase tracking-widest fl-text-sm/2xl'
     }
 
-    return 'text-pretty font-bold uppercase tracking-widest ~text-sm/3xl'
+    return 'text-pretty font-bold uppercase tracking-widest fl-text-sm/3xl'
   }
 
   const subtitleStyle = () => {
     if (tileSize() === 1) {
-      return '~text-xs/sm text-pretty uppercase tracking-wide'
+      return 'fl-text-xs/sm text-pretty uppercase tracking-wide'
     }
 
     if (tileSize() === 2) {
-      return '~text-xs/sm text-pretty uppercase tracking-wide'
+      return 'fl-text-xs/sm text-pretty uppercase tracking-wide'
     }
 
     if (tileSize() === 4) {
-      return '~text-xs/base text-pretty uppercase tracking-widest'
+      return 'fl-text-xs/base text-pretty uppercase tracking-widest'
     }
 
-    return '~text-xs/base text-pretty uppercase tracking-widest'
+    return 'fl-text-xs/base text-pretty uppercase tracking-widest'
   }
 
   const countdownStyle = () => {
@@ -136,7 +136,7 @@ export const YogsStreamTile: Component<YogsStreamTileProps> = (props) => {
       return '~text-xxxs font-bold tracking-wide'
     }
 
-    return '~text-base/lg font-bold tracking-wide'
+    return 'fl-text-base/lg font-bold tracking-wide'
   }
 
   return (

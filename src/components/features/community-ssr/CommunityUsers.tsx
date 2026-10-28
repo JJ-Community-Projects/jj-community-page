@@ -34,7 +34,7 @@ export const CommunityUsers: Component = (props) => {
 
           <div
             class={
-              'grid w-full grid-cols-[repeat(auto-fit,_minmax(250px,_1fr))] content-center gap-2'
+              'grid w-full grid-cols-[repeat(auto-fit,minmax(250px,1fr))] content-center gap-2'
             }
           >
             <For each={list()}>

@@ -30,7 +30,7 @@ export const StreamEditDialog: Component = () => {
             <div class="p-5 overflow-y-auto flex-1">
               <Show when={dialog.lockedBy()}>
                 {(holder) => (
-                  <div role="status" class="mb-4 bg-amber-100 border border-amber-400 text-amber-800 px-4 py-2 rounded text-sm">
+                  <div role="status" class="mb-4 bg-amber-100 border border-amber-400 text-amber-800 px-4 py-2 rounded-sm text-sm">
                     <FaSolidLock class="inline mr-1" />{lockHolderName(holder())} is editing this stream. Saving is refused until they close it.
                   </div>
                 )}
@@ -43,7 +43,7 @@ export const StreamEditDialog: Component = () => {
             <div class="border-t p-4">
               <Show when={dialog.error()}>
                 {(message) => (
-                  <div role="alert" class="mb-3 bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded text-sm">
+                  <div role="alert" class="mb-3 bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded-sm text-sm">
                     {message()}
                   </div>
                 )}

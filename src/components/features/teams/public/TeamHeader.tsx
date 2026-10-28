@@ -22,12 +22,12 @@ export const TeamHeader: Component<TeamHeaderProps> = (props) => {
           {/* Team Icon and Name Section - Horizontal */}
           <div class="mb-4 flex items-center gap-3">
             <FaSolidUsers class="h-8 w-8 text-neutral-600" />
-            <h1 class="font-babas text-black ~text-2xl/4xl">{team.name}</h1>
+            <h1 class="font-babas text-black fl-text-2xl/4xl">{team.name}</h1>
           </div>
 
           {/* Team Description Section - Below Name */}
           <Show when={team.description}>
-            <p class="mb-4 max-w-2xl font-poppins text-neutral-600 ~text-base/lg">
+            <p class="mb-4 max-w-2xl font-poppins text-neutral-600 fl-text-base/lg">
               {team.description}
             </p>
           </Show>

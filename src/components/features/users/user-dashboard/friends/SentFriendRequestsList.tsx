@@ -58,7 +58,7 @@ const SentFriendRequestItem: Component<SentFriendRequestItemProps> = (
               props.request.profileImage.trim() !== ''
             }
             fallback={
-              <div class="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-accent-500 to-accent-600 shadow-sm">
+              <div class="flex h-12 w-12 items-center justify-center rounded-full bg-linear-to-br from-accent-500 to-accent-600 shadow-xs">
                 <span class="font-semibold text-white">
                   {(props.request.username || 'U')[0].toUpperCase()}
                 </span>
@@ -68,7 +68,7 @@ const SentFriendRequestItem: Component<SentFriendRequestItemProps> = (
             <img
               src={props.request.profileImage}
               alt={`${props.request.username}'s profile`}
-              class="h-12 w-12 rounded-full object-cover shadow-sm"
+              class="h-12 w-12 rounded-full object-cover shadow-xs"
               onError={(e) => {
                 // Fallback to gradient avatar if image fails to load
                 const target = e.target as HTMLImageElement
@@ -77,7 +77,7 @@ const SentFriendRequestItem: Component<SentFriendRequestItemProps> = (
                 if (fallback) fallback.style.display = 'flex'
               }}
             />
-            <div class="flex hidden h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-accent-500 to-accent-600 shadow-sm">
+            <div class="flex hidden h-12 w-12 items-center justify-center rounded-full bg-linear-to-br from-accent-500 to-accent-600 shadow-xs">
               <span class="font-semibold text-white">
                 {(props.request.username || 'U')[0].toUpperCase()}
               </span>
@@ -108,7 +108,7 @@ const SentFriendRequestItem: Component<SentFriendRequestItemProps> = (
             type="button"
             onClick={handleCancelClick}
             disabled={isCancellingFriendRequest()}
-            class="flex items-center gap-1 rounded-lg bg-gray-200 px-4 py-2 text-sm font-medium text-gray-700 shadow-sm outline-none transition-all duration-200 hover:bg-red-200 hover:text-red-700 hover:shadow-md focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-white disabled:cursor-not-allowed disabled:opacity-50"
+            class="flex items-center gap-1 rounded-lg bg-gray-200 px-4 py-2 text-sm font-medium text-gray-700 shadow-xs outline-hidden transition-all duration-200 hover:bg-red-200 hover:text-red-700 hover:shadow-md focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-white disabled:cursor-not-allowed disabled:opacity-50"
             aria-label={`Cancel friend request to ${props.request.username}`}
           >
             <FaSolidXmark class="h-4 w-4" />
@@ -131,7 +131,7 @@ const SentFriendRequestItem: Component<SentFriendRequestItemProps> = (
 
 const EmptyState = () => (
   <div class="flex flex-col items-center justify-center px-4 py-12">
-    <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-accent-500 to-accent-600 shadow-lg">
+    <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-linear-to-br from-accent-500 to-accent-600 shadow-lg">
       <FaSolidPaperPlane class="h-8 w-8 text-white" />
     </div>
     <h3 class="mb-2 text-xl font-semibold text-gray-800">
@@ -146,9 +146,9 @@ const EmptyState = () => (
 
 const LoadingSkeleton = () => (
   <div class="space-y-4">
-    <div class="h-16 animate-pulse rounded-xl bg-gray-200 shadow-sm"></div>
-    <div class="h-16 animate-pulse rounded-xl bg-gray-200 shadow-sm"></div>
-    <div class="h-16 animate-pulse rounded-xl bg-gray-200 shadow-sm"></div>
+    <div class="h-16 animate-pulse rounded-xl bg-gray-200 shadow-xs"></div>
+    <div class="h-16 animate-pulse rounded-xl bg-gray-200 shadow-xs"></div>
+    <div class="h-16 animate-pulse rounded-xl bg-gray-200 shadow-xs"></div>
   </div>
 )
 
@@ -183,7 +183,7 @@ export const SentFriendRequestsList: Component = () => {
       <Show when={hasCancelFriendRequestError()}>
         <div class="mb-4 rounded-xl border border-red-200 bg-red-50 p-4">
           <div class="flex items-center gap-3 text-red-600">
-            <FaSolidCircleExclamation class="h-4 w-4 flex-shrink-0" />
+            <FaSolidCircleExclamation class="h-4 w-4 shrink-0" />
             <p class="text-sm font-medium">
               {cancelFriendRequestErrorMessage() ||
                 'Failed to cancel friend request'}
@@ -200,7 +200,7 @@ export const SentFriendRequestsList: Component = () => {
         <Match when={hasSentFriendRequestsError()}>
           <div class="rounded-xl border border-red-200 bg-red-50 p-6">
             <div class="flex items-center justify-center gap-3 text-red-600">
-              <FaSolidCircleExclamation class="h-5 w-5 flex-shrink-0" />
+              <FaSolidCircleExclamation class="h-5 w-5 shrink-0" />
               <div>
                 <p class="text-sm font-semibold">
                   Error loading sent friend requests

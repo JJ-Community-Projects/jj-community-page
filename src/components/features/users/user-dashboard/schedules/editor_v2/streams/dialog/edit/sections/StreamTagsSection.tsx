@@ -44,7 +44,7 @@ export const StreamTagsSection: Component<{ streamId: number }> = () => {
 
       <TextField value={tagSearch.searchInput?.() ?? ""} onChange={tagSearch.handleSearchInput}>
         <TextField.Label class="text-xs font-medium mb-1">Add tag</TextField.Label>
-        <TextField.Input class="w-full px-3 py-2 border rounded" placeholder="Search tag" />
+        <TextField.Input class="w-full px-3 py-2 border rounded-sm" placeholder="Search tag" />
       </TextField>
 
       {/* Suggestions */}

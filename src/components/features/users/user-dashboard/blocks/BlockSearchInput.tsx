@@ -48,7 +48,7 @@ export const BlockSearchInput: Component = () => {
         {/* Search input */}
         <input
           type="text"
-          class="w-full rounded-xl border-2 border-gray-200 bg-white/50 py-3 pl-12 pr-12 font-medium text-gray-800 placeholder-gray-500 shadow-sm outline-none backdrop-blur-sm transition-all duration-300 hover:bg-white/70 hover:shadow-md focus:border-danger focus:shadow-lg focus:ring-4 focus:ring-danger/20"
+          class="w-full rounded-xl border-2 border-gray-200 bg-white/50 py-3 pl-12 pr-12 font-medium text-gray-800 placeholder-gray-500 shadow-xs outline-hidden backdrop-blur-xs transition-all duration-300 hover:bg-white/70 hover:shadow-md focus:border-danger focus:shadow-lg focus:ring-4 focus:ring-danger/20"
           placeholder="Search for users to block..."
           value={searchInput()}
           onInput={handleInput}
@@ -60,7 +60,7 @@ export const BlockSearchInput: Component = () => {
           <button
             type="button"
             onClick={clearSearch}
-            class="absolute inset-y-0 right-0 flex items-center rounded-full p-1 pr-4 text-gray-400 outline-none transition-colors duration-200 hover:text-gray-600 focus:ring-2 focus:ring-danger focus:ring-offset-2 focus:ring-offset-white"
+            class="absolute inset-y-0 right-0 flex items-center rounded-full p-1 pr-4 text-gray-400 outline-hidden transition-colors duration-200 hover:text-gray-600 focus:ring-2 focus:ring-danger focus:ring-offset-2 focus:ring-offset-white"
             aria-label="Clear search"
           >
             <FaSolidXmark class="h-5 w-5" />
@@ -68,12 +68,12 @@ export const BlockSearchInput: Component = () => {
         )}
 
         {/* Focus ring enhancement */}
-        <div class="pointer-events-none absolute inset-0 rounded-xl bg-gradient-to-r from-danger/5 to-danger-600/10 opacity-0 transition-opacity duration-300 peer-focus:opacity-100"></div>
+        <div class="pointer-events-none absolute inset-0 rounded-xl bg-linear-to-r from-danger/5 to-danger-600/10 opacity-0 transition-opacity duration-300 peer-focus:opacity-100"></div>
       </div>
 
       {/* Helper text */}
       <div class="mt-3 flex items-start gap-2">
-        <FaSolidCircleInfo class="mt-0.5 h-3 w-3 flex-shrink-0 text-gray-400" />
+        <FaSolidCircleInfo class="mt-0.5 h-3 w-3 shrink-0 text-gray-400" />
         <div class="space-y-1 text-xs text-gray-500">
           {searchInput().length > 0 && (
             <p class="font-medium text-danger-600">

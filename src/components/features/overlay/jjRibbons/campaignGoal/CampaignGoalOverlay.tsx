@@ -84,7 +84,7 @@ const Body: Component = () => {
       }}
     >
       <div
-        class={`relative flex h-[40px] w-full items-center justify-center bg-[var(--main-ribbon-color)] font-bold text-white`}
+        class={`relative flex h-[40px] w-full items-center justify-center bg-(--main-ribbon-color) font-bold text-white`}
         style={{
           'clip-path': ribbonShape(),
         }}
@@ -100,7 +100,7 @@ const Body: Component = () => {
         <Show when={showChangeLabel()}>
           <span
             class={twMerge(
-              'pointer-events-none absolute top-1/2 -translate-y-1/2 rounded-full bg-green-500 px-2 py-0.5 text-xxs font-bold text-white shadow-sm',
+              'pointer-events-none absolute top-1/2 -translate-y-1/2 rounded-full bg-green-500 px-2 py-0.5 text-xxs font-bold text-white shadow-xs',
               alignment() === 'right' && 'right-2',
               alignment() === 'left' && 'left-2',
             )}
@@ -123,7 +123,7 @@ const Body: Component = () => {
 
       <div class="flex w-[70%] flex-col items-end">
         <div
-          class={`flex h-[40px] w-full items-center justify-center bg-white font-bold text-[var(--main-ribbon-color)]`}
+          class={`flex h-[40px] w-full items-center justify-center bg-white font-bold text-(--main-ribbon-color)`}
           style={{
             'clip-path': ribbonShape(),
           }}
@@ -136,7 +136,7 @@ const Body: Component = () => {
             />
           </p>
         </div>
-        <div class={`h-3 w-full overflow-hidden rounded ${barClass()}`}>
+        <div class={`h-3 w-full overflow-hidden rounded-sm ${barClass()}`}>
           <div
             class={twMerge(
               `h-full ${barFullClass()} transition-all duration-700`,

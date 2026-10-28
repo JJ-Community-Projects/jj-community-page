@@ -115,16 +115,16 @@ const SortSelection: Component = () => {
         </RadioGroup.Label>
         <div
           class={twMerge(
-            'inline-flex w-fit items-center gap-1 rounded-xl p-1 shadow-sm',
-            'bg-gradient-to-b from-neutral-50 to-neutral-100 ring-1 ring-black/5',
+            'inline-flex w-fit items-center gap-1 rounded-xl p-1 shadow-xs',
+            'bg-linear-to-b from-neutral-50 to-neutral-100 ring-1 ring-black/5',
           )}
         >
           <RadioGroup.Item
             value={'raised'}
             class={twMerge(
               'group relative inline-flex select-none items-center rounded-lg px-3 py-1.5 text-xs font-semibold text-neutral-700',
-              'transition-all duration-200 hover:brightness-105 focus-visible:outline-none',
-              'data-[checked]:bg-white data-[checked]:text-primary-500 data-[checked]:shadow',
+              'transition-all duration-200 hover:brightness-105 focus-visible:outline-hidden',
+              'data-checked:bg-white data-checked:text-primary-500 data-checked:shadow-sm',
             )}
           >
             <RadioGroup.ItemInput class={'sr-only'} />
@@ -137,8 +137,8 @@ const SortSelection: Component = () => {
             value={'live'}
             class={twMerge(
               'group relative inline-flex select-none items-center rounded-lg px-3 py-1.5 text-xs font-semibold text-neutral-700',
-              'transition-all duration-200 hover:brightness-105 focus-visible:outline-none',
-              'data-[checked]:bg-white data-[checked]:text-primary-500 data-[checked]:shadow',
+              'transition-all duration-200 hover:brightness-105 focus-visible:outline-hidden',
+              'data-checked:bg-white data-checked:text-primary-500 data-checked:shadow-sm',
             )}
           >
             <RadioGroup.ItemInput class={'sr-only'} />
@@ -151,8 +151,8 @@ const SortSelection: Component = () => {
             value={'cause'}
             class={twMerge(
               'group relative inline-flex select-none items-center rounded-lg px-3 py-1.5 text-xs font-semibold text-neutral-700',
-              'transition-all duration-200 hover:brightness-105 focus-visible:outline-none',
-              'data-[checked]:bg-white data-[checked]:text-primary-500 data-[checked]:shadow',
+              'transition-all duration-200 hover:brightness-105 focus-visible:outline-hidden',
+              'data-checked:bg-white data-checked:text-primary-500 data-checked:shadow-sm',
             )}
           >
             <RadioGroup.ItemInput class={'sr-only'} />
@@ -185,16 +185,16 @@ const CurrencySelection: Component = () => {
         </RadioGroup.Label>
         <div
           class={twMerge(
-            'inline-flex w-fit items-center gap-1 rounded-xl p-1 shadow-sm',
-            'bg-gradient-to-b from-neutral-50 to-neutral-100 ring-1 ring-black/5',
+            'inline-flex w-fit items-center gap-1 rounded-xl p-1 shadow-xs',
+            'bg-linear-to-b from-neutral-50 to-neutral-100 ring-1 ring-black/5',
           )}
         >
           <RadioGroup.Item
             value={'GBP'}
             class={twMerge(
               'group relative inline-flex select-none items-center rounded-lg px-3 py-1.5 text-xs font-semibold text-neutral-700',
-              'transition-all duration-200 hover:brightness-105 focus-visible:outline-none',
-              'data-[checked]:bg-white data-[checked]:text-primary-500 data-[checked]:shadow',
+              'transition-all duration-200 hover:brightness-105 focus-visible:outline-hidden',
+              'data-checked:bg-white data-checked:text-primary-500 data-checked:shadow-sm',
             )}
           >
             <RadioGroup.ItemInput class={'sr-only'} />
@@ -207,8 +207,8 @@ const CurrencySelection: Component = () => {
             value={'USD'}
             class={twMerge(
               'group relative inline-flex select-none items-center rounded-lg px-3 py-1.5 text-xs font-semibold text-neutral-700',
-              'transition-all duration-200 hover:brightness-105 focus-visible:outline-none',
-              'data-[checked]:bg-white data-[checked]:text-primary-500 data-[checked]:shadow',
+              'transition-all duration-200 hover:brightness-105 focus-visible:outline-hidden',
+              'data-checked:bg-white data-checked:text-primary-500 data-checked:shadow-sm',
             )}
           >
             <RadioGroup.ItemInput class={'sr-only'} />
@@ -221,8 +221,8 @@ const CurrencySelection: Component = () => {
             value={'EUR'}
             class={twMerge(
               'group relative inline-flex select-none items-center rounded-lg px-3 py-1.5 text-xs font-semibold text-neutral-700',
-              'transition-all duration-200 hover:brightness-105 focus-visible:outline-none',
-              'data-[checked]:bg-white data-[checked]:text-primary-500 data-[checked]:shadow',
+              'transition-all duration-200 hover:brightness-105 focus-visible:outline-hidden',
+              'data-checked:bg-white data-checked:text-primary-500 data-checked:shadow-sm',
             )}
           >
             <RadioGroup.ItemInput class={'sr-only'} />
@@ -241,13 +241,13 @@ const Header: Component = () => {
   const jjStartCountdown = useJJStartCountdown()
   const isJJ = useIsJJ()
   return (
-    <div class="rounded-xl border-2 bg-gradient-to-b from-neutral-50 to-neutral-100 p-2 shadow-md transition-all duration-300 hover:shadow-lg">
+    <div class="rounded-xl border-2 bg-linear-to-b from-neutral-50 to-neutral-100 p-2 shadow-md transition-all duration-300 hover:shadow-lg">
       <div class="flex w-full flex-col gap-2 p-4 md:flex-row md:items-center md:justify-between">
         {/* Left: Title, icon, subtitle (left-aligned) */}
         <div class="flex flex-col items-center text-center md:items-start md:text-left">
           <div class="flex items-center gap-2">
             <FaSolidHeart class="h-8 w-8 text-neutral-600" />
-            <h1 class="font-bold text-black ~text-2xl/4xl">Community</h1>
+            <h1 class="font-bold text-black fl-text-2xl/4xl">Community</h1>
           </div>
           <h2 class={'font-semibold text-black'}>
             Fundraisers and upcoming streams
@@ -324,7 +324,7 @@ const CampaignGrid: Component = () => {
       <CommunityTagSearch />
       <div
         class={
-          'grid w-full grid-cols-[repeat(auto-fit,_minmax(250px,_1fr))] content-center gap-2'
+          'grid w-full grid-cols-[repeat(auto-fit,minmax(250px,1fr))] content-center gap-2'
         }
       >
         <For each={campaignsSorted()}>
@@ -373,7 +373,7 @@ const CampaignGridByCause: Component = () => {
                 <CommunityCauseCard cause={cause} />
                 <div
                   class={
-                    'grid w-full grid-cols-[repeat(auto-fit,_minmax(300px,_1fr))] content-center gap-4'
+                    'grid w-full grid-cols-[repeat(auto-fit,minmax(300px,1fr))] content-center gap-4'
                   }
                 >
                   <For each={campaigns}>

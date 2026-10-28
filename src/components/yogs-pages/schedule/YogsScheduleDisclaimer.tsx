@@ -9,7 +9,7 @@ import {
 
 export const YogsScheduleDisclaimer: Component = () => {
   return (
-    <div class={'max-w-[30rem] text-pretty text-center text-white'}>
+    <div class={'max-w-120 text-pretty text-center text-white'}>
       <p>
         This site <strong>is maintained by the community</strong>.
       </p>
@@ -36,7 +36,7 @@ export const YogsScheduleDisclaimer: Component = () => {
 
 export const YogsStreamDisclaimer: Component = () => {
   return (
-    <div class={'max-w-[30rem] text-pretty text-center text-xs'}>
+    <div class={'max-w-120 text-pretty text-center text-xs'}>
       <p>
         The schedule is subject to change and not all participants are
         confirmed. For more information visit the Yogscast's social media.

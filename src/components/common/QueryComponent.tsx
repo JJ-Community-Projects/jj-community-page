@@ -168,7 +168,7 @@ export function RawQueryComponent<TData, TError>(props: RawQueryComponentProps<T
             </Show>
             <button
               onClick={refetch()}
-              class="mt-2 px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
+              class="mt-2 px-3 py-1 bg-blue-500 text-white rounded-sm hover:bg-blue-600"
             >
               Retry
             </button>
@@ -194,7 +194,7 @@ export function RawQueryComponent<TData, TError>(props: RawQueryComponentProps<T
             {props.refetching?.(props.query.data!) ?? (
               <div class="relative">
                 {props.children(props.query.data!)}
-                <div class="absolute top-0 right-0 bg-blue-500 text-white text-xs px-2 py-1 rounded">
+                <div class="absolute top-0 right-0 bg-blue-500 text-white text-xs px-2 py-1 rounded-sm">
                   Updating...
                 </div>
               </div>

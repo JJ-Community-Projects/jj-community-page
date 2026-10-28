@@ -138,7 +138,7 @@ export const CreateScheduleDialog: Component<{
                   Schedule Name
                 </TextField.Label>
                 <TextField.Input
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-accent"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-hidden focus:ring-2 focus:ring-accent"
                   placeholder="My Awesome Schedule 2024"
                 />
               </TextField>
@@ -153,7 +153,7 @@ export const CreateScheduleDialog: Component<{
                 </TextField.Label>
                 <div class="relative">
                   <TextField.Input
-                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-accent"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-hidden focus:ring-2 focus:ring-accent"
                     placeholder="my-awesome-schedule-2024"
                   />
                   <Show when={isCheckingSlug() && slug().length>0}>
@@ -208,7 +208,7 @@ export const CreateScheduleDialog: Component<{
                   type="number"
                   min="2020"
                   max="2030"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-accent"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-hidden focus:ring-2 focus:ring-accent"
                   placeholder="2024"
                 />
               </TextField>
@@ -216,7 +216,7 @@ export const CreateScheduleDialog: Component<{
               <Checkbox checked={primary()} onChange={setPrimary}>
                 <div class="flex items-center gap-2">
                   <Checkbox.Input class="sr-only" />
-                  <Checkbox.Control class="w-4 h-4 border-2 border-gray-300 rounded flex items-center justify-center data-[checked]:bg-accent data-[checked]:border-accent">
+                  <Checkbox.Control class="w-4 h-4 border-2 border-gray-300 rounded-sm flex items-center justify-center data-checked:bg-accent data-checked:border-accent">
                     <Checkbox.Indicator>
                       <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>

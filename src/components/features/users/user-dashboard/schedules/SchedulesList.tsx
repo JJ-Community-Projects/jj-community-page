@@ -71,7 +71,7 @@ const SchedulesListContent: Component<{ user: User }> = (props) => {
                   </svg>
                 </div>
                 <div class="space-y-2">
-                  <h3 class="font-bold text-gray-800 ~text-lg/xl">
+                  <h3 class="font-bold text-gray-800 fl-text-lg/xl">
                     No Schedules found
                   </h3>
                   <p class="mx-auto max-w-md leading-relaxed text-gray-600">
@@ -80,7 +80,7 @@ const SchedulesListContent: Component<{ user: User }> = (props) => {
                 </div>
                 <button
                   onClick={() => setIsCreateDialogOpen(true)}
-                  class="transform rounded-lg bg-accent px-6 py-3 font-medium text-white shadow-sm transition-all duration-200 hover:bg-accent-600 hover:shadow-md focus:ring-2 focus:ring-accent focus:ring-offset-2 active:scale-95"
+                  class="transform rounded-lg bg-accent px-6 py-3 font-medium text-white shadow-xs transition-all duration-200 hover:bg-accent-600 hover:shadow-md focus:ring-2 focus:ring-accent focus:ring-offset-2 active:scale-95"
                 >
                   Create Your First Schedule
                 </button>
@@ -141,7 +141,7 @@ const SchedulesListItem: Component<{
       </div>
 
       {/* Schedule title */}
-      <h3 class="mb-3 font-bold text-gray-800 transition-colors ~text-lg/xl group-hover:text-primary-600">
+      <h3 class="mb-3 font-bold text-gray-800 transition-colors fl-text-lg/xl group-hover:text-primary-600">
         {props.schedule.title}
       </h3>
 
@@ -164,7 +164,7 @@ const SchedulesListItem: Component<{
       <div class="mt-4 flex flex-row items-center justify-center gap-2">
         <a
           href={`/dashboard/schedules/${props.schedule.id}/edit`}
-          class="transform rounded-lg bg-accent p-2 text-white shadow-sm transition-all duration-200 hover:bg-accent-600 hover:shadow-md focus:ring-2 focus:ring-accent focus:ring-offset-2 active:scale-95"
+          class="transform rounded-lg bg-accent p-2 text-white shadow-xs transition-all duration-200 hover:bg-accent-600 hover:shadow-md focus:ring-2 focus:ring-accent focus:ring-offset-2 active:scale-95"
           title="Edit Schedule"
         >
           <FaRegularPenToSquare class="h-4 w-4" />
@@ -230,7 +230,7 @@ const SchedulePrimaryButton: Component<{
     <button
       onClick={() => handleSetPrimary()}
       disabled={setPrimaryMutation.isPending || removePrimaryMutation.isPending}
-      class="transform rounded-lg bg-accent p-2 font-medium text-white shadow-sm transition-all duration-200 hover:bg-accent-600 hover:shadow-md focus:ring-2 focus:ring-accent focus:ring-offset-2 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+      class="transform rounded-lg bg-accent p-2 font-medium text-white shadow-xs transition-all duration-200 hover:bg-accent-600 hover:shadow-md focus:ring-2 focus:ring-accent focus:ring-offset-2 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
       title={
         props.schedule.primary ? 'Remove Primary Schedule' : 'Set as Primary'
       }
@@ -281,7 +281,7 @@ const ScheduleVisibilityButton: Component<{
     <button
       onClick={() => handleToggleVisibility()}
       disabled={toggleVisibilityMutation.isPending}
-      class="transform rounded-lg bg-primary p-2 font-medium text-white shadow-sm transition-all duration-200 hover:bg-primary-600 hover:shadow-md focus:ring-2 focus:ring-primary focus:ring-offset-2 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+      class="transform rounded-lg bg-primary p-2 font-medium text-white shadow-xs transition-all duration-200 hover:bg-primary-600 hover:shadow-md focus:ring-2 focus:ring-primary focus:ring-offset-2 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
       title={props.schedule.visible ? 'Make Private' : 'Make Public'}
     >
       {props.schedule.visible ? (
@@ -332,7 +332,7 @@ const ScheduleDeleteButton: Component<{
       <button
         onClick={modal.open}
         disabled={deleteScheduleMutation.isPending}
-        class="transform rounded-lg bg-danger p-2 font-medium text-white shadow-sm transition-all duration-200 hover:bg-danger-600 hover:shadow-md focus:ring-2 focus:ring-danger focus:ring-offset-2 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+        class="transform rounded-lg bg-danger p-2 font-medium text-white shadow-xs transition-all duration-200 hover:bg-danger-600 hover:shadow-md focus:ring-2 focus:ring-danger focus:ring-offset-2 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
         title="Delete Schedule"
       >
         <FaSolidTrash class="h-4 w-4" />

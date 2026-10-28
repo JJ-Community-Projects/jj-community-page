@@ -14,13 +14,13 @@ const StatusIndicator = () => {
     <div class="flex items-center gap-1">
       <Switch>
         <Match when={isLoadingSearch()}>
-          <div class="flex items-center gap-2 rounded-full bg-gradient-to-r from-danger-100 to-danger-200 px-3 py-1.5 shadow-sm">
+          <div class="flex items-center gap-2 rounded-full bg-linear-to-r from-danger-100 to-danger-200 px-3 py-1.5 shadow-xs">
             <div class="h-2 w-2 animate-pulse rounded-full bg-danger"></div>
             <span class="text-xs font-medium text-danger-700">Searching</span>
           </div>
         </Match>
         <Match when={hasSearchError()}>
-          <div class="flex items-center gap-2 rounded-full bg-gradient-to-r from-danger-100 to-danger-200 px-3 py-1.5 shadow-sm">
+          <div class="flex items-center gap-2 rounded-full bg-linear-to-r from-danger-100 to-danger-200 px-3 py-1.5 shadow-xs">
             <div class="h-2 w-2 rounded-full bg-danger-500"></div>
             <span class="text-xs font-medium text-danger-700">Error</span>
           </div>
@@ -31,7 +31,7 @@ const StatusIndicator = () => {
 }
 
 const UserSkeleton = () => (
-  <div class="h-16 w-full animate-pulse rounded-lg bg-gray-200 shadow-sm"></div>
+  <div class="h-16 w-full animate-pulse rounded-lg bg-gray-200 shadow-xs"></div>
 )
 
 /**
@@ -58,7 +58,7 @@ export const AvailableUsersToBlockList: Component = () => {
 
   const EmptyState = () => (
     <div class="flex flex-col items-center justify-center px-4 py-8">
-      <div class="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-gray-400 to-gray-500">
+      <div class="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-linear-to-br from-gray-400 to-gray-500">
         <FaSolidUsers class="h-6 w-6 text-white" />
       </div>
       <h4 class="mb-1 text-sm font-semibold text-gray-700">
@@ -99,7 +99,7 @@ export const AvailableUsersToBlockList: Component = () => {
       <Show when={hasBlockError()}>
         <div class="mb-4 rounded-xl border border-red-200 bg-red-50 p-4">
           <div class="flex items-center gap-3 text-red-600">
-            <FaSolidCircleExclamation class="h-4 w-4 flex-shrink-0" />
+            <FaSolidCircleExclamation class="h-4 w-4 shrink-0" />
             <p class="text-sm font-medium">
               {blockErrorMessage() || 'Failed to block user'}
             </p>
@@ -111,7 +111,7 @@ export const AvailableUsersToBlockList: Component = () => {
         <Match when={hasSearchError()}>
           <div class="rounded-xl border border-red-200 bg-red-50 p-6">
             <div class="flex items-center justify-center gap-3 text-red-600">
-              <FaSolidCircleExclamation class="h-5 w-5 flex-shrink-0" />
+              <FaSolidCircleExclamation class="h-5 w-5 shrink-0" />
               <div>
                 <p class="text-sm font-semibold">Error searching users</p>
                 <p class="text-xs opacity-90">
@@ -145,7 +145,7 @@ export const AvailableUsersToBlockList: Component = () => {
                       {/* User info */}
                       <div class="flex items-center gap-3">
                         {/* Avatar placeholder */}
-                        <div class="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-danger-500 to-danger-600 shadow-sm">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-full bg-linear-to-br from-danger-500 to-danger-600 shadow-xs">
                           <span class="text-sm font-semibold text-white">
                             {(user.tiltifyUsername ||
                               user.twitchUsername ||
@@ -175,9 +175,9 @@ export const AvailableUsersToBlockList: Component = () => {
                         type="button"
                         onClick={() => handleBlockRequest(user.userId)}
                         disabled={!canBlockUser() || isBlockingUser()}
-                        class={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium outline-none transition-all duration-200 focus:ring-2 focus:ring-danger focus:ring-offset-2 focus:ring-offset-white ${
+                        class={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium outline-hidden transition-all duration-200 focus:ring-2 focus:ring-danger focus:ring-offset-2 focus:ring-offset-white ${
                           canBlockUser() && !isBlockingUser()
-                            ? 'bg-danger text-white shadow-sm hover:bg-danger-600 hover:shadow-md'
+                            ? 'bg-danger text-white shadow-xs hover:bg-danger-600 hover:shadow-md'
                             : 'cursor-not-allowed bg-gray-100 text-gray-500'
                         } `}
                         aria-label={`${canBlockUser() ? 'Block' : 'Cannot block'} ${user.tiltifyUsername || user.twitchUsername}`}

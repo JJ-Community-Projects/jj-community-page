@@ -46,7 +46,7 @@ const FriendListItem: Component<FriendListItemProps> = (props) => {
             props.friend.profileImage && props.friend.profileImage.trim() !== ''
           }
           fallback={
-            <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary-400 to-primary-500 shadow-sm">
+            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-primary-400 to-primary-500 shadow-xs">
               <span class="text-sm font-semibold text-white">
                 {(props.friend.username || 'U')[0].toUpperCase()}
               </span>
@@ -56,7 +56,7 @@ const FriendListItem: Component<FriendListItemProps> = (props) => {
           <img
             src={props.friend.profileImage}
             alt={`${props.friend.username}'s profile`}
-            class="h-10 w-10 flex-shrink-0 rounded-full object-cover shadow-sm"
+            class="h-10 w-10 shrink-0 rounded-full object-cover shadow-xs"
             onError={(e) => {
               // Fallback to gradient avatar if image fails to load
               const target = e.target as HTMLImageElement
@@ -65,7 +65,7 @@ const FriendListItem: Component<FriendListItemProps> = (props) => {
               if (fallback) fallback.style.display = 'flex'
             }}
           />
-          <div class="flex hidden h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary-400 to-primary-500 shadow-sm">
+          <div class="flex hidden h-10 w-10 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-primary-400 to-primary-500 shadow-xs">
             <span class="text-sm font-semibold text-white">
               {(props.friend.username || 'U')[0].toUpperCase()}
             </span>
@@ -94,7 +94,7 @@ const FriendListItem: Component<FriendListItemProps> = (props) => {
           type="button"
           onClick={handleRemoveClick}
           disabled={isRemovingFriend()}
-          class="flex-shrink-0 rounded-full p-2 opacity-70 outline-none transition-all duration-200 group-hover:opacity-100 hover:scale-110 hover:bg-red-100 focus:bg-red-100 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-white active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+          class="shrink-0 rounded-full p-2 opacity-70 outline-hidden transition-all duration-200 group-hover:opacity-100 hover:scale-110 hover:bg-red-100 focus:bg-red-100 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-white active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
           aria-label={`Remove ${props.friend.username} from friends`}
           title="Remove friend"
         >
@@ -116,7 +116,7 @@ const FriendListItem: Component<FriendListItemProps> = (props) => {
 
 const EmptyState = () => (
   <div class="flex flex-col items-center justify-center px-4 py-12">
-    <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-primary-400 to-primary-500 shadow-lg">
+    <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-linear-to-br from-primary-400 to-primary-500 shadow-lg">
       <FaSolidUsers class="h-8 w-8 text-white" />
     </div>
     <h3 class="mb-2 text-xl font-semibold text-gray-800">No friends yet</h3>
@@ -129,9 +129,9 @@ const EmptyState = () => (
 
 const LoadingSkeleton = () => (
   <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-    <div class="h-16 animate-pulse rounded-xl bg-gray-200 shadow-sm"></div>
-    <div class="h-16 animate-pulse rounded-xl bg-gray-200 shadow-sm"></div>
-    <div class="h-16 animate-pulse rounded-xl bg-gray-200 shadow-sm"></div>
+    <div class="h-16 animate-pulse rounded-xl bg-gray-200 shadow-xs"></div>
+    <div class="h-16 animate-pulse rounded-xl bg-gray-200 shadow-xs"></div>
+    <div class="h-16 animate-pulse rounded-xl bg-gray-200 shadow-xs"></div>
   </div>
 )
 /**
@@ -165,7 +165,7 @@ export const UserFriendsList: Component = () => {
       <Show when={hasRemoveFriendError()}>
         <div class="mb-4 rounded-xl border border-red-200 bg-red-50 p-4">
           <div class="flex items-center gap-3 text-red-600">
-            <FaSolidCircleExclamation class="h-4 w-4 flex-shrink-0" />
+            <FaSolidCircleExclamation class="h-4 w-4 shrink-0" />
             <p class="text-sm font-medium">
               {removeFriendErrorMessage() || 'Failed to remove friend'}
             </p>
@@ -181,7 +181,7 @@ export const UserFriendsList: Component = () => {
         <Match when={hasFriendsError()}>
           <div class="rounded-xl border border-red-200 bg-red-50 p-6">
             <div class="flex items-center justify-center gap-3 text-red-600">
-              <FaSolidCircleExclamation class="h-5 w-5 flex-shrink-0" />
+              <FaSolidCircleExclamation class="h-5 w-5 shrink-0" />
               <div>
                 <p class="text-sm font-semibold">Error loading friends</p>
                 <p class="text-xs opacity-90">
@@ -197,7 +197,7 @@ export const UserFriendsList: Component = () => {
         </Match>
 
         <Match when={hasFriends()}>
-          <div class="grid grid-cols-1 ~gap-3/4 sm:grid-cols-1 lg:grid-cols-2">
+          <div class="grid grid-cols-1 fl-gap-3/4 sm:grid-cols-1 lg:grid-cols-2">
             <For each={friendsList()}>
               {(friend) => <FriendListItem friend={friend} />}
             </For>

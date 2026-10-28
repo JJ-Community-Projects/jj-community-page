@@ -43,7 +43,7 @@ const InviteListItem: Component<InviteListItemProps> = (props) => {
       <div class="group flex flex-col gap-4 rounded-xl border-2 bg-white p-2 shadow-md transition-all duration-300 hover:border-warning-100">
         <div class="flex flex-1 items-center gap-3">
           {/* Avatar placeholder */}
-          <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-warning-400 to-warning-500 shadow-sm">
+          <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-warning-400 to-warning-500 shadow-xs">
             <span class="text-sm font-semibold text-white">
               {(props.invite.username || 'U')[0].toUpperCase()}
             </span>
@@ -67,7 +67,7 @@ const InviteListItem: Component<InviteListItemProps> = (props) => {
             type="button"
             onClick={handleCancelClick}
             disabled={cancelInviteMutation.isPending}
-            class="flex-shrink-0 rounded-full p-2 opacity-70 outline-none transition-all duration-200 group-hover:opacity-100 hover:scale-110 hover:bg-danger-100 focus:bg-danger-100 focus:ring-2 focus:ring-danger-500 focus:ring-offset-2 focus:ring-offset-white active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+            class="shrink-0 rounded-full p-2 opacity-70 outline-hidden transition-all duration-200 group-hover:opacity-100 hover:scale-110 hover:bg-danger-100 focus:bg-danger-100 focus:ring-2 focus:ring-danger-500 focus:ring-offset-2 focus:ring-offset-white active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
             aria-label={`Cancel invitation for ${props.invite.username}`}
             title="Cancel invitation"
           >
@@ -97,7 +97,7 @@ const InviteListItem: Component<InviteListItemProps> = (props) => {
 
 const EmptyState = () => (
   <div class="flex flex-col items-center justify-center px-4 py-12">
-    <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-accent-400 to-accent-500 shadow-lg">
+    <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-linear-to-br from-accent-400 to-accent-500 shadow-lg">
       <FaSolidEnvelope class="h-8 w-8 text-white" />
     </div>
     <h4 class="mb-2 text-xl font-semibold text-gray-800">No pending invites</h4>
@@ -110,9 +110,9 @@ const EmptyState = () => (
 
 const LoadingSkeleton = () => (
   <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-    <div class="h-16 animate-pulse rounded-xl bg-gray-200 shadow-sm"></div>
-    <div class="h-16 animate-pulse rounded-xl bg-gray-200 shadow-sm"></div>
-    <div class="h-16 animate-pulse rounded-xl bg-gray-200 shadow-sm"></div>
+    <div class="h-16 animate-pulse rounded-xl bg-gray-200 shadow-xs"></div>
+    <div class="h-16 animate-pulse rounded-xl bg-gray-200 shadow-xs"></div>
+    <div class="h-16 animate-pulse rounded-xl bg-gray-200 shadow-xs"></div>
   </div>
 )
 
@@ -149,7 +149,7 @@ export const AdminTeamInvitesSection: Component = () => {
         <Show when={cancelInviteMutation.isError}>
           <div class="rounded-xl border border-danger-200 bg-danger-50 p-4">
             <div class="flex items-center gap-3 text-danger-600">
-              <FaSolidCircleExclamation class="h-4 w-4 flex-shrink-0" />
+              <FaSolidCircleExclamation class="h-4 w-4 shrink-0" />
               <p class="text-sm font-medium">
                 {cancelInviteMutation.failureReason?.message ||
                   'Failed to cancel invitation'}
@@ -166,7 +166,7 @@ export const AdminTeamInvitesSection: Component = () => {
           <Match when={hasError()}>
             <div class="rounded-xl border border-danger-200 bg-danger-50 p-6">
               <div class="flex items-center justify-center gap-3 text-danger-600">
-                <FaSolidCircleExclamation class="h-5 w-5 flex-shrink-0" />
+                <FaSolidCircleExclamation class="h-5 w-5 shrink-0" />
                 <div>
                   <p class="text-sm font-semibold">Error loading invites</p>
                   <p class="text-xs opacity-90">
@@ -182,7 +182,7 @@ export const AdminTeamInvitesSection: Component = () => {
           </Match>
 
           <Match when={hasInvites()}>
-            <div class="grid grid-cols-1 ~gap-3/4 sm:grid-cols-2 lg:grid-cols-3">
+            <div class="grid grid-cols-1 fl-gap-3/4 sm:grid-cols-2 lg:grid-cols-3">
               <For each={invitesList()}>
                 {(invite) => <InviteListItem invite={invite} />}
               </For>

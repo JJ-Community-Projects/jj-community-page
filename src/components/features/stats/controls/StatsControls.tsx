@@ -190,7 +190,7 @@ const DataSelector: Component = () => {
         </Select.Icon>
       </Select.Trigger>
       <Select.Portal>
-        <Select.Content class="rounded bg-accent-500 shadow">
+        <Select.Content class="rounded-sm bg-accent-500 shadow-sm">
           {/* Make long creator lists scrollable */}
           <Select.Listbox class="flex max-h-80 flex-col gap-1 overflow-y-auto" />
         </Select.Content>
@@ -266,7 +266,7 @@ const DaysSelector: Component = () => {
             return (
               <ToggleButton.Root
                 class={twMerge(
-                  'border-1 min-w-[28px] rounded-md border-accent-500 px-1 py-0.5 text-xs transition-all',
+                  'border min-w-[28px] rounded-md border-accent-500 px-1 py-0.5 text-xs transition-all',
                   has(day)
                     ? 'bg-accent text-white'
                     : 'bg-transparent hover:bg-accent-500/30',
@@ -360,7 +360,7 @@ const CreatorSelector: Component = () => {
         </Select.Icon>
       </Select.Trigger>
       <Select.Portal>
-        <Select.Content class="rounded bg-accent-500 shadow">
+        <Select.Content class="rounded-sm bg-accent-500 shadow-sm">
           <Select.Listbox class="flex max-h-72 flex-col gap-1 overflow-y-auto" />
         </Select.Content>
       </Select.Portal>

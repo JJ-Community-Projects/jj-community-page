@@ -24,7 +24,7 @@ export const AllStreamsSection: Component = () => {
   return (
     <div class="flex flex-col gap-3">
       <div class="flex justify-end">
-        <button class="text-sm px-3 py-1.5 bg-accent text-white rounded hover:bg-accent-600" onClick={addCustom}>
+        <button class="text-sm px-3 py-1.5 bg-accent text-white rounded-sm hover:bg-accent-600" onClick={addCustom}>
           Add Custom Stream
         </button>
       </div>

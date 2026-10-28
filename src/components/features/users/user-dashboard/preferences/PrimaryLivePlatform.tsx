@@ -119,7 +119,7 @@ export const PrimaryLivePlatform: Component = () => {
           <p class="mb-2 text-red-500">Failed to load platform settings</p>
           <button
             onClick={retry}
-            class="rounded bg-blue-500 px-3 py-1 text-white hover:bg-blue-600"
+            class="rounded-sm bg-blue-500 px-3 py-1 text-white hover:bg-blue-600"
           >
             Retry
           </button>

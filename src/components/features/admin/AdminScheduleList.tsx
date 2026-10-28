@@ -13,7 +13,7 @@ export const AdminScheduleList: Component = () => {
         <div class="mt-4">
           <h3 class="text-lg font-semibold mb-2">All Schedules</h3>
           <Show when={schedules.length > 0} fallback={<div class="text-sm text-gray-500">No schedules found.</div>}>
-            <div class="overflow-x-auto rounded border border-gray-200">
+            <div class="overflow-x-auto rounded-sm border border-gray-200">
               <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                   <tr>
@@ -38,12 +38,12 @@ export const AdminScheduleList: Component = () => {
                           </div>
                         </td>
                         <td class="px-4 py-2 whitespace-nowrap text-sm">
-                          <span class={`inline-flex items-center rounded px-2 py-0.5 text-xs font-medium ${s.visible ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-700'}`}>
+                          <span class={`inline-flex items-center rounded-sm px-2 py-0.5 text-xs font-medium ${s.visible ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-700'}`}>
                             {s.visible ? 'Yes' : 'No'}
                           </span>
                         </td>
                         <td class="px-4 py-2 whitespace-nowrap text-sm">
-                          <span class={`inline-flex items-center rounded px-2 py-0.5 text-xs font-medium ${s.primary ? 'bg-indigo-100 text-indigo-800' : 'bg-gray-100 text-gray-700'}`}>
+                          <span class={`inline-flex items-center rounded-sm px-2 py-0.5 text-xs font-medium ${s.primary ? 'bg-indigo-100 text-indigo-800' : 'bg-gray-100 text-gray-700'}`}>
                             {s.primary ? 'Primary' : '—'}
                           </span>
                         </td>
@@ -51,7 +51,7 @@ export const AdminScheduleList: Component = () => {
                           <div class="inline-flex gap-2">
                             <button
                               type="button"
-                              class="px-3 py-1.5 rounded border border-gray-300 text-gray-700 hover:bg-gray-50 text-xs"
+                              class="px-3 py-1.5 rounded-sm border border-gray-300 text-gray-700 hover:bg-gray-50 text-xs"
                               onClick={async () => {
                                 try {
                                   const json = await exportSchedule.mutateAsync({ scheduleId: s.scheduleId })
@@ -76,7 +76,7 @@ export const AdminScheduleList: Component = () => {
                             </button>
                             <a
                               href={`/dashboard/schedules/${s.scheduleId}/edit`}
-                              class="px-3 py-1.5 rounded bg-indigo-600 text-white hover:bg-indigo-700 text-xs"
+                              class="px-3 py-1.5 rounded-sm bg-indigo-600 text-white hover:bg-indigo-700 text-xs"
                             >
                               Edit
                             </a>

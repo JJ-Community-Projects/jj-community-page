@@ -26,7 +26,7 @@ const StreamCardBody: Component<{ stream: DraftStream; showDate?: boolean; white
 
   return (
     <button
-      class={`w-full text-left rounded-lg border p-3 hover:shadow transition bg-white`}
+      class={`w-full text-left rounded-lg border p-3 hover:shadow-sm transition bg-white`}
       onClick={() => dialog.open()}
     >
       <div class="flex items-center justify-between">

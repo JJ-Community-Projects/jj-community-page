@@ -70,7 +70,7 @@ export const YogsScheduleHeader: Component = () => {
               <FaSolidChevronLeft/>
             </Tooltip.Trigger>
             <Tooltip.Portal>
-              <Tooltip.Content class={'bg-accent rounded p-2 text-white'}>
+              <Tooltip.Content class={'bg-accent rounded-sm p-2 text-white'}>
                 <Tooltip.Arrow/>
                 <p>Previous Week</p>
               </Tooltip.Content>
@@ -86,7 +86,7 @@ export const YogsScheduleHeader: Component = () => {
               <FaSolidChevronRight/>
             </Tooltip.Trigger>
             <Tooltip.Portal>
-              <Tooltip.Content class={'bg-accent rounded p-2 text-white'}>
+              <Tooltip.Content class={'bg-accent rounded-sm p-2 text-white'}>
                 <Tooltip.Arrow/>
                 <p>Next Week</p>
               </Tooltip.Content>

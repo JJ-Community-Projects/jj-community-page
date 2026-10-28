@@ -32,7 +32,7 @@ export const YogsCreatorDialog: Component<CreatorDialogProps> = (props) => {
     >
       <Dialog.Portal>
         <Dialog.Overlay class="fixed inset-0 bg-black/20 p-2 lg:p-16" />
-        <Dialog.Content class="fixed left-1/2 top-1/2 w-[calc(100vw_-_24px)] -translate-x-1/2 -translate-y-1/2 transform rounded-2xl bg-white shadow-xl lg:w-[min(calc(100vw_-_16px),_386px)]">
+        <Dialog.Content class="fixed left-1/2 top-1/2 w-[calc(100vw-24px)] -translate-x-1/2 -translate-y-1/2 transform rounded-2xl bg-white shadow-xl lg:w-[min(calc(100vw-16px),386px)]">
           <Dialog.Title
             class="flex flex-row gap-4 rounded-t-2xl p-2"
             style={{

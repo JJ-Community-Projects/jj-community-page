@@ -130,13 +130,13 @@ export const AdminKVConfigSection: Component = () => {
       <div class="flex flex-col gap-2">
         <div class="flex items-center gap-2">
           <input
-            class="input input-bordered w-64 rounded border px-2 py-1"
+            class="input input-bordered w-64 rounded-sm border px-2 py-1"
             placeholder="key"
             value={keyInput()}
             onInput={(e) => setKeyInput(e.currentTarget.value)}
           />
           <button
-            class="rounded border px-2 py-1"
+            class="rounded-sm border px-2 py-1"
             onClick={() => setKeyInput('')}
           >
             clear
@@ -144,21 +144,21 @@ export const AdminKVConfigSection: Component = () => {
         </div>
         <div class="flex items-start gap-2">
           <textarea
-            class="textarea textarea-bordered min-h-[80px] w-full rounded border px-2 py-1 font-mono"
+            class="textarea textarea-bordered min-h-[80px] w-full rounded-sm border px-2 py-1 font-mono"
             placeholder="value"
             value={valueInput()}
             onInput={(e) => setValueInput(e.currentTarget.value)}
           />
           <div class="flex flex-col gap-2">
             <button
-              class="btn rounded border bg-blue-600 px-3 py-1 text-white disabled:opacity-50"
+              class="btn rounded-sm border bg-blue-600 px-3 py-1 text-white disabled:opacity-50"
               disabled={putMut.isPending}
               onClick={onSave}
             >
               {kvQuery.data ? 'Save' : 'Create'}
             </button>
             <button
-              class="btn rounded border border-red-300 px-3 py-1 text-red-700 disabled:opacity-50"
+              class="btn rounded-sm border border-red-300 px-3 py-1 text-red-700 disabled:opacity-50"
               disabled={!keyInput().trim() || deleteMut.isPending}
               onClick={onDelete}
             >
@@ -187,7 +187,7 @@ export const AdminKVConfigSection: Component = () => {
           queryOptions={() => orpcPrivate.admin.getAllKVKeys.queryOptions()}
         >
           {(keys) => (
-            <div class="flex max-h-64 flex-col gap-1 overflow-auto rounded border bg-gray-50 p-2">
+            <div class="flex max-h-64 flex-col gap-1 overflow-auto rounded-sm border bg-gray-50 p-2">
               <Show
                 when={keys.length > 0}
                 fallback={<div class="text-sm text-gray-500">No keys</div>}
@@ -195,7 +195,7 @@ export const AdminKVConfigSection: Component = () => {
                 <For each={keys}>
                   {(k) => (
                     <button
-                      class="flex w-full items-center justify-between rounded border bg-white px-2 py-1 text-left hover:bg-gray-100"
+                      class="flex w-full items-center justify-between rounded-sm border bg-white px-2 py-1 text-left hover:bg-gray-100"
                       onClick={() => selectKey(k)}
                       title={k}
                     >

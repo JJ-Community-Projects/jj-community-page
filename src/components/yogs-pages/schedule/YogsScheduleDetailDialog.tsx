@@ -50,7 +50,7 @@ export const YogsScheduleDetailDialog: Component<
     >
       <Dialog.Portal>
         <Dialog.Overlay class="fixed inset-0 bg-black/20 p-2 lg:p-16" />
-        <Dialog.Content class="fixed left-1/2 top-1/2 flex h-[70vh] w-[calc(100vw_-_24px)] -translate-x-1/2 -translate-y-1/2 transform flex-col rounded-2xl bg-white shadow-xl md:h-[90vh] lg:w-[min(calc(100vw_-_16px),_386px)]">
+        <Dialog.Content class="fixed left-1/2 top-1/2 flex h-[70vh] w-[calc(100vw-24px)] -translate-x-1/2 -translate-y-1/2 transform flex-col rounded-2xl bg-white shadow-xl md:h-[90vh] lg:w-[min(calc(100vw-16px),386px)]">
           <Dialog.Title
             class="flex flex-row gap-4 rounded-t-2xl p-2"
             style={{
@@ -280,7 +280,7 @@ const CreatorComponent: Component<CreatorComponentProps> = (props) => {
   return (
     <>
       <button
-        class="flex cursor-pointer flex-row items-center gap-2 rounded-full p-2 transition-all duration-200 ~text-xs/base hover:scale-105 hover:brightness-105"
+        class="flex cursor-pointer flex-row items-center gap-2 rounded-full p-2 transition-all duration-200 fl-text-xs/base hover:scale-105 hover:brightness-105"
         style={{
           'background-color': bg,
           color: textColor,
@@ -291,7 +291,7 @@ const CreatorComponent: Component<CreatorComponentProps> = (props) => {
         }}
       >
         {imageUrl && (
-          <img src={imageUrl} alt={label} class="rounded-full ~h-5/8 ~w-5/8" />
+          <img src={imageUrl} alt={label} class="rounded-full fl-h-5/8 fl-w-5/8" />
         )}
         <span>{label}</span>
       </button>

@@ -18,8 +18,8 @@ export const LoginPage: Component = () => {
       <div class="w-full max-w-md space-y-6">
         {/* Hero Section */}
         <div class="space-y-4 text-center">
-          <h1 class="font-babas font-bold text-white ~text-2xl/4xl">Login</h1>
-          <p class="font-poppins text-white/80 ~text-base/lg">
+          <h1 class="font-babas font-bold text-white fl-text-2xl/4xl">Login</h1>
+          <p class="font-poppins text-white/80 fl-text-base/lg">
             Join the JJ community page to access more community features. Accounts are <b>not required</b> to use the JJ community page. Your fundraiser will automatically
             appear on the <a class={'underline'} href={'/community'}> community fundraiser page</a>. Accounts are only needed if you want to create your own schedule.
           </p>
@@ -30,7 +30,7 @@ export const LoginPage: Component = () => {
           {/* Community Notice */}
           <div class="mb-6 rounded-lg border border-primary/30 bg-primary/10 p-4">
             <div class="flex items-start gap-3">
-              <div class="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-primary/20">
+              <div class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/20">
                 <div class="h-2 w-2 rounded-full bg-primary" />
               </div>
               <div class="text-sm text-neutral-700">
@@ -54,9 +54,9 @@ export const LoginPage: Component = () => {
           <Dialog.Portal>
             <Dialog.Overlay class="fixed inset-0 z-50 bg-black/50" />
 
-            <Dialog.Content class="fixed left-1/2 top-1/2 z-50 w-[90%] max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-neutral-200 bg-white p-6 shadow-2xl focus:outline-none">
+            <Dialog.Content class="fixed left-1/2 top-1/2 z-50 w-[90%] max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-neutral-200 bg-white p-6 shadow-2xl focus:outline-hidden">
               <div class="mb-4 flex items-start justify-between">
-                <Dialog.Title class="font-poppins font-semibold text-neutral-800 ~text-xl/2xl">
+                <Dialog.Title class="font-poppins font-semibold text-neutral-800 fl-text-xl/2xl">
                   Community Guidelines & Account Purpose
                 </Dialog.Title>
                 <Dialog.CloseButton
@@ -79,14 +79,14 @@ export const LoginPage: Component = () => {
                   Jingle Jam.
                 </p>
                 {/* Account Purpose */}
-                <section class="rounded-xl border-2 border-white/10 bg-white px-4 shadow-sm">
-                  <p class="mb-2 text-neutral-600 ~text-base/xl">
+                <section class="rounded-xl border-2 border-white/10 bg-white px-4 shadow-xs">
+                  <p class="mb-2 text-neutral-600 fl-text-base/xl">
                     By logging in, you agree to our community guidelines
                   </p>
-                  <h3 class="mb-3 font-poppins font-semibold text-neutral-700 ~text-lg/xl">
+                  <h3 class="mb-3 font-poppins font-semibold text-neutral-700 fl-text-lg/xl">
                     Account Purpose
                   </h3>
-                  <ul class="space-y-2 text-neutral-600 ~text-sm/base">
+                  <ul class="space-y-2 text-neutral-600 fl-text-sm/base">
                     <li class="flex items-start gap-2">
                       <span class="mt-1 text-accent">•</span>
                       Schedule and stream management
@@ -98,11 +98,11 @@ export const LoginPage: Component = () => {
                   </ul>
                 </section>
                 {/* Community Guidelines */}
-                <section class="rounded-xl border-2 border-white/10 bg-white px-4 shadow-sm">
-                  <h3 class="font-poppins font-semibold text-neutral-700 ~text-lg/xl">
+                <section class="rounded-xl border-2 border-white/10 bg-white px-4 shadow-xs">
+                  <h3 class="font-poppins font-semibold text-neutral-700 fl-text-lg/xl">
                     Community Guidelines
                   </h3>
-                  <div class="space-y-3 text-neutral-600 ~text-sm/base">
+                  <div class="space-y-3 text-neutral-600 fl-text-sm/base">
                     <div class="flex items-start gap-2">
                       <span class="mt-1 text-warning">•</span>
                       <div>
@@ -126,7 +126,7 @@ export const LoginPage: Component = () => {
                     </div>
                   </div>
                   <div class="mt-4 border-t border-neutral-200">
-                    <p class="text-neutral-500 ~text-xs/sm">
+                    <p class="text-neutral-500 fl-text-xs/sm">
                       Questions? Contact{' '}
                       <span class="font-medium text-accent">@Ostof</span> on
                       Discord
@@ -146,7 +146,7 @@ export const LoginPage: Component = () => {
                 <button
                   type="button"
                   onClick={acceptAndContinue}
-                  class="rounded-md bg-primary px-4 py-2 font-medium text-white shadow-sm hover:bg-primary/90"
+                  class="rounded-md bg-primary px-4 py-2 font-medium text-white shadow-xs hover:bg-primary/90"
                 >
                   Accept & Continue
                 </button>

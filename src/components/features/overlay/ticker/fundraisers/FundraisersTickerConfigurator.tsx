@@ -33,14 +33,14 @@ export const FundraisersTickerConfigurator: Component<{
   )
 
   return (
-    <div class="flex flex-col gap-2 rounded bg-black/30 p-3">
-      <div class="mb-2 rounded border border-white/10 bg-white/5 p-2 text-sm text-white/80">
+    <div class="flex flex-col gap-2 rounded-sm bg-black/30 p-3">
+      <div class="mb-2 rounded-sm border border-white/10 bg-white/5 p-2 text-sm text-white/80">
         A horizontal scrolling ticker of community fundraisers. Sort by recent, top, or alphabetical and pick a currency. Set your OBS Browser Source to 1920x80 px.
       </div>
       <PreviewDataField value={previewData()} onChange={setPreviewData} />
       <FieldRow label="Order By">
         <select
-          class="rounded bg-black/40 px-2 py-1"
+          class="rounded-sm bg-black/40 px-2 py-1"
           value={orderBy()}
           onChange={(e) => setOrderBy(e.currentTarget.value as OrderBy)}
         >
@@ -53,7 +53,7 @@ export const FundraisersTickerConfigurator: Component<{
         <select
           value={currency()}
           onChange={(e) => setCurrency(e.currentTarget.value as 'GBP' | 'USD' | 'EUR')}
-          class="w-40 rounded bg-black/40 px-2 py-1"
+          class="w-40 rounded-sm bg-black/40 px-2 py-1"
         >
           <option value="GBP">GBP</option>
           <option value="USD">USD</option>

@@ -27,7 +27,7 @@ export const FriendsSection: Component<FriendsSectionProps> = (props) => {
       <div class="p-4">
         <div class="mb-4 flex items-center gap-2 text-lg font-semibold">
           <FaSolidUserGroup class="h-5 w-5 text-black transition-all duration-300 group-hover:text-accent" />
-          <h2 class="font-babas text-black transition-all duration-300 ~text-xl/2xl group-hover:text-accent">
+          <h2 class="font-babas text-black transition-all duration-300 fl-text-xl/2xl group-hover:text-accent">
             Friends
           </h2>
         </div>

@@ -51,14 +51,14 @@ export const AdminSchedulerSection: Component = () => {
   }))
 
   return (
-    <div class="rounded border border-gray-300 bg-white p-4">
+    <div class="rounded-sm border border-gray-300 bg-white p-4">
       <div class="mb-2 flex items-center justify-between">
         <div class="flex items-center gap-3">
           <h2 class="text-lg font-semibold">Background Tasks</h2>
           <Show when={tasksQuery.data}>
             {(data) => (
               <button
-                class={`rounded px-3 py-1.5 text-xs text-white ${data().paused ? 'bg-red-600 hover:bg-red-500' : 'bg-green-600 hover:bg-green-500'}`}
+                class={`rounded-sm px-3 py-1.5 text-xs text-white ${data().paused ? 'bg-red-600 hover:bg-red-500' : 'bg-green-600 hover:bg-green-500'}`}
                 disabled={togglePaused.isPending}
                 onClick={() => togglePaused.mutate({ paused: !data().paused })}
                 title={data().paused ? 'Resume the alarm scheduler' : 'Pause the alarm scheduler (cron triggers still work)'}
@@ -70,14 +70,14 @@ export const AdminSchedulerSection: Component = () => {
         </div>
         <div class="flex items-center gap-2">
           <button
-            class={`rounded px-3 py-1.5 text-white ${tasksQuery.isFetching ? 'bg-gray-400' : 'bg-neutral-800 hover:bg-neutral-700'}`}
+            class={`rounded-sm px-3 py-1.5 text-white ${tasksQuery.isFetching ? 'bg-gray-400' : 'bg-neutral-800 hover:bg-neutral-700'}`}
             disabled={tasksQuery.isFetching}
             onClick={() => tasksQuery.refetch()}
           >
             {tasksQuery.isFetching ? 'Refreshing…' : 'Refresh'}
           </button>
           <button
-            class={`rounded px-3 py-1.5 text-white ${runOverdue.isPending ? 'bg-gray-400' : 'bg-accent hover:opacity-90'}`}
+            class={`rounded-sm px-3 py-1.5 text-white ${runOverdue.isPending ? 'bg-gray-400' : 'bg-accent hover:opacity-90'}`}
             disabled={runOverdue.isPending}
             onClick={() => runOverdue.mutate()}
           >
@@ -107,7 +107,7 @@ export const AdminSchedulerSection: Component = () => {
                     <td class="py-2 pr-4">{fmtMs(t.everyMs)}</td>
                     <td class="py-2 pr-4">
                       <button
-                        class={`rounded px-2 py-1 text-xs ${t.enabled ? 'bg-green-600 text-white' : 'bg-gray-300 text-gray-800'}`}
+                        class={`rounded-sm px-2 py-1 text-xs ${t.enabled ? 'bg-green-600 text-white' : 'bg-gray-300 text-gray-800'}`}
                         disabled={toggle.isPending}
                         onClick={() => toggle.mutate({ name: t.name, enabled: !t.enabled })}
                         title={t.enabled ? 'Disable' : 'Enable'}
@@ -123,7 +123,7 @@ export const AdminSchedulerSection: Component = () => {
                     </td>
                     <td class="py-2 pr-0 text-right">
                       <button
-                        class={`rounded px-3 py-1.5 text-white text-xs ${runOne.isPending ? 'bg-gray-400' : 'bg-primary hover:bg-primary-600'}`}
+                        class={`rounded-sm px-3 py-1.5 text-white text-xs ${runOne.isPending ? 'bg-gray-400' : 'bg-primary hover:bg-primary-600'}`}
                         disabled={runOne.isPending}
                         onClick={() => runOne.mutate({ name: t.name })}
                       >

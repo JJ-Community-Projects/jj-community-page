@@ -53,7 +53,7 @@ const BlockedUserItem: Component<BlockedUserItemProps> = (props) => {
             props.user.profileImage && props.user.profileImage.trim() !== ''
           }
           fallback={
-            <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-danger-500 to-danger-600 shadow-sm">
+            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-danger-500 to-danger-600 shadow-xs">
               <span class="text-sm font-semibold text-white">
                 {(props.user.username || 'U')[0].toUpperCase()}
               </span>
@@ -63,7 +63,7 @@ const BlockedUserItem: Component<BlockedUserItemProps> = (props) => {
           <img
             src={props.user.profileImage}
             alt={`${props.user.username}'s profile`}
-            class="h-10 w-10 flex-shrink-0 rounded-full object-cover shadow-sm"
+            class="h-10 w-10 shrink-0 rounded-full object-cover shadow-xs"
             onError={(e) => {
               // Fallback to gradient avatar if image fails to load
               const target = e.target as HTMLImageElement
@@ -72,7 +72,7 @@ const BlockedUserItem: Component<BlockedUserItemProps> = (props) => {
               if (fallback) fallback.style.display = 'flex'
             }}
           />
-          <div class="flex hidden h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-danger-500 to-danger-600 shadow-sm">
+          <div class="flex hidden h-10 w-10 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-danger-500 to-danger-600 shadow-xs">
             <span class="text-sm font-semibold text-white">
               {(props.user.username || 'U')[0].toUpperCase()}
             </span>
@@ -96,7 +96,7 @@ const BlockedUserItem: Component<BlockedUserItemProps> = (props) => {
           type="button"
           onClick={handleUnblockClick}
           disabled={isUnblockingUser()}
-          class="flex flex-shrink-0 items-center gap-2 rounded-lg bg-gray-200 px-3 py-2 text-sm font-medium text-gray-700 shadow-sm outline-none transition-all duration-200 hover:bg-gray-300 hover:shadow-md focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-white disabled:cursor-not-allowed disabled:opacity-50"
+          class="flex shrink-0 items-center gap-2 rounded-lg bg-gray-200 px-3 py-2 text-sm font-medium text-gray-700 shadow-xs outline-hidden transition-all duration-200 hover:bg-gray-300 hover:shadow-md focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-white disabled:cursor-not-allowed disabled:opacity-50"
           aria-label={`Unblock ${props.user.username}`}
           title="Unblock user"
         >
@@ -126,7 +126,7 @@ const BlockedUserItem: Component<BlockedUserItemProps> = (props) => {
 
 const EmptyState = () => (
   <div class="flex flex-col items-center justify-center px-4 py-12">
-    <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-danger-500 to-danger-600 shadow-lg">
+    <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-linear-to-br from-danger-500 to-danger-600 shadow-lg">
       <FaSolidUserSlash class="h-8 w-8 text-white" />
     </div>
     <h3 class="mb-2 text-xl font-semibold text-gray-800">No blocked users</h3>
@@ -139,9 +139,9 @@ const EmptyState = () => (
 
 const LoadingSkeleton = () => (
   <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-    <div class="h-16 animate-pulse rounded-xl bg-gray-200 shadow-sm"></div>
-    <div class="h-16 animate-pulse rounded-xl bg-gray-200 shadow-sm"></div>
-    <div class="h-16 animate-pulse rounded-xl bg-gray-200 shadow-sm"></div>
+    <div class="h-16 animate-pulse rounded-xl bg-gray-200 shadow-xs"></div>
+    <div class="h-16 animate-pulse rounded-xl bg-gray-200 shadow-xs"></div>
+    <div class="h-16 animate-pulse rounded-xl bg-gray-200 shadow-xs"></div>
   </div>
 )
 
@@ -176,7 +176,7 @@ export const BlockedUsersList: Component = () => {
       <Show when={hasUnblockError()}>
         <div class="mb-4 rounded-xl border border-red-200 bg-red-50 p-4">
           <div class="flex items-center gap-3 text-red-600">
-            <FaSolidCircleExclamation class="h-4 w-4 flex-shrink-0" />
+            <FaSolidCircleExclamation class="h-4 w-4 shrink-0" />
             <p class="text-sm font-medium">
               {unblockErrorMessage() || 'Failed to unblock user'}
             </p>
@@ -192,7 +192,7 @@ export const BlockedUsersList: Component = () => {
         <Match when={hasBlockedUsersError()}>
           <div class="rounded-xl border border-red-200 bg-red-50 p-6">
             <div class="flex items-center justify-center gap-3 text-red-600">
-              <FaSolidCircleExclamation class="h-5 w-5 flex-shrink-0" />
+              <FaSolidCircleExclamation class="h-5 w-5 shrink-0" />
               <div>
                 <p class="text-sm font-semibold">Error loading blocked users</p>
                 <p class="text-xs opacity-90">
@@ -208,7 +208,7 @@ export const BlockedUsersList: Component = () => {
         </Match>
 
         <Match when={hasBlockedUsers()}>
-          <div class="grid grid-cols-1 ~gap-3/4 sm:grid-cols-2 lg:grid-cols-3">
+          <div class="grid grid-cols-1 fl-gap-3/4 sm:grid-cols-2 lg:grid-cols-3">
             <For each={blockedUsers()}>
               {(user) => <BlockedUserItem user={user} />}
             </For>

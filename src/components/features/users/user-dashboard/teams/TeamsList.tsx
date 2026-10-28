@@ -69,7 +69,7 @@ const TeamsHeader: Component = () => {
 
   return (
     <div class="overflow-hidden rounded-2xl border-2 border-gray-200 bg-white shadow-xl">
-      <div class="~p-4/8">
+      <div class="fl-p-4/8">
         <div class="flex flex-col gap-4">
           <div>
             <a
@@ -83,7 +83,7 @@ const TeamsHeader: Component = () => {
           <div class="flex items-center justify-between">
             <h1 class="text-2xl font-bold text-gray-900">Your Teams</h1>
             <button
-              class="flex items-center gap-2 rounded-lg bg-accent px-4 py-2 font-medium text-white shadow-sm outline-none transition-all duration-200 hover:bg-accent-600 hover:shadow-md focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-white active:scale-95"
+              class="flex items-center gap-2 rounded-lg bg-accent px-4 py-2 font-medium text-white shadow-xs outline-hidden transition-all duration-200 hover:bg-accent-600 hover:shadow-md focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-white active:scale-95"
               onClick={() => setIsOpen(true)}
               disabled={disabled()}
             >
@@ -111,7 +111,7 @@ const OwnedTeamsList: Component = () => {
 
   return (
     <div class="overflow-hidden rounded-2xl border-2 border-gray-200 bg-white shadow-xl">
-      <div class="~p-4/8">
+      <div class="fl-p-4/8">
         <h3 class="mb-4 flex items-center gap-2 text-lg font-semibold text-gray-800">
           <FaSolidCrown class="h-5 w-5 text-primary" />
           <Show when={canCreateTeam.data} fallback={<>Teams You Own</>}>
@@ -131,8 +131,8 @@ const OwnedTeamsList: Component = () => {
           }
           loading={() => (
             <div class="space-y-3">
-              <div class="h-20 animate-pulse rounded-xl bg-gray-200 shadow-sm"></div>
-              <div class="h-20 animate-pulse rounded-xl bg-gray-200 shadow-sm"></div>
+              <div class="h-20 animate-pulse rounded-xl bg-gray-200 shadow-xs"></div>
+              <div class="h-20 animate-pulse rounded-xl bg-gray-200 shadow-xs"></div>
             </div>
           )}
           error={(error, refetch) => (
@@ -147,7 +147,7 @@ const OwnedTeamsList: Component = () => {
               </div>
               <button
                 onClick={refetch}
-                class="rounded-lg bg-danger px-4 py-2 text-white outline-none transition-all duration-200 hover:bg-danger-600 focus:ring-2 focus:ring-danger focus:ring-offset-2 focus:ring-offset-white"
+                class="rounded-lg bg-danger px-4 py-2 text-white outline-hidden transition-all duration-200 hover:bg-danger-600 focus:ring-2 focus:ring-danger focus:ring-offset-2 focus:ring-offset-white"
               >
                 Retry
               </button>
@@ -161,7 +161,7 @@ const OwnedTeamsList: Component = () => {
                 when={teams.length > 0}
                 fallback={
                   <div class="flex flex-col items-center justify-center px-4 py-12">
-                    <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-primary-500 to-primary-600 shadow-lg">
+                    <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-linear-to-br from-primary-500 to-primary-600 shadow-lg">
                       <FaSolidCrown class="h-8 w-8 text-white" />
                     </div>
                     <h4 class="mb-2 text-xl font-semibold text-gray-800">
@@ -179,7 +179,7 @@ const OwnedTeamsList: Component = () => {
                     {(team) => (
                       <a
                         href={`/dashboard/teams/${team.id}`}
-                        class="group block rounded-xl border-2 bg-white p-4 shadow-md outline-none transition-all duration-300 hover:border-primary-200"
+                        class="group block rounded-xl border-2 bg-white p-4 shadow-md outline-hidden transition-all duration-300 hover:border-primary-200"
                       >
                         <div class="flex items-center justify-between">
                           <div class="min-w-0 flex-1">
@@ -215,7 +215,7 @@ const MemberTeamsList: Component = () => {
 
   return (
     <div class="overflow-hidden rounded-2xl border-2 border-gray-200 bg-white shadow-xl">
-      <div class="~p-4/8">
+      <div class="fl-p-4/8">
         <h3 class="mb-4 flex items-center gap-2 text-lg font-semibold text-gray-800">
           <FaSolidUsers class="h-5 w-5 text-accent" />
           <Show
@@ -238,8 +238,8 @@ const MemberTeamsList: Component = () => {
           }
           loading={() => (
             <div class="space-y-3">
-              <div class="h-20 animate-pulse rounded-xl bg-gray-200 shadow-sm"></div>
-              <div class="h-20 animate-pulse rounded-xl bg-gray-200 shadow-sm"></div>
+              <div class="h-20 animate-pulse rounded-xl bg-gray-200 shadow-xs"></div>
+              <div class="h-20 animate-pulse rounded-xl bg-gray-200 shadow-xs"></div>
             </div>
           )}
           error={(error, refetch) => (
@@ -254,7 +254,7 @@ const MemberTeamsList: Component = () => {
               </div>
               <button
                 onClick={refetch}
-                class="rounded-lg bg-danger px-4 py-2 text-white outline-none transition-all duration-200 hover:bg-danger-600 focus:ring-2 focus:ring-danger focus:ring-offset-2 focus:ring-offset-white"
+                class="rounded-lg bg-danger px-4 py-2 text-white outline-hidden transition-all duration-200 hover:bg-danger-600 focus:ring-2 focus:ring-danger focus:ring-offset-2 focus:ring-offset-white"
               >
                 Retry
               </button>
@@ -268,7 +268,7 @@ const MemberTeamsList: Component = () => {
                 when={teams.length > 0}
                 fallback={
                   <div class="flex flex-col items-center justify-center px-4 py-12">
-                    <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-accent-500 to-accent-600 shadow-lg">
+                    <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-linear-to-br from-accent-500 to-accent-600 shadow-lg">
                       <FaSolidUsers class="h-8 w-8 text-white" />
                     </div>
                     <h4 class="mb-2 text-xl font-semibold text-gray-800">
@@ -286,7 +286,7 @@ const MemberTeamsList: Component = () => {
                     {(team) => (
                       <a
                         href={`/dashboard/teams/${team.id}`}
-                        class="group block rounded-xl border-2 bg-white p-4 shadow-md outline-none transition-all duration-300 hover:border-accent-100"
+                        class="group block rounded-xl border-2 bg-white p-4 shadow-md outline-hidden transition-all duration-300 hover:border-accent-100"
                       >
                         <div class="flex items-center justify-between">
                           <h4 class="mb-1 flex-1 truncate text-sm font-semibold text-gray-900 transition-colors group-hover:text-accent">
@@ -368,7 +368,7 @@ const InvitesList: Component = () => {
 
   return (
     <div class="overflow-hidden rounded-2xl border-2 border-gray-200 bg-white shadow-xl">
-      <div class="~p-4/8">
+      <div class="fl-p-4/8">
         <h3 class="mb-4 flex items-center gap-2 text-lg font-semibold text-gray-800">
           <FaSolidEnvelope class="h-5 w-5 text-warning" />
           Team Invitations
@@ -385,8 +385,8 @@ const InvitesList: Component = () => {
           }
           loading={() => (
             <div class="space-y-3">
-              <div class="h-20 animate-pulse rounded-xl bg-gray-200 shadow-sm"></div>
-              <div class="h-20 animate-pulse rounded-xl bg-gray-200 shadow-sm"></div>
+              <div class="h-20 animate-pulse rounded-xl bg-gray-200 shadow-xs"></div>
+              <div class="h-20 animate-pulse rounded-xl bg-gray-200 shadow-xs"></div>
             </div>
           )}
           error={(error, refetch) => (
@@ -403,7 +403,7 @@ const InvitesList: Component = () => {
               </div>
               <button
                 onClick={refetch}
-                class="rounded-lg bg-danger px-4 py-2 text-white outline-none transition-all duration-200 hover:bg-danger-600 focus:ring-2 focus:ring-danger focus:ring-offset-2 focus:ring-offset-white"
+                class="rounded-lg bg-danger px-4 py-2 text-white outline-hidden transition-all duration-200 hover:bg-danger-600 focus:ring-2 focus:ring-danger focus:ring-offset-2 focus:ring-offset-white"
               >
                 Retry
               </button>
@@ -415,7 +415,7 @@ const InvitesList: Component = () => {
               when={result.invites.length > 0}
               fallback={
                 <div class="flex flex-col items-center justify-center px-4 py-12">
-                  <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-warning-500 to-warning-600 shadow-lg">
+                  <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-linear-to-br from-warning-500 to-warning-600 shadow-lg">
                     <FaSolidEnvelope class="h-8 w-8 text-white" />
                   </div>
                   <h4 class="mb-2 text-xl font-semibold text-gray-800">
@@ -446,7 +446,7 @@ const InvitesList: Component = () => {
                             acceptInviteMutation.isPending ||
                             rejectInviteMutation.isPending
                           }
-                          class="flex items-center gap-1 rounded-lg bg-success px-3 py-1.5 text-xs font-medium text-white outline-none transition-all duration-200 hover:bg-success-600 hover:shadow-sm focus:ring-2 focus:ring-success focus:ring-offset-2 focus:ring-offset-white active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+                          class="flex items-center gap-1 rounded-lg bg-success px-3 py-1.5 text-xs font-medium text-white outline-hidden transition-all duration-200 hover:bg-success-600 hover:shadow-xs focus:ring-2 focus:ring-success focus:ring-offset-2 focus:ring-offset-white active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
                         >
                           <span>Accept</span>
                         </button>
@@ -458,7 +458,7 @@ const InvitesList: Component = () => {
                             acceptInviteMutation.isPending ||
                             rejectInviteMutation.isPending
                           }
-                          class="flex items-center gap-1 rounded-lg bg-danger px-3 py-1.5 text-xs font-medium text-white outline-none transition-all duration-200 hover:bg-danger-600 hover:shadow-sm focus:ring-2 focus:ring-danger focus:ring-offset-2 focus:ring-offset-white active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+                          class="flex items-center gap-1 rounded-lg bg-danger px-3 py-1.5 text-xs font-medium text-white outline-hidden transition-all duration-200 hover:bg-danger-600 hover:shadow-xs focus:ring-2 focus:ring-danger focus:ring-offset-2 focus:ring-offset-white active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
                         >
                           <span>Reject</span>
                         </button>

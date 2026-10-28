@@ -51,7 +51,7 @@ export const CommunityTagSearch: Component = () => {
         <input
           type="text"
           class={twMerge(
-            'w-full rounded-lg border-2 border-gray-200 px-3 py-2 text-sm outline-none',
+            'w-full rounded-lg border-2 border-gray-200 px-3 py-2 text-sm outline-hidden',
             'focus:border-accent focus:ring-2 focus:ring-accent/20',
           )}
           placeholder="Search tags…"
@@ -63,7 +63,7 @@ export const CommunityTagSearch: Component = () => {
         <Show when={searchInput().length > 0}>
           <button
             type="button"
-            class="absolute right-2 top-1/2 -translate-y-1/2 rounded px-2 py-1 text-xs text-gray-500 hover:bg-gray-100"
+            class="absolute right-2 top-1/2 -translate-y-1/2 rounded-sm px-2 py-1 text-xs text-gray-500 hover:bg-gray-100"
             onClick={clearInput}
             aria-label="Clear search"
           >

@@ -43,7 +43,7 @@ const Body: Component = () => {
         <Accordion.Header class="w-full">
           <Accordion.Trigger
             class={twMerge(
-              'hover:scale-102 hover:brightness-102 border-1 group m-2 flex w-full flex-row items-center rounded border-accent-500 bg-primary-200/50 p-2 text-xl text-white shadow',
+              'hover:scale-102 hover:brightness-102 border group m-2 flex w-full flex-row items-center rounded-sm border-accent-500 bg-primary-200/50 p-2 text-xl text-white shadow-sm',
             )}
           >
             <p class="flex-1 text-left">Charities Panel</p>
@@ -68,7 +68,7 @@ const Body: Component = () => {
         <Accordion.Header class="w-full">
           <Accordion.Trigger
             class={twMerge(
-              'hover:scale-102 hover:brightness-102 border-1 group m-2 flex w-full flex-row items-center rounded border-accent-500 bg-primary-200/50 p-2 text-xl text-white shadow',
+              'hover:scale-102 hover:brightness-102 border group m-2 flex w-full flex-row items-center rounded-sm border-accent-500 bg-primary-200/50 p-2 text-xl text-white shadow-sm',
             )}
           >
             <p class="flex-1 text-left">Active Dono Matches</p>
@@ -94,7 +94,7 @@ const Body: Component = () => {
         <Accordion.Header class="w-full">
           <Accordion.Trigger
             class={twMerge(
-              'hover:scale-102 hover:brightness-102 border-1 group m-2 flex w-full flex-row items-center rounded border-accent-500 bg-primary-200/50 p-2 text-xl text-white shadow',
+              'hover:scale-102 hover:brightness-102 border group m-2 flex w-full flex-row items-center rounded-sm border-accent-500 bg-primary-200/50 p-2 text-xl text-white shadow-sm',
             )}
           >
             <p class="flex-1 text-left">Primary User Schedule Panel</p>
@@ -119,7 +119,7 @@ const Body: Component = () => {
         <Accordion.Header class="w-full">
           <Accordion.Trigger
             class={twMerge(
-              'hover:scale-102 hover:brightness-102 border-1 group m-2 flex w-full flex-row items-center rounded border-accent-500 bg-primary-200/50 p-2 text-xl text-white shadow',
+              'hover:scale-102 hover:brightness-102 border group m-2 flex w-full flex-row items-center rounded-sm border-accent-500 bg-primary-200/50 p-2 text-xl text-white shadow-sm',
             )}
           >
             <p class="flex-1 text-left">Team Schedule Panel</p>
@@ -149,7 +149,7 @@ const Body: Component = () => {
         <Accordion.Header class="w-full">
           <Accordion.Trigger
             class={twMerge(
-              'hover:scale-102 hover:brightness-102 border-1 group m-2 flex w-full flex-row items-center rounded border-accent-500 bg-primary-200/50 p-2 text-xl text-white shadow',
+              'hover:scale-102 hover:brightness-102 border group m-2 flex w-full flex-row items-center rounded-sm border-accent-500 bg-primary-200/50 p-2 text-xl text-white shadow-sm',
             )}
           >
             <p class="flex-1 text-left">Charities Ticker</p>
@@ -174,7 +174,7 @@ const Body: Component = () => {
         <Accordion.Header class="w-full">
           <Accordion.Trigger
             class={twMerge(
-              'hover:scale-102 hover:brightness-102 border-1 group m-2 flex w-full flex-row items-center rounded border-accent-500 bg-primary-200/50 p-2 text-xl text-white shadow',
+              'hover:scale-102 hover:brightness-102 border group m-2 flex w-full flex-row items-center rounded-sm border-accent-500 bg-primary-200/50 p-2 text-xl text-white shadow-sm',
             )}
           >
             <p class="flex-1 text-left">All Fundraisers Ticker</p>
@@ -199,7 +199,7 @@ const Body: Component = () => {
         <Accordion.Header class="w-full">
           <Accordion.Trigger
             class={twMerge(
-              'hover:scale-102 hover:brightness-102 border-1 group m-2 flex w-full flex-row items-center rounded border-accent-500 bg-primary-200/50 p-2 text-xl text-white shadow',
+              'hover:scale-102 hover:brightness-102 border group m-2 flex w-full flex-row items-center rounded-sm border-accent-500 bg-primary-200/50 p-2 text-xl text-white shadow-sm',
             )}
           >
             <p class="flex-1 text-left">Fundraisers by Team Ticker</p>
@@ -224,7 +224,7 @@ const Body: Component = () => {
         <Accordion.Header class="w-full">
           <Accordion.Trigger
             class={twMerge(
-              'hover:scale-102 hover:brightness-102 border-1 group m-2 flex w-full flex-row items-center rounded border-accent-500 bg-primary-200/50 p-2 text-xl text-white shadow',
+              'hover:scale-102 hover:brightness-102 border group m-2 flex w-full flex-row items-center rounded-sm border-accent-500 bg-primary-200/50 p-2 text-xl text-white shadow-sm',
             )}
           >
             <p class="flex-1 text-left">Fundraisers by Cause Ticker</p>
@@ -257,7 +257,7 @@ const Body: Component = () => {
         <Accordion.Header class="w-full">
           <Accordion.Trigger
             class={twMerge(
-              'hover:scale-102 hover:brightness-102 border-1 group m-2 flex w-full flex-row items-center rounded border-accent-500 bg-primary-200/50 p-2 text-xl text-white shadow',
+              'hover:scale-102 hover:brightness-102 border group m-2 flex w-full flex-row items-center rounded-sm border-accent-500 bg-primary-200/50 p-2 text-xl text-white shadow-sm',
             )}
           >
             <p class="flex-1 text-left">Campaign Goal (EXPERIMENTAL)</p>
@@ -282,7 +282,7 @@ const Body: Component = () => {
         <Accordion.Header class="w-full">
           <Accordion.Trigger
             class={twMerge(
-              'hover:scale-102 hover:brightness-102 border-1 group m-2 flex w-full flex-row items-center rounded border-accent-500 bg-primary-200/50 p-2 text-xl text-white shadow',
+              'hover:scale-102 hover:brightness-102 border group m-2 flex w-full flex-row items-center rounded-sm border-accent-500 bg-primary-200/50 p-2 text-xl text-white shadow-sm',
             )}
           >
             <p class="flex-1 text-left">Big Campaign Goal (EXPERIMENTAL)</p>
@@ -307,7 +307,7 @@ const Body: Component = () => {
         <Accordion.Header class="w-full">
           <Accordion.Trigger
             class={twMerge(
-              'hover:scale-102 hover:brightness-102 border-1 group m-2 flex w-full flex-row items-center rounded border-accent-500 bg-primary-200/50 p-2 text-xl text-white shadow',
+              'hover:scale-102 hover:brightness-102 border group m-2 flex w-full flex-row items-center rounded-sm border-accent-500 bg-primary-200/50 p-2 text-xl text-white shadow-sm',
             )}
           >
             <p class="flex-1 text-left">Basic Label</p>

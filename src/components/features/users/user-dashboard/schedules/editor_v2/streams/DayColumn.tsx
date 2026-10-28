@@ -82,7 +82,7 @@ export const DayColumn: Component<{ date: Date; dayIndex: number }> = (
         <div class="text-sm font-semibold">{header()}</div>
         <Show when={shouldShowSetAllInvisibleButton()}>
           <button
-            class="rounded bg-accent px-2 py-1 text-xs text-white hover:bg-accent-600"
+            class="rounded-sm bg-accent px-2 py-1 text-xs text-white hover:bg-accent-600"
             onClick={setAllInvisible}
             title="Set All Invisible"
           >
@@ -91,7 +91,7 @@ export const DayColumn: Component<{ date: Date; dayIndex: number }> = (
         </Show>
         <Show when={shouldShowSetAllVisibleButton()}>
           <button
-            class="rounded bg-accent px-2 py-1 text-xs text-white hover:bg-accent-600"
+            class="rounded-sm bg-accent px-2 py-1 text-xs text-white hover:bg-accent-600"
             onClick={setAllVisible}
             title="Set All Visible"
           >
@@ -99,7 +99,7 @@ export const DayColumn: Component<{ date: Date; dayIndex: number }> = (
           </button>
         </Show>
         <button
-          class="rounded bg-accent px-2 py-1 text-xs text-white hover:bg-accent-600"
+          class="rounded-sm bg-accent px-2 py-1 text-xs text-white hover:bg-accent-600"
           onClick={addNew}
           title="Add New Stream"
         >
@@ -109,7 +109,7 @@ export const DayColumn: Component<{ date: Date; dayIndex: number }> = (
 
       <Show when={error()}>
         {(message) => (
-          <div role="alert" class="rounded border border-red-400 bg-red-100 px-2 py-1 text-xs text-red-700">
+          <div role="alert" class="rounded-sm border border-red-400 bg-red-100 px-2 py-1 text-xs text-red-700">
             {message()}
           </div>
         )}

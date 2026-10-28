@@ -36,20 +36,20 @@ export const CategoryTagsList: Component = () => {
   const hasTags = () => (categoryTags()?.length ?? 0) > 0
 
   const TagSkeleton = () => (
-    <div class="h-10 w-28 animate-pulse rounded-lg bg-neutral-200 shadow-sm"></div>
+    <div class="h-10 w-28 animate-pulse rounded-lg bg-neutral-200 shadow-xs"></div>
   )
 
   const CategoriesStatusIndicator = () => (
     <div class="flex items-center gap-1">
       <Switch>
         <Match when={isLoadingCategories()}>
-          <div class="flex items-center gap-2 rounded-full bg-gradient-to-r from-accent-100 to-accent-200 px-3 py-1.5 shadow-sm">
+          <div class="flex items-center gap-2 rounded-full bg-linear-to-r from-accent-100 to-accent-200 px-3 py-1.5 shadow-xs">
             <div class="h-2 w-2 animate-pulse rounded-full bg-accent"></div>
             <span class="text-xs font-medium text-accent-700">Loading</span>
           </div>
         </Match>
         <Match when={hasCategoriesError()}>
-          <div class="flex items-center gap-2 rounded-full bg-gradient-to-r from-danger-100 to-danger-200 px-3 py-1.5 shadow-sm">
+          <div class="flex items-center gap-2 rounded-full bg-linear-to-r from-danger-100 to-danger-200 px-3 py-1.5 shadow-xs">
             <div class="h-2 w-2 rounded-full bg-danger-500"></div>
             <span class="text-xs font-medium text-danger-700">Error</span>
           </div>
@@ -101,7 +101,7 @@ export const CategoryTagsList: Component = () => {
                   <button
                     type="button"
                     onClick={() => handleToggleCategory(category.id)}
-                    class={`rounded-md px-3 py-1.5 text-sm font-medium border transition-colors focus:outline-none focus:ring-2 focus:ring-accent ${
+                    class={`rounded-md px-3 py-1.5 text-sm font-medium border transition-colors focus:outline-hidden focus:ring-2 focus:ring-accent ${
                       isSelected()
                         ? 'bg-accent text-white border-accent-600'
                         : 'bg-white text-gray-800 border-gray-200 hover:bg-gray-50'
@@ -146,7 +146,7 @@ export const CategoryTagsList: Component = () => {
         <Match when={hasCategory() && hasCategoryTagsError()}>
           <div class="rounded-xl border border-danger-200 bg-danger-50 p-6">
             <div class="flex items-center justify-center gap-3 text-danger-600">
-              <FaSolidCircleExclamation class="h-5 w-5 flex-shrink-0" />
+              <FaSolidCircleExclamation class="h-5 w-5 shrink-0" />
               <div>
                 <p class="text-sm font-semibold">Error loading tags</p>
                 <p class="text-xs opacity-90">{categoryTagsError() || 'Unknown error occurred'}</p>
@@ -170,7 +170,7 @@ export const CategoryTagsList: Component = () => {
 
         <Match when={hasCategory() && !isLoadingCategoryTags() && !hasTags()}>
           <div class="flex flex-col items-center justify-center px-4 py-8">
-            <div class="mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-accent-500 to-accent-600">
+            <div class="mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-linear-to-br from-accent-500 to-accent-600">
               <FaSolidTag class="h-5 w-5 text-white" />
             </div>
             <p class="text-sm font-medium text-gray-700">No tags in this category</p>
@@ -179,7 +179,7 @@ export const CategoryTagsList: Component = () => {
         </Match>
 
         <Match when={hasCategory() && hasTags()}>
-          <div class="grid grid-cols-1 ~gap-3/4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div class="grid grid-cols-1 fl-gap-3/4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             <For each={categoryTags()}>
               {(tag) => {
                 const userHasTag = () => userTags().some((ut) => ut.tagId === tag.id)
@@ -188,7 +188,7 @@ export const CategoryTagsList: Component = () => {
                     type="button"
                     onClick={(e) => handleSelectTag(e, tag.id)}
                     disabled={userHasTag() || !canAddTag()}
-                    class={`relative rounded-full border px-3 py-2 text-sm font-medium outline-none transition-colors duration-200 ease-out focus:ring-2 focus:ring-accent focus:ring-offset-2 ${
+                    class={`relative rounded-full border px-3 py-2 text-sm font-medium outline-hidden transition-colors duration-200 ease-out focus:ring-2 focus:ring-accent focus:ring-offset-2 ${
                       userHasTag() || !canAddTag()
                         ? 'cursor-not-allowed border-gray-200 bg-gray-100 text-gray-400'
                         : 'bg-white hover:bg-gray-50'

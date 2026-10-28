@@ -62,8 +62,8 @@ export const MainHeader: Component = () => {
       }
     >
       <div class="flex flex-col items-center justify-center p-2 text-white">
-        <p class="w-full text-center ~text-2xl/4xl">The Jingle Jam Community</p>
-        <p class="text-center ~text-lg/xl">
+        <p class="w-full text-center fl-text-2xl/4xl">The Jingle Jam Community</p>
+        <p class="text-center fl-text-lg/xl">
           A central place to showcase the streams of the Jingle Jam!
         </p>
       </div>

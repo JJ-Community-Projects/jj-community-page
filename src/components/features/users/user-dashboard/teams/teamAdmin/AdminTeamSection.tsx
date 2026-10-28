@@ -26,7 +26,7 @@ export const AdminTeamSection: Component = () => {
 
   return (
     <div class="bg-white/95 backdrop-blur-lg rounded-2xl shadow-xl border border-white/20 overflow-hidden">
-      <div class="~p-4/8 space-y-6">
+      <div class="fl-p-4/8 space-y-6">
 
         {/* Team Information Header */}
         <AdminTeamHeader/>

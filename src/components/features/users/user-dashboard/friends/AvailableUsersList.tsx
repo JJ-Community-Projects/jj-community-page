@@ -13,14 +13,14 @@ const StatusIndicator = () => {
       <Switch>
         <Match when={isLoadingSearch()}>
           <div
-            class="flex items-center gap-2 bg-gradient-to-r from-accent-100 to-accent-200 px-3 py-1.5 rounded-full shadow-sm">
+            class="flex items-center gap-2 bg-linear-to-r from-accent-100 to-accent-200 px-3 py-1.5 rounded-full shadow-xs">
             <div class="w-2 h-2 bg-accent rounded-full animate-pulse"></div>
             <span class="text-accent-700 text-xs font-medium">Searching</span>
           </div>
         </Match>
         <Match when={hasSearchError()}>
           <div
-            class="flex items-center gap-2 bg-gradient-to-r from-red-100 to-red-200 px-3 py-1.5 rounded-full shadow-sm">
+            class="flex items-center gap-2 bg-linear-to-r from-red-100 to-red-200 px-3 py-1.5 rounded-full shadow-xs">
             <div class="w-2 h-2 bg-red-500 rounded-full"></div>
             <span class="text-red-700 text-xs font-medium">Error</span>
           </div>
@@ -31,7 +31,7 @@ const StatusIndicator = () => {
 }
 
 const UserSkeleton = () => (
-  <div class="animate-pulse bg-gray-200 rounded-lg h-16 w-full shadow-sm"></div>
+  <div class="animate-pulse bg-gray-200 rounded-lg h-16 w-full shadow-xs"></div>
 );
 
 
@@ -61,7 +61,7 @@ export const AvailableUsersList: Component = () => {
   const EmptyState = () => (
     <div class="flex flex-col items-center justify-center py-8 px-4">
       <div
-        class="w-12 h-12 bg-gradient-to-br from-gray-400 to-gray-500 rounded-full flex items-center justify-center mb-3">
+        class="w-12 h-12 bg-linear-to-br from-gray-400 to-gray-500 rounded-full flex items-center justify-center mb-3">
         <FaSolidUsers class="w-6 h-6 text-white" />
       </div>
       <h4 class="text-sm font-semibold text-gray-700 mb-1">
@@ -109,7 +109,7 @@ export const AvailableUsersList: Component = () => {
       <Show when={hasSendFriendRequestError()}>
         <div class="bg-red-50 rounded-xl p-4 border border-red-200 mb-4">
           <div class="flex items-center gap-3 text-red-600">
-            <FaSolidCircleExclamation class="w-4 h-4 flex-shrink-0" />
+            <FaSolidCircleExclamation class="w-4 h-4 shrink-0" />
             <p class="text-sm font-medium">{sendFriendRequestErrorMessage() || "Failed to send friend request"}</p>
           </div>
         </div>
@@ -119,7 +119,7 @@ export const AvailableUsersList: Component = () => {
         <Match when={hasSearchError()}>
           <div class="bg-red-50 rounded-xl p-6 border border-red-200">
             <div class="flex items-center justify-center gap-3 text-red-600">
-              <FaSolidCircleExclamation class="w-5 h-5 flex-shrink-0" />
+              <FaSolidCircleExclamation class="w-5 h-5 shrink-0" />
               <div>
                 <p class="font-semibold text-sm">Error searching users</p>
                 <p class="text-xs opacity-90">{searchErrorMessage() || "Unknown error occurred"}</p>
@@ -153,7 +153,7 @@ export const AvailableUsersList: Component = () => {
                       <div class="flex items-center gap-3">
                         {/* Avatar placeholder */}
                         <div
-                          class="w-10 h-10 rounded-full bg-gradient-to-br from-accent-500 to-accent-600 flex items-center justify-center shadow-sm">
+                          class="w-10 h-10 rounded-full bg-linear-to-br from-accent-500 to-accent-600 flex items-center justify-center shadow-xs">
                           <span class="text-white font-semibold text-sm">
                             {(user.tiltifyUsername || user.twitchUsername || 'U')[0].toUpperCase()}
                           </span>
@@ -179,9 +179,9 @@ export const AvailableUsersList: Component = () => {
                         disabled={!canSendRequest() || isSendingFriendRequest()}
                         class={`
                           px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200
-                          focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-white outline-none
+                          focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-white outline-hidden
                           ${canSendRequest() && !isSendingFriendRequest()
-                          ? 'bg-accent text-white hover:bg-accent-600 shadow-sm hover:shadow-md'
+                          ? 'bg-accent text-white hover:bg-accent-600 shadow-xs hover:shadow-md'
                           : 'bg-gray-100 text-gray-500 cursor-not-allowed'
                         }
                         `}

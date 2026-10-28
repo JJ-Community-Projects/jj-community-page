@@ -48,10 +48,10 @@ export const FriendSearchInput: Component = () => {
           class="
             w-full pl-12 pr-12 py-3 rounded-xl border-2 border-gray-200
             focus:border-primary focus:ring-4 focus:ring-primary/20
-            transition-all duration-300 outline-none
-            bg-white/50 backdrop-blur-sm hover:bg-white/70
+            transition-all duration-300 outline-hidden
+            bg-white/50 backdrop-blur-xs hover:bg-white/70
             placeholder-gray-500 text-gray-800 font-medium
-            shadow-sm hover:shadow-md focus:shadow-lg
+            shadow-xs hover:shadow-md focus:shadow-lg
           "
           placeholder="Search for users to add as friends..."
           value={searchInput()}
@@ -68,7 +68,7 @@ export const FriendSearchInput: Component = () => {
               absolute inset-y-0 right-0 pr-4 flex items-center
               text-gray-400 hover:text-gray-600 transition-colors duration-200
               focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-white
-              outline-none rounded-full p-1
+              outline-hidden rounded-full p-1
             "
             aria-label="Clear search"
           >
@@ -77,12 +77,12 @@ export const FriendSearchInput: Component = () => {
         )}
 
         {/* Focus ring enhancement */}
-        <div class="absolute inset-0 rounded-xl bg-gradient-to-r from-accent/5 to-accent/10 opacity-0 transition-opacity duration-300 pointer-events-none peer-focus:opacity-100"></div>
+        <div class="absolute inset-0 rounded-xl bg-linear-to-r from-accent/5 to-accent/10 opacity-0 transition-opacity duration-300 pointer-events-none peer-focus:opacity-100"></div>
       </div>
 
       {/* Helper text */}
       <div class="mt-3 flex items-start gap-2">
-        <FaSolidCircleInfo class="w-3 h-3 text-gray-400 mt-0.5 flex-shrink-0" />
+        <FaSolidCircleInfo class="w-3 h-3 text-gray-400 mt-0.5 shrink-0" />
         <div class="text-xs text-gray-500 space-y-1">
           <p>Search for users by their username to send friend requests.</p>
           {searchInput().length > 0 && (

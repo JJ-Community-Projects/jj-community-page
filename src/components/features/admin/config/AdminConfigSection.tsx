@@ -101,13 +101,13 @@ export const AdminConfigSection: Component = () => {
       <form class="flex flex-col gap-2" onSubmit={onSubmit}>
         <div class="flex items-center gap-2">
           <input
-            class="input input-bordered w-48 rounded border px-2 py-1"
+            class="input input-bordered w-48 rounded-sm border px-2 py-1"
             placeholder="key"
             value={keyInput()}
             onInput={(e) => setKeyInput(e.currentTarget.value)}
           />
           <select
-            class="select rounded border px-2 py-1"
+            class="select rounded-sm border px-2 py-1"
             value={typeInput()}
             onChange={(e) => setTypeInput(e.currentTarget.value as any)}
           >
@@ -117,7 +117,7 @@ export const AdminConfigSection: Component = () => {
           </select>
           <Show when={typeInput() === 'string'}>
             <input
-              class="input input-bordered w-56 rounded border px-2 py-1"
+              class="input input-bordered w-56 rounded-sm border px-2 py-1"
               placeholder="value"
               value={stringValue()}
               onInput={(e) => setStringValue(e.currentTarget.value)}
@@ -125,7 +125,7 @@ export const AdminConfigSection: Component = () => {
           </Show>
           <Show when={typeInput() === 'number'}>
             <input
-              class="input input-bordered w-40 rounded border px-2 py-1"
+              class="input input-bordered w-40 rounded-sm border px-2 py-1"
               placeholder="number"
               type="number"
               value={numberValue() as any}
@@ -150,7 +150,7 @@ export const AdminConfigSection: Component = () => {
           </Show>
           <button
             type="submit"
-            class="btn rounded border bg-blue-600 px-3 py-1 text-white disabled:opacity-50"
+            class="btn rounded-sm border bg-blue-600 px-3 py-1 text-white disabled:opacity-50"
             disabled={
               addStringMut.isPending ||
               addNumberMut.isPending ||
@@ -169,10 +169,10 @@ export const AdminConfigSection: Component = () => {
           <div class="flex flex-col gap-2">
             <For each={configs}>
               {(c) => (
-                <div class="flex items-center justify-between rounded border p-2">
+                <div class="flex items-center justify-between rounded-sm border p-2">
                   <div class="flex items-center gap-2">
                     <span class="font-mono text-sm text-gray-600">{c.key}</span>
-                    <span class="rounded border bg-gray-100 px-2 py-0.5 text-xs">
+                    <span class="rounded-sm border bg-gray-100 px-2 py-0.5 text-xs">
                       {c.type}
                     </span>
 
@@ -198,14 +198,14 @@ export const AdminConfigSection: Component = () => {
                       <>
                         <Show when={c.type === 'string'}>
                           <input
-                            class="input input-bordered w-56 rounded border px-2 py-1"
+                            class="input input-bordered w-56 rounded-sm border px-2 py-1"
                             value={editStringValue()}
                             onInput={(e) => setEditStringValue(e.currentTarget.value)}
                           />
                         </Show>
                         <Show when={c.type === 'number'}>
                           <input
-                            class="input input-bordered w-40 rounded border px-2 py-1"
+                            class="input input-bordered w-40 rounded-sm border px-2 py-1"
                             type="number"
                             value={editNumberValue() as any}
                             onInput={(e) =>
@@ -235,7 +235,7 @@ export const AdminConfigSection: Component = () => {
                     <Show when={editingKey() !== c.key}>
                       <>
                         <button
-                          class="rounded border px-2 py-1"
+                          class="rounded-sm border px-2 py-1"
                           onClick={() => {
                             setEditingKey(c.key)
                             if (c.type === 'string') setEditStringValue((c as any).value as string)
@@ -246,7 +246,7 @@ export const AdminConfigSection: Component = () => {
                           edit
                         </button>
                         <button
-                          class="rounded border border-red-300 px-2 py-1 text-red-700"
+                          class="rounded-sm border border-red-300 px-2 py-1 text-red-700"
                           onClick={() => {
                             if (!confirm(`Delete config "${c.key}"?`)) return
                             removeMut.mutate({ key: c.key })
@@ -260,7 +260,7 @@ export const AdminConfigSection: Component = () => {
                     <Show when={editingKey() === c.key}>
                       <>
                         <button
-                          class="rounded border bg-green-600 text-white px-2 py-1 disabled:opacity-50"
+                          class="rounded-sm border bg-green-600 text-white px-2 py-1 disabled:opacity-50"
                           onClick={() => {
                             if (c.type === 'string') {
                               const v = editStringValue()
@@ -278,7 +278,7 @@ export const AdminConfigSection: Component = () => {
                           save
                         </button>
                         <button
-                          class="rounded border px-2 py-1"
+                          class="rounded-sm border px-2 py-1"
                           onClick={() => setEditingKey(null)}
                         >
                           cancel

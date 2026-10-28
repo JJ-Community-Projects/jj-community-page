@@ -40,9 +40,9 @@ export const CommunityItem: Component<{
   return (
     <div
       class={twMerge(
-        'w-full rounded-2xl shadow-sm transition-all duration-200 hover:shadow-md',
+        'w-full rounded-2xl shadow-xs transition-all duration-200 hover:shadow-md',
         'hover:scale-101 hover:brightness-105',
-        'bg-gradient-to-b from-neutral-50 to-neutral-100 ring-1 ring-black/5',
+        'bg-linear-to-b from-neutral-50 to-neutral-100 ring-1 ring-black/5',
       )}
     >
       <div class={'flex h-full w-full flex-col gap-2 p-2'}>
@@ -176,7 +176,7 @@ const Live = () => {
           'relative hidden h-3 items-center justify-center group-hover/live:flex'
         }
       >
-        <p class={'rounded bg-twitch-500 p-0.5 text-[6px] text-white'}>LIVE</p>
+        <p class={'rounded-sm bg-twitch-500 p-0.5 text-[6px] text-white'}>LIVE</p>
       </div>
       <span class="relative flex h-3 w-3 items-center justify-center group-hover/live:hidden">
         <span

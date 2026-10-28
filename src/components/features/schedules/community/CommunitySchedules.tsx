@@ -36,13 +36,13 @@ const Header: Component<{
   const jjStartCountdown = useJJStartCountdown()
   const isJJ = useIsJJ()
   return (
-    <div class="rounded-xl border-2 bg-gradient-to-b from-neutral-50 to-neutral-100 p-2 shadow-md transition-all duration-300 hover:shadow-lg">
+    <div class="rounded-xl border-2 bg-linear-to-b from-neutral-50 to-neutral-100 p-2 shadow-md transition-all duration-300 hover:shadow-lg">
       <div class="flex w-full flex-col gap-2 p-4 md:flex-row md:items-center md:justify-between">
         {/* Left: Title, icon, subtitle (left-aligned) */}
         <div class="flex flex-col items-center text-center md:items-start md:text-left">
           <div class="flex items-center gap-2">
             <FaSolidCalendarWeek class="h-8 w-8 text-neutral-600" />
-            <h2 class="font-bold text-black ~text-2xl/4xl">Full Schedule</h2>
+            <h2 class="font-bold text-black fl-text-2xl/4xl">Full Schedule</h2>
           </div>
           <Show when={props.schedule}>
             {(schedule) => {
@@ -332,7 +332,7 @@ const DayAccordionItem: Component<{
                         minute: '2-digit',
                       })}
                     </p>
-                    <div class="grid w-full grid-cols-[repeat(auto-fit,_minmax(250px,_1fr))] gap-2">
+                    <div class="grid w-full grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-2">
                       <For each={streams}>
                         {(item) => {
                           const { stream, owner } = item

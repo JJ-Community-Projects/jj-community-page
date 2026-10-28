@@ -53,7 +53,7 @@ export const MobileNav: Component<MobileNavProps> = (props) => {
         <div class="group relative">
           <a
             href="/yogs"
-            class="flex w-full flex-row items-center rounded-lg bg-transparent focus:outline-none"
+            class="flex w-full flex-row items-center rounded-lg bg-transparent focus:outline-hidden"
           >
             <span>Yogs</span>
           </a>

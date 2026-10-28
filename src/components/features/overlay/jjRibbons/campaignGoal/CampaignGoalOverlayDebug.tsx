@@ -17,7 +17,7 @@ export const CampaignGoalOverlayDebug: Component = () => {
       {/* Compact debug panel: low visual weight, unobtrusive, easy to use */}
       <div
         class={
-          'pointer-events-auto absolute bottom-2 left-2 z-50 flex min-w-[220px] flex-col gap-1 rounded-md border border-white/10 bg-black/60 p-2 text-[11px] text-white/80 shadow-md backdrop-blur'
+          'pointer-events-auto absolute bottom-2 left-2 z-50 flex min-w-[220px] flex-col gap-1 rounded-md border border-white/10 bg-black/60 p-2 text-[11px] text-white/80 shadow-md backdrop-blur-sm'
         }
       >
         <p class={'mb-1 text-[10px] text-white/60'}>
@@ -31,7 +31,7 @@ export const CampaignGoalOverlayDebug: Component = () => {
             <button
               aria-label="Decrease raised"
               class={
-                'h-6 w-6 rounded-sm border border-white/15 bg-white/5 text-white/80 hover:bg-white/10'
+                'h-6 w-6 rounded-xs border border-white/15 bg-white/5 text-white/80 hover:bg-white/10'
               }
               onClick={() => setRaised(raised() - 10)}
             >
@@ -43,7 +43,7 @@ export const CampaignGoalOverlayDebug: Component = () => {
             <button
               aria-label="Increase raised"
               class={
-                'h-6 w-6 rounded-sm border border-white/15 bg-white/5 text-white/80 hover:bg-white/10'
+                'h-6 w-6 rounded-xs border border-white/15 bg-white/5 text-white/80 hover:bg-white/10'
               }
               onClick={() => setRaised(raised() + 10)}
             >
@@ -59,7 +59,7 @@ export const CampaignGoalOverlayDebug: Component = () => {
             <button
               aria-label="Decrease goal"
               class={
-                'h-6 w-6 rounded-sm border border-white/15 bg-white/5 text-white/80 hover:bg-white/10'
+                'h-6 w-6 rounded-xs border border-white/15 bg-white/5 text-white/80 hover:bg-white/10'
               }
               onClick={() => setGoal(goal() - 100)}
             >
@@ -71,7 +71,7 @@ export const CampaignGoalOverlayDebug: Component = () => {
             <button
               aria-label="Increase goal"
               class={
-                'h-6 w-6 rounded-sm border border-white/15 bg-white/5 text-white/80 hover:bg-white/10'
+                'h-6 w-6 rounded-xs border border-white/15 bg-white/5 text-white/80 hover:bg-white/10'
               }
               onClick={() => setGoal(goal() + 100)}
             >
@@ -87,7 +87,7 @@ export const CampaignGoalOverlayDebug: Component = () => {
             <button
               aria-label="Decrease previous goal"
               class={
-                'h-6 w-6 rounded-sm border border-white/15 bg-white/5 text-white/80 hover:bg-white/10'
+                'h-6 w-6 rounded-xs border border-white/15 bg-white/5 text-white/80 hover:bg-white/10'
               }
               onClick={() => setPreviousGoal(previousGoal() - 100)}
             >
@@ -99,7 +99,7 @@ export const CampaignGoalOverlayDebug: Component = () => {
             <button
               aria-label="Increase previous goal"
               class={
-                'h-6 w-6 rounded-sm border border-white/15 bg-white/5 text-white/80 hover:bg-white/10'
+                'h-6 w-6 rounded-xs border border-white/15 bg-white/5 text-white/80 hover:bg-white/10'
               }
               onClick={() => setPreviousGoal(previousGoal() + 100)}
             >

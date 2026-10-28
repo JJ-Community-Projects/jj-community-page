@@ -4,7 +4,7 @@ import { FaSolidCircleExclamation, FaSolidTag, FaSolidUser, FaSolidXmark, } from
 
 const EmptyState = () => (
   <div class="flex flex-col items-center justify-center px-4 py-6">
-    <div class="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-primary-500 to-primary-600 shadow">
+    <div class="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-linear-to-br from-primary-500 to-primary-600 shadow-sm">
       <FaSolidTag class="h-6 w-6 text-white" />
     </div>
     <h3 class="mb-1 text-lg font-semibold text-gray-800">No tags added yet</h3>
@@ -18,9 +18,9 @@ const EmptyState = () => (
 
 const LoadingSkeleton = () => (
   <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-    <div class="h-16 animate-pulse rounded-xl bg-neutral-200 shadow-sm"></div>
-    <div class="h-16 animate-pulse rounded-xl bg-neutral-200 shadow-sm"></div>
-    <div class="h-16 animate-pulse rounded-xl bg-neutral-200 shadow-sm"></div>
+    <div class="h-16 animate-pulse rounded-xl bg-neutral-200 shadow-xs"></div>
+    <div class="h-16 animate-pulse rounded-xl bg-neutral-200 shadow-xs"></div>
+    <div class="h-16 animate-pulse rounded-xl bg-neutral-200 shadow-xs"></div>
   </div>
 )
 
@@ -66,7 +66,7 @@ export const UserTagsList: Component = () => {
         <Match when={hasUserTagsError()}>
           <div class="rounded-xl border border-danger-200 bg-danger-50 p-6">
             <div class="flex items-center justify-center gap-3 text-danger-600">
-              <FaSolidCircleExclamation class="h-5 w-5 flex-shrink-0" />
+              <FaSolidCircleExclamation class="h-5 w-5 shrink-0" />
               <div>
                 <p class="text-sm font-semibold">Error loading your tags</p>
                 <p class="text-xs opacity-90">
@@ -82,7 +82,7 @@ export const UserTagsList: Component = () => {
         </Match>
 
         <Match when={hasTags()}>
-          <div class="grid grid-cols-1 ~gap-3/4 sm:grid-cols-2 lg:grid-cols-3">
+          <div class="grid grid-cols-1 fl-gap-3/4 sm:grid-cols-2 lg:grid-cols-3">
             <For each={userTags()}>
               {(userTag) => (
                 <div
@@ -95,7 +95,7 @@ export const UserTagsList: Component = () => {
                   <div class="flex flex-1 items-center gap-3">
                     {/* Color indicator */}
                     <div
-                      class="h-4 w-4 flex-shrink-0 rounded-full shadow-sm"
+                      class="h-4 w-4 shrink-0 rounded-full shadow-xs"
                       style={{ 'background-color': userTag.tag.color }}
                     ></div>
 
@@ -115,7 +115,7 @@ export const UserTagsList: Component = () => {
                     <button
                       type="button"
                       onClick={() => handleRemoveTag(userTag.tagId)}
-                      class="flex-shrink-0 rounded-full p-2 opacity-70 outline-none transition-all duration-200 group-hover:opacity-100 hover:scale-110 hover:bg-danger-100 focus:bg-danger-100 focus:ring-2 focus:ring-danger-500 focus:ring-offset-2 focus:ring-offset-white active:scale-95"
+                      class="shrink-0 rounded-full p-2 opacity-70 outline-hidden transition-all duration-200 group-hover:opacity-100 hover:scale-110 hover:bg-danger-100 focus:bg-danger-100 focus:ring-2 focus:ring-danger-500 focus:ring-offset-2 focus:ring-offset-white active:scale-95"
                       aria-label={`Remove ${userTag.tag.name} tag`}
                       title="Remove tag"
                     >

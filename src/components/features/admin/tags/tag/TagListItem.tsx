@@ -102,7 +102,7 @@ export const TagListItem: Component<TagListItemProps> = (props) => {
           <button
             type="button"
             onClick={() => setExpanded(!expanded())}
-            class="p-1 hover:bg-gray-100 rounded transition-colors"
+            class="p-1 hover:bg-gray-100 rounded-sm transition-colors"
           >
             <svg
               class={`w-4 h-4 transition-transform ${expanded() ? 'rotate-90' : ''}`}
@@ -120,7 +120,7 @@ export const TagListItem: Component<TagListItemProps> = (props) => {
         </div>
         <div class="flex items-center gap-2">
           <Show when={tag.totalUsage > 0}>
-            <span class="text-xs text-green-600 bg-green-50 px-2 py-1 rounded">
+            <span class="text-xs text-green-600 bg-green-50 px-2 py-1 rounded-sm">
               {tag.totalUsage} total uses
             </span>
           </Show>
@@ -128,7 +128,7 @@ export const TagListItem: Component<TagListItemProps> = (props) => {
             <button
               type="button"
               onClick={() => setExpanded(!expanded())}
-              class="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded hover:bg-blue-100 transition-colors cursor-pointer"
+              class="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded-sm hover:bg-blue-100 transition-colors cursor-pointer"
             >
               {tag.aliases.length} aliases
             </button>
@@ -151,7 +151,7 @@ export const TagListItem: Component<TagListItemProps> = (props) => {
               </TextField.Label>
               <TextField.Input
                 placeholder="e.g., Minecraft"
-                class="w-full px-2 py-1.5 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent text-sm"
+                class="w-full px-2 py-1.5 border border-gray-300 rounded-sm focus:outline-hidden focus:ring-1 focus:ring-blue-500 focus:border-transparent text-sm"
               />
             </TextField>
           </div>
@@ -170,7 +170,7 @@ export const TagListItem: Component<TagListItemProps> = (props) => {
               <TextField.Input
                 placeholder="e.g., minecraft"
                 pattern="^[a-z0-9-]+$"
-                class="w-full px-2 py-1.5 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent text-sm"
+                class="w-full px-2 py-1.5 border border-gray-300 rounded-sm focus:outline-hidden focus:ring-1 focus:ring-blue-500 focus:border-transparent text-sm"
               />
             </TextField>
           </div>
@@ -187,7 +187,7 @@ export const TagListItem: Component<TagListItemProps> = (props) => {
               </TextField.Label>
               <TextField.Input
                 placeholder="Optional description"
-                class="w-full px-2 py-1.5 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent text-sm"
+                class="w-full px-2 py-1.5 border border-gray-300 rounded-sm focus:outline-hidden focus:ring-1 focus:ring-blue-500 focus:border-transparent text-sm"
               />
             </TextField>
           </div>
@@ -203,7 +203,7 @@ export const TagListItem: Component<TagListItemProps> = (props) => {
                 type="color"
                 value={editableTag.color}
                 onInput={(e) => setEditableTag('color', e.currentTarget.value)}
-                class="w-full h-8 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
+                class="w-full h-8 border border-gray-300 rounded-sm focus:outline-hidden focus:ring-1 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
 
@@ -214,7 +214,7 @@ export const TagListItem: Component<TagListItemProps> = (props) => {
             >
               <Checkbox.Input class="sr-only"/>
               <Checkbox.Control
-                class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 border border-gray-300 rounded bg-white flex items-center justify-center">
+                class="w-4 h-4 text-blue-600 border-gray-300 rounded-sm focus:ring-blue-500 border border-gray-300 rounded-sm bg-white flex items-center justify-center">
                 <Checkbox.Indicator>
                   <svg class="w-3 h-3 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd"
@@ -234,7 +234,7 @@ export const TagListItem: Component<TagListItemProps> = (props) => {
               <button
                 type="submit"
                 disabled={updateTag.isPending || !editableTag.name.trim() || !editableTag.slug.trim()}
-                class="px-3 py-1 bg-blue-600 text-white text-xs font-medium rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                class="px-3 py-1 bg-blue-600 text-white text-xs font-medium rounded-sm hover:bg-blue-700 focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Show when={updateTag.isPending} fallback="Update">
                   Updating...
@@ -253,7 +253,7 @@ export const TagListItem: Component<TagListItemProps> = (props) => {
                   visible: tag.visible,
                 })
               }}
-              class="px-3 py-1 bg-gray-200 text-gray-700 text-xs font-medium rounded hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+              class="px-3 py-1 bg-gray-200 text-gray-700 text-xs font-medium rounded-sm hover:bg-gray-300 focus:outline-hidden focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
               disabled={!hasChanges()}
             >
               Reset
@@ -264,7 +264,7 @@ export const TagListItem: Component<TagListItemProps> = (props) => {
             type="button"
             onClick={handleDelete}
             disabled={deleteTag.isPending}
-            class="px-3 py-1 bg-red-600 text-white text-xs font-medium rounded hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            class="px-3 py-1 bg-red-600 text-white text-xs font-medium rounded-sm hover:bg-red-700 focus:outline-hidden focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Show when={deleteTag.isPending} fallback={showDeleteConfirm() ? "Confirm Delete" : "Delete"}>
               Deleting...
@@ -296,7 +296,7 @@ export const TagListItem: Component<TagListItemProps> = (props) => {
               <button
                 type="button"
                 onClick={() => setShowDeleteConfirm(false)}
-                class="px-2 py-1 bg-gray-200 text-gray-700 text-xs font-medium rounded hover:bg-gray-300"
+                class="px-2 py-1 bg-gray-200 text-gray-700 text-xs font-medium rounded-sm hover:bg-gray-300"
               >
                 Cancel
               </button>

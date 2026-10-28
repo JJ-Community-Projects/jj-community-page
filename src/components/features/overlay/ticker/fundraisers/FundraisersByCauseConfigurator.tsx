@@ -45,8 +45,8 @@ export const FundraisersByCauseConfigurator: Component<{
   )
 
   return (
-    <div class="flex flex-col gap-2 rounded bg-black/30 p-3">
-      <p class="mb-2 rounded border border-white/10 bg-white/5 p-2 text-sm text-white/80">
+    <div class="flex flex-col gap-2 rounded-sm bg-black/30 p-3">
+      <p class="mb-2 rounded-sm border border-white/10 bg-white/5 p-2 text-sm text-white/80">
         A horizontal scrolling ticker showing fundraisers filtered by
         cause/charity. Choose a theme, show or hide the raised total, and select
         a currency. Set your OBS Browser Source to 1920x80 px.
@@ -54,7 +54,7 @@ export const FundraisersByCauseConfigurator: Component<{
       <PreviewDataField value={previewData()} onChange={setPreviewData} />
       <FieldRow label="Cause">
         <select
-          class="w-80 rounded bg-black/40 px-2 py-1"
+          class="w-80 rounded-sm bg-black/40 px-2 py-1"
           value={String(causeId())}
           onChange={(e) => {
             const v = e.currentTarget.value
@@ -71,7 +71,7 @@ export const FundraisersByCauseConfigurator: Component<{
         <select
           value={theme()}
           onChange={(e) => setTheme(e.currentTarget.value as any)}
-          class="w-40 rounded bg-black/40 px-2 py-1"
+          class="w-40 rounded-sm bg-black/40 px-2 py-1"
         >
           <option value="default">Default</option>
           <option value="red">Red</option>
@@ -82,7 +82,7 @@ export const FundraisersByCauseConfigurator: Component<{
         <select
           value={currency()}
           onChange={(e) => setCurrency(e.currentTarget.value as 'GBP' | 'USD' | 'EUR')}
-          class="w-40 rounded bg-black/40 px-2 py-1"
+          class="w-40 rounded-sm bg-black/40 px-2 py-1"
         >
           <option value="GBP">GBP</option>
           <option value="USD">USD</option>

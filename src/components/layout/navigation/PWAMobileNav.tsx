@@ -32,7 +32,7 @@ export const PWAMobileNav: Component<MobileNavProps> = (props) => {
            ref={setRef}>
         <a href="/pwa">Home</a>
         <div class="group relative">
-          <a href="/pwa/yogs" class="flex w-full flex-row items-center rounded-lg bg-transparent focus:outline-none">
+          <a href="/pwa/yogs" class="flex w-full flex-row items-center rounded-lg bg-transparent focus:outline-hidden">
             <span>Yogs</span>
           </a>
         </div>

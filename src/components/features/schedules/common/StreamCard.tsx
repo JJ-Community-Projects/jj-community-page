@@ -333,9 +333,9 @@ const ScheduleStreamCardSidebarHover: Component<ScheduleStreamCardProps> = (
         />
 
         {/* Overlay that animates from left to right on hover */}
-        <div class="absolute inset-0 z-0 origin-left scale-x-0 transform rounded-2xl bg-gradient-to-r from-[var(--stream-highlight-color)] to-[var(--stream-highlight-color)] opacity-0 transition-all duration-500 ease-in-out group-hover:scale-x-100 group-hover:opacity-100" />
+        <div class="absolute inset-0 z-0 origin-left scale-x-0 transform rounded-2xl bg-linear-to-r from-(--stream-highlight-color) to-(--stream-highlight-color) opacity-0 transition-all duration-500 ease-in-out group-hover:scale-x-100 group-hover:opacity-100" />
 
-        <div class="z-2 relative flex flex-grow flex-col px-1 py-4 text-left transition-colors duration-300 group-hover:text-[var(--stream-text-color)]">
+        <div class="z-2 relative flex grow flex-col px-1 py-4 text-left transition-colors duration-300 group-hover:text-(--stream-text-color)">
           <div class="flex w-full flex-col items-start">
             <p class="line-clamp-2 text-pretty text-lg font-bold uppercase tracking-widest">
               {props.stream.title}
@@ -352,7 +352,7 @@ const ScheduleStreamCardSidebarHover: Component<ScheduleStreamCardProps> = (
               </p>
             </Show>
             <Show when={!showCountdown() && isLive()}>
-              <p class="text-md font-bold tracking-wide text-accent group-hover:text-[var(--stream-text-color)]">
+              <p class="text-md font-bold tracking-wide text-accent group-hover:text-(--stream-text-color)">
                 LIVE
               </p>
             </Show>
@@ -395,7 +395,7 @@ const ScheduleStreamCardBottomBar: Component<ScheduleStreamCardProps> = (
         class="group relative flex w-full flex-col overflow-hidden rounded-2xl bg-white shadow-md transition-shadow duration-300 hover:shadow-lg"
         onClick={() => modal.open()}
       >
-        <div class="flex flex-grow flex-col px-5 py-4 text-center">
+        <div class="flex grow flex-col px-5 py-4 text-center">
           <div class="flex w-full origin-center flex-col items-center justify-center transition-transform group-hover:scale-105">
             <p class="line-clamp-2 text-pretty text-lg font-bold uppercase tracking-widest">
               {props.stream.title}
@@ -467,9 +467,9 @@ const ScheduleStreamCardBottomBarHover: Component<ScheduleStreamCardProps> = (
         }}
       >
         {/* Overlay that animates from bottom to top on hover */}
-        <div class="absolute inset-0 z-0 origin-bottom scale-y-0 transform rounded-2xl bg-gradient-to-t from-[var(--stream-highlight-color)] to-[var(--stream-highlight-color)] opacity-0 transition-all duration-500 ease-in-out group-hover:scale-y-100 group-hover:opacity-100" />
+        <div class="absolute inset-0 z-0 origin-bottom scale-y-0 transform rounded-2xl bg-linear-to-t from-(--stream-highlight-color) to-(--stream-highlight-color) opacity-0 transition-all duration-500 ease-in-out group-hover:scale-y-100 group-hover:opacity-100" />
 
-        <div class="z-2 relative flex flex-grow flex-col px-5 py-4 text-center transition-colors duration-300 group-hover:text-[var(--stream-text-color)]">
+        <div class="z-2 relative flex grow flex-col px-5 py-4 text-center transition-colors duration-300 group-hover:text-(--stream-text-color)">
           <div class="flex w-full flex-col items-center justify-center">
             <p class="line-clamp-2 text-pretty text-lg font-bold uppercase tracking-widest">
               {props.stream.title}
@@ -486,7 +486,7 @@ const ScheduleStreamCardBottomBarHover: Component<ScheduleStreamCardProps> = (
               </p>
             </Show>
             <Show when={!showCountdown() && isLive()}>
-              <p class="text-md font-bold tracking-wide text-accent group-hover:text-[var(--stream-text-color)]">
+              <p class="text-md font-bold tracking-wide text-accent group-hover:text-(--stream-text-color)">
                 LIVE
               </p>
             </Show>
@@ -561,7 +561,7 @@ const ScheduleStreamCardTopBar: Component<ScheduleStreamCardProps> = (
           </div>
         </div>
 
-        <div class="flex flex-grow flex-col px-5 py-4 text-center">
+        <div class="flex grow flex-col px-5 py-4 text-center">
           <div class="flex w-full origin-center flex-col items-center justify-center transition-transform group-hover:scale-105">
             <p class="line-clamp-2 text-pretty text-lg font-bold uppercase tracking-widest">
               {props.stream.title}
@@ -624,7 +624,7 @@ const ScheduleStreamCardTopBarHover: Component<ScheduleStreamCardProps> = (
         }}
       >
         {/* Overlay that animates from top to bottom on hover */}
-        <div class="absolute inset-0 z-0 origin-top scale-y-0 transform rounded-2xl bg-gradient-to-b from-[var(--stream-highlight-color)] to-[var(--stream-highlight-color)] opacity-0 transition-all duration-500 ease-in-out group-hover:scale-y-100 group-hover:opacity-100" />
+        <div class="absolute inset-0 z-0 origin-top scale-y-0 transform rounded-2xl bg-linear-to-b from-(--stream-highlight-color) to-(--stream-highlight-color) opacity-0 transition-all duration-500 ease-in-out group-hover:scale-y-100 group-hover:opacity-100" />
 
         {/* colored stripe at top */}
         <div
@@ -634,7 +634,7 @@ const ScheduleStreamCardTopBarHover: Component<ScheduleStreamCardProps> = (
           )}
           style={{ 'background-color': highlightColor }}
         >
-          <div class="flex h-full w-full flex-row items-center gap-2 text-[var(--stream-text-color)]">
+          <div class="flex h-full w-full flex-row items-center gap-2 text-(--stream-text-color)">
             <div class="flex flex-1 flex-row items-center gap-2">
               <Show when={props.stream.twitchVodUrl}>
                 <FaBrandsTwitch />
@@ -668,7 +668,7 @@ const ScheduleStreamCardTopBarHover: Component<ScheduleStreamCardProps> = (
           </div>
         </div>
 
-        <div class="relative z-10 flex flex-grow flex-col px-5 py-4 text-center transition-colors delay-100 duration-300 group-hover:text-[var(--stream-text-color)]">
+        <div class="relative z-10 flex grow flex-col px-5 py-4 text-center transition-colors delay-100 duration-300 group-hover:text-(--stream-text-color)">
           <div class="flex w-full flex-col items-center justify-center">
             <p class="line-clamp-2 text-pretty text-lg font-bold uppercase tracking-widest">
               {props.stream.title}
@@ -703,7 +703,7 @@ const ScheduleStreamCardTopBarHover: Component<ScheduleStreamCardProps> = (
  */
 const LiveStreamIndicator: Component = () => {
   return (
-    <div class={'flex flex-row items-center justify-center gap-2 rounded px-1'}>
+    <div class={'flex flex-row items-center justify-center gap-2 rounded-sm px-1'}>
       <p class={'text-xs font-bold tracking-wide'}>LIVE</p>
       <div class={'h-2 w-2'}>
         <span class="relative flex h-2 w-2">
@@ -810,7 +810,7 @@ export const UpcomingStreamsStreamCard: Component<ScheduleStreamCardProps> = (
         }}
       >
         {/* Overlay that animates from top to bottom on hover */}
-        <div class="absolute inset-0 z-0 origin-top scale-y-0 transform rounded-2xl bg-gradient-to-b from-[var(--stream-highlight-color)] to-[var(--stream-highlight-color)] opacity-0 transition-all duration-500 ease-in-out group-hover:scale-y-100 group-hover:opacity-100" />
+        <div class="absolute inset-0 z-0 origin-top scale-y-0 transform rounded-2xl bg-linear-to-b from-(--stream-highlight-color) to-(--stream-highlight-color) opacity-0 transition-all duration-500 ease-in-out group-hover:scale-y-100 group-hover:opacity-100" />
 
         {/* colored stripe at top */}
         <div
@@ -820,7 +820,7 @@ export const UpcomingStreamsStreamCard: Component<ScheduleStreamCardProps> = (
           )}
           style={{ 'background-color': highlightColor }}
         >
-          <div class="flex h-full w-full flex-row items-center gap-2 text-[var(--stream-text-color)]">
+          <div class="flex h-full w-full flex-row items-center gap-2 text-(--stream-text-color)">
             <Show when={props.stream.participants.length > 0}>
               <FaSolidUsers />
             </Show>
@@ -846,7 +846,7 @@ export const UpcomingStreamsStreamCard: Component<ScheduleStreamCardProps> = (
           </div>
         </div>
 
-        <div class="relative z-10 flex flex-grow flex-col p-2 text-left transition-colors delay-100 duration-300 group-hover:text-[var(--stream-text-color)]">
+        <div class="relative z-10 flex grow flex-col p-2 text-left transition-colors delay-100 duration-300 group-hover:text-(--stream-text-color)">
           <div
             class={
               'flex h-full w-full flex-row items-start justify-start gap-1'

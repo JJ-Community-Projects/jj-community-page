@@ -113,7 +113,7 @@ export const MobileYogsStreamTile: Component<MobileScheduleBodyProps> = (
           <p class={'font-mono text-xs'}>{countdown()}</p>
         </Show>
         <Show when={!showCountdown() && isLive()}>
-          <p class={'~text-md/lg font-bold tracking-wide text-white'}>LIVE</p>
+          <p class={'fl-text-md/lg font-bold tracking-wide text-white'}>LIVE</p>
         </Show>
         {/* Icons after hydration only (see Indicator in YogsStreamTile); the row keeps its height */}
         <div

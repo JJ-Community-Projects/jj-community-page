@@ -91,7 +91,7 @@ const DataSelector: Component = () => {
         </Select.Icon>
       </Select.Trigger>
       <Select.Portal>
-        <Select.Content class="bg-accent-500 rounded shadow">
+        <Select.Content class="bg-accent-500 rounded-sm shadow-sm">
           <Select.Listbox class="flex flex-col gap-1"/>
         </Select.Content>
       </Select.Portal>

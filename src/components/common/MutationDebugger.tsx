@@ -23,7 +23,7 @@ interface MutationDebuggerProps<TData = unknown, TError = unknown, TVariables = 
  */
 export const MutationDebugger: Component<MutationDebuggerProps<any, any, any, any>> = (props) => {
   return (
-    <div class="p-3 bg-gray-100 border-l-4 border-purple-500 rounded text-sm font-mono">
+    <div class="p-3 bg-gray-100 border-l-4 border-purple-500 rounded-sm text-sm font-mono">
       <div class="font-bold text-gray-700 mb-2">Mutation Debug State:</div>
       <Switch>
         <Match when={props.mutation.isIdle}>

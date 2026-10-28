@@ -55,7 +55,7 @@ const TeamDetailContent: Component<{ teamId: number }> = (props) => {
     <div class="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-8">
       {/* Team Header */}
       <div class="overflow-hidden rounded-2xl border border-white/20 bg-white/95 shadow-xl backdrop-blur-lg">
-        <div class="~p-4/8">
+        <div class="fl-p-4/8">
           <div class="flex flex-col gap-4">
             <div>
               <a
@@ -86,7 +86,7 @@ const TeamDetailContent: Component<{ teamId: number }> = (props) => {
               </div>
 
               <button
-                class="flex items-center gap-2 rounded-lg bg-danger px-4 py-2 font-medium text-white shadow-sm outline-none transition-all duration-200 hover:bg-danger-600 hover:shadow-md focus:ring-2 focus:ring-danger focus:ring-offset-2 focus:ring-offset-white active:scale-95"
+                class="flex items-center gap-2 rounded-lg bg-danger px-4 py-2 font-medium text-white shadow-xs outline-hidden transition-all duration-200 hover:bg-danger-600 hover:shadow-md focus:ring-2 focus:ring-danger focus:ring-offset-2 focus:ring-offset-white active:scale-95"
                 onClick={leaveDialog.open}
               >
                 <span class="text-sm font-medium">Leave Team</span>
@@ -97,7 +97,7 @@ const TeamDetailContent: Component<{ teamId: number }> = (props) => {
       </div>
 
       <div class="overflow-hidden rounded-2xl border border-white/20 bg-white/95 shadow-xl backdrop-blur-lg">
-        <div class="space-y-6 ~p-4/8">
+        <div class="space-y-6 fl-p-4/8">
           {/* Team Information */}
           <div class="border-b border-neutral-200 pb-6">
             <h3 class="mb-4 flex items-center gap-2 text-lg font-semibold text-neutral-700">
@@ -130,15 +130,15 @@ const TeamDetailContent: Component<{ teamId: number }> = (props) => {
             <Switch>
               <Match when={isLoading()}>
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                  <div class="h-16 animate-pulse rounded-xl bg-neutral-200 shadow-sm"></div>
-                  <div class="h-16 animate-pulse rounded-xl bg-neutral-200 shadow-sm"></div>
-                  <div class="h-16 animate-pulse rounded-xl bg-neutral-200 shadow-sm"></div>
+                  <div class="h-16 animate-pulse rounded-xl bg-neutral-200 shadow-xs"></div>
+                  <div class="h-16 animate-pulse rounded-xl bg-neutral-200 shadow-xs"></div>
+                  <div class="h-16 animate-pulse rounded-xl bg-neutral-200 shadow-xs"></div>
                 </div>
               </Match>
 
               <Match when={!hasMembers()}>
                 <div class="flex flex-col items-center justify-center px-4 py-12">
-                  <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-primary-400 to-primary-500 shadow-lg">
+                  <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-linear-to-br from-primary-400 to-primary-500 shadow-lg">
                     <FaSolidUsers class="h-8 w-8 text-white" />
                   </div>
                   <h4 class="mb-2 text-xl font-semibold text-neutral-700">
@@ -151,13 +151,13 @@ const TeamDetailContent: Component<{ teamId: number }> = (props) => {
               </Match>
 
               <Match when={hasMembers()}>
-                <div class="grid grid-cols-1 ~gap-3/4 sm:grid-cols-2 lg:grid-cols-3">
+                <div class="grid grid-cols-1 fl-gap-3/4 sm:grid-cols-2 lg:grid-cols-3">
                   <For each={membersList()}>
                     {(member) => (
                       <div class="group flex flex-col gap-4 rounded-xl border-2 hover:border-primary-100 bg-white p-2 shadow-md transition-all duration-300">
                         <div class="flex flex-1 items-center gap-3">
                           {/* Avatar placeholder */}
-                          <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary-400 to-primary-500 shadow-sm">
+                          <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-primary-400 to-primary-500 shadow-xs">
                             <span class="text-sm font-semibold text-white">
                               {(member.username || 'U')[0].toUpperCase()}
                             </span>

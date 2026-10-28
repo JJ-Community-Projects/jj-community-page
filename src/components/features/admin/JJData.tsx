@@ -119,7 +119,7 @@ export const JJData: Component = () => {
     <div class="flex flex-col gap-4 text-black">
       <div class="flex items-center gap-2">
         <button
-          class={'rounded bg-accent px-3 py-1 text-white'}
+          class={'rounded-sm bg-accent px-3 py-1 text-white'}
           onClick={refresh.mutate}
         >
           Refresh JJ API Data
@@ -129,7 +129,7 @@ export const JJData: Component = () => {
 
       <div class="flex flex-wrap items-center gap-2">
         <button
-          class="rounded bg-blue-600 px-3 py-1 text-white"
+          class="rounded-sm bg-blue-600 px-3 py-1 text-white"
           onClick={() => validateTwitchChannels.mutate()}
         >
           Validate Twitch Channels
@@ -138,14 +138,14 @@ export const JJData: Component = () => {
           {validateTwitchChannels.status}
         </span>
         <button
-          class="rounded bg-purple-600 px-3 py-1 text-white"
+          class="rounded-sm bg-purple-600 px-3 py-1 text-white"
           onClick={() => checkLiveStreams.mutate()}
         >
           Check Live Streams
         </button>
         <span class="text-xs text-gray-600">{checkLiveStreams.status}</span>
         <button
-          class="rounded bg-amber-600 px-3 py-1 text-white"
+          class="rounded-sm bg-amber-600 px-3 py-1 text-white"
           onClick={() => clearInvalidTwitchChannels.mutate()}
         >
           Clear Invalid Twitch Channels
@@ -154,7 +154,7 @@ export const JJData: Component = () => {
           {clearInvalidTwitchChannels.status}
         </span>
         <button
-          class="rounded bg-red-600 px-3 py-1 text-white"
+          class="rounded-sm bg-red-600 px-3 py-1 text-white"
           onClick={() => clearJJData.mutate()}
         >
           Clear JJ Data
@@ -163,7 +163,7 @@ export const JJData: Component = () => {
       </div>
 
       <div class="grid gap-6 md:grid-cols-3">
-        <div class="rounded border border-gray-200 bg-white p-4 shadow-sm">
+        <div class="rounded-sm border border-gray-200 bg-white p-4 shadow-xs">
           <h3 class="mb-2 font-semibold">All Twitch Channels</h3>
           <Show
             when={allTwitchChannels.data}
@@ -190,7 +190,7 @@ export const JJData: Component = () => {
           </Show>
         </div>
 
-        <div class="rounded border border-gray-200 bg-white p-4 shadow-sm">
+        <div class="rounded-sm border border-gray-200 bg-white p-4 shadow-xs">
           <h3 class="mb-2 font-semibold">All YouTube Channels</h3>
           <Show
             when={allYoutubeChannels.data}
@@ -221,7 +221,7 @@ export const JJData: Component = () => {
           </Show>
         </div>
 
-        <div class="rounded border border-gray-200 bg-white p-4 shadow-sm">
+        <div class="rounded-sm border border-gray-200 bg-white p-4 shadow-xs">
           <h3 class="mb-2 font-semibold">Live Channels</h3>
           <Show
             when={allLiveChannels.data}
@@ -248,7 +248,7 @@ export const JJData: Component = () => {
           </Show>
         </div>
 
-        <div class="rounded border border-gray-200 bg-white p-4 shadow-sm">
+        <div class="rounded-sm border border-gray-200 bg-white p-4 shadow-xs">
           <h3 class="mb-2 font-semibold">Invalid Twitch Channels</h3>
           <Show
             when={invalidTwitchChannels.data}
@@ -285,12 +285,12 @@ export const JJData: Component = () => {
             <For each={causes().causes}>
               {(cause) => {
                 return (
-                  <div class="my-4 rounded border border-gray-200 bg-white p-4 shadow-sm">
+                  <div class="my-4 rounded-sm border border-gray-200 bg-white p-4 shadow-xs">
                     <div class="flex items-start gap-4">
                       <img
                         src={cause.logo}
                         alt={`${cause.name} logo`}
-                        class="h-16 w-16 flex-none rounded bg-gray-50 object-contain"
+                        class="h-16 w-16 flex-none rounded-sm bg-gray-50 object-contain"
                       />
                       <div class="min-w-0">
                         <p class="text-lg font-semibold">{cause.name}</p>
@@ -322,7 +322,7 @@ export const JJData: Component = () => {
                     </div>
 
                     <div class="mt-4 grid gap-3 sm:grid-cols-3">
-                      <div class="rounded border border-gray-100 p-3">
+                      <div class="rounded-sm border border-gray-100 p-3">
                         <p class="text-xs font-medium text-gray-500">
                           Yogscast Raised
                         </p>
@@ -333,7 +333,7 @@ export const JJData: Component = () => {
                           USD: {cause.raised.usdFormatted}
                         </p>
                       </div>
-                      <div class="rounded border border-gray-100 p-3">
+                      <div class="rounded-sm border border-gray-100 p-3">
                         <p class="text-xs font-medium text-gray-500">
                           Fundraisers Raised
                         </p>
@@ -344,7 +344,7 @@ export const JJData: Component = () => {
                           USD: {cause.raised.usdFormatted}
                         </p>
                       </div>
-                      <div class="rounded border border-gray-100 p-3">
+                      <div class="rounded-sm border border-gray-100 p-3">
                         <p class="text-xs font-medium text-gray-500">
                           Total Raised
                         </p>

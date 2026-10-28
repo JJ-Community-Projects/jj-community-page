@@ -69,7 +69,7 @@ export const FriendRequestsListItem: Component<FriendRequestsListItemProps> = (
           <Show
             when={request.profileImage && request.profileImage.trim() !== ''}
             fallback={
-              <div class="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-primary-500 to-primary-600 shadow-sm">
+              <div class="flex h-12 w-12 items-center justify-center rounded-full bg-linear-to-br from-primary-500 to-primary-600 shadow-xs">
                 <span class="font-semibold text-white">
                   {(request.username || 'U')[0].toUpperCase()}
                 </span>
@@ -79,7 +79,7 @@ export const FriendRequestsListItem: Component<FriendRequestsListItemProps> = (
             <img
               src={request.profileImage}
               alt={`${request.username}'s profile`}
-              class="h-12 w-12 rounded-full object-cover shadow-sm"
+              class="h-12 w-12 rounded-full object-cover shadow-xs"
               onError={(e) => {
                 // Fallback to gradient avatar if image fails to load
                 const target = e.target as HTMLImageElement
@@ -88,7 +88,7 @@ export const FriendRequestsListItem: Component<FriendRequestsListItemProps> = (
                 if (fallback) fallback.style.display = 'flex'
               }}
             />
-            <div class="flex hidden h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-primary-500 to-primary-600 shadow-sm">
+            <div class="flex hidden h-12 w-12 items-center justify-center rounded-full bg-linear-to-br from-primary-500 to-primary-600 shadow-xs">
               <span class="font-semibold text-white">
                 {(request.username || 'U')[0].toUpperCase()}
               </span>
@@ -118,7 +118,7 @@ export const FriendRequestsListItem: Component<FriendRequestsListItemProps> = (
             type="button"
             onClick={() => handleAcceptRequest(request.userId)}
             disabled={isAcceptingFriendRequest() || isDecliningFriendRequest()}
-            class="flex items-center gap-1 rounded-lg bg-success px-4 py-2 text-sm font-medium text-white shadow-sm outline-none transition-all duration-200 hover:bg-success-600 hover:shadow-md focus:ring-2 focus:ring-success focus:ring-offset-2 focus:ring-offset-white disabled:cursor-not-allowed disabled:opacity-50"
+            class="flex items-center gap-1 rounded-lg bg-success px-4 py-2 text-sm font-medium text-white shadow-xs outline-hidden transition-all duration-200 hover:bg-success-600 hover:shadow-md focus:ring-2 focus:ring-success focus:ring-offset-2 focus:ring-offset-white disabled:cursor-not-allowed disabled:opacity-50"
             aria-label={`Accept friend request from ${request.username}`}
           >
             <FaSolidCheck class="h-4 w-4" />
@@ -130,7 +130,7 @@ export const FriendRequestsListItem: Component<FriendRequestsListItemProps> = (
             type="button"
             onClick={handleDeclineClick}
             disabled={isAcceptingFriendRequest() || isDecliningFriendRequest()}
-            class="flex items-center gap-1 rounded-lg bg-gray-200 px-4 py-2 text-sm font-medium text-gray-700 shadow-sm outline-none transition-all duration-200 hover:bg-gray-300 hover:shadow-md focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-white disabled:cursor-not-allowed disabled:opacity-50"
+            class="flex items-center gap-1 rounded-lg bg-gray-200 px-4 py-2 text-sm font-medium text-gray-700 shadow-xs outline-hidden transition-all duration-200 hover:bg-gray-300 hover:shadow-md focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-white disabled:cursor-not-allowed disabled:opacity-50"
             aria-label={`Decline friend request from ${request.username}`}
           >
             <FaSolidXmark class="h-4 w-4" />
@@ -152,7 +152,7 @@ export const FriendRequestsListItem: Component<FriendRequestsListItemProps> = (
 
 const EmptyState = () => (
   <div class="flex flex-col items-center justify-center px-4 py-12">
-    <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-primary-500 to-primary-600 shadow-lg">
+    <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-linear-to-br from-primary-500 to-primary-600 shadow-lg">
       <FaSolidUserPlus class="h-8 w-8 text-white" />
     </div>
     <h3 class="mb-2 text-xl font-semibold text-gray-800">
@@ -167,9 +167,9 @@ const EmptyState = () => (
 
 const LoadingSkeleton = () => (
   <div class="space-y-4">
-    <div class="h-16 animate-pulse rounded-xl bg-gray-200 shadow-sm"></div>
-    <div class="h-16 animate-pulse rounded-xl bg-gray-200 shadow-sm"></div>
-    <div class="h-16 animate-pulse rounded-xl bg-gray-200 shadow-sm"></div>
+    <div class="h-16 animate-pulse rounded-xl bg-gray-200 shadow-xs"></div>
+    <div class="h-16 animate-pulse rounded-xl bg-gray-200 shadow-xs"></div>
+    <div class="h-16 animate-pulse rounded-xl bg-gray-200 shadow-xs"></div>
   </div>
 )
 
@@ -206,7 +206,7 @@ export const FriendRequestsList: Component = () => {
       <Show when={hasAcceptFriendRequestError()}>
         <div class="mb-4 rounded-xl border border-red-200 bg-red-50 p-4">
           <div class="flex items-center gap-3 text-red-600">
-            <FaSolidCircleExclamation class="h-4 w-4 flex-shrink-0" />
+            <FaSolidCircleExclamation class="h-4 w-4 shrink-0" />
             <p class="text-sm font-medium">
               {acceptFriendRequestErrorMessage() ||
                 'Failed to accept friend request'}
@@ -218,7 +218,7 @@ export const FriendRequestsList: Component = () => {
       <Show when={hasDeclineFriendRequestError()}>
         <div class="mb-4 rounded-xl border border-red-200 bg-red-50 p-4">
           <div class="flex items-center gap-3 text-red-600">
-            <FaSolidCircleExclamation class="h-4 w-4 flex-shrink-0" />
+            <FaSolidCircleExclamation class="h-4 w-4 shrink-0" />
             <p class="text-sm font-medium">
               {declineFriendRequestErrorMessage() ||
                 'Failed to decline friend request'}
@@ -236,7 +236,7 @@ export const FriendRequestsList: Component = () => {
           <div class="rounded-xl border border-red-200 bg-red-50 p-6">
             <div class="flex items-center justify-center gap-3 text-red-600">
               <svg
-                class="h-5 w-5 flex-shrink-0"
+                class="h-5 w-5 shrink-0"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"

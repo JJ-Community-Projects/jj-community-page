@@ -56,7 +56,7 @@ const Body: Component<DonationMatchesOverlayProps> = (props) => {
             {(match) => (
               <li
                 class={
-                  'flex flex-row items-center gap-3 rounded-2xl bg-black/20 px-3 py-2 shadow'
+                  'flex flex-row items-center gap-3 rounded-2xl bg-black/20 px-3 py-2 shadow-sm'
                 }
               >
                 <Show when={match.avatar}>

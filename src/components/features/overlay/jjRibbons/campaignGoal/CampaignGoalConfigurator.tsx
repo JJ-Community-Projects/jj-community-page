@@ -42,11 +42,11 @@ export const CampaignGoalConfigurator: Component<{
   )
 
   return (
-    <div class="flex flex-col gap-2 rounded bg-black/30 p-3">
-      <p class="rounded border border-yellow-500/30 bg-yellow-500/10 p-2 text-sm text-yellow-200">
+    <div class="flex flex-col gap-2 rounded-sm bg-black/30 p-3">
+      <p class="rounded-sm border border-yellow-500/30 bg-yellow-500/10 p-2 text-sm text-yellow-200">
         This Overlay is still experimental
       </p>
-      <p class="mb-2 rounded border border-white/10 bg-white/5 p-2 text-sm text-white/80">
+      <p class="mb-2 rounded-sm border border-white/10 bg-white/5 p-2 text-sm text-white/80">
         Display your current campaign total and goal with a compact progress
         bar. Pick a color style and paste the generated URL into an OBS Browser
         Source. The overlay updates roughly every 30 seconds. Recommended size
@@ -57,7 +57,7 @@ export const CampaignGoalConfigurator: Component<{
           <div class="flex flex-1 flex-col">
             <FieldRow label="Theme">
               <select
-                class="rounded bg-black/40 px-2 py-1"
+                class="rounded-sm bg-black/40 px-2 py-1"
                 value={theme()}
                 onChange={(e) => setTheme(e.currentTarget.value as Style)}
               >
@@ -68,7 +68,7 @@ export const CampaignGoalConfigurator: Component<{
             </FieldRow>
             <FieldRow label="Currency">
               <select
-                class="rounded bg-black/40 px-2 py-1"
+                class="rounded-sm bg-black/40 px-2 py-1"
                 value={currency()}
                 onChange={(e) => setCurrency(e.currentTarget.value as Currency)}
               >
@@ -79,7 +79,7 @@ export const CampaignGoalConfigurator: Component<{
             </FieldRow>
             <FieldRow label="Alignment">
               <select
-                class="rounded bg-black/40 px-2 py-1"
+                class="rounded-sm bg-black/40 px-2 py-1"
                 value={alignment()}
                 onChange={(e) =>
                   setAlignment(e.currentTarget.value as Alignment)

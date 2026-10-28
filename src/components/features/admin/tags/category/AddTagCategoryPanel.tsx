@@ -81,7 +81,7 @@ export const AddTagCategoryPanel: Component = () => {
               <TextField.Input
                 placeholder="e.g., gaming"
                 pattern="^[a-z0-9-]+$"
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
               />
             </TextField>
           </div>
@@ -99,7 +99,7 @@ export const AddTagCategoryPanel: Component = () => {
               </TextField.Label>
               <TextField.Input
                 placeholder="e.g., Gaming"
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
               />
             </TextField>
           </div>
@@ -116,7 +116,7 @@ export const AddTagCategoryPanel: Component = () => {
               </TextField.Label>
               <TextField.Input
                 placeholder="Optional description"
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
               />
             </TextField>
           </div>
@@ -131,7 +131,7 @@ export const AddTagCategoryPanel: Component = () => {
               type="color"
               value={category.color}
               onInput={(e) => setCategory('color', e.currentTarget.value)}
-              class="w-full h-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              class="w-full h-10 border border-gray-300 rounded-md focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
 
@@ -143,7 +143,7 @@ export const AddTagCategoryPanel: Component = () => {
               class="flex items-center"
             >
               <Checkbox.Input class="sr-only" />
-              <Checkbox.Control class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 border border-gray-300 rounded bg-white flex items-center justify-center">
+              <Checkbox.Control class="w-4 h-4 text-blue-600 border-gray-300 rounded-sm focus:ring-blue-500 border border-gray-300 rounded-sm bg-white flex items-center justify-center">
                 <Checkbox.Indicator>
                   <svg class="w-3 h-3 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
@@ -156,7 +156,7 @@ export const AddTagCategoryPanel: Component = () => {
             <button
               type="submit"
               disabled={createTagCategory.isPending || !category.slug.trim() || !category.name.trim()}
-              class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Show when={createTagCategory.isPending} fallback="Add Category">
                 Adding...

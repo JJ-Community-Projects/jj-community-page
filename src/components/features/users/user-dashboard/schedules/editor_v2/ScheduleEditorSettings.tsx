@@ -164,14 +164,14 @@ export const ScheduleEditorSettings: Component = () => {
         <div class="grid grid-cols-1 gap-4">
           {/* Error from updateMeta */}
           <Show when={updateMetaMutation.isError}>
-            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded">
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded-sm">
               {updateMetaMutation.error?.message}
             </div>
           </Show>
 
           {/* Title + Year */}
           <div class="flex gap-4">
-            <TextField name="title" class="flex flex-col flex-grow" validationState="valid">
+            <TextField name="title" class="flex flex-col grow" validationState="valid">
               <TextField.Label class="text-sm font-medium mb-1">Title:</TextField.Label>
               <div class="relative">
                 <TextField.Input
@@ -210,7 +210,7 @@ export const ScheduleEditorSettings: Component = () => {
             <TextField.Label class="text-sm font-medium mb-1">Slug:</TextField.Label>
             <div class="relative">
               <TextField.Input
-                class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent"
+                class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-hidden focus:ring-2 focus:ring-accent"
                 value={slugField.inputValue()}
                 onInput={(e) => slugField.onInput(e.currentTarget.value.toLowerCase())}
                 onFocus={() => slugField.setFocused(true)}
@@ -263,7 +263,7 @@ export const ScheduleEditorSettings: Component = () => {
             disabled={updateMetaMutation.isPending}
           >
             <Checkbox.Input class="sr-only" />
-            <Checkbox.Control class="h-5 w-5 rounded border border-gray-300 bg-white text-blue-600 focus:ring-blue-500 data-[checked]:bg-blue-600 data-[checked]:border-blue-600">
+            <Checkbox.Control class="h-5 w-5 rounded-sm border border-gray-300 bg-white text-blue-600 focus:ring-blue-500 data-checked:bg-blue-600 data-checked:border-blue-600">
               <Checkbox.Indicator>
                 <svg class="h-4 w-4 text-white" viewBox="0 0 8 8">
                   <path stroke="currentColor" stroke-width="1.5" fill="none" d="M1,4 L3,6 L7,2" />

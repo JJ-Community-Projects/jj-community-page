@@ -73,7 +73,7 @@ export const AdminTeamHeader: Component = () => {
               bg-danger-50 hover:bg-danger-100 text-danger-700 hover:text-danger-800
               border border-danger-200 hover:border-danger-300
               focus:ring-2 focus:ring-danger-500 focus:ring-offset-2 focus:ring-offset-white
-              outline-none hover:shadow-md active:scale-95
+              outline-hidden hover:shadow-md active:scale-95
               disabled:opacity-50 disabled:cursor-not-allowed
             "
             disabled={deleteTeamMutation.isPending}
@@ -89,7 +89,7 @@ export const AdminTeamHeader: Component = () => {
         {/* Informational notice */}
         <div class="mt-4 p-3 bg-accent-50 text-accent-700 rounded-lg border border-accent-200">
           <div class="flex items-start gap-2">
-            <FaSolidCircleInfo class="w-4 h-4 mt-0.5 flex-shrink-0" />
+            <FaSolidCircleInfo class="w-4 h-4 mt-0.5 shrink-0" />
             <p class="text-sm">
               Manage your team details, members, and invites from this page.
               Changes to team properties are saved when you click the Save button.

@@ -49,14 +49,14 @@ const Body: Component<{ visible?: boolean }> = (p) => {
   )
 
   return (
-    <div class="flex flex-col gap-2 rounded bg-black/30 p-3">
-      <div class="mb-2 rounded border border-white/10 bg-white/5 p-2 text-sm text-white/80">
+    <div class="flex flex-col gap-2 rounded-sm bg-black/30 p-3">
+      <div class="mb-2 rounded-sm border border-white/10 bg-white/5 p-2 text-sm text-white/80">
         A horizontal scrolling ticker showing fundraisers filtered by team.
         Choose a theme and currency. Set your OBS Browser Source to 1920x80 px.
       </div>
       <PreviewDataField value={previewData()} onChange={setPreviewData} />
       <Show when={!qTeams.isLoading && noTeams()}>
-        <div class="mb-2 rounded border border-yellow-400/40 bg-yellow-500/10 p-2 text-sm text-yellow-300">
+        <div class="mb-2 rounded-sm border border-yellow-400/40 bg-yellow-500/10 p-2 text-sm text-yellow-300">
           You are not part of any team yet. Create or join a team to filter by
           team.
         </div>
@@ -64,7 +64,7 @@ const Body: Component<{ visible?: boolean }> = (p) => {
       <FieldRow label="Team">
         <Show when={!qTeams.isLoading} fallback={<span>Loading…</span>}>
           <select
-            class="w-60 rounded bg-black/40 px-2 py-1"
+            class="w-60 rounded-sm bg-black/40 px-2 py-1"
             value={teamSlug()}
             onChange={(e) => setTeamSlug(e.currentTarget.value)}
             title={
@@ -82,7 +82,7 @@ const Body: Component<{ visible?: boolean }> = (p) => {
         <select
           value={theme()}
           onChange={(e) => setTheme(e.currentTarget.value as any)}
-          class="w-40 rounded bg-black/40 px-2 py-1"
+          class="w-40 rounded-sm bg-black/40 px-2 py-1"
         >
           <option value="default">Default</option>
           <option value="red">Red</option>
@@ -93,7 +93,7 @@ const Body: Component<{ visible?: boolean }> = (p) => {
         <select
           value={currency()}
           onChange={(e) => setCurrency(e.currentTarget.value as 'GBP' | 'USD' | 'EUR')}
-          class="w-40 rounded bg-black/40 px-2 py-1"
+          class="w-40 rounded-sm bg-black/40 px-2 py-1"
         >
           <option value="GBP">GBP</option>
           <option value="USD">USD</option>

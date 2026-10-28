@@ -26,7 +26,7 @@ export const NextThreeStreams: Component = () => {
     <div class="group/next-stream w-full rounded-xl border-2 bg-white p-4 shadow-md transition-all duration-300 group-hover:border-accent-200 hover:shadow-lg">
       <div class="mb-4 flex items-center gap-2 text-lg font-semibold">
         <FaSolidPlay class="h-5 w-5 text-black transition-all duration-300 group-hover/next-stream:text-accent" />
-        <h2 class="font-babas text-black transition-all duration-300 ~text-xl/2xl group-hover/next-stream:text-accent">
+        <h2 class="font-babas text-black transition-all duration-300 fl-text-xl/2xl group-hover/next-stream:text-accent">
           Next Streams
         </h2>
       </div>
@@ -49,7 +49,7 @@ export const DaysAccordion: Component = () => {
     <div class="group w-full rounded-xl border-2 bg-white p-4 shadow-md transition-all duration-300 group-hover:border-accent-200 hover:shadow-lg">
       <div class="mb-4 flex items-center gap-2 text-lg font-semibold">
         <FaSolidCalendarDays class="h-5 w-5 text-black transition-all duration-300 group-hover/next-stream:text-accent" />
-        <h2 class="font-babas text-black transition-all duration-300 ~text-xl/2xl group-hover/next-stream:text-accent">
+        <h2 class="font-babas text-black transition-all duration-300 fl-text-xl/2xl group-hover/next-stream:text-accent">
           Schedule
         </h2>
       </div>

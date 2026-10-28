@@ -7,9 +7,9 @@ import { CategoryTagsList } from './CategoryTagsList.tsx'
 export const UserTagsSection: Component = () => {
   return (
     <div class="overflow-visible rounded-2xl border border-white/20 bg-white/95 shadow-xl backdrop-blur-lg">
-      <div class="space-y-6 ~p-4/8">
-        <div class="relative space-y-4 px-6 pb-6 leading-relaxed text-gray-700 ~text-sm/base">
-          <div class="rounded-xl border border-accent/20 bg-gradient-to-br from-white to-accent/5 p-5 shadow-sm ring-1 ring-black/5">
+      <div class="space-y-6 fl-p-4/8">
+        <div class="relative space-y-4 px-6 pb-6 leading-relaxed text-gray-700 fl-text-sm/base">
+          <div class="rounded-xl border border-accent/20 bg-linear-to-br from-white to-accent/5 p-5 shadow-xs ring-1 ring-black/5">
             <ul class="list-disc space-y-1 pl-6 marker:text-accent-600">
               <li>
                 Choose from available tags to show off your self and your
@@ -30,7 +30,7 @@ export const UserTagsSection: Component = () => {
               <li>You can have a maximum of 10 tags.</li>
             </ul>
 
-            <div class="mt-4 flex items-start gap-3 rounded-lg border-l-4 border-accent/30 bg-gradient-to-r from-accent/10 to-accent/5 p-4">
+            <div class="mt-4 flex items-start gap-3 rounded-lg border-l-4 border-accent/30 bg-linear-to-r from-accent/10 to-accent/5 p-4">
               <p class="font-medium text-accent-700">
                 <span>
                   <strong>You can not find the right tags?</strong> Message

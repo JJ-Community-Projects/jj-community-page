@@ -29,14 +29,14 @@ export const DonationMatchesConfigurator: Component<{ visible?: boolean }> = (
   )
 
   return (
-    <div class="flex flex-col gap-2 rounded bg-black/30 p-3">
-      <p class="mb-2 rounded border border-white/10 bg-white/5 p-2 text-sm text-white/80">
+    <div class="flex flex-col gap-2 rounded-sm bg-black/30 p-3">
+      <p class="mb-2 rounded-sm border border-white/10 bg-white/5 p-2 text-sm text-white/80">
         A list of the 5 most recent active donation matches.
       </p>
       <PreviewDataField value={previewData()} onChange={setPreviewData} />
       <FieldRow label="Background">
         <select
-          class="rounded bg-black/40 px-2 py-1"
+          class="rounded-sm bg-black/40 px-2 py-1"
           value={bg()}
           onChange={(e) => setBg(e.currentTarget.value as BgPreset)}
         >

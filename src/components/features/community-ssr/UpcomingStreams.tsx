@@ -45,7 +45,7 @@ export const UpcomingStreams: Component = () => {
         <Show when={remainingCount() > 0}>
           <div class="mt-3 flex justify-center">
             <button
-              class="rounded-lg bg-white/10 px-4 py-2 text-sm font-semibold text-white backdrop-blur transition-colors hover:bg-white/20"
+              class="rounded-lg bg-white/10 px-4 py-2 text-sm font-semibold text-white backdrop-blur-sm transition-colors hover:bg-white/20"
               onClick={() => setShowAll((v) => !v)}
             >
               {showAll() ? 'Show less' : `Show ${remainingCount()} more`}

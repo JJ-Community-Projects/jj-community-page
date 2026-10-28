@@ -66,10 +66,10 @@ export const AdminTeamInviteSearchInput: Component = () => {
           class="
             w-full pl-12 pr-12 py-3 rounded-xl border-2 border-gray-200
             focus:border-accent focus:ring-4 focus:ring-accent/20
-            transition-all duration-300 outline-none
-            bg-white/50 backdrop-blur-sm hover:bg-white/70
+            transition-all duration-300 outline-hidden
+            bg-white/50 backdrop-blur-xs hover:bg-white/70
             placeholder-gray-500 text-gray-800 font-medium
-            shadow-sm hover:shadow-md focus:shadow-lg
+            shadow-xs hover:shadow-md focus:shadow-lg
           "
           placeholder="Search for users to invite..."
           value={userSearch.searchInput()}
@@ -86,7 +86,7 @@ export const AdminTeamInviteSearchInput: Component = () => {
               absolute inset-y-0 right-0 pr-4 flex items-center
               text-gray-400 hover:text-gray-600 transition-colors duration-200
               focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-white
-              outline-none rounded-full p-1
+              outline-hidden rounded-full p-1
             "
             aria-label="Clear search"
           >
@@ -99,7 +99,7 @@ export const AdminTeamInviteSearchInput: Component = () => {
       <Show when={inviteUserMutation.isError}>
         <div class="bg-danger-50 rounded-xl p-4 border border-danger-200">
           <div class="flex items-center gap-3 text-danger-600">
-            <FaSolidXmark class="w-4 h-4 flex-shrink-0"/>
+            <FaSolidXmark class="w-4 h-4 shrink-0"/>
             <p class="text-sm font-medium">{inviteUserMutation.failureReason?.message || "Failed to invite user"}</p>
           </div>
         </div>
@@ -108,7 +108,7 @@ export const AdminTeamInviteSearchInput: Component = () => {
       <Show when={hasSearchError()}>
         <div class="bg-danger-50 rounded-xl p-4 border border-danger-200">
           <div class="flex items-center gap-3 text-danger-600">
-            <FaSolidXmark class="w-4 h-4 flex-shrink-0"/>
+            <FaSolidXmark class="w-4 h-4 shrink-0"/>
             <p class="text-sm font-medium">{userSearch.errorMessage()}</p>
           </div>
         </div>
@@ -116,7 +116,7 @@ export const AdminTeamInviteSearchInput: Component = () => {
 
       {/* Search Results */}
       <Show when={searchResults().length > 0}>
-        <div class="bg-white rounded-xl border border-gray-200 shadow-sm max-h-60 overflow-y-auto">
+        <div class="bg-white rounded-xl border border-gray-200 shadow-xs max-h-60 overflow-y-auto">
           <div class="p-3 border-b border-gray-200">
             <p class="text-sm font-medium text-gray-700">Search Results</p>
           </div>
@@ -128,7 +128,7 @@ export const AdminTeamInviteSearchInput: Component = () => {
                     <div class="flex items-center gap-3">
                       {/* Avatar placeholder */}
                       <div
-                        class="w-8 h-8 rounded-full bg-gradient-to-br from-accent-400 to-accent-500 flex items-center justify-center shadow-sm flex-shrink-0">
+                        class="w-8 h-8 rounded-full bg-linear-to-br from-accent-400 to-accent-500 flex items-center justify-center shadow-xs shrink-0">
                         <span class="text-white font-semibold text-xs">
                           {(result.tiltifyUsername || 'U')[0].toUpperCase()}
                         </span>
@@ -154,7 +154,7 @@ export const AdminTeamInviteSearchInput: Component = () => {
                         bg-accent-50 hover:bg-accent-100 text-accent-700 hover:text-accent-800
                         border border-accent-200 hover:border-accent-300
                         focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-white
-                        outline-none hover:shadow-sm active:scale-95
+                        outline-hidden hover:shadow-xs active:scale-95
                         disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium
                       "
                       onClick={() => handleInvite(result.userId)}
@@ -184,7 +184,7 @@ export const AdminTeamInviteSearchInput: Component = () => {
 
       {/* Helper text */}
       <div class="flex items-start gap-2">
-        <FaSolidCircleInfo class="w-3 h-3 text-gray-400 mt-0.5 flex-shrink-0"/>
+        <FaSolidCircleInfo class="w-3 h-3 text-gray-400 mt-0.5 shrink-0"/>
         <div class="text-xs text-gray-500 space-y-1">
           <p>Search for users by their username to send team invitations.</p>
           {userSearch.searchInput().length > 0 && (

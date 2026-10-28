@@ -30,7 +30,7 @@ export const TeamNextStreamsSection: Component<TeamNextStreamsSectionProps> = (p
         {/* Section Header */}
         <div class="flex items-center gap-2 text-lg font-semibold mb-4">
           <FaSolidPlay class="w-5 h-5 text-black group-hover/next-stream:text-accent transition-all duration-300" />
-          <h2 class="~text-xl/2xl font-babas text-black group-hover/next-stream:text-accent transition-all duration-300">
+          <h2 class="fl-text-xl/2xl font-babas text-black group-hover/next-stream:text-accent transition-all duration-300">
             Upcoming Streams
           </h2>
         </div>

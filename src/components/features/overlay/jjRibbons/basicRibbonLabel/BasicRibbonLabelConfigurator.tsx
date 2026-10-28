@@ -31,8 +31,8 @@ export const BasicRibbonLabelConfigurator: Component<{ visible?: boolean }> = ()
   )
 
   return (
-    <div class="flex flex-col gap-2 rounded bg-black/30 p-3">
-      <p class="mb-2 rounded border border-white/10 bg-white/5 p-2 text-sm text-white/80">
+    <div class="flex flex-col gap-2 rounded-sm bg-black/30 p-3">
+      <p class="mb-2 rounded-sm border border-white/10 bg-white/5 p-2 text-sm text-white/80">
         Create a simple ribbon label with a selectable color, alignment and text.
         Paste the generated URL into an OBS Browser Source. Adjust browser size to fit.
         Recommended height 100px.
@@ -43,7 +43,7 @@ export const BasicRibbonLabelConfigurator: Component<{ visible?: boolean }> = ()
           <div class="flex flex-1 flex-col">
             <FieldRow label="Style">
               <select
-                class="rounded bg-black/40 px-2 py-1"
+                class="rounded-sm bg-black/40 px-2 py-1"
                 value={style()}
                 onChange={(e) => setStyle(e.currentTarget.value as Style)}
               >
@@ -55,7 +55,7 @@ export const BasicRibbonLabelConfigurator: Component<{ visible?: boolean }> = ()
 
             <FieldRow label="Alignment">
               <select
-                class="rounded bg-black/40 px-2 py-1"
+                class="rounded-sm bg-black/40 px-2 py-1"
                 value={alignment()}
                 onChange={(e) => setAlignment(e.currentTarget.value as Alignment)}
               >
@@ -67,7 +67,7 @@ export const BasicRibbonLabelConfigurator: Component<{ visible?: boolean }> = ()
 
             <FieldRow label="Text">
               <input
-                class="w-full rounded bg-black/40 px-2 py-1"
+                class="w-full rounded-sm bg-black/40 px-2 py-1"
                 type="text"
                 value={text()}
                 onInput={(e) => setText(e.currentTarget.value)}

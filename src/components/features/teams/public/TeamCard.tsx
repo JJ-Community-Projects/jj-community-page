@@ -25,12 +25,12 @@ export function TeamCard(props: TeamCardProps) {
       "
     >
       <div class="space-y-3">
-        <h2 class="~text-lg/xl font-semibold font-poppins text-neutral-800 group-hover:text-accent-700 transition-colors">
+        <h2 class="fl-text-lg/xl font-semibold font-poppins text-neutral-800 group-hover:text-accent-700 transition-colors">
           {props.team.name}
         </h2>
 
         <Show when={props.team.description}>
-          <p class="text-neutral-600 ~text-sm/base font-poppins line-clamp-2 leading-relaxed">
+          <p class="text-neutral-600 fl-text-sm/base font-poppins line-clamp-2 leading-relaxed">
             {props.team.description!.length > 100
               ? props.team.description!.substring(0, 100) + '...'
               : props.team.description
@@ -39,7 +39,7 @@ export function TeamCard(props: TeamCardProps) {
         </Show>
 
         <div class="flex items-center justify-between pt-2 border-t border-accent-100">
-          <span class="inline-flex items-center gap-1 px-2 py-1 bg-accent-50 text-accent-700 rounded-full ~text-xs/sm font-medium">
+          <span class="inline-flex items-center gap-1 px-2 py-1 bg-accent-50 text-accent-700 rounded-full fl-text-xs/sm font-medium">
             <FaSolidUsers class="w-3 h-3" />
             {props.team.memberCount} {props.team.memberCount === 1 ? 'member' : 'members'}
           </span>

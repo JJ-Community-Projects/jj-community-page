@@ -34,7 +34,7 @@ const Carousel: Component<{ images: ImageMetadata[]; alt: string }> = (
   const img = () => images[idx()]
   return (
     <div class="relative w-full max-w-3xl select-none">
-      <div class="relative aspect-video w-full overflow-hidden rounded border border-accent-500/60 bg-black/40">
+      <div class="relative aspect-video w-full overflow-hidden rounded-sm border border-accent-500/60 bg-black/40">
         <img
           src={img().src}
           alt={alt}
@@ -43,14 +43,14 @@ const Carousel: Component<{ images: ImageMetadata[]; alt: string }> = (
           onClick={() => setLightbox(idx())}
         />
         <button
-          class="absolute left-2 top-1/2 -translate-y-1/2 rounded bg-black/60 p-2 text-white hover:bg-black/80"
+          class="absolute left-2 top-1/2 -translate-y-1/2 rounded-sm bg-black/60 p-2 text-white hover:bg-black/80"
           onClick={prev}
           aria-label="Previous"
         >
           <FaSolidChevronLeft />
         </button>
         <button
-          class="absolute right-2 top-1/2 -translate-y-1/2 rounded bg-black/60 p-2 text-white hover:bg-black/80"
+          class="absolute right-2 top-1/2 -translate-y-1/2 rounded-sm bg-black/60 p-2 text-white hover:bg-black/80"
           onClick={next}
           aria-label="Next"
         >
@@ -61,7 +61,7 @@ const Carousel: Component<{ images: ImageMetadata[]; alt: string }> = (
         {images.map((src, i) => (
           <button
             class={twMerge(
-              'h-14 w-20 overflow-hidden rounded border border-transparent bg-black/40 opacity-70 hover:opacity-100',
+              'h-14 w-20 overflow-hidden rounded-sm border border-transparent bg-black/40 opacity-70 hover:opacity-100',
               i === idx() && 'border-accent-500 opacity-100',
             )}
             onClick={() => setIdx(i)}
@@ -83,7 +83,7 @@ const Carousel: Component<{ images: ImageMetadata[]; alt: string }> = (
           onClick={() => setLightbox(null)}
         >
           <button
-            class="absolute right-4 top-4 rounded bg-black/60 p-2 text-white hover:bg-black/80"
+            class="absolute right-4 top-4 rounded-sm bg-black/60 p-2 text-white hover:bg-black/80"
             onClick={(e) => {
               e.stopPropagation()
               setLightbox(null)
@@ -95,7 +95,7 @@ const Carousel: Component<{ images: ImageMetadata[]; alt: string }> = (
           <img
             src={images[lightbox() ?? 0].src}
             alt={`${alt} enlarged`}
-            class="max-h-[90vh] max-w-[90vw] rounded shadow-lg"
+            class="max-h-[90vh] max-w-[90vw] rounded-sm shadow-lg"
           />
         </div>
       )}
@@ -117,14 +117,14 @@ export const StreamResources: Component<{ user: User | null }> = (props) => {
         {/* Twitch Extension */}
         <Accordion.Item value="twitch" class="w-full">
           <Accordion.Header class="w-full">
-            <Accordion.Trigger class="border-1 group m-2 flex w-full flex-row items-center rounded border-accent-500 bg-primary-200/50 p-2 text-xl text-white shadow hover:scale-102 hover:brightness-102">
+            <Accordion.Trigger class="border group m-2 flex w-full flex-row items-center rounded-sm border-accent-500 bg-primary-200/50 p-2 text-xl text-white shadow-sm hover:scale-102 hover:brightness-102">
               <p class="flex-1 text-left">Twitch Extension</p>
-              <FaSolidChevronDown class="transition-all group-data-[expanded]:rotate-180" />
+              <FaSolidChevronDown class="transition-all group-data-expanded:rotate-180" />
             </Accordion.Trigger>
           </Accordion.Header>
           <Accordion.Content class="w-full p-2">
             <div class="flex flex-col items-center gap-4 text-white">
-              <p class="text-center font-semibold ~text-2xl/3xl">
+              <p class="text-center font-semibold fl-text-2xl/3xl">
                 Jingle Jam Community Twitch Extension
               </p>
               <p class="text-center">
@@ -140,7 +140,7 @@ export const StreamResources: Component<{ user: User | null }> = (props) => {
               </p>
 
               <div class="mt-2 flex flex-col items-center gap-1">
-                <p class="~text-lg/xl">Twitch Panel Extension</p>
+                <p class="fl-text-lg/xl">Twitch Panel Extension</p>
                 <a
                   class="p-1 text-lg underline hover:text-twitch-100"
                   href="https://dashboard.twitch.tv/extensions/7m5fitr4o8raxn6fv59lndv2iy0uuz"
@@ -156,7 +156,7 @@ export const StreamResources: Component<{ user: User | null }> = (props) => {
               />
 
               <div class="mt-6 flex flex-col items-center gap-1">
-                <p class="~text-lg/xl">Twitch Overlay Extension</p>
+                <p class="fl-text-lg/xl">Twitch Overlay Extension</p>
                 <a
                   class="p-1 text-lg underline hover:text-twitch-100"
                   href="https://dashboard.twitch.tv/extensions/9urrg74yzq8di9hqr5prsto5lbmq3x"
@@ -197,9 +197,9 @@ export const StreamResources: Component<{ user: User | null }> = (props) => {
         {/* OBS Overlays */}
         <Accordion.Item value="overlays" class="w-full">
           <Accordion.Header class="w-full">
-            <Accordion.Trigger class="border-1 group m-2 flex w-full flex-row items-center rounded border-accent-500 bg-primary-200/50 p-2 text-xl text-white shadow hover:scale-102 hover:brightness-102">
+            <Accordion.Trigger class="border group m-2 flex w-full flex-row items-center rounded-sm border-accent-500 bg-primary-200/50 p-2 text-xl text-white shadow-sm hover:scale-102 hover:brightness-102">
               <p class="flex-1 text-left">OBS Overlays</p>
-              <FaSolidChevronDown class="transition-all group-data-[expanded]:rotate-180" />
+              <FaSolidChevronDown class="transition-all group-data-expanded:rotate-180" />
             </Accordion.Trigger>
           </Accordion.Header>
           <Accordion.Content class="w-full p-2">
