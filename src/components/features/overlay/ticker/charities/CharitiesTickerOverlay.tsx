@@ -119,7 +119,6 @@ const Body: Component<{
   return (
     <Switch>
       <Match when={data()}>
-        <p>{}</p>
         <div class="relative flex overflow-x-hidden">
           <div
             style={{

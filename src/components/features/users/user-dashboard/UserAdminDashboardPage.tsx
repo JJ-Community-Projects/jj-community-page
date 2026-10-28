@@ -1,7 +1,6 @@
 import { type Component, Show } from 'solid-js'
 import { UserProvider } from './providers/UserProvider.tsx'
 import type { User } from '../../../../lib/auth/User.ts'
-import './UserAdminDashboardPage.css'
 import { orpcPrivate } from '../../../../lib/orpc/client.ts'
 import { QueryClientProvider, useQuery } from '@tanstack/solid-query'
 import { QueryClient } from '@tanstack/query-core'
