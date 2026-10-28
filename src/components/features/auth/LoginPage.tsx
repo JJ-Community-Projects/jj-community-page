@@ -19,7 +19,7 @@ export const LoginPage: Component = () => {
         {/* Hero Section */}
         <div class="space-y-4 text-center">
           <h1 class="font-babas font-bold text-white fl-text-2xl/4xl">Login</h1>
-          <p class="font-poppins text-white/80 fl-text-base/lg">
+          <p class="text-white/80 fl-text-base/lg">
             Join the JJ community page to access more community features. Accounts are <b>not required</b> to use the JJ community page. Your fundraiser will automatically
             appear on the <a class={'underline'} href={'/community'}> community fundraiser page</a>. Accounts are only needed if you want to create your own schedule.
           </p>
@@ -56,7 +56,7 @@ export const LoginPage: Component = () => {
 
             <Dialog.Content class="fixed left-1/2 top-1/2 z-50 w-[90%] max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-neutral-200 bg-white p-6 shadow-2xl focus:outline-hidden">
               <div class="mb-4 flex items-start justify-between">
-                <Dialog.Title class="font-poppins font-semibold text-neutral-800 fl-text-xl/2xl">
+                <Dialog.Title class="font-semibold text-neutral-800 fl-text-xl/2xl">
                   Community Guidelines & Account Purpose
                 </Dialog.Title>
                 <Dialog.CloseButton
@@ -83,7 +83,7 @@ export const LoginPage: Component = () => {
                   <p class="mb-2 text-neutral-600 fl-text-base/xl">
                     By logging in, you agree to our community guidelines
                   </p>
-                  <h3 class="mb-3 font-poppins font-semibold text-neutral-700 fl-text-lg/xl">
+                  <h3 class="mb-3 font-semibold text-neutral-700 fl-text-lg/xl">
                     Account Purpose
                   </h3>
                   <ul class="space-y-2 text-neutral-600 fl-text-sm/base">
@@ -99,7 +99,7 @@ export const LoginPage: Component = () => {
                 </section>
                 {/* Community Guidelines */}
                 <section class="rounded-xl border-2 border-white/10 bg-white px-4 shadow-xs">
-                  <h3 class="font-poppins font-semibold text-neutral-700 fl-text-lg/xl">
+                  <h3 class="font-semibold text-neutral-700 fl-text-lg/xl">
                     Community Guidelines
                   </h3>
                   <div class="space-y-3 text-neutral-600 fl-text-sm/base">

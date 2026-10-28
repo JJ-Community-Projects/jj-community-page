@@ -47,8 +47,8 @@ export const TeamNextStreamsSection: Component<TeamNextStreamsSectionProps> = (p
               >
                 <FaSolidCalendarDays class="w-8 h-8 text-white" />
               </div>
-              <h3 class="text-lg font-semibold text-neutral-700 mb-2 font-poppins">No upcoming streams</h3>
-              <p class="text-neutral-500 font-poppins">
+              <h3 class="text-lg font-semibold text-neutral-700 mb-2">No upcoming streams</h3>
+              <p class="text-neutral-500">
                 Team member streams will appear here when scheduled
               </p>
             </div>

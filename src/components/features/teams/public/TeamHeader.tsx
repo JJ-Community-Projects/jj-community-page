@@ -27,7 +27,7 @@ export const TeamHeader: Component<TeamHeaderProps> = (props) => {
 
           {/* Team Description Section - Below Name */}
           <Show when={team.description}>
-            <p class="mb-4 max-w-2xl font-poppins text-neutral-600 fl-text-base/lg">
+            <p class="mb-4 max-w-2xl text-neutral-600 fl-text-base/lg">
               {team.description}
             </p>
           </Show>

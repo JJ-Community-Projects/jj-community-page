@@ -36,10 +36,10 @@ export const NextStreamsSection: Component<StreamsPreviewProps> = (props) => {
           fallback={
             <div class="flex flex-col items-center justify-center py-12 text-center">
               <FaSolidCalendarDays class="mb-6 h-10 w-10 text-black" />
-              <h3 class="mb-2 font-poppins text-lg font-semibold text-neutral-700">
+              <h3 class="mb-2 text-lg font-semibold text-neutral-700">
                 No upcoming streams
               </h3>
-              <p class="font-poppins text-neutral-500">
+              <p class="text-neutral-500">
                 Streams will appear here when scheduled in your primary schedule
               </p>
             </div>
@@ -71,7 +71,7 @@ export const NextStreamsSection: Component<StreamsPreviewProps> = (props) => {
           <div class="mt-6 border-t border-gray-100 pt-6 text-center">
             <a
               href={`/schedules/${props.primarySchedule.slug}`}
-              class="transform rounded-lg border-2 bg-accent px-6 py-2 font-poppins font-medium text-white transition-all duration-200 hover:bg-accent-600"
+              class="transform rounded-lg border-2 bg-accent px-6 py-2 font-medium text-white transition-all duration-200 hover:bg-accent-600"
             >
               View Full Schedule
             </a>

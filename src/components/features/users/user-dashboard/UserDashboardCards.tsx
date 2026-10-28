@@ -24,11 +24,11 @@ const ScheduleCard: Component = () => {
       <div class="flex h-full flex-col">
         <div class="mb-2 flex items-center gap-2">
           <FaSolidCalendarDays class="h-5 w-5 text-accent-600" />
-          <h3 class="font-poppins font-bold text-neutral-800 fl-text-lg/xl">
+          <h3 class="font-bold text-neutral-800 fl-text-lg/xl">
             Schedules
           </h3>
         </div>
-        <p class="mb-4 font-poppins text-neutral-600 fl-text-sm/base">
+        <p class="mb-4 text-neutral-600 fl-text-sm/base">
           Manage your streaming schedules for JingleJam
         </p>
         <Show when={showWarning()}>
@@ -36,13 +36,13 @@ const ScheduleCard: Component = () => {
             <span class="rounded-full bg-warning px-2 py-1 text-sm font-medium text-white">
               Warning
             </span>
-            <p class="font-poppins text-warning-600 fl-text-sm/base">
+            <p class="text-warning-600 fl-text-sm/base">
               Please check if your schedule is setup correctly. If you have any issues, please contact @Ostof on Discord.
             </p>
           </div>
         </Show>
         <div class="mt-auto">
-          <span class="font-poppins font-medium text-accent-600">
+          <span class="font-medium text-accent-600">
             View Schedules →
           </span>
         </div>
@@ -82,7 +82,7 @@ const TeamCard: Component = () => {
         <div class="mb-2 flex items-center justify-between gap-2">
           <div class="flex items-center gap-2">
             <FaSolidUserGroup class="h-5 w-5 text-accent-600" />
-            <h3 class="font-poppins font-bold text-neutral-800 fl-text-lg/xl">
+            <h3 class="font-bold text-neutral-800 fl-text-lg/xl">
               Teams
             </h3>
           </div>
@@ -95,11 +95,11 @@ const TeamCard: Component = () => {
             </span>
           </Show>
         </div>
-        <p class="mb-4 font-poppins text-neutral-600 fl-text-sm/base">
+        <p class="mb-4 text-neutral-600 fl-text-sm/base">
           Manage your teams and team invitations
         </p>
         <div class="mt-auto flex items-center justify-between">
-          <span class="font-poppins font-medium text-accent-600">
+          <span class="font-medium text-accent-600">
             View Teams →
           </span>
         </div>
@@ -117,15 +117,15 @@ const TagsCard: Component = () => {
       <div class="flex h-full flex-col">
         <div class="mb-2 flex items-center gap-2">
           <FaSolidTag class="h-5 w-5 text-accent-600" />
-          <h3 class="font-poppins font-bold text-neutral-800 fl-text-lg/xl">
+          <h3 class="font-bold text-neutral-800 fl-text-lg/xl">
             Tags
           </h3>
         </div>
-        <p class="mb-4 font-poppins text-neutral-600 fl-text-sm/base">
+        <p class="mb-4 text-neutral-600 fl-text-sm/base">
           Manage your profile tags and interests
         </p>
         <div class="mt-auto">
-          <span class="font-poppins font-medium text-accent-600">
+          <span class="font-medium text-accent-600">
             Manage Tags →
           </span>
         </div>
@@ -143,15 +143,15 @@ const PrefsCard: Component = () => {
       <div class="flex h-full flex-col">
         <div class="mb-2 flex items-center gap-2">
           <FaRegularPenToSquare class="h-5 w-5 text-accent-600" />
-          <h3 class="font-poppins font-bold text-neutral-800 fl-text-lg/xl">
+          <h3 class="font-bold text-neutral-800 fl-text-lg/xl">
             Preferences
           </h3>
         </div>
-        <p class="mb-4 font-poppins text-neutral-600 fl-text-sm/base">
+        <p class="mb-4 text-neutral-600 fl-text-sm/base">
           Manage your Socials and Style
         </p>
         <div class="mt-auto">
-          <span class="font-poppins font-medium text-accent-600">
+          <span class="font-medium text-accent-600">
             Manage Preferences →
           </span>
         </div>
@@ -191,7 +191,7 @@ const FriendsCard: Component = () => {
         <div class="mb-2 flex items-center justify-between gap-2">
           <div class="flex items-center gap-2">
             <FaSolidUser class="h-5 w-5 text-accent-600" />
-            <h3 class="font-poppins font-bold text-neutral-800 fl-text-lg/xl">
+            <h3 class="font-bold text-neutral-800 fl-text-lg/xl">
               Friends
             </h3>
           </div>
@@ -204,11 +204,11 @@ const FriendsCard: Component = () => {
             </span>
           </Show>
         </div>
-        <p class="mb-4 font-poppins text-neutral-600 fl-text-sm/base">
+        <p class="mb-4 text-neutral-600 fl-text-sm/base">
           Manage your friends and friend requests
         </p>
         <div class="mt-auto flex items-center justify-between">
-          <span class="font-poppins font-medium text-accent-600">
+          <span class="font-medium text-accent-600">
             Manage Friends →
           </span>
         </div>
@@ -244,15 +244,15 @@ const BlockedCard: Component = () => {
       <div class="flex h-full flex-col">
         <div class="mb-2 flex items-center gap-2">
           <FaSolidUserSlash class="h-5 w-5 text-danger-600" />
-          <h3 class="mb-2 font-poppins font-bold text-neutral-800 fl-text-lg/xl">
+          <h3 class="mb-2 font-bold text-neutral-800 fl-text-lg/xl">
             Blocked Users
           </h3>
         </div>
-        <p class="mb-4 font-poppins text-neutral-600 fl-text-sm/base">
+        <p class="mb-4 text-neutral-600 fl-text-sm/base">
           Manage your blocked users list
         </p>
         <div class="mt-auto flex items-center justify-between">
-          <span class="font-poppins font-medium text-danger-600">
+          <span class="font-medium text-danger-600">
             Manage Blocks →
           </span>
           <Show when={hasBlockedUsers()}>

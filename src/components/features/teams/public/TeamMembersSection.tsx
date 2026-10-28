@@ -46,8 +46,8 @@ export const TeamMembersSection: Component<TeamMembersSectionProps> = (props) =>
               >
                 <FaSolidUsers class="w-8 h-8 text-white" />
               </div>
-              <h3 class="text-lg font-semibold text-neutral-700 mb-2 font-poppins">No members yet</h3>
-              <p class="text-neutral-500 font-poppins">
+              <h3 class="text-lg font-semibold text-neutral-700 mb-2">No members yet</h3>
+              <p class="text-neutral-500">
                 Team members will appear here when they join
               </p>
             </div>

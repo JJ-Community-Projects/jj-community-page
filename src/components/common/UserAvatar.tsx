@@ -113,7 +113,7 @@ export const UserAvatar: Component<UserAvatarProps> = (props) => {
 
         {/* Username */}
         <p
-          class="text-xs font-medium font-poppins transition-all duration-300 group-hover:font-semibold group-hover:text-opacity-90 text-white px-2 py-1 rounded-full bg-black bg-opacity-40 backdrop-blur-xs"
+          class="text-xs font-medium transition-all duration-300 group-hover:font-semibold group-hover:text-opacity-90 text-white px-2 py-1 rounded-full bg-black bg-opacity-40 backdrop-blur-xs"
         >
           {user.username}
         </p>
@@ -149,7 +149,7 @@ export const UserPillAvatar: Component<UserAvatarProps> = (props) => {
         }}
         loading="lazy"
       />
-      <span class="font-medium font-poppins text-sm">{user.username}</span>
+      <span class="font-medium text-sm">{user.username}</span>
     </a>
   );
 };
@@ -181,7 +181,7 @@ export const UserSmallPillAvatar: Component<UserAvatarProps> = (props) => {
         }}
         loading="lazy"
       />
-      <span class="font-medium font-poppins text-xs">{user.username}</span>
+      <span class="font-medium text-xs">{user.username}</span>
     </a>
   );
 };

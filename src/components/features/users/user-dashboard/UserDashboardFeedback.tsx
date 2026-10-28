@@ -9,7 +9,7 @@ import {
 export const UserDashboardFeedback: Component = () => {
   return (
     <div class={'flex flex-col items-start justify-start gap-1 text-black'}>
-      <p class={'font-poppins font-bold text-neutral-800 '}>Send Feedback</p>
+      <p class={'font-bold text-neutral-800 '}>Send Feedback</p>
       <div class={'flex flex-row gap-4'}>
         <a
           class={

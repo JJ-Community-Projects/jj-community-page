@@ -65,16 +65,16 @@ const ProfileCard: Component = () => {
                     <FaSolidUser class="m-0.5 h-2 w-2 text-white" />
                   </div>
                 </div>
-                <h2 class="font-poppins font-bold text-neutral-800 fl-text-xl/2xl">
+                <h2 class="font-bold text-neutral-800 fl-text-xl/2xl">
                   {user.data?.username}
                 </h2>
               </div>
-              <p class="font-poppins text-primary-600 fl-text-sm/base">
+              <p class="text-primary-600 fl-text-sm/base">
                 Your JJ Community Profile
               </p>
             </div>
             <a
-              class="font-poppins font-medium text-primary transition-colors duration-200 hover:text-primary-600"
+              class="font-medium text-primary transition-colors duration-200 hover:text-primary-600"
               href={`/${user.data?.username}`}
             >
               jinglejam.ostof.dev/{user.data?.username}
@@ -83,7 +83,7 @@ const ProfileCard: Component = () => {
           <form action="/api/auth/logout" method="post">
             <button
               type="submit"
-              class="transform rounded-md bg-neutral-200 px-4 py-2 font-poppins font-medium text-neutral-700 shadow-xs transition-all duration-200 hover:bg-neutral-300 hover:shadow-md focus:ring-2 focus:ring-neutral-500 focus:ring-offset-2 active:scale-95"
+              class="transform rounded-md bg-neutral-200 px-4 py-2 font-medium text-neutral-700 shadow-xs transition-all duration-200 hover:bg-neutral-300 hover:shadow-md focus:ring-2 focus:ring-neutral-500 focus:ring-offset-2 active:scale-95"
             >
               Logout
             </button>
@@ -91,12 +91,12 @@ const ProfileCard: Component = () => {
         </div>
 
         <div class="">
-          <h3 class="mb-3 font-poppins font-bold text-neutral-800 fl-text-lg/xl">
+          <h3 class="mb-3 font-bold text-neutral-800 fl-text-lg/xl">
             Tiltify Links
           </h3>
           <div class="flex gap-3">
             <a
-              class="flex transform items-center gap-2 rounded-md bg-tiltify px-4 py-2 font-poppins font-medium text-white shadow-xs transition-all duration-200 hover:bg-accent-600 hover:shadow-md focus:ring-2 focus:ring-accent focus:ring-offset-2 active:scale-95"
+              class="flex transform items-center gap-2 rounded-md bg-tiltify px-4 py-2 font-medium text-white shadow-xs transition-all duration-200 hover:bg-accent-600 hover:shadow-md focus:ring-2 focus:ring-accent focus:ring-offset-2 active:scale-95"
               href="https://app.tiltify.com/hub"
               target="_blank"
               rel="noopener noreferrer"
@@ -105,7 +105,7 @@ const ProfileCard: Component = () => {
               Tiltify Hub
             </a>
             <a
-              class="flex transform items-center gap-2 rounded-md bg-tiltify px-4 py-2 font-poppins font-medium text-white shadow-xs transition-all duration-200 hover:bg-accent-600 hover:shadow-md focus:ring-2 focus:ring-accent focus:ring-offset-2 active:scale-95"
+              class="flex transform items-center gap-2 rounded-md bg-tiltify px-4 py-2 font-medium text-white shadow-xs transition-all duration-200 hover:bg-accent-600 hover:shadow-md focus:ring-2 focus:ring-accent focus:ring-offset-2 active:scale-95"
               href="https://app.tiltify.com/profile/setup"
               target="_blank"
               rel="noopener noreferrer"
@@ -114,7 +114,7 @@ const ProfileCard: Component = () => {
               Tiltify Profile
             </a>
             <a
-              class="flex transform items-center gap-2 rounded-md bg-primary px-4 py-2 font-poppins font-medium text-white shadow-xs transition-all duration-200 hover:bg-primary-600 hover:shadow-md focus:ring-2 focus:ring-primary focus:ring-offset-2 active:scale-95"
+              class="flex transform items-center gap-2 rounded-md bg-primary px-4 py-2 font-medium text-white shadow-xs transition-all duration-200 hover:bg-primary-600 hover:shadow-md focus:ring-2 focus:ring-primary focus:ring-offset-2 active:scale-95"
               href="https://jinglejam.tiltify.com/"
               target="_blank"
               rel="noopener noreferrer"

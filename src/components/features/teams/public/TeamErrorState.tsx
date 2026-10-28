@@ -24,7 +24,7 @@ export const TeamErrorState: Component<TeamErrorStateProps> = (props) => {
           </h1>
 
           {/* Error Message */}
-          <p class="fl-text-base/lg font-poppins text-neutral-600 mb-8 max-w-md">
+          <p class="fl-text-base/lg text-neutral-600 mb-8 max-w-md">
             {error || "The team you're looking for doesn't exist or may have been removed."}
           </p>
 
@@ -32,7 +32,7 @@ export const TeamErrorState: Component<TeamErrorStateProps> = (props) => {
           <div class="flex flex-col sm:flex-row gap-4">
             <a
               href="/teams"
-              class="px-6 py-3 bg-accent text-white rounded-lg font-medium font-poppins hover:bg-accent-600 shadow-xs hover:shadow-md focus:ring-2 focus:ring-accent focus:ring-offset-2 transition-all duration-200 transform active:scale-95 flex items-center gap-2"
+              class="px-6 py-3 bg-accent text-white rounded-lg font-medium hover:bg-accent-600 shadow-xs hover:shadow-md focus:ring-2 focus:ring-accent focus:ring-offset-2 transition-all duration-200 transform active:scale-95 flex items-center gap-2"
             >
               <FaSolidArrowLeft class="w-4 h-4" />
               Back to Teams
@@ -41,7 +41,7 @@ export const TeamErrorState: Component<TeamErrorStateProps> = (props) => {
             {onRetry && (
               <button
                 onClick={onRetry}
-                class="px-6 py-3 bg-neutral-200 text-neutral-700 rounded-lg font-medium font-poppins hover:bg-neutral-300 shadow-xs hover:shadow-md focus:ring-2 focus:ring-neutral-500 focus:ring-offset-2 transition-all duration-200 transform active:scale-95"
+                class="px-6 py-3 bg-neutral-200 text-neutral-700 rounded-lg font-medium hover:bg-neutral-300 shadow-xs hover:shadow-md focus:ring-2 focus:ring-neutral-500 focus:ring-offset-2 transition-all duration-200 transform active:scale-95"
               >
                 Try Again
               </button>

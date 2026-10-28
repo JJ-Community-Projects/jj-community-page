@@ -9,12 +9,39 @@
   maxviewport: 1536;
 }
 
+/*
+  Semantic tokens: the neutral tile on the red canvas (the Twitch extension's look).
+  Pages and components use these; the raw palettes below stay for brand and data colours.
+*/
 @theme {
-  --font-poppins: Poppins;
+  /* Tile: gradient surface -> surface-2, ring in `line`, shadow-tile (hover: shadow-tile-hover) */
+  --color-surface: var(--color-neutral-50);
+  --color-surface-2: var(--color-neutral-100);
+  /* Inner groups and inputs inside a tile */
+  --color-surface-strong: #ffffff;
+  /* Tile ring, dividers, input borders */
+  --color-line: rgb(0 0 0 / 0.05);
+  /* Text on a tile */
+  --color-fg: var(--color-neutral-900);
+  --color-fg-muted: var(--color-neutral-600);
+  /* Text directly on the red canvas: page titles, section labels, footer */
+  --color-on-canvas: #ffffff;
+  --color-on-canvas-muted: rgb(255 255 255 / 0.8);
+  /* "Raised" amounts */
+  --color-raised: var(--color-primary-600);
+
+  --radius-tile: 1rem;
+  --radius-group: 0.75rem;
+  --radius-media: 0.5rem;
+
+  --shadow-tile: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-tile-hover:
+    0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+@theme {
+  /* Body text uses Tailwind's default system stack (--font-sans); Bebas is the Yogs schedule grid's display font */
   --font-babas: Bebas;
-  --font-sans:
-    Inter, ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
-    'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 
   --text-xxs: 0.625rem;
   --text-xxs--line-height: 0.75rem;

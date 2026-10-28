@@ -25,12 +25,12 @@ export function TeamCard(props: TeamCardProps) {
       "
     >
       <div class="space-y-3">
-        <h2 class="fl-text-lg/xl font-semibold font-poppins text-neutral-800 group-hover:text-accent-700 transition-colors">
+        <h2 class="fl-text-lg/xl font-semibold text-neutral-800 group-hover:text-accent-700 transition-colors">
           {props.team.name}
         </h2>
 
         <Show when={props.team.description}>
-          <p class="text-neutral-600 fl-text-sm/base font-poppins line-clamp-2 leading-relaxed">
+          <p class="text-neutral-600 fl-text-sm/base line-clamp-2 leading-relaxed">
             {props.team.description!.length > 100
               ? props.team.description!.substring(0, 100) + '...'
               : props.team.description

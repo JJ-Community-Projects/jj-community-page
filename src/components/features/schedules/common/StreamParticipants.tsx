@@ -71,7 +71,7 @@ const StreamParticipant: Component<{ participant: UserDisplay }> = (props) => {
         }}
         loading="lazy"
       />
-      <span class="font-poppins text-xs font-medium">
+      <span class="text-xs font-medium">
         {props.participant.username}
       </span>
     </a>
