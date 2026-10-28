@@ -1,12 +1,24 @@
-import { For, Match, Show, Switch, createSignal, type Component } from 'solid-js'
+import {
+  type Component,
+  createSignal,
+  For,
+  Match,
+  Show,
+  Switch,
+} from 'solid-js'
+import { FaSolidXmark } from 'solid-icons/fa'
 import { useTagSearch } from '../../../lib/useTagSearch.ts'
-import { twMerge } from 'tailwind-merge'
-import { useCommunityPage } from './CommunityPageProvider.tsx'
+import { cn, focusRing } from '../../ui/cn'
+import { SearchField } from '../../ui/Form'
 
 type SimpleTag = { id: number; name: string; color?: string }
 
-export const CommunityTagSearch: Component = () => {
-  const { addSelectedTag, removeSelectedTag, selectedTagIds } = useCommunityPage()
+/** Tag filter for the fundraiser and user lists. Shared by both community pages; ids live in their providers. */
+export const CommunityTagSearch: Component<{
+  selectedTagIds: number[]
+  onAdd: (id: number) => void
+  onRemove: (id: number) => void
+}> = (props) => {
   const {
     searchInput,
     debouncedInput,
@@ -17,20 +29,13 @@ export const CommunityTagSearch: Component = () => {
     handleSearchInput,
   } = useTagSearch({ debounceMs: 300, limit: 12 })
 
-  // local cache for tag metadata to render chips; ids live in provider
+  // local cache for tag metadata to render chips; ids live in the provider
   const [tagsById, setTagsById] = createSignal<Record<number, SimpleTag>>({})
-
-  const onInput = (e: Event) => {
-    const t = e.target as HTMLInputElement
-    handleSearchInput(t.value)
-  }
-
-  const clearInput = () => handleSearchInput('')
 
   const addTag = (tag: SimpleTag) => {
     setTagsById((prev) => ({ ...prev, [tag.id]: tag }))
-    addSelectedTag(tag.id)
-    clearInput()
+    props.onAdd(tag.id)
+    handleSearchInput('')
   }
 
   const removeTag = (id: number) => {
@@ -39,95 +44,104 @@ export const CommunityTagSearch: Component = () => {
       delete copy[id]
       return copy
     })
-    removeSelectedTag(id)
+    props.onRemove(id)
   }
 
-  const showSuggestions = () => searchInput().length > 0
-
   return (
-    <div class={twMerge('w-full mt-2 rounded-xl border-2 bg-white/95 p-3 shadow-md')}
-         role="search">
+    <div class="flex flex-col gap-2" role="search">
       <div class="relative">
-        <input
-          type="text"
-          class={twMerge(
-            'w-full rounded-lg border-2 border-gray-200 px-3 py-2 text-sm outline-hidden',
-            'focus:border-accent focus:ring-2 focus:ring-accent/20',
-          )}
-          placeholder="Search tags…"
+        <SearchField
+          label="Search tags"
+          placeholder="Filter by tag…"
           value={searchInput()}
-          onInput={onInput}
-          aria-label="Search tags"
+          onInput={handleSearchInput}
+          loading={isLoadingTags()}
         />
-
         <Show when={searchInput().length > 0}>
-          <button
-            type="button"
-            class="absolute right-2 top-1/2 -translate-y-1/2 rounded-sm px-2 py-1 text-xs text-gray-500 hover:bg-gray-100"
-            onClick={clearInput}
-            aria-label="Clear search"
-          >
-            Clear
-          </button>
-        </Show>
-
-        <Show when={showSuggestions()}>
-          <div class="absolute left-0 right-0 z-20 mt-2 overflow-hidden rounded-lg border bg-white shadow-xl">
-            <div class="max-h-64 overflow-y-auto text-sm">
-              <Switch>
-                <Match when={hasTagsError()}>
-                  <div class="p-3 text-danger-600">
-                    {availableTagsError() || 'Error loading tags'}
-                  </div>
-                </Match>
-                <Match when={isLoadingTags()}>
-                  <div class="p-3 text-gray-500">Searching…</div>
-                </Match>
-                <Match when={(availableTags()?.length ?? 0) === 0 && debouncedInput().length > 0}>
-                  <div class="p-3 text-gray-500">No results for "{debouncedInput()}"</div>
-                </Match>
-                <Match when={(availableTags()?.length ?? 0) > 0}>
-                  <ul class="divide-y">
-                    <For each={availableTags().slice(0, 8)}>
-                      {(tag: any) => (
-                        <li>
-                          <button
-                            type="button"
-                            class="flex w-full items-center justify-between px-3 py-2 text-left hover:bg-gray-50"
-                            // onMouseDown avoids input blur issues
-                            onMouseDown={() => addTag({ id: tag.id, name: tag.name, color: tag.color })}
-                          >
-                            <span class="truncate font-medium" style={{ color: tag.color }}>{tag.name}</span>
-                            <span class="ml-3 text-xs text-gray-500">add</span>
-                          </button>
-                        </li>
-                      )}
-                    </For>
-                  </ul>
-                </Match>
-              </Switch>
-            </div>
+          <div class="rounded-group bg-surface-strong text-fg shadow-tile-hover ring-line absolute inset-x-0 z-20 mt-1 max-h-64 overflow-y-auto text-sm ring-1">
+            <Switch>
+              <Match when={hasTagsError()}>
+                <p class="text-danger-700 p-3">
+                  {availableTagsError() || 'Error loading tags'}
+                </p>
+              </Match>
+              <Match when={isLoadingTags()}>
+                <p class="text-fg-muted p-3">Searching…</p>
+              </Match>
+              <Match
+                when={
+                  (availableTags()?.length ?? 0) === 0 &&
+                  debouncedInput().length > 0
+                }
+              >
+                <p class="text-fg-muted p-3">
+                  No results for "{debouncedInput()}"
+                </p>
+              </Match>
+              <Match when={(availableTags()?.length ?? 0) > 0}>
+                <ul class="divide-line divide-y">
+                  <For each={availableTags().slice(0, 8)}>
+                    {(tag: any) => (
+                      <li>
+                        <button
+                          type="button"
+                          class={cn(
+                            'flex w-full items-center gap-2 px-3 py-2 text-left hover:bg-black/5',
+                            focusRing,
+                          )}
+                          // onMouseDown avoids input blur issues
+                          onMouseDown={() =>
+                            addTag({
+                              id: tag.id,
+                              name: tag.name,
+                              color: tag.color,
+                            })
+                          }
+                        >
+                          <span
+                            class="size-2 shrink-0 rounded-full ring-1 ring-black/10"
+                            style={{ 'background-color': tag.color }}
+                          />
+                          <span class="flex-1 truncate font-medium">
+                            {tag.name}
+                          </span>
+                          <span class="text-fg-muted text-xs">add</span>
+                        </button>
+                      </li>
+                    )}
+                  </For>
+                </ul>
+              </Match>
+            </Switch>
           </div>
         </Show>
       </div>
 
-      {/* Selected tags (ids from provider) */}
-      <Show when={selectedTagIds().length > 0}>
-        <div class="mt-3 flex flex-wrap gap-2">
-          <For each={selectedTagIds()}>
+      <Show when={props.selectedTagIds.length > 0}>
+        <div class="flex flex-wrap gap-1.5">
+          <For each={props.selectedTagIds}>
             {(id) => {
-              const tag = () => tagsById()[id] || { id, name: `#${id}`, color: '#888888' }
+              const tag = () => tagsById()[id] || { id, name: `#${id}` }
               return (
-              <button
-                type="button"
-                onClick={() => removeTag(id)}
-                class="inline-flex items-center gap-1 rounded-full border px-2 py-1 text-xs"
-                style={{ 'border-color': tag().color || '#ddd', color: tag().color || '#333', background: 'white' }}
-                title={`Remove ${tag().name}`}
-              >
-                <span>{tag().name}</span>
-                <span aria-hidden>×</span>
-              </button>
+                <button
+                  type="button"
+                  onClick={() => removeTag(id)}
+                  class={cn(
+                    'bg-surface-strong text-fg ring-line inline-flex items-center gap-1.5 rounded-full py-1 pr-2 pl-2.5 text-xs font-medium ring-1 hover:bg-black/5',
+                    focusRing,
+                  )}
+                  aria-label={`Remove tag ${tag().name}`}
+                >
+                  <span
+                    class="size-2 shrink-0 rounded-full ring-1 ring-black/10"
+                    style={{ 'background-color': tag().color ?? 'transparent' }}
+                  />
+                  {tag().name}
+                  <FaSolidXmark
+                    class="text-fg-muted size-3"
+                    aria-hidden="true"
+                  />
+                </button>
               )
             }}
           </For>
@@ -136,5 +150,3 @@ export const CommunityTagSearch: Component = () => {
     </div>
   )
 }
-
-export default CommunityTagSearch

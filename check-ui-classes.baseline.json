@@ -74,30 +74,6 @@
   "src/components/features/admin/tags/tag/TagSection.tsx": {
     "raw-palette": 5
   },
-  "src/components/features/community-ssr/CommunityPage.tsx": {
-    "raw-palette": 1
-  },
-  "src/components/features/community-ssr/CommunityTagSearch.tsx": {
-    "raw-palette": 7
-  },
-  "src/components/features/community-ssr/CommunityUsers.tsx": {
-    "raw-palette": 1
-  },
-  "src/components/features/community-ssr/UpcomingStreams.tsx": {
-    "raw-palette": 1
-  },
-  "src/components/features/community/CommunityPage.tsx": {
-    "raw-palette": 1
-  },
-  "src/components/features/community/CommunityTagSearch.tsx": {
-    "raw-palette": 7
-  },
-  "src/components/features/community/CommunityUsers.tsx": {
-    "raw-palette": 1
-  },
-  "src/components/features/community/UpcomingStreams.tsx": {
-    "raw-palette": 1
-  },
   "src/components/features/overlay/charities/CharitiesOverlay.tsx": {
     "hex": 2
   },
@@ -147,14 +123,10 @@
   },
   "src/components/features/schedules/common/StreamCard.tsx": {
     "unknown": 6,
-    "raw-palette": 6
+    "raw-palette": 4
   },
   "src/components/features/schedules/common/StreamParticipants.tsx": {
     "hex": 1
-  },
-  "src/components/features/schedules/community/CommunitySchedules.tsx": {
-    "unknown": 1,
-    "raw-palette": 1
   },
   "src/components/features/stats/controls/CreatorStatsControls.tsx": {
     "unknown": 3

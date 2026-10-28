@@ -1,4 +1,4 @@
-import { type Component, type JSX, Show } from 'solid-js'
+import { children, type Component, type JSX, Show } from 'solid-js'
 import { FaSolidArrowLeft } from 'solid-icons/fa'
 import { cn, focusRing } from './cn'
 
@@ -17,6 +17,8 @@ type PageHeaderProps = {
 /** The page title on the red canvas: the only large text outside a tile. */
 export const PageHeader: Component<PageHeaderProps> = (props) => {
   const centered = () => props.align !== 'start'
+  const subtitle = children(() => props.subtitle)
+  const actions = children(() => props.actions)
   return (
     <header
       class={cn(
@@ -48,20 +50,20 @@ export const PageHeader: Component<PageHeaderProps> = (props) => {
         <h1 class="min-w-0 text-2xl font-bold tracking-tight text-balance sm:text-3xl">
           {props.title}
         </h1>
-        <Show when={props.actions}>
+        <Show when={actions()}>
           <div
             class={cn(
               'flex shrink-0 flex-wrap gap-2',
               !centered() && 'sm:ml-auto',
             )}
           >
-            {props.actions}
+            {actions()}
           </div>
         </Show>
       </div>
-      <Show when={props.subtitle}>
+      <Show when={subtitle()}>
         <p class="text-on-canvas-muted max-w-prose text-sm sm:text-base">
-          {props.subtitle}
+          {subtitle()}
         </p>
       </Show>
       {props.children}

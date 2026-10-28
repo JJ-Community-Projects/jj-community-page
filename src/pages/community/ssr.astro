@@ -2,6 +2,7 @@
 import { serverClientPrivate, serverClientPublic } from '../../lib/orpc/serverClient.ts'
 import PageShell from '../../layouts/PageShell.astro'
 import { CommunityPage } from '../../components/features/community-ssr/CommunityPage.tsx'
+import { PageHeader } from '../../components/ui/PageHeader'
 
 export const prerender = false
 Astro.response.headers.set(
@@ -42,7 +43,8 @@ const [
   description="Explore community fundraisers and upcoming streams for Jingle Jam 2025 - discover creators and donate."
   canonical="https://jinglejam.ostof.dev/community"
 >
-  <div class="w-full flex flex-col justify-center items-stretch gap-4">
+  <div class="flex flex-col gap-3">
+    <PageHeader title="Community" subtitle="Fundraisers and upcoming streams" />
     <CommunityPage initial={{ community, causes, upcomingStreams, users }} tagCatalog={tagCatalog?.tags} client:idle />
   </div>
 </PageShell>

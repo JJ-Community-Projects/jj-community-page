@@ -1,4 +1,4 @@
-import { type Component, For, type JSX, Show } from 'solid-js'
+import { children, type Component, For, type JSX, Show } from 'solid-js'
 import type { Duration } from 'luxon'
 import {
   useIsJJ,
@@ -27,10 +27,11 @@ export const Countdown: Component<CountdownProps> = (props) => {
     }))
   }
   const md = () => props.size !== 'sm'
+  const label = children(() => props.label)
   return (
     <div class={cn('flex flex-col items-center gap-2', props.class)}>
-      <Show when={props.label}>
-        <p class="text-fg-muted text-sm font-semibold">{props.label}</p>
+      <Show when={label()}>
+        <p class="text-fg-muted text-sm font-semibold">{label()}</p>
       </Show>
       <div role="timer" class="flex gap-1.5 sm:gap-2">
         <For each={parts()}>

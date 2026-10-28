@@ -1,4 +1,4 @@
-import { type Component, type JSX, Show } from 'solid-js'
+import { children, type Component, type JSX, Show } from 'solid-js'
 import { Dynamic } from 'solid-js/web'
 import { FaSolidChevronRight } from 'solid-icons/fa'
 import { cn, focusRing, groupSurface, tileHover, tileSurface } from './cn'
@@ -41,6 +41,10 @@ type ListRowProps = {
 /** One fixed-height row: media · title + subline · trailing value · chevron. */
 export const ListRow: Component<ListRowProps> = (props) => {
   const d = () => density[props.density ?? 'compact']
+  // Element props resolve once (see Section): no double creation, no hydration mismatch.
+  const media = children(() => props.media)
+  const subline = children(() => props.subline)
+  const trailing = children(() => props.trailing)
   return (
     <Dynamic
       component={props.href ? 'a' : 'div'}
@@ -56,19 +60,17 @@ export const ListRow: Component<ListRowProps> = (props) => {
         props.class,
       )}
     >
-      <Show when={props.media}>
-        <div class="shrink-0">{props.media}</div>
+      <Show when={media()}>
+        <div class="shrink-0">{media()}</div>
       </Show>
       <div class="min-w-0 flex-1">
         <p class={cn('truncate font-semibold', d().title)}>{props.title}</p>
-        <Show when={props.subline}>
-          <p class={cn('text-fg-muted truncate', d().subline)}>
-            {props.subline}
-          </p>
+        <Show when={subline()}>
+          <p class={cn('text-fg-muted truncate', d().subline)}>{subline()}</p>
         </Show>
       </div>
-      <Show when={props.trailing}>
-        <div class="shrink-0 self-start">{props.trailing}</div>
+      <Show when={trailing()}>
+        <div class="shrink-0 self-start">{trailing()}</div>
       </Show>
       <Show when={props.href}>
         <FaSolidChevronRight

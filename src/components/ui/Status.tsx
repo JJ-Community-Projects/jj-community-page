@@ -1,4 +1,10 @@
-import { type Component, type JSX, type ParentComponent, Show } from 'solid-js'
+import {
+  children,
+  type Component,
+  type JSX,
+  type ParentComponent,
+  Show,
+} from 'solid-js'
 import { Dynamic } from 'solid-js/web'
 import {
   FaSolidCircleCheck,
@@ -37,6 +43,7 @@ type AlertProps = {
 
 export const Alert: ParentComponent<AlertProps> = (props) => {
   const tone = () => alertTones[props.tone ?? 'info']
+  const action = children(() => props.action)
   return (
     <div
       role={
@@ -59,8 +66,8 @@ export const Alert: ParentComponent<AlertProps> = (props) => {
         </Show>
         <div>{props.children}</div>
       </div>
-      <Show when={props.action}>
-        <div class="shrink-0">{props.action}</div>
+      <Show when={action()}>
+        <div class="shrink-0">{action()}</div>
       </Show>
     </div>
   )
@@ -74,25 +81,30 @@ type EmptyStateProps = {
   children?: JSX.Element
 }
 
-export const EmptyState: Component<EmptyStateProps> = (props) => (
-  <div
-    class={cn(
-      'flex flex-col items-center gap-2 px-4 py-6 text-center',
-      props.class,
-    )}
-  >
-    <Show when={props.icon}>
-      <div class="text-fg-muted text-2xl">{props.icon}</div>
-    </Show>
-    <p class="font-semibold">{props.title}</p>
-    <Show when={props.children}>
-      <div class="text-fg-muted max-w-prose text-sm">{props.children}</div>
-    </Show>
-    <Show when={props.action}>
-      <div class="mt-1">{props.action}</div>
-    </Show>
-  </div>
-)
+export const EmptyState: Component<EmptyStateProps> = (props) => {
+  const icon = children(() => props.icon)
+  const action = children(() => props.action)
+  const content = children(() => props.children)
+  return (
+    <div
+      class={cn(
+        'flex flex-col items-center gap-2 px-4 py-6 text-center',
+        props.class,
+      )}
+    >
+      <Show when={icon()}>
+        <div class="text-fg-muted text-2xl">{icon()}</div>
+      </Show>
+      <p class="font-semibold">{props.title}</p>
+      <Show when={content()}>
+        <div class="text-fg-muted max-w-prose text-sm">{content()}</div>
+      </Show>
+      <Show when={action()}>
+        <div class="mt-1">{action()}</div>
+      </Show>
+    </div>
+  )
+}
 
 const spinnerSizes = { sm: 'size-4', md: 'size-6' }
 

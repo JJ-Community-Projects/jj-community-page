@@ -1,65 +1,48 @@
 import { type Component, For, Show } from 'solid-js'
 import { useCommunityPage } from './CommunityPageProvider.tsx'
-import { CommunityUserItem } from './CommunityUserItem.tsx'
-import { twMerge } from 'tailwind-merge'
+import { CommunityUserItem } from '../community/CommunityUserItem.tsx'
+import { Button } from '../../ui/Button'
+import { Alert, EmptyState, Spinner } from '../../ui/Status'
+import { Section } from '../../ui/Tile'
 
-export const CommunityUsers: Component = (props) => {
-  const { users, selectedTagIds, clearSelectedTags, usersFiltered } = useCommunityPage()
+export const CommunityUsers: Component = () => {
+  const { users, selectedTagIds, clearSelectedTags, usersFiltered } =
+    useCommunityPage()
   const anyTagsSelected = () => selectedTagIds().length > 0
-  const list = () => (anyTagsSelected() ? usersFiltered() : users.data ? users.data : [])
+  const list = () =>
+    anyTagsSelected() ? usersFiltered() : users.data ? users.data : []
   return (
-    <>
+    <Section title="Users" level={2}>
+      <p class="text-fg-muted -mt-2 mb-3 text-sm">
+        Fundraisers that have an account
+      </p>
       <Show when={users.isLoading}>
-        <p class={'text-white/80'}>Loading users…</p>
+        <Spinner label="Loading users…" />
       </Show>
       <Show when={users.isError}>
-        <p class={'text-red-400'}>Failed to load users.</p>
+        <Alert tone="danger">Failed to load users.</Alert>
       </Show>
       <Show when={users.isSuccess && list().length > 0}>
-        <div class={'mx-auto flex w-full flex-col gap-4'}>
-          <div
-            class={twMerge(
-              'mb-2 mt-6 flex w-full flex-wrap items-end justify-between gap-x-4 gap-y-2',
-            )}
-          >
-            <div class={'flex flex-col'}>
-              <h2 class={twMerge('text-lg font-semibold text-white')}>
-                Users
-              </h2>
-              <p class={twMerge('text-white')}>
-                Fundraisers that have an account
-              </p>
-            </div>
-          </div>
-
-          <div
-            class={
-              'grid w-full grid-cols-[repeat(auto-fit,minmax(250px,1fr))] content-center gap-2'
-            }
-          >
-            <For each={list()}>
-              {(user) => <CommunityUserItem user={user} />}
-            </For>
-          </div>
+        <div class="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
+          <For each={list()}>{(user) => <CommunityUserItem user={user} />}</For>
         </div>
       </Show>
       <Show when={users.isSuccess && list().length === 0}>
-        <div class={'flex flex-col items-center gap-2 text-white/90'}>
-          <p>
-            {anyTagsSelected()
+        <EmptyState
+          title={
+            anyTagsSelected()
               ? 'No users match the selected tags.'
-              : 'No users found.'}
-          </p>
-          <Show when={anyTagsSelected()}>
-            <button
-              class={'rounded-lg bg-white/10 px-3 py-1 text-sm font-semibold text-white hover:bg-white/20'}
-              onClick={() => clearSelectedTags()}
-            >
-              Clear selected tags
-            </button>
-          </Show>
-        </div>
+              : 'No users found.'
+          }
+          action={
+            anyTagsSelected() ? (
+              <Button size="sm" onClick={() => clearSelectedTags()}>
+                Clear selected tags
+              </Button>
+            ) : undefined
+          }
+        />
       </Show>
-    </>
+    </Section>
   )
 }

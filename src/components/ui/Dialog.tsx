@@ -21,49 +21,57 @@ type DialogProps = {
   children?: JSX.Element
 }
 
-export const Dialog: Component<DialogProps> = (props) => (
-  <KDialog open={props.open} onOpenChange={props.onOpenChange}>
-    <KDialog.Portal>
-      <KDialog.Overlay class="fixed inset-0 z-50 bg-black/50" />
-      <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <KDialog.Content
-          class={cn(
-            'rounded-tile bg-surface-strong text-fg shadow-tile-hover flex max-h-[calc(100dvh-2rem)] w-full flex-col overflow-hidden',
-            sizes[props.size ?? 'md'],
-          )}
-        >
-          <div class="border-line flex items-start gap-2 border-b px-4 py-3">
-            <div class="min-w-0 flex-1">
-              <KDialog.Title class="text-lg font-semibold">
-                {props.title}
-              </KDialog.Title>
-              <Show when={props.description}>
-                <KDialog.Description class="text-fg-muted text-sm">
-                  {props.description}
-                </KDialog.Description>
-              </Show>
+export const Dialog: Component<DialogProps> = (props) => {
+  // Element props are read once, inside the portal (only while open), via Show's accessor:
+  // reading them twice would create them twice and break hydration.
+  return (
+    <KDialog open={props.open} onOpenChange={props.onOpenChange}>
+      <KDialog.Portal>
+        <KDialog.Overlay class="fixed inset-0 z-50 bg-black/50" />
+        <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <KDialog.Content
+            class={cn(
+              'rounded-tile bg-surface-strong text-fg shadow-tile-hover flex max-h-[calc(100dvh-2rem)] w-full flex-col overflow-hidden',
+              sizes[props.size ?? 'md'],
+            )}
+          >
+            <div class="border-line flex items-start gap-2 border-b px-4 py-3">
+              <div class="min-w-0 flex-1">
+                <KDialog.Title class="text-lg font-semibold">
+                  {props.title}
+                </KDialog.Title>
+                <Show when={props.description}>
+                  {(description) => (
+                    <KDialog.Description class="text-fg-muted text-sm">
+                      {description()}
+                    </KDialog.Description>
+                  )}
+                </Show>
+              </div>
+              <KDialog.CloseButton
+                as={IconButton}
+                variant="ghost"
+                size="sm"
+                aria-label="Close"
+                class="-mr-1"
+              >
+                <FaSolidXmark class="size-4" aria-hidden="true" />
+              </KDialog.CloseButton>
             </div>
-            <KDialog.CloseButton
-              as={IconButton}
-              variant="ghost"
-              size="sm"
-              aria-label="Close"
-              class="-mr-1"
-            >
-              <FaSolidXmark class="size-4" aria-hidden="true" />
-            </KDialog.CloseButton>
-          </div>
-          <div class="overflow-y-auto px-4 py-3">{props.children}</div>
-          <Show when={props.footer}>
-            <div class="border-line flex flex-wrap justify-end gap-2 border-t px-4 py-3">
-              {props.footer}
-            </div>
-          </Show>
-        </KDialog.Content>
-      </div>
-    </KDialog.Portal>
-  </KDialog>
-)
+            <div class="overflow-y-auto px-4 py-3">{props.children}</div>
+            <Show when={props.footer}>
+              {(footer) => (
+                <div class="border-line flex flex-wrap justify-end gap-2 border-t px-4 py-3">
+                  {footer()}
+                </div>
+              )}
+            </Show>
+          </KDialog.Content>
+        </div>
+      </KDialog.Portal>
+    </KDialog>
+  )
+}
 
 type ConfirmDialogProps = {
   open: boolean

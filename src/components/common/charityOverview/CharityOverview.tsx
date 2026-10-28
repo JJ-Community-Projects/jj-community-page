@@ -1,4 +1,4 @@
-import  { type Component, Show } from 'solid-js'
+import { type Component, For, Show } from 'solid-js'
 import type {
   Currencies,
   JJCauseType,
@@ -18,101 +18,97 @@ import {
   YoutubeIcon,
 } from '../icons/JJIcons.tsx'
 import { useCurrency } from '../CurrencyProvider.tsx'
+import { Avatar } from '../../ui/Avatar'
+import { cn, focusRing, tileSurface } from '../../ui/cn'
 
-export const CharityItem: Component<{
-  item: {
-    donationData?: JJCauseType
-    staticData: CharityStatic
-  }
-}> = (props) => {
-  const it = props.item
-  return (
-    <div class="inline-block h-[96px] w-full">
-      <div class="hover:scale-101 flex h-full w-full items-center gap-3 rounded-2xl bg-linear-to-b from-neutral-50 to-neutral-100 p-2 text-black shadow-sm hover:brightness-105">
-        <img
-          src={it.donationData?.logo}
-          alt={it.donationData?.name || it.staticData.name}
-          class="h-12 w-12 shrink-0 rounded-sm object-cover"
-          loading="lazy"
-        />
-        <div class="min-w-0 flex-1">
-          <div class="truncate text-sm font-semibold text-black">
-            {it.donationData?.name || it.staticData.name}
-          </div>
-          <RaisedValue
-            class={'font-bold text-primary-600'}
-            item={it.donationData?.raised}
-          />
-          <Socials
-            website={it.staticData.website}
-            websites={it.staticData.websites}
-          />
-        </div>
-      </div>
-    </div>
-  )
+type CharityItemData = {
+  donationData?: JJCauseType
+  staticData: CharityStatic
 }
 
-// Closed (collapsed) version of the charity item: smaller icon with raised amount below
-export const CharityItemClosed: Component<{
-  item: { donationData?: JJCauseType; staticData: CharityStatic }
-}> = (props) => {
-  const it = props.item
-  return (
-    <div class="inline-block w-full">
-      <div class="flex h-full w-full flex-col items-center justify-center gap-1 rounded-2xl bg-linear-to-b from-neutral-50 to-neutral-100 p-2 text-black shadow-sm hover:brightness-105">
-        <img
-          src={it.donationData?.logo}
-          alt={it.donationData?.name || it.staticData.name}
-          class="h-10 w-10 shrink-0 rounded-sm object-cover"
-          loading="lazy"
-        />
-        <p class={'text-center text-xxs font-semibold'}>{it.staticData.name}</p>
-        <RaisedValue
-          class={'text-center text-xxs font-bold text-primary-600'}
-          item={it.donationData?.raised}
-        />
-      </div>
+const name = (it: CharityItemData) =>
+  it.donationData?.name || it.staticData.name
+
+/** A charity as a row: logo · name, raised, socials. */
+export const CharityItem: Component<{ item: CharityItemData }> = (props) => (
+  <div class={cn(tileSurface, 'flex items-center gap-3 p-2')}>
+    <Avatar
+      src={props.item.donationData?.logo}
+      alt=""
+      size="md"
+      fallback={name(props.item)[0]}
+    />
+    <div class="min-w-0 flex-1">
+      <p class="truncate text-sm font-semibold">{name(props.item)}</p>
+      <RaisedValue
+        class="text-raised text-sm font-bold"
+        item={props.item.donationData?.raised}
+      />
+      <Socials
+        website={props.item.staticData.website}
+        websites={props.item.staticData.websites}
+      />
     </div>
-  )
-}
+  </div>
+)
+
+// Collapsed sidebar version: logo, short name and raised amount
+export const CharityItemClosed: Component<{ item: CharityItemData }> = (
+  props,
+) => (
+  <div
+    class={cn(tileSurface, 'flex flex-col items-center gap-1 p-2 text-center')}
+  >
+    <Avatar
+      src={props.item.donationData?.logo}
+      alt=""
+      size="md"
+      fallback={name(props.item)[0]}
+    />
+    <p class="text-xxs leading-tight font-semibold">
+      {props.item.staticData.name}
+    </p>
+    <RaisedValue
+      class="text-raised text-xxs font-bold"
+      item={props.item.donationData?.raised}
+    />
+  </div>
+)
 
 export const OverviewComponent: Component<{ overview: Overview }> = (props) => {
   const isJJ = useIsJJ()
+  const rows = () => [
+    {
+      label: 'Total',
+      value: (
+        <RaisedValue
+          class="text-raised font-bold"
+          item={props.overview.raised.total}
+        />
+      ),
+    },
+    {
+      label: 'Donations',
+      value: isJJ() ? props.overview.donations : 0,
+    },
+    {
+      label: 'Collections distributed',
+      value: isJJ() ? props.overview.collections.redeemed : 0,
+    },
+  ]
   return (
-    <div class="flex w-full flex-col items-start justify-start gap-2 rounded-2xl bg-linear-to-b from-neutral-50 to-neutral-100 p-2 text-primary-600 hover:brightness-105">
-      <table class="w-full">
-        <tbody>
-        <tr>
-          <td class="align-middle text-xs text-black">Total</td>
-          <td class="text-right align-middle">
-            <RaisedValue
-              class={'font-bold text-primary-600'}
-              item={props.overview.raised.total}
-            />
-          </td>
-        </tr>
-        <tr>
-          <td class="align-middle text-xs text-black">Donations</td>
-          <td class="text-right align-middle">
-            <p class={'font-bold text-primary-600'}>
-              {isJJ() ? props.overview.donations : 0}
-            </p>
-          </td>
-        </tr>
-        <tr>
-          <td class="align-middle text-xs text-black">
-            Collections Distributed
-          </td>
-          <td class="text-right align-middle">
-            <p class={'font-bold text-primary-600'}>
-              {isJJ() ? props.overview.collections.redeemed : 0}
-            </p>
-          </td>
-        </tr>
-        </tbody>
-      </table>
-      <p class={'text-xs text-black'}>
+    <div class={cn(tileSurface, 'flex flex-col gap-1.5 p-3')}>
+      <dl class="flex flex-col gap-1 text-sm">
+        <For each={rows()}>
+          {(row) => (
+            <div class="flex items-baseline justify-between gap-2">
+              <dt class="text-fg-muted text-xs">{row.label}</dt>
+              <dd class="text-raised font-bold tabular-nums">{row.value}</dd>
+            </div>
+          )}
+        </For>
+      </dl>
+      <p class="text-fg-muted text-xxs">
         Last update,{' '}
         {DateTime.fromJSDate(props.overview.date).toLocaleString(
           DateTime.DATETIME_MED,
@@ -122,18 +118,17 @@ export const OverviewComponent: Component<{ overview: Overview }> = (props) => {
   )
 }
 
-// Closed (collapsed) version: only show total raised
-export const OverviewComponentClosed: Component<{ overview: Overview }> = (props) => {
-  return (
-    <div class="flex w-full flex-col items-center justify-center gap-1 rounded-2xl bg-linear-to-b from-neutral-50 to-neutral-100 p-2 text-primary-600 hover:brightness-105">
-      <RaisedValue
-        class={'text-center text-xs font-bold text-primary-600'}
-        item={props.overview.raised.total}
-      />
-    </div>
-  )
-}
-
+// Collapsed sidebar version: only the total raised
+export const OverviewComponentClosed: Component<{ overview: Overview }> = (
+  props,
+) => (
+  <div class={cn(tileSurface, 'p-2 text-center')}>
+    <RaisedValue
+      class="text-raised text-xs font-bold"
+      item={props.overview.raised.total}
+    />
+  </div>
+)
 
 const RaisedValue: Component<{ item?: Currencies; class?: string }> = (
   props,
@@ -159,137 +154,51 @@ const RaisedValue: Component<{ item?: Currencies; class?: string }> = (
   )
 }
 
+const socialIcons = {
+  discord: { label: 'Discord', Icon: DiscordIcon },
+  twitter: { label: 'Twitter', Icon: TwitterIcon },
+  instagram: { label: 'Instagram', Icon: InstagramIcon },
+  tiktok: { label: 'TikTok', Icon: TiktokIcon },
+  youtube: { label: 'YouTube', Icon: YoutubeIcon },
+  twitch: { label: 'Twitch', Icon: TwitchIcon },
+} as const
+
 const Socials: Component<{
   website?: string
-  websites?: {
-    discord?: string
-    twitter?: string
-    instagram?: string
-    tiktok?: string
-    facebook?: string
-    youtube?: string
-    twitch?: string
-  }
-}> = (p) => {
-  const w = p.websites
-  if (!w) return null as any
-  const iconClass = 'h-4 w-4'
-  // Hover helpers (use CreatorDialog.tsx as reference for hex values)
-  const linkHoverColor = (type: string) => {
-    switch (type) {
-      case 'twitch':
-        return 'hover:text-[#6441A4]'
-      case 'youtube':
-        return 'hover:text-[#FF0000]'
-      case 'twitter':
-        return 'hover:text-[#1DA1F2]'
-      case 'tiktok':
-        return 'hover:text-[#69C9D0]'
-      case 'instagram':
-        return 'hover:text-[#E4405F]'
-      case 'discord':
-        return 'hover:text-[#5865F2]'
-      default:
-        return 'hover:text-[#000000]'
-    }
-  }
-  const linkBGHoverColor = (type: string) => {
-    switch (type) {
-      case 'twitch':
-        return 'hover:bg-[#6441A4]/10'
-      case 'youtube':
-        return 'hover:bg-[#FF0000]/10'
-      case 'twitter':
-        return 'hover:bg-[#1DA1F2]/10'
-      case 'tiktok':
-        return 'hover:bg-[#69C9D0]/10'
-      case 'instagram':
-        return 'hover:bg-[#E4405F]/10'
-      case 'discord':
-        return 'hover:bg-[#5865F2]/10'
-      default:
-        return 'hover:bg-[#000000]/10'
-    }
+  websites?: Partial<Record<keyof typeof socialIcons | 'facebook', string>>
+}> = (props) => {
+  const links = () => {
+    const w = props.websites
+    if (!w) return []
+    return [
+      ...(props.website
+        ? [{ href: props.website, label: 'Website', Icon: FaSolidGlobe }]
+        : []),
+      ...(Object.keys(socialIcons) as (keyof typeof socialIcons)[])
+        .filter((key) => w[key])
+        .map((key) => ({ href: w[key]!, ...socialIcons[key] })),
+    ]
   }
   return (
-    <div class="flex flex-row items-center gap-1 text-black/70">
-      <Show when={p.website}>
-        <a
-          href={p.website!}
-          target="_blank"
-          rel="noreferrer"
-          aria-label="Website"
-          class={`rounded-full p-1 transition-colors ${linkHoverColor('website')} ${linkBGHoverColor('website')}`}
-        >
-          <FaSolidGlobe class={iconClass} />
-        </a>
-      </Show>
-      <Show when={w.discord}>
-        <a
-          href={w.discord!}
-          target="_blank"
-          rel="noreferrer"
-          aria-label="Discord"
-          class={`rounded-full p-1 transition-colors ${linkHoverColor('discord')} ${linkBGHoverColor('discord')}`}
-        >
-          <DiscordIcon class={iconClass} />
-        </a>
-      </Show>
-      <Show when={w.twitter}>
-        <a
-          href={w.twitter!}
-          target="_blank"
-          rel="noreferrer"
-          aria-label="Twitter"
-          class={`rounded-full p-1 transition-colors ${linkHoverColor('twitter')} ${linkBGHoverColor('twitter')}`}
-        >
-          <TwitterIcon class={iconClass} />
-        </a>
-      </Show>
-      <Show when={w.instagram}>
-        <a
-          href={w.instagram!}
-          target="_blank"
-          rel="noreferrer"
-          aria-label="Instagram"
-          class={`rounded-full p-1 transition-colors ${linkHoverColor('instagram')} ${linkBGHoverColor('instagram')}`}
-        >
-          <InstagramIcon class={iconClass} />
-        </a>
-      </Show>
-      <Show when={w.tiktok}>
-        <a
-          href={w.tiktok!}
-          target="_blank"
-          rel="noreferrer"
-          aria-label="TikTok"
-          class={`rounded-full p-1 transition-colors ${linkHoverColor('tiktok')} ${linkBGHoverColor('tiktok')}`}
-        >
-          <TiktokIcon class={iconClass} />
-        </a>
-      </Show>
-      <Show when={w.youtube}>
-        <a
-          href={w.youtube!}
-          target="_blank"
-          rel="noreferrer"
-          aria-label="YouTube"
-          class={`rounded-full p-1 transition-colors ${linkHoverColor('youtube')} ${linkBGHoverColor('youtube')}`}
-        >
-          <YoutubeIcon class={iconClass} />
-        </a>
-      </Show>
-      <Show when={w.twitch}>
-        <a
-          href={w.twitch!}
-          target="_blank"
-          rel="noreferrer"
-          aria-label="Twitch"
-          class={`rounded-full p-1 transition-colors ${linkHoverColor('twitch')} ${linkBGHoverColor('twitch')}`}
-        >
-          <TwitchIcon class={iconClass} />
-        </a>
-      </Show>
-    </div>
+    <Show when={links().length > 0}>
+      <div class="text-fg-muted -ml-1 flex flex-row flex-wrap items-center">
+        <For each={links()}>
+          {(link) => (
+            <a
+              href={link.href}
+              target="_blank"
+              rel="noreferrer"
+              aria-label={link.label}
+              class={cn(
+                'hover:text-fg rounded-full p-1 transition-colors hover:bg-black/5',
+                focusRing,
+              )}
+            >
+              <link.Icon class="size-3.5" />
+            </a>
+          )}
+        </For>
+      </div>
+    </Show>
   )
 }

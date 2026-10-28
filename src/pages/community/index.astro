@@ -3,10 +3,9 @@ import { getEntry } from 'astro:content'
 export const prerender = false
 import PageShell from '../../layouts/PageShell.astro'
 import { CommunityPage } from '../../components/features/community/CommunityPage.tsx'
-import {
-  MainCountdownSimple,
-  MainJJStartTimes,
-} from '../../components/common/ui/MainHeader.tsx'
+import { PageHeader } from '../../components/ui/PageHeader'
+import { Tile } from '../../components/ui/Tile'
+import { JJStartCountdown, JJStartTimes } from '../../components/ui/Countdown'
 import { serverClientPublic } from '../../lib/orpc/serverClient'
 import { getConfigYear } from '../../lib/utils/configYear'
 import { upcomingJJYear } from '../../lib/utils/jjYear'
@@ -44,33 +43,26 @@ const tagCatalog = HIDE_CONTENT
   description={`Community fundraisers and upcoming streams for Jingle Jam ${year}: fundraiser totals, who is streaming next, and links to donate. Community-run, not official.`}
   canonical="https://jinglejam.ostof.dev/community"
 >
-  {HIDE_CONTENT ? (
-    <div class="flex w-full flex-col items-center gap-1 rounded-xl border border-white/10 bg-white/5 p-4 text-center text-white text-white/90 sm:p-4">
-      <div class="flex flex-col items-center justify-center text-white">
-        <h1 class="w-full text-center fl-text-2xl/4xl">Jingle Jam {year} Community Fundraisers & Streams</h1>
-        <h2 class="text-center fl-text-lg/xl">
-          Coming soon for the next Jingle Jam!
-        </h2>
-        <p class="mt-2 max-w-2xl text-center text-white/90">
+  <div class="flex flex-col gap-3">
+    <PageHeader
+      title={`Jingle Jam ${year} Community Fundraisers & Streams`}
+      subtitle={HIDE_CONTENT ? 'Coming soon for the next Jingle Jam!' : undefined}
+    />
+    {HIDE_CONTENT ? (
+      <Tile class="flex flex-col items-center gap-4 text-center">
+        <p class="max-w-2xl text-sm sm:text-base">
           On the first day of Jingle Jam {year} (1 December) this page starts listing the community
           fundraisers with their totals and the community streams coming up next. Until then, see the{' '}
-          <a class="underline" href="/yogs">Yogscast Jingle Jam schedule</a>.
+          <a class="font-medium underline" href="/yogs">Yogscast Jingle Jam schedule</a>.
         </p>
-      </div>
-      <div class="w-full">
-        <MainCountdownSimple client:only="solid-js" />
-      </div>
-      <div class="w-full">
-        <MainJJStartTimes client:only="solid-js" />
-      </div>
-    </div>
-  ) : (
-    <div class="w-full flex flex-col justify-center items-stretch gap-4">
-      <h1 class="w-full text-center text-white fl-text-2xl/4xl">Jingle Jam {year} Community Fundraisers & Streams</h1>
+        <JJStartCountdown client:only="solid-js" />
+        <JJStartTimes client:only="solid-js" class="max-w-lg" />
+      </Tile>
+    ) : (
       <CommunityPage
         charitiesData={charityData?.data}
         tagCatalog={tagCatalog}
         client:only="solid-js" />
-    </div>
-  )}
+    )}
+  </div>
 </PageShell>

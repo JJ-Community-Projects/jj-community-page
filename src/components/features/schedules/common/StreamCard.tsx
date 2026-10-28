@@ -3,12 +3,18 @@ import type { Stream } from '../../../../lib/orpc/public/schemas/schedules.ts'
 import { DateTime } from 'luxon'
 import { useNow } from '../../../../lib/utils/useNow.ts'
 import { createModalSignal } from '../../../../lib/createModalSignal.ts'
-import { getStreamColor, getStreamColors, } from '../../../../functions/jjDatesToColors.ts'
+import {
+  getStreamColor,
+  getStreamColors,
+} from '../../../../functions/jjDatesToColors.ts'
 import { getTextColor } from '../../../../lib/utils/textColors.ts'
 import { ScheduleStreamDetailDialog } from './ScheduleStreamDetailDialog.tsx'
 import { twMerge } from 'tailwind-merge'
 import { FaBrandsTwitch, FaBrandsYoutube, FaSolidUsers } from 'solid-icons/fa'
 import type { UserDisplay } from '../../../../lib/orpc/public/schemas/UserDisplaySchema.ts'
+import { Avatar } from '../../../ui/Avatar'
+import { cn, focusRing } from '../../../ui/cn'
+import { LiveBadge } from '../../../ui/Labels'
 
 /**
  * Custom hook that manages state for schedule stream cards
@@ -200,17 +206,17 @@ const ScheduleStreamCardColored: Component<ScheduleStreamCardProps> = (
           onClick={() => modal.open()}
         >
           <div class="flex w-full flex-col items-center justify-center">
-            <p class="line-clamp-2 text-pretty text-lg font-bold uppercase tracking-widest">
+            <p class="line-clamp-2 text-lg font-bold tracking-widest text-pretty uppercase">
               {props.stream.title}
             </p>
             <Show when={props.stream.subtitle}>
-              <p class="line-clamp-1 text-pretty text-sm uppercase tracking-widest">
+              <p class="line-clamp-1 text-sm tracking-widest text-pretty uppercase">
                 {props.stream.subtitle}
               </p>
             </Show>
             <p class="text-sm">{formatDate()}</p>
             <Show when={showCountdown()}>
-              <p class="line-clamp-1 font-mono text-xs font-bold lowercase tracking-wide">
+              <p class="line-clamp-1 font-mono text-xs font-bold tracking-wide lowercase">
                 {countdown()}
               </p>
             </Show>
@@ -263,24 +269,24 @@ const ScheduleStreamCardSidebar: Component<ScheduleStreamCardProps> = (
           style={{ 'background-color': highlightColor }}
         />
 
-        <div class="flex flex-1 flex-col py-4 pl-2 pr-8 text-left">
+        <div class="flex flex-1 flex-col py-4 pr-8 pl-2 text-left">
           <div class="flex w-full origin-left flex-col items-start transition-transform group-hover:scale-105">
-            <p class="line-clamp-2 text-pretty text-lg font-bold uppercase tracking-widest">
+            <p class="line-clamp-2 text-lg font-bold tracking-widest text-pretty uppercase">
               {props.stream.title}
             </p>
             <Show when={props.stream.subtitle}>
-              <p class="line-clamp-1 text-pretty text-sm uppercase tracking-widest">
+              <p class="line-clamp-1 text-sm tracking-widest text-pretty uppercase">
                 {props.stream.subtitle}
               </p>
             </Show>
             <p class="text-sm">{formatDate()}</p>
             <Show when={showCountdown()}>
-              <p class="line-clamp-1 font-mono text-xs font-bold lowercase tracking-wide">
+              <p class="line-clamp-1 font-mono text-xs font-bold tracking-wide lowercase">
                 {countdown()}
               </p>
             </Show>
             <Show when={!showCountdown() && isLive()}>
-              <p class="text-md font-bold tracking-wide text-accent">LIVE</p>
+              <p class="text-md text-accent font-bold tracking-wide">LIVE</p>
             </Show>
             <UserInfo user={props.user} />
           </div>
@@ -335,24 +341,24 @@ const ScheduleStreamCardSidebarHover: Component<ScheduleStreamCardProps> = (
         {/* Overlay that animates from left to right on hover */}
         <div class="absolute inset-0 z-0 origin-left scale-x-0 transform rounded-2xl bg-linear-to-r from-(--stream-highlight-color) to-(--stream-highlight-color) opacity-0 transition-all duration-500 ease-in-out group-hover:scale-x-100 group-hover:opacity-100" />
 
-        <div class="z-2 relative flex grow flex-col px-1 py-4 text-left transition-colors duration-300 group-hover:text-(--stream-text-color)">
+        <div class="relative z-2 flex grow flex-col px-1 py-4 text-left transition-colors duration-300 group-hover:text-(--stream-text-color)">
           <div class="flex w-full flex-col items-start">
-            <p class="line-clamp-2 text-pretty text-lg font-bold uppercase tracking-widest">
+            <p class="line-clamp-2 text-lg font-bold tracking-widest text-pretty uppercase">
               {props.stream.title}
             </p>
             <Show when={props.stream.subtitle}>
-              <p class="line-clamp-1 text-pretty text-sm uppercase tracking-widest">
+              <p class="line-clamp-1 text-sm tracking-widest text-pretty uppercase">
                 {props.stream.subtitle}
               </p>
             </Show>
             <p class="text-sm">{formatDate()}</p>
             <Show when={showCountdown()}>
-              <p class="line-clamp-1 font-mono text-xs font-bold lowercase tracking-wide">
+              <p class="line-clamp-1 font-mono text-xs font-bold tracking-wide lowercase">
                 {countdown()}
               </p>
             </Show>
             <Show when={!showCountdown() && isLive()}>
-              <p class="text-md font-bold tracking-wide text-accent group-hover:text-(--stream-text-color)">
+              <p class="text-md text-accent font-bold tracking-wide group-hover:text-(--stream-text-color)">
                 LIVE
               </p>
             </Show>
@@ -397,22 +403,22 @@ const ScheduleStreamCardBottomBar: Component<ScheduleStreamCardProps> = (
       >
         <div class="flex grow flex-col px-5 py-4 text-center">
           <div class="flex w-full origin-center flex-col items-center justify-center transition-transform group-hover:scale-105">
-            <p class="line-clamp-2 text-pretty text-lg font-bold uppercase tracking-widest">
+            <p class="line-clamp-2 text-lg font-bold tracking-widest text-pretty uppercase">
               {props.stream.title}
             </p>
             <Show when={props.stream.subtitle}>
-              <p class="line-clamp-1 text-pretty text-sm uppercase tracking-widest">
+              <p class="line-clamp-1 text-sm tracking-widest text-pretty uppercase">
                 {props.stream.subtitle}
               </p>
             </Show>
             <p class="text-sm">{formatDate()}</p>
             <Show when={showCountdown()}>
-              <p class="line-clamp-1 font-mono text-xs font-bold lowercase tracking-wide">
+              <p class="line-clamp-1 font-mono text-xs font-bold tracking-wide lowercase">
                 {countdown()}
               </p>
             </Show>
             <Show when={!showCountdown() && isLive()}>
-              <p class="text-md font-bold tracking-wide text-accent">LIVE</p>
+              <p class="text-md text-accent font-bold tracking-wide">LIVE</p>
             </Show>
           </div>
           <UserInfo user={props.user} />
@@ -469,24 +475,24 @@ const ScheduleStreamCardBottomBarHover: Component<ScheduleStreamCardProps> = (
         {/* Overlay that animates from bottom to top on hover */}
         <div class="absolute inset-0 z-0 origin-bottom scale-y-0 transform rounded-2xl bg-linear-to-t from-(--stream-highlight-color) to-(--stream-highlight-color) opacity-0 transition-all duration-500 ease-in-out group-hover:scale-y-100 group-hover:opacity-100" />
 
-        <div class="z-2 relative flex grow flex-col px-5 py-4 text-center transition-colors duration-300 group-hover:text-(--stream-text-color)">
+        <div class="relative z-2 flex grow flex-col px-5 py-4 text-center transition-colors duration-300 group-hover:text-(--stream-text-color)">
           <div class="flex w-full flex-col items-center justify-center">
-            <p class="line-clamp-2 text-pretty text-lg font-bold uppercase tracking-widest">
+            <p class="line-clamp-2 text-lg font-bold tracking-widest text-pretty uppercase">
               {props.stream.title}
             </p>
             <Show when={props.stream.subtitle}>
-              <p class="line-clamp-1 text-pretty text-sm uppercase tracking-widest">
+              <p class="line-clamp-1 text-sm tracking-widest text-pretty uppercase">
                 {props.stream.subtitle}
               </p>
             </Show>
             <p class="text-sm">{formatDate()}</p>
             <Show when={showCountdown()}>
-              <p class="line-clamp-1 font-mono text-xs font-bold lowercase tracking-wide">
+              <p class="line-clamp-1 font-mono text-xs font-bold tracking-wide lowercase">
                 {countdown()}
               </p>
             </Show>
             <Show when={!showCountdown() && isLive()}>
-              <p class="text-md font-bold tracking-wide text-accent group-hover:text-(--stream-text-color)">
+              <p class="text-md text-accent font-bold tracking-wide group-hover:text-(--stream-text-color)">
                 LIVE
               </p>
             </Show>
@@ -563,22 +569,22 @@ const ScheduleStreamCardTopBar: Component<ScheduleStreamCardProps> = (
 
         <div class="flex grow flex-col px-5 py-4 text-center">
           <div class="flex w-full origin-center flex-col items-center justify-center transition-transform group-hover:scale-105">
-            <p class="line-clamp-2 text-pretty text-lg font-bold uppercase tracking-widest">
+            <p class="line-clamp-2 text-lg font-bold tracking-widest text-pretty uppercase">
               {props.stream.title}
             </p>
             <Show when={props.stream.subtitle}>
-              <p class="line-clamp-1 text-pretty text-sm uppercase tracking-widest">
+              <p class="line-clamp-1 text-sm tracking-widest text-pretty uppercase">
                 {props.stream.subtitle}
               </p>
             </Show>
             <p class="text-sm">{formatDate()}</p>
             <Show when={showCountdown()}>
-              <p class="line-clamp-1 font-mono text-xs font-bold lowercase tracking-wide">
+              <p class="line-clamp-1 font-mono text-xs font-bold tracking-wide lowercase">
                 {countdown()}
               </p>
             </Show>
             <Show when={!showCountdown() && isLive()}>
-              <p class="text-md font-bold tracking-wide text-accent">LIVE</p>
+              <p class="text-md text-accent font-bold tracking-wide">LIVE</p>
             </Show>
             <UserInfo user={props.user} />
           </div>
@@ -670,17 +676,17 @@ const ScheduleStreamCardTopBarHover: Component<ScheduleStreamCardProps> = (
 
         <div class="relative z-10 flex grow flex-col px-5 py-4 text-center transition-colors delay-100 duration-300 group-hover:text-(--stream-text-color)">
           <div class="flex w-full flex-col items-center justify-center">
-            <p class="line-clamp-2 text-pretty text-lg font-bold uppercase tracking-widest">
+            <p class="line-clamp-2 text-lg font-bold tracking-widest text-pretty uppercase">
               {props.stream.title}
             </p>
             <Show when={props.stream.subtitle}>
-              <p class="line-clamp-1 text-pretty text-sm uppercase tracking-widest">
+              <p class="line-clamp-1 text-sm tracking-widest text-pretty uppercase">
                 {props.stream.subtitle}
               </p>
             </Show>
             <p class="text-sm">{formatDate()}</p>
             <Show when={showCountdown()}>
-              <p class="line-clamp-1 font-mono text-xs font-bold lowercase tracking-wide">
+              <p class="line-clamp-1 font-mono text-xs font-bold tracking-wide lowercase">
                 {countdown()}
               </p>
             </Show>
@@ -703,7 +709,9 @@ const ScheduleStreamCardTopBarHover: Component<ScheduleStreamCardProps> = (
  */
 const LiveStreamIndicator: Component = () => {
   return (
-    <div class={'flex flex-row items-center justify-center gap-2 rounded-sm px-1'}>
+    <div
+      class={'flex flex-row items-center justify-center gap-2 rounded-sm px-1'}
+    >
       <p class={'text-xs font-bold tracking-wide'}>LIVE</p>
       <div class={'h-2 w-2'}>
         <span class="relative flex h-2 w-2">
@@ -737,7 +745,7 @@ const LiveStreamPulseWrapper: Component<LiveStreamPulseWrapperProps> = (
     <Switch>
       <Match when={props.isLive}>
         <div class="relative h-full w-full">
-          <div class="absolute h-full w-full animate-pulse rounded-2xl bg-accent-300 duration-300"></div>
+          <div class="bg-accent-300 absolute h-full w-full animate-pulse rounded-2xl duration-300"></div>
           <div class="absolute h-full w-full p-1">{props.children}</div>
         </div>
       </Match>
@@ -761,7 +769,7 @@ const UserInfo: Component<{ user?: UserDisplay }> = (props) => {
               loading="lazy"
             />
             <div class="min-w-0">
-              <p class="truncate text-ellipsis text-sm font-semibold">
+              <p class="truncate text-sm font-semibold text-ellipsis">
                 {user().username}
               </p>
             </div>
@@ -772,125 +780,63 @@ const UserInfo: Component<{ user?: UserDisplay }> = (props) => {
   )
 }
 
-export const UpcomingStreamsStreamCard: Component<ScheduleStreamCardProps> = (
-  props,
-) => {
+/**
+ * One upcoming stream as a compact row: day-colour stripe, owner avatar, title, owner and time, and a
+ * countdown or LIVE badge. Opens the stream's detail dialog. Sits on a tile or group surface.
+ */
+export const UpcomingStreamRow: Component<
+  ScheduleStreamCardProps & { class?: string }
+> = (props) => {
   const {
     modal,
-    now,
     showCountdown,
     isLive,
-    diff,
     countdown,
     formatDate,
     highlightColor,
-    textColor,
-    pallet,
   } = useScheduleStreamState(props.stream, props.streamColor)
-
-  const bg = () => {
-    /*if (props.stream.id < 0) {
-      return 'bg-primary-300 text-white'
-    }*/
-    return 'bg-white'
-  }
 
   return (
     <>
-      {/* white card with content */}
       <button
-        class={twMerge(
-          'group relative flex w-full flex-1 flex-col overflow-hidden rounded-2xl shadow-md transition-shadow duration-300 hover:shadow-lg',
-          bg(),
+        type="button"
+        class={cn(
+          'rounded-group bg-surface-strong ring-line hover:bg-surface relative flex w-full min-w-0 items-center gap-2 overflow-hidden py-2 pr-2 pl-3.5 text-left ring-1 transition-colors',
+          focusRing,
+          props.class,
         )}
         onClick={modal.open}
-        style={{
-          '--stream-highlight-color': highlightColor,
-          '--stream-text-color': textColor,
-        }}
       >
-        {/* Overlay that animates from top to bottom on hover */}
-        <div class="absolute inset-0 z-0 origin-top scale-y-0 transform rounded-2xl bg-linear-to-b from-(--stream-highlight-color) to-(--stream-highlight-color) opacity-0 transition-all duration-500 ease-in-out group-hover:scale-y-100 group-hover:opacity-100" />
-
-        {/* colored stripe at top */}
-        <div
-          class={twMerge(
-            'z-10 h-6 w-full rounded-t-2xl px-4 py-2',
-            isLive() && 'animate-pulse',
-          )}
+        <span
+          class="absolute inset-y-0 left-0 w-1.5"
           style={{ 'background-color': highlightColor }}
-        >
-          <div class="flex h-full w-full flex-row items-center gap-2 text-(--stream-text-color)">
-            <Show when={props.stream.participants.length > 0}>
-              <FaSolidUsers />
-            </Show>
-            <Show when={isLive()}>
-              <div class="flex flex-row items-center gap-1">
-                <p class="text-xs">LIVE</p>
-                <div class={'h-2 w-2'}>
-                  <span class="relative flex h-2 w-2">
-                    <span
-                      class={
-                        'relative inline-flex h-full w-full rounded-full bg-red-500'
-                      }
-                    />
-                    <span
-                      class={
-                        'absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75 duration-700'
-                      }
-                    />
-                  </span>
-                </div>
-              </div>
-            </Show>
-          </div>
+          aria-hidden="true"
+        />
+        <Show when={props.user}>
+          {(user) => (
+            <Avatar
+              src={user().profileImage}
+              alt=""
+              size="sm"
+              fallback={user().username[0]}
+            />
+          )}
+        </Show>
+        <div class="min-w-0 flex-1">
+          <p class="truncate text-sm font-semibold">{props.stream.title}</p>
+          <p class="text-fg-muted truncate text-xs">
+            <Show when={props.user}>{(user) => `${user().username} · `}</Show>
+            {formatDate()}
+          </p>
         </div>
-
-        <div class="relative z-10 flex grow flex-col p-2 text-left transition-colors delay-100 duration-300 group-hover:text-(--stream-text-color)">
-          <div
-            class={
-              'flex h-full w-full flex-row items-start justify-start gap-1'
-            }
-          >
-            <div class="flex w-full flex-1 flex-col items-start justify-start">
-              <div class={'flex w-full flex-row gap-1'}>
-                <p class="line-clamp-1 flex-1 text-ellipsis text-xs font-bold uppercase">
-                  {props.stream.title}
-                </p>
-                <Show when={props.user}>
-                  {(user) => {
-                    return (
-                      <div class="flex min-w-0 flex-row items-center justify-end gap-1">
-                        <img
-                          class="size-4 shrink-0 rounded-lg ring-1 ring-black/10"
-                          alt={user().username}
-                          src={user().profileImage}
-                          loading="lazy"
-                        />
-                        <div class="min-w-0">
-                          <p class="truncate text-xs font-semibold">
-                            {user().username}
-                          </p>
-                        </div>
-                      </div>
-                    )
-                  }}
-                </Show>
-              </div>
-              <Show when={props.stream.subtitle}>
-                <p class="truncate text-xs uppercase">
-                  {props.stream.subtitle}
-                </p>
-              </Show>
-              <p class="text-xs">{formatDate()}</p>
-              <Show when={showCountdown()}>
-                <p class="line-clamp-1 font-mono text-xxs font-bold lowercase tracking-wide">
-                  {countdown()}
-                </p>
-              </Show>
-            </div>
-          </div>
-        </div>
+        <Show when={isLive()}>
+          <LiveBadge class="shrink-0" />
+        </Show>
+        <Show when={!isLive() && showCountdown()}>
+          <span class="text-fg-muted text-xxs shrink-0 font-medium tabular-nums">
+            {countdown()}
+          </span>
+        </Show>
       </button>
       <ScheduleStreamDetailDialog
         stream={props.stream}
