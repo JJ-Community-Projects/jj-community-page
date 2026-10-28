@@ -13,7 +13,7 @@ interface TeamsGridProps {
 
 export function TeamsGrid(props: TeamsGridProps) {
   return (
-    <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+    <div class="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
       <For each={props.teams}>{(team) => <TeamCard team={team} />}</For>
     </div>
   )

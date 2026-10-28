@@ -12,10 +12,6 @@
   "src/components/common/QueryDebugger.tsx": {
     "raw-palette": 12
   },
-  "src/components/common/UserAvatar.tsx": {
-    "unknown": 2,
-    "hex": 6
-  },
   "src/components/features/admin/AdminCampaignsList.tsx": {
     "raw-palette": 6
   },
@@ -118,46 +114,11 @@
   "src/components/features/overlay/ticker/fundraisers/FundraisersByTeamConfigurator.tsx": {
     "raw-palette": 3
   },
-  "src/components/features/schedules/common/ScheduleStreamDetailDialog.tsx": {
-    "raw-palette": 2
-  },
-  "src/components/features/schedules/common/StreamCard.tsx": {
-    "unknown": 6,
-    "raw-palette": 4
-  },
-  "src/components/features/schedules/common/StreamParticipants.tsx": {
-    "hex": 1
-  },
-  "src/components/features/teams/public/TeamMembersSection.tsx": {
-    "hex": 2
-  },
-  "src/components/features/teams/public/TeamNextStreamsSection.tsx": {
-    "hex": 2
-  },
-  "src/components/features/users/public/FriendsSection.tsx": {
-    "hex": 2
-  },
-  "src/components/features/users/public/NextStreamsSection.tsx": {
-    "raw-palette": 1,
-    "hex": 2
-  },
-  "src/components/features/users/public/OtherSchedulesSection.astro": {
-    "raw-palette": 2,
-    "hex": 2
-  },
-  "src/components/features/users/public/RelatedSection.tsx": {
-    "hex": 2
-  },
   "src/components/features/users/public/social/TwitchLive.tsx": {
-    "unknown": 1,
     "raw-palette": 1
   },
   "src/components/features/users/public/UserHeader.tsx": {
     "hex": 1
-  },
-  "src/components/features/users/public/UserTeamsSection.astro": {
-    "raw-palette": 3,
-    "hex": 2
   },
   "src/components/features/users/user-dashboard/blocks/AvailableUsersToBlockList.tsx": {
     "raw-palette": 16
@@ -320,15 +281,5 @@
   },
   "src/pages/[...username]/index.astro": {
     "hex": 1
-  },
-  "src/pages/schedules/[...slug].astro": {
-    "raw-palette": 1
-  },
-  "src/pages/teams/[slug].astro": {
-    "hex": 2
-  },
-  "src/pages/teams/index.astro": {
-    "unknown": 1,
-    "raw-palette": 1
   }
 }

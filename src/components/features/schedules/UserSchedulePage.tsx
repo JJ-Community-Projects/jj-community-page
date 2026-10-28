@@ -1,36 +1,84 @@
-import { type Component } from 'solid-js'
-import { ScheduleProvider } from './common/ScheduleProvider.tsx'
+import { type Component, For, Show } from 'solid-js'
+import { DateTime } from 'luxon'
+import { FaSolidPlay } from 'solid-icons/fa'
 import {
-  DaysAccordion,
-  NextThreeStreams,
-  UserSchedulePageBodyDesktop,
-} from './desktop/UserSchedulePageBodyDesktop.tsx'
+  ScheduleProvider,
+  useScheduleTest,
+} from './common/ScheduleProvider.tsx'
+import { StreamTimeRow, UpcomingStreamRow } from './common/StreamCard.tsx'
 import type { FullSchedule } from '../../../lib/orpc/public/schemas/schedules.ts'
+import { DateDivider } from '../../ui/Labels'
+import { Section } from '../../ui/Tile'
 
 interface UserSchedulePageProps {
   initSchedule: FullSchedule
 }
 
-export const UserSchedulePage: Component<UserSchedulePageProps> = (props) => {
-  // Header/title should be rendered by the page shell (Astro). Keep this island focused on body content only.
+/** The next three streams of the schedule, with the owner on each row. */
+const NextStreams: Component = () => {
+  const { nextThreeStreams, schedule } = useScheduleTest()
   return (
-    <ScheduleProvider schedule={props.initSchedule}>
-      <div class="mx-auto w-full max-w-7xl">
-        <UserSchedulePageBodyDesktop />
-      </div>
-    </ScheduleProvider>
+    <Section title="Next Streams" icon={<FaSolidPlay />}>
+      <Show
+        when={nextThreeStreams().length > 0}
+        fallback={<p class="text-fg-muted text-sm">No upcoming streams.</p>}
+      >
+        <div class="grid gap-2 sm:grid-cols-3">
+          <For each={nextThreeStreams()}>
+            {(stream) => (
+              <UpcomingStreamRow stream={stream} user={schedule.owner} />
+            )}
+          </For>
+        </div>
+      </Show>
+    </Section>
+  )
+}
+
+/** Every day of the schedule: a date divider and its streams as time-block rows. */
+const ScheduleDays: Component = () => {
+  const { days } = useScheduleTest()
+  const label = (day: Date) =>
+    DateTime.fromJSDate(day, { zone: 'utc' })
+      .toLocal()
+      .toLocaleString({ weekday: 'long', month: 'long', day: 'numeric' })
+  return (
+    <section class="flex flex-col gap-3" aria-label="Schedule">
+      <h2 class="sr-only">Schedule</h2>
+      <For each={days()}>
+        {(day) => (
+          <div class="flex flex-col gap-2">
+            <DateDivider>{label(day.day)}</DateDivider>
+            <Show
+              when={day.streams.length > 0}
+              fallback={
+                <p class="text-on-canvas-muted text-center text-sm">
+                  No streams scheduled for this day.
+                </p>
+              }
+            >
+              <div class="flex flex-col gap-2">
+                <For each={day.streams}>
+                  {(stream) => <StreamTimeRow stream={stream} />}
+                </For>
+              </div>
+            </Show>
+          </div>
+        )}
+      </For>
+    </section>
   )
 }
 
 // Focused islands for page-level section composition
 export const NextStreamsIsland: Component<UserSchedulePageProps> = (props) => (
   <ScheduleProvider schedule={props.initSchedule}>
-    <NextThreeStreams />
+    <NextStreams />
   </ScheduleProvider>
 )
 
 export const FullScheduleIsland: Component<UserSchedulePageProps> = (props) => (
   <ScheduleProvider schedule={props.initSchedule}>
-    <DaysAccordion />
+    <ScheduleDays />
   </ScheduleProvider>
 )

@@ -1,10 +1,12 @@
 ---
 import PageShell from '../../layouts/PageShell.astro'
 import { serverClientPublic } from "../../lib/orpc/serverClient";
-import { TeamHeader } from "../../components/features/teams/public/TeamHeader";
+import { PageHeader } from "../../components/ui/PageHeader";
+import { Button } from "../../components/ui/Button";
+import { Alert, EmptyState } from "../../components/ui/Status";
+import { Tile } from "../../components/ui/Tile";
 import { TeamMembersSection } from "../../components/features/teams/public/TeamMembersSection";
 import { TeamNextStreamsSection } from "../../components/features/teams/public/TeamNextStreamsSection";
-import { TeamNotFoundState } from "../../components/features/teams/public/TeamErrorState";
 import { isNotFoundError } from "../../lib/utils/notFound";
 
 const { slug } = Astro.params;
@@ -44,38 +46,35 @@ const pageDescription = teamDescription
   ? teamDescription.length > 155 ? `${teamDescription.slice(0, 154).trimEnd()}…` : teamDescription
   : team ? `${team.name} is a Jingle Jam community team: see its members and their upcoming streams.` : undefined;
 
-// Semantic DS tokens with safe fallbacks; keep island prop contract (strings)
-const teamColors = {
-  primaryColor: 'var(--jj-color-primary-500, #E30E50)',
-  accentColor: 'var(--jj-color-accent-500, #3584BF)'
-};
 ---
 
 <PageShell title={pageTitle} description={pageDescription} robots="noindex,follow">
-  <div class="w-full flex flex-col justify-center items-stretch gap-4">
+  <div class="flex flex-col gap-3">
     {(!team || teamError) ? (
-      <div class="w-full">
-        <TeamNotFoundState client:only="solid-js" />
-      </div>
+      <Tile>
+        <EmptyState title="This team couldn't be loaded">
+          Please try again in a moment.
+          <Button slot="action" href="/teams" size="sm" variant="accent">Back to Teams</Button>
+        </EmptyState>
+      </Tile>
     ) : (
       <>
-        {/* Hero/Header: static, so the h1 is in the server HTML */}
-        <TeamHeader team={team} memberCount={members?.members.length ?? 0} teamColors={teamColors} />
+        <PageHeader
+          title={team.name}
+          subtitle={team.description ?? undefined}
+          back={{ href: '/teams', label: 'Teams' }}
+        />
 
         {(!membersError && members) ? (
-          <TeamMembersSection client:only="solid-js" members={members.members} teamColors={teamColors} />
+          <TeamMembersSection client:only="solid-js" members={members.members} />
         ) : membersError ? (
-          <div class="bg-white rounded-xl p-4 shadow-md border-2 border-danger-200">
-            <p class="text-danger-700 text-center">Unable to load team members. Please try again.</p>
-          </div>
+          <Alert tone="danger">Unable to load team members. Please try again.</Alert>
         ) : null}
 
         {(!streamsError && nextStreams && nextStreams.length > 0) ? (
-          <TeamNextStreamsSection client:only="solid-js" streams={nextStreams} teamSlug={slug} teamColors={teamColors} />
+          <TeamNextStreamsSection client:only="solid-js" streams={nextStreams} />
         ) : streamsError ? (
-          <div class="bg-white rounded-xl p-4 shadow-md border-2 border-danger-200">
-            <p class="text-danger-700 text-center">Unable to load upcoming streams. Please try again.</p>
-          </div>
+          <Alert tone="danger">Unable to load upcoming streams. Please try again.</Alert>
         ) : null}
       </>
     )}

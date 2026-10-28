@@ -8,6 +8,8 @@ import UserTeamsSection from '../../components/features/users/public/UserTeamsSe
 import OtherSchedulesSection from '../../components/features/users/public/OtherSchedulesSection.astro'
 import { ORPCError, ValidationError } from '@orpc/server'
 import PageShell from '../../layouts/PageShell.astro'
+import { Alert } from '../../components/ui/Status'
+import { Tile } from '../../components/ui/Tile'
 import { isNotFoundError } from '../../lib/utils/notFound'
 
 const { username } = Astro.params
@@ -93,26 +95,34 @@ const accentColor = /^#[0-9a-f]{3,8}$/i.test(userAccentColor)
 ---
 
 <PageShell title={pageTitle} description={pageDescription} robots="noindex,follow">
-  {error && <pre>ERROR: {JSON.stringify(error, null, 2)}</pre>}
+  {error && (
+    <Alert tone="danger" title="This profile couldn't be loaded">
+      Please try again in a moment.
+    </Alert>
+  )}
 
   {
     !error && user && (
-      <div class="w-full flex flex-col justify-center items-stretch gap-4">
-        <div class="w-full rounded-xl border-2 bg-white shadow-md transition-all duration-300 hover:shadow-lg">
-          <div class="p-4">
-            <div class="flex flex-col items-center text-center">
-              <div class="relative size-24 overflow-hidden rounded-full border-4" style={`border-color: ${accentColor}`}>
-                <img
-                  src={user.user.profileImage}
-                  alt={`${user.user.username}'s profile`}
-                  class="h-full w-full object-cover"
-                />
-              </div>
-              <h1 class="font-babas text-black fl-text-xl/2xl">{user.user.username}</h1>
-              <UserHeaderLinks client:only="solid-js" user={user} />
-            </div>
+      <div class="flex flex-col gap-3">
+        <Tile class="flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-4">
+          {/* A border (not a ring) in the user's accent colour */}
+          <div
+            class="shadow-tile size-24 shrink-0 overflow-hidden rounded-full border-4"
+            style={`border-color: ${accentColor}`}
+          >
+            <img
+              src={user.user.profileImage}
+              alt={`${user.user.username}'s profile`}
+              class="size-full object-cover"
+            />
           </div>
-        </div>
+          <div class="flex min-w-0 flex-1 flex-col gap-2">
+            <h1 class="truncate text-2xl font-bold tracking-tight sm:text-3xl">
+              {user.user.username}
+            </h1>
+            <UserHeaderLinks client:only="solid-js" user={user} />
+          </div>
+        </Tile>
         {user.primarySchedule && user.nextPrimaryStreams.length > 0 && (
           <NextStreamsSection
             client:only="solid-js"
@@ -122,42 +132,14 @@ const accentColor = /^#[0-9a-f]{3,8}$/i.test(userAccentColor)
           />
         )}
         {user.friends.length > 0 && (
-          <FriendsSection
-            client:only="solid-js"
-            friends={user.friends}
-            userColors={{
-              primaryColor: user.style.primaryColor,
-              accentColor: user.style.accentColor,
-            }}
-          />
+          <FriendsSection client:only="solid-js" friends={user.friends} />
         )}
-        {user.teams.length > 0 && (
-          <UserTeamsSection
-            teams={user.teams}
-            userColors={{
-              primaryColor: user.style.primaryColor,
-              accentColor: user.style.accentColor,
-            }}
-          />
-        )}
+        {user.teams.length > 0 && <UserTeamsSection teams={user.teams} />}
         {user.schedules.length > 0 && (
-          <OtherSchedulesSection
-            schedules={user.schedules}
-            userColors={{
-              primaryColor: user.style.primaryColor,
-              accentColor: user.style.accentColor,
-            }}
-          />
+          <OtherSchedulesSection schedules={user.schedules} />
         )}
         {user.related.length > 0 && (
-          <RelatedSection
-            client:only="solid-js"
-            related={user.related}
-            userColors={{
-              primaryColor: user.style.primaryColor,
-              accentColor: user.style.accentColor,
-            }}
-          />
+          <RelatedSection client:only="solid-js" related={user.related} />
         )}
       </div>
     )

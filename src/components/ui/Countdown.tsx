@@ -6,6 +6,7 @@ import {
   useNextJJStartDate,
 } from '../../lib/utils/jjDates'
 import { cn } from './cn'
+import { Tile } from './Tile'
 
 const units = ['days', 'hours', 'minutes', 'seconds'] as const
 
@@ -115,5 +116,17 @@ export const JJStartTimes: Component<{ class?: string }> = (props) => {
         )}
       </For>
     </div>
+  )
+}
+
+/** `JJStartCountdown` in its own small tile; the whole tile is gone while the event runs. */
+export const JJStartCountdownTile: Component<{ class?: string }> = (props) => {
+  const isJJ = useIsJJ()
+  return (
+    <Show when={!isJJ()}>
+      <Tile pad="sm" class={cn('flex justify-center', props.class)}>
+        <JJStartCountdown size="sm" />
+      </Tile>
+    </Show>
   )
 }

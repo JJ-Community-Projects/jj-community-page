@@ -1,51 +1,54 @@
-import { Show } from "solid-js";
-import { FaSolidUsers, FaSolidArrowRight } from "solid-icons/fa";
+import { Show } from 'solid-js'
+import { Dynamic } from 'solid-js/web'
+import { FaSolidChevronRight, FaSolidUsers } from 'solid-icons/fa'
+import { Tile } from '../../../ui/Tile'
+import { Chip } from '../../../ui/Labels'
 
 interface TeamCardProps {
   team: {
-    id: number;
-    name: string;
-    slug: string;
-    description: string | null;
-    memberCount: number;
-  };
+    name: string
+    slug: string
+    description: string | null
+    /** Shown as a chip when known (the profile's team list has no counts). */
+    memberCount?: number
+  }
+  /** Heading level of the team name: 2 on /teams, 3 inside a profile section. */
+  level?: 2 | 3
 }
 
+/** A team as a clickable tile: name, two lines of description, member count. */
 export function TeamCard(props: TeamCardProps) {
   return (
-    <a
+    <Tile
       href={`/teams/${props.team.slug}`}
-      class="
-        group relative overflow-hidden rounded-xl px-4 py-3
-        shadow-md hover:shadow-lg hover:scale-[1.02]
-        transition-all duration-300 ease-out transform
-        focus:ring-2 focus:ring-accent focus:ring-offset-2
-        active:scale-[0.98] border-2 border-accent-100 hover:border-accent-200
-        bg-white
-      "
+      pad="sm"
+      class="flex flex-col gap-1.5 p-3"
     >
-      <div class="space-y-3">
-        <h2 class="fl-text-lg/xl font-semibold text-neutral-800 group-hover:text-accent-700 transition-colors">
+      <div class="flex items-center gap-2">
+        <Dynamic
+          component={props.level === 3 ? 'h3' : 'h2'}
+          class="min-w-0 flex-1 truncate font-semibold"
+        >
           {props.team.name}
-        </h2>
-
-        <Show when={props.team.description}>
-          <p class="text-neutral-600 fl-text-sm/base line-clamp-2 leading-relaxed">
-            {props.team.description!.length > 100
-              ? props.team.description!.substring(0, 100) + '...'
-              : props.team.description
-            }
-          </p>
-        </Show>
-
-        <div class="flex items-center justify-between pt-2 border-t border-accent-100">
-          <span class="inline-flex items-center gap-1 px-2 py-1 bg-accent-50 text-accent-700 rounded-full fl-text-xs/sm font-medium">
-            <FaSolidUsers class="w-3 h-3" />
-            {props.team.memberCount} {props.team.memberCount === 1 ? 'member' : 'members'}
-          </span>
-          <FaSolidArrowRight class="w-4 h-4 text-accent-500 group-hover:text-accent-600 group-hover:translate-x-1 transition-all" />
-        </div>
+        </Dynamic>
+        <FaSolidChevronRight
+          class="text-fg-muted size-3 shrink-0"
+          aria-hidden="true"
+        />
       </div>
-    </a>
-  );
+      <Show when={props.team.description}>
+        <p class="text-fg-muted line-clamp-2 text-sm">
+          {props.team.description}
+        </p>
+      </Show>
+      <Show when={props.team.memberCount !== undefined}>
+        <div>
+          <Chip size="sm" icon={<FaSolidUsers class="size-2.5" />}>
+            {props.team.memberCount}{' '}
+            {props.team.memberCount === 1 ? 'member' : 'members'}
+          </Chip>
+        </div>
+      </Show>
+    </Tile>
+  )
 }

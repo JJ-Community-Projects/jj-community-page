@@ -6,7 +6,9 @@ import {
   FullScheduleIsland,
 } from '../../components/features/schedules/UserSchedulePage'
 import { DebugJSONView } from '../../components/common/DebugJSONView'
-import { FaSolidPlay } from 'solid-icons/fa'
+import { PageHeader } from '../../components/ui/PageHeader'
+import { Alert } from '../../components/ui/Status'
+import { Section } from '../../components/ui/Tile'
 import { isNotFoundError } from '../../lib/utils/notFound'
 
 const { slug } = Astro.params
@@ -53,69 +55,34 @@ const pageDescription = schedule
 ---
 
 <PageShell title={pageTitle} description={pageDescription} robots="noindex,follow">
-  <div class="w-full flex flex-col justify-center items-stretch gap-4">
-    <!-- Hero / Header (centered H1) -->
-    <div
-      class="group w-full bg-white rounded-xl shadow-md border-2 group-hover:border-accent-200 hover:shadow-lg transition-all duration-300 p-4"
-    >
-      <h1 class="fl-text-xl/2xl font-babas text-black text-center">
-        {pageTitleBase}
-      </h1>
-      {
-        ownerName && (
-          <div class="mt-1 text-center">
-            <a href={`/${ownerSlug}`} class="text-accent hover:underline">
-              {ownerName}
-            </a>
-          </div>
-        )
-      }
-    </div>
+  <div class="flex flex-col gap-3">
+    <PageHeader title={pageTitleBase}>
+      {ownerName && (
+        <span slot="subtitle">
+          by <a href={`/${ownerSlug}`} class="text-on-canvas font-semibold underline">{ownerName}</a>
+          {schedule && ` · Jingle Jam ${schedule.data.year}`}
+        </span>
+      )}
+    </PageHeader>
 
-    <!-- Error state (single card) -->
-    {
-      error && (
-        <div class="group w-full bg-white rounded-xl shadow-md border-2 group-hover:border-accent-200 hover:shadow-lg transition-all duration-300 p-4">
-          <div class="flex items-center gap-2 text-lg font-semibold mb-4">
-            <h2 class="fl-text-xl/2xl font-babas text-black group-hover:text-accent transition-all duration-300">
-              Error
-            </h2>
-          </div>
-          <p class="text-gray-800">{error.message}</p>
-        </div>
-      )
-    }
+    {error && (
+      <Alert tone="danger" title="This schedule couldn't be loaded">
+        {error.message}
+      </Alert>
+    )}
 
-    <!-- Next Streams section -->
-    {
-      !error && schedule && (
-        <NextStreamsIsland client:only="solid-js" initSchedule={schedule} />
-      )
-    }
+    {!error && schedule && (
+      <NextStreamsIsland client:only="solid-js" initSchedule={schedule} />
+    )}
 
-    <!-- Full Schedule section -->
-    {
-      !error && schedule && (
-        <FullScheduleIsland client:only="solid-js" initSchedule={schedule} />
-      )
-    }
+    {!error && schedule && (
+      <FullScheduleIsland client:only="solid-js" initSchedule={schedule} />
+    )}
 
-    <!-- Debug view (conditional) -->
-    {
-      !error && schedule && isDebug && (
-        <div class="group w-full bg-white rounded-xl shadow-md border-2 group-hover:border-accent-200 hover:shadow-lg transition-all duration-300 p-4">
-          <div class="flex items-center gap-2 text-lg font-semibold mb-4">
-            <h2 class="fl-text-xl/2xl font-babas text-black group-hover:text-accent transition-all duration-300">
-              Debug Data
-            </h2>
-          </div>
-          <DebugJSONView
-            client:only="solid-js"
-            data={schedule}
-            title="DEBUG Schedule Data"
-          />
-        </div>
-      )
-    }
+    {!error && schedule && isDebug && (
+      <Section title="Debug Data">
+        <DebugJSONView client:only="solid-js" data={schedule} title="DEBUG Schedule Data" />
+      </Section>
+    )}
   </div>
 </PageShell>
