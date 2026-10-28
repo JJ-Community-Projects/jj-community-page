@@ -72,10 +72,11 @@ const showBanner = now > showStart && now < showEnd;
       banner.classList.remove('hidden');
       banner.classList.add('flex');
     }
-    button.addEventListener('click', () => {
+    // The banner (and its button) is only rendered in some periods; gtag only exists on prod
+    button?.addEventListener('click', () => {
       feedbackLocalstorage.setItem(`feedback-${year}-banner`, 'false');
-      document.getElementById(`feedback-${year}-banner`).remove();
-      window.gtag('event', 'dismiss_' + `feedback-${year}-banner`);
+      document.getElementById(`feedback-${year}-banner`)?.remove();
+      window.gtag?.('event', 'dismiss_' + `feedback-${year}-banner`);
     });
   }
 </script>

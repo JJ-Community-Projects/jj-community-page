@@ -1,12 +1,10 @@
 ---
 import PWABaseLayout from "../../../../layouts/PWABaseLayout.astro";
 export const prerender = false;
-import {type FullSchedule} from "../../../../lib/model/ContentTypes";
-import {YogsScheduleComponent} from "../../../../components/yogs-pages/schedule/YogsScheduleComponent.tsx";
-import {contentScheduleToJs} from "../../../../content/loadScheduleFromContent";
 import {getEntry} from 'astro:content';
-import {loadAllCreatorsFromContent} from "../../../../content/loadCreatorsFromContent";
-import {MobileYogsScheduleComponent} from "../../../../components/yogs-pages/schedule/mobile/MobileYogsScheduleComponent.tsx";
+import {getYogsScheduleFromContent} from "../../../../content/getYogsScheduleFromContent.ts";
+import {compactYogsSchedule} from "../../../../lib/utils/compactYogsSchedule.ts";
+import {YogsResponsiveSchedule} from "../../../../components/yogs-pages/schedule/YogsResponsiveSchedule.tsx";
 
 const year = Astro.params.year
 const entry = year ? await getEntry('schedules', year) : undefined
@@ -15,9 +13,8 @@ if (!entry || !entry.data.visible) {
   return Astro.redirect('/yogs')
 }
 
-const schedule: FullSchedule = await contentScheduleToJs(entry.data)
-
-const creators = await loadAllCreatorsFromContent()
+// Same loader and island as /yogs/archive/[year]
+const schedule = await getYogsScheduleFromContent(Number(year))
 
 ---
 
@@ -111,32 +108,17 @@ const creators = await loadAllCreatorsFromContent()
         description={`The Yogscast Jingle Jam ${year} Interactive Schedule made by the Community`}
         canonical={`https://jinglejam.ostof.dev/yogs/archive/${year}`}
 >
-    <!--Show MobileYogsScheduleComponent on mobile screens-->
-
-
-    <div class="desktop-schedule w-full">
-        <YogsScheduleComponent
-                schedule={schedule}
-                creators={creators}
-                client:only="solid-js"
-        >
-        </YogsScheduleComponent>
-    </div>
-
-    <div class="mobile-schedule w-full">
-        <MobileYogsScheduleComponent
-          schedule={schedule}
-          creators={creators}
-          client:only="solid-js"
-        >
-        </MobileYogsScheduleComponent>
-    </div>
-    <p class="text-white text-center mt-4">
-        This Yogscast Jingle Jam schedule is maintained by the community.
-        If you find errors or see that a stream is missing use the contact info below.
-        Streams that appear here are not guaranteed to happen or might be delayed.
-        For more information visit the Jingle Jam Twitter page.
-        This schedule is a fan Project and not associated with the Jingle Jam, the Yogscast or their partners.
-    </p>
+    <YogsResponsiveSchedule
+        schedule={compactYogsSchedule(schedule)}
+        client:load
+    >
+        <p class="text-white text-center mt-4">
+            This Yogscast Jingle Jam schedule is maintained by the community.
+            If you find errors or see that a stream is missing use the contact info below.
+            Streams that appear here are not guaranteed to happen or might be delayed.
+            For more information visit the Jingle Jam Twitter page.
+            This schedule is a fan Project and not associated with the Jingle Jam, the Yogscast or their partners.
+        </p>
+    </YogsResponsiveSchedule>
 
 </PWABaseLayout>

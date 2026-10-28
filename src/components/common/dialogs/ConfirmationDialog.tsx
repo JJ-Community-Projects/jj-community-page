@@ -14,8 +14,8 @@ export const ConfirmationDialog: Component<ConfirmationDialogProps> = (props) =>
   return (
     <Dialog.Root open={props.isOpen} onOpenChange={props.onOpenChange}>
       <Dialog.Portal>
-        <Dialog.Overlay class="fixed inset-0 bg-black/50" />
-        <Dialog.Content class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-6 rounded-lg shadow-xl">
+        <Dialog.Overlay class="fixed inset-0 z-50 bg-black/50" />
+        <Dialog.Content class="fixed top-1/2 left-1/2 z-50 w-[calc(100%-2rem)] max-w-md transform -translate-x-1/2 -translate-y-1/2 bg-white p-6 rounded-lg shadow-xl">
           <Dialog.Title class="text-xl font-bold mb-4">{props.title}</Dialog.Title>
           <Dialog.Description class="mb-6">{props.text}</Dialog.Description>
           <div class="flex justify-end space-x-4">

@@ -1,6 +1,4 @@
 ---
-
-import BaseLayout from "../../layouts/BaseLayout.astro";---
-<BaseLayout>
-    <p>Schedule not found</p>
-</BaseLayout>
+// Same page and status as every other unknown schedule
+return Astro.rewrite('/404')
+---

@@ -14,7 +14,7 @@ export const AdminFXRateSection: Component = () => {
       <div class="flex items-center justify-between">
         <h2 class="text-lg font-semibold">FX: GBP → EUR</h2>
         <button
-          class="btn btn-sm"
+          class="rounded bg-accent px-3 py-1.5 text-sm text-white hover:opacity-90 disabled:opacity-50"
           onClick={() => rateQuery.refetch()}
           disabled={rateQuery.isFetching}
         >
@@ -22,7 +22,7 @@ export const AdminFXRateSection: Component = () => {
         </button>
       </div>
 
-      <div class="mt-2 text-sm text-neutral-300">
+      <div class="mt-2 text-sm text-neutral-600">
         <Show when={rateQuery.isSuccess} fallback={<span>Loading…</span>}>
           <div>
             Current rate: <span class="font-mono">{rateQuery.data?.toFixed(4)}</span>

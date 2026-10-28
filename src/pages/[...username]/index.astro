@@ -118,10 +118,7 @@ const accentColor = /^#[0-9a-f]{3,8}$/i.test(userAccentColor)
             client:only="solid-js"
             primarySchedule={user.primarySchedule}
             streams={user.nextPrimaryStreams}
-            userColors={{
-              primaryColor: user.style.primaryColor,
-              accentColor: user.style.accentColor,
-            }}
+            user={user.user}
           />
         )}
         {user.friends.length > 0 && (

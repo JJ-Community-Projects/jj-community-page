@@ -1,6 +1,4 @@
 ---
-import BaseLayout from "../../layouts/BaseLayout.astro";
+Astro.response.status = 500
+return Astro.rewrite('/500')
 ---
-<BaseLayout>
-    <p>An error occured</p>
-</BaseLayout>

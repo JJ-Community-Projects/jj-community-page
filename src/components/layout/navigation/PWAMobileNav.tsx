@@ -38,7 +38,7 @@ export const PWAMobileNav: Component<MobileNavProps> = (props) => {
         </div>
         <For each={props.yogsPaths}>
           {path => (
-            <a class="nav" href={`/pwa/yogs/archive/${path}`}>Yogs {path}</a>
+            <a class="nav" href={`/pwa/yogs/schedules/${path}`}>Yogs {path}</a>
           )}
         </For>
       </div>

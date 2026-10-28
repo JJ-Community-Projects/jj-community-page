@@ -87,18 +87,18 @@ export const ScheduleAdminEditorHeader: Component = () => {
   return (
     <>
       <div class="mb-6 rounded-2xl bg-white p-6 shadow-xl transition-transform">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-4">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1">
             <a
               href={`/dashboard/schedules`}
               class="flex flex-row items-center gap-1 text-primary hover:underline"
             >
               <FaSolidChevronLeft />
-              <p>Back to Dahboard</p>
+              <p>Back to Schedules</p>
             </a>
             <h1 class="text-2xl font-bold">Schedule Editor</h1>
           </div>
-          <div class="flex gap-2">
+          <div class="flex flex-wrap gap-2">
             <button
               onClick={showDeleteDialog.open}
               class="rounded-lg bg-red-500 px-4 py-2 text-white transition-all hover:bg-red-600"

@@ -50,7 +50,7 @@ const Body: Component = () => {
     theme() === 'blue'
       ? 'bg-accent'
       : theme() === 'black'
-        ? 'bg-gray'
+        ? 'bg-gray-500'
         : 'bg-primary'
 
   const mainRibbonColor = () => {
