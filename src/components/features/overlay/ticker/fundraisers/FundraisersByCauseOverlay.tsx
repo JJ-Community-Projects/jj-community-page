@@ -12,7 +12,6 @@ import { DEMO_CAUSE, DEMO_CAUSE_FUNDRAISERS } from '../../demoData.ts'
 export type CauseFundraiserProps = {
   causeId?: string
   theme?: 'default' | 'red' | 'blue'
-  speed?: number
   showRaised?: boolean
   currency?: 'GBP' | 'USD' | 'EUR'
   user?: string

@@ -9,7 +9,7 @@ type Props = {
   user?: string
   timezone?: string
   theme?: 'default' | 'red' | 'blue'
-  style?: 'filled' | 'stripe'
+  style?: 'filled' | 'striped'
   limit?: number
 }
 
@@ -50,7 +50,7 @@ const Body: Component<Props> = (props) => {
           {(data) => (
             <div class="flex flex-col gap-1">
               <Show
-                when={style() === 'stripe'}
+                when={style() === 'striped'}
                 fallback={
                   <UserScheduleOverlayHeader
                     title={data().schedule.name}
@@ -67,7 +67,7 @@ const Body: Component<Props> = (props) => {
               </Show>
               <For each={data().blocks}>
                 {(b) =>
-                  style() === 'stripe' ? (
+                  style() === 'striped' ? (
                     <OverlayStreamCardSidebar
                       stream={b}
                       timezone={data().timezone}

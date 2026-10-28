@@ -12,22 +12,11 @@
   "src/components/features/admin/tags/tag/AddTagPanel.tsx": {
     "hex": 2
   },
-  "src/components/features/overlay/charities/CharitiesOverlay.tsx": {
-    "hex": 2
-  },
-  "src/components/features/overlay/donationMatches/presets.ts": {
-    "hex": 3
-  },
-  "src/components/features/overlay/jjRibbons/basicRibbonLabel/BasicRibbonLabelOverlay.tsx": {
-    "hex": 3
-  },
   "src/components/features/overlay/jjRibbons/bigCampaignGoal/BigCampaignGoalOverlay.tsx": {
-    "raw-palette": 3,
-    "hex": 5
+    "raw-palette": 2
   },
   "src/components/features/overlay/jjRibbons/campaignGoal/CampaignGoalOverlay.tsx": {
-    "raw-palette": 3,
-    "hex": 5
+    "raw-palette": 2
   },
   "src/components/features/overlay/schedule/common/OverlayStreamCard.tsx": {
     "raw-palette": 6

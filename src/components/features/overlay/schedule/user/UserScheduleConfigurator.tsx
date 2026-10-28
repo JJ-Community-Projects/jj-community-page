@@ -9,7 +9,7 @@ import { useUser } from '../../../users/user-dashboard/providers/UserProvider.ts
 import { Select } from '../../../../ui/Select'
 
 type Theme = 'default' | 'red' | 'blue'
-type StreamStyle = 'filled' | 'stripe'
+type StreamStyle = 'filled' | 'striped'
 
 const LIMITS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
 
@@ -46,7 +46,7 @@ export const UserScheduleConfigurator: Component = () => {
       <Select
         label="Stream style"
         showLabel
-        options={['filled', 'stripe'] as StreamStyle[]}
+        options={['filled', 'striped'] as StreamStyle[]}
         value={streamStyle()}
         onChange={setStreamStyle}
         format={(v) => (v === 'filled' ? 'Filled' : 'Striped')}

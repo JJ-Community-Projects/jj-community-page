@@ -18,7 +18,7 @@ export const BasicRibbonLabelConfigurator: Component = () => {
 
   const url = createMemo(() =>
     buildUrl('/overlays/basic-ribbon-label', {
-      style: style(),
+      theme: style(),
       alignment: alignment(),
       text: text(),
     }),

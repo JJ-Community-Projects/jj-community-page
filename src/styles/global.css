@@ -86,6 +86,9 @@
   --color-accent: #3584bf;
   --color-accent-shade: #09437a;
 
+  /* The OBS overlays' black theme (ribbons, donation matches) */
+  --color-ink: #313131;
+
   --color-success-50: #d1fae5;
   --color-success-100: #a7f3d0;
   --color-success-200: #6ee7b7;

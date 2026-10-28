@@ -42,19 +42,19 @@ const Body: Component<{ barPosition: 'top' | 'bottom' }> = (props) => {
     theme() === 'blue'
       ? 'bg-accent'
       : theme() === 'black'
-        ? 'bg-gray-500'
+        ? 'bg-neutral-500'
         : 'bg-primary'
 
   const mainRibbonColor = () => {
-    if (theme() === 'blue') return '#3584BF'
-    if (theme() === 'black') return '#313131'
-    return '#E30E50'
+    if (theme() === 'blue') return 'var(--color-accent)'
+    if (theme() === 'black') return 'var(--color-ink)'
+    return 'var(--color-primary)'
   }
 
   const mainRibbonShadeColor = () => {
-    if (theme() === 'blue') return '#09437a'
-    if (theme() === 'black') return '#000000'
-    return '#57051f'
+    if (theme() === 'blue') return 'var(--color-accent-shade)'
+    if (theme() === 'black') return 'black'
+    return 'var(--color-primary-shade)'
   }
 
   const leftRibbonShape =

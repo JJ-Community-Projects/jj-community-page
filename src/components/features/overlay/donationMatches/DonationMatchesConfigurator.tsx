@@ -14,14 +14,14 @@ export const DonationMatchesConfigurator: Component = () => {
   const [previewData, setPreviewData] = createSignal<PreviewDataMode>('test')
 
   const url = createMemo(() =>
-    buildUrl('/overlays/donation-matches', { bg: bg() }),
+    buildUrl('/overlays/donation-matches', { theme: bg() }),
   )
 
   // Preview requests Example fixtures by default so the list is populated even
   // when no donation match is live; the OBS URL never includes `demo`.
   const previewUrl = createMemo(() =>
     buildUrl('/overlays/donation-matches', {
-      bg: bg(),
+      theme: bg(),
       demo: previewData() === 'test',
     }),
   )
@@ -35,7 +35,7 @@ export const DonationMatchesConfigurator: Component = () => {
     >
       <PreviewDataField value={previewData()} onChange={setPreviewData} />
       <Select
-        label="Background"
+        label="Theme"
         showLabel
         options={BG_PRESET_ORDER}
         value={bg()}

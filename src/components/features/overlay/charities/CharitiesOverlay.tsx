@@ -335,13 +335,13 @@ const CharityItem: Component<{
       : 'text-primary-500'
 
   const qrCodeFG = () =>
-    props.theme === 'red' || props.theme === 'blue' ? '#ffffff' : '#000000'
+    props.theme === 'red' || props.theme === 'blue' ? 'white' : 'black'
   const qrCodeBG = () =>
     props.theme === 'red'
-      ? '#E21350'
+      ? 'var(--color-primary-500)'
       : props.theme === 'blue'
-        ? '#3484BF'
-        : '#ffffff'
+        ? 'var(--color-accent-500)'
+        : 'white'
 
   const qrcodeUrl = () => {
     if (props.qrCode === 'fundraiser') {
