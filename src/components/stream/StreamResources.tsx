@@ -12,14 +12,20 @@ import { OverlayConfiguration } from '../features/overlay/overview/OverlayConfig
 import { PublicOverlayConfiguration } from '../features/overlay/overview/PublicOverlayConfiguration'
 import type { User } from '../../lib/auth/User'
 
-import img1 from '../../images/extension2025/JJ_Twitch_Extension_Screenshots_1.png'
-import img2 from '../../images/extension2025/JJ_Twitch_Extension_Screenshots_2.png'
-import img3 from '../../images/extension2025/JJ_Twitch_Extension_Screenshots_3.png'
+import panel1 from '../../images/extension2025/JJ_Twitch_Extension_Screenshots_1.png'
+import panel2 from '../../images/extension2025/JJ_Twitch_Extension_Screenshots_2.png'
+import panel3 from '../../images/extension2025/JJ_Twitch_Extension_Screenshots_3.png'
+import overlay1 from '../../images/extension2025/JJ_Twitch_Overlay_Screenshots_1.png'
+import overlay2 from '../../images/extension2025/JJ_Twitch_Overlay_Screenshots_2.png'
+import overlay3 from '../../images/extension2025/JJ_Twitch_Overlay_Screenshots_3.png'
+import overlay4 from '../../images/extension2025/JJ_Twitch_Overlay_Screenshots_4.png'
 import { BskyIcon, DiscordIcon, RedditIcon } from '../common/icons/JJIcons.tsx'
 
-const Carousel: Component = () => {
-  const alt = 'JJ Twitch Extension Screenshots'
-  const images = [img1, img2, img3]
+const Carousel: Component<{ images: ImageMetadata[]; alt: string }> = (
+  props,
+) => {
+  const alt = props.alt
+  const images = props.images
   const [idx, setIdx] = createSignal(0)
   const [lightbox, setLightbox] = createSignal<null | number>(null)
 
@@ -55,7 +61,7 @@ const Carousel: Component = () => {
         {images.map((src, i) => (
           <button
             class={twMerge(
-              'h-14 w-20 overflow-hidden rounded border border-transparent opacity-70 hover:opacity-100',
+              'h-14 w-20 overflow-hidden rounded border border-transparent bg-black/40 opacity-70 hover:opacity-100',
               i === idx() && 'border-accent-500 opacity-100',
             )}
             onClick={() => setIdx(i)}
@@ -144,7 +150,34 @@ export const StreamResources: Component<{ user: User | null }> = (props) => {
                 </a>
               </div>
 
-              <Carousel />
+              <Carousel
+                images={[panel1, panel2, panel3]}
+                alt="JJ Twitch Panel Extension Screenshots"
+              />
+
+              <div class="mt-6 flex flex-col items-center gap-1">
+                <p class="~text-lg/xl">Twitch Overlay Extension</p>
+                <a
+                  class="p-1 text-lg underline hover:text-twitch-100"
+                  href="https://dashboard.twitch.tv/extensions/9urrg74yzq8di9hqr5prsto5lbmq3x"
+                  target="_blank"
+                >
+                  Get the Overlay Extension on Twitch
+                </a>
+              </div>
+              <p class="text-center">
+                The Overlay sits on top of the Twitch video player and only
+                shows up while viewers hover over the stream.
+              </p>
+              <p class="text-center">
+                It has the same charities, fundraisers and schedules as the
+                Panel.
+              </p>
+
+              <Carousel
+                images={[overlay1, overlay2, overlay3, overlay4]}
+                alt="JJ Twitch Overlay Extension Screenshots"
+              />
 
               <a class="text-white underline" href="/twitch-extension/privacy">
                 Privacy Policy
