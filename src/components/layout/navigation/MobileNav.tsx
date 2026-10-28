@@ -49,6 +49,7 @@ export const MobileNav: Component<MobileNavProps> = (props) => {
         <a href="/community">Community</a>
         <a href="/community/schedule">Schedule</a>
         <a href="/teams">Teams</a>
+        <a href="/stream-resources">Stream Resources</a>
         <div class="group relative">
           <a
             href="/yogs"
@@ -65,7 +66,6 @@ export const MobileNav: Component<MobileNavProps> = (props) => {
           )}
         </For>
         <a href="/yogs/stats">Statistics</a>
-        <a href="/stream-resources">Stream Resources</a>
         <a href="/faq">FAQ</a>
         <Show when={isJJ()}>
           <a
