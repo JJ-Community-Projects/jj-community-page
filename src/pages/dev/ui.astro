@@ -1,0 +1,243 @@
+---
+// The UI primitives in src/components/ui/, rendered once each. Not on prod; noindex elsewhere.
+// In .astro files, element props of a Solid primitive (icon, action, media, trailing, …) go in as
+// named slots (`<Icon slot="icon" />`): a JSX expression passed as a prop renders as "undefined".
+import { env } from 'cloudflare:workers'
+import {
+  FaSolidHeart,
+  FaSolidInbox,
+  FaSolidPen,
+  FaSolidUsers,
+} from 'solid-icons/fa'
+import BaseLayout4xl from '../../layouts/BaseLayout4xl.astro'
+import { PageHeader } from '../../components/ui/PageHeader'
+import { Section, Tile, TileGroup } from '../../components/ui/Tile'
+import { ListRow } from '../../components/ui/ListRow'
+import { Button, IconButton } from '../../components/ui/Button'
+import { Avatar } from '../../components/ui/Avatar'
+import {
+  Chip,
+  DateDivider,
+  LiveBadge,
+  Raised,
+} from '../../components/ui/Labels'
+import {
+  Alert,
+  EmptyState,
+  Skeleton,
+  Spinner,
+} from '../../components/ui/Status'
+import { DevUiInteractive } from '../../components/features/dev/DevUiInteractive'
+
+if (env.ENVIRONMENT === 'PROD') {
+  return Astro.rewrite('/404')
+}
+
+const rows = [
+  {
+    name: 'Lewis',
+    subline: 'Watch Live · Dono Matching',
+    raised: '£12,480',
+    live: true,
+  },
+  {
+    name: 'A creator with a very long name that has to truncate',
+    subline: 'Visit Twitch',
+    raised: '£980',
+  },
+  { name: 'Quiet fundraiser', subline: undefined, raised: '£25' },
+]
+---
+
+<BaseLayout4xl title="UI primitives" robots="noindex,nofollow">
+  <div class="flex flex-col gap-4 px-2">
+    <PageHeader
+      title="UI primitives"
+      subtitle="Every component in src/components/ui/, as the pages use them."
+      back={{ href: '/', label: 'Home' }}
+    />
+
+    <DateDivider>Static (server-rendered)</DateDivider>
+
+    <Section title="Tile and Section">
+      <FaSolidUsers slot="icon" />
+      <Button slot="action" size="sm">
+        Action
+      </Button>
+      <div class="grid gap-2 sm:grid-cols-2">
+        <TileGroup>
+          TileGroup: a group inside a tile, without a shadow.
+        </TileGroup>
+        <TileGroup pad="md">TileGroup with md padding.</TileGroup>
+      </div>
+    </Section>
+
+    <div class="grid gap-2 sm:grid-cols-2">
+      <Tile href="#">Clickable Tile (whole tile is a link)</Tile>
+      <Tile pad="sm">Tile with sm padding</Tile>
+    </div>
+
+    <Section title="ListRow">
+      <div class="flex flex-col gap-2">
+        {rows.map((row) => (
+          <ListRow
+            surface="group"
+            href="#"
+            title={row.name}
+            subline={row.subline}
+          >
+            <Avatar slot="media" alt={row.name} size="sm" />
+            <Raised slot="trailing">{row.raised}</Raised>
+          </ListRow>
+        ))}
+        <ListRow
+          surface="group"
+          density="regular"
+          title="Regular density, no link"
+          subline="Second line, muted"
+        >
+          <Avatar
+            slot="media"
+            src="/android-chrome-192x192.png"
+            alt="Jingle Jam"
+            size="md"
+          />
+          <LiveBadge slot="trailing" />
+        </ListRow>
+      </div>
+    </Section>
+
+    <DateDivider>Rows on the canvas</DateDivider>
+    <div class="flex flex-col gap-2">
+      {rows.slice(0, 2).map((row) => (
+        <ListRow href="#" title={row.name} subline={row.subline}>
+          <Avatar slot="media" alt={row.name} size="sm" />
+          <Raised slot="trailing">{row.raised}</Raised>
+        </ListRow>
+      ))}
+    </div>
+
+    <Section title="Buttons">
+      <div class="flex flex-col gap-3">
+        <div class="flex flex-wrap items-center gap-2">
+          <Button variant="primary">Primary</Button>
+          <Button variant="accent">Accent</Button>
+          <Button>Secondary</Button>
+          <Button variant="ghost">Ghost</Button>
+          <Button variant="danger">Danger</Button>
+          <Button variant="primary" disabled>
+            Disabled
+          </Button>
+          <Button href="#" variant="accent">
+            <FaSolidPen class="size-3" /> Link
+          </Button>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <Button size="sm" variant="primary">
+            Small
+          </Button>
+          <Button size="sm">Small</Button>
+          <Button size="sm" brand="twitch">
+            Twitch
+          </Button>
+          <Button size="sm" brand="youtube">
+            YouTube
+          </Button>
+          <Button size="sm" brand="tiltify">
+            Tiltify
+          </Button>
+          <Button size="sm" brand="discord">
+            Discord
+          </Button>
+          <Button size="sm" brand="bluesky">
+            Bluesky
+          </Button>
+          <IconButton aria-label="Like" size="sm">
+            <FaSolidHeart />
+          </IconButton>
+          <IconButton aria-label="Like" variant="primary">
+            <FaSolidHeart />
+          </IconButton>
+        </div>
+      </div>
+    </Section>
+
+    <div class="flex flex-wrap gap-2">
+      <Button variant="canvas">Canvas button</Button>
+      <Chip tone="canvas">Canvas chip</Chip>
+    </div>
+
+    <Section title="Chips, badges, avatars">
+      <div class="flex flex-col gap-3">
+        <div class="flex flex-wrap items-center gap-2">
+          <Chip>Neutral</Chip>
+          <Chip tone="accent">Accent</Chip>
+          <Chip tone="primary">Primary</Chip>
+          <Chip color="#9bcd15">Minecraft</Chip>
+          <Chip color="#e252b2" size="sm">
+            Small, data colour
+          </Chip>
+          <LiveBadge />
+        </div>
+        <div class="flex flex-wrap items-end gap-3">
+          <Avatar alt="Xs" size="xs" />
+          <Avatar alt="Sm" size="sm" />
+          <Avatar alt="Md" size="md" src="/android-chrome-192x192.png" />
+          <Avatar alt="Lg" size="lg" ringColor="var(--color-accent)" />
+          <Avatar
+            alt="Xl"
+            size="xl"
+            shape="circle"
+            src="/android-chrome-192x192.png"
+            ringColor="var(--color-accent)"
+          />
+        </div>
+        <DateDivider tone="tile">Saturday, 6 December</DateDivider>
+        <div class="flex gap-6">
+          <Raised>£1,234</Raised>
+          <Raised size="md" label="Goal">
+            £5,000
+          </Raised>
+        </div>
+      </div>
+    </Section>
+
+    <Section title="Status">
+      <div class="flex flex-col gap-2">
+        <Alert title="Heads up">
+          Schedules lock 24 hours before the event.
+        </Alert>
+        <Alert tone="success">Saved.</Alert>
+        <Alert tone="warning" title="Unsaved changes">
+          Leave the page anyway?
+        </Alert>
+        <Alert tone="danger" title="Couldn't load your teams">
+          <Button slot="action" size="sm">
+            Retry
+          </Button>
+          The server didn't answer.
+        </Alert>
+        <TileGroup>
+          <EmptyState title="No friend requests">
+            <FaSolidInbox slot="icon" />
+            <Button slot="action" size="sm" variant="accent">
+              Find friends
+            </Button>
+            Requests you get show up here.
+          </EmptyState>
+        </TileGroup>
+        <div class="flex items-center gap-4">
+          <Spinner />
+          <Spinner size="md" label="Loading schedules…" />
+        </div>
+        <div class="flex flex-col gap-2">
+          <Skeleton class="h-4 w-48" />
+          <Skeleton class="h-10 w-full" />
+        </div>
+      </div>
+    </Section>
+
+    <DateDivider>Interactive (client)</DateDivider>
+    <DevUiInteractive client:only="solid-js" />
+  </div>
+</BaseLayout4xl>

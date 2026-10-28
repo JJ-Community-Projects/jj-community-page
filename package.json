@@ -40,7 +40,7 @@
     "@astrojs/sitemap": "^3.7.4",
     "@astrojs/solid-js": "^7.1.0",
     "@cf-wasm/photon": "^0.2.2",
-    "@kobalte/core": "^0.13.10",
+    "@kobalte/core": "^0.13.14",
     "@orpc/client": "1.15.7",
     "@orpc/contract": "1.15.7",
     "@orpc/experimental-durable-iterator": "1.15.7",

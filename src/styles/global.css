@@ -19,8 +19,10 @@
   --color-surface-2: var(--color-neutral-100);
   /* Inner groups and inputs inside a tile */
   --color-surface-strong: #ffffff;
-  /* Tile ring, dividers, input borders */
+  /* Tile ring, dividers */
   --color-line: rgb(0 0 0 / 0.05);
+  /* Input and control borders */
+  --color-line-strong: rgb(0 0 0 / 0.15);
   /* Text on a tile */
   --color-fg: var(--color-neutral-900);
   --color-fg-muted: var(--color-neutral-600);
