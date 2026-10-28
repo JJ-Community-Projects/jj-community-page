@@ -1,20 +1,19 @@
 ---
-import PageShell from '../layouts/PageShell.astro'
+import ErrorPage from '../layouts/ErrorPage.astro'
+import { Button } from '../components/ui/Button'
 
 // Astro renders this for any error thrown while rendering. Without it, the catch-all
 // `[...username]` would match `/500` and answer with the 404 page.
 export const prerender = false
 ---
 
-<PageShell
+
+<ErrorPage
   title="Something went wrong | Jingle Jam Community"
   description="An error occurred on the Jingle Jam Community site."
+  heading="Something went wrong"
+  code="500"
 >
-  <div class="flex w-full flex-col items-center gap-4 rounded-xl border border-white/10 bg-white/5 p-6 text-center text-white">
-    <h1 class="fl-text-2xl/4xl">Something went wrong</h1>
-    <p class="text-white/90">
-      This page couldn't be loaded. Please try again in a moment.
-    </p>
-    <a href="/" class="underline hover:text-accent">Back to the homepage</a>
-  </div>
-</PageShell>
+  This page couldn't be loaded. Please try again in a moment.
+  <Button slot="actions" href="/" size="sm" variant="primary">Back to the homepage</Button>
+</ErrorPage>

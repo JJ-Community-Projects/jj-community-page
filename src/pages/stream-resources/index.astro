@@ -1,6 +1,8 @@
 ---
 import PageShell from '../../layouts/PageShell.astro'
 import { StreamResources } from '../../components/stream/StreamResources'
+import FeedbackButtons from '../../components/layout/footer/FeedbackButtons.astro'
+import { PageHeader } from '../../components/ui/PageHeader'
 import { serverClientPublic } from '../../lib/orpc/serverClient'
 import { getConfigYear } from '../../lib/utils/configYear'
 import { upcomingJJYear } from '../../lib/utils/jjYear'
@@ -25,12 +27,13 @@ const year = upcomingJJYear(configYear, contentHidden ?? true)
     image: 'https://jinglejam.ostof.dev/jj-og-stream.png',
   }}
 >
-  <div class="mx-auto flex w-fit flex-col items-center p-1 text-center text-base text-white md:w-[70%] md:text-2xl">
-    <h1 class="p-2 text-2xl font-bold md:text-4xl">Jingle Jam Stream Resources</h1>
-    <p class="text-base text-white/90 md:text-xl">
-      Everything you need to integrate Jingle Jam into your stream: Twitch
-      Extension and OBS Overlays.
-    </p>
+  <div class="flex flex-col gap-3">
+    <PageHeader
+      title="Jingle Jam Stream Resources"
+      subtitle="Everything you need to integrate Jingle Jam into your stream: Twitch Extension and OBS Overlays."
+    >
+      <FeedbackButtons />
+    </PageHeader>
+    <StreamResources client:only="solid-js" user={user} />
   </div>
-  <StreamResources client:only="solid-js" user={user} />
 </PageShell>

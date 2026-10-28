@@ -77,7 +77,7 @@ export const Section: Component<SectionProps> = (props) => (
       </Show>
       <Dynamic
         component={props.level === 3 ? 'h3' : 'h2'}
-        class="min-w-0 flex-1 truncate text-base font-semibold"
+        class="min-w-0 flex-1 text-base font-semibold text-balance"
       >
         {props.title}
       </Dynamic>

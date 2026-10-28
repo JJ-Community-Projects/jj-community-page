@@ -1,0 +1,29 @@
+---
+import PageShell from './PageShell.astro'
+import { Tile } from '../components/ui/Tile'
+
+// The one error layout: 404 (unknown page, user, team, schedule), 500 and the auth error.
+interface Props {
+  /** `<title>`; the visible heading is `heading`. */
+  title: string
+  description?: string
+  heading: string
+  /** Short code above the heading, e.g. "404". */
+  code?: string
+}
+
+const { title, description, heading, code } = Astro.props
+---
+
+<PageShell title={title} description={description}>
+  <Tile class="mx-auto mt-4 flex w-full max-w-lg flex-col items-center gap-3 px-6 py-8 text-center sm:mt-8">
+    {code && <p class="text-sm font-semibold tracking-widest text-primary">{code}</p>}
+    <h1 class="text-2xl font-bold tracking-tight text-balance">{heading}</h1>
+    <div class="text-fg-muted max-w-prose text-sm sm:text-base">
+      <slot />
+    </div>
+    <div class="mt-2 flex flex-wrap justify-center gap-2">
+      <slot name="actions" />
+    </div>
+  </Tile>
+</PageShell>

@@ -3,14 +3,13 @@ import {
   useIsBeforeJJ,
   useIsJJ,
   useJJStartCountdown,
-  useNextJJStartDate,
 } from '../../../lib/utils/jjDates.ts'
-import { MainJJStartTimes } from '../../common/ui/MainHeader.tsx'
+import { Button } from '../../ui/Button'
+import { Countdown, JJStartTimes } from '../../ui/Countdown'
 
-// The card and its h1 ("Is the collection live?") are rendered by the page; this fills in the answer.
+// The tile and its h1 ("Is the collection live?") are rendered by the page; this fills in the answer.
 export const CollectionCountdown = () => {
   const isJJ = useIsJJ()
-
   const isBefore = useIsBeforeJJ()
 
   return (
@@ -19,45 +18,44 @@ export const CollectionCountdown = () => {
         <JJIsLive />
       </Show>
       <Show when={!isJJ() && isBefore()}>
-        <Countdown />
+        <NotLiveYet />
       </Show>
     </>
   )
 }
 
-const Countdown = () => {
+const answer = 'text-6xl font-black tracking-tight'
+
+const NotLiveYet = () => {
   const jjStartCountdown = useJJStartCountdown()
   return (
-    <>
-      <p class={'text-6xl'}>No</p>
-      <p>
-        Checkout the{' '}
-        <a href={'/yogs'} class={'underline'}>
-          Yogs Schedule
+    <div class="flex w-full flex-col items-center gap-4">
+      <p class={answer}>No</p>
+      <Countdown
+        label="The collection goes live in"
+        duration={jjStartCountdown()}
+      />
+      <JJStartTimes class="max-w-lg" />
+      <p class="text-fg-muted text-sm">
+        Meanwhile, check out the{' '}
+        <a href="/yogs" class="text-fg font-medium underline">
+          Yogs schedule
         </a>{' '}
         and the{' '}
-        <a href={'/community/schedule'} class={'underline'}>
-          Community Streams
+        <a href="/community/schedule" class="text-fg font-medium underline">
+          community streams
         </a>
+        .
       </p>
-      <div class={'mt-3 flex flex-col items-center sm:mt-4'}>
-        <p class={'text-lg font-semibold sm:text-xl'}>
-          The collection goes live in
-        </p>
-        <p class={'font-mono text-2xl tabular-nums tracking-tight sm:text-3xl'}>
-          {jjStartCountdown().toFormat("dd'd' hh'h' mm'm' ss's'")}
-        </p>
-      </div>
-      <MainJJStartTimes />
-    </>
+    </div>
   )
 }
 
-const JJIsLive = () => {
-  return (
-    <>
-      <p class={'text-6xl'}>YES</p>
-      <a href={'https://jinglejam.tiltify.com'} class={'underline'}>Donate to the Jingle Jam</a>
-    </>
-  )
-}
+const JJIsLive = () => (
+  <div class="flex flex-col items-center gap-4">
+    <p class={answer}>Yes</p>
+    <Button href="https://jinglejam.tiltify.com" variant="primary">
+      Donate to the Jingle Jam
+    </Button>
+  </div>
+)

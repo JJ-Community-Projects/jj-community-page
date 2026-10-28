@@ -1,5 +1,6 @@
 ---
-import PageShell from '../layouts/PageShell.astro'
+import ErrorPage from '../layouts/ErrorPage.astro'
+import { Button } from '../components/ui/Button'
 
 // Unmatched paths and the pages that rewrite here (unknown user, team, schedule) answer 404.
 export const prerender = false
@@ -12,19 +13,17 @@ const links = [
 ]
 ---
 
-<PageShell
+
+<ErrorPage
   title="Page not found | Jingle Jam Community"
   description="This page doesn't exist on the Jingle Jam Community site."
+  heading="Page not found"
+  code="404"
 >
-  <div class="flex w-full flex-col items-center gap-4 rounded-xl border border-white/10 bg-white/5 p-6 text-center text-white">
-    <h1 class="fl-text-2xl/4xl">Page not found</h1>
-    <p class="text-white/90">
-      The page, creator, team or schedule you're looking for doesn't exist.
-    </p>
-    <nav class="flex flex-wrap justify-center gap-4">
-      {links.map(({ href, label }) => (
-        <a href={href} class="underline hover:text-accent">{label}</a>
-      ))}
-    </nav>
-  </div>
-</PageShell>
+  The page, creator, team or schedule you're looking for doesn't exist.
+  <Fragment slot="actions">
+    {links.map(({ href, label }, i) => (
+      <Button href={href} size="sm" variant={i === 0 ? 'primary' : 'secondary'}>{label}</Button>
+    ))}
+  </Fragment>
+</ErrorPage>

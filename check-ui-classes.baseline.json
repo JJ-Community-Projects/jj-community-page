@@ -361,9 +361,6 @@
   "src/pages/[...username]/index.astro": {
     "hex": 1
   },
-  "src/pages/auth-error.astro": {
-    "raw-palette": 3
-  },
   "src/pages/schedules/[...slug].astro": {
     "raw-palette": 1
   },
