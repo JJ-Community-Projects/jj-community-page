@@ -10,7 +10,7 @@ export const CommunityCampaignGrid: Component = () => {
   return (
     <div class="flex w-full flex-col gap-3">
       <h2 class="text-on-canvas text-lg font-semibold">Fundraisers</h2>
-      <div class="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
+      <div class="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-3">
         <For each={campaignsSorted()}>
           {(campaign: JJCampaignType) => (
             <FundraiserCard campaign={campaign} currency={currency()} />

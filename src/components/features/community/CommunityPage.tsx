@@ -172,7 +172,7 @@ const Body: Component = () => {
 const CampaignGrid: Component = () => {
   const { campaignsSorted, currency } = useCommunityPage()
   return (
-    <div class="grid gap-2 sm:grid-cols-2">
+    <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
       <For each={campaignsSorted()}>
         {(campaign: JJCampaignType) => (
           <FundraiserCard campaign={campaign} currency={currency()} />
@@ -200,7 +200,7 @@ const CampaignGridByCause: Component = () => {
         {(group) => (
           <section class="flex flex-col gap-2">
             <CommunityCauseCard cause={group.cause} />
-            <div class="grid gap-2 sm:grid-cols-2">
+            <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
               <For each={group.campaigns}>
                 {(campaign) => (
                   <FundraiserCard campaign={campaign} currency={currency()} />

@@ -30,7 +30,7 @@ export const NextStreamsSection: Component<StreamsPreviewProps> = (props) => (
       </Button>
     }
   >
-    <div class="grid gap-2 sm:grid-cols-2">
+    <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
       <For each={props.streams}>
         {(stream) => <UpcomingStreamRow stream={stream} user={props.user} />}
       </For>

@@ -9,7 +9,7 @@ export const TeamNextStreamsSection: Component<{ streams: Stream[] }> = (
   props,
 ) => (
   <Section title="Upcoming Streams" icon={<FaSolidPlay />}>
-    <div class="grid gap-2 sm:grid-cols-2">
+    <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
       <For each={props.streams}>
         {(stream) => <UpcomingStreamRow stream={stream} />}
       </For>

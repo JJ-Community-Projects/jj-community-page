@@ -139,7 +139,7 @@ const ScheduleDay: Component<{ day: DateTime; streams: UserStream[] }> = (
   return (
     <section class="flex flex-col gap-2" aria-label={label()}>
       <DateDivider>{label()}</DateDivider>
-      <div class="grid gap-2 sm:grid-cols-2">
+      <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
         <For each={props.streams}>
           {(item) => (
             <UpcomingStreamRow stream={item.stream} user={item.owner} />

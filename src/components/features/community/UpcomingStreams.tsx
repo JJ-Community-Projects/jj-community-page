@@ -34,7 +34,7 @@ export const UpcomingStreams: Component = () => {
         <p class="text-fg-muted text-sm">No upcoming streams right now.</p>
       </Show>
       <Show when={upcomingStreams.isSuccess && items().length > 0}>
-        <div class="grid gap-2 sm:grid-cols-2">
+        <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
           <For each={visibleItems()}>
             {(item) => (
               <UpcomingStreamRow stream={item.stream} user={item.owner} />

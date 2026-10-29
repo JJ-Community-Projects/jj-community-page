@@ -23,7 +23,7 @@ export const CommunityUsers: Component = () => {
         <Alert tone="danger">Failed to load users.</Alert>
       </Show>
       <Show when={users.isSuccess && list().length > 0}>
-        <div class="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
+        <div class="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-3">
           <For each={list()}>{(user) => <CommunityUserItem user={user} />}</For>
         </div>
       </Show>

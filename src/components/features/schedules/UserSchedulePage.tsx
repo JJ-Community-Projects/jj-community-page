@@ -23,7 +23,7 @@ const NextStreams: Component = () => {
         when={nextThreeStreams().length > 0}
         fallback={<p class="text-fg-muted text-sm">No upcoming streams.</p>}
       >
-        <div class="grid gap-2 sm:grid-cols-3">
+        <div class="grid grid-cols-1 gap-2 sm:grid-cols-3">
           <For each={nextThreeStreams()}>
             {(stream) => (
               <UpcomingStreamRow stream={stream} user={schedule.owner} />
