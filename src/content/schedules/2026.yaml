@@ -1,6 +1,6 @@
 title: Yogscast Jingle Jam 2026
 timezone: "Europe/London"
-visible: false
+visible: true
 times:
   - start: 2026-12-01T11:00:00Z
     end: 2026-12-01T14:00:00Z
