@@ -18,6 +18,9 @@ import {
 } from '../utils/twitchLogins.ts'
 import type { TiltifyStore } from './TiltifyStore.ts'
 import type { TwitchTracker } from './TwitchTracker.ts'
+
+// Cause colours are entered by hand upstream; only pass on real hex values.
+const HEX_COLOR = /^#[0-9a-f]{3,8}$/i
 import type { CurrencyStore } from './CurrencyStore.ts'
 import type { UserTagsBuilder, UserWithTags } from './UserTagsBuilder.ts'
 import type { DonationMatchStore } from './DonationMatchStore.ts'
@@ -233,6 +236,7 @@ export class DisplayBuilder {
             name: c.name,
             logo: c.logo,
             description: c.description,
+            color: c.color && HEX_COLOR.test(c.color) ? c.color : undefined,
             url: c.url,
             donateUrl: c.donateUrl,
             raised: raised,
