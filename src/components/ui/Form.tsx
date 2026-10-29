@@ -238,9 +238,36 @@ type SegmentedProps = {
   class?: string
 }
 
-/** Pill bar with an accent fill on the selected option (the extension's tab bar). */
+/**
+ * Pill bar with an accent fill on the selected option (the extension's tab bar).
+ * With exactly two options it acts as a toggle: re-selecting the checked option
+ * switches to the other one.
+ */
 export const Segmented: Component<SegmentedProps> = (props) => {
   const id = createUniqueId()
+  // A checked radio fires no change event on a label click or Space, so flip
+  // to the other option here. Returns the value switched to, if any.
+  const toggleFrom = (value: string) => {
+    if (props.options.length !== 2 || value !== props.value) return
+    const other = props.options.find((o) => o.value !== value)
+    if (other) props.onChange(other.value)
+    return other?.value
+  }
+  // Space on a checked radio dispatches no click; toggle and move focus to the
+  // newly checked option, as the arrow keys do.
+  const onKeyDown = (e: KeyboardEvent, value: string) => {
+    if (e.key !== ' ') return
+    const target = e.currentTarget as HTMLInputElement
+    const next = toggleFrom(value)
+    if (next === undefined) return
+    e.preventDefault()
+    const inputs = target
+      .closest('[role="radiogroup"]')
+      ?.querySelectorAll<HTMLInputElement>('input[type="radio"]')
+    Array.from(inputs ?? [])
+      .find((input) => input.value === next)
+      ?.focus()
+  }
   return (
     <SegmentedControl
       value={props.value}
@@ -261,7 +288,11 @@ export const Segmented: Component<SegmentedProps> = (props) => {
             value={option.value}
             class="relative z-10 min-w-0 flex-1"
           >
-            <SegmentedControl.ItemInput class="peer" />
+            <SegmentedControl.ItemInput
+              class="peer"
+              onClick={() => toggleFrom(option.value)}
+              onKeyDown={(e) => onKeyDown(e, option.value)}
+            />
             <SegmentedControl.ItemLabel
               class={cn(
                 'text-fg-muted peer-focus-visible:outline-accent hover:text-fg flex cursor-pointer items-center justify-center gap-1.5 rounded-full font-semibold whitespace-nowrap transition-colors peer-focus-visible:outline-2 data-checked:text-white',
