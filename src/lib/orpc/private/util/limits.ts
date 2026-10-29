@@ -6,6 +6,7 @@ import type { JJDrizzleDatabase } from '../../../db/db.ts'
 // Centralized limits used across private procedures
 export const SCHEDULES_PER_USER_PER_YEAR = 3
 export const TAGS_PER_USER = 10
+export const TAGS_PER_STREAM = 10
 export const TEAMS_PER_USER = 10 // Max teams a user can be a member of
 export const TEAM_OWNER_PER_USER = 5 // Max teams a user can own
 export const STREAMS_PER_DATE = 8
@@ -64,6 +65,12 @@ export const userTagsCount = (db: JJDrizzleDatabase, userId: number) =>
 export const canAddTagFrom = (rows: { c: number }[]) => {
   const tags = rows[0]?.c ?? 0
   return { canAdd: tags < TAGS_PER_USER, tags, maxTags: TAGS_PER_USER } as const
+}
+
+/** Whether a stream may have these tags (TAGS_PER_STREAM); `tagIds` is the stream's full tag list. */
+export function streamTagLimit(tagIds: number[]) {
+  const tags = new Set(tagIds).size
+  return { canSet: tags <= TAGS_PER_STREAM, tags, maxTags: TAGS_PER_STREAM } as const
 }
 
 /** Whether another stream fits on `date` (STREAMS_PER_DATE), from the start times of the draft's streams. */

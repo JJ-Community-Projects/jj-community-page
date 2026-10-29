@@ -12,8 +12,9 @@ import {
 import { scheduleOwnerOrEditorMiddleware } from '../middleware.ts'
 import { draftCopyStatements } from '../utils.ts'
 import { assertStreamLockAvailableOrOwned, lockStreamEditing, unlockStreamEditing, } from '../streamEditingLock.ts'
-import { and, asc, eq, inArray, sql } from 'drizzle-orm'
+import { and, asc, eq, inArray, max, sql } from 'drizzle-orm'
 import { editStreamsTable } from '../../../../db/schema/edit-streams-schema.ts'
+import { streamsTable } from '../../../../db/schema/jj-schema.ts'
 import { editStreamParticipantsTable } from '../../../../db/schema/edit-stream-participants-schema.ts'
 import { editStreamTagsTable } from '../../../../db/schema/edit-stream-tags-schema.ts'
 import { tags as tagsTable } from '../../../../db/schema/tags-schema.ts'
@@ -25,6 +26,7 @@ import { scheduleEditingChannels } from '../channels.ts'
 import {
   movedStreamsDateLimit,
   streamDateLimitFromStarts,
+  streamTagLimit,
 } from '../../util/limits.ts'
 
 const os = implement({
@@ -113,6 +115,23 @@ function assertKnownTags(known: { id: number }[], ids: number[]) {
     throw new Error(`Unknown tag IDs: ${unknown.join(', ')}`)
 }
 
+/** Fails when a stream would get more than TAGS_PER_STREAM tags (F-87); `tagIds` is its full list. */
+function assertStreamTagLimit(tagIds: number[]) {
+  const limit = streamTagLimit(tagIds)
+  if (!limit.canSet)
+    throw new ORPCError('FORBIDDEN', {
+      message: 'Stream tag limit reached',
+      ...limit,
+    })
+}
+
+/** The highest published stream id of the schedule (null without streams). */
+const publishedMaxIdQuery = (db: JJDrizzleDatabase, scheduleId: number) =>
+  db
+    .select({ maxId: max(streamsTable.id) })
+    .from(streamsTable)
+    .where(eq(streamsTable.scheduleId, scheduleId))
+
 export const addStream = os.addStreamContract
   .use(authMiddleware)
   .use(scheduleOwnerOrEditorMiddleware)
@@ -132,12 +151,14 @@ export const addStream = os.addStreamContract
       tags,
     } = input
     const tagIds = [...new Set(tags ?? [])]
+    assertStreamTagLimit(tagIds)
 
-    // One batch: the draft copy, then the draft's streams (ids and start times), which give both
-    // the per-date limit and the smallest free id, and the tags to set (only when given).
-    const [, , , , draftStreams, desiredTags = []] = await db.batch([
+    // One batch: the draft copy, then the draft's streams (ids and start times) for the per-date
+    // limit, the highest published id, and the tags to set (only when given).
+    const [, , , , draftStreams, [published], desiredTags = []] = await db.batch([
       ...draftCopyStatements(db, scheduleId, editorId),
       draftStreamStartsQuery(db, scheduleId),
+      publishedMaxIdQuery(db, scheduleId),
       ...(tagIds.length > 0 ? [tagsByIdQuery(db, tagIds)] : []),
     ] as const)
     assertKnownTags(desiredTags, tagIds)
@@ -154,16 +175,10 @@ export const addStream = os.addStreamContract
       } as any)
     }
 
-    const nonNegSet = new Set(
-      draftStreams
-        .map((r) => Number(r.id))
-        .filter((id) => Number.isFinite(id) && id > 0),
-    )
-
-    let smallestAvailable = 1
-    while (nonNegSet.has(smallestAvailable)) smallestAvailable += 1
-
-    const id = smallestAvailable
+    // Above every draft and published id (F-54): a published stream deleted in the draft keeps
+    // its id, so publish deletes it instead of turning it into the new stream.
+    const id =
+      Math.max(0, published?.maxId ?? 0, ...draftStreams.map((r) => r.id)) + 1
     const stream = {
       id,
       scheduleId,
@@ -278,6 +293,7 @@ type StreamDetailsInput = {
  * - A patch-only save finds a missing stream through its update (0 rows changed). With several
  *   streams each update only matches while all of them exist, so nothing is written either.
  *   Streams with the same patch share one update.
+ * - More than TAGS_PER_STREAM tags on a stream answers FORBIDDEN before anything is read.
  * - A missing stream answers NOT_FOUND; a failed write batch INTERNAL_SERVER_ERROR. Either way
  *   nothing was written, and the caller broadcasts nothing.
  */
@@ -294,6 +310,7 @@ async function saveStreamsWithDetails(
       fields: Object.keys(fields).length > 0 ? fields : undefined,
     }
   })
+  for (const s of streams) if (s.tags !== undefined) assertStreamTagLimit(s.tags)
   const ids = [...new Set(streams.map((s) => s.id))]
   const withParticipants = streams.filter((s) => s.participants !== undefined)
   const withTags = streams.filter((s) => s.tags !== undefined)
