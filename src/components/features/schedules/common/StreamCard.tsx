@@ -197,8 +197,9 @@ export const UpcomingStreamRow: Component<
 }
 
 /**
- * A stream inside a day list (public schedule): time block in the day colour, title and subtitle,
- * countdown or LIVE on the right. Opens the stream's detail dialog.
+ * A stream inside a day list (public and community schedule), in the extension's slot layout: a time
+ * block in the day colour with start and end (LIVE joins it while live), title and subline, then the
+ * countdown and the owner's avatar on the right. Opens the stream's detail dialog.
  */
 export const StreamTimeRow: Component<
   ScheduleStreamCardProps & { class?: string }
@@ -209,45 +210,63 @@ export const StreamTimeRow: Component<
     DateTime.fromJSDate(date, { zone: 'utc' })
       .toLocal()
       .toLocaleString(DateTime.TIME_SIMPLE)
+  const subline = () =>
+    [props.user?.username, props.stream.subtitle].filter(Boolean).join(' · ')
 
   return (
     <>
       <button
         type="button"
         class={cn(
-          'rounded-group bg-surface-strong ring-line hover:bg-surface flex w-full min-w-0 items-stretch gap-3 overflow-hidden text-left ring-1 transition-colors',
+          'rounded-group bg-surface-strong ring-line hover:bg-surface flex min-h-14 w-full min-w-0 items-stretch gap-3 overflow-hidden text-left ring-1 transition-colors',
           focusRing,
           props.class,
         )}
         onClick={modal.open}
       >
         <span
-          class="flex w-16 shrink-0 flex-col items-center justify-center px-1 py-2 text-xs leading-tight font-semibold tabular-nums"
+          class="flex w-16 shrink-0 flex-col items-center justify-center gap-0.5 px-1 py-2 text-xs leading-tight font-semibold tabular-nums"
           style={{ 'background-color': highlightColor, color: textColor }}
         >
           <Show when={!props.stream.isTimeTBD} fallback="TBD">
             <span>{time(props.stream.start)}</span>
+            {/* Inverted colours so the label stands out inside the block */}
+            <Show when={isLive()}>
+              <span
+                class="text-xxs rounded-full px-1.5 leading-tight font-bold tracking-wide uppercase"
+                style={{ 'background-color': textColor, color: highlightColor }}
+              >
+                Live
+              </span>
+            </Show>
             <span class="opacity-80">{time(props.stream.end)}</span>
           </Show>
         </span>
-        <span class="min-w-0 flex-1 py-2">
+        <span class="flex min-w-0 flex-1 flex-col justify-center py-2">
           <span class="block truncate text-sm font-semibold">
             {props.stream.title}
           </span>
-          <Show when={props.stream.subtitle}>
+          <Show when={subline()}>
             <span class="text-fg-muted block truncate text-xs">
-              {props.stream.subtitle}
+              {subline()}
             </span>
           </Show>
         </span>
-        <span class="flex shrink-0 items-center pr-2">
-          <Show when={isLive()}>
-            <LiveBadge />
-          </Show>
-          <Show when={!isLive() && showCountdown()}>
+        <span class="flex shrink-0 flex-col items-end justify-center gap-1 py-2 pr-2">
+          <Show when={showCountdown()}>
             <span class="text-fg-muted text-xxs font-medium tabular-nums">
               {countdown()}
             </span>
+          </Show>
+          <Show when={props.user}>
+            {(user) => (
+              <Avatar
+                src={user().profileImage}
+                alt=""
+                size="sm"
+                fallback={user().username[0]}
+              />
+            )}
           </Show>
         </span>
       </button>

@@ -1,4 +1,4 @@
-import { type Component, createMemo, For, Show } from 'solid-js'
+import { type Component, createMemo, createSignal, For, Show } from 'solid-js'
 import { useIsJJ } from '../../../../lib/utils/jjDates.ts'
 import { createI18n, I18nProvider } from 'solid-i18n'
 import { QueryClient } from '@tanstack/query-core'
@@ -8,7 +8,8 @@ import { useLocale } from '@kobalte/core'
 import type { CharitiesStatic } from '../../../../content/schema.ts'
 import { CurrencyProvider } from '../../../common/CurrencyProvider.tsx'
 import { CharityOverviewProvider } from '../../../common/charityOverview/CharityOverviewProvider.tsx'
-import { UpcomingStreamRow } from '../common/StreamCard.tsx'
+import { StreamTimeRow } from '../common/StreamCard.tsx'
+import { getStreamColor } from '../../../../functions/jjDatesToColors.ts'
 import {
   CommunityCharitiesOverview,
   CommunityCharitiesOverviewMobile,
@@ -21,7 +22,8 @@ import { DateTime } from 'luxon'
 import { useNow } from '../../../../lib/utils/useNow.ts'
 import { HeadlinerTicker } from '../common/HeadlinerTicker.tsx'
 import { JJStartCountdown } from '../../../ui/Countdown'
-import { DateDivider } from '../../../ui/Labels'
+import { Accordion, AccordionItem } from '../../../ui/Accordion'
+import { LiveBadge } from '../../../ui/Labels'
 import { Alert, Spinner } from '../../../ui/Status'
 import { Tile } from '../../../ui/Tile'
 
@@ -101,51 +103,87 @@ const FullSchedule: Component<{ schedule: FullCommunitySchedule }> = (
     }))
   })
 
+  // Opens on today; before or between event days on the next day with streams; afterwards all closed.
+  const today = DateTime.local().toFormat('yyyy-MM-dd')
+  const openDay = days().find((d) => d.day.toFormat('yyyy-MM-dd') >= today)
+  const [open, setOpen] = createSignal<string[]>(
+    openDay ? [openDay.day.toFormat('yyyy-MM-dd')] : [],
+  )
+
   return (
     <div class="flex flex-col gap-3">
       <p class="text-on-canvas-muted text-sm">
         {props.schedule.streams.length} streams, in your time zone
       </p>
-      <For each={days()}>
-        {(day) => <ScheduleDay day={day.day} streams={day.streams} />}
-      </For>
+      <Accordion
+        multiple
+        collapsible
+        value={open()}
+        onChange={setOpen}
+        class="flex flex-col gap-2"
+      >
+        <For each={days()}>
+          {(day) => <ScheduleDay day={day.day} streams={day.streams} />}
+        </For>
+      </Accordion>
     </div>
   )
 }
 
+/** One day as an accordion item in the day's colour; its streams use the same colour for their time blocks. */
 const ScheduleDay: Component<{ day: DateTime; streams: UserStream[] }> = (
   props,
 ) => {
   const now = useNow()
+  const color = getStreamColor(props.day)
   const liveCount = () =>
     props.streams.filter(
       (s) =>
         DateTime.fromJSDate(s.stream.start) < now() &&
         DateTime.fromJSDate(s.stream.end) > now(),
     ).length
-  const label = () =>
-    [
-      props.day.toLocaleString({
-        weekday: 'long',
-        month: 'long',
-        day: 'numeric',
-      }),
-      `${props.streams.length} ${props.streams.length === 1 ? 'stream' : 'streams'}`,
-      liveCount() > 0 ? `${liveCount()} live` : undefined,
-    ]
-      .filter(Boolean)
-      .join(' · ')
 
   return (
-    <section class="flex flex-col gap-2" aria-label={label()}>
-      <DateDivider>{label()}</DateDivider>
+    <AccordionItem
+      value={props.day.toFormat('yyyy-MM-dd')}
+      level={2}
+      title={
+        <span class="flex items-center gap-2">
+          <span
+            class="h-5 w-1.5 shrink-0 rounded-full"
+            style={{ 'background-color': color }}
+            aria-hidden="true"
+          />
+          {props.day.toLocaleString({
+            weekday: 'long',
+            month: 'long',
+            day: 'numeric',
+          })}
+        </span>
+      }
+      summary={
+        <>
+          <Show when={liveCount() > 0}>
+            <LiveBadge label={`${liveCount()} live`} />
+          </Show>
+          <span class="text-fg-muted text-xs font-normal">
+            {props.streams.length}{' '}
+            {props.streams.length === 1 ? 'stream' : 'streams'}
+          </span>
+        </>
+      }
+    >
       <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
         <For each={props.streams}>
           {(item) => (
-            <UpcomingStreamRow stream={item.stream} user={item.owner} />
+            <StreamTimeRow
+              stream={item.stream}
+              user={item.owner}
+              streamColor={color}
+            />
           )}
         </For>
       </div>
-    </section>
+    </AccordionItem>
   )
 }
