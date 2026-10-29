@@ -18,6 +18,7 @@ import type { CharitiesStatic } from '../../../content/schema.ts'
 import {
   CommunityCharitiesOverview,
   CommunityCharitiesOverviewMobile,
+  sidebarNeighbour,
 } from '../../common/charityOverview/CommunityCharitiesOverview.tsx'
 import { CharityOverviewProvider } from '../../common/charityOverview/CharityOverviewProvider.tsx'
 import { CurrencyProvider } from '../../common/CurrencyProvider.tsx'
@@ -140,7 +141,10 @@ const Body: Component = () => {
         <aside class="hidden shrink-0 lg:block" aria-label="Charities">
           <CommunityCharitiesOverview />
         </aside>
-        <div class="flex min-w-0 flex-1 flex-col gap-3">
+        <div
+          class="flex min-w-0 flex-1 flex-col gap-3"
+          style={sidebarNeighbour}
+        >
           <HeadlinerTicker />
           <UpcomingStreams />
           <FundraiserToolbar title="Fundraisers" />

@@ -13,6 +13,7 @@ import { getStreamColor } from '../../../../functions/jjDatesToColors.ts'
 import {
   CommunityCharitiesOverview,
   CommunityCharitiesOverviewMobile,
+  sidebarNeighbour,
 } from '../../../common/charityOverview/CommunityCharitiesOverview.tsx'
 import type {
   FullCommunitySchedule,
@@ -64,7 +65,10 @@ const Body: Component = () => {
         <aside class="hidden shrink-0 lg:block" aria-label="Charities">
           <CommunityCharitiesOverview />
         </aside>
-        <div class="flex min-w-0 flex-1 flex-col gap-3">
+        <div
+          class="flex min-w-0 flex-1 flex-col gap-3"
+          style={sidebarNeighbour}
+        >
           <HeadlinerTicker />
           <Show when={scheduleQuery.data}>
             {(schedule) => <FullSchedule schedule={schedule()} />}

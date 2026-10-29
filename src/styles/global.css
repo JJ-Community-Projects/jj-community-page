@@ -61,6 +61,42 @@
   }
 }
 
+/*
+ * Charity sidebar open/close (CommunityCharitiesOverview) runs as a view transition: every named part
+ * (tile, logo, name, amount, totals) morphs from its wide to its compact place and back. Tiles stretch
+ * their snapshot to the animated box; text keeps its size and cross-fades while it travels; extras (in
+ * only one layout: "Raised", chevron, teaser, the other totals) fade out fast or fade in at the end. The
+ * page column next to the sidebar slides as its new layout instead of cross-fading with the old one.
+ */
+::view-transition-group(*) {
+  animation-duration: 350ms;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+::view-transition-old(.charity-surface),
+::view-transition-new(.charity-surface) {
+  width: 100%;
+  height: 100%;
+}
+::view-transition-old(.charity-text),
+::view-transition-new(.charity-text) {
+  width: auto;
+  height: auto;
+}
+::view-transition-old(.charity-extra) {
+  animation-duration: 120ms;
+}
+::view-transition-new(.charity-extra) {
+  animation-delay: 230ms;
+  animation-duration: 120ms;
+}
+::view-transition-old(charity-main) {
+  display: none;
+}
+::view-transition-new(charity-main) {
+  animation: none;
+  width: auto;
+}
+
 @theme {
   /* Body text uses Tailwind's default system stack (--font-sans); Bebas is the Yogs schedule grid's display font */
   --font-babas: Bebas;

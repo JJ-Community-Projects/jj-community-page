@@ -31,13 +31,42 @@ const name = (it: CharityItemData) =>
   it.donationData?.name || it.staticData.name
 
 /**
+ * Inline style that gives an element a view-transition-name, so the sidebar's open/close view transition
+ * (CommunityCharitiesOverview) morphs it from its wide to its compact place. The kind picks its motion in
+ * global.css: a surface stretches to the animated box, text keeps its size and cross-fades, an extra
+ * (only in one of the two layouts) fades out quickly or fades in late.
+ */
+export const morphStyle = (
+  name: string | undefined,
+  kind?: 'surface' | 'text' | 'extra',
+) =>
+  name === undefined
+    ? undefined
+    : {
+        'view-transition-name': name,
+        ...(kind ? { 'view-transition-class': `charity-${kind}` } : {}),
+      }
+
+// The view-transition-name of one part of the charity at `index` in the sidebar; none outside it.
+const part = (index: number | undefined, name: string) =>
+  index === undefined ? undefined : `charity-${index}-${name}`
+
+/**
  * A charity as a row in the extension's look: logo · name over a one-line description teaser · raised ·
  * chevron. It opens in place to the full description and the socials; the teaser fades out meanwhile.
  */
-export const CharityItem: Component<{ item: CharityItemData }> = (props) => {
+export const CharityItem: Component<{
+  item: CharityItemData
+  /** Position in the desktop sidebar, which morphs the row into CharityItemClosed. */
+  morph?: number
+}> = (props) => {
   const description = () => props.item.donationData?.description
   return (
-    <Accordion collapsible class={cn(tileSurface, 'w-full')}>
+    <Accordion
+      collapsible
+      class={cn(tileSurface, 'w-full')}
+      style={morphStyle(part(props.morph, 'tile'), 'surface')}
+    >
       <Accordion.Item value="charity">
         <Accordion.Header as="h3">
           <Accordion.Trigger
@@ -46,37 +75,63 @@ export const CharityItem: Component<{ item: CharityItemData }> = (props) => {
               'group rounded-tile flex w-full items-center gap-3 p-2 text-left',
             )}
           >
-            <Avatar
-              src={props.item.donationData?.logo}
-              alt=""
-              size="md"
-              fallback={name(props.item)[0]}
-            />
+            <span
+              class="shrink-0"
+              style={morphStyle(part(props.morph, 'logo'))}
+            >
+              <Avatar
+                src={props.item.donationData?.logo}
+                alt=""
+                size="md"
+                fallback={name(props.item)[0]}
+              />
+            </span>
             <span class="min-w-0 flex-1">
-              <span class="block truncate text-sm font-semibold">
+              <span
+                class="block w-fit max-w-full truncate text-sm font-semibold"
+                style={morphStyle(part(props.morph, 'name'), 'text')}
+              >
                 {name(props.item)}
               </span>
               <Show when={description()}>
-                <span class="text-fg-muted block max-h-4 truncate text-xs transition-all duration-200 group-data-expanded:max-h-0 group-data-expanded:opacity-0 motion-reduce:transition-none">
+                <span
+                  class="text-fg-muted block max-h-4 truncate text-xs transition-all duration-200 group-data-expanded:max-h-0 group-data-expanded:opacity-0 motion-reduce:transition-none"
+                  style={morphStyle(part(props.morph, 'teaser'), 'extra')}
+                >
                   {description()}
                 </span>
               </Show>
             </span>
             <span class="text-raised flex shrink-0 flex-col items-end leading-tight font-bold">
-              <span class="text-xxs">Raised</span>
-              <RaisedValue
-                class="text-sm"
-                item={props.item.donationData?.raised}
+              <span
+                class="text-xxs"
+                style={morphStyle(part(props.morph, 'label'), 'extra')}
+              >
+                Raised
+              </span>
+              <span style={morphStyle(part(props.morph, 'raised'), 'text')}>
+                <RaisedValue
+                  class="text-sm"
+                  item={props.item.donationData?.raised}
+                />
+              </span>
+            </span>
+            <span
+              class="flex shrink-0"
+              style={morphStyle(part(props.morph, 'chevron'), 'extra')}
+            >
+              <FaSolidChevronDown
+                class="text-fg-muted size-3.5 transition-transform group-data-expanded:rotate-180"
+                aria-hidden="true"
               />
             </span>
-            <FaSolidChevronDown
-              class="text-fg-muted size-3.5 shrink-0 transition-transform group-data-expanded:rotate-180"
-              aria-hidden="true"
-            />
           </Accordion.Trigger>
         </Accordion.Header>
         <Accordion.Content class={accordionContentMotion}>
-          <div class="flex flex-col gap-1 px-2 pb-1">
+          <div
+            class="flex flex-col gap-1 px-2 pb-1"
+            style={morphStyle(part(props.morph, 'details'), 'extra')}
+          >
             <Show when={description()}>
               <p class="text-fg-muted text-xs whitespace-pre-line">
                 {description()}
@@ -94,38 +149,55 @@ export const CharityItem: Component<{ item: CharityItemData }> = (props) => {
 }
 
 // Collapsed sidebar version: logo, short name and raised amount
-export const CharityItemClosed: Component<{ item: CharityItemData }> = (
-  props,
-) => (
+export const CharityItemClosed: Component<{
+  item: CharityItemData
+  morph?: number
+}> = (props) => (
   <div
     class={cn(tileSurface, 'flex flex-col items-center gap-1 p-2 text-center')}
+    style={morphStyle(part(props.morph, 'tile'), 'surface')}
   >
-    <Avatar
-      src={props.item.donationData?.logo}
-      alt=""
-      size="md"
-      fallback={name(props.item)[0]}
-    />
-    <p class="text-xxs leading-tight font-semibold">
+    <span style={morphStyle(part(props.morph, 'logo'))}>
+      <Avatar
+        src={props.item.donationData?.logo}
+        alt=""
+        size="md"
+        fallback={name(props.item)[0]}
+      />
+    </span>
+    <p
+      class="text-xxs leading-tight font-semibold"
+      style={morphStyle(part(props.morph, 'name'), 'text')}
+    >
       {props.item.staticData.name}
     </p>
-    <RaisedValue
-      class="text-raised text-xxs font-bold"
-      item={props.item.donationData?.raised}
-    />
+    <span style={morphStyle(part(props.morph, 'raised'), 'text')}>
+      <RaisedValue
+        class="text-raised text-xxs font-bold"
+        item={props.item.donationData?.raised}
+      />
+    </span>
   </div>
 )
 
-export const OverviewComponent: Component<{ overview: Overview }> = (props) => {
+export const OverviewComponent: Component<{
+  overview: Overview
+  /** In the desktop sidebar, which morphs it into OverviewComponentClosed. */
+  morph?: boolean
+}> = (props) => {
   const isJJ = useIsJJ()
   const rows = () => [
     {
       label: 'Total',
       value: (
-        <RaisedValue
-          class="text-raised font-bold"
-          item={props.overview.raised.total}
-        />
+        <span
+          style={morphStyle(props.morph ? 'charity-total' : undefined, 'text')}
+        >
+          <RaisedValue
+            class="text-raised font-bold"
+            item={props.overview.raised.total}
+          />
+        </span>
       ),
     },
     {
@@ -138,18 +210,49 @@ export const OverviewComponent: Component<{ overview: Overview }> = (props) => {
     },
   ]
   return (
-    <div class={cn(tileSurface, 'flex flex-col gap-1.5 p-3')}>
+    <div
+      class={cn(tileSurface, 'flex flex-col gap-1.5 p-3')}
+      style={morphStyle(
+        props.morph ? 'charity-overview' : undefined,
+        'surface',
+      )}
+    >
       <dl class="flex flex-col gap-1 text-sm">
         <For each={rows()}>
-          {(row) => (
-            <div class="flex items-baseline justify-between gap-2">
-              <dt class="text-fg-muted text-xs">{row.label}</dt>
+          {(row, index) => (
+            // In the sidebar morph only the total travels; the labels and other rows are extras
+            <div
+              class="flex items-baseline justify-between gap-2"
+              style={morphStyle(
+                props.morph && index() > 0
+                  ? `charity-overview-row-${index()}`
+                  : undefined,
+                'extra',
+              )}
+            >
+              <dt
+                class="text-fg-muted text-xs"
+                style={morphStyle(
+                  props.morph && index() === 0
+                    ? 'charity-overview-label'
+                    : undefined,
+                  'extra',
+                )}
+              >
+                {row.label}
+              </dt>
               <dd class="text-raised font-bold tabular-nums">{row.value}</dd>
             </div>
           )}
         </For>
       </dl>
-      <p class="text-fg-muted text-xxs">
+      <p
+        class="text-fg-muted text-xxs"
+        style={morphStyle(
+          props.morph ? 'charity-overview-updated' : undefined,
+          'extra',
+        )}
+      >
         Last update,{' '}
         {DateTime.fromJSDate(props.overview.date).toLocaleString(
           DateTime.DATETIME_MED,
@@ -160,14 +263,20 @@ export const OverviewComponent: Component<{ overview: Overview }> = (props) => {
 }
 
 // Collapsed sidebar version: only the total raised
-export const OverviewComponentClosed: Component<{ overview: Overview }> = (
-  props,
-) => (
-  <div class={cn(tileSurface, 'p-2 text-center')}>
-    <RaisedValue
-      class="text-raised text-xs font-bold"
-      item={props.overview.raised.total}
-    />
+export const OverviewComponentClosed: Component<{
+  overview: Overview
+  morph?: boolean
+}> = (props) => (
+  <div
+    class={cn(tileSurface, 'p-2 text-center')}
+    style={morphStyle(props.morph ? 'charity-overview' : undefined, 'surface')}
+  >
+    <span style={morphStyle(props.morph ? 'charity-total' : undefined, 'text')}>
+      <RaisedValue
+        class="text-raised text-xs font-bold"
+        item={props.overview.raised.total}
+      />
+    </span>
   </div>
 )
 
