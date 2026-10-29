@@ -102,7 +102,7 @@ export const YogsCreatorDialog: Component<CreatorDialogProps> = (props) => {
           >
             <JJIcon class="size-5" />
             {props.streamCount
-              ? `Show ${props.creator.name}'s ${props.streamCount} streams`
+              ? `Show ${props.creator.name}'s ${props.streamCount} ${props.streamCount === 1 ? 'stream' : 'streams'}`
               : 'Show Jingle Jam streams'}
           </Button>
         </Show>

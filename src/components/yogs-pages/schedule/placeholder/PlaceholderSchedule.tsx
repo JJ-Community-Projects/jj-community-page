@@ -70,12 +70,7 @@ export const PlaceholderSchedule: Component = () => (
         <Skeleton class="h-10 rounded-full bg-white/20" />
       </div>
       <For each={ROWS}>
-        {() => (
-          <div class="flex gap-2">
-            <div class="w-11 shrink-0" />
-            <Skeleton class="rounded-tile h-24 flex-1 bg-white/20" />
-          </div>
-        )}
+        {() => <Skeleton class="rounded-tile h-14 w-full bg-white/20" />}
       </For>
     </div>
   </div>

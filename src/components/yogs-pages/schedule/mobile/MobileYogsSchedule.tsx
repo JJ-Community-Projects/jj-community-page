@@ -2,7 +2,7 @@ import { type Component, For, Show } from 'solid-js'
 
 import { useCreatorFilter } from '../provider/CreatorFilterProvider.tsx'
 import { useYogsSchedule } from '../provider/YogsScheduleProvider.tsx'
-import { MobileYogsStreamTile, MOBILE_UNIT_REM } from './MobileYogsStreamTile.tsx'
+import { MobileYogsStreamTile, MOBILE_ROW_REM } from './MobileYogsStreamTile.tsx'
 import {
   MobileScheduleControls,
   MobileScheduleHeader,
@@ -34,17 +34,11 @@ const MobileScheduleBody: Component = () => {
   const { day, days, toDateTime } = useYogsSchedule()
   const { isEmpty, isSlotPartOfFilter } = useCreatorFilter()
 
-  // The tallest day by summed slot sizes, reserved so the page doesn't jump between days (rows
-  // with more text than their slot grow past it, so this is a floor)
+  // The day with the most rows, reserved so the page doesn't jump between days (a floor: rows
+  // with a two-line title grow a little)
   const reservedHeight = () => {
-    const tallest = days().reduce(
-      (best, d) => {
-        const units = d.streams.reduce((sum, s) => sum + s.size, 0)
-        return units > best.units ? { units, rows: d.streams.length } : best
-      },
-      { units: 0, rows: 0 },
-    )
-    return `${tallest.units * MOBILE_UNIT_REM + Math.max(tallest.rows - 1, 0) * ROW_GAP_REM}rem`
+    const rows = Math.max(...days().map((d) => d.streams.length), 0)
+    return `${rows * MOBILE_ROW_REM + Math.max(rows - 1, 0) * ROW_GAP_REM}rem`
   }
 
   const filteredDays = () =>

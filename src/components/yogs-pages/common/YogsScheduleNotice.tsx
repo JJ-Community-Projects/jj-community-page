@@ -61,7 +61,7 @@ export const YogsScheduleNotice: Component<{
         <Show when={props.variant === 'canvas'}>
           Found an error or a missing stream? Use the contact info below or message @ostof on Discord.{' '}
         </Show>
-        It's a fan project, not associated with the Jingle Jam, the Yogscast or their partners.
+        This is a community project, not associated with the Jingle Jam, the Yogscast or their partners.
       </p>
     </Show>
   </div>

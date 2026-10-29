@@ -11,9 +11,10 @@ import {
   FaRegularCalendar,
   FaSolidChevronLeft,
   FaSolidChevronRight,
+  FaSolidRotateLeft,
 } from 'solid-icons/fa'
 import { Button, IconButton } from '../../../ui/Button'
-import { cn, tileSurface } from '../../../ui/cn'
+import { cn, focusRing, tileSurface } from '../../../ui/cn'
 import { LiveBadge } from '../../../ui/Labels'
 
 /**
@@ -36,7 +37,7 @@ export const MobileScheduleHeader: Component = () => {
 
   return (
     <div class={cn(tileSurface, 'sticky top-2 z-10 flex flex-col gap-1 px-2 py-2')}>
-      <p class="font-babas text-center text-xl leading-none tracking-wider">
+      <p class="font-babas text-center text-lg leading-none tracking-wider">
         {schedule.title}
         <Show when={isEmpty()}> · Week {week()}</Show>
       </p>
@@ -54,7 +55,9 @@ export const MobileScheduleHeader: Component = () => {
 const DayRow: Component<{ date: string; today: boolean; live: boolean }> = (
   props,
 ) => {
-  const { nextDay, prevDay } = useYogsSchedule()
+  const { nextDay, prevDay, isRunning, todayIndex, dayIndex, goToToday } =
+    useYogsSchedule()
+  const awayFromToday = () => todayIndex() >= 0 && todayIndex() !== dayIndex()
   return (
     <div class="flex items-center justify-between gap-2">
       <IconButton variant="ghost" aria-label="Previous day" onClick={prevDay}>
@@ -65,15 +68,33 @@ const DayRow: Component<{ date: string; today: boolean; live: boolean }> = (
         aria-live="polite"
         aria-current={props.today ? 'date' : undefined}
       >
-        <p class="font-babas flex items-center gap-1.5 text-2xl leading-none tracking-wider">
+        <p class="font-babas flex items-center gap-1.5 text-xl leading-none tracking-wider">
           {props.date}
           <Show when={props.today}>
             <span class="bg-accent size-1.5 rounded-full" aria-hidden="true" />
             <span class="sr-only">(today)</span>
           </Show>
         </p>
-        <Show when={props.live}>
-          <LiveBadge label="Live now" />
+        {/* While the event runs this line is always there, so the sticky header keeps its height */}
+        <Show when={isRunning()}>
+          <div class="flex h-5 items-center">
+            <Show when={props.live}>
+              <LiveBadge label="Live now" />
+            </Show>
+            <Show when={awayFromToday()}>
+              <button
+                type="button"
+                class={cn(
+                  'bg-accent text-xxs hover:bg-accent-600 inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-bold tracking-wide text-white uppercase',
+                  focusRing,
+                )}
+                onClick={goToToday}
+              >
+                <FaSolidRotateLeft class="size-2.5" aria-hidden="true" />
+                Back to today
+              </button>
+            </Show>
+          </div>
         </Show>
       </div>
       <IconButton variant="ghost" aria-label="Next day" onClick={nextDay}>

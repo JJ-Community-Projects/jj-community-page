@@ -33,6 +33,12 @@ export const useStreamState = (stream: () => YogsStream) => {
     return d.toFormat("d'd' hh'h' mm'm' ss's'")
   }
 
+  /** Narrow form for the mobile rows (as in the extension): "2d 3h", a ticking "02:14:09" on the day. */
+  const shortCountdown = () => {
+    const d = start().diff(now())
+    return d.as('day') >= 1 ? d.toFormat("d'd' h'h'") : d.toFormat('hh:mm:ss')
+  }
+
   /** "Title, Subtitle, Mon 1 Dec, 12:00 – 15:00[, live now]" */
   const label = () =>
     [
@@ -44,7 +50,7 @@ export const useStreamState = (stream: () => YogsStream) => {
       .filter(Boolean)
       .join(', ')
 
-  return { isLive, showCountdown, ended, countdown, label }
+  return { isLive, showCountdown, ended, countdown, shortCountdown, label }
 }
 
 /** The countdown as a chip, readable on light and dark stream colours. */

@@ -4,6 +4,7 @@ import { DateTime } from 'luxon'
 import { useNextJJEndDate } from '../../../../lib/utils/jjDates.ts'
 import { createModalSignal } from '../../../../lib/createModalSignal.ts'
 import { useNow } from '../../../../lib/utils/useNow.ts'
+import { rangeFromData } from '../../../../lib/utils/rangeFromData.ts'
 
 const useYogsScheduleHook = (
   schedule: YogsSchedule,
@@ -106,6 +107,17 @@ const useYogsScheduleHook = (
   /** The date is today in the viewer's timezone, while the schedule is running. */
   const isToday = (date: Date) =>
     isRunning() && DateTime.fromJSDate(date).hasSame(clock(), 'day')
+  /** When a day's streams start (the day's own start is midnight London). */
+  const dayStart = (index: number) => {
+    const d = days()[index]
+    return rangeFromData(d.streams)?.start ?? d.start
+  }
+  /** Index of today's day while the schedule is running, else -1. */
+  const todayIndex = () => days().findIndex((_, i) => isToday(dayStart(i)))
+  const goToToday = () => {
+    const i = todayIndex()
+    if (i >= 0) setDayIndex(i)
+  }
 
   const filterModalSignal = createModalSignal()
   const exportModalSignal = createModalSignal()
@@ -121,6 +133,9 @@ const useYogsScheduleHook = (
     week,
     day,
     days,
+    dayIndex,
+    todayIndex,
+    goToToday,
     nextWeek,
     prevWeek,
     weekIndex,
