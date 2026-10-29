@@ -1,6 +1,4 @@
-import { type Component, createSignal, createUniqueId, For, Show } from 'solid-js'
-import { Dialog } from '@kobalte/core'
-import { FaRegularSquare, FaSolidInfo, FaSolidSquareCheck, FaSolidXmark } from 'solid-icons/fa'
+import { type Component, createSignal, For } from 'solid-js'
 import { DateTime, Duration } from 'luxon'
 import ical, { ICalAlarmType } from 'ical-generator'
 import { type ModalSignal } from '../../../../lib/createModalSignal.ts'
@@ -9,42 +7,28 @@ import { useYogsSchedule } from './YogsScheduleProvider.tsx'
 import { rangeFromData } from '../../../../lib/utils/rangeFromData.ts'
 import type { YogsStream } from '../../../../lib/orpc/private/yogs/contract.ts'
 import { log } from '../../../../lib/analytics.ts'
-
-type FullStream = YogsStream & { creators: Array<{ id: string }>; style?: any };
-
+import { Dialog } from '../../../ui/Dialog'
+import { Button } from '../../../ui/Button'
+import { SearchField } from '../../../ui/Form'
+import { Alert } from '../../../ui/Status'
+import { DateDivider } from '../../../ui/Labels'
+import { TileGroup } from '../../../ui/Tile'
+import { cn, focusRing } from '../../../ui/cn'
+import { CheckMark } from './ScheduleCreatorFilterButton.tsx'
 
 interface CalendarDialogDialogProps {
   modalSignal: ModalSignal
 }
 
+/**
+ * Pick streams and download them as one .ics file. The list takes the creator filter into account;
+ * the file (events, ids, name) is the same as before the redesign.
+ */
 export const CalendarDialog: Component<CalendarDialogDialogProps> = props => {
-  const {modalSignal} = props
-
-  return (
-    <Dialog.Root open={modalSignal.isOpen()} onOpenChange={modalSignal.setOpen}>
-      <Dialog.Portal>
-        <Dialog.Overlay class={'fixed inset-0 z-50 bg-black/20'}/>
-        <div class={'fixed inset-0 z-50 flex items-center justify-center'}>
-          <Dialog.Content class={'h-full max-sm:h-[70vh] w-full max-w-[500px] p-2 lg:w-[min(calc(100vw-16px),500px)] lg:p-16'}>
-            <CalendarDialogDialogBody onClose={modalSignal.close}/>
-          </Dialog.Content>
-        </div>
-      </Dialog.Portal>
-    </Dialog.Root>
-  )
-}
-
-interface CalendarDialogDialogBodyProps {
-  onClose: () => void
-}
-
-const CalendarDialogDialogBody: Component<CalendarDialogDialogBodyProps> = props => {
-  const {onClose} = props
   const {schedule, streams, days} = useYogsSchedule()
-  const {filteredStreams, isSlotPartOfFilter} = useCreatorFilter()
+  const {filteredStreams, isSlotPartOfFilter, isEmpty} = useCreatorFilter()
   const [selectedSlots, setSelectedSlots] = createSignal<YogsStream[]>([])
   const [search, setSearch] = createSignal('')
-  const searchId = createUniqueId()
 
   const download = () => {
     const s = icalString()
@@ -119,134 +103,98 @@ const CalendarDialogDialogBody: Component<CalendarDialogDialogBodyProps> = props
       names.some(n => n.toLowerCase().includes(search().toLowerCase()))
     )
   }
+
+  // Select all / Deselect all stay one toggle, as before
+  const allSelected = () => selectedSlots().length === filteredStreams().length
+  const toggleAll = () =>
+    allSelected() ? setSelectedSlots([]) : setSelectedSlots(streams().filter(isInSearch))
+
+  // Only rendered while open, so after mount: the viewer's offset
+  const offset = () => DateTime.fromJSDate(schedule.streams[0]?.start ?? new Date()).offsetNameShort
+
   return (
-    <div class={'flex h-full w-full flex-col rounded-2xl bg-white'}>
-      <div class={`bg-primary flex max-h-[72px] items-center justify-center rounded-t-2xl p-2 text-white shadow-xl`}>
-        <button onClick={onClose}>
-          <FaSolidXmark size={20} class={''}/>
-        </button>
-        <div class={'flex-1'}></div>
-        <h3 class={'text-xl'}>Calendar Export</h3>
-        <div class={'flex-1'}></div>
-        <div class={'w-[20px]'}></div>
-      </div>
-      <div class={'flex w-full flex-1 flex-col gap-2 overflow-auto p-2'}>
-        <a
-          class={'flex flex-row items-center justify-start gap-1 px-2 py-2 text-sm'}
-          href={'https://support.google.com/calendar/answer/37118?co=GENIE.Platform%3DDesktop'}
-          target={'_blank'}
-        >
-          <FaSolidInfo/> How to import an .ics (iCal) file into Google Calendar
-        </a>
-        <p class={'px-2 py-2'}>Filtered streams: {filteredStreams().length}</p>
-        <p class={'px-2 py-2'}>This list of streams takes the creator filter into account</p>
-        <div class="p-2">
-          <label class="mb-2 block text-sm font-bold text-gray-700" for={searchId}>
-            Search
-          </label>
-          <input
-            class="w-full appearance-none rounded-sm border px-3 py-2 leading-tight text-gray-700 shadow-sm focus:outline-hidden"
-            id={searchId}
-            type="text"
-            placeholder="Search"
+    <Dialog
+      open={props.modalSignal.isOpen()}
+      onOpenChange={props.modalSignal.setOpen}
+      title="Export to calendar"
+      description={`Pick streams, download one .ics file · times in ${offset()}`}
+      footer={
+        <>
+          <p class="text-fg-muted mr-auto self-center text-sm tabular-nums" aria-live="polite">
+            {selectedSlots().length} selected
+          </p>
+          <Button variant="ghost" size="sm" onClick={toggleAll}>
+            {allSelected() ? 'Deselect all' : 'Select all'}
+          </Button>
+          <Button variant="primary" size="sm" disabled={selectedSlots().length == 0} onClick={download}>
+            Download .ics
+          </Button>
+        </>
+      }
+    >
+      <div class="flex flex-col gap-3">
+        <Alert class="text-xs">
+          {isEmpty()
+            ? `All ${filteredStreams().length} streams. Set a creator filter to narrow the list. `
+            : `Uses your creator filter (${filteredStreams().length} streams). `}
+          <a
+            class="font-semibold underline"
+            href="https://support.google.com/calendar/answer/37118?co=GENIE.Platform%3DDesktop"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            How to import an .ics into Google Calendar
+          </a>
+        </Alert>
+        <div class="bg-surface-strong sticky -top-3 z-10 -mx-4 px-4 py-1">
+          <SearchField
+            label="Search streams or creators"
+            placeholder="Search streams or creators"
             value={search()}
-            onInput={e => {
-              const target = e.target as HTMLInputElement
-              if (target) {
-                setSearch(target.value)
-              }
-            }}
+            onInput={setSearch}
           />
         </div>
-        <For each={days()}>
+        <For
+          each={days().filter(day => day.streams.some(isInSearch))}
+          fallback={<p class="text-fg-muted py-6 text-center text-sm">No stream matches “{search()}”.</p>}
+        >
           {day => {
-
-            const s = () => {
-              const range = rangeFromData(day.streams)
-              if (range) {
-                return DateTime.fromJSDate(range.start)
-              }
-              return DateTime.fromJSDate(day.start)
-            }
-
-            const start = s()
-            const slots = day.streams
-            const hasSlots = () => slots.some(s => isInSearch(s))
+            const start = DateTime.fromJSDate(rangeFromData(day.streams)?.start ?? day.start)
             return (
-              <>
-                <Show when={hasSlots()}>
-                  <>
-                    <p>
-                      {start.toLocaleString({
-                        day: '2-digit',
-                        month: 'short',
-                        weekday: 'short',
-                      })}
-                    </p>
-                    <For each={day.streams}>
-                      {slot => {
-                        const start = DateTime.fromJSDate(slot.start)
-                        return (
-                          <Show when={isInSearch(slot)}>
-                            <button
-                              class={'hover:bg-accent-50 border-accent-50 rounded-xl border-2 p-4 hover:brightness-105'}
-                              onClick={() => toggle(slot)}
-                            >
-                              <div class={'flex flex-row items-center'}>
-                                <p class={'flex-1 text-left'}>
-                                  {slot.title} ({start.toLocaleString(DateTime.TIME_WITH_SHORT_OFFSET)})
-                                </p>
-                                <div class={'text-accent-500'}>
-                                  <Show when={includes(slot)}>
-                                    <FaSolidSquareCheck size={24}/>
-                                  </Show>
-                                  <Show when={!includes(slot)}>
-                                    <FaRegularSquare size={24}/>
-                                  </Show>
-                                </div>
-                              </div>
-                            </button>
-                          </Show>
-                        )
-                      }}
-                    </For>
-                  </>
-                </Show>
-              </>
+              <section class="flex flex-col gap-1.5">
+                <DateDivider tone="tile">{start.toFormat('EEE d MMM')}</DateDivider>
+                <TileGroup pad="none" class="divide-line flex flex-col divide-y overflow-hidden">
+                  <For each={day.streams.filter(isInSearch)}>
+                    {slot => (
+                      <button
+                        type="button"
+                        role="checkbox"
+                        aria-checked={includes(slot)}
+                        class={cn(
+                          'flex w-full items-center gap-2.5 px-3 py-1.5 text-left text-sm transition-colors hover:bg-black/5 focus-visible:-outline-offset-2',
+                          focusRing,
+                        )}
+                        onClick={() => toggle(slot)}
+                      >
+                        <span
+                          class="h-5 w-1 shrink-0 rounded-full bg-(--stream-color)"
+                          style={{'--stream-color': slot.color}}
+                          aria-hidden="true"
+                        />
+                        <span class="min-w-0 flex-1 truncate font-medium">{slot.title}</span>
+                        <span class="text-fg-muted text-xs tabular-nums">
+                          {DateTime.fromJSDate(slot.start).toLocaleString(DateTime.TIME_SIMPLE)}
+                        </span>
+                        <CheckMark checked={includes(slot)}/>
+                      </button>
+                    )}
+                  </For>
+                </TileGroup>
+              </section>
             )
           }}
         </For>
       </div>
-      <div class={'flex h-[72px] flex-row items-center justify-end gap-2 p-2'}>
-        <Show when={selectedSlots().length < filteredStreams().length}>
-          <button
-            class={'bg-primary rounded-xl p-2 text-white'}
-            onclick={() => {
-              const filteredSlots = streams().filter(isInSearch)
-              setSelectedSlots(filteredSlots)
-            }}
-          >
-            Select All
-          </button>
-        </Show>
-        <Show when={selectedSlots().length === filteredStreams().length}>
-          <button
-            class={'bg-primary rounded-xl p-2 text-white'}
-            onclick={() => {
-              setSelectedSlots([])
-            }}
-          >
-            Deselect All
-          </button>
-        </Show>
-        <button
-          disabled={selectedSlots().length == 0}
-          class={'bg-primary rounded-xl p-2 text-white disabled:bg-gray-500 disabled:opacity-75'}
-          onclick={download}
-        >
-          Download
-        </button>
-      </div>
-    </div>
+    </Dialog>
   )
 }

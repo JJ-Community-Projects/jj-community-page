@@ -233,16 +233,21 @@ const CreatorRow: Component<CreatorRowProps> = props => (
     <span class="text-fg-muted text-xs tabular-nums">
       {props.count} {props.count === 1 ? 'stream' : 'streams'}
     </span>
-    <span
-      class={cn(
-        'rounded-media ring-line-strong flex size-5 shrink-0 items-center justify-center ring-1 transition-colors',
-        props.checked ? 'bg-accent ring-accent' : 'bg-surface-strong',
-      )}
-      aria-hidden="true"
-    >
-      <Show when={props.checked}>
-        <FaSolidCheck class="size-3 text-white"/>
-      </Show>
-    </span>
+    <CheckMark checked={props.checked}/>
   </button>
+)
+
+/** The checkbox square of a `role="checkbox"` row (filter and export dialogs). */
+export const CheckMark: Component<{checked: boolean}> = props => (
+  <span
+    class={cn(
+      'rounded-media ring-line-strong flex size-5 shrink-0 items-center justify-center ring-1 transition-colors',
+      props.checked ? 'bg-accent ring-accent' : 'bg-surface-strong',
+    )}
+    aria-hidden="true"
+  >
+    <Show when={props.checked}>
+      <FaSolidCheck class="size-3 text-white"/>
+    </Show>
+  </span>
 )
