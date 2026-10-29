@@ -1,111 +1,82 @@
-import { type Component } from 'solid-js'
-import type { YogsSchedule } from '../../../../lib/orpc/private/yogs/contract.ts'
-import { StreamPlaceholder } from './StreamPlaceholder.tsx'
+import { type Component, For } from 'solid-js'
+import { Skeleton } from '../../../ui/Status'
 import '../yogs-schedule.css'
 
-interface PlaceholderScheduleProps {
-  schedule: YogsSchedule
-}
+const DAYS = Array.from({ length: 7 })
+const SLOTS = Array.from({ length: 4 })
+const ROWS = Array.from({ length: 4 })
 
-export const PlaceholderSchedule: Component<PlaceholderScheduleProps> = (
-  props,
-) => {
-  const schedule = props.schedule
-  const week = schedule.weeks[0]
-  return (
-    <div class={'yogs-grid-container flex w-full justify-center'}>
-      <div class={'yogs-grid flex flex-col blur-xs'}>
-        <div class={'data-height flex w-full flex-row'}>
-          <div class={'data-height data-width'} />
-          <div class={'header-title-card-width p-2'}>
-            <div
-              class={
-                'flex h-full w-full flex-row items-center justify-center rounded-2xl bg-white'
-              }
-            ></div>
-          </div>
-          <div class={'stream-width data-height flex flex-row justify-end'}>
-            <div
-              class={
-                'flex h-full w-full flex-row items-end justify-end gap-2 p-2'
-              }
-            ></div>
-          </div>
-          <div class={'stream-width p-2'}>
-            <div
-              class={
-                'flex h-full w-full flex-1 flex-col items-center justify-center rounded-2xl bg-white'
-              }
-            >
-              <div
-                class={'flex w-full flex-row items-center justify-around'}
-              ></div>
-            </div>
-          </div>
+const block = 'rounded-tile size-full bg-white/20'
 
-          <div class={'stream-width p-2'}>
-            <div
-              class={
-                'flex h-full w-full flex-1 flex-col items-center justify-center rounded-2xl bg-white'
-              }
-            >
-              <div
-                class={'flex w-full flex-row items-center justify-around'}
-              ></div>
-            </div>
+/**
+ * While the client-only pages load the schedule: skeleton tiles in the grid's shape (desktop) and
+ * the timeline's (mobile), sized by yogs-schedule.css like the real grid. Needs no data.
+ */
+export const PlaceholderSchedule: Component = () => (
+  <div class="flex w-full flex-col items-center" aria-busy="true" aria-label="Loading the schedule">
+    <div class="desktop-schedule flex w-full justify-center">
+      <div class="yogs-grid flex flex-col">
+        <div class="data-height flex w-full flex-row">
+          <div class="data-width" />
+          <div class="yogs-cell header-title-card-width h-full">
+            <Skeleton class={block} />
           </div>
-
-          <div class={'stream-width p-2'}>
-            <div
-              class={'flex h-full w-full flex-row items-center justify-center'}
-            >
-              <div
-                class={
-                  'flex h-full flex-1 flex-col items-center justify-center rounded-l-2xl bg-white'
-                }
-              ></div>
-              <div
-                class={
-                  'flex h-full flex-1 flex-col items-center justify-center rounded-r-2xl bg-white'
-                }
-              ></div>
-            </div>
-          </div>
-        </div>
-
-        <div class={'flex flex-row'}>
-          <div class="data-width flex flex-col text-sm">
-            <div class="timezone p-1">
-              <p class="flex h-full w-full flex-row items-center justify-center rounded-2xl bg-white" />
-            </div>
-            {schedule!.times.map((time) => (
-              <div class="time p-1">
-                <div class="flex h-full w-full flex-col items-center justify-around rounded-2xl bg-white p-1" />
+          <div class="stream-width" />
+          <For each={SLOTS.slice(1)}>
+            {() => (
+              <div class="yogs-cell stream-width h-full">
+                <Skeleton class={block} />
               </div>
-            ))}
-          </div>
-
-          <div class="flex flex-row">
-            {week.days.map((day) => {
-              return (
-                <div class="day-container flex flex-col">
-                  <div class={'day p-1'}>
-                    <div
-                      class={
-                        'flex h-full w-full flex-row items-center justify-center rounded-2xl bg-white'
-                      }
-                    />
-                  </div>
-
-                  {day.streams.map((stream) => {
-                    return <StreamPlaceholder stream={stream} />
-                  })}
+            )}
+          </For>
+        </div>
+        <div class="flex flex-row">
+          <div class="data-width flex flex-col">
+            <div class="yogs-cell timezone">
+              <Skeleton class={block} />
+            </div>
+            <For each={SLOTS}>
+              {() => (
+                <div class="yogs-cell time">
+                  <Skeleton class={block} />
                 </div>
-              )
-            })}
+              )}
+            </For>
           </div>
+          <For each={DAYS}>
+            {() => (
+              <div class="day-container flex flex-col">
+                <div class="yogs-cell day">
+                  <Skeleton class={block} />
+                </div>
+                {/* Not `.time`: its width is the time column's (one unit) */}
+                <For each={SLOTS}>
+                  {() => (
+                    <div class="yogs-cell w-full" style={{ height: 'var(--yogs-slot)' }}>
+                      <Skeleton class={block} />
+                    </div>
+                  )}
+                </For>
+              </div>
+            )}
+          </For>
         </div>
       </div>
     </div>
-  )
-}
+    <div class="mobile-schedule mx-auto flex w-full max-w-2xl flex-col gap-3">
+      <Skeleton class="rounded-tile h-24 w-full bg-white/20" />
+      <div class="grid grid-cols-2 gap-2">
+        <Skeleton class="h-10 rounded-full bg-white/20" />
+        <Skeleton class="h-10 rounded-full bg-white/20" />
+      </div>
+      <For each={ROWS}>
+        {() => (
+          <div class="flex gap-2">
+            <div class="w-11 shrink-0" />
+            <Skeleton class="rounded-tile h-24 flex-1 bg-white/20" />
+          </div>
+        )}
+      </For>
+    </div>
+  </div>
+)

@@ -10,11 +10,11 @@ import {
 import { getCollection } from 'astro:content'
 import { YogsResponsiveSchedule } from '../../components/yogs-pages/schedule/YogsResponsiveSchedule.tsx'
 import { YogsSeasonSchedule } from '../../components/yogs-pages/schedule/YogsSeasonSchedule.tsx'
-import { ScheduleNotice } from '../../components/yogs-pages/schedule/YogsCurrentScheduleLoader.tsx'
+import { YogsScheduleNotice } from '../../components/yogs-pages/common/YogsScheduleNotice.tsx'
+import YogsArchiveNav from '../../components/yogs-pages/common/YogsArchiveNav.astro'
 import { JJStartCountdown, JJStartTimes } from '../../components/ui/Countdown'
 import { PageHeader } from '../../components/ui/PageHeader'
 import { Tile } from '../../components/ui/Tile'
-import { Button } from '../../components/ui/Button'
 import { compactYogsSchedule } from '../../lib/utils/compactYogsSchedule.ts'
 import {
   getBreadcrumbList,
@@ -244,9 +244,11 @@ const ogImage = preRenderdImageExists
             The <span class="font-bold">Yogscast Jingle Jam {year} Schedule</span>
             will be shown once it is announced on social media.
           </p>
-          <ScheduleNotice />
+          <YogsScheduleNotice variant="tile" />
         </Tile>
       )}
+
+      <YogsArchiveNav years={archiveYears} title="Schedule archive" />
     </div>
   ) : (
     <div class="flex w-full flex-col items-center gap-4">
@@ -278,34 +280,11 @@ const ogImage = preRenderdImageExists
             schedule={compactYogsSchedule(lastSchedule)}
             showCreators
             client:load
-          >
-            <p class="text-on-canvas-muted mx-auto mt-4 max-w-3xl text-center text-sm">
-              This Yogscast Jingle Jam schedule is maintained by the community. If
-              you find errors or see that a stream is missing use the contact info
-              below. Streams that appear here are not guaranteed to happen or might
-              be delayed. For more information visit the Jingle Jam Twitter page.
-              This schedule is a fan Project and not associated with the Jingle
-              Jam, the Yogscast or their partners.
-            </p>
-          </YogsResponsiveSchedule>
+          />
         </section>
       )}
 
-      {archiveYears.length > 0 && (
-        <nav
-          aria-label="Yogscast Jingle Jam schedule archive"
-          class="flex flex-col items-center gap-2 p-4"
-        >
-          <h2 class="text-on-canvas text-center text-lg font-semibold">Schedule archive</h2>
-          <div class="flex flex-wrap items-center justify-center gap-2">
-            {archiveYears.map((archiveYear) => (
-              <Button href={`/yogs/archive/${archiveYear}`} size="sm" variant="canvas">
-                Jingle Jam {archiveYear}
-              </Button>
-            ))}
-          </div>
-        </nav>
-      )}
+      <YogsArchiveNav years={archiveYears} title="Schedule archive" />
     </div>
   )}
 </PageShell>

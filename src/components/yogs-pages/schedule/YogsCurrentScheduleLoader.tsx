@@ -1,254 +1,82 @@
-import { type Component, For, Match, Show, Switch } from 'solid-js'
-import { YogsScheduleComponent } from './YogsScheduleComponent.tsx'
-import type {
-  YogsCreator,
-  YogsSchedule,
-} from '../../../lib/orpc/private/yogs/contract.ts'
-import { PlaceholderSchedule } from './placeholder/PlaceholderSchedule.tsx'
-import { MobileYogsScheduleComponent } from './mobile/MobileYogsScheduleComponent.tsx'
+import { type Component, Match, Show, Switch } from 'solid-js'
 import { QueryClientProvider, useQuery } from '@tanstack/solid-query'
 import { orpcPrivate } from '../../../lib/orpc/client.ts'
 import { QueryClient } from '@tanstack/query-core'
-import { Countdown, JJStartCountdown, JJStartTimes } from '../../ui/Countdown'
+import { JJStartCountdown, JJStartTimes } from '../../ui/Countdown'
 import { Tile } from '../../ui/Tile'
 import { Alert } from '../../ui/Status'
-import { cn } from '../../ui/cn'
-import {
-  BskyIcon,
-  InstagramIcon,
-  TiktokIcon,
-  TwitchIcon,
-  TwitterIcon,
-  YoutubeIcon,
-} from '../../common/icons/JJIcons.tsx'
-import { DateTime } from 'luxon'
-import { YogsCreatorPill } from '../creators/YogsCreatorPill.tsx'
-import {
-  useIsAfterJJEnd,
-  useIsBeforeJJ,
-  useJJStartCountdown,
-} from '../../../lib/utils/jjDates.ts'
-import { HeadlinerTicker } from '../../features/schedules/common/HeadlinerTicker.tsx'
-import { useNow } from '../../../lib/utils/useNow.ts'
+import { PlaceholderSchedule } from './placeholder/PlaceholderSchedule.tsx'
+import { YogsSeasonBody } from './YogsSeasonSchedule.tsx'
+import { YogsScheduleNotice } from '../common/YogsScheduleNotice.tsx'
 
-interface ConfigLoaderProps {
-  creators: YogsCreator[]
-  fallbackSchedule: YogsSchedule
+const refetch = {
+  staleTime: 60_000,
+  refetchInterval: 60_000 * 5,
+  refetchOnMount: true,
+  refetchOnReconnect: true,
+  refetchIntervalInBackground: true,
+  refetchOnWindowFocus: false,
 }
 
-const ConfigLoader: Component<ConfigLoaderProps> = (props) => {
-  const config = useQuery(() =>
-    orpcPrivate.yogs.config.queryOptions({
-      staleTime: 60_000,
-      refetchInterval: 60_000 * 5,
-      refetchOnMount: true,
-      refetchOnReconnect: true,
-      refetchIntervalInBackground: true,
-      refetchOnWindowFocus: false,
-    }),
+/**
+ * The current schedule for the client-only pages (/pwa/yogs, /embed/yogs): fetches config and
+ * schedule, then renders the same season layout as /yogs.
+ */
+export const YogsCurrentScheduleLoader: Component = () => {
+  return (
+    <div class={'min-h-20'}>
+      <QueryClientProvider client={new QueryClient()}>
+        <ConfigLoader />
+      </QueryClientProvider>
+    </div>
   )
+}
+
+const ConfigLoader: Component = () => {
+  const config = useQuery(() => orpcPrivate.yogs.config.queryOptions(refetch))
   return (
     <Switch>
       <Match when={config.data}>
-        <Show when={config.data?.showSchedule}>
-          <Body
-            fallbackSchedule={props.fallbackSchedule}
-            creators={props.creators}
-          />
-        </Show>
-        <Show when={!config.data?.showSchedule}>
-          <Tile class="flex w-full flex-col items-center gap-3 text-center">
-            <h1 class="text-xl font-bold tracking-tight sm:text-2xl">
-              Yogscast Jingle Jam Schedule
-            </h1>
-            <p class="text-fg-muted text-sm sm:text-base">
-              The Yogscast Jingle Jam in your timezone with links to
-              participants, VODs and more.
-            </p>
-            <JJStartCountdown />
-            <JJStartTimes class="max-w-lg" />
-            <p class="text-sm">
-              The <span class={'font-bold'}>Yogscast Jingle Jam Schedule</span>{' '}
-              will be shown once it is announced on social media.
-            </p>
-            <div
-              class={
-                'flex w-full flex-row items-center justify-center gap-4 p-2'
-              }
-            >
-              <a
-                class={'transition-all hover:scale-110'}
-                href={'https://www.youtube.com/yogscast'}
-                target={'_blank'}
-                aria-label={'Yogscast Youtube channel'}
-              >
-                <YoutubeIcon class={'size-4'} />
-              </a>
-              <a
-                class={'transition-all hover:scale-110'}
-                href={'https://twitch.tv/yogscast'}
-                target={'_blank'}
-                aria-label={'Yogscast Twitch channel'}
-              >
-                <TwitchIcon class={'size-4'} />
-              </a>
-              <a
-                class={'transition-all hover:scale-110'}
-                target={'_blank'}
-                href={'https://bsky.app/profile/yogscast.com'}
-                aria-label={'Yogscast Blue sky'}
-              >
-                <BskyIcon class={'size-4'} />
-              </a>
-              <a
-                class={'transition-all hover:scale-110'}
-                target={'_blank'}
-                href={'https://x.com/yogscast'}
-                aria-label={'Yogscast Twitter'}
-              >
-                <TwitterIcon class={'size-4'} />
-              </a>
-              <a
-                class={'transition-all hover:scale-110'}
-                target={'_blank'}
-                href={'https://www.instagram.com/officialyogscast/'}
-                aria-label={'Yogscast Instagram'}
-              >
-                <InstagramIcon class={'size-4'} />
-              </a>
-              <a
-                class={'transition-all hover:scale-110'}
-                target={'_blank'}
-                href={'https://www.tiktok.com/@yogscastofficial'}
-                aria-label={'Jingle Jam Tiktok'}
-              >
-                <TiktokIcon class={'size-4'} />
-              </a>
-            </div>
-          </Tile>
+        <Show when={config.data?.showSchedule} fallback={<NotAnnounced />}>
+          <Body />
         </Show>
       </Match>
     </Switch>
   )
 }
 
-interface CurrentScheduleLoaderProps {
-  creators: YogsCreator[]
-  fallbackSchedule: YogsSchedule
-}
+/** Before the schedule is shown: countdown and start times. */
+const NotAnnounced: Component = () => (
+  <Tile class="mx-auto flex w-full max-w-2xl flex-col items-center gap-3 text-center">
+    <h1 class="text-xl font-bold tracking-tight sm:text-2xl">
+      Yogscast Jingle Jam Schedule
+    </h1>
+    <p class="text-fg-muted text-sm sm:text-base">
+      The Yogscast Jingle Jam in your timezone with links to participants, VODs
+      and more.
+    </p>
+    <JJStartCountdown />
+    <JJStartTimes class="max-w-lg" />
+    <p class="text-sm">
+      The <span class={'font-bold'}>Yogscast Jingle Jam Schedule</span> will be
+      shown once it is announced on social media.
+    </p>
+    <YogsScheduleNotice variant="tile" />
+  </Tile>
+)
 
-export const YogsCurrentScheduleLoader: Component<
-  CurrentScheduleLoaderProps
-> = (props) => {
-  return (
-    <div class={'min-h-20'}>
-      <QueryClientProvider client={new QueryClient()}>
-        <ConfigLoader
-          creators={props.creators}
-          fallbackSchedule={props.fallbackSchedule}
-        />
-      </QueryClientProvider>
-    </div>
-  )
-}
-
-interface BodyProps {
-  creators: YogsCreator[]
-  fallbackSchedule: YogsSchedule
-}
-
-const Body: Component<BodyProps> = (props) => {
+const Body: Component = () => {
   const schedule = useQuery(() =>
-    orpcPrivate.yogs.schedule.queryOptions({
-      staleTime: 60_000,
-      refetchInterval: 60_000 * 5,
-      refetchOnMount: true,
-      refetchOnReconnect: true,
-      refetchIntervalInBackground: true,
-      refetchOnWindowFocus: false,
-    }),
+    orpcPrivate.yogs.schedule.queryOptions(refetch),
   )
-
-  const now = useNow()
-  const isBeforeJJ = useIsBeforeJJ()
-  const isAfterJJEnd = useIsAfterJJEnd()
-  const jjStartCountdown = useJJStartCountdown()
-
-  const showCountdown = () => {
-    const isNov = now().month === 11
-    const isDec = now().month === 12
-    return isBeforeJJ() && !isAfterJJEnd() && (
-      isNov || isDec
-    )
-  }
 
   return (
     <Switch>
       <Match when={schedule.data}>
-        <div class={'flex flex-col items-center justify-center gap-2'}>
-          <Show when={showCountdown()}>
-            <Tile pad="sm" class="flex justify-center">
-              <Countdown
-                size="sm"
-                label="The collection goes live in"
-                duration={jjStartCountdown()}
-              />
-            </Tile>
-          </Show>
-          <div class="desktop-schedule flex w-full flex-col items-center justify-center gap-2">
-            <YogsScheduleComponent
-              schedule={schedule.data!}
-              creators={props.creators}
-            />
-            <Show when={schedule.data?.updatedAt}>
-              {(updatedAt) => {
-                return (
-                  <p class={'text-center text-white'}>
-                    Last Updated{' '}
-                    {DateTime.fromJSDate(updatedAt()).toLocaleString({
-                      year: 'numeric',
-                      month: 'short',
-                      day: 'numeric',
-                      hour: 'numeric',
-                      minute: 'numeric',
-                      timeZoneName: 'short',
-                    })}
-                  </p>
-                )
-              }}
-            </Show>
-          </div>
-          <div class={'max-w-[80vw]'}>
-            <HeadlinerTicker />
-          </div>
-          <div class="mobile-schedule flex w-full flex-col items-center justify-center gap-2">
-            <MobileYogsScheduleComponent
-              schedule={schedule.data!}
-              creators={props.creators}
-            />
-            <Show when={schedule.data?.updatedAt}>
-              {(updatedAt) => {
-                return (
-                  <p class={'text-center text-white'}>
-                    Last Updated{' '}
-                    {DateTime.fromJSDate(updatedAt()).toLocaleString({
-                      month: 'short',
-                      day: 'numeric',
-                      hour: 'numeric',
-                      minute: 'numeric',
-                      timeZoneName: 'short',
-                    })}
-                  </p>
-                )
-              }}
-            </Show>
-          </div>
-          <Creators creators={props.creators} />
-          <ScheduleNotice class="text-on-canvas-muted" />
-        </div>
+        {(data) => <YogsSeasonBody schedule={data()} />}
       </Match>
       <Match when={schedule.isPending}>
-        <PlaceholderSchedule schedule={props.fallbackSchedule} />
+        <PlaceholderSchedule />
       </Match>
       <Match when={schedule.error}>
         <Alert tone="danger" class="mx-auto max-w-2xl">
@@ -256,127 +84,5 @@ const Body: Component<BodyProps> = (props) => {
         </Alert>
       </Match>
     </Switch>
-  )
-}
-
-export const Creators: Component<{
-  creators: YogsCreator[]
-}> = (props) => {
-  const yogs = props.creators.filter(
-    (creator) => creator.type === 'yogs' || creator.type === 'staff',
-  ).sort((a, b) => a.name.localeCompare(b.name))
-  const bestOf = props.creators.filter((creator) => creator.type === 'best_of')
-  const friends = props.creators.filter((creator) => creator.type === 'friend')
-
-  return (
-    <Show when={props.creators.length > 0}>
-      <div class="flex flex-col items-center justify-center gap-2 p-4">
-        <p class="text-center text-2xl text-white">Yogs & Friends</p>
-        <Show when={yogs.length > 0}>
-          <p class="mb-1 text-xl text-white">Yogs</p>
-          <div class="flex flex-wrap items-center justify-center gap-2">
-            <For each={yogs}>
-              {(creator) => <YogsCreatorPill creator={creator} />}
-            </For>
-          </div>
-        </Show>
-        <Show when={bestOf.length > 0}>
-          <p class="mb-1 text-xl text-white">Best of</p>
-          <div class="flex flex-wrap items-center justify-center gap-2">
-            <For each={bestOf}>
-              {(creator) => <YogsCreatorPill creator={creator} />}
-            </For>
-          </div>
-        </Show>
-        <Show when={friends.length > 0}>
-          <p class="mb-1 text-xl text-white">Friends</p>
-          <div class="flex flex-wrap items-center justify-center gap-2">
-            <For each={friends}>
-              {(creator) => <YogsCreatorPill creator={creator} />}
-            </For>
-          </div>
-        </Show>
-      </div>
-    </Show>
-  )
-}
-
-/** Disclaimer and Yogscast social links below the schedule. */
-export const ScheduleNotice: Component<{ class?: string }> = (props) => {
-  return (
-    <div
-      class={cn(
-        'flex flex-col items-center justify-center gap-1 text-pretty text-center text-sm',
-        props.class,
-      )}
-    >
-      <p>
-        The schedule is subject to change and not all participants are
-        confirmed. For more information visit the Yogscast's social media.
-      </p>
-
-      <div
-        class={
-          'flex w-full flex-row items-center justify-center gap-4 p-2'
-        }
-      >
-        <a
-          class={'transition-all hover:scale-110'}
-          href={'https://twitch.tv/yogscast'}
-          target={'_blank'}
-          aria-label={'Yogscast Twitch channel'}
-        >
-          <TwitchIcon class={'size-4'} />
-        </a>
-        <a
-          class={'transition-all hover:scale-110'}
-          href={'https://www.youtube.com/yogscast'}
-          target={'_blank'}
-          aria-label={'Yogscast Youtube channel'}
-        >
-          <YoutubeIcon class={'size-4'} />
-        </a>
-        <a
-          class={'transition-all hover:scale-110'}
-          target={'_blank'}
-          href={'https://bsky.app/profile/yogscast.com'}
-          aria-label={'Yogscast Blue sky'}
-        >
-          <BskyIcon class={'size-4'} />
-        </a>
-        <a
-          class={'transition-all hover:scale-110'}
-          target={'_blank'}
-          href={'https://www.tiktok.com/@yogscastofficial'}
-          aria-label={'Jingle Jam Tiktok'}
-        >
-          <TiktokIcon class={'size-4'} />
-        </a>
-        <a
-          class={'transition-all hover:scale-110'}
-          target={'_blank'}
-          href={'https://www.instagram.com/officialyogscast/'}
-          aria-label={'Yogscast Instagram'}
-        >
-          <InstagramIcon class={'size-4'} />
-        </a>
-        <a
-          class={'transition-all hover:scale-110'}
-          target={'_blank'}
-          href={'https://x.com/yogscast'}
-          aria-label={'Yogscast Twitter'}
-        >
-          <TwitterIcon class={'size-4'} />
-        </a>
-      </div>
-      <p>
-        This Yogscast Jingle Jam schedule is maintained by the community.
-        If you find errors or see that a stream is missing use the contact
-        info below. Streams that appear here are not guaranteed to happen
-        or might be delayed. For more information visit the Jingle Jam
-        Twitter page. This schedule is a fan Project and not associated
-        with the Jingle Jam, the Yogscast or their partners.
-      </p>
-    </div>
   )
 }

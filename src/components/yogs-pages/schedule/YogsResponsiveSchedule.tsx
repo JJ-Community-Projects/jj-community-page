@@ -1,4 +1,4 @@
-import { type ParentComponent, Show } from 'solid-js'
+import { type Component, Show } from 'solid-js'
 import { YogsScheduleProvider } from './provider/YogsScheduleProvider.tsx'
 import { CreatorFilterProvider } from './provider/CreatorFilterProvider.tsx'
 import { YogsScheduleWeek } from './YogsScheduleWeek.tsx'
@@ -7,23 +7,24 @@ import {
   type CompactYogsSchedule,
   expandYogsSchedule,
 } from '../../../lib/utils/compactYogsSchedule.ts'
-import { YogsCreatorPills } from '../creators/YogsCreatorPills.tsx'
+import { YogsAndFriends } from '../creators/YogsAndFriends.tsx'
+import { YogsScheduleNotice } from '../common/YogsScheduleNotice.tsx'
 
 interface YogsResponsiveScheduleProps {
   schedule: CompactYogsSchedule
-  /** "Yogs & Friends" pills after the children; they need the same creators, so no second island. */
+  /** "Yogs & Friends" after the notice; they need the same creators, so no second island. */
   showCreators?: boolean
 }
 
 /**
- * Desktop week grid and mobile day list in one island: the schedule is serialized once, and the
- * page's `.desktop-schedule` / `.mobile-schedule` media queries pick the view. Server-rendered and
- * hydrated (see YogsScheduleProvider for what waits until the island is mounted). Children (an
- * Astro slot) go between the schedule and the creator pills.
+ * Desktop week grid and mobile day list in one island (hub, archive pages): the schedule is
+ * serialized once, and yogs-schedule.css picks the view. Server-rendered and hydrated (see
+ * YogsScheduleProvider for what waits until the island is mounted). Then the notice and, when
+ * asked for, Yogs & Friends.
  */
-export const YogsResponsiveSchedule: ParentComponent<
-  YogsResponsiveScheduleProps
-> = (props) => {
+export const YogsResponsiveSchedule: Component<YogsResponsiveScheduleProps> = (
+  props,
+) => {
   const schedule = expandYogsSchedule(props.schedule)
   return (
     <YogsScheduleProvider schedule={schedule} creators={schedule.creators}>
@@ -34,9 +35,9 @@ export const YogsResponsiveSchedule: ParentComponent<
         <div class="mobile-schedule w-full">
           <MobileYogsSchedule />
         </div>
-        {props.children}
+        <YogsScheduleNotice variant="canvas" class="mt-2" />
         <Show when={props.showCreators}>
-          <YogsCreatorPills creators={schedule.creators} />
+          <YogsAndFriends creators={schedule.creators} />
         </Show>
       </CreatorFilterProvider>
     </YogsScheduleProvider>

@@ -26,7 +26,7 @@ import { useYogsSchedule } from './provider/YogsScheduleProvider.tsx'
 import { useCreatorFilter } from './provider/CreatorFilterProvider.tsx'
 import { SolidMarkdown } from 'solid-markdown'
 import remarkGfm from 'remark-gfm'
-import { YogsStreamDisclaimer } from './YogsScheduleDisclaimer.tsx'
+import { YogsScheduleNotice } from '../common/YogsScheduleNotice.tsx'
 import { YogsCreatorDialog } from '../creators/YogsCreatorDialog.tsx'
 import { YogsCreatorChip } from '../creators/YogsCreatorChip.tsx'
 import { Dialog } from '../../ui/Dialog'
@@ -87,7 +87,7 @@ export const YogsScheduleDetailDialog: Component<
       title={stream().title}
       description={stream().subtitle || undefined}
       accent={{ background: color(), color: getTextColor(color()) }}
-      aside={<YogsStreamDisclaimer />}
+      aside={<YogsScheduleNotice variant="compact" />}
     >
       <div class="flex flex-col gap-4 text-sm">
         <div class="flex flex-col items-start gap-1">

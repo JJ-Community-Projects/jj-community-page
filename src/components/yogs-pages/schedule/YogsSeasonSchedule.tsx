@@ -10,15 +10,14 @@ import {
 import { CreatorFilterProvider } from './provider/CreatorFilterProvider.tsx'
 import { YogsScheduleWeek } from './YogsScheduleWeek.tsx'
 import { MobileYogsSchedule } from './mobile/MobileYogsSchedule.tsx'
-import {
-  Creators,
-  ScheduleNotice,
-} from './YogsCurrentScheduleLoader.tsx'
+import { YogsAndFriends } from '../creators/YogsAndFriends.tsx'
+import { YogsScheduleNotice } from '../common/YogsScheduleNotice.tsx'
 import { HeadlinerTicker } from '../../features/schedules/common/HeadlinerTicker.tsx'
 import {
   type CompactYogsSchedule,
   expandYogsSchedule,
 } from '../../../lib/utils/compactYogsSchedule.ts'
+import type { YogsSchedule } from '../../../lib/orpc/private/yogs/contract.ts'
 import {
   useIsAfterJJEnd,
   useIsBeforeJJ,
@@ -31,18 +30,23 @@ interface YogsSeasonScheduleProps {
 }
 
 /**
- * The current Yogscast schedule on /yogs: the same layout as YogsCurrentScheduleLoader's schedule
- * view, but server-rendered from the schedule the page loaded and hydrated, with desktop and mobile
- * sharing one provider (one serialized schedule).
+ * The current Yogscast schedule on /yogs, server-rendered from the schedule the page loaded and
+ * hydrated (one serialized schedule for desktop and mobile).
  */
 export const YogsSeasonSchedule: Component<YogsSeasonScheduleProps> = (
   props,
-) => {
-  const schedule = expandYogsSchedule(props.schedule)
+) => <YogsSeasonBody schedule={expandYogsSchedule(props.schedule)} />
+
+/**
+ * The season layout: countdown, grid / timeline with "Updated", headliner ticker, notice, Yogs &
+ * Friends. Shared by /yogs and by the PWA / embed loader, which fetches the schedule first.
+ */
+export const YogsSeasonBody: Component<{ schedule: YogsSchedule }> = (props) => {
+  const schedule = props.schedule
   return (
     <YogsScheduleProvider schedule={schedule} creators={schedule.creators}>
       <CreatorFilterProvider>
-        <div class={'flex flex-col items-center justify-center gap-2'}>
+        <div class={'flex w-full flex-col items-center justify-center gap-4'}>
           <CollectionCountdown />
           <div class="desktop-schedule flex w-full flex-col items-center justify-center">
             {/* Shrinks to the grid, so the line ends at its right edge */}
@@ -51,13 +55,13 @@ export const YogsSeasonSchedule: Component<YogsSeasonScheduleProps> = (
               <UpdatedAt year class="text-on-canvas-muted px-1 text-xs" />
             </div>
           </div>
-          <Ticker />
           <div class="mobile-schedule flex w-full flex-col items-center justify-center gap-2">
             <MobileYogsSchedule />
             <UpdatedAt class="text-on-canvas-muted text-center text-xs" />
           </div>
-          <Creators creators={schedule.creators} />
-          <ScheduleNotice class="text-on-canvas-muted" />
+          <Ticker />
+          <YogsScheduleNotice variant="canvas" />
+          <YogsAndFriends creators={schedule.creators} />
         </div>
       </CreatorFilterProvider>
     </YogsScheduleProvider>

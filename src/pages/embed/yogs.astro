@@ -2,12 +2,8 @@
 import '../../styles/global.css'
 export const prerender = false;
 import {YogsCurrentScheduleLoader} from "../../components/yogs-pages/schedule/YogsCurrentScheduleLoader";
-import {loadAllCreatorsFromContent} from "../../content/loadCreatorsFromContent";
-import {loadScheduleFromContent} from "../../content/loadScheduleFromContent";
-const creators = await loadAllCreatorsFromContent();
-const fallbackSchedule = await loadScheduleFromContent('2024')
 ---
 
 <div class={'min-h-32'}>
-    <YogsCurrentScheduleLoader client:only="solid-js" creators={creators} fallbackSchedule={fallbackSchedule!}/>
+    <YogsCurrentScheduleLoader client:only="solid-js"/>
 </div>

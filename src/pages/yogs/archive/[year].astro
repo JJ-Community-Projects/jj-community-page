@@ -11,6 +11,7 @@ import {
   getJingleJamEventSeries,
 } from '../../../content/getJingleJamEventSeries.ts'
 import { canonicalUrl } from '../../../lib/utils/canonical.ts'
+import YogsArchiveNav from '../../../components/yogs-pages/common/YogsArchiveNav.astro'
 
 export async function getStaticPaths() {
   const schedules = await getCollection('schedules')
@@ -44,6 +45,12 @@ const jsonLd = [
     { name: `${year}`, url: canonical },
   ]),
 ]
+
+// The year switcher: every year with an archive page, newest first
+const archiveYears = (await getCollection('schedules'))
+  .filter((entry) => entry.data.visible && /^\d{4}$/.test(entry.id))
+  .map((entry) => Number(entry.id))
+  .sort((a, b) => b - a)
 ---
 
 <PageShell width="full"
@@ -52,25 +59,18 @@ const jsonLd = [
   canonical={canonical}
   jsonLd={jsonLd}
 >
-  <PageHeader class="mb-4" title={`Yogscast Jingle Jam ${year} Schedule`}>
-    <span slot="subtitle">
-      Every stream of the Yogscast Jingle Jam {year} with participants and VODs.{' '}
-      <a class="text-on-canvas underline" href="/yogs">Current Yogscast Jingle Jam schedule</a>
-    </span>
-  </PageHeader>
+  <div class="flex w-full flex-col items-center gap-4">
+    <PageHeader
+      title={`Yogscast Jingle Jam ${year} Schedule`}
+      subtitle={`Every stream of the Yogscast Jingle Jam ${year} with participants and VODs.`}
+      back={{ href: '/yogs', label: 'Current schedule' }}
+    />
+    <YogsArchiveNav years={archiveYears} current={Number(year)} />
 
-  <YogsResponsiveSchedule
-    schedule={compactYogsSchedule(schedule)}
-    showCreators
-    client:load
-  >
-    <p class="text-on-canvas-muted mx-auto mt-4 max-w-3xl text-center text-sm">
-      This Yogscast Jingle Jam schedule is maintained by the community. If you
-      find errors or see that a stream is missing use the contact info below.
-      Streams that appear here are not guaranteed to happen or might be delayed.
-      For more information visit the Jingle Jam Twitter page. This schedule is a
-      fan Project and not associated with the Jingle Jam, the Yogscast or their
-      partners.
-    </p>
-  </YogsResponsiveSchedule>
+    <YogsResponsiveSchedule
+      schedule={compactYogsSchedule(schedule)}
+      showCreators
+      client:load
+    />
+  </div>
 </PageShell>

@@ -1,17 +1,16 @@
 ---
 export const prerender = false;
-import {loadScheduleFromContent} from "../../../content/loadScheduleFromContent";
 import {loadAllCreatorsFromContent} from "../../../content/loadCreatorsFromContent";
 import {YogsCurrentScheduleLoader} from "../../../components/yogs-pages/schedule/YogsCurrentScheduleLoader";
 
 import PageShell from '../../../layouts/PageShell.astro'
 import { getConfigYear } from '../../../lib/utils/configYear.ts'
 
+// Only for the description of a filtered link; the island fetches the schedule with its creators
 const creators = await loadAllCreatorsFromContent();
 
 const year = await getConfigYear();
 
-const fallbackSchedule = await loadScheduleFromContent('2024')
 const filter = Astro.url.searchParams.get('filter') || '';
 const filterCreators = () => {
   if (filter === '') {
@@ -61,6 +60,6 @@ if (filteredCreators) {
         canonical="https://jinglejam.ostof.dev/yogs"
 >
     <div class={'min-h-32'}>
-        <YogsCurrentScheduleLoader client:only="solid-js" creators={creators} fallbackSchedule={fallbackSchedule!}/>
+        <YogsCurrentScheduleLoader client:only="solid-js"/>
     </div>
 </PageShell>
