@@ -154,30 +154,6 @@ const rateLimit = server.$context<ORPCContext>().middleware(
   },
 )
 
-const originCheck = server.$context<ORPCContext>().middleware(
-  async (
-    { context, next },
-    input: {
-      channelId: string
-      userId: string
-    },
-  ) => {
-    const origin = context.resHeaders?.get('origin')
-    if (!origin) {
-      return next()
-    }
-
-    if (origin.includes('ext-twitch.tv')) {
-      return next()
-    }
-    if (origin.includes('http://localhost')) {
-      return next()
-    }
-
-    return next()
-  },
-)
-
 const os = implement(contracts).use(hasAstroContext)
 
 type ExtensionInput = { channelId: string; userId: string }
