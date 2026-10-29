@@ -8,6 +8,7 @@ import { QueryClientProvider, useQuery } from '@tanstack/solid-query'
 import { QueryClient } from '@tanstack/query-core'
 import type { CharityItem, FundraiserItem, } from '../../../../lib/orpc/private/overlay/contract.ts'
 import { DEMO_CHARITIES } from '../demoData.ts'
+import { getTextColor } from '../../../../lib/utils/textColors.ts'
 
 export type TransitionStyle = 'fade' | 'slide' | 'flip' | 'none'
 
@@ -72,6 +73,17 @@ const SwapTransition: Component<{
       </Transition>
     </Show>
   )
+}
+
+// The 'charity' theme uses each cause's own colour. getTextColor expects
+// #rrggbb, so expand #rgb and drop alpha; anything else falls back to default.
+function charityHex(color?: string) {
+  if (!color) return undefined
+  if (/^#[0-9a-f]{3}$/i.test(color))
+    return '#' + [...color.slice(1)].map((x) => x + x).join('')
+  return /^#[0-9a-f]{6}([0-9a-f]{2})?$/i.test(color)
+    ? color.slice(0, 7)
+    : undefined
 }
 
 // Header cards (mirrors V1 CharityOverlay2)
@@ -177,7 +189,7 @@ const OverlayHeader: Component<{
 export type Props = {
   headers?: string[]
   includeTotals?: boolean // maps to showRaised
-  theme?: 'default' | 'red' | 'blue' | 'carousel'
+  theme?: 'default' | 'red' | 'blue' | 'carousel' | 'charity'
   headerTheme?: 'default' | 'red' | 'blue'
   showDesc?: boolean
   qrCode?: 'none' | 'fundraiser' | 'charity'
@@ -330,13 +342,17 @@ const Charities2OverlayBody: Component<Props> = (props) => {
       <Show when={showDots() && !oneCause() && displayList().length > 0}>
         <div class="flex items-center justify-center gap-1.5 pb-2">
           <For each={displayList()}>
-            {(_, i) => (
+            {(c, i) => (
               <span
                 class={twMerge(
                   'size-2 rounded-full shadow-md transition-all duration-500',
                   bg(currentTheme(i())),
                   i() === idx() % displayList().length && 'size-3',
                 )}
+                style={{
+                  'background-color':
+                    theme() === 'charity' ? charityHex(c.color) : undefined,
+                }}
               />
             )}
           </For>
@@ -355,6 +371,12 @@ const CharityItem: Component<{
   showUrl: boolean
   showRaised: boolean
 }> = (props) => {
+  const own = () =>
+    props.theme === 'charity' ? charityHex(props.charity.color) : undefined
+  const ownFG = () => {
+    const c = own()
+    return c ? getTextColor(c) : undefined
+  }
   const background = () =>
     props.theme === 'red'
       ? 'bg-primary-500'
@@ -366,18 +388,22 @@ const CharityItem: Component<{
       ? 'text-white'
       : 'text-black'
   const raisedColor = () =>
-    props.theme === 'red' || props.theme === 'blue'
-      ? 'text-white'
-      : 'text-primary-500'
+    own()
+      ? ''
+      : props.theme === 'red' || props.theme === 'blue'
+        ? 'text-white'
+        : 'text-primary-500'
 
   const qrCodeFG = () =>
-    props.theme === 'red' || props.theme === 'blue' ? 'white' : 'black'
+    ownFG() ??
+    (props.theme === 'red' || props.theme === 'blue' ? 'white' : 'black')
   const qrCodeBG = () =>
-    props.theme === 'red'
+    own() ??
+    (props.theme === 'red'
       ? 'var(--color-primary-500)'
       : props.theme === 'blue'
         ? 'var(--color-accent-500)'
-        : 'white'
+        : 'white')
 
   const qrcodeUrl = () => {
     if (props.qrCode === 'fundraiser') {
@@ -409,6 +435,7 @@ const CharityItem: Component<{
           background(),
           textColor(),
         )}
+        style={{ 'background-color': own(), color: ownFG() }}
       >
         <img
           class={'h-20 w-20 rounded-lg bg-white'}

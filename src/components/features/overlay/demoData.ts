@@ -34,6 +34,7 @@ export const DEMO_CHARITIES: CharitiesPreviewData = {
   charities: [
     {
       id: '46fb567a-6d11-462a-8945-cd85b39735a6',
+      color: '#cbf900',
       name: 'CALM',
       description:
         'Supporting their life-saving suicide prevention helpline and creating vital online resources for anyone struggling with life.',
@@ -45,6 +46,7 @@ export const DEMO_CHARITIES: CharitiesPreviewData = {
     },
     {
       id: 'a030eee8-edfc-4782-ade9-a883b46a317a',
+      color: '#cb222d',
       name: 'War Child',
       description:
         'Protecting, educating and advocating for children impacted by war worldwide, including in Lebanon, Gaza and Ukraine.',
@@ -56,6 +58,7 @@ export const DEMO_CHARITIES: CharitiesPreviewData = {
     },
     {
       id: 'b25aeef5-0206-411e-9711-be7005b23722',
+      color: '#0073b6',
       name: 'SpecialEffect',
       description:
         'Supporting people with physical disabilities to access gaming through the innovative use of assistive technology.',
@@ -67,6 +70,7 @@ export const DEMO_CHARITIES: CharitiesPreviewData = {
     },
     {
       id: '8544df59-538f-4750-8352-1acb6cd27c1a',
+      color: '#0063b8',
       name: 'Make-A-Wish',
       description:
         "Granting life-changing wishes for children with critical illnesses, creating moments of hope, strength, and joy when they're needed most.",
@@ -78,6 +82,7 @@ export const DEMO_CHARITIES: CharitiesPreviewData = {
     },
     {
       id: '8a1edcb6-d5d1-4b0a-a84c-38ebd4c7c191',
+      color: '#ef5b41',
       name: 'The Trevor Project',
       description:
         'Providing 24/7 crisis intervention services to LGBTQ+ young people backed by research, education, advocacy, and peer support.',
@@ -89,6 +94,7 @@ export const DEMO_CHARITIES: CharitiesPreviewData = {
     },
     {
       id: '4cf222bd-6fcd-4126-9b34-4aebc97a1957',
+      color: '#000000',
       name: 'WWF',
       description:
         'Leading the fight against climate change for a world where nature and wildlife can thrive for future generations.',
@@ -100,6 +106,7 @@ export const DEMO_CHARITIES: CharitiesPreviewData = {
     },
     {
       id: '1e060cf5-49e2-4887-b302-3a0a9b518b64',
+      color: '#09d7ff',
       name: 'GOSH Charity',
       description:
         'Supporting the GOSH Play Team, who help make hospital a bit less hard and a lot more fun for seriously ill children.',
@@ -111,6 +118,7 @@ export const DEMO_CHARITIES: CharitiesPreviewData = {
     },
     {
       id: '1eab2296-cf54-4c47-8640-951795d5b76b',
+      color: '#2b2f88',
       name: 'Become',
       description:
         'Helping care-experienced young people get the guidance, support, and community that everyone needs.',

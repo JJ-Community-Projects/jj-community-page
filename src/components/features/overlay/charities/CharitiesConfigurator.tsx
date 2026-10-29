@@ -18,7 +18,7 @@ import { Select } from '../../../ui/Select'
 import { TileGroup } from '../../../ui/Tile'
 import { Spinner } from '../../../ui/Status'
 
-type Theme2 = 'default' | 'red' | 'blue' | 'carousel'
+type Theme2 = 'default' | 'red' | 'blue' | 'carousel' | 'charity'
 type HeaderTheme2 = 'default' | 'red' | 'blue'
 type QrCode = 'none' | 'fundraiser' | 'charity'
 type Interval = 'default' | 'slow'
@@ -114,7 +114,7 @@ export const CharitiesConfigurator: Component = () => {
       <Select
         label="Theme"
         showLabel
-        options={['default', 'red', 'blue', 'carousel'] as Theme2[]}
+        options={['default', 'red', 'blue', 'carousel', 'charity'] as Theme2[]}
         value={theme2()}
         onChange={setTheme2}
         format={titleCase}
