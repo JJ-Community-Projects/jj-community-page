@@ -33,6 +33,12 @@ export const StreamResources: Component<{ user: User | null }> = (props) => (
         >
           Get the Panel Extension on Twitch
         </Button>
+        <p class="text-fg-muted max-w-prose">
+          The panel sits below the Twitch video player next to your other
+          channel panels, so viewers can scroll down to it at any time. It also
+          works on the Twitch mobile app, there it is a button above chat. It shows the charities, community
+          fundraisers and schedules.
+        </p>
         <Carousel
           images={panelImages}
           alt="JJ Twitch Panel Extension screenshot"
