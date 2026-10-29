@@ -41,7 +41,7 @@ export const CharitiesConfigurator: Component = () => {
   const [qrCode, setQrCode] = createSignal<QrCode>('none')
   const [currency, setCurrency] = createSignal<Currency>('GBP')
   const [showUrl, setShowUrl] = createSignal<boolean>(true)
-  const [showDots, setShowDots] = createSignal<boolean>(false)
+  const [showDots, setShowDots] = createSignal<boolean>(true)
   const [selectedIds, setSelectedIds] = createSignal<string[]>([])
   const [previewData, setPreviewData] = createSignal<PreviewDataMode>('test')
 

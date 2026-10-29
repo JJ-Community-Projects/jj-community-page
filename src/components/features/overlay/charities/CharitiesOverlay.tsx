@@ -22,7 +22,7 @@ function bg(theme: string) {
 }
 
 const HeaderCard: Component<{ theme: string; children: any }> = (p) => (
-  <div class="w-full p-2">
+  <div class="w-full px-2 pt-2">
     <div
       class={twMerge(
         'flex h-11 w-full flex-row items-center justify-center rounded-2xl p-2 text-4xl font-bold shadow-xl transition-all',
@@ -168,7 +168,8 @@ const Charities2OverlayBody: Component<Props> = (props) => {
   const showQRCode = () => qrCode() !== 'none'
   const showUrl = () =>
     props.showUrl === undefined ? true : Boolean(props.showUrl)
-  const showDots = () => Boolean(props.showDots)
+  const showDots = () =>
+    props.showDots === undefined ? true : Boolean(props.showDots)
   const causes = () => props.causes ?? []
 
   const [displayList, setDisplayList] = createSignal<CharityItem[]>([])

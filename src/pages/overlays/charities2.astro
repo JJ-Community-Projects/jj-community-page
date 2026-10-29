@@ -42,7 +42,7 @@ const currency = (() => {
   return v === 'USD' ? 'USD' : v === 'EUR' ? 'EUR' : 'GBP'
 })()
 const showUrl = showUrlParam === undefined ? undefined : (showUrlParam === 'true' || showUrlParam === '1')
-const showDots = showDotsParam === 'true' || showDotsParam === '1'
+const showDots = showDotsParam === null || showDotsParam === 'true' || showDotsParam === '1'
 const causes = causesParam
   ? causesParam.split(',').map((s) => (s.trim()))
   : undefined
