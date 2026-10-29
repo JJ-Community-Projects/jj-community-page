@@ -84,10 +84,6 @@ const useYogsScheduleHook = (
     )
   }
 
-  const longestDayLength = () => {
-    return days().reduce((acc, day) => Math.max(acc, day.streams.length), 0)
-  }
-
   // The server render and the first client render (hydration) must produce the same markup, so
   // times are shown in London time with a fixed locale and nothing depends on the clock until the
   // island is mounted; then dates switch to the viewer's timezone and countdowns / live state start.
@@ -133,7 +129,6 @@ const useYogsScheduleHook = (
     prevDay,
     times,
     getCreatorStreams,
-    longestDayLength,
     filterModalSignal,
     exportModalSignal
   }

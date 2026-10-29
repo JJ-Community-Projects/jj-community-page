@@ -1,16 +1,18 @@
 import { type Component, Show } from 'solid-js'
 import { YogsScheduleDetailDialog } from './YogsScheduleDetailDialog.tsx'
-import { getTextColor, isColorLight } from '../../../lib/utils/textColors.ts'
-import { BiLogosTwitch, BiLogosYoutube } from 'solid-icons/bi'
-import { DateTime } from 'luxon'
+import { getTextColor } from '../../../lib/utils/textColors.ts'
 import { useCreatorFilter } from './provider/CreatorFilterProvider.tsx'
-import { YogsStreamUtils } from '../../../lib/utils/YogsStreamUtils.ts'
 import type { YogsStream } from '../../../lib/orpc/private/yogs/contract.ts'
 import { logSlotClick } from '../../../lib/analytics.ts'
 import { createModalSignal } from '../../../lib/createModalSignal.ts'
-import { useYogsSchedule } from './provider/YogsScheduleProvider.tsx'
 import { cn, focusRing } from '../../ui/cn'
 import { LiveBadge } from '../../ui/Labels'
+import {
+  CountdownChip,
+  LiveRing,
+  useStreamState,
+  VodIcons,
+} from './YogsStreamParts.tsx'
 
 interface YogsStreamTileProps {
   stream: YogsStream
@@ -43,42 +45,17 @@ export const YogsStreamTile: Component<YogsStreamTileProps> = (props) => {
   const modal = createModalSignal()
 
   const { isSlotPartOfFilter } = useCreatorFilter()
-  const { mounted, now, isRunning, toDateTime } = useYogsSchedule()
+  const { isLive, showCountdown, ended, countdown, label } = useStreamState(
+    () => props.stream,
+  )
 
   const stream = () => props.stream
   const title = () => stream().title
   const subtitle = () => stream().subtitle
   const tileSize = () => stream().size
   const color = () => stream().color
-
-  const start = () => DateTime.fromJSDate(stream().start)
-  const end = () => DateTime.fromJSDate(stream().end)
-  const isLive = () => mounted() && start() < now() && end() > now()
-  const showCountdown = () => mounted() && YogsStreamUtils.isBefore(stream(), now())
-  // Filtered-out tiles stay clickable and focusable, only dimmed; ended ones only while the event runs
+  // Filtered-out tiles stay clickable and focusable, only dimmed
   const dimmed = () => !isSlotPartOfFilter(stream())
-  const ended = () => isRunning() && end() < now()
-
-  const countdown = () => {
-    const d = start().diff(now())
-    if (d.as('hour') < 1) {
-      return d.toFormat("mm'm' ss's'")
-    }
-    if (d.as('day') < 1) {
-      return d.toFormat("h'h' mm'm' ss's'")
-    }
-    return d.toFormat("d'd' hh'h' mm'm' ss's'")
-  }
-
-  const label = () =>
-    [
-      title(),
-      subtitle(),
-      `${toDateTime(stream().start).toFormat('EEE d MMM, HH:mm')} – ${toDateTime(stream().end).toFormat('HH:mm')}`,
-      isLive() && 'live now',
-    ]
-      .filter(Boolean)
-      .join(', ')
 
   return (
     <>
@@ -108,10 +85,7 @@ export const YogsStreamTile: Component<YogsStreamTileProps> = (props) => {
           }}
         >
           <Show when={isLive()}>
-            <span
-              class="rounded-tile pointer-events-none absolute inset-0 animate-pulse ring-2 ring-white ring-inset motion-reduce:animate-none"
-              aria-hidden="true"
-            />
+            <LiveRing />
           </Show>
           <div class="flex min-h-0 w-full flex-1 flex-col items-center justify-center gap-0.5">
             <Show when={isLive() && tileSize() > 1}>
@@ -122,46 +96,18 @@ export const YogsStreamTile: Component<YogsStreamTileProps> = (props) => {
               <p class={subtitleClass(tileSize())}>{subtitle()}</p>
             </Show>
             <Show when={showCountdown()}>
-              <p
-                class={cn(
-                  'rounded-full px-1.5 font-sans font-semibold whitespace-nowrap tabular-nums',
-                  countdownSize(tileSize()),
-                  isColorLight(color()) ? 'bg-black/10' : 'bg-black/15',
-                )}
-              >
+              <CountdownChip color={color()} class={countdownSize(tileSize())}>
                 {countdown()}
-              </p>
+              </CountdownChip>
             </Show>
           </div>
           {/* VODs exist after the start; with a countdown the row would only crowd the tile */}
           <Show when={tileSize() > 1 && !showCountdown()}>
-            <VodIcons stream={props.stream} />
+            <VodIcons stream={props.stream} class="justify-center" />
           </Show>
         </button>
       </div>
       <YogsScheduleDetailDialog stream={props.stream} modalSignal={modal} />
     </>
-  )
-}
-
-const VodIcons: Component<{ stream: YogsStream }> = (props) => {
-  const { mounted } = useYogsSchedule()
-  const types = () => props.stream.vods?.map((vod) => vod.type) ?? []
-
-  // Drawn after hydration only: as inline SVGs in every tile they were a sixth of the server-rendered
-  // page. The row keeps its height meanwhile.
-  return (
-    <Show when={types().length > 0}>
-      <div class="flex min-h-3 items-center justify-center gap-1.5 opacity-80" aria-hidden="true">
-        <Show when={mounted()}>
-          <Show when={types().includes('twitch')}>
-            <BiLogosTwitch class="size-3" />
-          </Show>
-          <Show when={types().includes('youtube')}>
-            <BiLogosYoutube class="size-3" />
-          </Show>
-        </Show>
-      </div>
-    </Show>
   )
 }

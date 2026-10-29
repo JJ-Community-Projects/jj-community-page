@@ -54,7 +54,7 @@ export const YogsSeasonSchedule: Component<YogsSeasonScheduleProps> = (
           <Ticker />
           <div class="mobile-schedule flex w-full flex-col items-center justify-center gap-2">
             <MobileYogsSchedule />
-            <UpdatedAt class="text-center text-white" />
+            <UpdatedAt class="text-on-canvas-muted text-center text-xs" />
           </div>
           <Creators creators={schedule.creators} />
           <ScheduleNotice class="text-on-canvas-muted" />
