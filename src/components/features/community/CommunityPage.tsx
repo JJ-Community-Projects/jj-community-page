@@ -1,18 +1,17 @@
 import { type Component, For, Show } from 'solid-js'
-import type { JJCampaignType } from '../../../lib/orpc/private/jjData/contract.ts'
 import { createI18n, I18nProvider } from 'solid-i18n'
 import { useLocale } from '@kobalte/core'
 import { useIsBeforeJJ, useIsJJ } from '../../../lib/utils/jjDates.ts'
 import { QueryClientProvider } from '@tanstack/solid-query'
 import { QueryClient } from '@tanstack/query-core'
 import {
+  type CauseGroup,
   CommunityPageProvider,
   useCommunityPage,
 } from './CommunityPageProvider.tsx'
 import { UpcomingStreams } from './UpcomingStreams.tsx'
-import { FundraiserCard } from './FundraiserCard.tsx'
+import { CommunityFundraiserItem } from './CommunityFundraiserItem.tsx'
 import { CommunityCauseCard } from './CommunityCauseCard.tsx'
-import { CommunityUsers } from './CommunityUsers.tsx'
 import { CommunityTagSearch } from './CommunityTagSearch.tsx'
 import type { CharitiesStatic } from '../../../content/schema.ts'
 import {
@@ -27,6 +26,8 @@ import { TagCatalogContext } from '../../../lib/useTagSearch.ts'
 import type { CatalogTag } from '../../../lib/tagCatalog.ts'
 import { JJStartCountdown } from '../../ui/Countdown'
 import { Segmented } from '../../ui/Form'
+import { Button } from '../../ui/Button'
+import { DateDivider } from '../../ui/Labels'
 import { Alert, EmptyState, Spinner } from '../../ui/Status'
 import { Tile } from '../../ui/Tile'
 
@@ -153,16 +154,8 @@ const Body: Component = () => {
             onAdd={addSelectedTag}
             onRemove={removeSelectedTag}
           />
-          <Show
-            when={sortBy() === 'cause'}
-            fallback={
-              <>
-                <CampaignGrid />
-                <CommunityUsers />
-              </>
-            }
-          >
-            <CampaignGridByCause />
+          <Show when={sortBy() === 'cause'} fallback={<FundraiserGrid />}>
+            <FundraiserGridByCause />
           </Show>
         </div>
       </div>
@@ -173,47 +166,69 @@ const Body: Component = () => {
   )
 }
 
-const CampaignGrid: Component = () => {
-  const { campaignsSorted, currency } = useCommunityPage()
+// Three tiles per row once the content column is wide enough (xl, next to the charity sidebar)
+const gridClass = 'grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-3'
+
+const NoTagMatches: Component = () => {
+  const { clearSelectedTags } = useCommunityPage()
   return (
-    <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
-      <For each={campaignsSorted()}>
-        {(campaign: JJCampaignType) => (
-          <FundraiserCard campaign={campaign} currency={currency()} />
-        )}
-      </For>
-    </div>
+    <EmptyState
+      title="No fundraisers match the selected tags."
+      action={
+        <Button size="sm" onClick={() => clearSelectedTags()}>
+          Clear selected tags
+        </Button>
+      }
+    />
   )
 }
 
-const CampaignGridByCause: Component = () => {
-  const {
-    campaignsByCause,
-    campaignsByCauseFiltered,
-    selectedTagIds,
-    currency,
-  } = useCommunityPage()
-  const groups = () =>
-    selectedTagIds().length > 0
-      ? campaignsByCauseFiltered()
-      : campaignsByCause()
-
+const FundraiserGrid: Component = () => {
+  const { fundraisersSorted, currency } = useCommunityPage()
   return (
-    <div class="flex w-full flex-col gap-5">
-      <For each={groups()}>
-        {(group) => (
-          <section class="flex flex-col gap-2">
-            <CommunityCauseCard cause={group.cause} />
-            <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
-              <For each={group.campaigns}>
-                {(campaign) => (
-                  <FundraiserCard campaign={campaign} currency={currency()} />
-                )}
-              </For>
-            </div>
-          </section>
-        )}
-      </For>
-    </div>
+    <Show when={fundraisersSorted().length > 0} fallback={<NoTagMatches />}>
+      <div class={gridClass}>
+        <For each={fundraisersSorted()}>
+          {(fundraiser) => (
+            <CommunityFundraiserItem
+              fundraiser={fundraiser}
+              currency={currency()}
+            />
+          )}
+        </For>
+      </div>
+    </Show>
+  )
+}
+
+const FundraiserGridByCause: Component = () => {
+  const { fundraisersByCause, currency } = useCommunityPage()
+  return (
+    <Show when={fundraisersByCause().length > 0} fallback={<NoTagMatches />}>
+      <div class="flex w-full flex-col gap-5">
+        <For each={fundraisersByCause()}>
+          {(group: CauseGroup) => (
+            <section class="flex flex-col gap-2" aria-label={group.title}>
+              <Show
+                when={group.cause}
+                fallback={<DateDivider>{group.title}</DateDivider>}
+              >
+                {(cause) => <CommunityCauseCard cause={cause()} />}
+              </Show>
+              <div class={gridClass}>
+                <For each={group.fundraisers}>
+                  {(fundraiser) => (
+                    <CommunityFundraiserItem
+                      fundraiser={fundraiser}
+                      currency={currency()}
+                    />
+                  )}
+                </For>
+              </div>
+            </section>
+          )}
+        </For>
+      </div>
+    </Show>
   )
 }
