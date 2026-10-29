@@ -6,6 +6,13 @@ import { cn, focusRing, tileSurface } from './cn'
 /** Kobalte's accordion root (`collapsible`, `multiple`, `value`, `onChange`). */
 export const Accordion = KAccordion
 
+/**
+ * Slide animation for `Accordion.Content`. The 4px gutter (padding, cancelled by a negative margin) keeps the
+ * content's rings and tile shadows outside the clip while it animates.
+ */
+export const accordionContentMotion =
+  '-m-1 overflow-hidden p-1 motion-safe:data-closed:animate-accordion-up motion-safe:data-expanded:animate-accordion-down'
+
 /** One accordion row: a tile-styled trigger; the content below picks its own surface. */
 export const AccordionItem: ParentComponent<{
   value: string
@@ -46,7 +53,10 @@ export const AccordionItem: ParentComponent<{
           />
         </KAccordion.Trigger>
       </KAccordion.Header>
-      <KAccordion.Content class="data-closed:hidden">
+      {/* Always-mounted content just hides when closed; the rest slides */}
+      <KAccordion.Content
+        class={props.forceMount ? 'data-closed:hidden' : accordionContentMotion}
+      >
         {props.children}
       </KAccordion.Content>
     </KAccordion.Item>

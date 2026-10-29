@@ -18,6 +18,8 @@ type DialogProps = {
   size?: keyof typeof sizes
   /** Buttons, right-aligned below the body. */
   footer?: JSX.Element
+  /** Header band and border in a colour (e.g. a stream's), with its readable text colour. */
+  accent?: { background: string; color: string }
   children?: JSX.Element
 }
 
@@ -33,16 +35,40 @@ export const Dialog: Component<DialogProps> = (props) => {
             class={cn(
               'rounded-tile bg-surface-strong text-fg shadow-tile-hover flex max-h-[calc(100dvh-2rem)] w-full flex-col overflow-hidden',
               sizes[props.size ?? 'md'],
+              props.accent && 'border-2',
             )}
+            style={
+              props.accent
+                ? { 'border-color': props.accent.background }
+                : undefined
+            }
           >
-            <div class="border-line flex items-start gap-2 border-b px-4 py-3">
+            <div
+              class={cn(
+                'flex items-start gap-2 px-4 py-3',
+                !props.accent && 'border-line border-b',
+              )}
+              style={
+                props.accent
+                  ? {
+                      'background-color': props.accent.background,
+                      color: props.accent.color,
+                    }
+                  : undefined
+              }
+            >
               <div class="min-w-0 flex-1">
                 <KDialog.Title class="text-lg font-semibold">
                   {props.title}
                 </KDialog.Title>
                 <Show when={props.description}>
                   {(description) => (
-                    <KDialog.Description class="text-fg-muted text-sm">
+                    <KDialog.Description
+                      class={cn(
+                        'text-sm',
+                        props.accent ? 'opacity-90' : 'text-fg-muted',
+                      )}
+                    >
                       {description()}
                     </KDialog.Description>
                   )}
@@ -53,7 +79,10 @@ export const Dialog: Component<DialogProps> = (props) => {
                 variant="ghost"
                 size="sm"
                 aria-label="Close"
-                class="-mr-1"
+                class={cn(
+                  '-mr-1',
+                  props.accent && 'text-current hover:bg-black/10',
+                )}
               >
                 <FaSolidXmark class="size-4" aria-hidden="true" />
               </KDialog.CloseButton>

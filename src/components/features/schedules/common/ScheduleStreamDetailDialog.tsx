@@ -1,4 +1,4 @@
-import { type Component, type JSX, Show } from 'solid-js'
+import { type Component, type JSX, Match, Show, Switch } from 'solid-js'
 import type { Stream } from '../../../../lib/orpc/public/schemas/schedules.ts'
 import { DateTime, Duration } from 'luxon'
 import ical, { ICalAlarmType } from 'ical-generator'
@@ -7,9 +7,10 @@ import { type ModalSignal } from '../../../../lib/createModalSignal.ts'
 import { getStreamColor } from '../../../../functions/jjDatesToColors.ts'
 import { Button } from '../../../ui/Button'
 import { Dialog } from '../../../ui/Dialog'
-import { Chip, LiveBadge } from '../../../ui/Labels'
+import { LiveBadge } from '../../../ui/Labels'
+import { getTextColor } from '../../../../lib/utils/textColors.ts'
 import { StreamTags } from './StreamTags'
-import { StreamParticipants } from './StreamParticipants'
+import { StreamParticipants, sectionLabel } from './StreamParticipants'
 import type { UserDisplay } from '../../../../lib/orpc/public/schemas/UserDisplaySchema.ts'
 import {
   FaBrandsTwitch,
@@ -21,11 +22,14 @@ interface ScheduleStreamDetailDialogProps {
   stream: Stream
   modalSignal: ModalSignal
   user?: UserDisplay
+  /** The row's colour (e.g. its day's); the stream's own day colour when unset. */
+  color?: string
 }
 
 /**
- * Dialog component that displays detailed information about a stream
- * Shows title, subtitle, description, time, countdown, and tags
+ * A stream's details, laid out like the extension's slot dialog: header band in the stream colour,
+ * then when (with live / countdown / ended), description, participants, tags, the streamer's links
+ * and the calendar buttons.
  */
 export const ScheduleStreamDetailDialog: Component<
   ScheduleStreamDetailDialogProps
@@ -67,59 +71,39 @@ export const ScheduleStreamDetailDialog: Component<
     return parts
   }
 
-  // Convert UTC dates from backend to DateTime objects
-  const getStreamStartDateTime = () => {
-    // Create DateTime from JS Date, assuming it's in UTC, then convert to local time
-    return DateTime.fromJSDate(stream().start, { zone: 'utc' }).toLocal()
-  }
+  // UTC dates from the backend, shown in the viewer's time zone
+  const start = () =>
+    DateTime.fromJSDate(stream().start, { zone: 'utc' }).toLocal()
+  const end = () => DateTime.fromJSDate(stream().end, { zone: 'utc' }).toLocal()
 
-  const getStreamEndDateTime = () => {
-    // Create DateTime from JS Date, assuming it's in UTC, then convert to local time
-    return DateTime.fromJSDate(stream().end, { zone: 'utc' }).toLocal()
-  }
+  // The UTC day's colour, like the rows, unless the row passes its own
+  const color = () =>
+    props.color ??
+    getStreamColor(DateTime.fromJSDate(stream().start, { zone: 'utc' }))
 
-  // Calculate the highlight color using getStreamColor
-  const getHighlightColor = () => {
-    // For color calculation, we still use UTC to maintain consistent colors
-    const startDate = DateTime.fromJSDate(stream().start, { zone: 'utc' })
-    return getStreamColor(startDate)
-  }
-
-  const highlightColor = getHighlightColor()
-
-  const showCountdown = () => {
-    return getStreamStartDateTime() > now() && !stream().isTimeTBD
-  }
-
-  const isLive = () => {
-    const start = getStreamStartDateTime()
-    const end = getStreamEndDateTime()
-    return start < now() && end > now()
-  }
-
-  const diff = () => {
-    return getStreamStartDateTime().diff(now())
-  }
+  const isLive = () => start() < now() && end() > now()
+  const isOver = () => end() < now()
+  const showCountdown = () => start() > now() && !stream().isTimeTBD
 
   const countdownFormat = () => {
-    const d = diff()
+    const d = start().diff(now())
     if (d.as('day') < 1) {
       return d.toFormat("hh'h' mm'm' ss's'")
     }
     return d.toFormat("dd'd' hh'h' mm'm' ss's'")
   }
 
-  const when = () =>
-    stream().isTimeTBD
-      ? `${getStreamStartDateTime().toLocaleString({ weekday: 'short', month: 'short', day: 'numeric' })} TBD`
-      : getStreamStartDateTime().toLocaleString({
-          weekday: 'short',
-          month: 'short',
-          day: 'numeric',
-          hour: 'numeric',
-          minute: 'numeric',
-          timeZoneName: 'short',
-        })
+  // "Sat 6 Dec · 20:00 – 22:00 GMT"
+  const when = () => {
+    const day = start().toLocaleString({
+      weekday: 'short',
+      day: 'numeric',
+      month: 'short',
+    })
+    if (stream().isTimeTBD) return `${day} · time TBD`
+    const time = (dt: DateTime) => dt.toLocaleString(DateTime.TIME_SIMPLE)
+    return `${day} · ${time(start())} – ${time(end())} ${start().offsetNameShort ?? ''}`
+  }
 
   return (
     <Dialog
@@ -127,18 +111,27 @@ export const ScheduleStreamDetailDialog: Component<
       onOpenChange={props.modalSignal.setOpen}
       title={stream().title}
       description={stream().subtitle || undefined}
+      accent={{ background: color(), color: getTextColor(color()) }}
     >
       <div class="flex flex-col gap-4 text-sm">
-        <div class="flex flex-wrap items-center gap-2">
-          <Chip color={highlightColor}>{when()}</Chip>
-          <Show when={isLive()}>
-            <LiveBadge />
-          </Show>
-          <Show when={showCountdown()}>
-            <span class="text-fg-muted text-xs font-medium tabular-nums">
-              starts in {countdownFormat()}
-            </span>
-          </Show>
+        <div class="flex flex-col items-start gap-1">
+          <p class="font-semibold">{when()}</p>
+          <Switch>
+            <Match when={isLive()}>
+              <LiveBadge label="Live now" />
+            </Match>
+            <Match when={showCountdown()}>
+              <p class="text-fg-muted text-xs">
+                Starts in{' '}
+                <span class="font-medium tabular-nums">
+                  {countdownFormat()}
+                </span>
+              </p>
+            </Match>
+            <Match when={isOver()}>
+              <p class="text-fg-muted text-xs">Ended</p>
+            </Match>
+          </Switch>
         </div>
 
         <Show when={stream().description}>
@@ -147,55 +140,61 @@ export const ScheduleStreamDetailDialog: Component<
           </p>
         </Show>
 
+        <StreamParticipants participants={stream().participants} />
+        <StreamTags tags={stream().tags} />
+
         <Show when={props.user}>
           {(user) => (
-            <div class="flex flex-wrap gap-2">
-              <Button
-                href={`/${user().tiltifySlug}`}
-                size="sm"
-                variant="accent"
-              >
-                Go to user profile
-              </Button>
-              <Show when={user().twitchLogin}>
-                {(twitchLogin) => (
-                  <Button
-                    href={`https://twitch.tv/${twitchLogin()}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    size="sm"
-                    brand="twitch"
-                  >
-                    <FaBrandsTwitch aria-hidden="true" /> Open Twitch
-                  </Button>
-                )}
-              </Show>
-              <Show when={user().youtubeUrl}>
-                {(url) => (
-                  <Button
-                    href={url()}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    size="sm"
-                    brand="youtube"
-                  >
-                    <FaBrandsYoutube aria-hidden="true" /> Open YouTube
-                  </Button>
-                )}
-              </Show>
-            </div>
+            <section class="flex flex-col gap-1.5">
+              <h3 class={sectionLabel}>Streamer</h3>
+              <div class="flex flex-wrap gap-2">
+                <Button
+                  href={`/${user().tiltifySlug}`}
+                  size="sm"
+                  variant="accent"
+                >
+                  Go to user profile
+                </Button>
+                <Show when={user().twitchLogin}>
+                  {(twitchLogin) => (
+                    <Button
+                      href={`https://twitch.tv/${twitchLogin()}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      size="sm"
+                      brand="twitch"
+                    >
+                      <FaBrandsTwitch aria-hidden="true" /> Open Twitch
+                    </Button>
+                  )}
+                </Show>
+                <Show when={user().youtubeUrl}>
+                  {(url) => (
+                    <Button
+                      href={url()}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      size="sm"
+                      brand="youtube"
+                    >
+                      <FaBrandsYoutube aria-hidden="true" /> Open YouTube
+                    </Button>
+                  )}
+                </Show>
+              </div>
+            </section>
           )}
         </Show>
 
         <Show when={showCountdown()}>
-          <div class="flex flex-wrap gap-2">
-            <AddToGoogleCalendarButton stream={stream()} user={props.user} />
-            <DownloadIcsButton stream={stream()} user={props.user} />
-          </div>
+          <section class="flex flex-col gap-1.5">
+            <h3 class={sectionLabel}>Add to calendar</h3>
+            <div class="flex flex-wrap gap-2">
+              <AddToGoogleCalendarButton stream={stream()} user={props.user} />
+              <DownloadIcsButton stream={stream()} user={props.user} />
+            </div>
+          </section>
         </Show>
-
-        <StreamTags tags={stream().tags} />
-        <StreamParticipants participants={stream().participants} />
       </div>
     </Dialog>
   )

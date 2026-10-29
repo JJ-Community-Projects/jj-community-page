@@ -8,7 +8,8 @@ import type { CharityStatic } from '../../../content/schema.ts'
 import { useIsJJ } from '../../../lib/utils/jjDates.ts'
 import { DateTime } from 'luxon'
 import { Numeric } from 'solid-i18n'
-import { FaSolidGlobe } from 'solid-icons/fa'
+import { FaSolidChevronDown, FaSolidGlobe } from 'solid-icons/fa'
+import { Accordion, accordionContentMotion } from '../../ui/Accordion'
 import {
   DiscordIcon,
   InstagramIcon,
@@ -29,28 +30,68 @@ type CharityItemData = {
 const name = (it: CharityItemData) =>
   it.donationData?.name || it.staticData.name
 
-/** A charity as a row: logo · name, raised, socials. */
-export const CharityItem: Component<{ item: CharityItemData }> = (props) => (
-  <div class={cn(tileSurface, 'flex items-center gap-3 p-2')}>
-    <Avatar
-      src={props.item.donationData?.logo}
-      alt=""
-      size="md"
-      fallback={name(props.item)[0]}
-    />
-    <div class="min-w-0 flex-1">
-      <p class="truncate text-sm font-semibold">{name(props.item)}</p>
-      <RaisedValue
-        class="text-raised text-sm font-bold"
-        item={props.item.donationData?.raised}
-      />
-      <Socials
-        website={props.item.staticData.website}
-        websites={props.item.staticData.websites}
-      />
-    </div>
-  </div>
-)
+/**
+ * A charity as a row in the extension's look: logo · name over a one-line description teaser · raised ·
+ * chevron. It opens in place to the full description and the socials; the teaser fades out meanwhile.
+ */
+export const CharityItem: Component<{ item: CharityItemData }> = (props) => {
+  const description = () => props.item.donationData?.description
+  return (
+    <Accordion collapsible class={cn(tileSurface, 'w-full')}>
+      <Accordion.Item value="charity">
+        <Accordion.Header as="h3">
+          <Accordion.Trigger
+            class={cn(
+              focusRing,
+              'group rounded-tile flex w-full items-center gap-3 p-2 text-left',
+            )}
+          >
+            <Avatar
+              src={props.item.donationData?.logo}
+              alt=""
+              size="md"
+              fallback={name(props.item)[0]}
+            />
+            <span class="min-w-0 flex-1">
+              <span class="block truncate text-sm font-semibold">
+                {name(props.item)}
+              </span>
+              <Show when={description()}>
+                <span class="text-fg-muted block max-h-4 truncate text-xs transition-all duration-200 group-data-expanded:max-h-0 group-data-expanded:opacity-0 motion-reduce:transition-none">
+                  {description()}
+                </span>
+              </Show>
+            </span>
+            <span class="text-raised flex shrink-0 flex-col items-end leading-tight font-bold">
+              <span class="text-xxs">Raised</span>
+              <RaisedValue
+                class="text-sm"
+                item={props.item.donationData?.raised}
+              />
+            </span>
+            <FaSolidChevronDown
+              class="text-fg-muted size-3.5 shrink-0 transition-transform group-data-expanded:rotate-180"
+              aria-hidden="true"
+            />
+          </Accordion.Trigger>
+        </Accordion.Header>
+        <Accordion.Content class={accordionContentMotion}>
+          <div class="flex flex-col gap-1 px-2 pb-1">
+            <Show when={description()}>
+              <p class="text-fg-muted text-xs whitespace-pre-line">
+                {description()}
+              </p>
+            </Show>
+            <Socials
+              website={props.item.staticData.website}
+              websites={props.item.staticData.websites}
+            />
+          </div>
+        </Accordion.Content>
+      </Accordion.Item>
+    </Accordion>
+  )
+}
 
 // Collapsed sidebar version: logo, short name and raised amount
 export const CharityItemClosed: Component<{ item: CharityItemData }> = (

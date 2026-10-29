@@ -16,7 +16,7 @@ export const CommunityCharitiesOverview: Component = () => {
   return (
     <Show when={mergedCharityItems().length > 0}>
       <div
-        class="flex flex-col items-stretch gap-2"
+        class="flex flex-col items-stretch gap-2 transition-[width] duration-300 ease-out motion-reduce:transition-none"
         classList={{ 'w-64': charityOpen(), 'w-24': !charityOpen() }}
       >
         <Toggle />
@@ -56,7 +56,7 @@ export const CommunityCharitiesOverviewMobile: Component = () => {
         <Show when={overview.data}>
           {(ov) => <OverviewComponent overview={ov()} />}
         </Show>
-        <div class="grid w-full grid-cols-1 gap-2 sm:grid-cols-2">
+        <div class="grid w-full grid-cols-1 items-start gap-2 sm:grid-cols-2">
           <For each={mergedCharityItems()}>
             {(it) => <CharityItem item={it} />}
           </For>

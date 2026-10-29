@@ -191,6 +191,7 @@ export const UpcomingStreamRow: Component<
         stream={props.stream}
         modalSignal={modal}
         user={props.user}
+        color={highlightColor}
       />
     </>
   )
@@ -274,6 +275,7 @@ export const StreamTimeRow: Component<
         stream={props.stream}
         modalSignal={modal}
         user={props.user}
+        color={highlightColor}
       />
     </>
   )
