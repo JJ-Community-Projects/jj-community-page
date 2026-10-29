@@ -230,7 +230,7 @@ const ogImage = preRenderdImageExists
       />
 
       {showSchedule && currentSchedule ? (
-        <div class="min-h-32 w-full" style="--yogs-viewport-share: 80">
+        <div class="min-h-32 w-full">
           <YogsSeasonSchedule
             schedule={compactYogsSchedule(currentSchedule)}
             client:load
@@ -265,7 +265,7 @@ const ogImage = preRenderdImageExists
       </Tile>
 
       {lastSchedule && (
-        <section class="flex w-full flex-col items-center gap-2" style="--yogs-viewport-share: 80">
+        <section class="flex w-full flex-col items-center gap-2">
           <h2 class="text-on-canvas text-center text-xl font-bold">
             Jingle Jam {lastYear} Schedule
           </h2>

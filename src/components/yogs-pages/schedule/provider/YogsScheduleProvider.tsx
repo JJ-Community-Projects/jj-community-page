@@ -3,6 +3,7 @@ import type { YogsCreator, YogsSchedule, } from '../../../../lib/orpc/private/yo
 import { DateTime } from 'luxon'
 import { useNextJJEndDate } from '../../../../lib/utils/jjDates.ts'
 import { createModalSignal } from '../../../../lib/createModalSignal.ts'
+import { useNow } from '../../../../lib/utils/useNow.ts'
 
 const useYogsScheduleHook = (
   schedule: YogsSchedule,
@@ -97,11 +98,27 @@ const useYogsScheduleHook = (
       ? DateTime.fromJSDate(date)
       : DateTime.fromJSDate(date, { zone: 'Europe/London' }).setLocale('en-US')
 
+  // One clock for the grid; the states below stay false until mounted, like everything clock-based
+  const clock = useNow()
+  const scheduleStart = Math.min(...schedule.streams.map((s) => s.start.getTime()))
+  const scheduleEnd = Math.max(...schedule.streams.map((s) => s.end.getTime()))
+  /** Between the schedule's first start and last end (so never on archive pages). */
+  const isRunning = () =>
+    mounted() &&
+    clock().toMillis() >= scheduleStart &&
+    clock().toMillis() <= scheduleEnd
+  /** The date is today in the viewer's timezone, while the schedule is running. */
+  const isToday = (date: Date) =>
+    isRunning() && DateTime.fromJSDate(date).hasSame(clock(), 'day')
+
   const filterModalSignal = createModalSignal()
   const exportModalSignal = createModalSignal()
   return {
     mounted,
     toDateTime,
+    now: clock,
+    isRunning,
+    isToday,
     schedule,
     streams,
     creators,
@@ -111,6 +128,7 @@ const useYogsScheduleHook = (
     nextWeek,
     prevWeek,
     weekIndex,
+    numberOfWeeks,
     nextDay,
     prevDay,
     times,

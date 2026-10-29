@@ -1,67 +1,64 @@
-import {Dialog, ToggleButton, Tooltip} from "@kobalte/core"
+import {Dialog, ToggleButton} from "@kobalte/core"
 import {twMerge} from "tailwind-merge";
-import {type Component, createSignal, createUniqueId, For, Match, Show, Switch} from "solid-js";
+import {type Component, createSignal, createUniqueId, For, Match, onCleanup, Show, Switch} from "solid-js";
 import {useCreatorFilter} from "./CreatorFilterProvider.tsx";
-import {BiRegularReset, BiRegularShare} from "solid-icons/bi";
+import {BiRegularReset} from "solid-icons/bi";
 import {type ModalSignal} from "../../../../lib/createModalSignal.ts";
 import {CgClose} from "solid-icons/cg";
 import {
   FaRegularSquare,
+  FaSolidCheck,
   FaSolidShare,
   FaSolidSquareCheck,
 } from 'solid-icons/fa'
 import {useYogsSchedule} from "./YogsScheduleProvider.tsx";
+import {IconButton} from "../../../ui/Button";
 
-export const FilterResetButton: Component = () => {
+/** Copies the filter link; `copied()` stays true for 2 s after it worked. */
+export const useCopyFilterLink = () => {
+  const {copyFilterUrl} = useCreatorFilter()
+  const [copied, setCopied] = createSignal(false)
+  let timer: ReturnType<typeof setTimeout> | undefined
+  onCleanup(() => clearTimeout(timer))
+  const copy = async () => {
+    if (!(await copyFilterUrl())) return
+    setCopied(true)
+    clearTimeout(timer)
+    timer = setTimeout(() => setCopied(false), 2000)
+  }
+  return {copied, copy}
+}
+
+export const FilterResetButton: Component<{class?: string}> = props => {
   const {isEmpty, reset} = useCreatorFilter()
   return (
     <Show when={!isEmpty()}>
-      <Tooltip.Root openDelay={300} closeDelay={300}>
-        <Tooltip.Trigger
-          class={
-            'h-full data-width bg-white hover:bg-accent-50 flex flex-1 flex-col items-center justify-center rounded-2xl transition-all hover:scale-105'
-          }
-          onClick={reset}
-        >
-          <div class={'flex w-full flex-row items-center justify-around'}>
-            <BiRegularReset/>
-          </div>
-        </Tooltip.Trigger>
-        <Tooltip.Portal>
-          <Tooltip.Content class={'bg-accent rounded-sm p-2 text-white'}>
-            <Tooltip.Arrow/>
-            <p>Reset Filter</p>
-          </Tooltip.Content>
-        </Tooltip.Portal>
-      </Tooltip.Root>
+      <IconButton variant="canvas" aria-label="Reset filter" title="Reset filter" class={props.class} onClick={reset}>
+        <BiRegularReset class="size-4"/>
+      </IconButton>
     </Show>
   )
 }
 
-export const FilterShareButton: Component = () => {
-  const {isEmpty, copyFilterUrl} = useCreatorFilter()
+export const FilterShareButton: Component<{class?: string}> = props => {
+  const {isEmpty} = useCreatorFilter()
   const {mounted} = useYogsSchedule()
+  const {copied, copy} = useCopyFilterLink()
   // navigator only after mount: the server has no clipboard, and hydration must match its markup
   return (
     <Show when={!isEmpty() && mounted() && navigator.clipboard}>
-      <Tooltip.Root openDelay={300} closeDelay={300}>
-        <Tooltip.Trigger
-          class={
-            'h-full data-width bg-white hover:bg-accent-50 flex flex-1 flex-col items-center justify-center rounded-2xl transition-all hover:scale-105'
-          }
-          onClick={copyFilterUrl}
-        >
-          <div class={'flex w-full flex-row items-center justify-around'}>
-            <FaSolidShare/>
-          </div>
-        </Tooltip.Trigger>
-        <Tooltip.Portal>
-          <Tooltip.Content class={'bg-accent rounded-sm p-2 text-white'}>
-            <Tooltip.Arrow/>
-            <p>Share Schedule Link</p>
-          </Tooltip.Content>
-        </Tooltip.Portal>
-      </Tooltip.Root>
+      <IconButton
+        variant="canvas"
+        aria-label="Copy filter link"
+        title={copied() ? 'Copied' : 'Copy filter link'}
+        class={props.class}
+        onClick={copy}
+      >
+        <Show when={copied()} fallback={<FaSolidShare class="size-4"/>}>
+          <FaSolidCheck class="size-4"/>
+        </Show>
+      </IconButton>
+      <span class="sr-only" aria-live="polite">{copied() ? 'Link copied' : ''}</span>
     </Show>
   )
 }
@@ -94,8 +91,9 @@ interface FilterDialogBodyProps {
 const FilterDialogBody: Component<FilterDialogBodyProps> = props => {
   const {onClose} = props
   const {creators, mounted} = useYogsSchedule()
-  const {copyFilterUrl, toggleFilter, reset, filter, filteredStreams, appearanceCount, includesFilter, sortByName} =
+  const {toggleFilter, reset, filter, filteredStreams, appearanceCount, includesFilter, sortByName} =
     useCreatorFilter()
+  const {copied, copy} = useCopyFilterLink()
   const [search, setSearch] = createSignal('')
   const searchId = createUniqueId()
 
@@ -193,9 +191,9 @@ const FilterDialogBody: Component<FilterDialogBodyProps> = props => {
           <button
             class={'bg-primary rounded-xl p-2 text-white disabled:bg-gray-500 disabled:opacity-75'}
             disabled={filter().length == 0}
-            onclick={copyFilterUrl}
+            onclick={copy}
           >
-            Share Link
+            {copied() ? 'Copied' : 'Share Link'}
           </button>
         </Show>
         <button

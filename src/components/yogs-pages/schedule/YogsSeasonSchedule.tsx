@@ -44,14 +44,17 @@ export const YogsSeasonSchedule: Component<YogsSeasonScheduleProps> = (
       <CreatorFilterProvider>
         <div class={'flex flex-col items-center justify-center gap-2'}>
           <CollectionCountdown />
-          <div class="desktop-schedule flex w-full flex-col items-center justify-center gap-2">
-            <YogsScheduleWeek />
-            <UpdatedAt year />
+          <div class="desktop-schedule flex w-full flex-col items-center justify-center">
+            {/* Shrinks to the grid, so the line ends at its right edge */}
+            <div class="flex flex-col items-end gap-1">
+              <YogsScheduleWeek />
+              <UpdatedAt year class="text-on-canvas-muted px-1 text-xs" />
+            </div>
           </div>
           <Ticker />
           <div class="mobile-schedule flex w-full flex-col items-center justify-center gap-2">
             <MobileYogsSchedule />
-            <UpdatedAt />
+            <UpdatedAt class="text-center text-white" />
           </div>
           <Creators creators={schedule.creators} />
           <ScheduleNotice class="text-on-canvas-muted" />
@@ -100,13 +103,13 @@ const Ticker: Component = () => {
   )
 }
 
-const UpdatedAt: Component<{ year?: boolean }> = (props) => {
+const UpdatedAt: Component<{ year?: boolean; class: string }> = (props) => {
   const { schedule, toDateTime } = useYogsSchedule()
   return (
     <Show when={schedule.updatedAt}>
       {(updatedAt) => (
-        <p class={'text-center text-white'}>
-          Last Updated{' '}
+        <p class={props.class}>
+          Updated{' '}
           {toDateTime(updatedAt()).toLocaleString({
             ...(props.year && { year: 'numeric' }),
             month: 'short',

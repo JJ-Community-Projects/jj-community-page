@@ -13,7 +13,7 @@ export const StreamPlaceholder: Component<StreamPlaceholderProps> = (props) => {
   return (
     <div
       style={{
-        height: `calc(${tileSize} * var(--jj-schedule-slot-size))`,
+        height: `calc(${tileSize} * var(--yogs-unit))`,
         width: '100%',
       }}
       class="p-1.5"
