@@ -449,6 +449,23 @@ function reviveUserStream(item: any) {
   return revived
 }
 
+// Revive Dates from ISO strings for the FullCommunitySchedule shape
+function reviveFullSchedule(raw: any) {
+  return {
+    days: Array.isArray(raw.days)
+      ? raw.days.map((d: any) => ({
+          day: new Date(d.day),
+          streams: Array.isArray(d.streams)
+            ? d.streams.map(reviveUserStream)
+            : [],
+        }))
+      : [],
+    streams: Array.isArray(raw.streams)
+      ? raw.streams.map(reviveUserStream)
+      : [],
+  }
+}
+
 function reviveUserDisplay(u: any) {
   if (!u || typeof u !== 'object') return u
   return {
@@ -692,27 +709,18 @@ const fullSchedule = os.fullScheduleContract.handler(async ({ context }) => {
     const cacheKey = `jj:fullSchedule:${year}`
     const cached = await getJSON<any>(context.env.KV, cacheKey)
     if (cached && Array.isArray(cached.days)) {
-      // Revive Dates from ISO strings for UserStream shape
-      const days = cached.days.map((d: any) => ({
-        day: new Date(d.day),
-        streams: Array.isArray(d.streams)
-          ? d.streams.map(reviveUserStream)
-          : [],
-      }))
-      return {
-        days,
-        streams: Array.isArray(cached.streams)
-          ? cached.streams.map(reviveUserStream)
-          : [],
-      }
+      return reviveFullSchedule(cached)
     }
     const DO = context.env.JingleJamData
     const stubID = DO.idFromName('JJ_API_CACHE')
     const stub = DO.get(stubID)
-    const result = await stub.getFullSchedule()
-    if (!result) {
+    const stored = await stub.getFullSchedule()
+    if (!stored) {
       throw new ORPCError('NOT_FOUND')
     }
+    // The stored schedule can predate the current schema (F-92): normalise it
+    // like the KV copy, or output validation fails on every cache miss
+    const result = reviveFullSchedule(stored)
     await putJSON(context.env.KV, cacheKey, result, 300)
     return result
   } catch (e) {
