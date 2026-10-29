@@ -25,6 +25,9 @@ import type { CurrencyStore } from './CurrencyStore.ts'
 import type { UserTagsBuilder, UserWithTags } from './UserTagsBuilder.ts'
 import type { DonationMatchStore } from './DonationMatchStore.ts'
 
+// A TV cause plus the event year of the raw cause it was built from.
+export type StoredTVCause = JJCauseTVType & { year?: number }
+
 // TV/display projections (the hot read path for the Twitch extension and
 // overlay). Reads from the Tiltify/Twitch/Currency/UserTags modules plus D1.
 //
@@ -53,22 +56,24 @@ export class DisplayBuilder {
   }
 
   // --- TV causes ---
-  public async setTVCause(cause: JJCauseTVType) {
+  public async setTVCause(cause: StoredTVCause) {
     await this.storage.put(this.causeKeyTV(cause.id), cause)
   }
 
   public getTVCause(causeId: string) {
     return this.storage.get(this.causeKeyTV(causeId)) as Promise<
-      JJCauseTVType | undefined
+      StoredTVCause | undefined
     >
   }
 
-  public async getCausesTV() {
+  // With `year`, only the causes stored for that event year (`cause:tv:*` keeps past years' too).
+  public async getCausesTV(year?: number) {
     const map = (await this.storage.list({ prefix: 'cause:tv:' })) as Map<
       string,
       unknown
     >
-    return Array.from(map.values()) as JJCauseTVType[]
+    const causes = Array.from(map.values()) as StoredTVCause[]
+    return year === undefined ? causes : causes.filter((c) => c.year === year)
   }
 
   // --- Display getters ---
@@ -244,7 +249,10 @@ export class DisplayBuilder {
         }),
       )
 
-      await Promise.all(causes.map((c) => this.setTVCause(c)))
+      // The year goes on the overlay's `cause:tv:*` entries only, not into `causes:display`.
+      await Promise.all(
+        causes.map((c, i) => this.setTVCause({ ...c, year: rawCauses[i].year })),
+      )
 
       const output: CausesDisplayTVType = {
         count: causes.length,

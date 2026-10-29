@@ -18,6 +18,7 @@ import {
 import { DateTime, IANAZone } from 'luxon'
 import { getStreamColors } from '../../../../functions/jjDatesToColors.ts'
 import { byInput, cached } from '../../middleware/cached.ts'
+import { getConfigYear } from '../../../utils/configYear.ts'
 
 const os = implement(contracts).use(dbMiddleware)
 
@@ -105,7 +106,7 @@ const charities = os.charitiesContract
   const DO = context.env.JingleJamData
   const stubID = DO.idFromName('JJ_API_CACHE')
   const stub = DO.get(stubID)
-  const causes = await stub.getCausesTV()
+  const causes = await stub.getCausesTV(await getConfigYear())
   const avgConversionRate = await stub.getDollarConversionRate()
   const eurRate = await stub.getGbpToEurRate()
   const c = await stub.getCampaign(input.user ?? '')
@@ -159,7 +160,7 @@ const causeById = os.causeByIdContract
   const DO = context.env.JingleJamData
   const stubID = DO.idFromName('JJ_API_CACHE')
   const stub = DO.get(stubID)
-  const causes = await stub.getCausesTV()
+  const causes = await stub.getCausesTV(await getConfigYear())
   if (!causes?.length) return null
 
   const id = input.causeId

@@ -26,6 +26,9 @@ const MAX_BOUND_PARAMS = 100
 const INSERTED_KEY = 'd1:jj:inserted'
 type InsertedRows = { year: number; causes: string[]; campaigns: string[] }
 
+// A JJ API cause plus the event year it was stored for (absent on causes stored before the stamp).
+export type StoredCause = JJCause & { year?: number }
+
 // Source-of-truth cache for Jingle Jam API data: campaigns, causes, event
 // metadata, per-campaign goal tracking and Tiltify user/social records. Also
 // persists derived rows to D1.
@@ -42,15 +45,17 @@ export class TiltifyStore {
   ) {}
 
   // --- Causes ---
-  public async setCauses(causes: JJCause[]) {
-    const entries: Record<string, JJCause> = {}
-    for (const c of causes) entries[this.causeKey(c.id)] = c
+  // Cause keys are never deleted, so last year's causes stay in storage; each is stamped with
+  // the event year it came in with so readers can keep to one year.
+  public async setCauses(causes: JJCause[], year: number) {
+    const entries: Record<string, StoredCause> = {}
+    for (const c of causes) entries[this.causeKey(c.id)] = { ...c, year }
     await this.storage.put(entries)
   }
 
   public getCause(causeId: string) {
     return this.storage.get(this.causeKey(causeId)) as Promise<
-      JJCause | undefined
+      StoredCause | undefined
     >
   }
 
@@ -59,7 +64,7 @@ export class TiltifyStore {
       string,
       unknown
     >
-    return Array.from(map.values()) as JJCause[]
+    return Array.from(map.values()) as StoredCause[]
   }
 
   // --- Campaigns ---
@@ -189,7 +194,7 @@ export class TiltifyStore {
 
     // Update DO storage (granular)
     try {
-      await this.setCauses(data.causes)
+      await this.setCauses(data.causes, data.event.year)
     } catch (e) {
       console.error('setCauses', e)
     }
