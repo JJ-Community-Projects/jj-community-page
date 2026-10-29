@@ -22,6 +22,8 @@ const showDescParam = Astro.url.searchParams.get('showDesc')
 const qrCodeParam = Astro.url.searchParams.get('qrCode')
 const showUrlParam = Astro.url.searchParams.get('showUrl')
 const showDotsParam = Astro.url.searchParams.get('showDots')
+const transitionParam = Astro.url.searchParams.get('transition')
+const intervalParam = Astro.url.searchParams.get('interval')
 const causesParam = Astro.url.searchParams.get('causes')
 const currencyParam = Astro.url.searchParams.get('currency')
 const user = Astro.url.searchParams.get('user') ?? undefined
@@ -43,6 +45,11 @@ const currency = (() => {
 })()
 const showUrl = showUrlParam === undefined ? undefined : (showUrlParam === 'true' || showUrlParam === '1')
 const showDots = showDotsParam === null || showDotsParam === 'true' || showDotsParam === '1'
+const transition = (() => {
+  const v = (transitionParam ?? 'fade').toLowerCase()
+  return v === 'slide' || v === 'flip' || v === 'none' ? v : 'fade'
+})()
+const interval = intervalParam === 'slow' ? 'slow' : 'default'
 const causes = causesParam
   ? causesParam.split(',').map((s) => (s.trim()))
   : undefined
@@ -51,6 +58,6 @@ const causes = causesParam
     {HIDE_CONTENT ? (
       <p class="bg-black/70 p-4 text-center text-sm text-white/60">Overlay currently unavailable</p>
     ) : (
-      <CharitiesOverlay client:only="solid-js" headers={headers} includeTotals={includeTotals} theme={theme} headerTheme={headerTheme} showDesc={showDesc} qrCode={qrCode} currency={currency} showUrl={showUrl} showDots={showDots} causes={causes} user={user} demo={demo} />
+      <CharitiesOverlay client:only="solid-js" headers={headers} includeTotals={includeTotals} theme={theme} headerTheme={headerTheme} showDesc={showDesc} qrCode={qrCode} currency={currency} showUrl={showUrl} showDots={showDots} transition={transition} interval={interval} causes={causes} user={user} demo={demo} />
     )}
   </div>

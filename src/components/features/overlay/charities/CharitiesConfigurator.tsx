@@ -10,6 +10,7 @@ import {
   titleCase,
 } from '../overview/Common.tsx'
 import { OVERLAY_FORMATS } from '../overview/formats.ts'
+import type { TransitionStyle } from './CharitiesOverlay.tsx'
 import { orpcPrivate } from '../../../../lib/orpc/client.ts'
 import { useUser } from '../../users/user-dashboard/providers/UserProvider.tsx'
 import { Checkbox, fieldClass } from '../../../ui/Form'
@@ -20,6 +21,7 @@ import { Spinner } from '../../../ui/Status'
 type Theme2 = 'default' | 'red' | 'blue' | 'carousel'
 type HeaderTheme2 = 'default' | 'red' | 'blue'
 type QrCode = 'none' | 'fundraiser' | 'charity'
+type Interval = 'default' | 'slow'
 
 // URL values, in display order
 const headerOptions = ['Title', 'Donate', 'JJLink'] as const
@@ -42,6 +44,8 @@ export const CharitiesConfigurator: Component = () => {
   const [currency, setCurrency] = createSignal<Currency>('GBP')
   const [showUrl, setShowUrl] = createSignal<boolean>(true)
   const [showDots, setShowDots] = createSignal<boolean>(true)
+  const [transition, setTransition] = createSignal<TransitionStyle>('fade')
+  const [rotation, setRotation] = createSignal<Interval>('default')
   const [selectedIds, setSelectedIds] = createSignal<string[]>([])
   const [previewData, setPreviewData] = createSignal<PreviewDataMode>('test')
 
@@ -82,6 +86,8 @@ export const CharitiesConfigurator: Component = () => {
     currency: currency(),
     showUrl: showUrl(),
     showDots: showDots(),
+    transition: transition(),
+    interval: rotation(),
     causes: causesParam(),
     user: user?.tiltifySlug,
   })
@@ -120,6 +126,22 @@ export const CharitiesConfigurator: Component = () => {
         value={headerTheme2()}
         onChange={setHeaderTheme2}
         format={titleCase}
+      />
+      <Select
+        label="Transition"
+        showLabel
+        options={['fade', 'slide', 'flip', 'none'] as TransitionStyle[]}
+        value={transition()}
+        onChange={setTransition}
+        format={titleCase}
+      />
+      <Select
+        label="Interval"
+        showLabel
+        options={['default', 'slow'] as Interval[]}
+        value={rotation()}
+        onChange={setRotation}
+        format={(v) => (v === 'slow' ? 'Slow (20s)' : 'Default (10s)')}
       />
       <CurrencySelect value={currency()} onChange={setCurrency} />
       <Select
