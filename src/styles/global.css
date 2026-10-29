@@ -65,12 +65,20 @@
  * Charity sidebar open/close (CommunityCharitiesOverview) runs as a view transition: every named part
  * (tile, logo, name, amount, totals) morphs from its wide to its compact place and back. Tiles stretch
  * their snapshot to the animated box; text keeps its size and cross-fades while it travels; extras (in
- * only one layout: "Raised", chevron, teaser, the other totals) fade out fast or fade in at the end. The
- * page column next to the sidebar slides as its new layout instead of cross-fading with the old one.
+ * only one layout: "Raised", description and socials, the other totals) fade out fast or fade in at the
+ * end. The page column next to the sidebar slides as its new layout instead of cross-fading with the old
+ * one, and the rest of the page (root) shows its live new state at once: no frozen copy fading out, so
+ * tickers and countdowns don't double up or jump.
  */
 ::view-transition-group(*) {
   animation-duration: 350ms;
   animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+::view-transition-old(root) {
+  display: none;
+}
+::view-transition-new(root) {
+  animation: none;
 }
 ::view-transition-old(.charity-surface),
 ::view-transition-new(.charity-surface) {
