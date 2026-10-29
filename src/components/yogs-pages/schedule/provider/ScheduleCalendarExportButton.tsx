@@ -1,9 +1,9 @@
-import { type Component, createSignal, For, Show } from 'solid-js'
+import { type Component, createSignal, createUniqueId, For, Show } from 'solid-js'
 import { Dialog } from '@kobalte/core'
-import { FaRegularCalendar, FaRegularSquare, FaSolidInfo, FaSolidSquareCheck, FaSolidXmark } from 'solid-icons/fa'
+import { FaRegularSquare, FaSolidInfo, FaSolidSquareCheck, FaSolidXmark } from 'solid-icons/fa'
 import { DateTime, Duration } from 'luxon'
 import ical, { ICalAlarmType } from 'ical-generator'
-import { createModalSignal, type ModalSignal } from '../../../../lib/createModalSignal.ts'
+import { type ModalSignal } from '../../../../lib/createModalSignal.ts'
 import { useCreatorFilter } from './CreatorFilterProvider.tsx'
 import { useYogsSchedule } from './YogsScheduleProvider.tsx'
 import { rangeFromData } from '../../../../lib/utils/rangeFromData.ts'
@@ -12,30 +12,6 @@ import { log } from '../../../../lib/analytics.ts'
 
 type FullStream = YogsStream & { creators: Array<{ id: string }>; style?: any };
 
-
-export const CalendarExportButton: Component = () => {
-  const modalSignal = createModalSignal()
-
-  return (
-    <>
-      <div class={'w-slot p-schedule'}>
-        <div class={'flex flex-row'}>
-          <button
-            class={
-              'hover:bg-accent-50 flex flex-1 flex-col items-center justify-center rounded-2xl transition-all hover:scale-105'
-            }
-            onclick={modalSignal.open}
-          >
-            <div class={'flex w-full flex-row items-center justify-around'}>
-              <p>Export</p> <FaRegularCalendar/>
-            </div>
-          </button>
-        </div>
-      </div>
-      <CalendarDialog modalSignal={modalSignal}/>
-    </>
-  )
-}
 
 interface CalendarDialogDialogProps {
   modalSignal: ModalSignal
@@ -68,6 +44,7 @@ const CalendarDialogDialogBody: Component<CalendarDialogDialogBodyProps> = props
   const {filteredStreams, isSlotPartOfFilter} = useCreatorFilter()
   const [selectedSlots, setSelectedSlots] = createSignal<YogsStream[]>([])
   const [search, setSearch] = createSignal('')
+  const searchId = createUniqueId()
 
   const download = () => {
     const s = icalString()
@@ -164,12 +141,12 @@ const CalendarDialogDialogBody: Component<CalendarDialogDialogBodyProps> = props
         <p class={'px-2 py-2'}>Filtered streams: {filteredStreams().length}</p>
         <p class={'px-2 py-2'}>This list of streams takes the creator filter into account</p>
         <div class="p-2">
-          <label class="mb-2 block text-sm font-bold text-gray-700" for="search">
+          <label class="mb-2 block text-sm font-bold text-gray-700" for={searchId}>
             Search
           </label>
           <input
             class="w-full appearance-none rounded-sm border px-3 py-2 leading-tight text-gray-700 shadow-sm focus:outline-hidden"
-            id="search"
+            id={searchId}
             type="text"
             placeholder="Search"
             value={search()}

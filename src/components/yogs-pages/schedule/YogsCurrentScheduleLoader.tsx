@@ -248,9 +248,7 @@ const Body: Component<BodyProps> = (props) => {
         </div>
       </Match>
       <Match when={schedule.isPending}>
-        <div class={'loading-container'}>
-          <PlaceholderSchedule schedule={props.fallbackSchedule} />
-        </div>
+        <PlaceholderSchedule schedule={props.fallbackSchedule} />
       </Match>
       <Match when={schedule.error}>
         <Alert tone="danger" class="mx-auto max-w-2xl">

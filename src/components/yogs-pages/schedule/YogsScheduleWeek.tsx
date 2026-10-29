@@ -2,10 +2,11 @@ import {type Component} from "solid-js";
 import {YogsScheduleWeekBody} from "./YogsScheduleWeekBody.tsx";
 import {YogsScheduleTimeColumn} from "./YogsScheduleTimeColumn.tsx";
 import {YogsScheduleHeader} from "./header/YogsScheduleHeader.tsx";
+import "./yogs-schedule.css";
 
 export const YogsScheduleWeek: Component = (props) => {
   return (
-    <div class={'flex flex-col font-babas'}>
+    <div class={'yogs-grid flex flex-col font-babas'}>
       <YogsScheduleHeader/>
       <div class={'flex flex-row'}>
         <YogsScheduleTimeColumn/>

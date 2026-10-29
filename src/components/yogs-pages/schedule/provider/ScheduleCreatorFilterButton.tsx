@@ -1,10 +1,9 @@
 import {Dialog, ToggleButton, Tooltip} from "@kobalte/core"
 import {twMerge} from "tailwind-merge";
-import {type Component, createSignal, For, Match, Show, Switch} from "solid-js";
+import {type Component, createSignal, createUniqueId, For, Match, Show, Switch} from "solid-js";
 import {useCreatorFilter} from "./CreatorFilterProvider.tsx";
 import {BiRegularReset, BiRegularShare} from "solid-icons/bi";
-import {createModalSignal, type ModalSignal} from "../../../../lib/createModalSignal.ts";
-import {BsPeopleFill} from "solid-icons/bs";
+import {type ModalSignal} from "../../../../lib/createModalSignal.ts";
 import {CgClose} from "solid-icons/cg";
 import {
   FaRegularSquare,
@@ -41,8 +40,10 @@ export const FilterResetButton: Component = () => {
 
 export const FilterShareButton: Component = () => {
   const {isEmpty, copyFilterUrl} = useCreatorFilter()
+  const {mounted} = useYogsSchedule()
+  // navigator only after mount: the server has no clipboard, and hydration must match its markup
   return (
-    <Show when={!isEmpty() && navigator.clipboard}>
+    <Show when={!isEmpty() && mounted() && navigator.clipboard}>
       <Tooltip.Root openDelay={300} closeDelay={300}>
         <Tooltip.Trigger
           class={
@@ -62,28 +63,6 @@ export const FilterShareButton: Component = () => {
         </Tooltip.Portal>
       </Tooltip.Root>
     </Show>
-  )
-}
-
-export const FilterButton: Component = () => {
-
-  const modalSignal = createModalSignal()
-
-  return (
-    <>
-      <button
-        class={
-          'hover:bg-accent-50 flex flex-1 flex-col items-center justify-center rounded-2xl transition-all hover:scale-105'
-        }
-        onclick={modalSignal.open}
-      >
-        <div class={'flex w-full flex-row items-center justify-around'}>
-          <p>Filter</p>
-          <BsPeopleFill/>
-        </div>
-      </button>
-      <FilterDialog modalSignal={modalSignal}/>
-    </>
   )
 }
 
@@ -114,10 +93,11 @@ interface FilterDialogBodyProps {
 
 const FilterDialogBody: Component<FilterDialogBodyProps> = props => {
   const {onClose} = props
-  const {creators} = useYogsSchedule()
+  const {creators, mounted} = useYogsSchedule()
   const {copyFilterUrl, toggleFilter, reset, filter, filteredStreams, appearanceCount, includesFilter, sortByName} =
     useCreatorFilter()
   const [search, setSearch] = createSignal('')
+  const searchId = createUniqueId()
 
   const searchCreatorList = () => {
     if (search() === '') {
@@ -164,12 +144,12 @@ const FilterDialogBody: Component<FilterDialogBodyProps> = props => {
               <AndToggle/>
             </div>
             <div class="p-2">
-              <label class="mb-2 block text-sm font-bold text-gray-700" for="search">
+              <label class="mb-2 block text-sm font-bold text-gray-700" for={searchId}>
                 Search
               </label>
               <input
                 class="w-full appearance-none rounded-sm border px-3 py-2 leading-tight text-gray-700 shadow-sm focus:outline-hidden"
-                id="search"
+                id={searchId}
                 type="text"
                 placeholder="Search"
                 value={search()}
@@ -209,7 +189,7 @@ const FilterDialogBody: Component<FilterDialogBodyProps> = props => {
         </Switch>
       </div>
       <div class={'flex h-[72px] flex-row items-center justify-end gap-2 p-4'}>
-        <Show when={navigator.clipboard}>
+        <Show when={mounted() && navigator.clipboard}>
           <button
             class={'bg-primary rounded-xl p-2 text-white disabled:bg-gray-500 disabled:opacity-75'}
             disabled={filter().length == 0}

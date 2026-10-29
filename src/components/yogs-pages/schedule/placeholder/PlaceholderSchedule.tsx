@@ -1,6 +1,7 @@
 import { type Component } from 'solid-js'
 import type { YogsSchedule } from '../../../../lib/orpc/private/yogs/contract.ts'
 import { StreamPlaceholder } from './StreamPlaceholder.tsx'
+import '../yogs-schedule.css'
 
 interface PlaceholderScheduleProps {
   schedule: YogsSchedule
@@ -12,7 +13,7 @@ export const PlaceholderSchedule: Component<PlaceholderScheduleProps> = (
   const schedule = props.schedule
   const week = schedule.weeks[0]
   return (
-    <div class={'jj-placeholder flex flex-col blur-xs'}>
+    <div class={'yogs-grid flex flex-col blur-xs'}>
       <div class={'data-height flex w-full flex-row'}>
         <div class={'data-height data-width'} />
         <div class={'header-title-card-width p-2'}>

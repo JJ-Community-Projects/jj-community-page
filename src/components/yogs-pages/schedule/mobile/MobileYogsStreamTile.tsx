@@ -48,36 +48,6 @@ export const MobileYogsStreamTile: Component<MobileScheduleBodyProps> = (
     return mounted() && start < now() && end > now()
   }
 
-  function textColor(background: string) {
-    return getTextColor(background)
-  }
-
-  function _parseColor(c: string): string {
-    return '#' + c.substring(2) //  + c.substring(0, 2)
-  }
-
-  /*
-  const background = () => {
-    let gradientStyle: JSX.CSSProperties | undefined
-    if (stream.style.linearGradient) {
-      const linearGradient = stream.style.linearGradient
-      gradientStyle = {
-        background: `linear-gradient(180deg, ${linearGradient.colors.map(_parseColor).join(', ')})`,
-        color: textColor(_parseColor(stream.style.background ?? linearGradient.colors[0] ?? 'ffff0000')),
-        height: '100%',
-      }
-    } else {
-      if (stream.style.background) {
-        gradientStyle = {
-          background: `${_parseColor(stream.style.background ?? 'ffff0000')}`,
-          // background: _parseColor(stream.style.background)
-          color: textColor(_parseColor(stream.style.background ?? 'ffff0000')),
-          height: '100%',
-        }
-      }
-    }
-    return gradientStyle
-  }*/
   const vodTypes = () => props.stream.vods?.map((vod) => vod.type) ?? []
 
   const hasYoutubeVod = () => {
