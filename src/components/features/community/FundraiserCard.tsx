@@ -1,10 +1,6 @@
-import { type Component, createSignal, For, onMount, Show } from 'solid-js'
-import { useLocale } from '@kobalte/core'
+import { type Component, createSignal, For, Show } from 'solid-js'
 import { FaSolidCalendarWeek, FaSolidHeart } from 'solid-icons/fa'
-import type {
-  Currencies,
-  JJCampaignType,
-} from '../../../lib/orpc/private/jjData/contract.ts'
+import type { JJCampaignType } from '../../../lib/orpc/private/jjData/contract.ts'
 import {
   TiltifyIcon,
   TwitchIcon,
@@ -15,33 +11,7 @@ import { Button, IconButton } from '../../ui/Button'
 import { cn, focusRing, tileSurface } from '../../ui/cn'
 import { Dialog } from '../../ui/Dialog'
 import { Chip, LiveBadge, Raised } from '../../ui/Labels'
-
-export type Currency = 'GBP' | 'USD' | 'EUR'
-
-export const raisedIn = (raised: Currencies | undefined, currency: Currency) =>
-  currency === 'USD'
-    ? (raised?.usd ?? 0)
-    : currency === 'EUR'
-      ? (raised?.euro ?? 0)
-      : (raised?.gbp ?? 0)
-
-/**
- * A currency amount. Server-rendered as en-US (solid-i18n's Numeric is client-only and /community/ssr
- * renders this on the server), then switched to the viewer's locale once mounted.
- */
-export const Money: Component<{ value: number; currency: Currency }> = (
-  props,
-) => {
-  const locale = useLocale()
-  const [mounted, setMounted] = createSignal(false)
-  onMount(() => setMounted(true))
-  const text = () =>
-    new Intl.NumberFormat(mounted() ? locale.locale() : 'en-US', {
-      style: 'currency',
-      currency: props.currency,
-    }).format(props.value)
-  return <>{text()}</>
-}
+import { type Currency, Money, raisedIn } from './Money.tsx'
 
 /**
  * A community fundraiser in the extension's row layout: avatar · name + one line · raised, plus a

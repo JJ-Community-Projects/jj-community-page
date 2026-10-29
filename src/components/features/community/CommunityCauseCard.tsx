@@ -5,7 +5,7 @@ import { Avatar } from '../../ui/Avatar'
 import { Button } from '../../ui/Button'
 import { cn, tileSurface } from '../../ui/cn'
 import { Raised } from '../../ui/Labels'
-import { Money, raisedIn } from './FundraiserCard.tsx'
+import { Money, raisedIn } from './Money.tsx'
 
 /** Group header for "sort by cause": the charity with its total and links, above its fundraisers. */
 export const CommunityCauseCard: Component<{ cause: JJCauseType }> = (
