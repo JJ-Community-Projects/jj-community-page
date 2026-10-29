@@ -18,9 +18,15 @@ export interface CommunityListSources {
   /** Twitch logins currently live (`getLiveLogins`) */
   liveLogins: string[]
   causes: JJCauseType[]
+  /** Profile images of the account holders' linked Twitch channels (`twitch_channels`) */
+  twitchAvatars?: { userId: number; profileImageUrl: string | null }[]
 }
 
 const slugKey = (slug: string) => slug.trim().toLowerCase()
+
+// Tiltify's placeholder for users without an avatar
+export const isDefaultAvatar = (url: string | null | undefined) =>
+  !url || url.endsWith('/default-avatar.png')
 
 // One campaign per Tiltify user; if a user has several, the highest raised wins.
 function campaignsBySlug(campaigns: JJCampaignType[]) {
@@ -54,11 +60,32 @@ function compareFundraisers(a: CommunityFundraiser, b: CommunityFundraiser) {
 // Merges the top N campaigns with all account holders (overlap = same lowercased
 // Tiltify slug) and sorts by dono match → live → raised (GBP desc) → name.
 export function buildCommunityList(
-  { users, campaigns, liveLogins, causes }: CommunityListSources,
+  {
+    users,
+    campaigns,
+    liveLogins,
+    causes,
+    twitchAvatars = [],
+  }: CommunityListSources,
   topN = COMMUNITY_TOP_N,
 ): CommunityList {
   const live = new Set(liveLogins.map((l) => normalizeTwitchLogin(l)))
   const causeById = new Map(causes.map((c) => [c.id, c]))
+  const twitchAvatarOf = new Map(
+    twitchAvatars.flatMap((t) =>
+      t.profileImageUrl ? [[t.userId, t.profileImageUrl] as const] : [],
+    ),
+  )
+
+  // The view picks the Twitch image only for Twitch-primary accounts; replace Tiltify's placeholder
+  // with the linked Twitch image, else the campaign's (Twitch-first in the DO).
+  const memberAvatar = (u: UserWithInfo, c: JJCampaignType | undefined) => {
+    if (!isDefaultAvatar(u.profileImage)) return u.profileImage
+    const twitch = twitchAvatarOf.get(u.userId)
+    if (twitch) return twitch
+    if (c && !isDefaultAvatar(c.avatar)) return c.avatar
+    return u.profileImage || c?.avatar || ''
+  }
   const bySlug = campaignsBySlug(campaigns)
 
   const charityOf = (c: JJCampaignType) => {
@@ -76,7 +103,7 @@ export function buildCommunityList(
     items.set(key, {
       key,
       name: u.username,
-      avatar: u.profileImage || c?.avatar || '',
+      avatar: memberAvatar(u, c),
       charity: c ? charityOf(c) : null,
       raised: c?.raised ?? null,
       tiltifyUrl: c?.tiltifyUrl ?? u.tiltifyUrl,

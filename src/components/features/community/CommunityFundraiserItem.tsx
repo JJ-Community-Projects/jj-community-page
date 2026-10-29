@@ -13,8 +13,11 @@ import { type Currency, Money, raisedIn } from './Money.tsx'
 const donoMatchSurface =
   'rounded-tile bg-primary-600 text-white shadow-tile ring-2 ring-white'
 
-// Live: the neutral tile with a pink tint and a white ring (a primary ring vanishes on the canvas).
-const liveSurface = cn(tileSurface, 'from-primary-50/60 ring-2 ring-white')
+// Live: the neutral tile with a white ring (a primary ring vanishes on the canvas).
+const liveSurface = cn(tileSurface, 'ring-2 ring-white')
+
+// Smaller than IconButton's `sm`, so three fit next to the raised amount
+const buttonSize = 'size-7'
 
 /**
  * One fundraiser of the unified community list (`jj.communityList`): a campaign, an account holder,
@@ -113,18 +116,20 @@ export const CommunityFundraiserItem: Component<{
             rel="noopener"
             brand="tiltify"
             size="sm"
+            class={buttonSize}
             aria-label={`${f().name} on Tiltify`}
           >
-            <TiltifyIcon class="size-3.5" />
+            <TiltifyIcon class="size-3" />
           </IconButton>
           <Show when={f().profileUrl}>
             {(url) => (
               <IconButton
                 href={url()}
                 size="sm"
+                class={buttonSize}
                 aria-label={`Profile of ${f().name}`}
               >
-                <FaSolidUser class="size-3" aria-hidden="true" />
+                <FaSolidUser class="size-2.5" aria-hidden="true" />
               </IconButton>
             )}
           </Show>
@@ -136,17 +141,14 @@ export const CommunityFundraiserItem: Component<{
                 rel="noopener"
                 brand="twitch"
                 size="sm"
-                class="relative"
+                class={buttonSize}
                 aria-label={
                   f().isLive
                     ? `Watch ${f().name} live on Twitch`
                     : `${f().name} on Twitch`
                 }
               >
-                <TwitchIcon class="size-3.5" />
-                <Show when={f().isLive}>
-                  <span class="bg-primary absolute -top-0.5 -right-0.5 size-2.5 animate-pulse rounded-full ring-2 ring-white motion-reduce:animate-none" />
-                </Show>
+                <TwitchIcon class="size-3" />
               </IconButton>
             )}
           </Show>

@@ -127,7 +127,7 @@ export const CommunityTagSearch: Component<{
                   type="button"
                   onClick={() => removeTag(id)}
                   class={cn(
-                    'bg-surface-strong text-fg ring-line inline-flex items-center gap-1.5 rounded-full py-1 pr-2 pl-2.5 text-xs font-medium ring-1 hover:bg-black/5',
+                    'bg-surface-strong text-fg ring-line hover:bg-surface inline-flex items-center gap-1.5 rounded-full py-1 pr-2 pl-2.5 text-xs font-medium ring-1',
                     focusRing,
                   )}
                   aria-label={`Remove tag ${tag().name}`}

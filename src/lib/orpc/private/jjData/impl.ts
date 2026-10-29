@@ -19,6 +19,7 @@ import {
   eq,
   gt,
   inArray,
+  isNotNull,
   notInArray,
   sql,
 } from 'drizzle-orm'
@@ -41,7 +42,11 @@ import type { JJDrizzleDatabase } from '../../../db/db.ts'
 import { cached } from '../../middleware/cached.ts'
 import { alias } from 'drizzle-orm/sqlite-core'
 import { getUpcomingStreamsFromSchedule } from '../../../../content/getYogsScheduleFromContent.ts'
-import { buildCommunityList } from '../../../services/communityList.ts'
+import {
+  buildCommunityList,
+  isDefaultAvatar,
+} from '../../../services/communityList.ts'
+import { twitchChannelSchema } from '../../../db/schema/twitch-channel-schema.ts'
 // New: get campaign by Twitch id
 
 const jjDataCacheMiddleware = cacheMiddleware({
@@ -557,8 +562,37 @@ const communityList = os.communityListContract
       stub.getLiveLogins(),
       stub.getCausesDisplay(),
     ])
+    // Members still on Tiltify's default avatar get their linked Twitch image instead. Usually a
+    // handful, looked up by the user_id index; chunks stay under D1's 100 bound parameters.
+    const defaultAvatarIds = users
+      .filter((u) => isDefaultAvatar(u.profileImage))
+      .map((u) => u.userId)
+    const chunks: number[][] = []
+    for (let i = 0; i < defaultAvatarIds.length; i += 90) {
+      chunks.push(defaultAvatarIds.slice(i, i + 90))
+    }
+    const twitchAvatars = (
+      await Promise.all(
+        chunks.map((ids) =>
+          context.db
+            .select({
+              userId: twitchChannelSchema.userId,
+              profileImageUrl: twitchChannelSchema.profileImageUrl,
+            })
+            .from(twitchChannelSchema)
+            .where(
+              and(
+                inArray(twitchChannelSchema.userId, ids),
+                isNotNull(twitchChannelSchema.profileImageUrl),
+              ),
+            )
+            .all(),
+        ),
+      )
+    ).flat()
     return buildCommunityList({
       users,
+      twitchAvatars,
       campaigns: campaigns?.list ?? [],
       liveLogins: liveLogins ?? [],
       causes: causes?.causes ?? [],
