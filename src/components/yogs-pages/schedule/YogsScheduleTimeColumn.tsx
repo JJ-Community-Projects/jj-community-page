@@ -1,4 +1,4 @@
-import {type Component, For} from "solid-js";
+import {type Component, For, Show} from "solid-js";
 import {useYogsSchedule} from "./provider/YogsScheduleProvider.tsx";
 import {useNextJJStartDate} from "../../../lib/utils/jjDates.ts";
 import {cn, tileSurface} from "../../ui/cn";
@@ -25,10 +25,27 @@ export const YogsScheduleTimeColumn: Component = () => {
 const Timezone: Component = () => {
   const nextJJStartDate = useNextJJStartDate()
   const {toDateTime} = useYogsSchedule()
+  const name = () => toDateTime(nextJJStartDate().toJSDate()).offsetNameShort ?? ''
+  // Long offsets ("GMT+10:30") don't fit the cell on one line: the offset goes below "GMT"
+  const parts = () => (name().length > 6 ? name().match(/^([A-Z]+)([+-].+)$/)?.slice(1) : undefined)
   return (
     <div class="yogs-cell timezone @container">
-      <p class={cn(tileSurface, 'text-fg-muted flex size-full items-center justify-center text-[length:clamp(0.625rem,24cqi,1rem)]')}>
-        {toDateTime(nextJJStartDate().toJSDate()).offsetNameShort}
+      <p
+        class={cn(
+          tileSurface,
+          'text-fg-muted flex size-full flex-col items-center justify-center leading-tight',
+          // Two lines need a lower floor in the small cell of narrow grids
+          parts() ? 'text-[length:clamp(0.5625rem,30cqi,1.25rem)]' : 'text-[length:clamp(0.75rem,30cqi,1.25rem)]',
+        )}
+      >
+        <Show when={parts()} fallback={name()}>
+          {(split) => (
+            <>
+              <span>{split()[0]}</span>
+              <span>{split()[1]}</span>
+            </>
+          )}
+        </Show>
       </p>
     </div>
   )
