@@ -8,6 +8,7 @@ import { twitchChannelSchema, twitchStreamSchema, } from '../../../db/schema/twi
 import { userSocials } from '../../../db/schema/auth-schema.ts'
 import { TiltifyAPI } from '../../../TiltifyAPI.ts'
 import { loggableError } from '../../../db/loggableError.ts'
+import { linkTwitchChannel } from '../../../services/twitchChannels.ts'
 
 const os = implement(platformsContract).use(dbMiddleware)
 
@@ -40,31 +41,11 @@ const addSocial = os.addSocialContract
           })
         }
 
-        const channel = data[0]
-
-        // Insert or update the channel data directly in the database
-        await db
-          .insert(twitchChannelSchema)
-          .values({
-            userId: userId,
-            id: channel.id,
-            login: channel.login,
-            displayName: channel.display_name,
-            description: channel.description,
-            profileImageUrl: channel.profile_image_url,
-            offlineImageUrl: channel.offline_image_url,
+        if ((await linkTwitchChannel(db, userId, data[0])) === 'taken') {
+          throw new ORPCError('CONFLICT', {
+            message: 'This Twitch channel is linked to another account',
           })
-          .onConflictDoUpdate({
-            target: [twitchChannelSchema.id],
-            set: {
-              id: channel.id,
-              login: channel.login,
-              displayName: channel.display_name,
-              description: channel.description,
-              profileImageUrl: channel.profile_image_url,
-              offlineImageUrl: channel.offline_image_url,
-            },
-          })
+        }
       }
 
       // Insert or update the social media link in the database
@@ -83,6 +64,8 @@ const addSocial = os.addSocialContract
 
       return result
     } catch (e) {
+      // NOT_FOUND / CONFLICT above are for the caller
+      if (e instanceof ORPCError) throw e
       console.error(loggableError(e)) // F-32
       throw new ORPCError('INTERNAL_SERVER_ERROR', {
         message: `Failed to add social`,
@@ -209,7 +192,6 @@ const importFromTiltify = os.importFromTiltifyContract
 
     // Process social media links
     const socials = tiltifyUser.data.social
-    console.log('socials', socials)
     const results: { provider: string; success: boolean }[] = []
 
     // Handle each social platform (twitch, twitter, youtube, instagram, tiktok)
@@ -248,35 +230,10 @@ const importFromTiltify = os.importFromTiltifyContract
               })
             }
 
-            const channel = data[0]
-
-            // Insert or update the channel data directly in the database
-            try {
-              await db
-                .insert(twitchChannelSchema)
-                .values({
-                  userId: userId,
-                  id: channel.id,
-                  login: channel.login,
-                  displayName: channel.display_name,
-                  description: channel.description,
-                  profileImageUrl: channel.profile_image_url,
-                  offlineImageUrl: channel.offline_image_url,
-                })
-                .onConflictDoUpdate({
-                  target: [twitchChannelSchema.id],
-                  set: {
-                    id: channel.id,
-                    login: channel.login,
-                    displayName: channel.display_name,
-                    description: channel.description,
-                    profileImageUrl: channel.profile_image_url,
-                    offlineImageUrl: channel.offline_image_url,
-                  },
-                })
-            } catch (e) {
-              console.error('twitchChannelSchema', channel, loggableError(e)) // F-32
-              throw e
+            // Another account's channel: not imported, and no Twitch social without it (F-12)
+            if ((await linkTwitchChannel(db, userId, data[0])) === 'taken') {
+              results.push({ provider: platform, success: false })
+              continue
             }
           }
 

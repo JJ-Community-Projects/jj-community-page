@@ -4,7 +4,7 @@ import { accounts, userSocials } from '../../../../lib/db/schema/auth-schema.ts'
 import { and, eq } from 'drizzle-orm'
 import { TiltifyAPI, type TiltifyUserResponse, } from '../../../../lib/TiltifyAPI.ts'
 import { TwitchAPI } from '../../../../lib/twitchAPI.ts'
-import { twitchChannelSchema } from '../../../../lib/db/schema/twitch-channel-schema.ts'
+import { linkTwitchChannel } from '../../../../lib/services/twitchChannels.ts'
 import {
   createNewUserSession,
   createSession,
@@ -96,12 +96,6 @@ export const GET: APIRoute = async (ctx) => {
   // If Tiltify profile includes Twitch, handle like manual addSocial (also store Twitch profile)
   try {
     const twitchValue = tiltifyUser?.data?.social?.twitch
-    console.log(
-      'api/auth/tiltify/callback',
-      'Tiltify signup Twitch handling',
-      'twitchValue',
-      twitchValue,
-    )
     if (twitchValue) {
       // Normalize to URL
       const twitchUrl = twitchValue.startsWith('http')
@@ -112,50 +106,18 @@ export const GET: APIRoute = async (ctx) => {
       const parts = twitchUrl.split('/')
       const username = parts[parts.length - 1]
 
-      console.log(
-        'api/auth/tiltify/callback',
-        'Tiltify signup Twitch handling',
-        'username',
-        username,
-      )
-
       // Resolve Twitch channel and upsert channel profile
       const twitchAPI = new TwitchAPI(env)
       const { data, error } = await twitchAPI.fetchUserByLogin(username)
-      console.log('api/auth/tiltify/callback', 'twitch.data', data)
       if (error){
         console.error('api/auth/tiltify/callback', 'twitch.error', error)
       }
-      if (data && data.length > 0) {
-        const channel = data[0]
-        console.log(
-          'api/auth/tiltify/callback',
-          'Tiltify signup Twitch handling',
-          'channel',
-          channel,
-        )
-        await db
-          .insert(twitchChannelSchema)
-          .values({
-            userId: session.userId,
-            id: channel.id,
-            login: channel.login,
-            displayName: channel.display_name,
-            description: channel.description,
-            profileImageUrl: channel.profile_image_url,
-            offlineImageUrl: channel.offline_image_url,
-          })
-          .onConflictDoUpdate({
-            target: [twitchChannelSchema.id],
-            set: {
-              id: channel.id,
-              login: channel.login,
-              displayName: channel.display_name,
-              description: channel.description,
-              profileImageUrl: channel.profile_image_url,
-              offlineImageUrl: channel.offline_image_url,
-            },
-          })
+      // Another account's channel: the new user gets neither the channel nor a Twitch social (F-12)
+      if (
+        data &&
+        data.length > 0 &&
+        (await linkTwitchChannel(db, session.userId, data[0])) === 'linked'
+      ) {
         // Upsert social link
         await db
           .insert(userSocials)

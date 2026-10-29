@@ -15,8 +15,9 @@ const handler = new RPCHandler(privateRouter, {
   ],
   interceptors: [
     onError((error) => {
-      // A DrizzleQueryError serializes its bound params (F-32)
-      console.error(JSON.stringify(loggableError(error), null, 2))
+      // The error itself, so stack and cause are kept (JSON.stringify of a plain Error is `{}`,
+      // F-73); loggableError drops a DrizzleQueryError's bound params (F-32)
+      console.error('/api/private', loggableError(error))
     }),
   ],
 })
