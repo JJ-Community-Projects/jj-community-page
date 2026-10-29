@@ -551,8 +551,9 @@ const getAllUsersWithInfo = os.getAllUsersWithInfoContract
   .handler(async ({ context }) => getUsers(context.db))
 
 // Community page: top N campaigns ∪ all account holders, merged and sorted (community-list)
+// 2 min edge cache during the event too (jjLive drops to 30 s): one D1 read + 3 DO reads per miss
 const communityList = os.communityListContract
-  .use(cached('jjLive', () => ''))
+  .use(cached('jjLive', () => '', { eventTtl: 2 * 60 }))
   .handler(async ({ context }) => {
     const DO = context.env.JingleJamData
     const stub = DO.get(DO.idFromName('JJ_API_CACHE'))
