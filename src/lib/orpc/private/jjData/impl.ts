@@ -41,6 +41,7 @@ import type { JJDrizzleDatabase } from '../../../db/db.ts'
 import { cached } from '../../middleware/cached.ts'
 import { alias } from 'drizzle-orm/sqlite-core'
 import { getUpcomingStreamsFromSchedule } from '../../../../content/getYogsScheduleFromContent.ts'
+import { buildCommunityList } from '../../../services/communityList.ts'
 // New: get campaign by Twitch id
 
 const jjDataCacheMiddleware = cacheMiddleware({
@@ -544,6 +545,26 @@ const getAllUsersWithInfo = os.getAllUsersWithInfoContract
   .use(cached('userDirectory', () => ''))
   .handler(async ({ context }) => getUsers(context.db))
 
+// Community page: top N campaigns ∪ all account holders, merged and sorted (community-list)
+const communityList = os.communityListContract
+  .use(cached('jjLive', () => ''))
+  .handler(async ({ context }) => {
+    const DO = context.env.JingleJamData
+    const stub = DO.get(DO.idFromName('JJ_API_CACHE'))
+    const [users, campaigns, liveLogins, causes] = await Promise.all([
+      getUsers(context.db),
+      stub.getCommunityCampaignsDisplayAll(),
+      stub.getLiveLogins(),
+      stub.getCausesDisplay(),
+    ])
+    return buildCommunityList({
+      users,
+      campaigns: campaigns?.list ?? [],
+      liveLogins: liveLogins ?? [],
+      causes: causes?.causes ?? [],
+    })
+  })
+
 async function loadOverview(kv: KVNamespace): Promise<Overview | null> {
   const data = await getJSON<any>(kv, 'twitch-extension:overview')
   if (!data) return null
@@ -742,6 +763,7 @@ export const jjRouter = {
   campaignsAll,
   fullSchedule,
   headliner,
+  communityList,
   /*
   causeById,
   campaignLookup,
