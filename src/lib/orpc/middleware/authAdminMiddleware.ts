@@ -49,7 +49,7 @@ export const adminAuthMiddleware = dbMiddleware
     }
 
     if (result.role !== 'admin') {
-      throw new ORPCError('UNAUTHORIZED', { message: 'User is not admin' })
+      throw new ORPCError('FORBIDDEN', { message: 'User is not admin' })
     }
 
     return next({

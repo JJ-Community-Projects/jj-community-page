@@ -137,7 +137,8 @@ export class Scheduler {
 
   public async setTaskEnabled(name: string, enabled: boolean) {
     await this.storage.put(this.keyEnabled(name), enabled)
-    await this.ensureAlarm() // recompute next alarm in case enabling/disabling changes the schedule
+    // Enabling or disabling a task can move the soonest due time (F-22)
+    await this.scheduleNextAlarm()
   }
 
   // Expose scheduler state for admin UI
@@ -163,7 +164,8 @@ export class Scheduler {
         everyMs: t.everyMs,
         enabled,
         lastRunMs: last ?? null,
-        nextDueAtMs: next,
+        // A task that never ran is due now, not `everyMs` after 1970 (F-22)
+        nextDueAtMs: last === undefined && !retry ? now : next,
         dueNow: next <= now && enabled,
       })
     }

@@ -22,6 +22,8 @@ export const GET: APIRoute = async (ctx) => {
   const code = url.searchParams.get('code')
   const state = ctx.url.searchParams.get('state')
   const storedState = ctx.cookies.get('tiltify_oauth_state')?.value ?? null
+  // Single use: the state is cleared on every outcome, so it can't pass the check again (F-24)
+  ctx.cookies.delete('tiltify_oauth_state', { path: '/' })
   if (!code) {
     return ctx.redirect('/auth-error?error=missing-code')
   }

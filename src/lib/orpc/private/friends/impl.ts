@@ -20,101 +20,100 @@ const os = implement(friendsContract).use(dbMiddleware)
 const sendFriendRequest = os.sendFriendRequestContract
   .use(authMiddleware)
   .handler(async ({ context, input }) => {
-    try {
-      const db = context.db
-      const userId = context.userId
-      const { toUserId } = input
+    const db = context.db
+    const userId = context.userId
+    const { toUserId } = input
 
-      // Prevent sending friend request to yourself
-      if (userId === toUserId) {
-        throw new Error('Cannot send friend request to yourself')
-      }
-
-      // Check if users are already friends
-      const existingFriendship = await db
-        .select()
-        .from(friendsTable)
-        .where(
-          or(
-            and(
-              eq(friendsTable.fromUserId, userId),
-              eq(friendsTable.toUserId, toUserId),
-            ),
-            and(
-              eq(friendsTable.fromUserId, toUserId),
-              eq(friendsTable.toUserId, userId),
-            ),
-          ),
-        )
-        .get()
-
-      if (existingFriendship) {
-        throw new Error('Users are already friends')
-      }
-
-      // Check if friend request already exists
-      const existingRequest = await db
-        .select()
-        .from(friendRequests)
-        .where(
-          or(
-            and(
-              eq(friendRequests.fromUserId, userId),
-              eq(friendRequests.toUserId, toUserId),
-            ),
-            and(
-              eq(friendRequests.fromUserId, toUserId),
-              eq(friendRequests.toUserId, userId),
-            ),
-          ),
-        )
-        .get()
-
-      if (existingRequest) {
-        throw new Error('Friend request already exists')
-      }
-
-      // Check if either user has blocked the other
-      const blockExists = await db
-        .select()
-        .from(blockedUsers)
-        .where(
-          or(
-            and(
-              eq(blockedUsers.userId, userId),
-              eq(blockedUsers.blockedUser, toUserId),
-            ),
-            and(
-              eq(blockedUsers.userId, toUserId),
-              eq(blockedUsers.blockedUser, userId),
-            ),
-          ),
-        )
-        .get()
-
-      if (blockExists) {
-        throw new Error('Cannot send friend request to blocked user')
-      }
-
-      // Insert friend request
-      await db.insert(friendRequests).values({
-        fromUserId: userId,
-        toUserId: toUserId,
-      })
-
-      // Publish event for real-time updates via Durable Objects
-      await Promise.all([
-        publishFriendRequestIncomingUpdate(context.env, toUserId),
-        publishFriendRequestSentUpdate(context.env, userId),
-      ])
-
-      return { success: true }
-    } catch (e) {
-      console.error('sendFriendRequest', e)
-      throw new ORPCError('INTERNAL_SERVER_ERROR', {
-        message: (e as any)?.message,
+    // Prevent sending friend request to yourself
+    if (userId === toUserId) {
+      throw new ORPCError('BAD_REQUEST', {
+        message: 'Cannot send friend request to yourself',
       })
     }
+
+    // Check if users are already friends
+    const existingFriendship = await db
+      .select()
+      .from(friendsTable)
+      .where(
+        or(
+          and(
+            eq(friendsTable.fromUserId, userId),
+            eq(friendsTable.toUserId, toUserId),
+          ),
+          and(
+            eq(friendsTable.fromUserId, toUserId),
+            eq(friendsTable.toUserId, userId),
+          ),
+        ),
+      )
+      .get()
+
+    if (existingFriendship) {
+      throw new ORPCError('CONFLICT', { message: 'Users are already friends' })
+    }
+
+    // Check if friend request already exists
+    const existingRequest = await db
+      .select()
+      .from(friendRequests)
+      .where(
+        or(
+          and(
+            eq(friendRequests.fromUserId, userId),
+            eq(friendRequests.toUserId, toUserId),
+          ),
+          and(
+            eq(friendRequests.fromUserId, toUserId),
+            eq(friendRequests.toUserId, userId),
+          ),
+        ),
+      )
+      .get()
+
+    if (existingRequest) {
+      throw new ORPCError('CONFLICT', {
+        message: 'Friend request already exists',
+      })
+    }
+
+    // Check if either user has blocked the other
+    const blockExists = await db
+      .select()
+      .from(blockedUsers)
+      .where(
+        or(
+          and(
+            eq(blockedUsers.userId, userId),
+            eq(blockedUsers.blockedUser, toUserId),
+          ),
+          and(
+            eq(blockedUsers.userId, toUserId),
+            eq(blockedUsers.blockedUser, userId),
+          ),
+        ),
+      )
+      .get()
+
+    if (blockExists) {
+      throw new ORPCError('FORBIDDEN', {
+        message: 'Cannot send friend request to blocked user',
+      })
+    }
+
+    // Insert friend request
+    await db.insert(friendRequests).values({
+      fromUserId: userId,
+      toUserId: toUserId,
+    })
+
+    // Publish event for real-time updates via Durable Objects
+    await Promise.all([
+      publishFriendRequestIncomingUpdate(context.env, toUserId),
+      publishFriendRequestSentUpdate(context.env, userId),
+    ])
+
+    return { success: true }
   })
 
 // Accept friend request implementation
@@ -138,7 +137,7 @@ const acceptFriendRequest = os.acceptFriendRequestContract
       .get()
 
     if (!friendRequest) {
-      throw new Error('Friend request not found')
+      throw new ORPCError('NOT_FOUND', { message: 'Friend request not found' })
     }
 
     // Remove the friend request and add friendship in a transaction
@@ -193,7 +192,7 @@ const declineFriendRequest = os.declineFriendRequestContract
       .get()
 
     if (!friendRequest) {
-      throw new Error('Friend request not found')
+      throw new ORPCError('NOT_FOUND', { message: 'Friend request not found' })
     }
 
     // Remove the friend request
@@ -236,7 +235,7 @@ const cancelFriendRequest = os.cancelFriendRequestContract
       .get()
 
     if (!friendRequest) {
-      throw new Error('Friend request not found')
+      throw new ORPCError('NOT_FOUND', { message: 'Friend request not found' })
     }
 
     // Remove the friend request
@@ -285,7 +284,7 @@ const removeFriend = os.removeFriendContract
       .get()
 
     if (!friendship) {
-      throw new Error('Friendship not found')
+      throw new ORPCError('NOT_FOUND', { message: 'Friendship not found' })
     }
 
     // Remove the friendship

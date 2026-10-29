@@ -89,16 +89,20 @@ const removeSocial = os.removeSocialContract
         ),
       )
       .returning()
-    console.log('removeSocial', input)
+    if (!result) {
+      throw new ORPCError('NOT_FOUND', { message: 'Social link not found' })
+    }
     if (input.provider === 'twitch') {
       const [channel] = await db
         .delete(twitchChannelSchema)
         .where(eq(twitchChannelSchema.userId, userId))
         .returning()
-      console.log('removeSocial', 'twitch', channel)
-      await db
-        .delete(twitchStreamSchema)
-        .where(eq(twitchStreamSchema.twitchId, channel.id))
+      // Rows from before F-12 can have a Twitch social whose channel stayed with another user
+      if (channel) {
+        await db
+          .delete(twitchStreamSchema)
+          .where(eq(twitchStreamSchema.twitchId, channel.id))
+      }
     }
 
     return result

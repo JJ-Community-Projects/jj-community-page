@@ -290,6 +290,18 @@ const getGBPToEURRate = os.getGBPToEURRateContract.handler(
   },
 )
 
+// The lower-cased login of a Twitch social: a bare login or a channel URL, where the login is the
+// first path segment (`https://www.twitch.tv/User/videos?x=1` → `user`). Twitch logins are
+// case-insensitive and the resolved users are keyed by the lower-cased login (F-20).
+function twitchLoginFromSocial(value: string): string | undefined {
+  if (!value.startsWith('http')) return value.toLowerCase()
+  try {
+    return new URL(value).pathname.split('/').find(Boolean)?.toLowerCase()
+  } catch {
+    return undefined
+  }
+}
+
 // Sync Twitch channels from user socials (provider: 'twitch')
 const syncTwitchChannelsFromSocials =
   os.syncTwitchChannelsFromSocialsContract.handler(async ({ context }) => {
@@ -320,12 +332,8 @@ const syncTwitchChannelsFromSocials =
     // 3) Build list of missing [userId, login]
     const missing = socials
       .filter((s) => !existingUserIds.has(s.userId))
-      .map((s) => ({
-        userId: s.userId,
-        login: s.url.startsWith('http')
-          ? s.url.split('/').toReversed()[0]
-          : s.url,
-      }))
+      .map((s) => ({ userId: s.userId, login: twitchLoginFromSocial(s.url) }))
+      .filter((m): m is { userId: number; login: string } => !!m.login)
 
 
     if (missing.length === 0) return

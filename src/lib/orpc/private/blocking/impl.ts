@@ -1,5 +1,5 @@
 import {blockContract} from './contract.ts';
-import {implement} from '@orpc/server';
+import {implement, ORPCError} from '@orpc/server';
 import {dbMiddleware} from '../../middleware/dbMiddleware.ts';
 import {authMiddleware} from '../../middleware/authMiddleware.ts';
 import {blockedUsers, friendRequests, friendsTable} from '../../../db/schema/auth-schema.ts';
@@ -25,7 +25,7 @@ const blockUser = os.blockUserContract
 
     // Prevent blocking yourself
     if (userId === blockedUserId) {
-      throw new Error('Cannot block yourself');
+      throw new ORPCError('BAD_REQUEST', { message: 'Cannot block yourself' });
     }
 
     // Check if user is already blocked
@@ -40,7 +40,7 @@ const blockUser = os.blockUserContract
       .get();
 
     if (existingBlock) {
-      throw new Error('User is already blocked');
+      throw new ORPCError('CONFLICT', { message: 'User is already blocked' });
     }
 
     // Remove any existing friendship and friend requests, then block user
@@ -108,7 +108,7 @@ const unblockUser = os.unblockUserContract
       .get();
 
     if (!existingBlock) {
-      throw new Error('User is not blocked');
+      throw new ORPCError('NOT_FOUND', { message: 'User is not blocked' });
     }
 
     // Remove the block
