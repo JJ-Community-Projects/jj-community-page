@@ -25,7 +25,10 @@ const [{ data: contentHidden }, configYear] = await Promise.all([
 const HIDE_CONTENT = contentHidden ?? true
 const year = upcomingJJYear(configYear, HIDE_CONTENT)
 
-const charityData = await getEntry('charities', '2025')
+// The charities of the configured event year (as the cause overlays use); 2025's when that year has no file.
+const charityData =
+  (await getEntry('charities', String(configYear))) ??
+  (await getEntry('charities', '2025'))
 
 // The tag search gets the catalog from the page (no public HTTP route)
 const tagCatalog = HIDE_CONTENT
