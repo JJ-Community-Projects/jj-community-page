@@ -1,4 +1,5 @@
-import type { Component } from 'solid-js'
+import { type Component, For } from 'solid-js'
+import { IconButton } from '../../ui/Button'
 import {
   InstagramIcon,
   TiktokIcon,
@@ -34,17 +35,41 @@ export const YogsScheduleDisclaimer: Component = () => {
   )
 }
 
+/** The stream dialog's fine print (Dialog `aside`): one line of text, the Yogscast links after it. */
 export const YogsStreamDisclaimer: Component = () => {
   return (
-    <div class={'max-w-120 text-pretty text-center text-xs'}>
+    <div class={'flex flex-col gap-1 text-pretty'}>
       <p>
         The schedule is subject to change and not all participants are
         confirmed. For more information visit the Yogscast's social media.
       </p>
-      <ExternalLinks />
+      <div class={'-ml-2 flex flex-row items-center'}>
+        <For each={YOGSCAST_LINKS}>
+          {(link) => (
+            <IconButton
+              variant="ghost"
+              size="sm"
+              href={link.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={link.label}
+            >
+              {link.icon()}
+            </IconButton>
+          )}
+        </For>
+      </div>
     </div>
   )
 }
+
+const YOGSCAST_LINKS = [
+  { label: 'Yogscast on YouTube', href: 'https://www.youtube.com/yogscast', icon: () => <YoutubeIcon class={'size-4'} /> },
+  { label: 'Yogscast on Twitch', href: 'https://twitch.tv/yogscast', icon: () => <TwitchIcon class={'size-4'} /> },
+  { label: 'Yogscast on X', href: 'https://x.com/yogscast', icon: () => <TwitterIcon class={'size-4'} /> },
+  { label: 'Yogscast on Instagram', href: 'https://www.instagram.com/officialyogscast/', icon: () => <InstagramIcon class={'size-4'} /> },
+  { label: 'Yogscast on TikTok', href: 'https://www.tiktok.com/@yogscastofficial', icon: () => <TiktokIcon class={'size-4'} /> },
+]
 
 const ExternalLinks = () => {
   return (

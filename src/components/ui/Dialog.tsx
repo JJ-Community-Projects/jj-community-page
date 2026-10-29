@@ -1,4 +1,5 @@
-import { type Component, type JSX, Show } from 'solid-js'
+import { type Component, createRenderEffect, type JSX, on, Show } from 'solid-js'
+import { isServer } from 'solid-js/web'
 import { Dialog as KDialog } from '@kobalte/core/dialog'
 import { FaSolidXmark } from 'solid-icons/fa'
 import { cn } from './cn'
@@ -20,10 +21,32 @@ type DialogProps = {
   footer?: JSX.Element
   /** Header band and border in a colour (e.g. a stream's), with its readable text colour. */
   accent?: { background: string; color: string }
+  /** Fine print under the body (a notice, not buttons): muted, below a border, after `footer`. */
+  aside?: JSX.Element
   children?: JSX.Element
 }
 
 export const Dialog: Component<DialogProps> = (props) => {
+  // Kobalte returns focus to a Dialog.Trigger on close; these dialogs open from signals, so
+  // remember what had focus when it opened (the clicked tile, row or button) and go back there.
+  let opener: HTMLElement | undefined
+  createRenderEffect(
+    on(
+      () => props.open,
+      (open) => {
+        if (open && !isServer) {
+          opener = (document.activeElement as HTMLElement | null) ?? undefined
+        }
+      },
+    ),
+  )
+  const returnFocus = (e: Event) => {
+    if (opener?.isConnected && opener !== document.body) {
+      e.preventDefault()
+      opener.focus({ preventScroll: true })
+    }
+  }
+
   // Element props are read once, inside the portal (only while open), via Show's accessor:
   // reading them twice would create them twice and break hydration.
   return (
@@ -32,6 +55,7 @@ export const Dialog: Component<DialogProps> = (props) => {
         <KDialog.Overlay class="fixed inset-0 z-50 bg-black/50" />
         <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
           <KDialog.Content
+            onCloseAutoFocus={returnFocus}
             class={cn(
               'rounded-tile bg-surface-strong text-fg shadow-tile-hover flex max-h-[calc(100dvh-2rem)] w-full flex-col overflow-hidden',
               sizes[props.size ?? 'md'],
@@ -92,6 +116,13 @@ export const Dialog: Component<DialogProps> = (props) => {
               {(footer) => (
                 <div class="border-line flex flex-wrap justify-end gap-2 border-t px-4 py-3">
                   {footer()}
+                </div>
+              )}
+            </Show>
+            <Show when={props.aside}>
+              {(aside) => (
+                <div class="border-line bg-surface text-fg-muted border-t px-4 py-2.5 text-xs">
+                  {aside()}
                 </div>
               )}
             </Show>
