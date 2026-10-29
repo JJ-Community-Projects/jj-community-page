@@ -1,4 +1,4 @@
-import { type Component, createEffect, createSignal, on, onCleanup, onMount, Show, } from 'solid-js'
+import { type Component, createEffect, createSignal, For, on, onCleanup, onMount, Show, } from 'solid-js'
 import { Transition } from 'solid-transition-group'
 import { twMerge } from 'tailwind-merge'
 import { QRCodeSVG } from 'solid-qr-code'
@@ -138,6 +138,7 @@ export type Props = {
   showDesc?: boolean
   qrCode?: 'none' | 'fundraiser' | 'charity'
   showUrl?: boolean
+  showDots?: boolean
   causes?: string[]
   user?: string
   currency?: 'GBP' | 'USD' | 'EUR'
@@ -167,6 +168,7 @@ const Charities2OverlayBody: Component<Props> = (props) => {
   const showQRCode = () => qrCode() !== 'none'
   const showUrl = () =>
     props.showUrl === undefined ? true : Boolean(props.showUrl)
+  const showDots = () => Boolean(props.showDots)
   const causes = () => props.causes ?? []
 
   const [displayList, setDisplayList] = createSignal<CharityItem[]>([])
@@ -306,6 +308,21 @@ const Charities2OverlayBody: Component<Props> = (props) => {
           )}
         </Show>
       </div>
+      <Show when={showDots() && !oneCause() && displayList().length > 0}>
+        <div class="flex items-center justify-center gap-1.5 pb-2">
+          <For each={displayList()}>
+            {(_, i) => (
+              <span
+                class={twMerge(
+                  'size-2 rounded-full shadow-md transition-all duration-500',
+                  bg(currentTheme(i())),
+                  i() === idx() % displayList().length && 'size-3',
+                )}
+              />
+            )}
+          </For>
+        </div>
+      </Show>
     </div>
   )
 }

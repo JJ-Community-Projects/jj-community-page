@@ -41,6 +41,7 @@ export const CharitiesConfigurator: Component = () => {
   const [qrCode, setQrCode] = createSignal<QrCode>('none')
   const [currency, setCurrency] = createSignal<Currency>('GBP')
   const [showUrl, setShowUrl] = createSignal<boolean>(true)
+  const [showDots, setShowDots] = createSignal<boolean>(false)
   const [selectedIds, setSelectedIds] = createSignal<string[]>([])
   const [previewData, setPreviewData] = createSignal<PreviewDataMode>('test')
 
@@ -80,6 +81,7 @@ export const CharitiesConfigurator: Component = () => {
     qrCode: qrCode(),
     currency: currency(),
     showUrl: showUrl(),
+    showDots: showDots(),
     causes: causesParam(),
     user: user?.tiltifySlug,
   })
@@ -155,6 +157,11 @@ export const CharitiesConfigurator: Component = () => {
           onChange={setShowDesc}
         />
         <Checkbox label="URL" checked={showUrl()} onChange={setShowUrl} />
+        <Checkbox
+          label="Position dots"
+          checked={showDots()}
+          onChange={setShowDots}
+        />
       </fieldset>
       <fieldset class="flex flex-col gap-1 sm:col-span-2">
         <legend class={`${fieldClass.label} mb-1`}>Charities</legend>
