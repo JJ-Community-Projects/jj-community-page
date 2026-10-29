@@ -2,8 +2,8 @@
   Sizing of the Yogs week grid (YogsScheduleWeek, PlaceholderSchedule) and the desktop / mobile
   switch, for every page that shows the schedule. The grid is 22 units wide (7 days × 3 + the time
   column) and sizes from its container, at most 80vw (as before the redesign) and 1600px. A slot is
-  3 units; every cell keeps half a gap of padding (8px between cells), the stream tiles a bit more
-  (12px between tiles, as before).
+  3 units; every cell keeps half a gap of padding (8px between cells), the stream tiles their own
+  (--yogs-tile-gap, also 8px).
 */
 
 /* Registered, so the unit is computed once on .yogs-grid (against the schedule container) and
