@@ -37,7 +37,8 @@ const useCreatorFilterHook = () => {
     } else {
       url.searchParams.delete('filterType')
     }
-    window.history.pushState({}, '', url.toString())
+    // replaceState: the URL follows the filter, but Back leaves the page instead of undoing clicks (D9)
+    window.history.replaceState(window.history.state, '', url.toString())
   })
 
   const addFilter = (id: string) => {

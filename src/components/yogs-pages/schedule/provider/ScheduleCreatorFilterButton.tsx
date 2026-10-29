@@ -1,18 +1,18 @@
-import {Dialog, ToggleButton} from "@kobalte/core"
-import {twMerge} from "tailwind-merge";
-import {type Component, createSignal, createUniqueId, For, Match, onCleanup, Show, Switch} from "solid-js";
+import {type Component, createSignal, For, onCleanup, Show} from "solid-js";
 import {useCreatorFilter} from "./CreatorFilterProvider.tsx";
 import {BiRegularReset} from "solid-icons/bi";
 import {type ModalSignal} from "../../../../lib/createModalSignal.ts";
-import {CgClose} from "solid-icons/cg";
-import {
-  FaRegularSquare,
-  FaSolidCheck,
-  FaSolidShare,
-  FaSolidSquareCheck,
-} from 'solid-icons/fa'
+import {FaSolidCheck, FaSolidShare, FaSolidXmark} from 'solid-icons/fa'
 import {useYogsSchedule} from "./YogsScheduleProvider.tsx";
-import {IconButton} from "../../../ui/Button";
+import {Button, IconButton} from "../../../ui/Button";
+import {Dialog} from "../../../ui/Dialog";
+import {SearchField, Segmented} from "../../../ui/Form";
+import {Avatar} from "../../../ui/Avatar";
+import {TileGroup} from "../../../ui/Tile";
+import {cn, focusRing} from "../../../ui/cn";
+import {sectionLabel} from "../../../features/schedules/common/StreamParticipants";
+import {CREATOR_FALLBACK_COLOR} from "../../creators/YogsCreatorChip.tsx";
+import type {YogsCreator} from "../../../../lib/orpc/private/yogs/contract.ts";
 
 /** Copies the filter link; `copied()` stays true for 2 s after it worked. */
 export const useCopyFilterLink = () => {
@@ -67,220 +67,182 @@ interface FilterDialogProps {
   modalSignal: ModalSignal
 }
 
+/** Creator filter: search, sort, Any / All, the selected creators, one row per creator. */
 export const FilterDialog: Component<FilterDialogProps> = props => {
-  const {modalSignal} = props
+  const {streams, mounted} = useYogsSchedule()
+  const {reset, isEmpty, filteredStreams} = useCreatorFilter()
+  const {copied, copy} = useCopyFilterLink()
+
+  const total = () => streams().length
+  const summary = () =>
+    isEmpty()
+      ? `${total()} streams`
+      : `${filteredStreams().length} of ${total()} streams match`
 
   return (
-    <Dialog.Root open={modalSignal.isOpen()} onOpenChange={modalSignal.setOpen}>
-      <Dialog.Portal>
-        <Dialog.Overlay class={'fixed inset-0 z-50 bg-black/20'}/>
-        <div class={'fixed inset-0 z-50 flex items-center justify-center'}>
-          <Dialog.Content class={'h-full max-sm:h-[70vh] w-full max-w-[500px] p-2 lg:w-[min(calc(100vw-16px),500px)] lg:p-16'}>
-            <FilterDialogBody onClose={modalSignal.close}/>
-          </Dialog.Content>
-        </div>
-      </Dialog.Portal>
-    </Dialog.Root>
+    <Dialog
+      open={props.modalSignal.isOpen()}
+      onOpenChange={props.modalSignal.setOpen}
+      title="Filter by creator"
+      description={<span aria-live="polite">{summary()}</span>}
+      footer={
+        <>
+          <Button variant="ghost" size="sm" class="mr-auto" disabled={isEmpty()} onClick={reset}>
+            Reset
+          </Button>
+          <Show when={mounted() && navigator.clipboard}>
+            <Button size="sm" disabled={isEmpty()} onClick={copy}>
+              {copied() ? 'Copied' : 'Copy link'}
+            </Button>
+          </Show>
+          <Button variant="primary" size="sm" onClick={() => props.modalSignal.close()}>
+            Done
+          </Button>
+        </>
+      }
+    >
+      <FilterDialogBody/>
+    </Dialog>
   )
 }
 
-interface FilterDialogBodyProps {
-  onClose: () => void
-}
-
-const FilterDialogBody: Component<FilterDialogBodyProps> = props => {
-  const {onClose} = props
-  const {creators, mounted} = useYogsSchedule()
-  const {toggleFilter, reset, filter, filteredStreams, appearanceCount, includesFilter, sortByName} =
+const FilterDialogBody: Component = () => {
+  const {creators} = useYogsSchedule()
+  const {filter, toggleFilter, appearanceCount, includesFilter, sortByName, setSortByName, and, toggleAnd} =
     useCreatorFilter()
-  const {copied, copy} = useCopyFilterLink()
   const [search, setSearch] = createSignal('')
-  const searchId = createUniqueId()
 
-  const searchCreatorList = () => {
-    if (search() === '') {
-      return creators()
-    }
-    return creators().filter(c => {
-      return c.name.toLowerCase().includes(search().toLowerCase())
-    })
+  const byName = (a: YogsCreator, b: YogsCreator) =>
+    a.name.toLowerCase().localeCompare(b.name.toLowerCase())
+
+  const list = () => {
+    const query = search().trim().toLowerCase()
+    const found = query
+      ? creators().filter(c => c.name.toLowerCase().includes(query))
+      : creators()
+    return found.sort((a, b) =>
+      sortByName() ? byName(a, b) : appearanceCount(b.id) - appearanceCount(a.id) || byName(a, b),
+    )
   }
 
-  const sortedCreatorList = () => {
-    if (sortByName()) {
-      return searchCreatorList().sort((a, b) => {
-        return a.name.toLowerCase().localeCompare(b.name.toLowerCase())
-      })
-    }
-    return searchCreatorList().sort((a, b) => {
-      const aAppearance = appearanceCount(a.id)
-      const bAppearance = appearanceCount(b.id)
-      if (aAppearance == bAppearance) {
-        return a.name.toLowerCase().localeCompare(b.name.toLowerCase())
-      }
-      return bAppearance - aAppearance
-    })
-  }
+  const selected = () =>
+    filter()
+      .map(id => creators().find(c => c.id === id))
+      .filter((c): c is YogsCreator => !!c)
 
   return (
-    <div class={'flex h-full w-full flex-col rounded-2xl bg-white'}>
-      <div class={`bg-primary flex max-h-[72px] items-center justify-center rounded-t-2xl p-2 text-white shadow-xl`}>
-        <button onClick={onClose}>
-          <CgClose size={20} class={''}/>
-        </button>
-        <div class={'flex-1'}></div>
-        <h3 class={'text-xl'}>Creator Filter</h3>
-        <div class={'flex-1'}></div>
-        <div class={'w-[20px]'}></div>
-      </div>
-      <div class={'flex w-full flex-1 flex-col gap-2 overflow-auto p-4'}>
-        <Switch>
-          <Match when={creators()}>
-            <p>Filtered streams: {filteredStreams().length}</p>
-            <div class={'flex flex-row items-center justify-stretch gap-2'}>
-              <SortToggle/>
-              <AndToggle/>
-            </div>
-            <div class="p-2">
-              <label class="mb-2 block text-sm font-bold text-gray-700" for={searchId}>
-                Search
-              </label>
-              <input
-                class="w-full appearance-none rounded-sm border px-3 py-2 leading-tight text-gray-700 shadow-sm focus:outline-hidden"
-                id={searchId}
-                type="text"
-                placeholder="Search"
-                value={search()}
-                onInput={e => {
-                  const target = e.target as HTMLInputElement
-                  if (target) {
-                    setSearch(target.value)
-                  }
-                }}
-              />
-            </div>
-            <For each={sortedCreatorList()}>
+    <div class="flex flex-col gap-3">
+      {/* Stays on top while the list scrolls; covers the body's top padding */}
+      <div class="bg-surface-strong sticky -top-3 z-10 -mx-4 -mt-3 flex flex-col gap-2.5 px-4 pt-3 pb-2">
+        <SearchField label="Search creators" placeholder="Search creators" value={search()} onInput={setSearch}/>
+        <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
+          <div class="flex items-center gap-2">
+            <span class={sectionLabel}>Sort</span>
+            <Segmented
+              label="Sort creators"
+              size="sm"
+              // Options share the width equally; "Appearances" needs more than half of its own
+              class="w-52"
+              value={sortByName() ? 'name' : 'appearances'}
+              onChange={value => setSortByName(value === 'name')}
+              options={[{value: 'name', label: 'Name'}, {value: 'appearances', label: 'Appearances'}]}
+            />
+          </div>
+          <div class="flex items-center gap-2">
+            <span class={sectionLabel}>Match</span>
+            <Segmented
+              label="Match"
+              size="sm"
+              value={and() ? 'all' : 'any'}
+              onChange={value => {
+                if ((value === 'all') !== and()) toggleAnd()
+              }}
+              options={[{value: 'any', label: 'Any'}, {value: 'all', label: 'All'}]}
+            />
+          </div>
+        </div>
+        <p class="text-fg-muted text-xs">
+          Any: streams with at least one of them · All: streams with all of them
+        </p>
+        <Show when={selected().length > 0}>
+          <div class="flex flex-wrap gap-1.5">
+            <For each={selected()}>
               {creator => (
-                <>
-                  <button
-                    class={'hover:bg-accent-50 border-accent-50 rounded-xl border-2 p-4 hover:brightness-105'}
-                    onClick={() => toggleFilter(creator.id)}
-                  >
-                    <div class={'flex flex-row items-center'}>
-                      <p class={'flex-1 text-left'}>
-                        {creator.name} ({appearanceCount(creator.id)})
-                      </p>
-                      <div class={'text-accent-500'}>
-                        <Show when={includesFilter(creator.id)}>
-                          <FaSolidSquareCheck size={24}/>
-                        </Show>
-                        <Show when={!includesFilter(creator.id)}>
-                          <FaRegularSquare size={24}/>
-                        </Show>
-                      </div>
-                    </div>
-                  </button>
-                </>
+                <button
+                  type="button"
+                  class={cn('bg-accent-50 text-accent-700 ring-accent-200 inline-flex items-center gap-1 rounded-full py-0.5 pr-1.5 pl-2.5 text-xs font-semibold ring-1 hover:brightness-95', focusRing)}
+                  aria-label={`Remove ${creator.name}`}
+                  onClick={() => toggleFilter(creator.id)}
+                >
+                  {creator.name}
+                  <FaSolidXmark class="size-3" aria-hidden="true"/>
+                </button>
               )}
             </For>
-          </Match>
-        </Switch>
-      </div>
-      <div class={'flex h-[72px] flex-row items-center justify-end gap-2 p-4'}>
-        <Show when={mounted() && navigator.clipboard}>
-          <button
-            class={'bg-primary rounded-xl p-2 text-white disabled:bg-gray-500 disabled:opacity-75'}
-            disabled={filter().length == 0}
-            onclick={copy}
-          >
-            {copied() ? 'Copied' : 'Share Link'}
-          </button>
+          </div>
         </Show>
-        <button
-          class={'bg-primary rounded-xl p-2 text-white'}
-          onclick={() => {
-            reset()
-          }}
-        >
-          Reset
-        </button>
-        <button
-          class={'bg-primary rounded-xl p-2 text-white'}
-          onclick={() => {
-            onClose()
-          }}
-        >
-          Done
-        </button>
       </div>
+
+      <Show
+        when={list().length > 0}
+        fallback={<p class="text-fg-muted py-6 text-center text-sm">No creator matches “{search()}”.</p>}
+      >
+        <TileGroup pad="none" class="divide-line flex flex-col divide-y overflow-hidden">
+          <For each={list()}>
+            {creator => (
+              <CreatorRow
+                creator={creator}
+                count={appearanceCount(creator.id)}
+                checked={includesFilter(creator.id)}
+                onToggle={() => toggleFilter(creator.id)}
+              />
+            )}
+          </For>
+        </TileGroup>
+      </Show>
     </div>
   )
 }
 
-const AndToggle = () => {
-  const {and, toggleAnd} = useCreatorFilter()
-
-  return (
-    <ToggleButton.Root
-      class={
-        'border-accent-50 flex flex-1 flex-row items-stretch justify-stretch rounded-full border-2 text-sm text-white transition-all'
-      }
-      pressed={and()}
-      onChange={toggleAnd}
-    >
-      {state => (
-        <>
-          <div
-            class={twMerge(
-              'flex-1 rounded-l-2xl bg-gray-400 p-1 opacity-60 transition-all',
-              !state.pressed() && 'bg-primary opacity-100',
-            )}
-          >
-            <p>OR</p>
-          </div>
-          <div
-            class={twMerge(
-              'flex-1 rounded-r-2xl bg-gray-400 p-1 opacity-60 transition-all',
-              state.pressed() && 'bg-primary opacity-100',
-            )}
-          >
-            <p>AND</p>
-          </div>
-        </>
-      )}
-    </ToggleButton.Root>
-  )
+interface CreatorRowProps {
+  creator: YogsCreator
+  count: number
+  checked: boolean
+  onToggle: () => void
 }
 
-const SortToggle = () => {
-  const {sortByName, toggleSortByName} = useCreatorFilter()
-
-  return (
-    <ToggleButton.Root
-      class={'border-accent-50 flex flex-1 flex-row rounded-full border-2 text-sm text-white transition-all'}
-      pressed={sortByName()}
-      onChange={toggleSortByName}
-    >
-      {state => (
-        <>
-          <div
-            class={twMerge(
-              'flex-1 rounded-l-2xl bg-gray-400 p-1 opacity-60 transition-all',
-              !state.pressed() && 'bg-primary opacity-100',
-            )}
-          >
-            <p>Appearance</p>
-          </div>
-          <div
-            class={twMerge(
-              'flex-1 rounded-r-2xl bg-gray-400 p-1 opacity-60 transition-all',
-              state.pressed() && 'bg-primary opacity-100',
-            )}
-          >
-            <p>Name</p>
-          </div>
-        </>
+/** The whole row toggles; it is the checkbox. */
+const CreatorRow: Component<CreatorRowProps> = props => (
+  <button
+    type="button"
+    role="checkbox"
+    aria-checked={props.checked}
+    class={cn('flex w-full items-center gap-2.5 px-3 py-1.5 text-left text-sm transition-colors hover:bg-black/5 focus-visible:-outline-offset-2', focusRing)}
+    onClick={() => props.onToggle()}
+  >
+    <Avatar
+      src={props.creator.imageUrl}
+      alt=""
+      fallback={props.creator.name.charAt(0)}
+      size="xs"
+      shape="circle"
+      ringColor={props.creator.color ?? CREATOR_FALLBACK_COLOR}
+      class="ring-2"
+    />
+    <span class="min-w-0 flex-1 truncate font-medium">{props.creator.name}</span>
+    <span class="text-fg-muted text-xs tabular-nums">
+      {props.count} {props.count === 1 ? 'stream' : 'streams'}
+    </span>
+    <span
+      class={cn(
+        'rounded-media ring-line-strong flex size-5 shrink-0 items-center justify-center ring-1 transition-colors',
+        props.checked ? 'bg-accent ring-accent' : 'bg-surface-strong',
       )}
-    </ToggleButton.Root>
-  )
-}
+      aria-hidden="true"
+    >
+      <Show when={props.checked}>
+        <FaSolidCheck class="size-3 text-white"/>
+      </Show>
+    </span>
+  </button>
+)
