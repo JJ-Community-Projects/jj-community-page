@@ -3,8 +3,9 @@ import type { YogsCreator, YogsStream } from './orpc/private/yogs/contract.ts'
 
 export const log = (eventName: string, data: { [key: string]: any }) => {
   try {
+    // gtag only exists on prod
     // @ts-ignore
-    window.gtag('event', eventName, data)
+    window.gtag?.('event', eventName, data)
   } catch (e) {
     console.error(e)
   }

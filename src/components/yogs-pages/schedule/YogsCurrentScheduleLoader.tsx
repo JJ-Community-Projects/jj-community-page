@@ -1,4 +1,4 @@
-import { type Component, Match, Show, Switch } from 'solid-js'
+import { type Component, createMemo, Match, Show, Switch } from 'solid-js'
 import { QueryClientProvider, useQuery } from '@tanstack/solid-query'
 import { orpcPrivate } from '../../../lib/orpc/client.ts'
 import { QueryClient } from '@tanstack/query-core'
@@ -69,11 +69,16 @@ const Body: Component = () => {
   const schedule = useQuery(() =>
     orpcPrivate.yogs.schedule.queryOptions(refetch),
   )
+  // The season view reads its schedule once, so it is remounted when the content changes. Keyed on
+  // the JSON, not the object: every refetch returns new Date objects, even when nothing changed.
+  const version = createMemo(() =>
+    schedule.data ? JSON.stringify(schedule.data) : undefined,
+  )
 
   return (
     <Switch>
-      <Match when={schedule.data}>
-        {(data) => <YogsSeasonBody schedule={data()} />}
+      <Match when={version()} keyed>
+        {(_json) => <YogsSeasonBody schedule={schedule.data!} />}
       </Match>
       <Match when={schedule.isPending}>
         <PlaceholderSchedule />
