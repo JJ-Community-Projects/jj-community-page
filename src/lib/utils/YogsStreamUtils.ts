@@ -12,8 +12,9 @@ export class YogsStreamUtils {
     return DateTime.fromJSDate(slot.start)
   }
 
+  // The stored end, not start + duration(): `plus(number)` reads milliseconds (F-91)
   static end(slot: YogsStream) {
-    return YogsStreamUtils.start(slot).plus(YogsStreamUtils.duration(slot))
+    return DateTime.fromJSDate(slot.end)
   }
 
   static sortByNextStream(a: YogsStream, b: YogsStream, now?: DateTime) {
@@ -42,9 +43,7 @@ export class YogsStreamUtils {
   }
 
   static nextStreamEnd(slot: YogsStream, now?: DateTime) {
-    return YogsStreamUtils.nextStream(slot, now).plus(
-      YogsStreamUtils.duration(slot),
-    )
+    return YogsStreamUtils.end(slot)
   }
 
   static isLive(slot: YogsStream, now?: DateTime) {
@@ -58,10 +57,7 @@ export class YogsStreamUtils {
 
   static isOver(slot: YogsStream, now?: DateTime) {
     now ??= DateTime.now()
-    return (
-      now >
-      YogsStreamUtils.nextStream(slot, now).plus(YogsStreamUtils.duration(slot))
-    )
+    return now > YogsStreamUtils.nextStreamEnd(slot, now)
   }
 
   static isBefore(slot: YogsStream, now?: DateTime) {

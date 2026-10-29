@@ -118,7 +118,8 @@ export async function findRelatedUsersWithJaccard(
     })
     .from(related)
     .innerJoin(userDisplayView, eq(userDisplayView.userId, related.userId))
-    .orderBy(asc(userDisplayView.userId))
+    // Best match first: the same order the candidates were ranked and cut by (F-38)
+    .orderBy(desc(related.jaccard), asc(related.userId))
     .all()
 
   const finalPayload = rows.map(({ shared, jaccard, user }) => ({

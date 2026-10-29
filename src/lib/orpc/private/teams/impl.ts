@@ -9,6 +9,7 @@ import {
   teamsTable,
 } from '../../../db/schema/jj-schema.ts'
 import { users } from '../../../db/schema/auth-schema.ts'
+import type { JJDrizzleDatabase } from '../../../db/db.ts'
 import { and, eq, not, sql } from 'drizzle-orm'
 import {
   createSlug,
@@ -31,6 +32,30 @@ import {
 } from '../util/limits.ts'
 
 const os = implement(privateTeamsContract).use(dbMiddleware)
+
+const teamMemberIds = (db: JJDrizzleDatabase, teamId: number) =>
+  db
+    .select({ userId: teamMembersTable.userId })
+    .from(teamMembersTable)
+    .where(eq(teamMembersTable.teamId, teamId))
+
+const teamInviteeIds = (db: JJDrizzleDatabase, teamId: number) =>
+  db
+    .select({ userId: teamInvitesTable.invitedUserId })
+    .from(teamInvitesTable)
+    .where(eq(teamInvitesTable.teamId, teamId))
+
+/** A team was renamed, hidden or deleted: refresh its members' team lists and its invitees' invite lists. */
+async function publishTeamChange(
+  env: Env,
+  members: { userId: number }[],
+  invites: { userId: number }[],
+) {
+  await Promise.all([
+    ...members.map(({ userId }) => publishUserTeamsUpdate(env, userId)),
+    ...invites.map(({ userId }) => publishUserInvitesUpdate(env, userId)),
+  ])
+}
 
 /**
  * Team CRUD Operations
@@ -144,21 +169,28 @@ const update = os.updateContract
         }
       }
 
-      await db
-        .update(teamsTable)
-        .set({
-          name: name,
-          slug: createSlug(slug),
-          ...(visible !== undefined && { visible: visible }),
-          ...(description !== undefined && {
-            description: description ?? null,
-          }),
-        })
-        .where(eq(teamsTable.id, input.teamId))
+      const [, members, invites] = await db.batch([
+        db
+          .update(teamsTable)
+          .set({
+            name: name,
+            slug: createSlug(slug),
+            ...(visible !== undefined && { visible: visible }),
+            ...(description !== undefined && {
+              description: description ?? null,
+            }),
+          })
+          .where(eq(teamsTable.id, input.teamId)),
+        teamMemberIds(db, input.teamId),
+        teamInviteeIds(db, input.teamId),
+      ])
 
       if (visible !== undefined && visible !== team.visible) {
         await forgetPublicTeam(db, context.request.url, team)
       }
+
+      // Members' team lists and invitees' invite lists show the team's name (F-10)
+      await publishTeamChange(context.env, members, invites)
 
       return { success: true }
     } catch (error) {
@@ -181,7 +213,14 @@ const deleteTeam = os.deleteContract
     const db = context.db
 
     try {
-      await db.delete(teamsTable).where(eq(teamsTable.id, input.teamId))
+      // Who to tell, read before the delete cascades members and invites (F-10)
+      const [members, invites] = await db.batch([
+        teamMemberIds(db, input.teamId),
+        teamInviteeIds(db, input.teamId),
+        db.delete(teamsTable).where(eq(teamsTable.id, input.teamId)),
+      ])
+
+      await publishTeamChange(context.env, members, invites)
 
       return { success: true }
     } catch (error) {

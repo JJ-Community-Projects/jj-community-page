@@ -21,20 +21,9 @@ const UPSERT_SET = Object.fromEntries(
     ]),
 )
 
+// Only `login` messages: the logins array is what the live readers use. An `id` path (no producer)
+// updated a separate ids array that drifted from it (F-23); stray `id` messages are acked and ignored.
 export class TwitchLiveCheckQueue {
-  sendIds(ids: string[], env: Env) {
-    const msgs: MessageSendRequest<string>[] = ids.map((id) => ({
-      body: JSON.stringify({ type: 'id', value: id }),
-      contentType: 'text',
-    }))
-    if (msgs.length === 0) {
-      return
-    }
-    return env.TWITCH_LIVE_CHECK.sendBatch(msgs, {
-      delaySeconds: 5,
-    })
-  }
-
   sendLogins(logins: string[], env: Env) {
     const msgs: MessageSendRequest<string>[] = logins.map((login) => ({
       body: JSON.stringify({ type: 'login', value: login }),
@@ -49,29 +38,25 @@ export class TwitchLiveCheckQueue {
   }
 
   /**
-   * Processes a batch of messages containing Twitch user IDs
-   * Fetches current stream data for these users and updates the database
+   * Processes a batch of messages containing Twitch logins
+   * Fetches current stream data for these channels and updates the database
    * - Removes entries for users who are not live
    * - Inserts or updates entries for users who are live
    *
-   * @param batch - Batch of messages containing Twitch user IDs
+   * @param batch - Batch of messages containing Twitch logins
    * @param env - Environment variables containing Durable Object references and DB
    * @param ctx - Execution context
    */
   async handle(batch: MessageBatch<string>, env: Env, ctx: ExecutionContext) {
     const messages = batch.messages
 
-    // Split identifiers by type
-    const ids: string[] = []
     const logins: string[] = []
     for (const m of messages) {
       const body = JSON.parse(m.body)
-      if (body?.type === 'id' && body?.value) ids.push(String(body.value))
       if (body?.type === 'login' && body?.value) logins.push(String(body.value))
     }
 
     console.log('twitch-live-checkQueue', 'handle', {
-      ids,
       logins,
     })
 
@@ -91,20 +76,6 @@ export class TwitchLiveCheckQueue {
       // Call Twitch API for provided identifiers
       const liveStreams: Array<TwitchStream> = []
 
-      if (ids.length > 0) {
-        for (const part of chunk(ids, 100)) {
-          const resp = await api.fetchStreamsByUserIds(part, token)
-          if (resp.data) {
-            for (const s of resp.data) {
-              // Only collect live streams
-              if (s && s.type !== undefined) {
-                liveStreams.push(s)
-              }
-            }
-          }
-        }
-      }
-
       if (logins.length > 0) {
         for (const part of chunk(logins, 100)) {
           const resp = await api.fetchStreamsByLogins(part, token)
@@ -118,32 +89,24 @@ export class TwitchLiveCheckQueue {
         }
       }
 
-      // Build sets of current-batch affected identifiers
-      const affectedIdsSet = new Set(ids.map((v) => String(v)))
+      // Build the set of current-batch affected logins
       const affectedLoginsSet = new Set(
         logins.map((v) => String(v).toLowerCase()),
       )
 
-      // Live sets from API response
-      const liveIdsSet = new Set(liveStreams.map((s) => s.user_id))
+      // Live set from API response
       const liveLoginsSet = new Set(
         liveStreams.map((s) => String(s.user_login).toLowerCase()),
       )
 
-      // Write back to JingleJamData DO by merging with existing arrays
+      // Write back to JingleJamData DO by merging with the existing array
       const DO = env.JingleJamData
       const stubID = DO.idFromName('JJ_API_CACHE')
       const stub = DO.get(stubID)
 
-      const existingIds = await stub.getStringArray('twitch:liveStreams:ids')
       const existingLogins = await stub.getStringArray(
         'twitch:liveStreams:logins',
       )
-
-      // Remove any entries for affected identifiers, then add the live ones from this batch
-      const nextIds = existingIds
-        .filter((id) => !affectedIdsSet.has(String(id)))
-        .concat(Array.from(liveIdsSet))
 
       // For logins, do case-insensitive dedupe/replace
       const existingLoginsMap = new Map<string, string>()
@@ -154,10 +117,6 @@ export class TwitchLiveCheckQueue {
       for (const l of liveLoginsSet) existingLoginsMap.set(l, l)
       const nextLogins = Array.from(existingLoginsMap.values())
 
-      await stub.setStringArray(
-        'twitch:liveStreams:ids',
-        Array.from(new Set(nextIds)),
-      )
       await stub.setStringArray('twitch:liveStreams:logins', nextLogins)
 
       // Persist live stream data to DB and clean up stale entries
@@ -184,9 +143,6 @@ export class TwitchLiveCheckQueue {
 
         // Channels of this batch that are not live: affected minus live, the same rows as
         // `IN (affected) AND NOT IN (live)`, but each list alone fits the param limit.
-        const offlineIds = [...affectedIdsSet].filter(
-          (id) => !liveIdsSet.has(id),
-        )
         const offlineLogins = [...affectedLoginsSet].filter(
           (login) => !liveLoginsSet.has(login),
         )
@@ -198,11 +154,6 @@ export class TwitchLiveCheckQueue {
               target: twitchStreamSchema.streamId,
               set: UPSERT_SET,
             }),
-          ),
-          ...chunk(offlineIds, MAX_BOUND_PARAMS).map((part) =>
-            db
-              .delete(twitchStreamSchema)
-              .where(inArray(twitchStreamSchema.twitchId, part)),
           ),
           ...chunk(offlineLogins, MAX_BOUND_PARAMS).map((part) =>
             db
@@ -219,8 +170,8 @@ export class TwitchLiveCheckQueue {
       }
 
       console.log('twitch-live-checkQueue', 'handle', {
-        received: { ids: ids.length, logins: logins.length },
-        liveFound: { ids: liveIdsSet.size, logins: liveLoginsSet.size },
+        received: { logins: logins.length },
+        liveFound: { logins: liveLoginsSet.size },
       })
     } catch (e) {
       console.error('twitch-live-checkQueue handle error', e)
