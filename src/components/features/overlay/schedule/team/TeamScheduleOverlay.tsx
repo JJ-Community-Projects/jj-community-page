@@ -2,10 +2,7 @@ import { type Component, createMemo, For, Show } from 'solid-js'
 import { QueryClientProvider, useQuery } from '@tanstack/solid-query'
 import { QueryClient } from '@tanstack/query-core'
 import { orpcPrivate } from '../../../../../lib/orpc/client.ts'
-import {
-  OverlayStreamCardFilled,
-  OverlayStreamCardSidebar,
-} from '../common/OverlayStreamCard.tsx'
+import { OverlayStreamCard } from '../common/OverlayStreamCard.tsx'
 import {
   TeamScheduleOverlayHeader,
   TeamScheduleOverlayHeaderSidebar,
@@ -54,7 +51,7 @@ const Body: Component<TeamScheduleOverlayProps> = (props) => {
         </Show>
         <Show when={q.data}>
           {(data) => (
-            <div class="flex flex-col gap-1">
+            <div class="flex flex-col gap-2">
               <Show
                 when={style() === 'striped'}
                 fallback={
@@ -72,19 +69,9 @@ const Body: Component<TeamScheduleOverlayProps> = (props) => {
                 />
               </Show>
               <For each={data().blocks}>
-                {(b) =>
-                  style() === 'striped' ? (
-                    <OverlayStreamCardSidebar
-                      stream={b}
-                      timezone={data().timezone}
-                    />
-                  ) : (
-                    <OverlayStreamCardFilled
-                      stream={b}
-                      timezone={data().timezone}
-                    />
-                  )
-                }
+                {(b) => (
+                  <OverlayStreamCard stream={b} timezone={data().timezone} />
+                )}
               </For>
             </div>
           )}

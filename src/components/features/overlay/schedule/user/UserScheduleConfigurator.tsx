@@ -30,7 +30,7 @@ export const UserScheduleConfigurator: Component = () => {
 
   return (
     <ConfiguratorBody
-      description="Your upcoming streams from your primary schedule in a compact panel. Choose a theme, filled or striped cards, and how many streams to show."
+      description="Your upcoming streams from your primary schedule in a compact panel, as slot rows like in the Twitch extension. Choose a theme, a filled or striped header, and how many streams to show."
       format={OVERLAY_FORMATS.schedule}
       previewUrl={scheduleUrl()}
       linkUrl={scheduleUrl()}
@@ -44,7 +44,7 @@ export const UserScheduleConfigurator: Component = () => {
         format={titleCase}
       />
       <Select
-        label="Stream style"
+        label="Header style"
         showLabel
         options={['filled', 'striped'] as StreamStyle[]}
         value={streamStyle()}

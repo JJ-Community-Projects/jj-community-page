@@ -45,7 +45,7 @@ export const TeamScheduleConfigurator: Component = () => {
 
   return (
     <ConfiguratorBody
-      description="A team's upcoming streams in a compact panel. Choose the team, a theme, filled or striped cards, and how many streams to show."
+      description="A team's upcoming streams in a compact panel, as slot rows like in the Twitch extension. Choose the team, a theme, a filled or striped header, and how many streams to show."
       format={OVERLAY_FORMATS['team-schedule']}
       previewUrl={scheduleUrl()}
       linkUrl={scheduleUrl()}
@@ -79,7 +79,7 @@ export const TeamScheduleConfigurator: Component = () => {
         format={titleCase}
       />
       <Select
-        label="Stream style"
+        label="Header style"
         showLabel
         options={['filled', 'striped'] as StreamStyle[]}
         value={streamStyle()}
