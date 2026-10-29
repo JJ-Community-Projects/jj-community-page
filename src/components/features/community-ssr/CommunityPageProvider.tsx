@@ -2,13 +2,11 @@ import { createContext, createMemo, createSignal, onMount, type ParentComponent,
 import { useQuery } from '@tanstack/solid-query'
 import { orpcPrivate } from '../../../lib/orpc/client.ts'
 import { makePersisted } from '@solid-primitives/storage'
-import type { JJCampaignsType, JJCauseType, } from '../../../lib/orpc/private/jjData/contract.ts'
+import type { CommunityList } from '../../../lib/orpc/private/jjData/contract.ts'
 
 export interface CommunityInitialData {
-  community?: JJCampaignsType
-  causes?: { causes: JJCauseType[], count:number }
+  community?: CommunityList
   upcomingStreams?: any
-  users?: any[]
 }
 
 const useCommunityPageHook = (initial?: CommunityInitialData) => {
@@ -16,22 +14,13 @@ const useCommunityPageHook = (initial?: CommunityInitialData) => {
 
   onMount(() => setEnable(true))
 
+  // One merged list: top N campaigns ∪ all account holders, sorted by the backend (community-list)
   const communityQuery = useQuery(() =>
-    orpcPrivate.jj.campaigns.queryOptions({
+    orpcPrivate.jj.communityList.queryOptions({
       staleTime: 60_000 * 4,
       refetchInterval: 60_000 * 5,
       enabled: enable(),
       placeholderData: (prev) => prev ?? initial?.community,
-      experimental_prefetchInRender: true,
-    }),
-  )
-
-  const causeQuery = useQuery(() =>
-    orpcPrivate.jj.causes.queryOptions({
-      staleTime: 60_000 * 4,
-      refetchInterval: 60_000 * 5,
-      enabled: enable(),
-      placeholderData: (prev) => prev ?? initial?.causes,
       experimental_prefetchInRender: true,
     }),
   )
@@ -44,20 +33,6 @@ const useCommunityPageHook = (initial?: CommunityInitialData) => {
       placeholderData: (prev) => prev ?? initial?.upcomingStreams,
       experimental_prefetchInRender: true,
     }),
-  )
-
-  const users = useQuery(() =>
-    orpcPrivate.jj.getAllUsersWithInfo.queryOptions({
-      staleTime: 60_000 * 8,
-      refetchInterval: 60_000 * 10,
-      enabled: enable(),
-      placeholderData: (prev) => prev ?? initial?.users,
-      experimental_prefetchInRender: true,
-    }),
-  )
-
-  const [sortBy, setSortBy] = makePersisted(
-    createSignal<'raised' | 'live' | 'cause'>('live'),
   )
 
   const [currency, setCurrency] = makePersisted(
@@ -75,117 +50,25 @@ const useCommunityPageHook = (initial?: CommunityInitialData) => {
   }
   const clearSelectedTags = () => setSelectedTagIds([])
 
-  const campaignsByCause = () => {
-    if (!causeQuery.data) return []
-    if (!communityQuery.data) return []
-    return causeQuery.data!.causes.map((cause) => {
-      return {
-        cause: cause,
-        campaigns: communityQuery.data!.list.filter(
-          (campaign) => campaign.tiltifyCauseId === cause.id,
-        ),
-      }
-    })
-  }
-
-  const campaignsSortedByLiveFirst = () => {
-    if (!communityQuery.data) return []
-    return communityQuery.data!.list.toSorted((a, b) => {
-      if (a.isTwitchLive && !b.isTwitchLive) return -1
-      if (!a.isTwitchLive && b.isTwitchLive) return 1
-      return 0
-    })
-  }
-
-  const campaignsSortedByRaised = () => {
-    if (!communityQuery.data) return []
-    return communityQuery.data!.list.toSorted((a, b) => {
-      if (a.raised.gbp < b.raised.gbp) return 1
-      if (a.raised.gbp > b.raised.gbp) return -1
-      return 0
-    })
-  }
-
-  // Helper: compute match count of an entity's tags vs selectedTagIds
-  const matchCount = (tagIds: number[]) => {
+  // Tag filter: keeps fundraisers with any selected tag, in the backend order
+  const fundraisers = createMemo(() => {
+    const list = communityQuery.data?.list ?? []
     const selected = selectedTagIds()
-    if (selected.length === 0) return 0
-    let c = 0
-    for (let i = 0; i < tagIds.length; i++) {
-      if (selected.includes(tagIds[i])) c++
-    }
-    return c
-  }
-
-  const baseSortedCampaigns = () =>
-    sortBy() === 'live'
-      ? campaignsSortedByLiveFirst()
-      : campaignsSortedByRaised()
-
-  // Sorted campaigns with optional tag filtering and prioritization
-  const campaignsSorted = createMemo(() => {
-    const base = baseSortedCampaigns()
-    const selected = selectedTagIds()
-    if (selected.length === 0) return base
-    return base
-      .map((c, i) => ({ c, i, mc: matchCount(c.tags.map((t) => t.id)) }))
-      .filter((x) => x.mc > 0)
-      .toSorted((a, b) => {
-        if (a.mc !== b.mc) return b.mc - a.mc
-        return a.i - b.i
-      })
-      .map((x) => x.c)
-  })
-
-  // filtered/prioritized users by selected tags
-  const usersFiltered = createMemo(() => {
-    const selected = selectedTagIds()
-    const list = users.data ? users.data : []
     if (selected.length === 0) return list
-    return list
-      .map((u, i) => ({ u, i, mc: matchCount(u.tags.map((t) => t.tagId)) }))
-      .filter((x) => x.mc > 0)
-      .toSorted((a, b) => (a.mc !== b.mc ? b.mc - a.mc : a.i - b.i))
-      .map((x) => x.u)
-  })
-
-  // campaigns by cause with tag filtering/prioritization
-  const campaignsByCauseFiltered = createMemo(() => {
-    const selected = selectedTagIds()
-    if (!causeQuery.data || !communityQuery.data)
-      return [] as ReturnType<typeof campaignsByCause>
-    const allByCause = campaignsByCause()
-    if (selected.length === 0) return allByCause
-    return allByCause
-      .map((entry) => {
-        const enriched = entry.campaigns
-          .map((c, i) => ({ c, i, mc: matchCount(c.tags.map((t) => t.id)) }))
-          .filter((x) => x.mc > 0)
-          .toSorted((a, b) => (a.mc !== b.mc ? b.mc - a.mc : a.i - b.i))
-          .map((x) => x.c)
-        return { cause: entry.cause, campaigns: enriched }
-      })
-      .filter((e) => e.campaigns.length > 0)
+    return list.filter((f) => f.tags.some((t) => selected.includes(t.id)))
   })
 
   return {
     community: communityQuery,
-    cause: causeQuery,
     upcomingStreams: upcomingStreamsQuery,
-    sortBy,
-    setSortBy,
     currency,
     setCurrency,
-    campaignsSorted,
-    campaignsByCause,
-    users,
+    fundraisers,
     // tag selection state (community page)
     selectedTagIds,
     addSelectedTag,
     removeSelectedTag,
     clearSelectedTags,
-    usersFiltered,
-    campaignsByCauseFiltered,
   }
 }
 

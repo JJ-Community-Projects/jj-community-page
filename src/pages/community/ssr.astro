@@ -10,10 +10,8 @@ Astro.response.headers.set(
   'public, s-maxage=60, stale-while-revalidate=600'
 )
 // Server-side load initial data via orpc server client
-const campaignsFn = serverClientPrivate.jj.campaigns
-const causesFn = serverClientPrivate.jj.causes
+const communityListFn = serverClientPrivate.jj.communityList
 const upcomingStreamsFn = serverClientPrivate.jj.upcomingStreams
-const usersFn = serverClientPrivate.jj.getAllUsersWithInfo
 
 const ctx = {
   context: {
@@ -24,15 +22,11 @@ const ctx = {
 
 const [
   { data: community },
-  { data: causes },
   { data: upcomingStreams },
-  { data: users },
   { data: tagCatalog },
 ] = await Promise.all([
-  campaignsFn({}, ctx),
-  causesFn({}, ctx),
+  communityListFn({}, ctx),
   upcomingStreamsFn({}, ctx),
-  usersFn({}, ctx),
   // The tag search gets the catalog from the page (no public HTTP route)
   serverClientPublic.tags.catalog({}, ctx),
 ])
@@ -45,6 +39,6 @@ const [
 >
   <div class="flex flex-col gap-3">
     <PageHeader title="Community" subtitle="Fundraisers and upcoming streams" />
-    <CommunityPage initial={{ community, causes, upcomingStreams, users }} tagCatalog={tagCatalog?.tags} client:idle />
+    <CommunityPage initial={{ community, upcomingStreams }} tagCatalog={tagCatalog?.tags} client:idle />
   </div>
 </PageShell>
