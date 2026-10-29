@@ -38,8 +38,8 @@ export const YogsSeasonSchedule: Component<YogsSeasonScheduleProps> = (
 ) => <YogsSeasonBody schedule={expandYogsSchedule(props.schedule)} />
 
 /**
- * The season layout: countdown, grid / timeline with "Updated", headliner ticker, notice, Yogs &
- * Friends. Shared by /yogs and by the PWA / embed loader, which fetches the schedule first.
+ * The season layout: countdown, grid / timeline with "Updated", headliner ticker, Yogs & Friends,
+ * notice. Shared by /yogs and by the PWA / embed loader, which fetches the schedule first.
  */
 export const YogsSeasonBody: Component<{ schedule: YogsSchedule }> = (props) => {
   const schedule = props.schedule
@@ -60,8 +60,8 @@ export const YogsSeasonBody: Component<{ schedule: YogsSchedule }> = (props) => 
             <UpdatedAt class="text-on-canvas-muted text-center text-xs" />
           </div>
           <Ticker />
-          <YogsScheduleNotice variant="canvas" />
           <YogsAndFriends creators={schedule.creators} />
+          <YogsScheduleNotice variant="canvas" />
         </div>
       </CreatorFilterProvider>
     </YogsScheduleProvider>

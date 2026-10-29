@@ -20,6 +20,10 @@ const brands = {
   tiltify: 'bg-tiltify text-white hover:bg-tiltify-600',
   discord: 'bg-discord text-white hover:bg-discord-600',
   bluesky: 'bg-bluesky text-white hover:bg-bluesky-600',
+  // A shade darker than the brand colour, so white text stays readable
+  tiktok: 'bg-tiktok-700 text-white hover:bg-tiktok-800',
+  instagram: 'bg-instagram-600 text-white hover:bg-instagram-700',
+  twitter: 'bg-twitter-600 text-white hover:bg-twitter-700',
 }
 
 const sizes = {

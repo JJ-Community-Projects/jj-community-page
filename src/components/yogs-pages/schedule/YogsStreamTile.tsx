@@ -60,7 +60,7 @@ export const YogsStreamTile: Component<YogsStreamTileProps> = (props) => {
   return (
     <>
       <div
-        class="yogs-cell"
+        class="yogs-tile-cell"
         style={{ height: `calc(${tileSize()} * var(--yogs-unit))` }}
       >
         <button

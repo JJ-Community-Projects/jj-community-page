@@ -1,8 +1,9 @@
 /*
   Sizing of the Yogs week grid (YogsScheduleWeek, PlaceholderSchedule) and the desktop / mobile
   switch, for every page that shows the schedule. The grid is 22 units wide (7 days × 3 + the time
-  column) and sizes from its container, at most 1600px. A slot is 3 units; every cell keeps half a
-  gap of padding, so neighbouring cells sit one gap apart.
+  column) and sizes from its container, at most 80vw (as before the redesign) and 1600px. A slot is
+  3 units; every cell keeps half a gap of padding (8px between cells), the stream tiles a bit more
+  (12px between tiles, as before).
 */
 
 /* Registered, so the unit is computed once on .yogs-grid (against the schedule container) and
@@ -20,14 +21,32 @@
 }
 
 .yogs-grid {
-  --yogs-unit: calc(min(100cqi, 1600px) / 22);
+  --yogs-unit: calc(min(100cqi, 80vw, 1600px) / 22);
   --yogs-slot: calc(var(--yogs-unit) * 3);
-  --yogs-gap: 0.375rem;
+  --yogs-gap: 0.5rem;
+  --yogs-tile-gap: 0.75rem;
   width: calc(var(--yogs-unit) * 22);
 }
 
 .yogs-cell {
   padding: calc(var(--yogs-gap) / 2);
+}
+
+.yogs-tile-cell {
+  padding: calc(var(--yogs-tile-gap) / 2);
+}
+
+/* Scrolling close to the schedule snaps its header row (title, controls) to the top, so the whole
+   week is in view. Desktop only: the mobile timeline has its sticky header. */
+@media (min-width: 901px) {
+  html:has(.desktop-schedule .yogs-grid) {
+    scroll-snap-type: y proximity;
+  }
+
+  .desktop-schedule .yogs-grid {
+    scroll-snap-align: start;
+    scroll-margin-top: 0.75rem;
+  }
 }
 
 .timezone {

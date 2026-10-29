@@ -25,28 +25,22 @@ interface CreatorDialogProps {
   streamCount?: number
 }
 
-const groupLabel = (type: string) => {
-  if (type === 'best_of') return 'Best of'
-  if (type === 'friend') return 'Friend'
-  return 'Yogs'
-}
-
-// Same order as before; a brand colour where the Button has one
+// Same order as before, each in its brand colour
 const LINKS: Record<
   string,
   {
     label: string
     icon: () => JSX.Element
-    brand?: 'twitch' | 'youtube' | 'bluesky' | 'discord'
+    brand: 'twitch' | 'youtube' | 'bluesky' | 'discord' | 'tiktok' | 'instagram' | 'twitter'
   }
 > = {
   twitch: { label: 'Twitch', icon: () => <FaBrandsTwitch />, brand: 'twitch' },
   youtube: { label: 'YouTube', icon: () => <FaBrandsYoutube />, brand: 'youtube' },
   bsky: { label: 'Bluesky', icon: () => <BskyIcon class="size-3.5" />, brand: 'bluesky' },
   discord: { label: 'Discord', icon: () => <FaBrandsDiscord />, brand: 'discord' },
-  tiktok: { label: 'TikTok', icon: () => <FaBrandsTiktok /> },
-  instagram: { label: 'Instagram', icon: () => <FaBrandsInstagram /> },
-  twitter: { label: 'X', icon: () => <FaBrandsTwitter /> },
+  tiktok: { label: 'TikTok', icon: () => <FaBrandsTiktok />, brand: 'tiktok' },
+  instagram: { label: 'Instagram', icon: () => <FaBrandsInstagram />, brand: 'instagram' },
+  twitter: { label: 'X', icon: () => <FaBrandsTwitter />, brand: 'twitter' },
 }
 const LINK_ORDER = Object.keys(LINKS)
 
@@ -62,7 +56,6 @@ export const YogsCreatorDialog: Component<CreatorDialogProps> = (props) => {
       open={props.modalSignal.isOpen()}
       onOpenChange={props.modalSignal.setOpen}
       title={props.creator.name}
-      description={groupLabel(props.creator.type)}
       size="sm"
       accent={{ background: color(), color: getTextColor(color()) }}
     >

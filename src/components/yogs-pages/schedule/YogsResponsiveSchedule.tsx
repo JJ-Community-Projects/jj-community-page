@@ -12,15 +12,15 @@ import { YogsScheduleNotice } from '../common/YogsScheduleNotice.tsx'
 
 interface YogsResponsiveScheduleProps {
   schedule: CompactYogsSchedule
-  /** "Yogs & Friends" after the notice; they need the same creators, so no second island. */
+  /** "Yogs & Friends" before the notice; they need the same creators, so no second island. */
   showCreators?: boolean
 }
 
 /**
  * Desktop week grid and mobile day list in one island (hub, archive pages): the schedule is
  * serialized once, and yogs-schedule.css picks the view. Server-rendered and hydrated (see
- * YogsScheduleProvider for what waits until the island is mounted). Then the notice and, when
- * asked for, Yogs & Friends.
+ * YogsScheduleProvider for what waits until the island is mounted). Then, when asked for, Yogs &
+ * Friends, and the notice.
  */
 export const YogsResponsiveSchedule: Component<YogsResponsiveScheduleProps> = (
   props,
@@ -35,10 +35,10 @@ export const YogsResponsiveSchedule: Component<YogsResponsiveScheduleProps> = (
         <div class="mobile-schedule w-full">
           <MobileYogsSchedule />
         </div>
-        <YogsScheduleNotice variant="canvas" class="mt-2" />
         <Show when={props.showCreators}>
           <YogsAndFriends creators={schedule.creators} />
         </Show>
+        <YogsScheduleNotice variant="canvas" class="mt-2" />
       </CreatorFilterProvider>
     </YogsScheduleProvider>
   )

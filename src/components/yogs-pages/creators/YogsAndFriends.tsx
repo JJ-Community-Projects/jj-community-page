@@ -38,7 +38,8 @@ export const YogsAndFriends: Component<YogsAndFriendsProps> = (props) => {
   return (
     <Show when={props.creators.length > 0}>
       {/* Collapsed by default; forceMount keeps the names in the server HTML while closed */}
-      <Accordion collapsible class="w-full max-w-[1600px]">
+      {/* As wide as the schedule: the timeline's max-w-2xl, then the grid's cap (yogs-schedule.css) */}
+      <Accordion collapsible class="w-full max-w-2xl min-[901px]:max-w-[min(80vw,1600px)]">
         <AccordionItem value="yogs-and-friends" title="Yogs & Friends" level={2} forceMount>
           <Tile class="flex flex-col gap-4">
             <CreatorGroup title="Yogs" creators={yogs()} onOpen={open} />
