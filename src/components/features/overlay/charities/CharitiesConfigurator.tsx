@@ -70,6 +70,12 @@ export const CharitiesConfigurator: Component = () => {
     setSelectedHeaders(headerOptions.filter((x) => set.has(x)))
   }
 
+  // Transition only applies when the charities or the header cards rotate;
+  // no charities checked means all of them are shown.
+  const charityCount = () => selectedIds().length || charities().length
+  const nothingRotates = () =>
+    charityCount() === 1 && selectedHeaders().length < 2
+
   const causesParam = createMemo(() =>
     selectedIds().length > 0 ? selectedIds().join(',') : undefined,
   )
@@ -134,6 +140,7 @@ export const CharitiesConfigurator: Component = () => {
         value={transition()}
         onChange={setTransition}
         format={titleCase}
+        disabled={nothingRotates()}
       />
       <Select
         label="Interval"

@@ -12,6 +12,7 @@ type SelectProps<T extends string> = {
   /** Text for an option (and for the trigger). */
   format: (value: T) => string
   size?: 'sm' | 'md'
+  disabled?: boolean
   class?: string
 }
 
@@ -21,7 +22,8 @@ export const Select = <T extends string>(props: SelectProps<T>) => (
     value={props.value}
     onChange={(value) => value !== null && props.onChange(value)}
     options={props.options}
-    class={cn('flex flex-col gap-1', props.class)}
+    disabled={props.disabled}
+    class={cn('flex flex-col gap-1 data-disabled:opacity-50', props.class)}
     itemComponent={(item) => (
       <KSelect.Item
         item={item.item}
@@ -45,7 +47,7 @@ export const Select = <T extends string>(props: SelectProps<T>) => (
     </KSelect.Label>
     <KSelect.Trigger
       class={cn(
-        'bg-surface-strong text-fg ring-line-strong hover:bg-surface inline-flex max-w-full items-center justify-between gap-2 rounded-full font-semibold ring-1 transition-colors',
+        'bg-surface-strong text-fg ring-line-strong hover:bg-surface data-disabled:hover:bg-surface-strong inline-flex max-w-full items-center justify-between gap-2 rounded-full font-semibold ring-1 transition-colors data-disabled:cursor-not-allowed',
         props.size === 'sm' ? 'px-3 py-1 text-xs' : 'px-3.5 py-1.5 text-sm',
         focusRing,
       )}
