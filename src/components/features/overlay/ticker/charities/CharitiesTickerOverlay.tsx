@@ -17,7 +17,7 @@ import { useQuery, QueryClientProvider } from '@tanstack/solid-query'
 import { QueryClient } from '@tanstack/query-core'
 import { CharityTickerChild } from '../common/CharityTickerChild'
 import { JJLogo } from '../common/JJLogo.tsx'
-import { DEMO_CHARITIES } from '../../demoData.ts'
+import { demoCharities } from '../../demoData.ts'
 
 export type CharitiesProps = {
   theme?: 'default' | 'red' | 'blue'
@@ -76,7 +76,8 @@ const Body: Component<{
 
   // `demo` swaps the live query for static fixtures so the editor preview is
   // always populated.
-  const data = () => (props.demo ? DEMO_CHARITIES : q.data)
+  const demoData = createMemo(() => demoCharities(props.currency))
+  const data = () => (props.demo ? demoData() : q.data)
 
   const displayItems = () => {
     const result: any[] = []

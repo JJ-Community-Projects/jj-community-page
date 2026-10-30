@@ -8,7 +8,7 @@ import type {
 //
 // Names/logos mirror the real Jingle Jam causes so the preview matches what the
 // overlay shows once data is live. `raised`/`raisedFormatted` are illustrative
-// GBP figures (dummy data ignores the selected currency).
+// GBP figures; the charity panel and ticker use `demoCharities` instead.
 export type CharitiesPreviewData = {
   userFundraiser: FundraiserItem | null
   charities: CharityItem[]
@@ -129,6 +129,28 @@ export const DEMO_CHARITIES: CharitiesPreviewData = {
       raisedFormatted: '£238,940.00',
     },
   ],
+}
+
+// Every charity shows the same round amount, formatted like the live data
+const DEMO_CHARITY_RAISED = 123456
+
+export const demoCharities = (
+  currency: 'GBP' | 'USD' | 'EUR',
+): CharitiesPreviewData => {
+  const locale =
+    currency === 'USD' ? 'en-US' : currency === 'EUR' ? 'de-DE' : 'en-GB'
+  const raisedFormatted = Intl.NumberFormat(locale, {
+    style: 'currency',
+    currency,
+  }).format(DEMO_CHARITY_RAISED)
+  return {
+    ...DEMO_CHARITIES,
+    charities: DEMO_CHARITIES.charities.map((charity) => ({
+      ...charity,
+      raised: DEMO_CHARITY_RAISED,
+      raisedFormatted,
+    })),
+  }
 }
 
 export type TeamFundraisersPreviewData = {

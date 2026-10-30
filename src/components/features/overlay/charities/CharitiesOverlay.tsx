@@ -1,4 +1,4 @@
-import { type Component, createEffect, createSignal, For, type JSX, on, onCleanup, onMount, Show, } from 'solid-js'
+import { type Component, createEffect, createMemo, createSignal, For, type JSX, on, onCleanup, onMount, Show, } from 'solid-js'
 import { Transition } from 'solid-transition-group'
 import { twMerge } from 'tailwind-merge'
 import { QRCodeSVG } from 'solid-qr-code'
@@ -7,7 +7,7 @@ import { orpcPrivate } from '../../../../lib/orpc/client.ts'
 import { QueryClientProvider, useQuery } from '@tanstack/solid-query'
 import { QueryClient } from '@tanstack/query-core'
 import type { CharityItem, FundraiserItem, } from '../../../../lib/orpc/private/overlay/contract.ts'
-import { DEMO_CHARITIES } from '../demoData.ts'
+import { demoCharities } from '../demoData.ts'
 import { getTextColor } from '../../../../lib/utils/textColors.ts'
 
 export type TransitionStyle = 'fade' | 'slide' | 'flip' | 'none'
@@ -246,7 +246,8 @@ const Charities2OverlayBody: Component<Props> = (props) => {
   )
   // `demo` swaps the live query for static fixtures so the editor preview is
   // always populated.
-  const data = () => (props.demo ? DEMO_CHARITIES : q.data)
+  const demoData = createMemo(() => demoCharities(props.currency ?? 'GBP'))
+  const data = () => (props.demo ? demoData() : q.data)
   const charities = () => data()?.charities ?? []
   const filteredCharities = () =>
     causes().length === 0
