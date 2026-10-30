@@ -4,6 +4,8 @@ import {sortByStart} from "./utils/streamFilters.ts";
 import {StreamCard} from "./StreamCard.tsx";
 import {useAddStreamDialog} from "./dialog/add/AddStreamDialogContext.tsx";
 import { latestByEnd, addHours, makeEmptyScheduleFallback } from "./utils/initialTimes.ts";
+import {Button} from "../../../../../../ui/Button";
+import {FaSolidPlus} from "solid-icons/fa";
 
 export const AllStreamsSection: Component = () => {
   const { state } = useScheduleEditor2();
@@ -22,14 +24,15 @@ export const AllStreamsSection: Component = () => {
   };
 
   return (
-    <div class="flex flex-col gap-3">
+    <div class="flex flex-col gap-2">
       <div class="flex justify-end">
-        <button class="text-sm px-3 py-1.5 bg-accent text-white rounded hover:bg-accent-600" onClick={addCustom}>
+        <Button variant="accent" size="sm" onClick={addCustom}>
+          <FaSolidPlus aria-hidden="true" />
           Add Custom Stream
-        </button>
+        </Button>
       </div>
-      <Show when={streams().length > 0} fallback={<div class="text-sm text-gray-500">No streams yet.</div>}>
-        <div class="flex flex-col gap-2">
+      <Show when={streams().length > 0} fallback={<p class="text-fg-muted text-sm">No streams yet.</p>}>
+        <div class="grid grid-cols-1 gap-1.5 sm:grid-cols-2 lg:grid-cols-3">
           <For each={streams()}>{(s) => <StreamCard stream={s} />}</For>
         </div>
       </Show>

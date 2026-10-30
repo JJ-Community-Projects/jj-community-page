@@ -21,7 +21,6 @@ import { DEMO_CHARITIES } from '../../demoData.ts'
 
 export type CharitiesProps = {
   theme?: 'default' | 'red' | 'blue'
-  speed?: number
   url?: string
   titleLogo?: string
   user?: string
@@ -119,7 +118,6 @@ const Body: Component<{
   return (
     <Switch>
       <Match when={data()}>
-        <p>{}</p>
         <div class="relative flex overflow-x-hidden">
           <div
             style={{

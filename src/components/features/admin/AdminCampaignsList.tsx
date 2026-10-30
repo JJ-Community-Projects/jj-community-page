@@ -1,77 +1,84 @@
 import { type Component, For, Show } from 'solid-js'
 import { orpcPrivate } from '../../../lib/orpc/client'
 import { QueryComponent } from '../../common/QueryComponent'
+import { Avatar } from '../../ui/Avatar'
+import { LiveBadge } from '../../ui/Labels'
+import { EmptyState, Spinner } from '../../ui/Status'
+import { cn } from '../../ui/cn'
+import { adminLink, adminTable } from './common/AdminSection'
 
 export const AdminCampaignsList: Component = () => {
 
   return (
-    <div class="rounded border border-gray-300 bg-white p-4">
-      <h2 class="mb-2 text-lg font-semibold">All Campaigns</h2>
-      <QueryComponent queryOptions={() => orpcPrivate.jj.campaignsAll.queryOptions()}>
-        {(campaigns) => (
-          <Show
-            when={campaigns.count > 0}
-            fallback={<p class="text-sm text-gray-500">No campaigns found.</p>}
-          >
-            <div class="overflow-x-auto">
-              <table class="min-w-full text-left text-sm">
-                <thead>
-                  <tr class="border-b">
-                    <th class="py-2 pr-4"></th>
-                    <th class="py-2 pr-4">Campaign ({campaigns.count})</th>
-                    <th class="py-2 pr-4">Tiltify</th>
-                    <th class="py-2 pr-4">Twitch</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <For each={campaigns.list}>{(c, i) => (
-                    <tr class="border-b last:border-b-0 align-top">
-                      <td class="py-2 pr-4">{i()+1}</td>
-                      <td class="py-2 pr-4">
-                        <div class="flex items-center gap-2">
-                          <img src={c.avatar} alt="avatar" class="h-8 w-8 rounded object-cover" />
-                          <div class="min-w-0">
-                            <div class="font-medium line-clamp-1" title={c.campaignName}>{c.campaignName}</div>
-                            <div class="text-xs text-gray-500">{c.tiltifySlug}</div>
-                          </div>
+    <QueryComponent
+      queryOptions={() => orpcPrivate.jj.campaignsAll.queryOptions()}
+      loading={() => <Spinner label="Loading…" />}
+    >
+      {(campaigns) => (
+        <Show
+          when={campaigns.count > 0}
+          fallback={<EmptyState title="No campaigns found." />}
+        >
+          <div class={adminTable.wrap}>
+            <table class={adminTable.table}>
+              <thead class={adminTable.head}>
+                <tr>
+                  <th class={adminTable.th}></th>
+                  <th class={adminTable.th}>Campaign ({campaigns.count})</th>
+                  <th class={adminTable.th}>Tiltify</th>
+                  <th class={adminTable.th}>Twitch</th>
+                </tr>
+              </thead>
+              <tbody>
+                <For each={campaigns.list}>{(c, i) => (
+                  <tr class={adminTable.row}>
+                    <td class={cn(adminTable.td, 'text-fg-muted')}>{i() + 1}</td>
+                    <td class={adminTable.td}>
+                      <div class="flex items-center gap-2">
+                        <Avatar src={c.avatar} alt="" fallback={c.campaignName.charAt(0)} size="sm" />
+                        <div class="min-w-0">
+                          <div class="line-clamp-1 font-semibold" title={c.campaignName}>{c.campaignName}</div>
+                          <div class="text-fg-muted text-xs">{c.tiltifySlug}</div>
                         </div>
-                      </td>
-                      <td class="py-2 pr-4">
-                        <a
-                          href={c.tiltifyUrl}
-                          target="_blank"
-                          rel="noreferrer"
-                          class="text-accent hover:underline"
-                        >
-                          {c.tiltifyName}
-                        </a>
-                      </td>
-                      <td class="py-2 pr-4">
-                        <Show when={c.twitch} fallback={<span class="text-gray-500">—</span>}>
-                          {(login) => (
+                      </div>
+                    </td>
+                    <td class={adminTable.td}>
+                      <a
+                        href={c.tiltifyUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        class={adminLink}
+                      >
+                        {c.tiltifyName}
+                      </a>
+                    </td>
+                    <td class={adminTable.td}>
+                      <Show when={c.twitch} fallback={<span class="text-fg-muted">—</span>}>
+                        {(login) => (
+                          <span class="inline-flex items-center gap-2">
                             <a
                               href={`https://twitch.tv/${login()}`}
                               target="_blank"
                               rel="noreferrer"
-                              class="inline-flex items-center gap-2 text-accent hover:underline"
+                              class={adminLink}
                             >
-                              <span>{login()}</span>
-                              <span class={c.isTwitchLive ? 'text-green-700' : 'text-gray-500'}>
-                                {c.isTwitchLive ? 'LIVE' : 'offline'}
-                              </span>
+                              {login()}
                             </a>
-                          )}
-                        </Show>
-                      </td>
-                    </tr>
-                  )}</For>
-                </tbody>
-              </table>
-            </div>
-          </Show>
-        )}
-      </QueryComponent>
-    </div>
+                            <Show when={c.isTwitchLive} fallback={<span class="text-fg-muted text-xs">offline</span>}>
+                              <LiveBadge />
+                            </Show>
+                          </span>
+                        )}
+                      </Show>
+                    </td>
+                  </tr>
+                )}</For>
+              </tbody>
+            </table>
+          </div>
+        </Show>
+      )}
+    </QueryComponent>
   )
 }
 

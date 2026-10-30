@@ -1,0 +1,43 @@
+---
+import '../styles/global.css'
+import Head, { type Props as HeadProps } from '../components/layout/head/Head.astro'
+import SiteHeader from '../components/layout/navigation/SiteHeader.astro'
+import Footer from '../components/layout/footer/Footer.astro'
+import FeedbackBanner from '../components/features/feedback/FeedbackBanner.astro'
+
+const widths = {
+  /** Reading width: info pages, profile, teams, schedules, dashboard forms. */
+  content: 'max-w-4xl',
+  /** Multi-column pages: community, dashboard home, editor, admin, overlays. */
+  wide: 'max-w-6xl',
+  /** The Yogs schedule grids, which size themselves. */
+  full: 'max-w-none xl:px-20',
+}
+
+interface Props extends HeadProps {
+  width?: keyof typeof widths
+  /** `pwa` swaps in the slim PWA nav and leaves out the feedback banner. */
+  nav?: 'main' | 'pwa'
+}
+
+const { width = 'content', nav = 'main', ...head } = Astro.props
+---
+
+<html lang="en">
+  <Head {...head} />
+  <body class="min-h-dvh bg-primary-shade">
+    <div
+      aria-hidden="true"
+      class="fixed inset-0 -z-10 bg-linear-to-br from-primary-shade via-primary to-primary-shade"
+    >
+    </div>
+    <div class="flex min-h-dvh flex-col">
+      <SiteHeader nav={nav} />
+      {nav === 'main' && <FeedbackBanner />}
+      <main class:list={['mx-auto flex w-full flex-1 flex-col px-2 pt-4 sm:px-4', widths[width]]}>
+        <slot />
+      </main>
+      <Footer />
+    </div>
+  </body>
+</html>

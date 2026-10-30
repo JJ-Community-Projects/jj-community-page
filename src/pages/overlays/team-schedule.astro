@@ -24,7 +24,8 @@ const teamIdRaw = Number(teamIdParam)
 const teamId = Number.isFinite(teamIdRaw) ? Math.max(1, Math.floor(teamIdRaw)) : undefined
 const timezone = timezoneParam ?? undefined
 const theme = themeParam === 'red' || themeParam === 'blue' || themeParam === 'default' ? themeParam : 'default'
-const style = styleParam === 'striped' || styleParam === 'filled' ? styleParam : 'filled'
+// Links from before 2026 say `striped` here and `stripe` on schedule; both pages accept both
+const style = styleParam === 'stripe' || styleParam === 'striped' ? 'striped' : 'filled'
 const limitRaw = Number(limitParam)
 const limitCandidate = Number.isFinite(limitRaw) ? Math.floor(limitRaw) : undefined
 const limit = typeof limitCandidate === 'number' ? Math.max(3, Math.min(10, limitCandidate)) : undefined

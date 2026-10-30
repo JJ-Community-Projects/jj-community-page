@@ -1,24 +1,22 @@
-import {type Component, For} from "solid-js";
+import {type Component, For, Show} from "solid-js";
 import {useYogsSchedule} from "./provider/YogsScheduleProvider.tsx";
 import {useNextJJStartDate} from "../../../lib/utils/jjDates.ts";
+import {cn, tileSurface} from "../../ui/cn";
 
-
-export const YogsScheduleTimeColumn: Component = (props) => {
+export const YogsScheduleTimeColumn: Component = () => {
   const {times, toDateTime} = useYogsSchedule()
   return (
-    <div class="data-width flex flex-col text-sm">
+    <div class="data-width flex flex-col">
       <Timezone/>
       <For each={times()}>
-        {
-          ({start, end}) => {
-            return <div class="time p-1 @container">
-              <div class="~text-xs/lg w-full h-full flex flex-col justify-around items-center bg-white rounded-2xl p-1">
-                <p>{toDateTime(start).toFormat('HH:mm')}</p>
-                <p>{toDateTime(end).toFormat('HH:mm')}</p>
-              </div>
+        {({start, end}) => (
+          <div class="yogs-cell time @container">
+            <div class={cn(tileSurface, 'flex size-full flex-col items-center justify-between py-2 text-[length:clamp(0.75rem,30cqi,1.25rem)] leading-none')}>
+              <p>{toDateTime(start).toFormat('HH:mm')}</p>
+              <p class="text-fg-muted">{toDateTime(end).toFormat('HH:mm')}</p>
             </div>
-          }
-        }
+          </div>
+        )}
       </For>
     </div>
   );
@@ -27,11 +25,28 @@ export const YogsScheduleTimeColumn: Component = (props) => {
 const Timezone: Component = () => {
   const nextJJStartDate = useNextJJStartDate()
   const {toDateTime} = useYogsSchedule()
+  const name = () => toDateTime(nextJJStartDate().toJSDate()).offsetNameShort ?? ''
+  // Long offsets ("GMT+10:30") don't fit the cell on one line: the offset goes below "GMT"
+  const parts = () => (name().length > 6 ? name().match(/^([A-Z]+)([+-].+)$/)?.slice(1) : undefined)
   return (
-    <div class="timezone p-1 @container">
-      <p class="~text-xs/lg w-full h-full bg-white rounded-2xl flex flex-row items-center justify-center">{
-        toDateTime(nextJJStartDate().toJSDate()).offsetNameShort
-      }</p>
+    <div class="yogs-cell timezone @container">
+      <p
+        class={cn(
+          tileSurface,
+          'text-fg-muted flex size-full flex-col items-center justify-center leading-tight',
+          // Two lines need a lower floor in the small cell of narrow grids
+          parts() ? 'text-[length:clamp(0.5625rem,30cqi,1.25rem)]' : 'text-[length:clamp(0.75rem,30cqi,1.25rem)]',
+        )}
+      >
+        <Show when={parts()} fallback={name()}>
+          {(split) => (
+            <>
+              <span>{split()[0]}</span>
+              <span>{split()[1]}</span>
+            </>
+          )}
+        </Show>
+      </p>
     </div>
   )
 }

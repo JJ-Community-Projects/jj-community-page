@@ -1,0 +1,37 @@
+---
+import { Button } from '../../ui/Button'
+
+interface Props {
+  /** Years with an archive page, newest first. */
+  years: number[]
+  /** The year being shown: accent, `aria-current="page"`. */
+  current?: number
+  /** Where a year links to, e.g. `/yogs/archive` or `/pwa/yogs/schedules`. */
+  base?: string
+  /** Visible heading; without it the chips are a bare year switcher. */
+  title?: string
+}
+
+const { years, current, base = '/yogs/archive', title } = Astro.props
+---
+
+{years.length > 0 && (
+  <nav
+    aria-label="Yogscast Jingle Jam schedule archive"
+    class="flex flex-col items-center gap-2"
+  >
+    {title && <h2 class="text-on-canvas text-center text-lg font-semibold">{title}</h2>}
+    <div class="flex flex-wrap items-center justify-center gap-2">
+      {years.map((year) => (
+        <Button
+          href={`${base}/${year}`}
+          size="sm"
+          variant={year === current ? 'accent' : 'canvas'}
+          aria-current={year === current ? 'page' : undefined}
+        >
+          Jingle Jam {year}
+        </Button>
+      ))}
+    </div>
+  </nav>
+)}

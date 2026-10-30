@@ -1,53 +1,39 @@
-import { type Component, For } from 'solid-js'
+import { type Component, For, Show } from 'solid-js'
 import { useCommunityPage } from './CommunityPageProvider.tsx'
-import { twMerge } from 'tailwind-merge'
-import type { JJCampaignType } from '../../../lib/orpc/private/jjData/contract.ts'
-import { CommunityItem } from './CommunityItem.tsx'
-import { CommunityUsers } from './CommunityUsers.tsx'
+import { CommunityFundraiserItem } from '../community/CommunityFundraiserItem.tsx'
+import { Button } from '../../ui/Button'
+import { EmptyState } from '../../ui/Status'
 
 export const CommunityCampaignGrid: Component = () => {
-  const { campaignsSorted } = useCommunityPage()
+  const { fundraisers, currency, clearSelectedTags } = useCommunityPage()
 
   return (
-    <div class={twMerge('mx-auto flex w-full flex-col gap-4')}>
-      <div
-        class={twMerge(
-          'mb-2 mt-6 flex w-full flex-wrap items-end justify-between gap-x-4 gap-y-2',
-        )}
-      >
-        <div class={'flex flex-col'}>
-          <h2 class={twMerge('text-lg font-semibold text-white')}>
-            Fundraisers (2024)
-          </h2>
-          <p class={twMerge('text-white')}>
-            2025 Fundraisers will be shown after the Jingle Jam has started.
-          </p>
-        </div>
-      </div>
-      <div
-        class={
-          'grid w-full grid-cols-[repeat(auto-fit,_minmax(250px,_1fr))] content-center gap-2'
+    <div class="flex w-full flex-col gap-3">
+      <h2 class="text-on-canvas text-lg font-semibold">Fundraisers</h2>
+      <Show
+        when={fundraisers().length > 0}
+        fallback={
+          <EmptyState
+            title="No fundraisers match the selected tags."
+            action={
+              <Button size="sm" onClick={() => clearSelectedTags()}>
+                Clear selected tags
+              </Button>
+            }
+          />
         }
       >
-        <For each={campaignsSorted()}>
-          {(campaign: JJCampaignType) => {
-            return <CommunityItem campaign={campaign} />
-          }}
-        </For>
-      </div>
-      <CommunityUsers />
+        <div class="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-3">
+          <For each={fundraisers()}>
+            {(fundraiser) => (
+              <CommunityFundraiserItem
+                fundraiser={fundraiser}
+                currency={currency()}
+              />
+            )}
+          </For>
+        </div>
+      </Show>
     </div>
   )
 }
-
-
-/*
-
-        <For each={campaignsSorted()}>
-          {(campaign: JJCampaignType) => {
-            return <CommunityItem campaign={campaign} />
-          }}
-        </For>
-      </div>
-      <CommunityUsers />
- */

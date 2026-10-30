@@ -1,23 +1,16 @@
 ---
-import BaseLayout from "../layouts/BaseLayout.astro";
-import FAQOther from "../components/features/faq/FAQOther.astro";
-import FAQCommunity from "../components/features/faq/FAQCommunity.astro";
+import PageShell from '../layouts/PageShell.astro'
+import FAQList from '../components/features/faq/FAQList.astro'
+import { PageHeader } from '../components/ui/PageHeader'
 ---
-<BaseLayout
-    title="Jingle Jam Community FAQ - Schedule, Fundraisers & Extensions"
-    description="When the Yogscast schedule and community fundraisers appear, whether you need an account, the Twitch extensions, and whether this fan-run site is official."
-    canonical="https://jinglejam.ostof.dev/faq"
->
-    <div class="flex flex-col justify-center items-center text-white p-2">
-        <h1 class="~text-2xl/4xl">Jingle Jam Community FAQ</h1>
-    </div>
-    <p class="text-white">Last updated, November 8th 2025</p>
-    <FAQOther/>
-    <FAQCommunity/>
-</BaseLayout>
 
-<style is:global>
-    p > a {
-        text-decoration: underline;
-    }
-</style>
+<PageShell
+  title="Jingle Jam Community FAQ - Schedule, Fundraisers & Extensions"
+  description="When the Yogscast schedule and community fundraisers appear, whether you need an account, the Twitch extensions, and whether this fan-run site is official."
+  canonical="https://jinglejam.ostof.dev/faq"
+>
+  <div class="flex flex-col gap-3">
+    <PageHeader title="Jingle Jam Community FAQ" subtitle="Last updated October 29th 2026" />
+    <FAQList />
+  </div>
+</PageShell>

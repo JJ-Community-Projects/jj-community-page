@@ -1,0 +1,140 @@
+---
+import { env } from 'cloudflare:workers'
+import { Image } from 'astro:assets'
+import { getCollection } from 'astro:content'
+import { FaSolidChevronDown } from 'solid-icons/fa'
+import jj_image from '../../../images/Jingle_Jam_Logo_White_Large.png'
+import { SITE_URL } from '../../../lib/utils/canonical.ts'
+import { DonateIcon } from '../../common/icons/JJIcons'
+import { cn, focusRing, tileSurface } from '../../ui/cn'
+import { MobileNav } from './MobileNav'
+import { currentHref, isActive, mainNav, pwaNav } from './navItems'
+
+interface Props {
+  nav: 'main' | 'pwa'
+}
+
+const { nav } = Astro.props
+
+const ENV = env.ENVIRONMENT
+const showBetaNotice = ENV === 'BETA' || ENV === 'DEV'
+
+const yogsYears = (await getCollection('schedules'))
+  .filter((ref) => ref.data.visible)
+  .map((entry) => entry.id)
+  .sort((a, b) => b.localeCompare(a))
+
+const now = new Date()
+const year = now.getFullYear()
+const showDonate =
+  now > new Date(`${year}-12-01T17:00:00Z`) && now < new Date(`${year}-12-14T23:59:59Z`)
+
+const items =
+  nav === 'pwa'
+    ? pwaNav(yogsYears)
+    : mainNav({ yogsYears, loggedIn: !!Astro.locals.session, showDonate })
+const current = currentHref(items, Astro.url.pathname)
+const home = nav === 'pwa' ? '/pwa' : '/'
+
+const linkClass = (active: boolean) =>
+  cn(
+    'flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition-colors',
+    focusRing,
+    active
+      ? 'bg-white/15 text-on-canvas'
+      : 'text-on-canvas-muted hover:bg-white/10 hover:text-on-canvas',
+  )
+---
+
+<header
+  class="mx-auto flex w-full max-w-6xl items-center justify-between gap-2 px-2 pt-2 sm:px-4 md:flex-col md:justify-center md:gap-1 md:pt-3"
+>
+  <a href={home} class={cn('shrink-0 rounded-group', focusRing)}>
+    <Image
+      src={jj_image}
+      alt="Jingle Jam Community home"
+      height="96"
+      loading="eager"
+      fetchpriority="high"
+      class="h-11 w-auto md:h-20"
+    />
+  </a>
+  <nav aria-label="Main" class="hidden md:block">
+    <ul class="flex flex-wrap items-center justify-center gap-1">
+      {
+        items.map((item) =>
+          item.children ? (
+            <li class="group relative">
+              <a
+                href={item.href}
+                class={linkClass(isActive(item, current))}
+                aria-current={item.href === current ? 'page' : undefined}
+              >
+                {item.label}
+                <FaSolidChevronDown class="size-2.5 opacity-70" aria-hidden="true" />
+              </a>
+              <div class="invisible absolute top-full left-1/2 z-50 -translate-x-1/2 pt-1 opacity-0 transition-opacity group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100">
+                <ul class={cn(tileSurface, 'flex min-w-44 flex-col gap-0.5 p-1.5')}>
+                  {item.children.map((child) => (
+                    <li>
+                      <a
+                        href={child.href}
+                        class={cn(
+                          'block rounded-group px-3 py-1.5 text-sm whitespace-nowrap',
+                          focusRing,
+                          child.href === current
+                            ? 'bg-surface-strong text-primary ring-1 ring-line font-medium'
+                            : 'text-fg hover:bg-black/5',
+                        )}
+                        aria-current={child.href === current ? 'page' : undefined}
+                      >
+                        {child.label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </li>
+          ) : item.external ? (
+            <li>
+              <a
+                href={item.href}
+                target="_blank"
+                rel="noopener"
+                class={cn(
+                  'flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-sm font-semibold text-primary transition-colors hover:bg-surface',
+                  focusRing,
+                )}
+              >
+                {item.label}
+                <DonateIcon class="size-4" />
+              </a>
+            </li>
+          ) : (
+            <li>
+              <a
+                href={item.href}
+                class={linkClass(item.href === current)}
+                aria-current={item.href === current ? 'page' : undefined}
+              >
+                {item.label}
+              </a>
+            </li>
+          ),
+        )
+      }
+    </ul>
+  </nav>
+  <MobileNav client:load items={items} current={current} />
+</header>
+{
+  showBetaNotice && (
+    <p class="mx-auto mt-2 w-fit max-w-[calc(100%-1rem)] rounded-group bg-accent px-3 py-1.5 text-center text-xs text-on-canvas">
+      <strong>Beta:</strong> data created here won't be migrated. The live site is{' '}
+      <a href={SITE_URL} class="font-semibold underline">
+        {new URL(SITE_URL).host}
+      </a>
+      .
+    </p>
+  )
+}

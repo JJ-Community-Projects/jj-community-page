@@ -1,5 +1,5 @@
 ---
-import BaseLayout from "../../../layouts/BaseLayout.astro";
+import PageShell from '../../../layouts/PageShell.astro'
 import {UserFriendsPage} from "../../../components/features/users/user-dashboard/friends/UserFriendsPage";
 
 const {session, user} = Astro.locals
@@ -7,6 +7,6 @@ if (session === null) {
   return Astro.redirect("/");
 }
 ---
-<BaseLayout>
+<PageShell>
     <UserFriendsPage client:only="solid-js" user={user} />
-</BaseLayout>
+</PageShell>

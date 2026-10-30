@@ -1,13 +1,15 @@
 ---
 import { serverClientPublic } from '../../lib/orpc/serverClient'
 import { TeamsGrid } from '../../components/features/teams/public/TeamsGrid'
-import BaseLayout4xl from '../../layouts/BaseLayout4xl.astro'
-import TeamsIndexCountdown from '../../components/features/teams/public/TeamsIndexHeader'
-import { FaSolidUsers } from 'solid-icons/fa'
+import PageShell from '../../layouts/PageShell.astro'
+import { PageHeader } from '../../components/ui/PageHeader'
+import { Tile } from '../../components/ui/Tile'
+import { Alert, EmptyState } from '../../components/ui/Status'
 import {
-  MainCountdownSimple,
-  MainJJStartTimes,
-} from '../../components/common/ui/MainHeader.tsx'
+  JJStartCountdown,
+  JJStartCountdownTile,
+  JJStartTimes,
+} from '../../components/ui/Countdown'
 import { getConfigYear } from '../../lib/utils/configYear'
 import { upcomingJJYear } from '../../lib/utils/jjYear'
 
@@ -37,57 +39,44 @@ const { data: teams, error } = await serverClientPublic.teams.findVisible(
 )
 ---
 
-<BaseLayout4xl
+<PageShell
   title={`Jingle Jam ${year} Teams | Jingle Jam Community`}
   description={`Teams of community streamers fundraising together for Jingle Jam ${year}: who is in each team and their upcoming streams. Community-run, not official.`}
 >
-  {HIDE_CONTENT ? (
-    <div class="flex w-full flex-col items-center gap-1 rounded-xl border border-white/10 bg-white/5 p-4 text-center text-white text-white/90 sm:p-4">
-      <div class="flex flex-col items-center justify-center text-white">
-        <h1 class="w-full text-center ~text-2xl/4xl">Jingle Jam {year} Teams</h1>
-        <h2 class="text-center ~text-lg/xl">
-          Teams will be available when the Jingle Jam starts!
-        </h2>
-        <p class="mt-2 max-w-2xl text-center text-white/90">
+  <div class="flex flex-col gap-3">
+    <PageHeader
+      title={`Jingle Jam ${year} Teams`}
+      subtitle={HIDE_CONTENT ? 'Teams will be available when the Jingle Jam starts!' : undefined}
+    />
+    {HIDE_CONTENT ? (
+      <Tile class="flex flex-col items-center gap-4 text-center">
+        <p class="max-w-2xl text-sm sm:text-base">
           Teams are groups of community streamers who stream and fundraise together for the Jingle Jam.
           When Jingle Jam {year} starts on 1 December, this page lists every team, and each team's page
           shows its members and upcoming streams.
         </p>
-      </div>
-      <div class="w-full">
-        <MainCountdownSimple client:only="solid-js" />
-      </div>
-      <div class="w-full">
-        <MainJJStartTimes client:only="solid-js" />
-      </div>
-    </div>
-  ) : (
-    <>
-      {error && (
-        <div class="bg-red-500 bg-opacity-20 p-4 rounded-lg text-white mb-6">
-          <h2 class="text-xl font-semibold">Error Loading Teams</h2>
-          <p>
+        <JJStartCountdown client:only="solid-js" />
+        <JJStartTimes client:only="solid-js" class="max-w-lg" />
+      </Tile>
+    ) : (
+      <>
+        {error && (
+          <Alert tone="danger" title="Error loading teams">
             {error?.message || 'An unknown error occurred while loading teams.'}
-          </p>
-        </div>
-      )}
-
-      {teams && (
-        <div class="w-full flex flex-col justify-center items-stretch gap-4 ">
-          <div class="rounded-xl border-2 bg-gradient-to-b from-neutral-50 to-neutral-100 p-2 shadow-md transition-all duration-300 hover:shadow-lg">
-            <div class="flex w-full flex-col gap-2 p-4 md:flex-row md:items-center md:justify-between md:p-2 lg:p-4">
-              <div class="flex flex-col items-center text-center md:items-start md:text-left">
-                <div class="flex items-center gap-2">
-                  <FaSolidUsers class="h-8 w-8 text-neutral-600" />
-                  <h1 class="font-babas text-black ~text-2xl/4xl">Jingle Jam {year} Teams</h1>
-                </div>
-              </div>
-              <TeamsIndexCountdown client:only="solid-js" />
-            </div>
-          </div>
-          <TeamsGrid teams={teams} client:only="solid-js" />
-        </div>
-      )}
-    </>
-  )}
-</BaseLayout4xl>
+          </Alert>
+        )}
+        {teams && teams.length > 0 && (
+          <>
+            <JJStartCountdownTile client:only="solid-js" />
+            <TeamsGrid teams={teams} client:only="solid-js" />
+          </>
+        )}
+        {teams && teams.length === 0 && (
+          <Tile>
+            <EmptyState title="No teams yet">Teams appear here once they are made public.</EmptyState>
+          </Tile>
+        )}
+      </>
+    )}
+  </div>
+</PageShell>

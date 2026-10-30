@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert';
 import { DateTime } from "luxon";
-import { jjDatesToColors, getStreamColor, getStreamColorTW, getStreamColors } from "./jjDatesToColors";
+import { jjDatesToColors, getStreamColor, getStreamColors } from "./jjDatesToColors";
 import { JJColors } from "../lib/JJColors";
 
 // Test data: Create DateTime objects for December 1st for different years
@@ -83,27 +83,6 @@ test('getStreamColor function returns valid hex colors', async (t) => {
         const colorWithShade = getStreamColor(streamStart, shade);
         const isValidHexColorWithShade = /^#[0-9A-F]{6}$/i.test(colorWithShade);
         assert.ok(isValidHexColorWithShade, `Expected a valid hex color for shade ${shade}, but got ${colorWithShade}`);
-      });
-    });
-  }
-});
-
-test('getStreamColorTW function returns valid Tailwind color classes', async (t) => {
-  for (const streamStart of testStreams) {
-    await t.test(`Testing stream on ${streamStart.toLocaleString(DateTime.DATE_FULL)}`, () => {
-      // Get the Tailwind color class for the stream
-      const colorClass = getStreamColorTW(streamStart);
-
-      // Verify the color class follows the expected format
-      const isValidColorClass = /^bg-day-[1-7]-\d+$/.test(colorClass);
-      assert.ok(isValidColorClass, `Expected a valid Tailwind color class, but got ${colorClass}`);
-
-      // Test with different shades
-      const shades = ['100', '500', '900'];
-      shades.forEach(shade => {
-        const colorClassWithShade = getStreamColorTW(streamStart, shade);
-        const isValidColorClassWithShade = /^bg-day-[1-7]-\d+$/.test(colorClassWithShade);
-        assert.ok(isValidColorClassWithShade, `Expected a valid Tailwind color class for shade ${shade}, but got ${colorClassWithShade}`);
       });
     });
   }

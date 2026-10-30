@@ -18,10 +18,10 @@ export const TwitchLive: Component<TwitchLiveProps> = (props) => {
       href={url}
       target="_blank"
       rel="noopener noreferrer"
-      class="aspect-square group group-hover flex flex-col items-center justify-center hover:scale-105 transition-all rounded-full p-2 hover:text-twitch hover:bg-twitch/10"
+      class="group flex min-w-14 flex-col items-center justify-center gap-0.5 rounded-group px-2 py-1.5 text-fg-muted transition-colors hover:text-twitch hover:bg-twitch/10"
     >
-      <TwitchIcon class="size-6" />
-      <Show when={isLive()} fallback={<p class="text-xxs">{name}</p>}>
+      <TwitchIcon class="size-5" />
+      <Show when={isLive()} fallback={<p class="text-xxs font-medium">{name}</p>}>
         <div class="bg-red-500 animate-pulse text-white text-xxxs font-bold px-0.5 py-0.25 mt-0.5 rounded-full z-10 group-hover:bg-twitch">
           LIVE
         </div>

@@ -1,4 +1,4 @@
-import { type Component, createEffect, createSignal, on, onCleanup, onMount, Show, } from 'solid-js'
+import { type Component, createEffect, createSignal, For, type JSX, on, onCleanup, onMount, Show, } from 'solid-js'
 import { Transition } from 'solid-transition-group'
 import { twMerge } from 'tailwind-merge'
 import { QRCodeSVG } from 'solid-qr-code'
@@ -8,6 +8,83 @@ import { QueryClientProvider, useQuery } from '@tanstack/solid-query'
 import { QueryClient } from '@tanstack/query-core'
 import type { CharityItem, FundraiserItem, } from '../../../../lib/orpc/private/overlay/contract.ts'
 import { DEMO_CHARITIES } from '../demoData.ts'
+import { getTextColor } from '../../../../lib/utils/textColors.ts'
+
+export type TransitionStyle = 'fade' | 'slide' | 'flip' | 'none'
+
+// Keyframes per style; `axis` only matters for flip (cards turn sideways,
+// header cards turn vertically).
+function swapFrames(style: TransitionStyle, axis: 'x' | 'y') {
+  switch (style) {
+    case 'slide':
+      return {
+        enter: [
+          { opacity: 0, transform: 'translateX(100%)' },
+          { opacity: 1, transform: 'translateX(0)' },
+        ],
+        exit: [
+          { opacity: 1, transform: 'translateX(0)' },
+          { opacity: 0, transform: 'translateX(-100%)' },
+        ],
+        duration: 450,
+      }
+    case 'flip': {
+      const rotate = axis === 'x' ? 'rotateY' : 'rotateX'
+      return {
+        enter: [
+          { opacity: 0, transform: `${rotate}(-90deg) perspective(800px)` },
+          { opacity: 1, transform: `${rotate}(0deg) perspective(0px)` },
+        ],
+        exit: [
+          { opacity: 1, transform: `${rotate}(0deg) perspective(0px)` },
+          { opacity: 0, transform: `${rotate}(90deg) perspective(800px)` },
+        ],
+        duration: axis === 'x' ? 900 : 700,
+      }
+    }
+    default:
+      return {
+        enter: [{ opacity: 0 }, { opacity: 1 }],
+        exit: [{ opacity: 1 }, { opacity: 0 }],
+        duration: 500,
+      }
+  }
+}
+
+// Animates the swap whenever `children` changes to a new element.
+const SwapTransition: Component<{
+  style: TransitionStyle
+  axis: 'x' | 'y'
+  children: JSX.Element
+}> = (p) => {
+  const run = (el: Element, kind: 'enter' | 'exit', done: () => void) => {
+    const f = swapFrames(p.style, p.axis)
+    el.animate(f[kind], { duration: f.duration, easing: 'ease-in-out' })
+      .finished.then(done)
+  }
+  return (
+    <Show when={p.style !== 'none'} fallback={p.children}>
+      <Transition
+        mode="outin"
+        onEnter={(el, done) => run(el, 'enter', done)}
+        onExit={(el, done) => run(el, 'exit', done)}
+      >
+        {p.children}
+      </Transition>
+    </Show>
+  )
+}
+
+// The 'charity' theme uses each cause's own colour. getTextColor expects
+// #rrggbb, so expand #rgb and drop alpha; anything else falls back to default.
+function charityHex(color?: string) {
+  if (!color) return undefined
+  if (/^#[0-9a-f]{3}$/i.test(color))
+    return '#' + [...color.slice(1)].map((x) => x + x).join('')
+  return /^#[0-9a-f]{6}([0-9a-f]{2})?$/i.test(color)
+    ? color.slice(0, 7)
+    : undefined
+}
 
 // Header cards (mirrors V1 CharityOverlay2)
 function bg(theme: string) {
@@ -22,7 +99,7 @@ function bg(theme: string) {
 }
 
 const HeaderCard: Component<{ theme: string; children: any }> = (p) => (
-  <div class="w-full p-2">
+  <div class="w-full px-2 pt-2">
     <div
       class={twMerge(
         'flex h-11 w-full flex-row items-center justify-center rounded-2xl p-2 text-4xl font-bold shadow-xl transition-all',
@@ -71,6 +148,7 @@ const OverlayHeader: Component<{
   header: string[]
   headerTheme: string
   speed: number
+  transition: TransitionStyle
 }> = (props) => {
   const names = () => props.header.map((h) => h.toLowerCase())
   const items = () => {
@@ -98,31 +176,9 @@ const OverlayHeader: Component<{
   return (
     <Show when={!names().includes('none')}>
       <Show when={animate()}>
-        <Transition
-          mode="outin"
-          onEnter={(el: any, done: any) => {
-            const a = el.animate(
-              [
-                { opacity: 1, transform: 'rotateX(-90deg) perspective(800px)' },
-                { opacity: 1, transform: 'rotateX(0deg) perspective(0px)' },
-              ],
-              { duration: 700 },
-            )
-            a.finished.then(done)
-          }}
-          onExit={(el: any, done: any) => {
-            const a = el.animate(
-              [
-                { opacity: 1, transform: 'rotateX(0deg) perspective(0px)' },
-                { opacity: 1, transform: 'rotateX(90deg) perspective(800px)' },
-              ],
-              { duration: 700 },
-            )
-            a.finished.then(done)
-          }}
-        >
+        <SwapTransition style={props.transition} axis="y">
           {current()}
-        </Transition>
+        </SwapTransition>
       </Show>
       <Show when={!animate()}>{current()}</Show>
     </Show>
@@ -133,11 +189,14 @@ const OverlayHeader: Component<{
 export type Props = {
   headers?: string[]
   includeTotals?: boolean // maps to showRaised
-  theme?: 'default' | 'red' | 'blue' | 'carousel'
+  theme?: 'default' | 'red' | 'blue' | 'carousel' | 'charity'
   headerTheme?: 'default' | 'red' | 'blue'
   showDesc?: boolean
   qrCode?: 'none' | 'fundraiser' | 'charity'
   showUrl?: boolean
+  showDots?: boolean
+  transition?: TransitionStyle
+  interval?: 'default' | 'slow'
   causes?: string[]
   user?: string
   currency?: 'GBP' | 'USD' | 'EUR'
@@ -158,7 +217,8 @@ export const CharitiesOverlay: Component<Props> = (props) => {
 
 const Charities2OverlayBody: Component<Props> = (props) => {
   const header = () => props.headers ?? []
-  const speed = () => 10
+  const speed = () => (props.interval === 'slow' ? 20 : 10)
+  const transition = () => props.transition ?? 'fade'
   const theme = () => props.theme ?? 'default'
   const headerTheme = () => props.headerTheme ?? 'default'
   const showRaised = () => Boolean(props.includeTotals)
@@ -167,6 +227,8 @@ const Charities2OverlayBody: Component<Props> = (props) => {
   const showQRCode = () => qrCode() !== 'none'
   const showUrl = () =>
     props.showUrl === undefined ? true : Boolean(props.showUrl)
+  const showDots = () =>
+    props.showDots === undefined ? true : Boolean(props.showDots)
   const causes = () => props.causes ?? []
 
   const [displayList, setDisplayList] = createSignal<CharityItem[]>([])
@@ -255,6 +317,7 @@ const Charities2OverlayBody: Component<Props> = (props) => {
         header={header()}
         headerTheme={headerTheme()}
         speed={speed()}
+        transition={transition()}
       />
       <div class="flex-1">
         <Show
@@ -271,41 +334,30 @@ const Charities2OverlayBody: Component<Props> = (props) => {
             />
           }
         >
-          {(c) => (
-            <Transition
-              mode="outin"
-              onEnter={(el: any, done: any) => {
-                const a = el.animate(
-                  [
-                    {
-                      opacity: 0,
-                      transform: 'rotateY(-90deg) perspective(800px)',
-                    },
-                    { opacity: 1, transform: 'rotateY(0deg) perspective(0px)' },
-                  ],
-                  { duration: 900 },
-                )
-                a.finished.then(done)
-              }}
-              onExit={(el: any, done: any) => {
-                const a = el.animate(
-                  [
-                    { opacity: 1, transform: 'rotateY(0deg) perspective(0px)' },
-                    {
-                      opacity: 0,
-                      transform: 'rotateY(90deg) perspective(800px)',
-                    },
-                  ],
-                  { duration: 900 },
-                )
-                a.finished.then(done)
-              }}
-            >
-              {currentItem()}
-            </Transition>
-          )}
+          <SwapTransition style={transition()} axis="x">
+            {currentItem()}
+          </SwapTransition>
         </Show>
       </div>
+      <Show when={showDots() && !oneCause() && displayList().length > 0}>
+        <div class="flex items-center justify-center gap-1.5 pb-2">
+          <For each={displayList()}>
+            {(c, i) => (
+              <span
+                class={twMerge(
+                  'size-2 rounded-full shadow-md transition-all duration-500',
+                  bg(currentTheme(i())),
+                  i() === idx() % displayList().length && 'size-3',
+                )}
+                style={{
+                  'background-color':
+                    theme() === 'charity' ? charityHex(c.color) : undefined,
+                }}
+              />
+            )}
+          </For>
+        </div>
+      </Show>
     </div>
   )
 }
@@ -319,6 +371,12 @@ const CharityItem: Component<{
   showUrl: boolean
   showRaised: boolean
 }> = (props) => {
+  const own = () =>
+    props.theme === 'charity' ? charityHex(props.charity.color) : undefined
+  const ownFG = () => {
+    const c = own()
+    return c ? getTextColor(c) : undefined
+  }
   const background = () =>
     props.theme === 'red'
       ? 'bg-primary-500'
@@ -330,18 +388,22 @@ const CharityItem: Component<{
       ? 'text-white'
       : 'text-black'
   const raisedColor = () =>
-    props.theme === 'red' || props.theme === 'blue'
-      ? 'text-white'
-      : 'text-primary-500'
+    own()
+      ? ''
+      : props.theme === 'red' || props.theme === 'blue'
+        ? 'text-white'
+        : 'text-primary-500'
 
   const qrCodeFG = () =>
-    props.theme === 'red' || props.theme === 'blue' ? '#ffffff' : '#000000'
+    ownFG() ??
+    (props.theme === 'red' || props.theme === 'blue' ? 'white' : 'black')
   const qrCodeBG = () =>
-    props.theme === 'red'
-      ? '#E21350'
+    own() ??
+    (props.theme === 'red'
+      ? 'var(--color-primary-500)'
       : props.theme === 'blue'
-        ? '#3484BF'
-        : '#ffffff'
+        ? 'var(--color-accent-500)'
+        : 'white')
 
   const qrcodeUrl = () => {
     if (props.qrCode === 'fundraiser') {
@@ -373,6 +435,7 @@ const CharityItem: Component<{
           background(),
           textColor(),
         )}
+        style={{ 'background-color': own(), color: ownFG() }}
       >
         <img
           class={'h-20 w-20 rounded-lg bg-white'}

@@ -1,2 +1,54 @@
 date: '2026-12-01'
-streams: []
+streams:
+  - creators: []
+    duration_hours: 3
+    end: '2026-12-01T14:00:00Z'
+    start: '2026-12-01T11:00:00Z'
+    style:
+      background:
+        colors:
+          - '#3485C0'
+          - '#3485C0'
+        orientation: TD
+      tileSize: 3
+    title: TBA
+    vods: []
+  - creators: []
+    duration_hours: 3
+    end: '2026-12-01T17:00:00Z'
+    start: '2026-12-01T14:00:00Z'
+    style:
+      background:
+        colors:
+          - '#3485C0'
+          - '#3485C0'
+        orientation: TD
+      tileSize: 3
+    title: TBA
+    vods: []
+  - creators: []
+    duration_hours: 3
+    end: '2026-12-01T20:00:00Z'
+    start: '2026-12-01T17:00:00Z'
+    style:
+      background:
+        colors:
+          - '#3485C0'
+          - '#3485C0'
+        orientation: TD
+      tileSize: 3
+    title: TBA
+    vods: []
+  - creators: []
+    duration_hours: 3
+    end: '2026-12-01T23:00:00Z'
+    start: '2026-12-01T20:00:00Z'
+    style:
+      background:
+        colors:
+          - '#3485C0'
+          - '#3485C0'
+        orientation: TD
+      tileSize: 3
+    title: TBA
+    vods: []

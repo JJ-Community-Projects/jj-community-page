@@ -35,6 +35,7 @@ export interface JJCause {
   name: string;
   logo: string;
   description: string;
+  color?: string;
   url: string;
   donateUrl: string;
   raised: number;

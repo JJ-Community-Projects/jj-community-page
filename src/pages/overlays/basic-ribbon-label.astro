@@ -14,7 +14,8 @@ const { data: contentHidden } = await serverClientPublic.overlays.visibility.get
 )
 const HIDE_CONTENT = contentHidden ?? true
 
-const styleParam = Astro.url.searchParams.get('style')
+// `theme` like every other overlay; `style` is the old name and keeps working (`theme` wins)
+const styleParam = Astro.url.searchParams.get('theme') ?? Astro.url.searchParams.get('style')
 const alignmentParam = Astro.url.searchParams.get('alignment')
 const textParam = Astro.url.searchParams.get('text')
 

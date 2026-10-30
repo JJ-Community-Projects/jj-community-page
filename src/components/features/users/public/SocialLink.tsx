@@ -41,10 +41,10 @@ export const SocialLink: Component<SocialLinkProps> = (props) => {
           href={props.url}
           target="_blank"
           rel="noopener noreferrer"
-          class="flex flex-col items-center justify-center hover:scale-105 transition-all rounded-full p-2 hover:text-neutral-600 hover:bg-neutral-100"
+          class="flex min-w-14 flex-col items-center justify-center gap-0.5 rounded-group px-2 py-1.5 text-fg-muted transition-colors hover:text-fg hover:bg-black/5"
         >
-          <FaSolidGlobe class="size-6"/>
-          <p class="text-xxs">{provider.charAt(0).toUpperCase() + provider.slice(1)}</p>
+          <FaSolidGlobe class="size-5"/>
+          <p class="text-xxs font-medium">{provider.charAt(0).toUpperCase() + provider.slice(1)}</p>
         </a>
       </Match>
     </Switch>

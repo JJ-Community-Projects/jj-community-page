@@ -1,3 +1,389 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* Scan src/ only (as v3's `content` did), not the yearly JSON files in the repo root */
+@import 'tailwindcss' source('../');
+
+@plugin 'tailwind-scrollbar';
+@plugin '@tailwindcss/typography';
+/* `fl-*` classes; the viewport range of the old fluid-tailwind (sm 40rem -> 2xl 96rem) */
+@plugin 'fluid-tailwindcss' {
+  minviewport: 640;
+  maxviewport: 1536;
+}
+
+/*
+  Semantic tokens: the neutral tile on the red canvas (the Twitch extension's look).
+  Pages and components use these; the raw palettes below stay for brand and data colours.
+*/
+@theme {
+  /* Tile: gradient surface -> surface-2, ring in `line`, shadow-tile (hover: shadow-tile-hover) */
+  --color-surface: var(--color-neutral-50);
+  --color-surface-2: var(--color-neutral-100);
+  /* Inner groups and inputs inside a tile */
+  --color-surface-strong: #ffffff;
+  /* Tile ring, dividers */
+  --color-line: rgb(0 0 0 / 0.05);
+  /* Input and control borders */
+  --color-line-strong: rgb(0 0 0 / 0.15);
+  /* Text on a tile */
+  --color-fg: var(--color-neutral-900);
+  --color-fg-muted: var(--color-neutral-600);
+  /* Text directly on the red canvas: page titles, section labels, footer */
+  --color-on-canvas: #ffffff;
+  --color-on-canvas-muted: rgb(255 255 255 / 0.8);
+  /* "Raised" amounts */
+  --color-raised: var(--color-primary-600);
+
+  --radius-tile: 1rem;
+  --radius-group: 0.75rem;
+  --radius-media: 0.5rem;
+
+  --shadow-tile: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-tile-hover:
+    0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+
+  /* Accordion content slides open and shut; Kobalte sets --kb-accordion-content-height */
+  --animate-accordion-down: accordion-down 200ms ease-out;
+  --animate-accordion-up: accordion-up 200ms ease-out;
+  @keyframes accordion-down {
+    from {
+      height: 0;
+    }
+    to {
+      height: var(--kb-accordion-content-height);
+    }
+  }
+  @keyframes accordion-up {
+    from {
+      height: var(--kb-accordion-content-height);
+    }
+    to {
+      height: 0;
+    }
+  }
+}
+
+/*
+ * Charity sidebar open/close (CommunityCharitiesOverview) runs as a view transition: every named part
+ * (tile, logo, name, amount, totals) morphs from its wide to its compact place and back. Tiles stretch
+ * their snapshot to the animated box; text keeps its size and cross-fades while it travels; extras (in
+ * only one layout: "Raised", description and socials, the other totals) fade out fast or fade in at the
+ * end. The page column next to the sidebar slides as its new layout instead of cross-fading with the old
+ * one, and the rest of the page (root) shows its live new state at once: no frozen copy fading out, so
+ * tickers and countdowns don't double up or jump.
+ */
+::view-transition-group(*) {
+  animation-duration: 350ms;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+::view-transition-old(root) {
+  display: none;
+}
+::view-transition-new(root) {
+  animation: none;
+}
+::view-transition-old(.charity-surface),
+::view-transition-new(.charity-surface) {
+  width: 100%;
+  height: 100%;
+}
+::view-transition-old(.charity-text),
+::view-transition-new(.charity-text) {
+  width: auto;
+  height: auto;
+}
+::view-transition-old(.charity-extra) {
+  animation-duration: 120ms;
+}
+::view-transition-new(.charity-extra) {
+  animation-delay: 230ms;
+  animation-duration: 120ms;
+}
+::view-transition-old(charity-main) {
+  display: none;
+}
+::view-transition-new(charity-main) {
+  animation: none;
+  width: auto;
+}
+
+@theme {
+  /* Body text uses Tailwind's default system stack (--font-sans); Bebas is the Yogs schedule grid's display font */
+  --font-babas: Bebas;
+
+  --text-xxs: 0.625rem;
+  --text-xxs--line-height: 0.75rem;
+  --text-xxxs: 0.5rem;
+  --text-xxxs--line-height: 0.625rem;
+
+  --scale-101: 1.01;
+  --scale-102: 1.02;
+
+  --brightness-101: 1.01;
+  --brightness-102: 1.02;
+
+  --color-overlay: #ffffff05;
+
+  --color-primary-50: #faafc6;
+  --color-primary-100: #f99bb8;
+  --color-primary-200: #f6759d;
+  --color-primary-300: #f44e82;
+  --color-primary-400: #f22867;
+  --color-primary-500: #e30e50;
+  --color-primary-600: #ae0b3d;
+  --color-primary-700: #79072b;
+  --color-primary-800: #440418;
+  --color-primary-900: #100106;
+  --color-primary-950: #000000;
+  --color-primary: #e30e50;
+  --color-primary-shade: #57051f;
+
+  --color-accent-50: #bed9ed;
+  --color-accent-100: #afd0e9;
+  --color-accent-200: #8fbde0;
+  --color-accent-300: #6faad7;
+  --color-accent-400: #4f98ce;
+  --color-accent-500: #3584bf;
+  --color-accent-600: #296693;
+  --color-accent-700: #1d4767;
+  --color-accent-800: #10293b;
+  --color-accent-900: #040b0f;
+  --color-accent-950: #000000;
+  --color-accent: #3584bf;
+  --color-accent-shade: #09437a;
+
+  /* The OBS overlays' black theme (ribbons, donation matches) */
+  --color-ink: #313131;
+
+  --color-success-50: #d1fae5;
+  --color-success-100: #a7f3d0;
+  --color-success-200: #6ee7b7;
+  --color-success-300: #34d399;
+  --color-success-400: #10b981;
+  --color-success-500: #059669;
+  --color-success-600: #047857;
+  --color-success-700: #065f46;
+  --color-success-800: #064e3b;
+  --color-success-900: #022c22;
+  --color-success: #10b981;
+
+  --color-warning-50: #fffbeb;
+  --color-warning-100: #fef3c7;
+  --color-warning-200: #fde68a;
+  --color-warning-300: #fcd34d;
+  --color-warning-400: #fbbf24;
+  --color-warning-500: #f59e0b;
+  --color-warning-600: #d97706;
+  --color-warning-700: #b45309;
+  --color-warning-800: #92400e;
+  --color-warning-900: #78350f;
+  --color-warning: #f59e0b;
+
+  --color-danger-50: #fef2f2;
+  --color-danger-100: #fee2e2;
+  --color-danger-200: #fecaca;
+  --color-danger-300: #fca5a5;
+  --color-danger-400: #f87171;
+  --color-danger-500: #ef4444;
+  --color-danger-600: #dc2626;
+  --color-danger-700: #b91c1c;
+  --color-danger-800: #991b1b;
+  --color-danger-900: #7f1d1d;
+  --color-danger: #ef4444;
+
+  --color-neutral-50: #f9fafb;
+  --color-neutral-100: #f3f4f6;
+  --color-neutral-200: #e5e7eb;
+  --color-neutral-300: #d1d5db;
+  --color-neutral-400: #9ca3af;
+  --color-neutral-500: #6b7280;
+  --color-neutral-600: #4b5563;
+  --color-neutral-700: #374151;
+  --color-neutral-800: #1f2937;
+  --color-neutral-900: #111827;
+  --color-neutral: #6b7280;
+
+  --color-twitch-50: #fefeff;
+  --color-twitch-100: #f2e9ff;
+  --color-twitch-200: #dac0ff;
+  --color-twitch-300: #c298ff;
+  --color-twitch-400: #a96fff;
+  --color-twitch-500: #9146ff;
+  --color-twitch-600: #700eff;
+  --color-twitch-700: #5600d5;
+  --color-twitch-800: #40009d;
+  --color-twitch-900: #290065;
+  --color-twitch: #9146ff;
+
+  --color-youtube-50: #ffb8b8;
+  --color-youtube-100: #ffa3a3;
+  --color-youtube-200: #ff7a7a;
+  --color-youtube-300: #ff5252;
+  --color-youtube-400: #ff2929;
+  --color-youtube-500: #ff0000;
+  --color-youtube-600: #c70000;
+  --color-youtube-700: #8f0000;
+  --color-youtube-800: #570000;
+  --color-youtube-900: #1f0000;
+  --color-youtube-950: #030000;
+  --color-youtube: #ff0000;
+
+  --color-reddit-50: #ffcbb8;
+  --color-reddit-100: #ffbca3;
+  --color-reddit-200: #ff9e7a;
+  --color-reddit-300: #ff8152;
+  --color-reddit-400: #ff6329;
+  --color-reddit-500: #ff4500;
+  --color-reddit-600: #c73600;
+  --color-reddit-700: #8f2700;
+  --color-reddit-800: #571700;
+  --color-reddit-900: #1f0800;
+  --color-reddit: #ff4500;
+
+  --color-discord-50: #ffffff;
+  --color-discord-100: #eff1fe;
+  --color-discord-200: #cacefb;
+  --color-discord-300: #a4abf8;
+  --color-discord-400: #7e88f5;
+  --color-discord-500: #5865f2;
+  --color-discord-600: #2435ee;
+  --color-discord-700: #101fca;
+  --color-discord-800: #0c1796;
+  --color-discord-900: #080f62;
+  --color-discord: #5865f2;
+
+  --color-github-50: #cadaee;
+  --color-github-100: #bbcfe8;
+  --color-github-200: #9cb9de;
+  --color-github-300: #7da3d4;
+  --color-github-400: #5f8eca;
+  --color-github-500: #4078c0;
+  --color-github-600: #325e96;
+  --color-github-700: #24436c;
+  --color-github-800: #162942;
+  --color-github-900: #080f18;
+  --color-github: #4078c0;
+
+  --color-instagram-50: #fff0f0;
+  --color-instagram-100: #ffdddd;
+  --color-instagram-200: #ffc1c1;
+  --color-instagram-300: #ff9595;
+  --color-instagram-400: #ff5959;
+  --color-instagram-500: #ff2525;
+  --color-instagram-600: #fd1d1d;
+  --color-instagram-700: #d50000;
+  --color-instagram-800: #b00404;
+  --color-instagram-900: #910b0b;
+  --color-instagram-950: #500000;
+  --color-instagram: #ff2525;
+
+  --color-tiktok-50: #eefffd;
+  --color-tiktok-100: #c5fffb;
+  --color-tiktok-200: #8afff8;
+  --color-tiktok-300: #48fff4;
+  --color-tiktok-400: #2af0ea;
+  --color-tiktok-500: #00d2ce;
+  --color-tiktok-600: #00a8a9;
+  --color-tiktok-700: #008386;
+  --color-tiktok-800: #05666a;
+  --color-tiktok-900: #0a5557;
+  --color-tiktok-950: #003336;
+  --color-tiktok: #00d2ce;
+
+  --color-bluesky-50: #edfdfe;
+  --color-bluesky-100: #d2f7fb;
+  --color-bluesky-200: #abedf6;
+  --color-bluesky-300: #71e0ef;
+  --color-bluesky-400: #25c5df;
+  --color-bluesky-500: #14abc6;
+  --color-bluesky-600: #1389a7;
+  --color-bluesky-700: #176e87;
+  --color-bluesky-800: #1b5a6f;
+  --color-bluesky-900: #1b4c5e;
+  --color-bluesky-950: #0c3140;
+  --color-bluesky: #14abc6;
+
+  --color-tiltify-50: #d9defe;
+  --color-tiltify-100: #c5cbfd;
+  --color-tiltify-200: #9ca6fb;
+  --color-tiltify-300: #7480f9;
+  --color-tiltify-400: #4b5bf7;
+  --color-tiltify-500: #143df4;
+  --color-tiltify-600: #0a2bd2;
+  --color-tiltify-700: #0821a0;
+  --color-tiltify-800: #05166e;
+  --color-tiltify-900: #030c3c;
+  --color-tiltify-950: #010520;
+  --color-tiltify: #143df4;
+
+  --color-twitter-50: #d8edfc;
+  --color-twitter-100: #c4e3fa;
+  --color-twitter-200: #9bd0f7;
+  --color-twitter-300: #72bdf3;
+  --color-twitter-400: #49aaf0;
+  --color-twitter-500: #1da1f2;
+  --color-twitter-600: #0c85cf;
+  --color-twitter-700: #09659d;
+  --color-twitter-800: #06456b;
+  --color-twitter-900: #032539;
+  --color-twitter-950: #01121c;
+  --color-twitter: #1da1f2;
+
+  --color-yogs-primary-50: #c9e6fb;
+  --color-yogs-primary-100: #b6ddfa;
+  --color-yogs-primary-200: #90cbf7;
+  --color-yogs-primary-300: #6ab9f4;
+  --color-yogs-primary-400: #44a7f2;
+  --color-yogs-primary-500: #1e95ef;
+  --color-yogs-primary-600: #0e77c7;
+  --color-yogs-primary-700: #0a5892;
+  --color-yogs-primary-800: #07385e;
+  --color-yogs-primary-900: #03192a;
+  --color-yogs-primary: #1e95ef;
+
+  --color-yogs-accent-50: #feece2;
+  --color-yogs-accent-100: #fddfce;
+  --color-yogs-accent-200: #fbc6a7;
+  --color-yogs-accent-300: #f9ac80;
+  --color-yogs-accent-400: #f89359;
+  --color-yogs-accent-500: #f67932;
+  --color-yogs-accent-600: #e65a0a;
+  --color-yogs-accent-700: #b04508;
+  --color-yogs-accent-800: #7a3005;
+  --color-yogs-accent-900: #451b03;
+  --color-yogs-accent: #f67932;
+}
+
+/*
+  TODO(tw4-compat): v3 defaults kept during the Tailwind 4 migration (UI rework R3);
+  each block can be dropped on its own once the redesign sets these explicitly.
+
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+}
+
+/* TODO(tw4-compat): v3 button cursor and placeholder colour */
+@layer base {
+  button:not(:disabled),
+  [role='button']:not(:disabled) {
+    cursor: pointer;
+  }
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--color-gray-400);
+  }
+}
+
+/* TODO(tw4-compat): v3 hover (also fires on tap on touch devices) */
+@custom-variant hover (&:hover);

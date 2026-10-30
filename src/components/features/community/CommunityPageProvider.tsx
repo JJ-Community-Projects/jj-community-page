@@ -9,10 +9,16 @@ import { useQuery } from '@tanstack/solid-query'
 import { orpcPrivate } from '../../../lib/orpc/client.ts'
 import { makePersisted } from '@solid-primitives/storage'
 import { useCurrency } from '../../common/CurrencyProvider.tsx'
+import type {
+  CommunityFundraiser,
+  JJCauseType,
+} from '../../../lib/orpc/private/jjData/contract.ts'
+import { raisedIn } from './Money.tsx'
 
 const useCommunityPageHook = () => {
+  // One merged list: top N campaigns ∪ all account holders, sorted by the backend (community-list)
   const communityQuery = useQuery(() =>
-    orpcPrivate.jj.campaigns.queryOptions({
+    orpcPrivate.jj.communityList.queryOptions({
       staleTime: 60_000 * 4,
       refetchInterval: 60_000 * 5,
     }),
@@ -31,19 +37,13 @@ const useCommunityPageHook = () => {
       refetchInterval: 60_000 * 10,
     }),
   )
-  const users = useQuery(() =>
-    orpcPrivate.jj.getAllUsersWithInfo.queryOptions({
-      staleTime: 60_000 * 8,
-      refetchInterval: 60_000 * 10,
-    }),
-  )
 
   const [sortBy, setSortBy] = makePersisted(
     createSignal<'raised' | 'live' | 'cause'>('live'),
-    { name: 'community-sort-by' }
+    { name: 'community-sort-by' },
   )
 
-  const {currency, setCurrency} = useCurrency()
+  const { currency, setCurrency } = useCurrency()
 
   // Selected tags for community page filtering/searching
   const [selectedTagIds, setSelectedTagIds] = createSignal<number[]>([])
@@ -56,97 +56,58 @@ const useCommunityPageHook = () => {
   }
   const clearSelectedTags = () => setSelectedTagIds([])
 
-  const campaignsByCause = () => {
-    if (!causeQuery.data) return []
-    if (!communityQuery.data) return []
-    return causeQuery.data!.causes.map((cause) => {
-      return {
-        cause: cause,
-        campaigns: communityQuery.data!.list.filter(
-          (campaign) => campaign.tiltifyCauseId === cause.id,
-        ),
-      }
-    })
-  }
-
-  const campaignsSortedByLiveFirst = () => {
-    if (!communityQuery.data) return []
-    return communityQuery.data!.list.toSorted((a, b) => {
-      if (a.isTwitchLive && !b.isTwitchLive) return -1
-      if (!a.isTwitchLive && b.isTwitchLive) return 1
-      return 0
-    })
-  }
-
-  const campaignsSortedByRaised = () => {
-    if (!communityQuery.data) return []
-    return communityQuery.data!.list.toSorted((a, b) => {
-      if (a.raised.gbp < b.raised.gbp) return 1
-      if (a.raised.gbp > b.raised.gbp) return -1
-      return 0
-    })
-  }
-
-  // Helper: compute match count of an entity's tags vs selectedTagIds
-  const matchCount = (tagIds: number[]) => {
+  // Tag filter: keeps fundraisers with any selected tag, in the current order
+  const fundraisers = createMemo(() => {
+    const list = communityQuery.data?.list ?? []
     const selected = selectedTagIds()
-    if (selected.length === 0) return 0
-    let c = 0
-    for (let i = 0; i < tagIds.length; i++) {
-      if (selected.includes(tagIds[i])) c++
-    }
-    return c
-  }
-
-  const baseSortedCampaigns = () =>
-    sortBy() === 'live'
-      ? campaignsSortedByLiveFirst()
-      : campaignsSortedByRaised()
-
-  // Sorted campaigns with optional tag filtering and prioritization
-  const campaignsSorted = createMemo(() => {
-    const base = baseSortedCampaigns()
-    const selected = selectedTagIds()
-    if (selected.length === 0) return base
-    return base
-      .map((c, i) => ({ c, i, mc: matchCount(c.tags.map((t) => t.id)) }))
-      .filter((x) => x.mc > 0)
-      .toSorted((a, b) => {
-        if (a.mc !== b.mc) return b.mc - a.mc
-        return a.i - b.i
-      })
-      .map((x) => x.c)
-  })
-
-  // filtered/prioritized users by selected tags
-  const usersFiltered = createMemo(() => {
-    const selected = selectedTagIds()
-    const list = users.data ? users.data : []
     if (selected.length === 0) return list
-    return list
-      .map((u, i) => ({ u, i, mc: matchCount(u.tags.map((t) => t.tagId)) }))
-      .filter((x) => x.mc > 0)
-      .toSorted((a, b) => (a.mc !== b.mc ? b.mc - a.mc : a.i - b.i))
-      .map((x) => x.u)
+    return list.filter((f) => f.tags.some((t) => selected.includes(t.id)))
   })
 
-  // campaigns by cause with tag filtering/prioritization
-  const campaignsByCauseFiltered = createMemo(() => {
-    const selected = selectedTagIds()
-    if (!causeQuery.data || !communityQuery.data)
-      return [] as ReturnType<typeof campaignsByCause>
-    const allByCause = campaignsByCause()
-    if (selected.length === 0) return allByCause
-    return allByCause
-      .map((entry) => {
-        const enriched = entry.campaigns
-          .map((c, i) => ({ c, i, mc: matchCount(c.tags.map((t) => t.id)) }))
-          .filter((x) => x.mc > 0)
-          .toSorted((a, b) => (a.mc !== b.mc ? b.mc - a.mc : a.i - b.i))
-          .map((x) => x.c)
-        return { cause: entry.cause, campaigns: enriched }
-      })
-      .filter((e) => e.campaigns.length > 0)
+  // Live: the backend order (dono match, live, raised, name). Raised: by the selected currency,
+  // fundraisers without a campaign last; toSorted is stable, so ties keep the backend order.
+  const fundraisersSorted = createMemo(() => {
+    const list = fundraisers()
+    if (sortBy() !== 'raised') return list
+    const c = currency()
+    return list.toSorted((a, b) => {
+      if (a.raised === null || b.raised === null) {
+        return (a.raised === null ? 1 : 0) - (b.raised === null ? 1 : 0)
+      }
+      return raisedIn(b.raised, c) - raisedIn(a.raised, c)
+    })
+  })
+
+  // Cause: one group per charity in causes order, then campaigns without a known charity, then
+  // account holders without a campaign. Empty charity groups only show while no tag is selected.
+  const fundraisersByCause = createMemo((): CauseGroup[] => {
+    const list = fundraisers()
+    const causes = causeQuery.data?.causes ?? []
+    const known = new Set(causes.map((c) => c.id))
+    const showEmpty = selectedTagIds().length === 0
+    const groups: CauseGroup[] = causes.map((cause) => ({
+      key: cause.id,
+      title: cause.name,
+      cause,
+      fundraisers: list.filter((f) => f.charity?.id === cause.id),
+    }))
+    groups.push(
+      {
+        key: 'other',
+        title: 'Other fundraisers',
+        fundraisers: list.filter(
+          (f) => f.raised !== null && !(f.charity && known.has(f.charity.id)),
+        ),
+      },
+      {
+        key: 'no-campaign',
+        title: 'No campaign yet',
+        fundraisers: list.filter((f) => f.raised === null),
+      },
+    )
+    return groups.filter(
+      (g) => g.fundraisers.length > 0 || (showEmpty && g.cause),
+    )
   })
 
   return {
@@ -156,17 +117,22 @@ const useCommunityPageHook = () => {
     setSortBy,
     currency,
     setCurrency,
-    campaignsSorted,
-    campaignsByCause,
-    users,
+    fundraisersSorted,
+    fundraisersByCause,
     // tag selection state (community page)
     selectedTagIds,
     addSelectedTag,
     removeSelectedTag,
     clearSelectedTags,
-    usersFiltered,
-    campaignsByCauseFiltered,
   }
+}
+
+export type CauseGroup = {
+  key: string
+  title: string
+  /** Set for a charity group; the trailing groups have none */
+  cause?: JJCauseType
+  fundraisers: CommunityFundraiser[]
 }
 
 interface CommunityPageProps {}

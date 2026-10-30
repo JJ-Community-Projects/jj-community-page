@@ -1,7 +1,9 @@
 ---
-import BaseLayout from '../../layouts/BaseLayout.astro'
+import PageShell from '../../layouts/PageShell.astro'
 import { OverlayConfiguration } from '../../components/features/overlay/overview/OverlayConfiguration.tsx'
-import { PublicOverlayConfiguration } from '../../components/features/overlay/overview/PublicOverlayConfiguration.tsx'
+import { PageHeader } from '../../components/ui/PageHeader'
+import { Tile } from '../../components/ui/Tile'
+import { JJStartCountdown } from '../../components/ui/Countdown'
 import { serverClientPublic } from '../../lib/orpc/serverClient'
 
 const { data: contentHidden } = await serverClientPublic.overlays.visibility.getHidden(
@@ -16,36 +18,30 @@ const { data: contentHidden } = await serverClientPublic.overlays.visibility.get
 const HIDE_CONTENT = contentHidden ?? true
 
 const user = Astro.locals.user
-
-const isLoggedIn = user !== null
 ---
 
-<BaseLayout
+<PageShell width="wide"
   title="Jingle Jam Community OBS Overlays"
   description="Configure your Overlay V2 links and copy ready-to-use URLs for OBS browser sources."
   canonical="https://jinglejam.ostof.dev/overlays"
 >
-  {HIDE_CONTENT ? (
-    <div class="flex w-full flex-col items-center gap-2 rounded-xl border border-white/10 bg-white/5 p-6 text-center text-white">
-      <h1 class="text-2xl font-bold">JJ Community OBS Overlays</h1>
-      <p class="text-white/60">Overlays are currently unavailable. They will be back when the Jingle Jam starts!</p>
-    </div>
-  ) : (
-    <>
-      <div
-        class="mx-auto flex w-fit flex-col items-center p-1 text-center text-base text-white md:w-[50%] md:text-2xl"
-      >
-        <p class="p-1 text-2xl font-bold md:p-2 md:text-4xl">
-          JJ Community OBS Overlays
+  <div class="flex w-full flex-col gap-3">
+    <PageHeader
+      title="JJ Community OBS Overlays"
+      subtitle={HIDE_CONTENT
+        ? 'Overlays are currently unavailable. They will be back when the Jingle Jam starts!'
+        : 'Overlays for OBS browser sources: set one up below, copy its link and add it as a browser source. Feedback is appreciated!'}
+    />
+    {HIDE_CONTENT ? (
+      <Tile class="flex flex-col items-center gap-4 text-center">
+        <p class="max-w-2xl text-sm sm:text-base">
+          The overlays show the Jingle Jam charities, community fundraisers, donation matches and your
+          stream schedule in OBS browser sources.
         </p>
-        <p>
-          These overlays are designed for OBS browser sources. Configure your
-          overlay below and copy the generated link.
-        </p>
-        <p class="text-xl font-bold">Feedback is appreciated!</p>
-      </div>
-      {isLoggedIn && <OverlayConfiguration client:only="solid-js" user={user} />}
-      {!isLoggedIn && <PublicOverlayConfiguration client:only="solid-js" user={user} />}
-    </>
-  )}
-</BaseLayout>
+        <JJStartCountdown client:only="solid-js" />
+      </Tile>
+    ) : (
+      <OverlayConfiguration client:only="solid-js" user={user} level={2} />
+    )}
+  </div>
+</PageShell>

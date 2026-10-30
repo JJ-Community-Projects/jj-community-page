@@ -37,7 +37,8 @@ const useCreatorFilterHook = () => {
     } else {
       url.searchParams.delete('filterType')
     }
-    window.history.pushState({}, '', url.toString())
+    // replaceState: the URL follows the filter, but Back leaves the page instead of undoing clicks (D9)
+    window.history.replaceState(window.history.state, '', url.toString())
   })
 
   const addFilter = (id: string) => {
@@ -98,24 +99,18 @@ const useCreatorFilterHook = () => {
     return encodeURI(url)
   }
 
+  /** Copies the filtered link; resolves to whether it worked (the buttons then show "Copied"). */
   const copyFilterUrl = async () => {
     const url = makeLink()
     try {
-      let copyValue = ''
-      if (url) {
-        copyValue = url
-      }
-      await navigator.clipboard.writeText(copyValue)
+      await navigator.clipboard.writeText(url)
       log('filter_copy', {
         filter_url: url,
       })
+      return true
     } catch (e: any) {
       console.error(e.toString())
-    }
-    try {
-      window.alert(`Copied ${url} to your clipboard`)
-    } catch (e: any) {
-      console.error(e.toString())
+      return false
     }
   }
   return {

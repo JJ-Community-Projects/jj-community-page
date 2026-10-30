@@ -1,9 +1,15 @@
-import { type Component, createSignal, Show } from 'solid-js'
+import { type Component, createSignal, createUniqueId, Show } from 'solid-js'
 import { orpcPrivate } from '../../../lib/orpc/client'
 import { useMutation, useQueryClient } from '@tanstack/solid-query'
+import { Button } from '../../ui/Button'
+import { Field, fieldClass } from '../../ui/Form'
+import { Alert } from '../../ui/Status'
+import { TileGroup } from '../../ui/Tile'
+import { cn } from '../../ui/cn'
 
 export const AdminScheduleImportPanel: Component = () => {
   const qc = useQueryClient()
+  const id = createUniqueId()
   const [text, setText] = createSignal('')
   const [message, setMessage] = createSignal<string | null>(null)
   const [error, setError] = createSignal<string | null>(null)
@@ -40,32 +46,37 @@ export const AdminScheduleImportPanel: Component = () => {
   }
 
   return (
-    <div class="mt-4 p-4 border border-gray-200 rounded">
-      <h3 class="text-lg font-semibold mb-2">Import Schedule</h3>
-      <p class="text-sm text-gray-600 mb-3">Paste a JSON export produced by the Export button and click Import.</p>
-      <textarea
-        class="w-full min-h-[160px] p-2 border rounded font-mono text-sm"
-        placeholder="Paste schedule JSON here"
-        value={text()}
-        onInput={(e) => setText(e.currentTarget.value)}
-        disabled={importSchedule.isPending}
-      ></textarea>
-      <div class="mt-3 flex items-center gap-2">
-        <button
-          type="button"
-          class="px-3 py-1.5 rounded bg-green-600 text-white hover:bg-green-700 text-xs disabled:opacity-50"
-          onClick={handleImport}
+    <TileGroup pad="md" class="flex flex-col gap-3">
+      <h3 class="font-semibold">Import Schedule</h3>
+      <Field
+        label="Schedule JSON"
+        for={id}
+        description="Paste a JSON export produced by the Export button and click Import."
+      >
+        <textarea
+          id={id}
+          class={cn(fieldClass.input, 'min-h-40 py-2 font-mono')}
+          placeholder="Paste schedule JSON here"
+          value={text()}
+          onInput={(e) => setText(e.currentTarget.value)}
           disabled={importSchedule.isPending}
-        >
-          {importSchedule.isPending ? 'Importing…' : 'Import'}
-        </button>
-        <Show when={message()}>
-          <span class="text-xs text-green-700">{message()}</span>
-        </Show>
-        <Show when={error()}>
-          <span class="text-xs text-red-600">{error()}</span>
-        </Show>
-      </div>
-    </div>
+        ></textarea>
+      </Field>
+      <Button
+        size="sm"
+        variant="primary"
+        class="self-start"
+        onClick={handleImport}
+        disabled={importSchedule.isPending}
+      >
+        {importSchedule.isPending ? 'Importing…' : 'Import'}
+      </Button>
+      <Show when={message()}>
+        <Alert tone="success">{message()}</Alert>
+      </Show>
+      <Show when={error()}>
+        <Alert tone="danger">{error()}</Alert>
+      </Show>
+    </TileGroup>
   )
 }

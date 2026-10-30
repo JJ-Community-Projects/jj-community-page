@@ -23,7 +23,8 @@ const limitParam = Astro.url.searchParams.get('limit')
 const user = userParam ?? undefined
 const timezone = timezoneParam ?? undefined
 const theme = themeParam === 'red' || themeParam === 'blue' || themeParam === 'default' ? themeParam : 'default'
-const style = styleParam === 'stripe' || styleParam === 'filled' ? styleParam : 'filled'
+// Links from before 2026 say `stripe` here and `striped` on team-schedule; both pages accept both
+const style = styleParam === 'stripe' || styleParam === 'striped' ? 'striped' : 'filled'
 const limitRaw = Number(limitParam)
 const limit = Number.isFinite(limitRaw) ? Math.min(100, Math.max(1, Math.floor(limitRaw))) : undefined
 

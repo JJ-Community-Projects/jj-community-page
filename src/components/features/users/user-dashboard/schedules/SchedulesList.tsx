@@ -1,19 +1,29 @@
 import { type Component, createSignal, For, Show } from 'solid-js'
-import { QueryClientProvider, useMutation, useQueryClient, } from '@tanstack/solid-query'
+import {
+  QueryClientProvider,
+  useMutation,
+  useQueryClient,
+} from '@tanstack/solid-query'
 import { orpcPrivate } from '../../../../../lib/orpc/client.ts'
 import type { User } from '../../../../../lib/auth/User.ts'
-import { Dialog } from '@kobalte/core/dialog'
 import { createModalSignal } from '../../../../../lib/createModalSignal.ts'
 import { CreateScheduleDialog } from './CreateScheduleDialog.tsx'
 import { ScheduleHeader } from './ScheduleHeader.tsx'
 import {
+  FaRegularCalendar,
   FaRegularEye,
   FaRegularEyeSlash,
   FaRegularPenToSquare,
   FaRegularStar,
   FaSolidStar,
+  FaSolidArrowUpRightFromSquare,
   FaSolidTrash,
 } from 'solid-icons/fa'
+import { Tile } from '../../../../ui/Tile'
+import { Button, IconButton } from '../../../../ui/Button'
+import { Dialog } from '../../../../ui/Dialog'
+import { Chip } from '../../../../ui/Labels'
+import { Alert, EmptyState, Spinner } from '../../../../ui/Status'
 import { QueryClient } from '@tanstack/query-core'
 import { useSchedule } from '../teams/useSchedule.ts'
 
@@ -35,7 +45,7 @@ const SchedulesListContent: Component<{ user: User }> = (props) => {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = createSignal(false)
 
   return (
-    <div class="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-8">
+    <div class="flex flex-col gap-3">
       <ScheduleHeader
         schedules={schedulesQuery.data ?? []}
         onAddSchedule={() => setIsCreateDialogOpen(true)}
@@ -44,52 +54,35 @@ const SchedulesListContent: Component<{ user: User }> = (props) => {
       <Show
         when={schedulesQuery.data && schedulesQuery.data.length > 0}
         fallback={
-          <div class="rounded-xl border-2 border-accent-100 bg-white p-8 text-center shadow-md">
-            <Show when={schedulesQuery.isLoading}>
-              <div class="flex flex-col items-center gap-4">
-                <div class="h-8 w-8 animate-spin rounded-full border-2 border-accent border-t-transparent"></div>
-                <p class="font-medium text-gray-600">
-                  Loading your schedules...
-                </p>
-              </div>
-            </Show>
-            <Show when={!schedulesQuery.isLoading}>
-              <div class="flex flex-col items-center gap-6">
-                <div class="flex h-16 w-16 items-center justify-center rounded-full bg-accent-100">
-                  <svg
-                    class="h-8 w-8 text-accent-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+          <Tile>
+            <Show
+              when={!schedulesQuery.isLoading}
+              fallback={
+                <div class="flex justify-center py-6">
+                  <Spinner label="Loading your schedules..." class="text-fg-muted" />
+                </div>
+              }
+            >
+              <EmptyState
+                level={3}
+                icon={<FaRegularCalendar />}
+                title="No Schedules found"
+                action={
+                  <Button
+                    variant="accent"
+                    onClick={() => setIsCreateDialogOpen(true)}
                   >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                    />
-                  </svg>
-                </div>
-                <div class="space-y-2">
-                  <h3 class="font-bold text-gray-800 ~text-lg/xl">
-                    No Schedules found
-                  </h3>
-                  <p class="mx-auto max-w-md leading-relaxed text-gray-600">
-                    Create your first schedule.
-                  </p>
-                </div>
-                <button
-                  onClick={() => setIsCreateDialogOpen(true)}
-                  class="transform rounded-lg bg-accent px-6 py-3 font-medium text-white shadow-sm transition-all duration-200 hover:bg-accent-600 hover:shadow-md focus:ring-2 focus:ring-accent focus:ring-offset-2 active:scale-95"
-                >
-                  Create Your First Schedule
-                </button>
-              </div>
+                    Create Your First Schedule
+                  </Button>
+                }
+              >
+                Create your first schedule.
+              </EmptyState>
             </Show>
-          </div>
+          </Tile>
         }
       >
-        <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div class="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
           <For each={schedulesQuery.data}>
             {(schedule) => <SchedulesListItem schedule={schedule} />}
           </For>
@@ -121,59 +114,50 @@ const SchedulesListItem: Component<{
   }
 }> = (props) => {
   return (
-    <div class="group rounded-xl border-2 border-primary-200 bg-white p-6 shadow-md transition-all duration-300">
-      {/* Status badges */}
-      <div class="mb-3 flex items-center gap-2">
+    <Tile class="flex flex-col gap-2">
+      <div class="flex flex-wrap items-center gap-1.5">
         <Show when={props.schedule.primary}>
-          <span class="rounded-full bg-accent-100 px-2 py-1 text-xs font-medium text-accent-700">
+          <Chip tone="accent" size="sm">
             Primary {props.schedule.year}
-          </span>
+          </Chip>
         </Show>
-        <span
-          class={`rounded-full px-2 py-1 text-xs font-medium ${
-            props.schedule.visible
-              ? 'bg-success-100 text-success-700'
-              : 'bg-neutral-200 text-neutral-700'
-          }`}
-        >
+        <Chip tone={props.schedule.visible ? 'primary' : 'neutral'} size="sm">
           {props.schedule.visible ? 'Public' : 'Private'}
-        </span>
+        </Chip>
       </div>
 
-      {/* Schedule title */}
-      <h3 class="mb-3 font-bold text-gray-800 transition-colors ~text-lg/xl group-hover:text-primary-600">
-        {props.schedule.title}
-      </h3>
+      {/* The browser tests find the card as the parent of this heading */}
+      <h3 class="text-lg font-semibold text-balance">{props.schedule.title}</h3>
 
-      {/* Schedule details */}
-      <div class="mb-4 space-y-1">
-        <p class="text-sm text-gray-600">
-          <span class="font-medium">Year:</span> {props.schedule.year}
-        </p>
+      <div class="text-sm">
+        <p class="text-fg-muted">Year {props.schedule.year}</p>
         <a
           href={`/schedules/${props.schedule.slug}`}
-          class="block text-sm font-medium text-primary transition-colors hover:text-primary-600 hover:underline"
+          class="text-accent-700 inline-flex items-center gap-1 font-semibold hover:underline"
           target="_blank"
           rel="noopener noreferrer"
         >
-          /schedules/{props.schedule.slug} ↗
+          /schedules/{props.schedule.slug}
+          <FaSolidArrowUpRightFromSquare class="size-3" aria-hidden="true" />
         </a>
       </div>
 
-      {/* Action buttons */}
-      <div class="mt-4 flex flex-row items-center justify-center gap-2">
-        <a
+      <div class="mt-1 flex flex-wrap items-center gap-1.5">
+        <Button
+          size="sm"
+          variant="accent"
           href={`/dashboard/schedules/${props.schedule.id}/edit`}
-          class="transform rounded-lg bg-accent p-2 text-white shadow-sm transition-all duration-200 hover:bg-accent-600 hover:shadow-md focus:ring-2 focus:ring-accent focus:ring-offset-2 active:scale-95"
+          aria-label="Edit Schedule"
           title="Edit Schedule"
         >
-          <FaRegularPenToSquare class="h-4 w-4" />
-        </a>
+          <FaRegularPenToSquare class="size-3.5" aria-hidden="true" />
+          Edit
+        </Button>
         <SchedulePrimaryButton schedule={props.schedule} />
         <ScheduleVisibilityButton schedule={props.schedule} />
         <ScheduleDeleteButton schedule={props.schedule} />
       </div>
-    </div>
+    </Tile>
   )
 }
 
@@ -210,6 +194,9 @@ const SchedulePrimaryButton: Component<{
     }),
   )
 
+  const label = () =>
+    props.schedule.primary ? 'Remove Primary Schedule' : 'Set as Primary'
+
   const handleSetPrimary = async () => {
     try {
       if (props.schedule.primary) {
@@ -227,20 +214,20 @@ const SchedulePrimaryButton: Component<{
   }
 
   return (
-    <button
+    <IconButton
+      size="sm"
+      variant="accent"
       onClick={() => handleSetPrimary()}
       disabled={setPrimaryMutation.isPending || removePrimaryMutation.isPending}
-      class="transform rounded-lg bg-accent p-2 font-medium text-white shadow-sm transition-all duration-200 hover:bg-accent-600 hover:shadow-md focus:ring-2 focus:ring-accent focus:ring-offset-2 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
-      title={
-        props.schedule.primary ? 'Remove Primary Schedule' : 'Set as Primary'
-      }
+      aria-label={label()}
+      title={label()}
     >
       {props.schedule.primary ? (
-        <FaSolidStar class="h-4 w-4" />
+        <FaSolidStar class="size-3.5" aria-hidden="true" />
       ) : (
-        <FaRegularStar class="h-4 w-4" />
+        <FaRegularStar class="size-3.5" aria-hidden="true" />
       )}
-    </button>
+    </IconButton>
   )
 }
 
@@ -267,6 +254,8 @@ const ScheduleVisibilityButton: Component<{
     }),
   )
 
+  const label = () => (props.schedule.visible ? 'Make Private' : 'Make Public')
+
   const handleToggleVisibility = async () => {
     try {
       await toggleVisibilityMutation.mutateAsync({
@@ -278,18 +267,20 @@ const ScheduleVisibilityButton: Component<{
   }
 
   return (
-    <button
+    <IconButton
+      size="sm"
+      variant="primary"
       onClick={() => handleToggleVisibility()}
       disabled={toggleVisibilityMutation.isPending}
-      class="transform rounded-lg bg-primary p-2 font-medium text-white shadow-sm transition-all duration-200 hover:bg-primary-600 hover:shadow-md focus:ring-2 focus:ring-primary focus:ring-offset-2 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
-      title={props.schedule.visible ? 'Make Private' : 'Make Public'}
+      aria-label={label()}
+      title={label()}
     >
       {props.schedule.visible ? (
-        <FaRegularEye class="h-4 w-4" />
+        <FaRegularEye class="size-3.5" aria-hidden="true" />
       ) : (
-        <FaRegularEyeSlash class="h-4 w-4" />
+        <FaRegularEyeSlash class="size-3.5" aria-hidden="true" />
       )}
-    </button>
+    </IconButton>
   )
 }
 
@@ -329,56 +320,54 @@ const ScheduleDeleteButton: Component<{
 
   return (
     <>
-      <button
+      <IconButton
+        size="sm"
+        variant="danger"
         onClick={modal.open}
         disabled={deleteScheduleMutation.isPending}
-        class="transform rounded-lg bg-danger p-2 font-medium text-white shadow-sm transition-all duration-200 hover:bg-danger-600 hover:shadow-md focus:ring-2 focus:ring-danger focus:ring-offset-2 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+        aria-label="Delete Schedule"
         title="Delete Schedule"
       >
-        <FaSolidTrash class="h-4 w-4" />
-      </button>
+        <FaSolidTrash class="size-3.5" aria-hidden="true" />
+      </IconButton>
 
-      <Dialog open={modal.isOpen()} onOpenChange={modal.setOpen}>
-        <Dialog.Portal>
-          <Dialog.Overlay class="fixed inset-0 z-40 bg-black/50" />
-          <div class="fixed inset-0 z-50 flex items-center justify-center">
-            <Dialog.Content class="w-full max-w-md rounded-xl bg-white p-6 shadow-xl">
-              <Dialog.Title class="mb-4 text-xl font-bold">
-                Delete Schedule
-              </Dialog.Title>
-              <Dialog.Description class="mb-4 text-gray-600">
-                Are you sure you want to delete "{props.schedule.title}"? This
-                action cannot be undone.
-              </Dialog.Description>
-
-              <Show when={deleteScheduleMutation.error}>
-                <div class="mb-4 text-red-500">
-                  {deleteScheduleMutation.error?.message ||
-                    'Failed to delete schedule'}
-                </div>
-              </Show>
-
-              <div class="mt-4 flex justify-end gap-2">
-                <button
-                  type="button"
-                  class="rounded-md border border-gray-300 px-4 py-2 hover:bg-gray-50"
-                  onClick={modal.close}
-                  disabled={deleteScheduleMutation.isPending}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  class="rounded-md bg-red-500 px-4 py-2 text-white hover:bg-red-600"
-                  onClick={handleDelete}
-                  disabled={deleteScheduleMutation.isPending}
-                >
-                  {deleteScheduleMutation.isPending ? 'Deleting...' : 'Delete'}
-                </button>
-              </div>
-            </Dialog.Content>
-          </div>
-        </Dialog.Portal>
+      <Dialog
+        open={modal.isOpen()}
+        onOpenChange={modal.setOpen}
+        title="Delete Schedule"
+        size="sm"
+        footer={
+          <>
+            <Button
+              size="sm"
+              onClick={modal.close}
+              disabled={deleteScheduleMutation.isPending}
+            >
+              Cancel
+            </Button>
+            <Button
+              size="sm"
+              variant="danger"
+              onClick={handleDelete}
+              disabled={deleteScheduleMutation.isPending}
+            >
+              {deleteScheduleMutation.isPending ? 'Deleting...' : 'Delete'}
+            </Button>
+          </>
+        }
+      >
+        <div class="flex flex-col gap-3 text-sm">
+          <p>
+            Are you sure you want to delete "{props.schedule.title}"? This
+            action cannot be undone.
+          </p>
+          <Show when={deleteScheduleMutation.error}>
+            <Alert tone="danger">
+              {deleteScheduleMutation.error?.message ||
+                'Failed to delete schedule'}
+            </Alert>
+          </Show>
+        </div>
       </Dialog>
     </>
   )

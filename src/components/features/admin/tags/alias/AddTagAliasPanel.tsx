@@ -1,14 +1,19 @@
-import {type Component, Show} from "solid-js";
+import {type Component, createUniqueId, Show} from "solid-js";
 import {useMutation, useQueryClient} from "@tanstack/solid-query";
 import {orpcPrivate} from "../../../../../lib/orpc/client.ts";
 import {createStore} from "solid-js/store";
-import {TextField} from "@kobalte/core/text-field";
+import {Button} from "../../../../ui/Button";
+import {Field, fieldClass} from "../../../../ui/Form";
+import {Alert} from "../../../../ui/Status";
+import {TileGroup} from "../../../../ui/Tile";
+import {cn} from "../../../../ui/cn";
 
 interface AddTagAliasPanelProps {
   tagId: number
 }
 
 export const AddTagAliasPanel: Component<AddTagAliasPanelProps> = (props) => {
+  const id = createUniqueId()
   const client = useQueryClient()
   const createTagAlias = useMutation(() =>
     orpcPrivate.adminTags.addTagAlias.mutationOptions({
@@ -45,49 +50,41 @@ export const AddTagAliasPanel: Component<AddTagAliasPanelProps> = (props) => {
   }
 
   return (
-    <div class="bg-gray-50 rounded-lg border border-gray-200 p-4 mb-4">
-      <h4 class="text-md font-medium text-gray-900 mb-3">Add New Alias</h4>
+    <TileGroup pad="md" class="flex flex-col gap-3">
+      <h5 class="text-sm font-semibold">Add New Alias</h5>
 
-      <form onSubmit={handleSubmit} class="space-y-4">
-        <div class="flex gap-4 items-end">
-          {/* Alias */}
-          <div class="flex-1">
-            <TextField
-              name="alias"
-              value={tagAlias.alias}
-              onChange={(value) => setTagAlias('alias', value)}
+      <form onSubmit={handleSubmit} class="flex flex-col gap-3">
+        <div class="flex items-end gap-3">
+          <Field label="Alias Name" for={id} class="min-w-0 flex-1">
+            <input
+              id={id}
               required
-            >
-              <TextField.Label class="block text-sm font-medium text-gray-700 mb-1">
-                Alias Name
-              </TextField.Label>
-              <TextField.Input
-                placeholder="e.g., alternative name or abbreviation"
-                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-              />
-            </TextField>
-          </div>
+              placeholder="e.g., alternative name or abbreviation"
+              class={cn(fieldClass.input, 'h-10')}
+              value={tagAlias.alias}
+              onInput={(e) => setTagAlias('alias', e.currentTarget.value)}
+            />
+          </Field>
 
-          {/* Submit */}
-          <div>
-            <button
-              type="submit"
-              disabled={createTagAlias.isPending || !tagAlias.alias.trim()}
-              class="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <Show when={createTagAlias.isPending} fallback="Add Alias">
-                Adding...
-              </Show>
-            </button>
-          </div>
+          <Button
+            type="submit"
+            size="sm"
+            variant="primary"
+            class="mb-1"
+            disabled={createTagAlias.isPending || !tagAlias.alias.trim()}
+          >
+            <Show when={createTagAlias.isPending} fallback="Add Alias">
+              Adding...
+            </Show>
+          </Button>
         </div>
 
         <Show when={createTagAlias.error}>
-          <div class="text-red-600 text-sm">
+          <Alert tone="danger">
             Error: {createTagAlias.error?.message || 'Failed to create alias'}
-          </div>
+          </Alert>
         </Show>
       </form>
-    </div>
+    </TileGroup>
   );
 }

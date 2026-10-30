@@ -1,5 +1,5 @@
 ---
-import BaseLayout from "../../../../layouts/BaseLayout.astro";
+import PageShell from '../../../../layouts/PageShell.astro'
 import {
   ScheduleAdminComponent
 } from '../../../../components/features/users/user-dashboard/schedules/editor_v2/ScheduleAdminComponent'
@@ -26,8 +26,6 @@ const { data: tagCatalog } = await serverClientPublic.tags.catalog(
 );
 ---
 
-<BaseLayout>
-  <div class="container mx-auto px-4 py-8">
-      <ScheduleAdminComponent client:only="solid-js" scheduleId={parseInt(id)} tagCatalog={tagCatalog?.tags}/>
-  </div>
-</BaseLayout>
+<PageShell width="wide">
+  <ScheduleAdminComponent client:only="solid-js" scheduleId={parseInt(id)} tagCatalog={tagCatalog?.tags}/>
+</PageShell>

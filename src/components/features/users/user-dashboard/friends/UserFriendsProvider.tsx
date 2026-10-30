@@ -1,10 +1,4 @@
-import {
-  createContext,
-  createEffect,
-  on,
-  type ParentComponent,
-  useContext,
-} from 'solid-js'
+import { createContext, type ParentComponent, useContext } from 'solid-js'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/solid-query'
 import { orpcPrivate } from '../../../../../lib/orpc/client.ts'
 import { feedRenewal } from '../../../../../lib/orpc/tokenRenewal.ts'
@@ -35,23 +29,6 @@ const useUserFriendsHook = () => {
       context: feedRenewal(queryClient, friendsWS.getSendUserFriendRequestsWS),
       staleTime: 30 * 1000, // 30 seconds
     }),
-  )
-
-  createEffect(
-    on(
-      () => sentFriendRequestsQuery.data,
-      (data) => {
-        console.log('sentFriendRequestsQuery.data', data)
-      },
-    ),
-  )
-  createEffect(
-    on(
-      () => sentFriendRequestsQuery.error,
-      (data) => {
-        console.error('sentFriendRequestsQuery.error', data)
-      },
-    ),
   )
 
   // Real-time friends list using WS

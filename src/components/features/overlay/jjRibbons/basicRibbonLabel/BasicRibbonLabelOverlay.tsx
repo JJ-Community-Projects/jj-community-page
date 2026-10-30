@@ -11,9 +11,9 @@ export interface BasicRibbonLabelOverlayProps {
 }
 
 const mainRibbonColor = (style?: RibbonStyle) => {
-  if (style === 'blue') return '#3584BF'
-  if (style === 'black') return '#313131'
-  return '#E30E50'
+  if (style === 'blue') return 'var(--color-accent)'
+  if (style === 'black') return 'var(--color-ink)'
+  return 'var(--color-primary)'
 }
 
 // Provide three clip-path variants matching other JJ ribbon visuals

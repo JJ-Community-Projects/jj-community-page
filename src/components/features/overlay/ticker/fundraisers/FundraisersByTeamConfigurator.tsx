@@ -1,21 +1,28 @@
-import { type Component, createMemo, createSignal, For, Show } from 'solid-js'
+import { type Component, createMemo, createSignal, Show } from 'solid-js'
+import { useQuery } from '@tanstack/solid-query'
 import {
   buildUrl,
-  FieldRow,
-  LinkPreview,
+  ConfiguratorBody,
+  type Currency,
+  CurrencySelect,
+  NO_CHOICE,
   PreviewDataField,
   type PreviewDataMode,
-  PreviewFrame,
+  titleCase,
 } from '../../overview/Common.tsx'
+import { OVERLAY_FORMATS } from '../../overview/formats.ts'
 import { orpcPrivate } from '../../../../../lib/orpc/client.ts'
-import { QueryClient } from '@tanstack/query-core'
-import { QueryClientProvider, useQuery } from '@tanstack/solid-query'
+import { Checkbox } from '../../../../ui/Form'
+import { Select } from '../../../../ui/Select'
+import { Alert, Spinner } from '../../../../ui/Status'
 
-const Body: Component<{ visible?: boolean }> = (p) => {
-  const [theme, setTheme] = createSignal<'default' | 'red' | 'blue'>('default')
+type Theme = 'default' | 'red' | 'blue'
+
+export const FundraisersByTeamConfigurator: Component = () => {
+  const [theme, setTheme] = createSignal<Theme>('default')
   const [showRaised, setShowRaised] = createSignal<boolean>(true)
   const [teamSlug, setTeamSlug] = createSignal<string>('')
-  const [currency, setCurrency] = createSignal<'GBP' | 'USD' | 'EUR'>('GBP')
+  const [currency, setCurrency] = createSignal<Currency>('GBP')
   const [previewData, setPreviewData] = createSignal<PreviewDataMode>('test')
 
   const qTeams = useQuery(() =>
@@ -25,7 +32,9 @@ const Body: Component<{ visible?: boolean }> = (p) => {
     }),
   )
 
-  const noTeams = () => (qTeams.data?.length ?? 0) === 0
+  const teams = () => qTeams.data ?? []
+  const teamName = (slug: string) =>
+    teams().find((t) => t.slug === slug)?.name ?? 'All teams'
 
   const url = createMemo(() =>
     buildUrl('/overlays/team-fundraiser', {
@@ -49,76 +58,44 @@ const Body: Component<{ visible?: boolean }> = (p) => {
   )
 
   return (
-    <div class="flex flex-col gap-2 rounded bg-black/30 p-3">
-      <div class="mb-2 rounded border border-white/10 bg-white/5 p-2 text-sm text-white/80">
-        A horizontal scrolling ticker showing fundraisers filtered by team.
-        Choose a theme and currency. Set your OBS Browser Source to 1920x80 px.
-      </div>
+    <ConfiguratorBody
+      description="A horizontal scrolling ticker of the fundraisers in one of your teams."
+      format={OVERLAY_FORMATS['team-fundraiser']}
+      previewUrl={previewUrl()}
+      linkUrl={url()}
+    >
       <PreviewDataField value={previewData()} onChange={setPreviewData} />
-      <Show when={!qTeams.isLoading && noTeams()}>
-        <div class="mb-2 rounded border border-yellow-400/40 bg-yellow-500/10 p-2 text-sm text-yellow-300">
-          You are not part of any team yet. Create or join a team to filter by
-          team.
-        </div>
-      </Show>
-      <FieldRow label="Team">
-        <Show when={!qTeams.isLoading} fallback={<span>Loading…</span>}>
-          <select
-            class="w-60 rounded bg-black/40 px-2 py-1"
-            value={teamSlug()}
-            onChange={(e) => setTeamSlug(e.currentTarget.value)}
-            title={
-              noTeams() ? 'Join or create a team to select it here' : undefined
-            }
-          >
-            <option value="">All teams</option>
-            <For each={qTeams.data ?? []}>
-              {(t) => <option value={t.slug}>{t.name}</option>}
-            </For>
-          </select>
+      <Show when={!qTeams.isLoading} fallback={<Spinner label="Loading your teams…" />}>
+        <Show when={teams().length === 0}>
+          <Alert tone="warning" role="status" class="sm:col-span-2">
+            You are not part of any team yet. Create or join a team to filter
+            by team.
+          </Alert>
         </Show>
-      </FieldRow>
-      <FieldRow label="Theme">
-        <select
-          value={theme()}
-          onChange={(e) => setTheme(e.currentTarget.value as any)}
-          class="w-40 rounded bg-black/40 px-2 py-1"
-        >
-          <option value="default">Default</option>
-          <option value="red">Red</option>
-          <option value="blue">Blue</option>
-        </select>
-      </FieldRow>
-      <FieldRow label="Currency">
-        <select
-          value={currency()}
-          onChange={(e) => setCurrency(e.currentTarget.value as 'GBP' | 'USD' | 'EUR')}
-          class="w-40 rounded bg-black/40 px-2 py-1"
-        >
-          <option value="GBP">GBP</option>
-          <option value="USD">USD</option>
-          <option value="EUR">EUR</option>
-        </select>
-      </FieldRow>
-      <FieldRow label="Show Raised">
-        <input
-          type="checkbox"
-          checked={showRaised()}
-          onChange={(e) => setShowRaised(e.currentTarget.checked)}
+        <Select
+          label="Team"
+          showLabel
+          options={[NO_CHOICE, ...teams().map((t) => t.slug)]}
+          value={teamSlug() || NO_CHOICE}
+          onChange={(v) => setTeamSlug(v === NO_CHOICE ? '' : v)}
+          format={teamName}
         />
-      </FieldRow>
-      <LinkPreview url={url()} />
-      <PreviewFrame url={previewUrl()} visible={p.visible} />
-    </div>
-  )
-}
-
-export const FundraisersByTeamConfigurator: Component<{ visible?: boolean }> = (
-  p,
-) => {
-  return (
-    <QueryClientProvider client={new QueryClient()}>
-      <Body visible={p.visible} />
-    </QueryClientProvider>
+      </Show>
+      <Select
+        label="Theme"
+        showLabel
+        options={['default', 'red', 'blue'] as Theme[]}
+        value={theme()}
+        onChange={setTheme}
+        format={titleCase}
+      />
+      <CurrencySelect value={currency()} onChange={setCurrency} />
+      <Checkbox
+        label="Show raised amounts"
+        checked={showRaised()}
+        onChange={setShowRaised}
+        class="self-end"
+      />
+    </ConfiguratorBody>
   )
 }

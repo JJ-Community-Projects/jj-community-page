@@ -2,15 +2,16 @@
 export const prerender = true
 import { getYogsScheduleFromContent } from '../../../content/getYogsScheduleFromContent.ts'
 import { type CollectionEntry, getCollection } from 'astro:content'
-import BaseLayout from '../../../layouts/BaseLayout.astro'
+import PageShell from '../../../layouts/PageShell.astro'
 import { YogsResponsiveSchedule } from '../../../components/yogs-pages/schedule/YogsResponsiveSchedule.tsx'
-import YogsJsonLd from '../../../components/yogs-pages/common/YogsJsonLd.astro'
+import { PageHeader } from '../../../components/ui/PageHeader'
 import { compactYogsSchedule } from '../../../lib/utils/compactYogsSchedule.ts'
 import {
   getBreadcrumbList,
   getJingleJamEventSeries,
 } from '../../../content/getJingleJamEventSeries.ts'
 import { canonicalUrl } from '../../../lib/utils/canonical.ts'
+import YogsArchiveNav from '../../../components/yogs-pages/common/YogsArchiveNav.astro'
 
 export async function getStaticPaths() {
   const schedules = await getCollection('schedules')
@@ -44,124 +45,32 @@ const jsonLd = [
     { name: `${year}`, url: canonical },
   ]),
 ]
+
+// The year switcher: every year with an archive page, newest first
+const archiveYears = (await getCollection('schedules'))
+  .filter((entry) => entry.data.visible && /^\d{4}$/.test(entry.id))
+  .map((entry) => Number(entry.id))
+  .sort((a, b) => b - a)
 ---
 
-<style is:global>
-  :root {
-    --jj-schedule-available-height: max(85vh, 400px);
-    --jj-schedule-available-width: min(max(85vw, 600px), 1600px);
-    --jj-schedule-w-size: calc(
-      var(--jj-schedule-available-width) / (7 * 3 + 1)
-    );
-    --jj-schedule-h-size: calc(
-      var(--jj-schedule-available-height) / (5 * 3 + 2)
-    );
-    --jj-schedule-data-size: max(
-      var(--jj-schedule-w-size),
-      var(--jj-schedule-h-size)
-    );
-    --jj-schedule-slot-size: calc(var(--jj-schedule-data-size) * 3);
-  }
-
-  .timezone {
-    width: var(--jj-schedule-data-size);
-    height: var(--jj-schedule-data-size);
-  }
-
-  .timezone-text {
-    font-size: 0.5rem;
-    line-height: 0.75rem;
-  }
-
-  .schedule-container {
-    width: 80vw;
-    min-height: 100%;
-  }
-
-  .schedule-body {
-    width: 100%;
-    height: 100%;
-  }
-
-  .schedule {
-    width: var(--jj-schedule-available-width);
-    height: 100%;
-  }
-
-  .time {
-    width: var(--jj-schedule-data-size);
-    height: var(--jj-schedule-slot-size);
-  }
-
-  .data-height {
-    height: var(--jj-schedule-data-size);
-  }
-
-  .data-width {
-    width: var(--jj-schedule-data-size);
-  }
-
-  .stream-width {
-    width: var(--jj-schedule-slot-size);
-  }
-
-  .stream-height {
-    height: var(--jj-schedule-slot-size);
-  }
-
-  .day {
-    width: 100%;
-    height: var(--jj-schedule-data-size);
-  }
-
-  .day-container {
-    width: var(--jj-schedule-slot-size);
-    height: 100%;
-  }
-
-  .header-title-card-width {
-    width: calc(var(--jj-schedule-slot-size) * 3);
-  }
-
-  @media (max-width: 900px) {
-    .desktop-schedule {
-      display: none;
-    }
-  }
-
-  @media (min-width: 901px) {
-    .mobile-schedule {
-      display: none;
-    }
-  }
-</style>
-
-<BaseLayout
+<PageShell width="full"
   title={`Yogscast Jingle Jam ${year} Schedule & VODs`}
   description={`The full Yogscast Jingle Jam ${year} schedule: every stream with date, time, participants and VOD links, in your timezone - maintained by the community.`}
   canonical={canonical}
+  jsonLd={jsonLd}
 >
-  <YogsJsonLd data={jsonLd} />
-  <div class="mb-4 flex w-full flex-col items-center gap-1 text-center text-white">
-    <h1 class="~text-2xl/4xl">Yogscast Jingle Jam {year} Schedule</h1>
-    <p class="text-white/90">
-      Every stream of the Yogscast Jingle Jam {year} with participants and VODs.
-      <a class="underline" href="/yogs">Current Yogscast Jingle Jam schedule</a>
-    </p>
-  </div>
+  <div class="flex w-full flex-col items-center gap-4">
+    <PageHeader
+      title={`Yogscast Jingle Jam ${year} Schedule`}
+      subtitle={`Every stream of the Yogscast Jingle Jam ${year} with participants and VODs.`}
+      back={{ href: '/yogs', label: 'Current schedule' }}
+    />
+    <YogsArchiveNav years={archiveYears} current={Number(year)} />
 
-  <YogsResponsiveSchedule
-    schedule={compactYogsSchedule(schedule)}
-    showCreators
-    client:load
-  >
-    <p class="text-white text-center mt-4">
-      This Yogscast Jingle Jam schedule is maintained by the community. If you
-      find errors or see that a stream is missing use the contact info below.
-      Streams that appear here are not guaranteed to happen or might be delayed.
-      For more information visit the Jingle Jam Twitter page. This schedule is a
-      fan Project and not associated with the Jingle Jam, the Yogscast or their
-      partners.
-    </p>
-  </YogsResponsiveSchedule>
-</BaseLayout>
+    <YogsResponsiveSchedule
+      schedule={compactYogsSchedule(schedule)}
+      showCreators
+      client:load
+    />
+  </div>
+</PageShell>

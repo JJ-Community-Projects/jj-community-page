@@ -42,19 +42,19 @@ const Body: Component<{ barPosition: 'top' | 'bottom' }> = (props) => {
     theme() === 'blue'
       ? 'bg-accent'
       : theme() === 'black'
-        ? 'bg-gray-500'
+        ? 'bg-neutral-500'
         : 'bg-primary'
 
   const mainRibbonColor = () => {
-    if (theme() === 'blue') return '#3584BF'
-    if (theme() === 'black') return '#313131'
-    return '#E30E50'
+    if (theme() === 'blue') return 'var(--color-accent)'
+    if (theme() === 'black') return 'var(--color-ink)'
+    return 'var(--color-primary)'
   }
 
   const mainRibbonShadeColor = () => {
-    if (theme() === 'blue') return '#09437a'
-    if (theme() === 'black') return '#000000'
-    return '#57051f'
+    if (theme() === 'blue') return 'var(--color-accent-shade)'
+    if (theme() === 'black') return 'black'
+    return 'var(--color-primary-shade)'
   }
 
   const leftRibbonShape =
@@ -62,7 +62,7 @@ const Body: Component<{ barPosition: 'top' | 'bottom' }> = (props) => {
   const rightRibbonShape = 'polygon(0 0, 100% 0, 100% 40px, 0 40px, 15px 20px)'
 
   const ProgressBar: Component = () => (
-    <div class={twMerge(`h-3 w-full overflow-hidden rounded`, barClass())}>
+    <div class={twMerge(`h-3 w-full overflow-hidden rounded-sm`, barClass())}>
       <div
         class={twMerge(
           `h-full ${barFullClass()} transition-all duration-700`,
@@ -90,7 +90,7 @@ const Body: Component<{ barPosition: 'top' | 'bottom' }> = (props) => {
         <div class="relative flex h-[40px] min-w-[20%] items-center justify-center">
           <div
             class={twMerge(
-              'flex h-full w-full items-center justify-center bg-[var(--main-ribbon-color)] font-bold text-white shadow-sm',
+              'flex h-full w-full items-center justify-center bg-(--main-ribbon-color) font-bold text-white shadow-xs',
               primaryBgClass(),
             )}
             style={{ 'clip-path': leftRibbonShape }}
@@ -107,7 +107,7 @@ const Body: Component<{ barPosition: 'top' | 'bottom' }> = (props) => {
           <Show when={showChangeLabel()}>
             <span
               class={twMerge(
-                'pointer-events-none absolute left-full ml-2 top-1/2 -translate-y-1/2 rounded-full bg-green-500 px-2 py-0.5 text-xxs font-bold text-white shadow-sm inline-flex items-center whitespace-nowrap gap-0.5',
+                'pointer-events-none absolute left-full ml-2 top-1/2 -translate-y-1/2 rounded-full bg-green-500 px-2 py-0.5 text-xxs font-bold text-white shadow-xs inline-flex items-center whitespace-nowrap gap-0.5',
               )}
               style="transition: opacity 300ms, transform 300ms; will-change: opacity, transform;"
               classList={{
@@ -129,7 +129,7 @@ const Body: Component<{ barPosition: 'top' | 'bottom' }> = (props) => {
         <div class="flex h-[40px] min-w-[20%] items-center justify-center">
           <div
             class={
-              'flex h-full w-full items-center justify-center bg-white font-bold text-[var(--main-ribbon-color)]'
+              'flex h-full w-full items-center justify-center bg-white font-bold text-(--main-ribbon-color)'
             }
             style={{ 'clip-path': rightRibbonShape }}
           >

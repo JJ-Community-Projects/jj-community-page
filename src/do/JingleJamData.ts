@@ -1,6 +1,6 @@
 import { DurableObject } from 'cloudflare:workers'
 import type { JJCampaign, JJCause } from './types/JJAPIModel.ts'
-import type { JJCauseTVType } from '../lib/orpc/public/twitchExtension/contract.ts'
+import type { StoredTVCause } from './jingleJamData/DisplayBuilder.ts'
 import { CurrencyStore } from './jingleJamData/CurrencyStore.ts'
 import { TiltifyStore } from './jingleJamData/TiltifyStore.ts'
 import { TwitchTracker } from './jingleJamData/TwitchTracker.ts'
@@ -63,8 +63,8 @@ export class JingleJamData extends DurableObject<Env> {
   }
 
   // --- Tiltify: causes ---
-  setCauses(causes: JJCause[]) {
-    return this.tiltify.setCauses(causes)
+  setCauses(causes: JJCause[], year: number) {
+    return this.tiltify.setCauses(causes, year)
   }
   getCause(causeId: string) {
     return this.tiltify.getCause(causeId)
@@ -207,14 +207,14 @@ export class JingleJamData extends DurableObject<Env> {
   buildDisplayData() {
     return this.display.buildDisplayData()
   }
-  setTVCause(cause: JJCauseTVType) {
+  setTVCause(cause: StoredTVCause) {
     return this.display.setTVCause(cause)
   }
   getTVCause(causeId: string) {
     return this.display.getTVCause(causeId)
   }
-  getCausesTV() {
-    return this.display.getCausesTV()
+  getCausesTV(year?: number) {
+    return this.display.getCausesTV(year)
   }
   getCampaignsDisplay() {
     return this.display.getCampaignsDisplay()

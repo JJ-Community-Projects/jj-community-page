@@ -1,6 +1,7 @@
 import {type Component, For, Show} from "solid-js";
 import {useQuery} from "@tanstack/solid-query";
 import {orpcPrivate} from "../../../../../lib/orpc/client.ts";
+import {Alert, EmptyState, Spinner} from "../../../../ui/Status";
 import {AddTagPanel} from "./AddTagPanel.tsx";
 import {TagListItem} from "./TagListItem.tsx";
 
@@ -19,32 +20,26 @@ export const TagSection: Component<TagSectionProps> = (props) => {
   )
 
   return (
-    <div class="space-y-4">
-      {/* Add Tag Panel */}
+    <div class="flex flex-col gap-3">
       <AddTagPanel categoryId={props.categoryId} />
 
-      {/* Loading State */}
       <Show when={tags.isPending}>
-        <div class="text-center py-4">
-          <div class="text-sm text-gray-500">Loading tags...</div>
-        </div>
+        <Spinner label="Loading tags..." class="text-fg-muted" />
       </Show>
 
-      {/* Error State */}
       <Show when={tags.error}>
-        <div class="text-red-600 text-sm bg-red-50 border border-red-200 rounded-md p-3">
+        <Alert tone="danger">
           Error loading tags: {tags.error?.message || 'Unknown error'}
-        </div>
+        </Alert>
       </Show>
 
-      {/* Tags List */}
       <Show when={tags.isSuccess}>
         <Show when={tags.data && tags.data.length > 0} fallback={
-          <div class="text-center py-8 text-gray-500 text-sm">
-            No tags found in this category. Create your first tag above.
-          </div>
+          <EmptyState title="No tags found in this category.">
+            Create your first tag above.
+          </EmptyState>
         }>
-          <div class="space-y-3">
+          <div class="flex flex-col gap-2">
             <For each={tags.data}>
               {(tag) => (
                 <TagListItem tag={tag} />

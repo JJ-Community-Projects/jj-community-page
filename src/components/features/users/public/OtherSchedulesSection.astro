@@ -1,49 +1,30 @@
 ---
-import {type ScheduleInfo} from "../../../../lib/orpc/public/schemas/schedules";
-import { FaSolidCalendarDays } from 'solid-icons/fa'
+import { type ScheduleInfo } from '../../../../lib/orpc/public/schemas/schedules'
+import { FaSolidCalendarDays, FaSolidChevronRight } from 'solid-icons/fa'
+import { Section } from '../../../ui/Tile'
+import { Chip } from '../../../ui/Labels'
 
 interface Props {
-  schedules: ScheduleInfo[];
-  userColors?: {
-    primaryColor: string | null;
-    accentColor: string | null;
-  };
+  schedules: ScheduleInfo[]
 }
 
-const { schedules, userColors } = Astro.props;
-
-// Get user colors with fallbacks to design system colors (optional for backward compatibility)
-const primaryColor = userColors?.primaryColor || '#E30E50';
-const accentColor = userColors?.accentColor || '#3584BF';
+const { schedules } = Astro.props
 ---
 
-<div class="group w-full bg-white rounded-xl shadow-md border-2 group-hover:border-accent-200 hover:shadow-lg transition-all duration-300 mb-6 p-4 md:p-6 lg:p-8">
-    <div class="flex items-center gap-2 text-lg font-semibold mb-4">
-      <FaSolidCalendarDays class="w-5 h-5 group-hover:text-accent transition-all duration-300" />
-      <h2 class="text-xl font-bold text-black font-babas group-hover:text-accent transition-all duration-300">Schedules</h2>
-    </div>
-  {schedules && schedules.length > 0 ? (
-    <div class="space-y-4">
-      {schedules.map((schedule) => (
-        <div class="border border-gray-200 rounded-md p-4">
-          <div class="flex justify-between items-center">
-          <div class="flex gap-2 items-center">
-            <h3 class="text-lg font-semibold">{schedule.title}</h3>
-            <span class="text-sm bg-primary text-white px-2 py-1 rounded">
-              {schedule.year}
-            </span>
-          </div>
-            <a
-              href={`/schedules/${schedule.slug}`}
-              class="text-accent hover:underline inline-block mt-2"
-            >
-              View Schedule
-            </a>
-          </div>
-        </div>
-      ))}
-    </div>
-  ) : (
-    <p class="text-gray-500">No public schedules available</p>
-  )}
-</div>
+<Section title="Schedules">
+  <FaSolidCalendarDays slot="icon" />
+  <div class="flex flex-col gap-2">
+    {
+      schedules.map((schedule) => (
+        <a
+          href={`/schedules/${schedule.slug}`}
+          class="flex items-center gap-2 rounded-group bg-surface-strong p-2 pl-3 ring-1 ring-line transition-colors hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+        >
+          <h3 class="min-w-0 flex-1 truncate text-sm font-semibold">{schedule.title}</h3>
+          <Chip size="sm" tone="primary">{schedule.year}</Chip>
+          <FaSolidChevronRight class="size-3 shrink-0 text-fg-muted" aria-hidden="true" />
+        </a>
+      ))
+    }
+  </div>
+</Section>

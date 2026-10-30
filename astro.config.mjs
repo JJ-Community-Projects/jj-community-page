@@ -5,6 +5,7 @@ import solidJs from '@astrojs/solid-js'
 import cloudflare from '@astrojs/cloudflare'
 
 import sitemap from '@astrojs/sitemap'
+import tailwindcss from '@tailwindcss/vite'
 
 import { execFileSync } from 'node:child_process'
 import { existsSync } from 'node:fs'
@@ -140,7 +141,7 @@ export default defineConfig({
     driver: sessionDrivers.null(),
   },
   vite: {
-    plugins: [excludeSolidDepsFromSsrOptimizer()],
+    plugins: [tailwindcss(), excludeSolidDepsFromSsrOptimizer()],
     optimizeDeps: {
       include: ['debug', 'extend'],
     },

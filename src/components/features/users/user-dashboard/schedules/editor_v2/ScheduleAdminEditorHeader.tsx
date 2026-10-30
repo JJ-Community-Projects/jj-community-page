@@ -1,13 +1,13 @@
-import { type Component, createEffect, createSignal, on, Show } from 'solid-js'
+import { type Component, createEffect, createSignal, on, onCleanup, Show } from 'solid-js'
 import { useScheduleEditor2 } from './ScheduleEditorProvider.tsx'
 import { createModalSignal } from '../../../../../../lib/createModalSignal.ts'
-import { ConfirmationDialog } from '../../../../../common/dialogs/ConfirmationDialog.tsx'
-import './successAnimation.css'
-import { Transition } from 'solid-transition-group'
-import { twMerge } from 'tailwind-merge'
-import { FaSolidChevronLeft } from 'solid-icons/fa'
+import { ConfirmDialog } from '../../../../../ui/Dialog'
+import { PageHeader } from '../../../../../ui/PageHeader'
+import { Button } from '../../../../../ui/Button'
+import { Chip } from '../../../../../ui/Labels'
+import { Alert } from '../../../../../ui/Status'
+import { FaRegularEye, FaRegularEyeSlash } from 'solid-icons/fa'
 import { DateTime } from 'luxon'
-import { UserDashboardFeedback } from '../../UserDashboardFeedback.tsx'
 
 export const ScheduleAdminEditorHeader: Component = () => {
   const {
@@ -39,7 +39,7 @@ export const ScheduleAdminEditorHeader: Component = () => {
   const lastUpdateStr = () => {
     const date = lastUpdate()
     if (!date) {
-      return 'no date'
+      return undefined
     }
     return DateTime.fromJSDate(date).toLocaleString({
       year: 'numeric',
@@ -54,11 +54,16 @@ export const ScheduleAdminEditorHeader: Component = () => {
   const showSaveDialog = createModalSignal()
   const showDeleteDialog = createModalSignal()
   const [saveSuccess, setSaveSuccess] = createSignal(false)
+  let successTimer: ReturnType<typeof setTimeout> | undefined
+  onCleanup(() => clearTimeout(successTimer))
 
   const handleSaveSchedule = async () => {
     try {
       await publishDraft()
       showSaveDialog.close()
+      setSaveSuccess(true)
+      clearTimeout(successTimer)
+      successTimer = setTimeout(() => setSaveSuccess(false), 4000)
     } catch (error) {
       console.error('Error in handleSaveSchedule:', error)
     }
@@ -86,144 +91,98 @@ export const ScheduleAdminEditorHeader: Component = () => {
 
   return (
     <>
-      <div class="mb-6 rounded-2xl bg-white p-6 shadow-xl transition-transform">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-4">
-            <a
-              href={`/dashboard/schedules`}
-              class="flex flex-row items-center gap-1 text-primary hover:underline"
-            >
-              <FaSolidChevronLeft />
-              <p>Back to Dahboard</p>
-            </a>
-            <h1 class="text-2xl font-bold">Schedule Editor</h1>
-          </div>
-          <div class="flex gap-2">
-            <button
-              onClick={showDeleteDialog.open}
-              class="rounded-lg bg-red-500 px-4 py-2 text-white transition-all hover:bg-red-600"
-            >
-              Delete Schedule
-            </button>
-            <button
-              onClick={showSaveDialog.open}
-              class="rounded-lg bg-accent px-4 py-2 text-white transition-all hover:bg-accent-600"
-            >
-              Publish Schedule
-            </button>
-          </div>
-        </div>
+      <div class="flex flex-col gap-3">
+        <PageHeader
+          title={state.schedule?.title || 'Schedule Editor'}
+          back={{ href: '/dashboard/schedules', label: 'Back to Schedules' }}
+          align="start"
+          subtitle={
+            <span class="text-on-canvas-muted flex flex-wrap items-center gap-x-2 gap-y-1 text-sm">
+              <Show when={state.schedule}>
+                {(schedule) => (
+                  <Chip
+                    tone="canvas"
+                    icon={
+                      schedule().visible ? (
+                        <FaRegularEye class="size-3" aria-hidden="true" />
+                      ) : (
+                        <FaRegularEyeSlash class="size-3" aria-hidden="true" />
+                      )
+                    }
+                  >
+                    {schedule().visible ? 'Schedule Visible' : 'Schedule Hidden'}
+                  </Chip>
+                )}
+              </Show>
+              <Show when={lastUpdateStr()}>
+                {(date) => <span>Last saved {date()}</span>}
+              </Show>
+            </span>
+          }
+          actions={
+            <>
+              <Button
+                variant="canvas"
+                class="text-danger-700"
+                onClick={showDeleteDialog.open}
+              >
+                Delete Schedule
+              </Button>
+              <Button variant="accent" onClick={showSaveDialog.open}>
+                Publish Schedule
+              </Button>
+            </>
+          }
+        />
 
-        {/* Added informational text */}
-        <div class="mt-4 rounded-lg bg-blue-50 p-3 text-sm text-blue-700">
-          <p>
-            The schedule is continuously saved automatically. To make your
-            changes visible to everyone, press the{' '}
-            <strong>Publish Schedule</strong> button.
-            <br />
-            <span>{lastUpdateStr()}</span>
-          </p>
-        </div>
-
-        {/* Label showing if the schedule is visible or not */}
-        <div class="mt-2 flex items-center">
-          <div
-            class={twMerge(
-              state.schedule?.visible && 'bg-green-100 text-green-800',
-              !state.schedule?.visible && 'bg-red-100 text-red-800',
-              'rounded-full px-2 py-1 text-xs',
-            )}
-          >
-            {state.schedule?.visible ? 'Schedule Visible' : 'Schedule Hidden'}
-          </div>
-        </div>
+        <Alert>
+          The schedule is continuously saved automatically. To make your changes
+          visible to everyone, press <strong>Publish Schedule</strong>.
+        </Alert>
 
         <Show when={noAccess()}>
-          <div class="mt-2 rounded-lg bg-red-50 p-2 text-sm text-red-700">
-            <p>
-              You no longer have access to edit this schedule. Live updates
-              have stopped and changes can't be saved.
-            </p>
-          </div>
+          <Alert tone="danger">
+            You no longer have access to edit this schedule. Live updates have
+            stopped and changes can't be saved.
+          </Alert>
         </Show>
 
         {/* Action status feedback */}
         <Show when={publishDraftMutation.isPending}>
-          <div class="mt-2 rounded-lg bg-yellow-50 p-2 text-sm text-yellow-700">
-            <p>Saving schedule...</p>
-          </div>
+          <Alert>Publishing schedule…</Alert>
         </Show>
         <Show when={publishDraftMutation.isError}>
-          <div class="mt-2 rounded-lg bg-red-50 p-2 text-sm text-red-700">
-            <p>Error: {publishDraftMutation.error?.message}</p>
-          </div>
+          <Alert tone="danger">Error: {publishDraftMutation.error?.message}</Alert>
         </Show>
         <Show when={deleteMutation.isPending}>
-          <div class="mt-2 rounded-lg bg-yellow-50 p-2 text-sm text-yellow-700">
-            <p>Deleting schedule...</p>
-          </div>
+          <Alert>Deleting schedule…</Alert>
         </Show>
         <Show when={deleteMutation.isError}>
-          <div class="mt-2 rounded-lg bg-red-50 p-2 text-sm text-red-700">
-            <p>Error: {deleteMutation.error?.message}</p>
-          </div>
+          <Alert tone="danger">Error: {deleteMutation.error?.message}</Alert>
         </Show>
-        <Transition
-          onEnter={(el) => {
-            // starting state
-            // @ts-ignore
-            el.style.height = '0px'
-            // @ts-ignore
-            el.style.opacity = '0'
-            // measure
-            const full = el.scrollHeight
-            requestAnimationFrame(() => {
-              // @ts-ignore
-              el.style.transition = 'height 0.3s ease, opacity 0.3s ease'
-              // @ts-ignore
-              el.style.height = `${full}px`
-              // @ts-ignore
-              el.style.opacity = '1'
-            })
-          }}
-          onExit={(el) => {
-            // from current to zero
-            // @ts-ignore
-            el.style.height = `${el.clientHeight}px`
-            requestAnimationFrame(() => {
-              // @ts-ignore
-              el.style.transition = 'height 0.3s ease, opacity 0.3s ease'
-              // @ts-ignore
-              el.style.height = '0px'
-              // @ts-ignore
-              el.style.opacity = '0'
-            })
-          }}
-        >
-          <Show when={saveSuccess()}>
-            <div class="success-message mt-2 rounded-lg bg-green-50 p-2 text-sm text-green-700">
-              <div class="success-background"></div>
-              <p class="success-text">Schedule saved successfully!</p>
-            </div>
-          </Show>
-        </Transition>
-        <UserDashboardFeedback/>
+        <Show when={saveSuccess()}>
+          <Alert tone="success">Schedule published.</Alert>
+        </Show>
       </div>
 
-      <ConfirmationDialog
-        isOpen={showSaveDialog.isOpen()}
+      <ConfirmDialog
+        open={showSaveDialog.isOpen()}
         onOpenChange={showSaveDialog.setOpen}
         title="Save Schedule"
         text="Are you sure you want to save this schedule? All changes will be publicly visible if the schedule is set to visible."
+        tone="primary"
+        pending={publishDraftMutation.isPending}
         onConfirm={handleSaveSchedule}
         onCancel={showSaveDialog.close}
       />
 
-      <ConfirmationDialog
-        isOpen={showDeleteDialog.isOpen()}
+      <ConfirmDialog
+        open={showDeleteDialog.isOpen()}
         onOpenChange={showDeleteDialog.setOpen}
         title="Delete Schedule"
         text="Are you sure you want to delete this schedule? This action cannot be undone."
+        confirmLabel="Delete"
+        pending={deleteMutation.isPending}
         onConfirm={handleDeleteSchedule}
         onCancel={showDeleteDialog.close}
       />

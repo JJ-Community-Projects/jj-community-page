@@ -1,14 +1,27 @@
 import { type Component, createMemo, createSignal } from 'solid-js'
-import { buildUrl, FieldRow, LinkPreview, PreviewDataField, type PreviewDataMode, PreviewFrame, } from '../../overview/Common.tsx'
+import {
+  buildUrl,
+  ConfiguratorBody,
+  type Currency,
+  CurrencySelect,
+  PreviewDataField,
+  type PreviewDataMode,
+} from '../../overview/Common.tsx'
+import { OVERLAY_FORMATS } from '../../overview/formats.ts'
 import { useUser } from '../../../users/user-dashboard/providers/UserProvider.tsx'
+import { Select } from '../../../../ui/Select'
 
 type OrderBy = 'recent' | 'top' | 'alphabetical'
 
-export const FundraisersTickerConfigurator: Component<{
-  visible?: boolean
-}> = (p) => {
+const orderLabels: Record<OrderBy, string> = {
+  recent: 'Most recent',
+  top: 'Top raised',
+  alphabetical: 'A to Z',
+}
+
+export const FundraisersTickerConfigurator: Component = () => {
   const [orderBy, setOrderBy] = createSignal<OrderBy>('recent')
-  const [currency, setCurrency] = createSignal<'GBP' | 'USD' | 'EUR'>('GBP')
+  const [currency, setCurrency] = createSignal<Currency>('GBP')
   const [previewData, setPreviewData] = createSignal<PreviewDataMode>('test')
 
   const { user } = useUser()
@@ -33,35 +46,22 @@ export const FundraisersTickerConfigurator: Component<{
   )
 
   return (
-    <div class="flex flex-col gap-2 rounded bg-black/30 p-3">
-      <div class="mb-2 rounded border border-white/10 bg-white/5 p-2 text-sm text-white/80">
-        A horizontal scrolling ticker of community fundraisers. Sort by recent, top, or alphabetical and pick a currency. Set your OBS Browser Source to 1920x80 px.
-      </div>
+    <ConfiguratorBody
+      description="A horizontal scrolling ticker of the community fundraisers."
+      format={OVERLAY_FORMATS.fundraisers}
+      previewUrl={previewUrl()}
+      linkUrl={fundraisersUrl()}
+    >
       <PreviewDataField value={previewData()} onChange={setPreviewData} />
-      <FieldRow label="Order By">
-        <select
-          class="rounded bg-black/40 px-2 py-1"
-          value={orderBy()}
-          onChange={(e) => setOrderBy(e.currentTarget.value as OrderBy)}
-        >
-          <option value="recent">recent</option>
-          <option value="top">top</option>
-          <option value="alphabetical">alphabetical</option>
-        </select>
-      </FieldRow>
-      <FieldRow label="Currency">
-        <select
-          value={currency()}
-          onChange={(e) => setCurrency(e.currentTarget.value as 'GBP' | 'USD' | 'EUR')}
-          class="w-40 rounded bg-black/40 px-2 py-1"
-        >
-          <option value="GBP">GBP</option>
-          <option value="USD">USD</option>
-          <option value="EUR">EUR</option>
-        </select>
-      </FieldRow>
-      <LinkPreview url={fundraisersUrl()} />
-      <PreviewFrame url={previewUrl()} visible={p.visible} />
-    </div>
+      <Select
+        label="Order"
+        showLabel
+        options={['recent', 'top', 'alphabetical'] as OrderBy[]}
+        value={orderBy()}
+        onChange={setOrderBy}
+        format={(v) => orderLabels[v]}
+      />
+      <CurrencySelect value={currency()} onChange={setCurrency} />
+    </ConfiguratorBody>
   )
 }

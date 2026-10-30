@@ -1,9 +1,9 @@
 ---
-import BaseLayout from "../../layouts/BaseLayout.astro";
+import PageShell from '../../layouts/PageShell.astro'
 import {loadAllCreatorsFromContent} from "../../content/loadCreatorsFromContent";
 import {type FullCreator} from "../../lib/model/ContentTypes";
 import {StatsPageRoot} from "../../components/yogs-pages/stats/StatsPage";
-import YogsJsonLd from "../../components/yogs-pages/common/YogsJsonLd.astro";
+import { PageHeader } from '../../components/ui/PageHeader'
 import {getBreadcrumbList} from "../../content/getJingleJamEventSeries";
 const creators = await loadAllCreatorsFromContent();
 const creatorMap: { [key: string]: FullCreator } = {}
@@ -26,18 +26,20 @@ const jsonLd = [
   ]),
 ]
 ---
-<BaseLayout
-        title="Yogscast Jingle Jam Statistics: Streams, Creators & Donations"
-        description={`Statistics for every Yogscast Jingle Jam${yearRange && ` from ${yearRange}`}: donations per stream and per hour, and how often each creator appeared - maintained by the community.`}
+<PageShell
+  width="wide"
+  title="Yogscast Jingle Jam Statistics: Streams, Creators & Donations"
+  description={`Statistics for every Yogscast Jingle Jam${yearRange && ` from ${yearRange}`}: donations per stream and per hour, and how often each creator appeared - maintained by the community.`}
+  jsonLd={jsonLd}
 >
-    <YogsJsonLd data={jsonLd}/>
-    <h1 class="~text-2xl/4xl w-full text-center text-white">Yogscast Jingle Jam Statistics</h1>
-    <p class="mb-2 max-w-3xl text-center text-white/90">
-        Stream and donation statistics for the Yogscast Jingle Jam{yearRange && ` from ${yearRange}`}: what each
-        stream and each hour raised, and how often and how long each creator appeared. Pick a year to see
-        its charts.
-    </p>
+  <div class="flex flex-col gap-3">
+    <PageHeader
+      title="Yogscast Jingle Jam Statistics"
+      subtitle={`Stream and donation statistics for the Yogscast Jingle Jam${yearRange && ` from ${yearRange}`}: what each stream and each hour raised, and how often and how long each creator appeared. Pick a year to see its charts.`}
+      back={{ href: '/yogs', label: 'Yogscast schedule' }}
+    />
     <StatsPageRoot client:only="solid-js" creatorMap={creatorMap}>
-        <div slot="fallback" class="text-white text-center">Loading</div>
+      <div slot="fallback" class="text-on-canvas-muted text-center text-sm">Loading…</div>
     </StatsPageRoot>
-</BaseLayout>
+  </div>
+</PageShell>

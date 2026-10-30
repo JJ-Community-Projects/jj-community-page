@@ -1,5 +1,5 @@
 ---
-import BaseLayout from "../../../layouts/BaseLayout.astro";
+import PageShell from '../../../layouts/PageShell.astro'
 import {TeamsList} from "../../../components/features/users/user-dashboard/teams/TeamsList";
 
 const {session, user} = Astro.locals
@@ -9,6 +9,6 @@ if (session === null) {
 
 ---
 
-<BaseLayout>
+<PageShell>
   <TeamsList user={user} client:only="solid-js" />
-</BaseLayout>
+</PageShell>

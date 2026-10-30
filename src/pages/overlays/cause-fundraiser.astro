@@ -1,5 +1,5 @@
 ---
-import BaseLayout from '../../layouts/BaseLayout.astro'
+import '../../styles/global.css'
 import { FundraisersByCauseOverlay } from '../../components/features/overlay/ticker/fundraisers/FundraisersByCauseOverlay.tsx'
 import { serverClientPublic } from '../../lib/orpc/serverClient'
 
@@ -16,7 +16,6 @@ const HIDE_CONTENT = contentHidden ?? true
 
 const causeParam = Astro.url.searchParams.get('cause')
 const themeParam = Astro.url.searchParams.get('theme')
-const speedParam = Astro.url.searchParams.get('speed')
 const showRaisedParam = Astro.url.searchParams.get('showraised')
 const currencyParam = Astro.url.searchParams.get('currency')
 const userParam = Astro.url.searchParams.get('user')
@@ -24,7 +23,6 @@ const demoParam = Astro.url.searchParams.get('demo')
 
 const causeId = causeParam ? (causeParam) : undefined
 const theme = (themeParam as any) ?? undefined
-const speed = speedParam ? Number(speedParam) : undefined
 const showRaised = showRaisedParam === '1' || showRaisedParam === 'true' || showRaisedParam === null ? true : false
 const currency = (() => { const v = (currencyParam ?? 'GBP').toUpperCase(); return v === 'USD' ? 'USD' : v === 'EUR' ? 'EUR' : 'GBP' })()
 const user = userParam ?? undefined
@@ -35,6 +33,6 @@ const demo = demoParam === 'true' || demoParam === '1'
   {HIDE_CONTENT ? (
     <p class="bg-black/70 p-4 text-center text-sm text-white/60">Overlay currently unavailable</p>
   ) : (
-    <FundraisersByCauseOverlay client:only="solid-js" causeId={causeId} theme={theme} speed={speed} showRaised={showRaised} currency={currency} user={user} demo={demo} />
+    <FundraisersByCauseOverlay client:only="solid-js" causeId={causeId} theme={theme} showRaised={showRaised} currency={currency} user={user} demo={demo} />
   )}
 </div>

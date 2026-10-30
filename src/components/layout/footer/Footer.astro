@@ -1,50 +1,111 @@
 ---
-import About from "./About.astro";
-import Feedback from "./Feedback.astro";
-import Disclaimer from "./Disclaimer.astro";
+import FeedbackButtons from './FeedbackButtons.astro'
 import { getCollection } from 'astro:content'
-
-const date = import.meta.env.VITE_BUILD_DATE
+import {
+  BskyIcon,
+  DiscordIcon,
+  GithubIcon,
+  InstagramIcon,
+  TiktokIcon,
+  TwitchIcon,
+  TwitterIcon,
+  YoutubeIcon,
+} from '../../common/icons/JJIcons'
 
 // Years with a visible Yogscast schedule, newest first (same rule as the /yogs hub)
 const archiveYears = (await getCollection('schedules'))
   .filter((schedule) => schedule.data.visible && /^\d{4}$/.test(schedule.id))
   .map((schedule) => Number(schedule.id))
   .sort((a, b) => b - a)
+
+const jjLinks = [
+  { href: 'https://twitch.tv/team/jinglejam', label: 'Jingle Jam Stream Team', Icon: TwitchIcon },
+  { href: 'https://www.youtube.com/@JingleJam', label: 'Jingle Jam Youtube', Icon: YoutubeIcon },
+  { href: 'https://discord.gg/dsCsJJcvAx', label: 'Jingle Jam Discord', Icon: DiscordIcon },
+  { href: 'https://bsky.app/profile/jinglejam.co.uk', label: 'Jingle Jam BlueSky', Icon: BskyIcon },
+  { href: 'https://x.com/jinglejam', label: 'Jingle Jam Twitter', Icon: TwitterIcon },
+  { href: 'http://instagram.com/jinglejamofficial', label: 'Jingle Jam Instagram', Icon: InstagramIcon },
+  { href: 'http://tiktok.com/@jinglejamofficial', label: 'Jingle Jam Tiktok', Icon: TiktokIcon },
+]
+
+const focus =
+  'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white'
 ---
 
-<div class={'my-2 flex flex-col items-center justify-center'}>
-    <div class={'grid grid-cols-1 gap-8 px-4 text-white md:grid-cols-3 md:px-6 md:py-8'}>
-        <About/>
-        <Feedback/>
-        <Disclaimer/>
+<footer class="mt-10 border-t border-white/15 text-sm text-on-canvas-muted">
+  <div class="mx-auto grid w-full max-w-6xl gap-6 px-4 py-6 md:grid-cols-3">
+    <section class="flex flex-col gap-1">
+      <h2 class="font-semibold text-on-canvas">About</h2>
+      <p>
+        jinglejam.ostof.dev is a site maintained by the community. You can see past Yogscast Jingle
+        Jam Streams including links to the VODs. For more information about the Jingle Jam visit{' '}
+        <a class="font-semibold text-on-canvas underline" href="https://jinglejam.co.uk"
+          >jinglejam.co.uk</a
+        >.
+      </p>
+      <div class="-ml-2 flex flex-row flex-wrap text-on-canvas">
+        {
+          jjLinks.map(({ href, label, Icon }) => (
+            <a
+              class={`rounded-full p-2 transition-colors hover:bg-white/10 ${focus}`}
+              href={href}
+              target="_blank"
+              aria-label={label}
+            >
+              <Icon class="size-5" />
+            </a>
+          ))
+        }
+      </div>
+    </section>
+    <section class="flex flex-col gap-1">
+      <h2 class="font-semibold text-on-canvas">Send Feedback</h2>
+      <p>Feedback is always appreciated.</p>
+      <div class="-ml-2">
+        <FeedbackButtons />
+      </div>
+    </section>
+    <section class="flex flex-col gap-1">
+      <h2 class="font-semibold text-on-canvas">Disclaimer</h2>
+      <p>
+        jinglejam.ostof.dev is a community project and <strong class="text-on-canvas"
+          >not associated or endorsed</strong
+        > by the Jingle Jam, the Yogscast or their partners.
+      </p>
+    </section>
+  </div>
+  <nav
+    aria-label="Footer"
+    class="mx-auto flex w-full max-w-6xl flex-col items-center gap-2 px-4 pb-6 text-center text-xs"
+  >
+    <div class="flex flex-row flex-wrap items-center justify-center gap-x-4 gap-y-1">
+      <a class="hover:text-on-canvas hover:underline" href="/about">About</a>
+      <a class="hover:text-on-canvas hover:underline" href="/faq">FAQ</a>
+      <a class="hover:text-on-canvas hover:underline" href="/stream-resources">Stream Resources</a>
+      <a class="hover:text-on-canvas hover:underline" href="/twitch-extension">Twitch Extension</a>
+      <a class="hover:text-on-canvas hover:underline" href="/is-the-collection-live"
+        >Is the Collection Live?</a
+      >
     </div>
-    <nav aria-label="Footer" class="flex flex-col items-center gap-2 px-4 pb-4 text-center text-sm text-white">
+    {
+      archiveYears.length > 0 && (
         <div class="flex flex-row flex-wrap items-center justify-center gap-x-4 gap-y-1">
-            <a class="hover:underline" href="/about">About</a>
-            <a class="hover:underline" href="/faq">FAQ</a>
-            <a class="hover:underline" href="/stream-resources">Stream Resources</a>
-            <a class="hover:underline" href="/twitch-extension">Twitch Extension</a>
-            <a class="hover:underline" href="/is-the-collection-live">Is the Collection Live?</a>
+          <span>Yogscast schedule archive:</span>
+          {archiveYears.map((year) => (
+            <a class="hover:text-on-canvas hover:underline" href={`/yogs/archive/${year}`}>
+              Jingle Jam {year}
+            </a>
+          ))}
         </div>
-        {archiveYears.length > 0 && (
-            <div class="flex flex-row flex-wrap items-center justify-center gap-x-4 gap-y-1">
-                <span>Yogscast schedule archive:</span>
-                {archiveYears.map((year) => (
-                    <a class="hover:underline" href={`/yogs/archive/${year}`}>Jingle Jam {year}</a>
-                ))}
-            </div>
-        )}
-    </nav>
-    <a class="text-white text-sm text-center flex flex-row items-center justify-center gap-1"
-       href={'https://github.com/orgs/JJ-Community-Projects/repositories'}
-       target={'_blank'}
-    >Contribute on Github
-        <svg fill="currentColor" stroke-width="0" xmlns="http://www.w3.org/2000/svg"
-             viewBox="0 0 496 512" height="1em"
-             width="1em" style="overflow: visible; color: currentcolor;">
-            <path
-                    d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"></path>
-        </svg>
+      )
+    }
+    <a
+      class="flex flex-row items-center gap-1 hover:text-on-canvas hover:underline"
+      href="https://github.com/orgs/JJ-Community-Projects/repositories"
+      target="_blank"
+    >
+      Contribute on GitHub
+      <GithubIcon class="size-3.5" />
     </a>
-</div>
+  </nav>
+</footer>

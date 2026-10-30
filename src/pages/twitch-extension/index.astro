@@ -1,74 +1,78 @@
 ---
-import BaseLayout from "../../layouts/BaseLayout.astro";
-import FeedbackButtons from "../../components/layout/footer/FeedbackButtons.astro";
-import screenshot from '../../images/extension/JJCE_Banner.png';
-import ext_stats from '../../images/extension/ext_stats.png';
-import overlay1 from '../../images/extension/JJ_Overlay_1_Small.png';
-import overlay2 from '../../images/extension/JJ_Overlay_2_Small.png';
-import overlay5 from '../../images/extension/JJ_Overlay_5.png';
-import {Image} from "astro:assets";
+import { FaSolidTableColumns, FaSolidTv } from 'solid-icons/fa'
+import PageShell from '../../layouts/PageShell.astro'
+import FeedbackButtons from '../../components/layout/footer/FeedbackButtons.astro'
+import { PageHeader } from '../../components/ui/PageHeader'
+import { Section, Tile } from '../../components/ui/Tile'
+import { Button } from '../../components/ui/Button'
+import {
+  Carousel,
+  OVERLAY_EXTENSION_URL,
+  PANEL_EXTENSION_URL,
+  overlayImages,
+  panelImages,
+} from '../../components/stream/ExtensionScreenshots'
 ---
 
-<BaseLayout
-        title="Jingle Jam Community Twitch Extensions: Panel & Overlay"
-        description="Twitch panel and video overlay extensions for Jingle Jam streamers: show viewers the charities, community fundraisers and the Yogscast schedule. Not official."
-        canonical="https://jinglejam.ostof.dev/twitch-extension"
+<PageShell
+  title="Jingle Jam Community Twitch Extensions: Panel & Overlay"
+  description="Twitch panel and video overlay extensions for Jingle Jam streamers: show viewers the charities, community fundraisers and the Yogscast schedule. Not official."
+  canonical="https://jinglejam.ostof.dev/twitch-extension"
 >
-    <div class={'mx-auto flex flex-col items-center p-1 text-center text-white md:w-[75%]'}>
-        <h1 class={'p-2 ~text-2xl/4xl font-bold'}>Jingle Jam Community Twitch Extensions</h1>
-        <p>These Extensions are for everyone who participates in the Jingle Jam and stream on Twitch.</p>
-        <p>They allow your viewers to see the charities and other community Fundraisers</p>
-        <p>Feedback regarding the extensions is always welcome.</p>
-        <FeedbackButtons/>
-    </div>
+  <div class="flex flex-col gap-3">
+    <PageHeader
+      title="Jingle Jam Community Twitch Extensions"
+      subtitle="For everyone who takes part in the Jingle Jam and streams on Twitch: your viewers see the charities and the other community fundraisers. Feedback is always welcome."
+    >
+      <FeedbackButtons />
+    </PageHeader>
 
-
-    <div class={'flex flex-col items-center p-2 text-white'}>
-        <p class="~text-xl/2xl">Twitch Panel Extension</p>
-        <a
-                class={'p-1 text-xl md:p-2 underline hover:text-twitch-100'}
-                href={'https://dashboard.twitch.tv/extensions/7m5fitr4o8raxn6fv59lndv2iy0uuz'}
-                target={'_blank'}
+    <Section title="Twitch Panel Extension">
+      <FaSolidTableColumns slot="icon" />
+      <Button slot="action" href={PANEL_EXTENSION_URL} target="_blank" brand="twitch" size="sm">
+        Get it on Twitch
+      </Button>
+      <div class="flex flex-col items-center gap-3 text-sm sm:text-base">
+        <p class="max-w-prose self-start">
+          A panel that sits below your stream. Viewers can click a charity to visit its website, or
+          a community fundraiser to visit their Twitch page. You can change the colour theme and the
+          order of the tabs.
+        </p>
+        <Carousel
+          client:visible
+          images={panelImages}
+          alt="JJ Twitch Panel Extension screenshot"
+        />
+        <a class="self-start font-medium underline" href="/twitch-extension/privacy"
+          >Privacy Policy</a
         >
-            Get the Panel Extension on Twitch
-        </a>
-        <Image class={'md:w-[50%]'} src={screenshot} alt={'Discovery'}/>
-        <p>This is a Panel which sits below your stream.</p>
-        <p>Users can click on each charity to visit their websites or on Community fundraisers to visit their Twitch
-            pages.</p>
-        <p>The extension is customizable. You can change the color theme or the order of the tabs.</p>
+      </div>
+    </Section>
 
-        <a
-                class="underline text-white"
-                href="/twitch-extension/privacy"
-        >Privacy Policy</a>
-    </div>
-    <div class="h-8"/>
-    <div class={'flex flex-col items-center p-2 text-white gap-2'}>
-        <p class="~text-xl/2xl">Twitch Overlay Extension</p>
-        <a
-                class={'p-1 text-xl md:p-2 underline hover:text-twitch-100'}
-                href={'https://dashboard.twitch.tv/extensions/9urrg74yzq8di9hqr5prsto5lbmq3x'}
-                target={'_blank'}
-        >
-            Get the Overlay Extension on Twitch
-        </a>
-        <Image src={overlay5} alt={'Overlay on Stream'} width={600}/>
-        <div class="flex flex-wrap gap-4">
-            <Image src={overlay1} alt={'About JJ'} width={300}/>
-            <Image src={overlay2} alt={'Charities'} width={300}/>
-        </div>
-        <div class="text-center">
-            <p>This is a Over which sits on top of the Twitch Video Player</p>
-            <p>It is only visible when users hover over the Video Player.</p>
-            <p>Users can also deactivate it.</p>
-            <p>It has similar functionality to the Panel Extension</p>
-        </div>
-    </div>
-    <div class="h-8"/>
+    <Section title="Twitch Overlay Extension">
+      <FaSolidTv slot="icon" />
+      <Button slot="action" href={OVERLAY_EXTENSION_URL} target="_blank" brand="twitch" size="sm">
+        Get it on Twitch
+      </Button>
+      <div class="flex flex-col items-center gap-3 text-sm sm:text-base">
+        <p class="max-w-prose self-start">
+          An overlay on top of the Twitch video player. It only shows while viewers hover over the
+          player, and they can turn it off. It has the same charities, fundraisers and schedules as
+          the panel.
+        </p>
+        <Carousel
+          client:visible
+          images={overlayImages}
+          alt="JJ Twitch Overlay Extension screenshot"
+        />
+      </div>
+    </Section>
 
-    <div>
-        <p class="text-center text-white">Thanks to Nairdwood for making the Extension assets. And thanks to No1mann for the access to the Jingle Jam Donation Tracker.</p>
-    </div>
-
-</BaseLayout>
+    <Tile pad="sm">
+      <p class="text-fg-muted text-center text-xs">
+        Thanks to Nairdwood for making the extension assets, and to No1mann for the access to the
+        Jingle Jam Donation Tracker.
+      </p>
+    </Tile>
+  </div>
+</PageShell>

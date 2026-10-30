@@ -2,14 +2,14 @@ import { type Component, createMemo, For, Show } from 'solid-js'
 import { orpcPrivate } from '../../../../../lib/orpc/client.ts'
 import { QueryClientProvider, useQuery } from '@tanstack/solid-query'
 import { QueryClient } from '@tanstack/query-core'
-import { OverlayStreamCardFilled, OverlayStreamCardSidebar, } from '../common/OverlayStreamCard.tsx'
+import { OverlayStreamCard } from '../common/OverlayStreamCard.tsx'
 import { UserScheduleOverlayHeader, UserScheduleOverlayHeaderSidebar, } from './UserScheduleOverlayHeader.tsx'
 
 type Props = {
   user?: string
   timezone?: string
   theme?: 'default' | 'red' | 'blue'
-  style?: 'filled' | 'stripe'
+  style?: 'filled' | 'striped'
   limit?: number
 }
 
@@ -48,9 +48,9 @@ const Body: Component<Props> = (props) => {
         </Show>
         <Show when={q.data}>
           {(data) => (
-            <div class="flex flex-col gap-1">
+            <div class="flex flex-col gap-2">
               <Show
-                when={style() === 'stripe'}
+                when={style() === 'striped'}
                 fallback={
                   <UserScheduleOverlayHeader
                     title={data().schedule.name}
@@ -66,19 +66,9 @@ const Body: Component<Props> = (props) => {
                 />
               </Show>
               <For each={data().blocks}>
-                {(b) =>
-                  style() === 'stripe' ? (
-                    <OverlayStreamCardSidebar
-                      stream={b}
-                      timezone={data().timezone}
-                    />
-                  ) : (
-                    <OverlayStreamCardFilled
-                      stream={b}
-                      timezone={data().timezone}
-                    />
-                  )
-                }
+                {(b) => (
+                  <OverlayStreamCard stream={b} timezone={data().timezone} />
+                )}
               </For>
             </div>
           )}

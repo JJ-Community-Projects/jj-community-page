@@ -19,6 +19,7 @@ import {
   eq,
   gt,
   inArray,
+  isNotNull,
   notInArray,
   sql,
 } from 'drizzle-orm'
@@ -41,6 +42,11 @@ import type { JJDrizzleDatabase } from '../../../db/db.ts'
 import { cached } from '../../middleware/cached.ts'
 import { alias } from 'drizzle-orm/sqlite-core'
 import { getUpcomingStreamsFromSchedule } from '../../../../content/getYogsScheduleFromContent.ts'
+import {
+  buildCommunityList,
+  isDefaultAvatar,
+} from '../../../services/communityList.ts'
+import { twitchChannelSchema } from '../../../db/schema/twitch-channel-schema.ts'
 // New: get campaign by Twitch id
 
 const jjDataCacheMiddleware = cacheMiddleware({
@@ -443,6 +449,23 @@ function reviveUserStream(item: any) {
   return revived
 }
 
+// Revive Dates from ISO strings for the FullCommunitySchedule shape
+function reviveFullSchedule(raw: any) {
+  return {
+    days: Array.isArray(raw.days)
+      ? raw.days.map((d: any) => ({
+          day: new Date(d.day),
+          streams: Array.isArray(d.streams)
+            ? d.streams.map(reviveUserStream)
+            : [],
+        }))
+      : [],
+    streams: Array.isArray(raw.streams)
+      ? raw.streams.map(reviveUserStream)
+      : [],
+  }
+}
+
 function reviveUserDisplay(u: any) {
   if (!u || typeof u !== 'object') return u
   return {
@@ -544,6 +567,56 @@ const getAllUsersWithInfo = os.getAllUsersWithInfoContract
   .use(cached('userDirectory', () => ''))
   .handler(async ({ context }) => getUsers(context.db))
 
+// Community page: top N campaigns ∪ all account holders, merged and sorted (community-list)
+// 2 min edge cache during the event too (jjLive drops to 30 s): one D1 read + 3 DO reads per miss
+const communityList = os.communityListContract
+  .use(cached('jjLive', () => '', { eventTtl: 2 * 60 }))
+  .handler(async ({ context }) => {
+    const DO = context.env.JingleJamData
+    const stub = DO.get(DO.idFromName('JJ_API_CACHE'))
+    const [users, campaigns, liveLogins, causes] = await Promise.all([
+      getUsers(context.db),
+      stub.getCommunityCampaignsDisplayAll(),
+      stub.getLiveLogins(),
+      stub.getCausesDisplay(),
+    ])
+    // Members still on Tiltify's default avatar get their linked Twitch image instead. Usually a
+    // handful, looked up by the user_id index; chunks stay under D1's 100 bound parameters.
+    const defaultAvatarIds = users
+      .filter((u) => isDefaultAvatar(u.profileImage))
+      .map((u) => u.userId)
+    const chunks: number[][] = []
+    for (let i = 0; i < defaultAvatarIds.length; i += 90) {
+      chunks.push(defaultAvatarIds.slice(i, i + 90))
+    }
+    const twitchAvatars = (
+      await Promise.all(
+        chunks.map((ids) =>
+          context.db
+            .select({
+              userId: twitchChannelSchema.userId,
+              profileImageUrl: twitchChannelSchema.profileImageUrl,
+            })
+            .from(twitchChannelSchema)
+            .where(
+              and(
+                inArray(twitchChannelSchema.userId, ids),
+                isNotNull(twitchChannelSchema.profileImageUrl),
+              ),
+            )
+            .all(),
+        ),
+      )
+    ).flat()
+    return buildCommunityList({
+      users,
+      twitchAvatars,
+      campaigns: campaigns?.list ?? [],
+      liveLogins: liveLogins ?? [],
+      causes: causes?.causes ?? [],
+    })
+  })
+
 async function loadOverview(kv: KVNamespace): Promise<Overview | null> {
   const data = await getJSON<any>(kv, 'twitch-extension:overview')
   if (!data) return null
@@ -636,27 +709,18 @@ const fullSchedule = os.fullScheduleContract.handler(async ({ context }) => {
     const cacheKey = `jj:fullSchedule:${year}`
     const cached = await getJSON<any>(context.env.KV, cacheKey)
     if (cached && Array.isArray(cached.days)) {
-      // Revive Dates from ISO strings for UserStream shape
-      const days = cached.days.map((d: any) => ({
-        day: new Date(d.day),
-        streams: Array.isArray(d.streams)
-          ? d.streams.map(reviveUserStream)
-          : [],
-      }))
-      return {
-        days,
-        streams: Array.isArray(cached.streams)
-          ? cached.streams.map(reviveUserStream)
-          : [],
-      }
+      return reviveFullSchedule(cached)
     }
     const DO = context.env.JingleJamData
     const stubID = DO.idFromName('JJ_API_CACHE')
     const stub = DO.get(stubID)
-    const result = await stub.getFullSchedule()
-    if (!result) {
+    const stored = await stub.getFullSchedule()
+    if (!stored) {
       throw new ORPCError('NOT_FOUND')
     }
+    // The stored schedule can predate the current schema (F-92): normalise it
+    // like the KV copy, or output validation fails on every cache miss
+    const result = reviveFullSchedule(stored)
     await putJSON(context.env.KV, cacheKey, result, 300)
     return result
   } catch (e) {
@@ -742,6 +806,7 @@ export const jjRouter = {
   campaignsAll,
   fullSchedule,
   headliner,
+  communityList,
   /*
   causeById,
   campaignLookup,

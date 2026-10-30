@@ -32,7 +32,7 @@ export const DebugJSONView: Component<DebugJSONViewProps> = (props) => {
           </Accordion.Header>
           <Accordion.Content>
             <div class="mt-4 p-4 bg-black/20 rounded-md overflow-auto max-h-96">
-              <pre class="text-white text-sm whitespace-pre-wrap break-words">
+              <pre class="text-white text-sm whitespace-pre-wrap wrap-break-word">
                 {JSON.stringify(props.data, null, 2)}
               </pre>
             </div>

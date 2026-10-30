@@ -1,7 +1,5 @@
-import { type Component, createSignal } from 'solid-js'
-import { Accordion } from '@kobalte/core'
-import { twMerge } from 'tailwind-merge'
-import { FaSolidChevronDown } from 'solid-icons/fa'
+import { type Component, createSignal, For, Show } from 'solid-js'
+import { Dynamic } from 'solid-js/web'
 import { QueryClientProvider } from '@tanstack/solid-query'
 import { QueryClient } from '@tanstack/query-core'
 import { UserScheduleConfigurator } from '../schedule/user/UserScheduleConfigurator.tsx'
@@ -17,323 +15,119 @@ import { TeamScheduleConfigurator } from '../schedule/team/TeamScheduleConfigura
 import { CampaignGoalConfigurator } from '../jjRibbons/campaignGoal/CampaignGoalConfigurator.tsx'
 import { BasicRibbonLabelConfigurator } from '../jjRibbons/basicRibbonLabel/BasicRibbonLabelConfigurator.tsx'
 import { BigCampaignGoalConfigurator } from '../jjRibbons/bigCampaignGoal/BigCampaignGoalConfigurator.tsx'
+import { OVERLAY_FORMATS, type OverlayId } from './formats'
+import { Accordion, AccordionItem } from '../../../ui/Accordion'
+import { Button } from '../../../ui/Button'
+import { Chip, DateDivider } from '../../../ui/Labels'
+import { EmptyState } from '../../../ui/Status'
+import { Tile } from '../../../ui/Tile'
 
-const Body: Component = () => {
+type Overlay = {
+  id: OverlayId
+  title: string
+  group: (typeof GROUPS)[number]
+  /** `login`: listed for everyone, configurable when logged in; `account`: only listed when logged in. */
+  access: 'public' | 'login' | 'account'
+  experimental?: boolean
+  configurator: Component
+}
+
+const GROUPS = ['Panels', 'Tickers', 'Jingle Jam ribbons'] as const
+
+const OVERLAYS: Overlay[] = [
+  { id: 'charities2', title: 'Charities panel', group: 'Panels', access: 'public', configurator: CharitiesConfigurator },
+  { id: 'donation-matches', title: 'Active donation matches', group: 'Panels', access: 'public', configurator: DonationMatchesConfigurator },
+  { id: 'schedule', title: 'Your schedule panel', group: 'Panels', access: 'login', configurator: UserScheduleConfigurator },
+  { id: 'team-schedule', title: 'Team schedule panel', group: 'Panels', access: 'login', configurator: TeamScheduleConfigurator },
+  { id: 'charities', title: 'Charities ticker', group: 'Tickers', access: 'public', configurator: CharitiesTickerConfigurator },
+  { id: 'fundraisers', title: 'All fundraisers ticker', group: 'Tickers', access: 'public', configurator: FundraisersTickerConfigurator },
+  { id: 'team-fundraiser', title: 'Fundraisers by team ticker', group: 'Tickers', access: 'login', configurator: FundraisersByTeamConfigurator },
+  { id: 'cause-fundraiser', title: 'Fundraisers by charity ticker', group: 'Tickers', access: 'public', configurator: FundraisersByCauseConfigurator },
+  { id: 'campaign-goal', title: 'Campaign goal', group: 'Jingle Jam ribbons', access: 'account', experimental: true, configurator: CampaignGoalConfigurator },
+  { id: 'big-campaign-goal', title: 'Big campaign goal', group: 'Jingle Jam ribbons', access: 'account', experimental: true, configurator: BigCampaignGoalConfigurator },
+  { id: 'basic-ribbon-label', title: 'Basic label', group: 'Jingle Jam ribbons', access: 'account', configurator: BasicRibbonLabelConfigurator },
+]
+
+const LoginCallToAction: Component = () => (
+  <Tile>
+    <EmptyState
+      title="Log in to set up this overlay"
+      action={
+        <Button variant="accent" href="/login">
+          Log in
+        </Button>
+      }
+    >
+      It shows your own schedule or teams, so it needs your account.
+    </EmptyState>
+  </Tile>
+)
+
+const Body: Component<{ loggedIn: boolean; level?: 2 | 3 }> = (p) => {
+  // One overlay open at a time: each open configurator runs a live preview
   const [expanded, setExpanded] = createSignal<string[]>([])
-
-  const isOpen = (v: string) => expanded().includes(v)
+  const listed = (group: Overlay['group']) =>
+    OVERLAYS.filter(
+      (o) => o.group === group && (p.loggedIn || o.access !== 'account'),
+    )
 
   return (
-    <Accordion.Root
+    <Accordion
       collapsible
       value={expanded()}
       onChange={setExpanded}
-      class="w-full flex-col text-base text-white accent-accent-500"
+      class="flex w-full flex-col gap-2"
     >
-      {/* Panels Section Header */}
-      <div class="mx-2 mt-4 w-full text-left text-2xl font-semibold text-white/90">
-        Panels
-      </div>
-
-      {/* Charities Panel */}
-      <Accordion.Item
-        value="charities2"
-        class="flex w-full flex-col items-center transition-all"
-      >
-        <Accordion.Header class="w-full">
-          <Accordion.Trigger
-            class={twMerge(
-              'hover:scale-102 hover:brightness-102 border-1 group m-2 flex w-full flex-row items-center rounded border-accent-500 bg-primary-200/50 p-2 text-xl text-white shadow',
-            )}
-          >
-            <p class="flex-1 text-left">Charities Panel</p>
-            <FaSolidChevronDown
-              class={twMerge(
-                'transition-all group-hover:animate-none',
-                isOpen('charities2') && 'rotate-180 animate-none',
+      <For each={GROUPS}>
+        {(group) => (
+          <Show when={listed(group).length > 0}>
+            <DateDivider class="mt-2">{group}</DateDivider>
+            <For each={listed(group)}>
+              {(overlay) => (
+                <AccordionItem
+                  value={overlay.id}
+                  title={overlay.title}
+                  level={p.level}
+                  summary={
+                    <>
+                      <Show when={overlay.experimental}>
+                        <Chip size="sm" tone="primary">
+                          Experimental
+                        </Chip>
+                      </Show>
+                      <Show when={OVERLAY_FORMATS[overlay.id].obs}>
+                        {(obs) => <Chip size="sm">{obs()}</Chip>}
+                      </Show>
+                    </>
+                  }
+                >
+                  <Show
+                    when={p.loggedIn || overlay.access === 'public'}
+                    fallback={<LoginCallToAction />}
+                  >
+                    <Dynamic component={overlay.configurator} />
+                  </Show>
+                </AccordionItem>
               )}
-            />
-          </Accordion.Trigger>
-        </Accordion.Header>
-        <Accordion.Content class="w-full p-2">
-          <CharitiesConfigurator visible={isOpen('charities2')} />
-        </Accordion.Content>
-      </Accordion.Item>
-
-      {/* Active Dono Matches */}
-      <Accordion.Item
-        value="donation-matches"
-        class="flex w-full flex-col items-center transition-all"
-      >
-        <Accordion.Header class="w-full">
-          <Accordion.Trigger
-            class={twMerge(
-              'hover:scale-102 hover:brightness-102 border-1 group m-2 flex w-full flex-row items-center rounded border-accent-500 bg-primary-200/50 p-2 text-xl text-white shadow',
-            )}
-          >
-            <p class="flex-1 text-left">Active Dono Matches</p>
-            <FaSolidChevronDown
-              class={twMerge(
-                'transition-all group-hover:animate-none',
-                isOpen('donation-matches') && 'rotate-180 animate-none',
-              )}
-            />
-          </Accordion.Trigger>
-        </Accordion.Header>
-        <Accordion.Content class="w-full p-2">
-          <DonationMatchesConfigurator visible={isOpen('donation-matches')} />
-        </Accordion.Content>
-      </Accordion.Item>
-
-
-      {/* Schedule (Full) */}
-      <Accordion.Item
-        value="schedule"
-        class="flex w-full flex-col items-center transition-all"
-      >
-        <Accordion.Header class="w-full">
-          <Accordion.Trigger
-            class={twMerge(
-              'hover:scale-102 hover:brightness-102 border-1 group m-2 flex w-full flex-row items-center rounded border-accent-500 bg-primary-200/50 p-2 text-xl text-white shadow',
-            )}
-          >
-            <p class="flex-1 text-left">Primary User Schedule Panel</p>
-            <FaSolidChevronDown
-              class={twMerge(
-                'transition-all group-hover:animate-none',
-                isOpen('schedule') && 'rotate-180 animate-none',
-              )}
-            />
-          </Accordion.Trigger>
-        </Accordion.Header>
-        <Accordion.Content class="w-full p-2">
-          <UserScheduleConfigurator visible={isOpen('schedule')} />
-        </Accordion.Content>
-      </Accordion.Item>
-
-      {/* Team Schedule (Full) */}
-      <Accordion.Item
-        value="team-schedule"
-        class="flex w-full flex-col items-center transition-all"
-      >
-        <Accordion.Header class="w-full">
-          <Accordion.Trigger
-            class={twMerge(
-              'hover:scale-102 hover:brightness-102 border-1 group m-2 flex w-full flex-row items-center rounded border-accent-500 bg-primary-200/50 p-2 text-xl text-white shadow',
-            )}
-          >
-            <p class="flex-1 text-left">Team Schedule Panel</p>
-            <FaSolidChevronDown
-              class={twMerge(
-                'transition-all group-hover:animate-none',
-                isOpen('team-schedule') && 'rotate-180 animate-none',
-              )}
-            />
-          </Accordion.Trigger>
-        </Accordion.Header>
-        <Accordion.Content class="w-full p-2">
-          <TeamScheduleConfigurator visible={isOpen('team-schedule')} />
-        </Accordion.Content>
-      </Accordion.Item>
-
-      {/* Tickers Section Header */}
-      <div class="mx-2 mt-6 w-full text-left text-2xl font-semibold text-white/90">
-        Tickers
-      </div>
-
-      {/* Charities Ticker */}
-      <Accordion.Item
-        value="charities"
-        class="flex w-full flex-col items-center transition-all"
-      >
-        <Accordion.Header class="w-full">
-          <Accordion.Trigger
-            class={twMerge(
-              'hover:scale-102 hover:brightness-102 border-1 group m-2 flex w-full flex-row items-center rounded border-accent-500 bg-primary-200/50 p-2 text-xl text-white shadow',
-            )}
-          >
-            <p class="flex-1 text-left">Charities Ticker</p>
-            <FaSolidChevronDown
-              class={twMerge(
-                'transition-all group-hover:animate-none',
-                isOpen('charities') && 'rotate-180 animate-none',
-              )}
-            />
-          </Accordion.Trigger>
-        </Accordion.Header>
-        <Accordion.Content class="w-full p-2">
-          <CharitiesTickerConfigurator visible={isOpen('charities')} />
-        </Accordion.Content>
-      </Accordion.Item>
-
-      {/* Fundraisers */}
-      <Accordion.Item
-        value="fundraisers"
-        class="flex w-full flex-col items-center transition-all"
-      >
-        <Accordion.Header class="w-full">
-          <Accordion.Trigger
-            class={twMerge(
-              'hover:scale-102 hover:brightness-102 border-1 group m-2 flex w-full flex-row items-center rounded border-accent-500 bg-primary-200/50 p-2 text-xl text-white shadow',
-            )}
-          >
-            <p class="flex-1 text-left">All Fundraisers Ticker</p>
-            <FaSolidChevronDown
-              class={twMerge(
-                'transition-all group-hover:animate-none',
-                isOpen('fundraisers') && 'rotate-180 animate-none',
-              )}
-            />
-          </Accordion.Trigger>
-        </Accordion.Header>
-        <Accordion.Content class="w-full p-2">
-          <FundraisersTickerConfigurator visible={isOpen('fundraisers')} />
-        </Accordion.Content>
-      </Accordion.Item>
-
-      {/* Team Fundraiser */}
-      <Accordion.Item
-        value="team-fundraiser"
-        class="flex w-full flex-col items-center transition-all"
-      >
-        <Accordion.Header class="w-full">
-          <Accordion.Trigger
-            class={twMerge(
-              'hover:scale-102 hover:brightness-102 border-1 group m-2 flex w-full flex-row items-center rounded border-accent-500 bg-primary-200/50 p-2 text-xl text-white shadow',
-            )}
-          >
-            <p class="flex-1 text-left">Fundraisers by Team Ticker</p>
-            <FaSolidChevronDown
-              class={twMerge(
-                'transition-all group-hover:animate-none',
-                isOpen('team-fundraiser') && 'rotate-180 animate-none',
-              )}
-            />
-          </Accordion.Trigger>
-        </Accordion.Header>
-        <Accordion.Content class="w-full p-2">
-          <FundraisersByTeamConfigurator visible={isOpen('team-fundraiser')} />
-        </Accordion.Content>
-      </Accordion.Item>
-
-      {/* Cause Fundraiser */}
-      <Accordion.Item
-        value="cause-fundraiser"
-        class="flex w-full flex-col items-center transition-all"
-      >
-        <Accordion.Header class="w-full">
-          <Accordion.Trigger
-            class={twMerge(
-              'hover:scale-102 hover:brightness-102 border-1 group m-2 flex w-full flex-row items-center rounded border-accent-500 bg-primary-200/50 p-2 text-xl text-white shadow',
-            )}
-          >
-            <p class="flex-1 text-left">Fundraisers by Cause Ticker</p>
-            <FaSolidChevronDown
-              class={twMerge(
-                'transition-all group-hover:animate-none',
-                isOpen('cause-fundraiser') && 'rotate-180 animate-none',
-              )}
-            />
-          </Accordion.Trigger>
-        </Accordion.Header>
-        <Accordion.Content class="w-full p-2">
-          <FundraisersByCauseConfigurator
-            visible={isOpen('cause-fundraiser')}
-          />
-        </Accordion.Content>
-      </Accordion.Item>
-
-
-      {/* Tickers Section Header */}
-      <div class="mx-2 mt-6 w-full text-left text-2xl font-semibold text-white/90">
-        Jingle Jam Ribbons (New)
-      </div>
-
-      {/* Campaign Goal Panel */}
-      <Accordion.Item
-        value="campaign-goal"
-        class="flex w-full flex-col items-center transition-all"
-      >
-        <Accordion.Header class="w-full">
-          <Accordion.Trigger
-            class={twMerge(
-              'hover:scale-102 hover:brightness-102 border-1 group m-2 flex w-full flex-row items-center rounded border-accent-500 bg-primary-200/50 p-2 text-xl text-white shadow',
-            )}
-          >
-            <p class="flex-1 text-left">Campaign Goal (EXPERIMENTAL)</p>
-            <FaSolidChevronDown
-              class={twMerge(
-                'transition-all group-hover:animate-none',
-                isOpen('campaign-goal') && 'rotate-180 animate-none',
-              )}
-            />
-          </Accordion.Trigger>
-        </Accordion.Header>
-        <Accordion.Content class="w-full p-2">
-          <CampaignGoalConfigurator visible={isOpen('campaign-goal')} />
-        </Accordion.Content>
-      </Accordion.Item>
-
-      {/* Big Campaign Goal Panel */}
-      <Accordion.Item
-        value="big-campaign-goal"
-        class="flex w-full flex-col items-center transition-all"
-      >
-        <Accordion.Header class="w-full">
-          <Accordion.Trigger
-            class={twMerge(
-              'hover:scale-102 hover:brightness-102 border-1 group m-2 flex w-full flex-row items-center rounded border-accent-500 bg-primary-200/50 p-2 text-xl text-white shadow',
-            )}
-          >
-            <p class="flex-1 text-left">Big Campaign Goal (EXPERIMENTAL)</p>
-            <FaSolidChevronDown
-              class={twMerge(
-                'transition-all group-hover:animate-none',
-                isOpen('big-campaign-goal') && 'rotate-180 animate-none',
-              )}
-            />
-          </Accordion.Trigger>
-        </Accordion.Header>
-        <Accordion.Content class="w-full p-2">
-          <BigCampaignGoalConfigurator visible={isOpen('big-campaign-goal')} />
-        </Accordion.Content>
-      </Accordion.Item>
-
-      {/* Basic Ribbon Label */}
-      <Accordion.Item
-        value="basic-ribbon-label"
-        class="flex w-full flex-col items-center transition-all"
-      >
-        <Accordion.Header class="w-full">
-          <Accordion.Trigger
-            class={twMerge(
-              'hover:scale-102 hover:brightness-102 border-1 group m-2 flex w-full flex-row items-center rounded border-accent-500 bg-primary-200/50 p-2 text-xl text-white shadow',
-            )}
-          >
-            <p class="flex-1 text-left">Basic Label</p>
-            <FaSolidChevronDown
-              class={twMerge(
-                'transition-all group-hover:animate-none',
-                isOpen('basic-ribbon-label') && 'rotate-180 animate-none',
-              )}
-            />
-          </Accordion.Trigger>
-        </Accordion.Header>
-        <Accordion.Content class="w-full p-2">
-          <BasicRibbonLabelConfigurator
-            visible={isOpen('basic-ribbon-label')}
-          />
-        </Accordion.Content>
-      </Accordion.Item>
-    </Accordion.Root>
+            </For>
+          </Show>
+        )}
+      </For>
+    </Accordion>
   )
 }
 
-export const OverlayConfiguration: Component<{ user: User }> = (props) => {
+/** The overlay list with a configurator per overlay; logged-out visitors get a login prompt where an overlay needs the account. */
+export const OverlayConfiguration: Component<{
+  user: User | null
+  /** Heading level of the overlay rows: 2 on `/overlays`, 3 (default) inside another accordion. */
+  level?: 2 | 3
+}> = (props) => {
+  const client = new QueryClient()
   return (
-    <UserProvider user={props.user}>
-      <QueryClientProvider client={new QueryClient()}>
-        <Body />
+    <UserProvider user={props.user as User}>
+      <QueryClientProvider client={client}>
+        <Body loggedIn={props.user !== null} level={props.level} />
       </QueryClientProvider>
     </UserProvider>
   )

@@ -2,6 +2,10 @@ import {type Component, createSignal, Show} from "solid-js";
 import {useMutation, useQueryClient} from "@tanstack/solid-query";
 import {orpcPrivate} from "../../../../../lib/orpc/client.ts";
 import type {TagAlias} from "../../../../../lib/db/schema/tags-schema.ts";
+import {Button} from "../../../../ui/Button";
+import {ConfirmDialog} from "../../../../ui/Dialog";
+import {Alert} from "../../../../ui/Status";
+import {TileGroup} from "../../../../ui/Tile";
 
 interface TagAliasListItemProps {
   alias: TagAlias
@@ -23,14 +27,10 @@ export const TagAliasListItem: Component<TagAliasListItemProps> = (props) => {
   )
 
   const handleDelete = () => {
-    if (showDeleteConfirm()) {
-      deleteAlias.mutate({
-        aliasId: alias.id
-      })
-      setShowDeleteConfirm(false)
-    } else {
-      setShowDeleteConfirm(true)
-    }
+    deleteAlias.mutate({
+      aliasId: alias.id
+    })
+    setShowDeleteConfirm(false)
   }
 
   const formatDate = (date: Date) => {
@@ -44,55 +44,44 @@ export const TagAliasListItem: Component<TagAliasListItemProps> = (props) => {
   }
 
   return (
-    <div class="bg-gray-50 rounded-lg border border-gray-200 p-4">
-      <div class="flex justify-between items-center">
-        <div class="flex-1">
-          <div class="flex items-center gap-3">
-            <h5 class="text-md font-medium text-gray-900">
-              "{alias.alias}"
-            </h5>
-            <span class="text-xs text-gray-500">
-              Created {formatDate(alias.createdAt)}
-            </span>
-          </div>
+    <TileGroup pad="sm" class="flex flex-col gap-2">
+      <div class="flex items-center gap-3">
+        <div class="flex min-w-0 flex-1 flex-wrap items-baseline gap-x-3">
+          <h5 class="text-sm font-semibold">
+            "{alias.alias}"
+          </h5>
+          <span class="text-fg-muted text-xs">
+            Created {formatDate(alias.createdAt)}
+          </span>
         </div>
 
-        <div class="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={handleDelete}
-            disabled={deleteAlias.isPending}
-            class="px-3 py-1 bg-red-600 text-white text-xs font-medium rounded hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <Show when={deleteAlias.isPending} fallback={showDeleteConfirm() ? "Confirm Delete" : "Delete"}>
-              Deleting...
-            </Show>
-          </button>
-        </div>
+        <Button
+          size="sm"
+          variant="danger"
+          onClick={() => setShowDeleteConfirm(true)}
+          disabled={deleteAlias.isPending}
+        >
+          <Show when={deleteAlias.isPending} fallback="Delete">
+            Deleting...
+          </Show>
+        </Button>
       </div>
 
       <Show when={deleteAlias.error}>
-        <div class="text-red-600 text-xs mt-2">
+        <Alert tone="danger">
           Error: {deleteAlias.error?.message || 'Failed to delete alias'}
-        </div>
+        </Alert>
       </Show>
 
-      <Show when={showDeleteConfirm()}>
-        <div class="bg-red-50 border border-red-200 rounded-md p-2 mt-3">
-          <p class="text-red-800 text-xs">
-            Are you sure you want to delete the alias "{alias.alias}"? This action cannot be undone.
-          </p>
-          <div class="flex gap-2 mt-2">
-            <button
-              type="button"
-              onClick={() => setShowDeleteConfirm(false)}
-              class="px-2 py-1 bg-gray-200 text-gray-700 text-xs font-medium rounded hover:bg-gray-300"
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      </Show>
-    </div>
+      <ConfirmDialog
+        open={showDeleteConfirm()}
+        onOpenChange={setShowDeleteConfirm}
+        title="Delete Alias"
+        text={<>Are you sure you want to delete the alias "{alias.alias}"? This action cannot be undone.</>}
+        confirmLabel="Delete"
+        pending={deleteAlias.isPending}
+        onConfirm={handleDelete}
+      />
+    </TileGroup>
   );
 }

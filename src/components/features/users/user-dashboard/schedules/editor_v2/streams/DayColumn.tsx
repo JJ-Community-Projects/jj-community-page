@@ -3,11 +3,15 @@ import { useScheduleEditor2 } from '../ScheduleEditorProvider.tsx'
 import { byDay } from './utils/streamFilters.ts'
 import { StreamCard } from './StreamCard.tsx'
 import { useAddStreamDialog } from './dialog/add/AddStreamDialogContext.tsx'
-import { addHours, latestByEndOnDay, makeDayFallback, } from './utils/initialTimes.ts'
+import {
+  addHours,
+  latestByEndOnDay,
+  makeDayFallback,
+} from './utils/initialTimes.ts'
 import { FaRegularEye, FaRegularEyeSlash, FaSolidPlus } from 'solid-icons/fa'
-import { twMerge } from 'tailwind-merge'
-import { DateTime } from 'luxon'
-import { getDayBackgroundColor } from './utils/colors.ts'
+import { getDayColor } from './utils/colors.ts'
+import { IconButton } from '../../../../../../ui/Button'
+import { Alert } from '../../../../../../ui/Status'
 
 export const DayColumn: Component<{ date: Date; dayIndex: number }> = (
   props,
@@ -16,8 +20,8 @@ export const DayColumn: Component<{ date: Date; dayIndex: number }> = (
   const dialog = useAddStreamDialog()
   const year = () => state.schedule?.year ?? props.date.getFullYear()
 
-  const streamsToday = () => byDay(state.streams, props.date)
-    .toSorted((a, b) => {
+  const streamsToday = () =>
+    byDay(state.streams, props.date).toSorted((a, b) => {
       if (a.start && b.start) {
         return a.start.getTime() - b.start.getTime()
       }
@@ -67,59 +71,71 @@ export const DayColumn: Component<{ date: Date; dayIndex: number }> = (
     return d.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric' })
   }
 
-  const getWeekDay = () => {
-    return DateTime.fromJSDate(props.date).weekday - 1
-  }
-
+  // The browser tests find a column from its header text: keep the text two levels below the column
   return (
     <div
-      class={twMerge(
-        'flex flex-col gap-2 rounded-lg border p-3',
-        getDayBackgroundColor(getWeekDay()),
-      )}
+      class="rounded-group ring-line flex min-w-0 flex-col gap-2 bg-(--day)/10 p-2 ring-1"
+      style={{ '--day': getDayColor(props.date) }}
     >
-      <div class="flex items-center justify-between">
-        <div class="text-sm font-semibold">{header()}</div>
-        <Show when={shouldShowSetAllInvisibleButton()}>
-          <button
-            class="rounded bg-accent px-2 py-1 text-xs text-white hover:bg-accent-600"
-            onClick={setAllInvisible}
-            title="Set All Invisible"
+      <div class="flex flex-wrap items-center gap-1">
+        <h3 class="flex flex-1 items-center gap-1.5 text-sm font-semibold whitespace-nowrap">
+          <span
+            class="size-2.5 shrink-0 rounded-full bg-(--day) ring-1 ring-black/10"
+            aria-hidden="true"
+          />
+          {header()}
+        </h3>
+        <div class="ml-auto flex items-center gap-0.5">
+          <Show when={shouldShowSetAllInvisibleButton()}>
+            <IconButton
+              variant="ghost"
+              size="sm"
+              class="size-7"
+              onClick={setAllInvisible}
+              aria-label="Set All Invisible"
+              title="Set All Invisible"
+            >
+              <FaRegularEyeSlash aria-hidden="true" />
+            </IconButton>
+          </Show>
+          <Show when={shouldShowSetAllVisibleButton()}>
+            <IconButton
+              variant="ghost"
+              size="sm"
+              class="size-7"
+              onClick={setAllVisible}
+              aria-label="Set All Visible"
+              title="Set All Visible"
+            >
+              <FaRegularEye aria-hidden="true" />
+            </IconButton>
+          </Show>
+          <IconButton
+            variant="accent"
+            size="sm"
+            class="size-7"
+            onClick={addNew}
+            aria-label="Add New Stream"
+            title="Add New Stream"
           >
-            <FaRegularEyeSlash />
-          </button>
-        </Show>
-        <Show when={shouldShowSetAllVisibleButton()}>
-          <button
-            class="rounded bg-accent px-2 py-1 text-xs text-white hover:bg-accent-600"
-            onClick={setAllVisible}
-            title="Set All Visible"
-          >
-            <FaRegularEye />
-          </button>
-        </Show>
-        <button
-          class="rounded bg-accent px-2 py-1 text-xs text-white hover:bg-accent-600"
-          onClick={addNew}
-          title="Add New Stream"
-        >
-          <FaSolidPlus />
-        </button>
+            <FaSolidPlus aria-hidden="true" />
+          </IconButton>
+        </div>
       </div>
 
       <Show when={error()}>
         {(message) => (
-          <div role="alert" class="rounded border border-red-400 bg-red-100 px-2 py-1 text-xs text-red-700">
+          <Alert tone="danger" class="p-2 text-xs">
             {message()}
-          </div>
+          </Alert>
         )}
       </Show>
 
       <Show
         when={streamsToday().length > 0}
-        fallback={<div class="text-xs text-gray-500">No streams</div>}
+        fallback={<p class="text-fg-muted px-1 text-xs">No streams</p>}
       >
-        <div class="flex flex-col gap-2">
+        <div class="flex flex-col gap-1.5">
           <For each={streamsToday()}>
             {(stream) => <StreamCard stream={stream} />}
           </For>

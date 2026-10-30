@@ -1,5 +1,5 @@
 ---
-import BaseLayout from "../../../layouts/BaseLayout.astro";
+import PageShell from '../../../layouts/PageShell.astro'
 import {TeamDetail} from "../../../components/features/users/user-dashboard/teams/TeamDetail";
 import {AdminTeamDetail} from "../../../components/features/users/user-dashboard/teams/teamAdmin/AdminTeamDetail";
 import {eq} from "drizzle-orm";
@@ -38,10 +38,10 @@ try {
 }
 ---
 
-<BaseLayout>
+<PageShell>
   {isOwner ? (
           <AdminTeamDetail user={user} teamId={teamId} client:only="solid-js"/>
   ) : (
           <TeamDetail user={user} teamId={teamId} client:only="solid-js"/>
   )}
-</BaseLayout>
+</PageShell>

@@ -18,7 +18,8 @@ const { data: contentHidden } = await serverClientPublic.overlays.visibility.get
 )
 const HIDE_CONTENT = contentHidden ?? true
 
-const bgParam = Astro.url.searchParams.get('bg')
+// `theme` like every other overlay; `bg` is the old name and keeps working (`theme` wins)
+const bgParam = Astro.url.searchParams.get('theme') ?? Astro.url.searchParams.get('bg')
 const demoParam = Astro.url.searchParams.get('demo')
 
 const bg: BgPreset =

@@ -1,0 +1,26 @@
+---
+import { getCollection, render } from 'astro:content'
+
+// Each question is a tile with its answer always shown: there are only a few, so no accordion.
+const groups = ['other', 'community']
+const faqs = (await getCollection('faq')).sort(
+  (a, b) =>
+    groups.findIndex((group) => a.id.includes(group)) -
+      groups.findIndex((group) => b.id.includes(group)) ||
+    a.id.localeCompare(b.id),
+)
+---
+
+<div class="flex flex-col gap-2">
+  {faqs.map(async (faq) => {
+    const { Content } = await render(faq)
+    return (
+      <section class="rounded-tile bg-linear-to-b from-surface to-surface-2 text-fg shadow-tile ring-1 ring-line flex flex-col gap-1 px-4 py-3">
+        <h2 class="font-semibold">{faq.data.question}</h2>
+        <div class="prose prose-sm max-w-none text-fg-muted prose-a:font-medium prose-a:text-fg">
+          <Content />
+        </div>
+      </section>
+    )
+  })}
+</div>

@@ -212,6 +212,44 @@ const fullScheduleContract = oc.output(FullScheduleSchema)
 
 const headlinerContract = oc.output(z.array(UserStreamSchema))
 
+// Community page: top N campaigns ∪ all account holders, merged by lowercased Tiltify slug
+const CommunityCharitySchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  logo: z.string(),
+})
+
+export const CommunityFundraiserSchema = z.object({
+  /** Lowercased Tiltify slug: merge key and list key */
+  key: z.string(),
+  name: z.string(),
+  avatar: z.string(),
+  charity: CommunityCharitySchema.nullable(),
+  /** null: account without a JJ campaign this year */
+  raised: CurrenciesSchema.nullable(),
+  /** Campaign page, else the Tiltify profile */
+  tiltifyUrl: z.string(),
+  /** `/${slug}` for account holders only */
+  profileUrl: z.string().nullable(),
+  twitchUrl: z.string().nullable(),
+  isLive: z.boolean(),
+  hasActiveDonationMatch: z.boolean(),
+  tags: z.array(SimpleCampaignTag),
+})
+
+export type CommunityFundraiser = z.infer<typeof CommunityFundraiserSchema>
+
+export const CommunityListSchema = z.object({
+  count: z.number(),
+  topN: z.number(),
+  /** Sorted: dono match → live → raised (GBP desc) → name */
+  list: z.array(CommunityFundraiserSchema),
+})
+
+export type CommunityList = z.infer<typeof CommunityListSchema>
+
+const communityListContract = oc.output(CommunityListSchema)
+
 export const contracts = {
   campaignsContract,
   causesContract,
@@ -219,5 +257,6 @@ export const contracts = {
   getAllUsersWithInfoContract,
   overviewContract,
   fullScheduleContract,
-  headlinerContract
+  headlinerContract,
+  communityListContract,
 }

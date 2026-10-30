@@ -1,267 +1,167 @@
 import {
   type Component,
-  Match,
-  type ParentComponent,
+  createEffect,
+  on,
+  onCleanup,
+  onMount,
   Show,
-  Switch,
 } from 'solid-js'
 import { YogsScheduleDetailDialog } from './YogsScheduleDetailDialog.tsx'
 import { getTextColor } from '../../../lib/utils/textColors.ts'
-import { BiLogosTwitch, BiLogosYoutube } from 'solid-icons/bi'
-import { BsPeopleFill } from 'solid-icons/bs'
-import { useNow } from '../../../lib/utils/useNow.ts'
-import { DateTime } from 'luxon'
 import { useCreatorFilter } from './provider/CreatorFilterProvider.tsx'
-import { twMerge } from 'tailwind-merge'
-import { YogsStreamUtils } from '../../../lib/utils/YogsStreamUtils.ts'
 import type { YogsStream } from '../../../lib/orpc/private/yogs/contract.ts'
-
 import { logSlotClick } from '../../../lib/analytics.ts'
 import { createModalSignal } from '../../../lib/createModalSignal.ts'
-import { useYogsSchedule } from './provider/YogsScheduleProvider.tsx'
+import { cn, focusRing } from '../../ui/cn'
+import { LiveBadge } from '../../ui/Labels'
+import {
+  CountdownChip,
+  LiveRing,
+  useStreamState,
+  VodIcons,
+} from './YogsStreamParts.tsx'
 
 interface YogsStreamTileProps {
   stream: YogsStream
 }
 
+const text = 'text-pretty font-bold uppercase'
+
+// Font sizes by slot size, in container units of the tile: at 1280px they match the old fluid sizes.
+// `--fit` (set by fitText) shrinks a long title and subtitle together until they fit the tile.
+const titleClass = (size: number, hasSubtitle: boolean) => {
+  if (size === 1) return cn(text, 'line-clamp-1 text-base tracking-wide')
+  if (size === 2) {
+    return hasSubtitle
+      ? cn(text, 'line-clamp-2 text-[length:calc(clamp(0.75rem,10.7cqi,1rem)*var(--fit,1))] tracking-wide')
+      : cn(text, 'line-clamp-2 text-[length:calc(clamp(1rem,15.6cqi,1.5rem)*var(--fit,1))] tracking-wide')
+  }
+  if (size === 3) return cn(text, 'text-[length:calc(clamp(0.875rem,15.2cqi,1.5rem)*var(--fit,1))] tracking-widest')
+  if (size === 4) return cn(text, 'line-clamp-3 text-[length:calc(clamp(0.875rem,15.2cqi,1.5rem)*var(--fit,1))] tracking-widest')
+  return cn(text, 'text-[length:calc(clamp(0.875rem,18.3cqi,1.875rem)*var(--fit,1))] tracking-widest')
+}
+
+const subtitleClass = (size: number) =>
+  size <= 2
+    ? 'text-pretty uppercase text-[length:calc(clamp(0.75rem,9.7cqi,0.875rem)*var(--fit,1))] tracking-wide'
+    : 'text-pretty uppercase text-[length:calc(clamp(0.75rem,10.7cqi,1rem)*var(--fit,1))] tracking-widest'
+
+/** Smallest `--fit`: below it the title gets hard to read, so the rest is cut as before. */
+const MIN_FIT = 0.6
+const FIT_STEP = 0.05
+
+/** Room the text keeps free in its tile, so a long title doesn't touch the edges. */
+const FIT_SLACK_PX = 4
+
+/** The text block doesn't fit the tile (with the slack): too tall, or a word wider than the tile. */
+const overflows = (el: HTMLElement) => {
+  const parts = [...el.children]
+  if (parts.length === 0) return false
+  const height =
+    parts.at(-1)!.getBoundingClientRect().bottom -
+    parts[0].getBoundingClientRect().top
+  return (
+    height > el.clientHeight - FIT_SLACK_PX ||
+    [...el.querySelectorAll('p')].some((p) => p.scrollWidth > p.clientWidth + 1)
+  )
+}
+
+/**
+ * Shrinks the tile's text in small steps until it fits. Only touches tiles that overflow; runs after
+ * mount (so the server markup is unchanged) and again when the tile is resized or the webfont loads.
+ */
+const fitText = (el: HTMLElement) => {
+  let fit = 1
+  el.style.setProperty('--fit', '1')
+  while (fit > MIN_FIT && overflows(el)) {
+    fit = Math.max(MIN_FIT, fit - FIT_STEP)
+    el.style.setProperty('--fit', fit.toFixed(2))
+  }
+}
+
+const countdownSize = (size: number) =>
+  size <= 1 ? 'text-xxs' : size <= 2 ? 'text-xs' : 'text-sm'
+
 export const YogsStreamTile: Component<YogsStreamTileProps> = (props) => {
   const modal = createModalSignal()
 
   const { isSlotPartOfFilter } = useCreatorFilter()
-  const { mounted } = useYogsSchedule()
+  const { isLive, showCountdown, ended, countdown, label } = useStreamState(
+    () => props.stream,
+  )
 
   const stream = () => props.stream
   const title = () => stream().title
   const subtitle = () => stream().subtitle
   const tileSize = () => stream().size
-  const enable = () => isSlotPartOfFilter(stream())
   const color = () => stream().color
+  // Filtered-out tiles stay clickable and focusable, only dimmed
+  const dimmed = () => !isSlotPartOfFilter(stream())
 
-  const buttonStyle = () => {
-    if (enable()) {
-      return {
-        'background-color': color(),
-        color: getTextColor(color()),
-      }
-    } else {
-      return {
-        'background-color': color(),
-        color: getTextColor(color()),
-        filter: 'brightness(0.5)',
-      }
-    }
-  }
-
-  const now = useNow()
-
-  const showCountdown = () => {
-    return mounted() && YogsStreamUtils.isBefore(stream(), now())
-  }
-
-  const isLive = () => {
-    const start = DateTime.fromJSDate(stream().start)
-    const end = DateTime.fromJSDate(stream().end)
-    return mounted() && start < now() && end > now()
-  }
-
-  const diff = () => {
-    return DateTime.fromJSDate(stream().start).diff(now())
-  }
-
-  const countdown = () => {
-    const d = diff()
-    if (d.as('hour') < 1) {
-      return d.toFormat("mm'm' ss's'")
-    }
-    if (d.as('day') < 1) {
-      return d.toFormat("h'h' mm'm' ss's'")
-    }
-    return d.toFormat("d'd' hh'h' mm'm' ss's'")
-  }
-
-  const titleStyle = () => {
-    if (tileSize() === 1) {
-      return 'line-clamp-1 text-pretty font-bold uppercase tracking-wide text-base'
-    }
-
-    if (tileSize() === 2 && (subtitle() === undefined || subtitle() === '')) {
-      return 'line-clamp-2 text-pretty font-bold uppercase tracking-wide ~text-base/2xl'
-    } else if (
-      tileSize() === 2 &&
-      !(subtitle() === undefined || subtitle() === '')
-    ) {
-      return 'line-clamp-2 text-pretty font-bold uppercase tracking-wide ~text-xs/base'
-    }
-
-    if (tileSize() === 3) {
-      return 'text-pretty font-bold uppercase tracking-widest ~text-sm/2xl'
-    }
-
-    if (tileSize() === 4) {
-      return 'line-clamp-3 text-pretty font-bold uppercase tracking-widest ~text-sm/2xl'
-    }
-
-    return 'text-pretty font-bold uppercase tracking-widest ~text-sm/3xl'
-  }
-
-  const subtitleStyle = () => {
-    if (tileSize() === 1) {
-      return '~text-xs/sm text-pretty uppercase tracking-wide'
-    }
-
-    if (tileSize() === 2) {
-      return '~text-xs/sm text-pretty uppercase tracking-wide'
-    }
-
-    if (tileSize() === 4) {
-      return '~text-xs/base text-pretty uppercase tracking-widest'
-    }
-
-    return '~text-xs/base text-pretty uppercase tracking-widest'
-  }
-
-  const countdownStyle = () => {
-    if (tileSize() <= 1) {
-      return 'line-clamp-1 font-mono text-xxs font-bold lowercase'
-    }
-    if (tileSize() <= 2) {
-      return 'line-clamp-1 font-mono text-xs font-bold lowercase'
-    }
-
-    return 'line-clamp-1 font-mono text-sm font-bold lowercase tracking-wide'
-  }
-
-  const liveStyle = () => {
-    if (tileSize() === 1) {
-      return '~text-xxxs font-bold tracking-wide'
-    }
-
-    return '~text-base/lg font-bold tracking-wide'
-  }
+  let content!: HTMLDivElement
+  onMount(() => {
+    const observer = new ResizeObserver(() => fitText(content))
+    observer.observe(content)
+    onCleanup(() => observer.disconnect())
+    void document.fonts.ready.then(() => fitText(content))
+  })
+  // The live badge and the countdown chip take room too
+  createEffect(on([isLive, showCountdown], () => fitText(content), { defer: true }))
 
   return (
     <>
       <div
-        style={{
-          height: `calc(${tileSize()} * var(--jj-schedule-data-size))`,
-          width: '100%',
-        }}
-        class="p-0.5"
+        class="yogs-tile-cell"
+        style={{ height: `calc(${tileSize()} * var(--yogs-unit))` }}
       >
-        <LivePulse stream={stream()}>
-          <button
-            class={twMerge(
-              'flex h-full w-full flex-col items-center justify-center rounded-2xl p-1 text-center transition-all',
-              enable() ? 'hover:scale-101 hover:brightness-102' : '',
-            )}
-            style={buttonStyle()}
-            disabled={!enable()}
-            onClick={() => {
-              logSlotClick(stream())
-              modal.open()
-            }}
+        <button
+          type="button"
+          class={cn(
+            'rounded-tile relative flex size-full flex-col items-center justify-center overflow-hidden p-1 text-center @container',
+            'hover:shadow-tile-hover transition-[filter,box-shadow,opacity] duration-200 hover:brightness-105',
+            // White on the canvas reads better than accent next to the data colours; focus undims
+            focusRing,
+            'focus-visible:outline-white',
+            dimmed() ? 'opacity-40 saturate-0' : ended() && 'opacity-80',
+            'focus-visible:opacity-100 focus-visible:saturate-100',
+          )}
+          style={{
+            'background-color': color(),
+            color: getTextColor(color()),
+          }}
+          aria-label={label()}
+          onClick={() => {
+            logSlotClick(stream())
+            modal.open()
+          }}
+        >
+          <Show when={isLive()}>
+            <LiveRing />
+          </Show>
+          <div
+            ref={content}
+            class="flex min-h-0 w-full flex-1 flex-col items-center justify-center gap-0.5"
           >
-            <div
-              class={
-                'flex h-full w-full flex-col items-center justify-center @container'
-              }
-            >
-              <p class={titleStyle()}>{title()}</p>
-              <Show when={subtitle() && tileSize() > 1}>
-                <p class={subtitleStyle()}>{subtitle()}</p>
-              </Show>
-              <Show when={showCountdown()}>
-                <p class={countdownStyle()}>{countdown()}</p>
-              </Show>
-              <Show when={!showCountdown() && isLive()}>
-                <p class={liveStyle()}>LIVE</p>
-              </Show>
-            </div>
-            <Show when={tileSize() > 1}>
-              <Indicator stream={props.stream} />
+            <Show when={isLive() && tileSize() > 1}>
+              <LiveBadge />
             </Show>
-          </button>
-        </LivePulse>
+            <p class={titleClass(tileSize(), !!subtitle())}>{title()}</p>
+            <Show when={subtitle() && tileSize() > 1}>
+              <p class={subtitleClass(tileSize())}>{subtitle()}</p>
+            </Show>
+            <Show when={showCountdown()}>
+              <CountdownChip color={color()} class={countdownSize(tileSize())}>
+                {countdown()}
+              </CountdownChip>
+            </Show>
+          </div>
+          {/* VODs exist after the start; with a countdown the row would only crowd the tile */}
+          <Show when={tileSize() > 1 && !showCountdown()}>
+            <VodIcons stream={props.stream} class="justify-center" />
+          </Show>
+        </button>
       </div>
       <YogsScheduleDetailDialog stream={props.stream} modalSignal={modal} />
     </>
-  )
-}
-
-interface IndicatorProps {
-  stream: YogsStream
-}
-
-export const Indicator: Component<IndicatorProps> = (props) => {
-  const vodTypes = () => props.stream.vods?.map((vod) => vod.type) ?? []
-
-  const hasYoutubeVod = () => {
-    return vodTypes().includes('youtube')
-  }
-
-  const hasTwitchVod = () => {
-    return vodTypes().includes('twitch')
-  }
-
-  const hasCreators = () => (props.stream.creators?.length ?? 0) > 0
-
-  // One set of icons sized by breakpoint. They are drawn after hydration only: as inline SVGs in
-  // every tile they were a sixth of the server-rendered page. The row keeps its height meanwhile.
-  // Below xl the people icon keeps the 1em it always had (`size={0}` fell back to 1em).
-  const { mounted } = useYogsSchedule()
-  return (
-    <div
-      class={twMerge(
-        'flex w-full flex-row justify-around',
-        hasCreators()
-          ? 'min-h-[1em] xl:min-h-3.5'
-          : (props.stream.vods?.length ?? 0) > 0 && 'min-h-2.5 xl:min-h-3.5',
-      )}
-    >
-      <Show when={mounted()}>
-        <Show when={hasTwitchVod()}>
-          <BiLogosTwitch class={'size-2.5 xl:size-3.5'} />
-        </Show>
-        <Show when={hasYoutubeVod()}>
-          <BiLogosYoutube class={'size-2.5 xl:size-3.5'} />
-        </Show>
-        <Show when={hasCreators()}>
-          <BsPeopleFill class={'size-[1em] xl:size-3.5'} />
-        </Show>
-      </Show>
-    </div>
-  )
-}
-
-interface LivePulseProps {
-  stream: YogsStream
-}
-
-const LivePulse: ParentComponent<LivePulseProps> = (props) => {
-  const stream = () => props.stream
-  const now = useNow()
-  const { mounted } = useYogsSchedule()
-
-  const isLive = () => {
-    const start = DateTime.fromJSDate(stream().start)
-    const end = DateTime.fromJSDate(stream().end)
-    return mounted() && start < now() && end > now()
-  }
-  return (
-    <Switch>
-      <Match when={isLive()}>
-        <div class={'relative h-full w-full'}>
-          <div
-            class={
-              'absolute h-full w-full animate-pulse rounded-2xl bg-accent-300 duration-300'
-            }
-          ></div>
-          <div class={'absolute h-full w-full p-1'}>{props.children}</div>
-        </div>
-      </Match>
-      <Match when={!isLive()}>
-        <div class={'h-full w-full p-1'}>{props.children}</div>
-      </Match>
-    </Switch>
   )
 }

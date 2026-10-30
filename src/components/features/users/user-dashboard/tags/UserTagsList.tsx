@@ -1,35 +1,13 @@
-import { type Component, For, Match, Show, Switch } from 'solid-js'
+import { type Component, For, Match, Switch } from 'solid-js'
+import { FaSolidTag, FaSolidXmark } from 'solid-icons/fa'
 import { useTags } from './UserTagsProvider.tsx'
-import { FaSolidCircleExclamation, FaSolidTag, FaSolidUser, FaSolidXmark, } from 'solid-icons/fa'
+import { tagGrid } from './TagPick.tsx'
+import { Section } from '../../../../ui/Tile'
+import { ListRow } from '../../../../ui/ListRow'
+import { IconButton } from '../../../../ui/Button'
+import { Alert, EmptyState, Skeleton } from '../../../../ui/Status'
 
-const EmptyState = () => (
-  <div class="flex flex-col items-center justify-center px-4 py-6">
-    <div class="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-primary-500 to-primary-600 shadow">
-      <FaSolidTag class="h-6 w-6 text-white" />
-    </div>
-    <h3 class="mb-1 text-lg font-semibold text-gray-800">No tags added yet</h3>
-    <p class="max-w-md text-center text-sm leading-relaxed text-gray-600">
-      Start building your profile by selecting tags that represent your
-      interests, games, or causes. This helps viewers discover and connect with
-      your content.
-    </p>
-  </div>
-)
-
-const LoadingSkeleton = () => (
-  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-    <div class="h-16 animate-pulse rounded-xl bg-neutral-200 shadow-sm"></div>
-    <div class="h-16 animate-pulse rounded-xl bg-neutral-200 shadow-sm"></div>
-    <div class="h-16 animate-pulse rounded-xl bg-neutral-200 shadow-sm"></div>
-  </div>
-)
-
-/**
- * UserTagsList Component
- *
- * Displays the user's current tags with removal functionality.
- * Enhanced with sophisticated tag cards, better removal UX, and engaging empty states.
- */
+/** The user's tags with the count against the limit; each one can be removed. */
 export const UserTagsList: Component = () => {
   const {
     userTags,
@@ -40,100 +18,65 @@ export const UserTagsList: Component = () => {
     canAddTagToUser,
   } = useTags()
 
-  const hasTags = () => userTags().length > 0
-  const needsMoreTags = () => userTags().length < 4
+  const title = () => {
+    const data = canAddTagToUser.data
+    return data ? `Your Tags (${data.tags}/${data.maxTags})` : 'Your Tags'
+  }
 
   return (
-    <div class="mt-6">
-      <div class="mb-4 flex items-center gap-3">
-        <h3 class="flex items-center gap-2 text-sm font-semibold text-gray-800">
-          <FaSolidUser class="h-4 w-4 text-primary" />
-          <Show when={canAddTagToUser.data} fallback={<>Your Tags</>}>
-            {(data) => (
-              <>
-                Your Tags ({data().tags}/{data().maxTags})
-              </>
-            )}
-          </Show>
-        </h3>
-      </div>
-
+    <Section level={3} title={title()} icon={<FaSolidTag />}>
       <Switch>
         <Match when={isLoadingUserTags()}>
-          <LoadingSkeleton />
-        </Match>
-
-        <Match when={hasUserTagsError()}>
-          <div class="rounded-xl border border-danger-200 bg-danger-50 p-6">
-            <div class="flex items-center justify-center gap-3 text-danger-600">
-              <FaSolidCircleExclamation class="h-5 w-5 flex-shrink-0" />
-              <div>
-                <p class="text-sm font-semibold">Error loading your tags</p>
-                <p class="text-xs opacity-90">
-                  {userTagsError() || 'Unknown error occurred'}
-                </p>
-              </div>
-            </div>
+          <div class={tagGrid}>
+            <Skeleton class="h-12" />
+            <Skeleton class="h-12" />
+            <Skeleton class="h-12" />
           </div>
         </Match>
-
-        <Match when={!hasTags()}>
-          <EmptyState />
+        <Match when={hasUserTagsError()}>
+          <Alert tone="danger" title="Error loading your tags">
+            {userTagsError() || 'Unknown error occurred'}
+          </Alert>
         </Match>
-
-        <Match when={hasTags()}>
-          <div class="grid grid-cols-1 ~gap-3/4 sm:grid-cols-2 lg:grid-cols-3">
+        <Match when={userTags().length === 0}>
+          <EmptyState title="No tags added yet">
+            Pick tags that show your interests, games or causes. They help
+            viewers find you.
+          </EmptyState>
+        </Match>
+        <Match when={userTags().length > 0}>
+          <div class={tagGrid}>
             <For each={userTags()}>
               {(userTag) => (
-                <div
-                  class="group relative flex items-center rounded-xl border-2 bg-white p-4 shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg"
-                  style={{
-                    'border-color': userTag.tag.color,
-                    background: `linear-gradient(135deg, ${userTag.tag.color}08, ${userTag.tag.color}15)`,
-                  }}
-                >
-                  <div class="flex flex-1 items-center gap-3">
-                    {/* Color indicator */}
-                    <div
-                      class="h-4 w-4 flex-shrink-0 rounded-full shadow-sm"
+                <ListRow
+                  surface="group"
+                  trailingAlign="center"
+                  media={
+                    <span
+                      class="block size-3 rounded-full ring-1 ring-black/10"
                       style={{ 'background-color': userTag.tag.color }}
-                    ></div>
-
-                    {/* Tag info */}
-                    <div class="min-w-0 flex-1">
-                      <span class="block truncate text-sm font-semibold text-gray-800">
-                        {userTag.tag.name}
-                      </span>
-                      {userTag.tag.description && (
-                        <span class="block truncate text-xs text-gray-600 opacity-80">
-                          {userTag.tag.description}
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Remove button */}
-                    <button
-                      type="button"
+                    />
+                  }
+                  title={userTag.tag.name}
+                  subline={userTag.tag.description || undefined}
+                  trailing={
+                    <IconButton
+                      variant="ghost"
+                      size="sm"
+                      class="text-danger-600"
                       onClick={() => handleRemoveTag(userTag.tagId)}
-                      class="flex-shrink-0 rounded-full p-2 opacity-70 outline-none transition-all duration-200 group-hover:opacity-100 hover:scale-110 hover:bg-danger-100 focus:bg-danger-100 focus:ring-2 focus:ring-danger-500 focus:ring-offset-2 focus:ring-offset-white active:scale-95"
                       aria-label={`Remove ${userTag.tag.name} tag`}
                       title="Remove tag"
                     >
-                      <FaSolidXmark class="h-4 w-4 text-danger-500 hover:text-danger-600" />
-                    </button>
-                  </div>
-
-                  {/* Subtle hover effect */}
-                  <div
-                    class="pointer-events-none absolute inset-0 rounded-xl opacity-0 transition-opacity duration-300 group-hover:opacity-5"
-                    style={{ 'background-color': userTag.tag.color }}
-                  ></div>
-                </div>
+                      <FaSolidXmark class="size-4" aria-hidden="true" />
+                    </IconButton>
+                  }
+                />
               )}
             </For>
           </div>
         </Match>
       </Switch>
-    </div>
+    </Section>
   )
 }

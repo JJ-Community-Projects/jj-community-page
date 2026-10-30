@@ -3,6 +3,8 @@ import type { YogsCreator, YogsSchedule, } from '../../../../lib/orpc/private/yo
 import { DateTime } from 'luxon'
 import { useNextJJEndDate } from '../../../../lib/utils/jjDates.ts'
 import { createModalSignal } from '../../../../lib/createModalSignal.ts'
+import { useNow } from '../../../../lib/utils/useNow.ts'
+import { rangeFromData } from '../../../../lib/utils/rangeFromData.ts'
 
 const useYogsScheduleHook = (
   schedule: YogsSchedule,
@@ -30,13 +32,6 @@ const useYogsScheduleHook = (
   const lastDay = end()
   const now = DateTime.now().setZone('Europe/London')
 
-  /*
-  console.log('numberOfDays', numberOfDays())
-  console.log('date', days()[numberOfDays() - 1].start)
-  console.log('firstDay', firstDay)
-  console.log('lastDay', lastDay)
-  console.log('now', now)
-  */
   const isNowBetween = now >= firstDay && now <= lastDay
 
   const jjEnd = useNextJJEndDate()
@@ -49,11 +44,6 @@ const useYogsScheduleHook = (
     const now = DateTime.now().setZone('Europe/London')
     const startWeek2 = DateTime.fromISO(now.year + '-12-08T01:00:00.000Z')
     const end = jjEnd()
-    /*
-    console.log('dates', now, startWeek2, end)
-    console.log('now >= startWeek2', now >= startWeek2)
-    console.log('now <= end', now <= end)
-    */
 
     if (now >= startWeek2 && now <= end) {
       setWeekIndex(1)
@@ -95,10 +85,6 @@ const useYogsScheduleHook = (
     )
   }
 
-  const longestDayLength = () => {
-    return days().reduce((acc, day) => Math.max(acc, day.streams.length), 0)
-  }
-
   // The server render and the first client render (hydration) must produce the same markup, so
   // times are shown in London time with a fixed locale and nothing depends on the clock until the
   // island is mounted; then dates switch to the viewer's timezone and countdowns / live state start.
@@ -109,25 +95,55 @@ const useYogsScheduleHook = (
       ? DateTime.fromJSDate(date)
       : DateTime.fromJSDate(date, { zone: 'Europe/London' }).setLocale('en-US')
 
+  // One clock for the grid; the states below stay false until mounted, like everything clock-based
+  const clock = useNow()
+  const scheduleStart = Math.min(...schedule.streams.map((s) => s.start.getTime()))
+  const scheduleEnd = Math.max(...schedule.streams.map((s) => s.end.getTime()))
+  /** Between the schedule's first start and last end (so never on archive pages). */
+  const isRunning = () =>
+    mounted() &&
+    clock().toMillis() >= scheduleStart &&
+    clock().toMillis() <= scheduleEnd
+  /** The date is today in the viewer's timezone, while the schedule is running. */
+  const isToday = (date: Date) =>
+    isRunning() && DateTime.fromJSDate(date).hasSame(clock(), 'day')
+  /** When a day's streams start (the day's own start is midnight London). */
+  const dayStart = (index: number) => {
+    const d = days()[index]
+    return rangeFromData(d.streams)?.start ?? d.start
+  }
+  /** Index of today's day while the schedule is running, else -1. */
+  const todayIndex = () => days().findIndex((_, i) => isToday(dayStart(i)))
+  const goToToday = () => {
+    const i = todayIndex()
+    if (i >= 0) setDayIndex(i)
+  }
+
   const filterModalSignal = createModalSignal()
   const exportModalSignal = createModalSignal()
   return {
     mounted,
     toDateTime,
+    now: clock,
+    isRunning,
+    isToday,
     schedule,
     streams,
     creators,
     week,
     day,
     days,
+    dayIndex,
+    todayIndex,
+    goToToday,
     nextWeek,
     prevWeek,
     weekIndex,
+    numberOfWeeks,
     nextDay,
     prevDay,
     times,
     getCreatorStreams,
-    longestDayLength,
     filterModalSignal,
     exportModalSignal
   }

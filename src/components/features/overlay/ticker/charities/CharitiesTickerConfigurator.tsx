@@ -1,12 +1,22 @@
 import { type Component, createMemo, createSignal } from 'solid-js'
-import { buildUrl, FieldRow, LinkPreview, PreviewDataField, type PreviewDataMode, PreviewFrame, } from '../../overview/Common.tsx'
+import {
+  buildUrl,
+  ConfiguratorBody,
+  type Currency,
+  CurrencySelect,
+  PreviewDataField,
+  type PreviewDataMode,
+  titleCase,
+} from '../../overview/Common.tsx'
+import { OVERLAY_FORMATS } from '../../overview/formats.ts'
 import { useUser } from '../../../users/user-dashboard/providers/UserProvider.tsx'
+import { Select } from '../../../../ui/Select'
 
-export const CharitiesTickerConfigurator: Component<{ visible?: boolean }> = (
-  p,
-) => {
-  const [theme, setTheme] = createSignal<string>('default')
-  const [currency, setCurrency] = createSignal<'GBP' | 'USD' | 'EUR'>('GBP')
+type Theme = 'default' | 'red' | 'blue'
+
+export const CharitiesTickerConfigurator: Component = () => {
+  const [theme, setTheme] = createSignal<Theme>('default')
+  const [currency, setCurrency] = createSignal<Currency>('GBP')
   const [previewData, setPreviewData] = createSignal<PreviewDataMode>('test')
 
   const { user } = useUser()
@@ -31,36 +41,22 @@ export const CharitiesTickerConfigurator: Component<{ visible?: boolean }> = (
   )
 
   return (
-    <div class="flex flex-col gap-2 rounded bg-black/30 p-3">
-      <p class="mb-2 rounded border border-white/10 bg-white/5 p-2 text-sm text-white/80">
-        A horizontal scrolling ticker that cycles through charities. Choose a
-        theme and currency. Set your OBS Browser Source to 1920x80 px.
-      </p>
+    <ConfiguratorBody
+      description="A horizontal scrolling ticker that cycles through the charities."
+      format={OVERLAY_FORMATS.charities}
+      previewUrl={previewUrl()}
+      linkUrl={charitiesUrl()}
+    >
       <PreviewDataField value={previewData()} onChange={setPreviewData} />
-      <FieldRow label="Theme">
-        <select
-          value={theme()}
-          onChange={(e) => setTheme(e.currentTarget.value)}
-          class="w-40 rounded bg-black/40 px-2 py-1"
-        >
-          <option value="default">Default</option>
-          <option value="red">Red</option>
-          <option value="blue">Blue</option>
-        </select>
-      </FieldRow>
-      <FieldRow label="Currency">
-        <select
-          value={currency()}
-          onChange={(e) => setCurrency(e.currentTarget.value as 'GBP' | 'USD' | 'EUR')}
-          class="w-40 rounded bg-black/40 px-2 py-1"
-        >
-          <option value="GBP">GBP</option>
-          <option value="USD">USD</option>
-          <option value="EUR">EUR</option>
-        </select>
-      </FieldRow>
-      <LinkPreview url={charitiesUrl()} />
-      <PreviewFrame url={previewUrl()} visible={p.visible} />
-    </div>
+      <Select
+        label="Theme"
+        showLabel
+        options={['default', 'red', 'blue'] as Theme[]}
+        value={theme()}
+        onChange={setTheme}
+        format={titleCase}
+      />
+      <CurrencySelect value={currency()} onChange={setCurrency} />
+    </ConfiguratorBody>
   )
 }

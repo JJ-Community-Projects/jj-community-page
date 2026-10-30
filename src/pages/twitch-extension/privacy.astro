@@ -1,36 +1,43 @@
 ---
-import BaseLayout from "../../layouts/BaseLayout.astro";
+import PageShell from '../../layouts/PageShell.astro'
+import { PageHeader } from '../../components/ui/PageHeader'
+import { Tile } from '../../components/ui/Tile'
 ---
-<BaseLayout
-        title="Privacy Policy - Jingle Jam Community Twitch Extension"
-        description="Privacy policy of the Jingle Jam Community Twitch Panel Extension: it does not collect, store or share any personal or user-identifiable information."
-        canonical="https://jinglejam.ostof.dev/twitch-extension/privacy"
+
+<PageShell
+  title="Privacy Policy - Jingle Jam Community Twitch Extension"
+  description="Privacy policy of the Jingle Jam Community Twitch Panel Extension: it does not collect, store or share any personal or user-identifiable information."
+  canonical="https://jinglejam.ostof.dev/twitch-extension/privacy"
 >
-    <div class="flex flex-col justify-center items-center text-white p-2">
-        <h1 class="flex w-full flex-col items-center">
-            <span class="~text-2xl/4xl w-full text-center">The Jingle Jam Community Twitch Panel Extension</span>
-            <span class="~text-xl/2xl w-full text-center">Privacy Policy</span>
-        </h1>
-    </div>
-
-    <div class="text-white flex flex-col gap-4 max-w-96">
-        <p class="font-bold">Effective Date: November 24th 2024</p>
+  <div class="flex flex-col gap-3">
+    <PageHeader
+      title="Privacy Policy"
+      subtitle="The Jingle Jam Community Twitch Panel Extension"
+      back={{ href: '/twitch-extension', label: 'Twitch extensions' }}
+    />
+    <Tile>
+      <div class="flex max-w-prose flex-col gap-3 text-sm sm:text-base">
+        <p class="font-semibold">Effective Date: November 24th 2024</p>
         <p>
-            The Jingle Jam Community Twitch Panel Extension respects your privacy and is committed to protecting it.
+          The Jingle Jam Community Twitch Panel Extension respects your privacy and is committed to
+          protecting it.
         </p>
         <p>
-            This extension does <b>NOT</b> collect, store, or share any personal or user-identifiable information.
+          This extension does <b>NOT</b> collect, store, or share any personal or user-identifiable
+          information.
         </p>
         <p>
-            If you have any questions or concerns regarding this privacy policy, feel free to contact me at <a class="underline" target="_blank" href="mailto:ostof13@gmail.com">ostof13@gmail.com</a>.
+          If you have any questions or concerns regarding this privacy policy, feel free to contact
+          me at <a class="font-medium underline" target="_blank" href="mailto:ostof13@gmail.com"
+            >ostof13@gmail.com</a
+          >.
         </p>
         <p>
-            This privacy policy is subject to change. Please check this page for the latest privacy policy.
+          This privacy policy is subject to change. Please check this page for the latest privacy
+          policy.
         </p>
-        <p>
-            Thank you for using The Jingle Jam Community Extension.
-        </p>
-    </div>
-
-
-</BaseLayout>
+        <p>Thank you for using The Jingle Jam Community Extension.</p>
+      </div>
+    </Tile>
+  </div>
+</PageShell>

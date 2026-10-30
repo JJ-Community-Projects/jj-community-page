@@ -1,17 +1,37 @@
 import { type Component, createMemo, createSignal, For, Show } from 'solid-js'
-import { buildUrl, FieldRow, LinkPreview, PreviewDataField, type PreviewDataMode, PreviewFrame, } from '../overview/Common.tsx'
 import { useQuery } from '@tanstack/solid-query'
+import {
+  buildUrl,
+  ConfiguratorBody,
+  type Currency,
+  CurrencySelect,
+  PreviewDataField,
+  type PreviewDataMode,
+  titleCase,
+} from '../overview/Common.tsx'
+import { OVERLAY_FORMATS } from '../overview/formats.ts'
+import type { TransitionStyle } from './CharitiesOverlay.tsx'
 import { orpcPrivate } from '../../../../lib/orpc/client.ts'
 import { useUser } from '../../users/user-dashboard/providers/UserProvider.tsx'
+import { Checkbox, fieldClass } from '../../../ui/Form'
+import { Select } from '../../../ui/Select'
+import { TileGroup } from '../../../ui/Tile'
+import { Spinner } from '../../../ui/Status'
 
-type Theme2 = 'default' | 'red' | 'blue' | 'carousel'
+type Theme2 = 'default' | 'red' | 'blue' | 'carousel' | 'charity'
 type HeaderTheme2 = 'default' | 'red' | 'blue'
+type QrCode = 'none' | 'fundraiser' | 'charity'
+type Interval = 'default' | 'slow'
 
-type Currency = 'GBP' | 'USD' | 'EUR'
+// URL values, in display order
+const headerOptions = ['Title', 'Donate', 'JJLink'] as const
+const headerLabels: Record<(typeof headerOptions)[number], string> = {
+  Title: 'Title',
+  Donate: 'Donate command',
+  JJLink: 'Jingle Jam link',
+}
 
- export const CharitiesConfigurator: Component<{ visible?: boolean }> = (p) => {
-  // Header selection via checkboxes (mirrors V1 behavior but easier UX)
-  const headerOptions = ['Title', 'Donate', 'JJLink'] as const
+export const CharitiesConfigurator: Component = () => {
   const [selectedHeaders, setSelectedHeaders] = createSignal<string[]>([
     'Title',
     'JJLink',
@@ -20,11 +40,12 @@ type Currency = 'GBP' | 'USD' | 'EUR'
   const [theme2, setTheme2] = createSignal<Theme2>('default')
   const [headerTheme2, setHeaderTheme2] = createSignal<HeaderTheme2>('default')
   const [showDesc, setShowDesc] = createSignal<boolean>(false)
-  const [qrCode, setQrCode] = createSignal<'none' | 'fundraiser' | 'charity'>(
-    'none',
-  )
+  const [qrCode, setQrCode] = createSignal<QrCode>('none')
   const [currency, setCurrency] = createSignal<Currency>('GBP')
   const [showUrl, setShowUrl] = createSignal<boolean>(true)
+  const [showDots, setShowDots] = createSignal<boolean>(true)
+  const [transition, setTransition] = createSignal<TransitionStyle>('fade')
+  const [rotation, setRotation] = createSignal<Interval>('default')
   const [selectedIds, setSelectedIds] = createSignal<string[]>([])
   const [previewData, setPreviewData] = createSignal<PreviewDataMode>('test')
 
@@ -35,15 +56,18 @@ type Currency = 'GBP' | 'USD' | 'EUR'
     }),
   )
   const charities = () => q.data?.charities ?? []
-  const allSelected = () =>
-    selectedIds().length > 0 && selectedIds().length === charities().length
-  const toggleAll = (checked: boolean) =>
-    setSelectedIds(checked ? charities().map((c) => (c.id)) : [])
   const toggleOne = (id: string, checked: boolean) => {
     const set = new Set(selectedIds())
     if (checked) set.add(id)
     else set.delete(id)
     setSelectedIds(Array.from(set))
+  }
+  const toggleHeader = (h: string, checked: boolean) => {
+    const set = new Set(selectedHeaders())
+    if (checked) set.add(h)
+    else set.delete(h)
+    // Preserve default display order of headerOptions
+    setSelectedHeaders(headerOptions.filter((x) => set.has(x)))
   }
 
   const causesParam = createMemo(() =>
@@ -52,186 +76,132 @@ type Currency = 'GBP' | 'USD' | 'EUR'
 
   const { user } = useUser()
 
+  const params = () => ({
+    header: selectedHeaders(),
+    includeTotals: includeTotals2(),
+    theme: theme2(),
+    headerTheme: headerTheme2(),
+    showDesc: showDesc(),
+    qrCode: qrCode(),
+    currency: currency(),
+    showUrl: showUrl(),
+    showDots: showDots(),
+    transition: transition(),
+    interval: rotation(),
+    causes: causesParam(),
+    user: user?.tiltifySlug,
+  })
   const charities2Url = createMemo(() =>
-    buildUrl('/overlays/charities2', {
-      header: selectedHeaders(),
-      includeTotals: includeTotals2(),
-      theme: theme2(),
-      headerTheme: headerTheme2(),
-      showDesc: showDesc(),
-      qrCode: qrCode(),
-      currency: currency(),
-      showUrl: showUrl(),
-      causes: causesParam(),
-      user: user?.tiltifySlug,
-    }),
+    buildUrl('/overlays/charities2', params()),
   )
-
   // Preview requests demo fixtures by default so the panel is populated even
   // when no live data is available; the OBS URL never includes `demo`.
   const previewUrl = createMemo(() =>
     buildUrl('/overlays/charities2', {
-      header: selectedHeaders(),
-      includeTotals: includeTotals2(),
-      theme: theme2(),
-      headerTheme: headerTheme2(),
-      showDesc: showDesc(),
-      qrCode: qrCode(),
-      currency: currency(),
-      showUrl: showUrl(),
-      causes: causesParam(),
-      user: user?.tiltifySlug,
+      ...params(),
       demo: previewData() === 'test',
     }),
   )
 
   return (
-    <div class="flex flex-col gap-2 rounded bg-black/30 p-3">
-      <p class="mb-2 rounded border border-white/10 bg-white/5 p-2 text-sm text-white/80">
-        Show a info panel. Choose a theme, pick filled or striped style, and set the item limit. Set your OBS Browser Source to 300x450 px.
-      </p>
-      <div class="flex flex-row gap-1">
-        <div class="flex flex-1 flex-col gap-4">
-          <PreviewDataField value={previewData()} onChange={setPreviewData} />
-          <div class="flex flex-1 flex-col">
-            <FieldRow label="Theme">
-              <select
-                class="rounded bg-black/40 px-2 py-1"
-                value={theme2()}
-                onChange={(e) => setTheme2(e.currentTarget.value as Theme2)}
-              >
-                <option value="default">default</option>
-                <option value="red">red</option>
-                <option value="blue">blue</option>
-                <option value="carousel">carousel</option>
-              </select>
-            </FieldRow>
-            <FieldRow label="Header Theme">
-              <select
-                class="rounded bg-black/40 px-2 py-1"
-                value={headerTheme2()}
-                onChange={(e) =>
-                  setHeaderTheme2(e.currentTarget.value as HeaderTheme2)
-                }
-              >
-                <option value="default">default</option>
-                <option value="red">red</option>
-                <option value="blue">blue</option>
-              </select>
-            </FieldRow>
-            <FieldRow label="Currency">
-              <select
-                class="rounded bg-black/40 px-2 py-1"
-                value={currency()}
-                onChange={(e) => setCurrency(e.currentTarget.value as Currency)}
-              >
-                <option value="GBP">GBP</option>
-                <option value="USD">USD</option>
-                <option value="EUR">EUR</option>
-              </select>
-            </FieldRow>
-            <FieldRow label="Header Cards">
-              <div class="flex w-[30rem] flex-col gap-1">
-                <For each={headerOptions as unknown as string[]}>
-                  {(h) => (
-                    <label class="flex cursor-pointer items-center gap-2 text-sm">
-                      <input
-                        type="checkbox"
-                        checked={selectedHeaders().includes(h)}
-                        onChange={(e) => {
-                          const set = new Set(selectedHeaders())
-                          if (e.currentTarget.checked) set.add(h)
-                          else set.delete(h)
-                          // Preserve default display order of headerOptions
-                          setSelectedHeaders(
-                            headerOptions.filter((x) => set.has(x)),
-                          )
-                        }}
-                      />
-                      <span>{h}</span>
-                    </label>
-                  )}
-                </For>
-              </div>
-            </FieldRow>
-          </div>
-
-          <div class="flex flex-1 flex-col">
-            <FieldRow label="Include Totals">
-              <input
-                type="checkbox"
-                checked={includeTotals2()}
-                onChange={(e) => setIncludeTotals2(e.currentTarget.checked)}
-              />
-            </FieldRow>
-            <FieldRow label="Show Description">
-              <input
-                type="checkbox"
-                checked={showDesc()}
-                onChange={(e) => setShowDesc(e.currentTarget.checked)}
-              />
-            </FieldRow>
-            <FieldRow label="QR Code">
-              <select
-                class="rounded bg-black/40 px-2 py-1"
-                value={qrCode()}
-                onChange={(e) =>
-                  setQrCode(
-                    e.currentTarget.value as 'none' | 'fundraiser' | 'charity',
-                  )
-                }
-              >
-                <option value="none">none</option>
-                <option value="fundraiser">fundraiser</option>
-                <option value="charity">charity</option>
-              </select>
-            </FieldRow>
-            <FieldRow label="Show URL">
-              <input
-                type="checkbox"
-                checked={showUrl()}
-                onChange={(e) => setShowUrl(e.currentTarget.checked)}
-              />
-            </FieldRow>
-          </div>
-          <FieldRow label="Select Charities">
-            <div class="flex w-[30rem] flex-col gap-2">
-              <div class="max-h-60 w-full overflow-y-auto rounded border border-accent-500/40 bg-black/20 p-2">
-                <Show
-                  when={!q.isLoading}
-                  fallback={<p class="opacity-70">Loading charities…</p>}
-                >
-                  <For each={charities()}>
-                    {(c) => (
-                      <label class="flex cursor-pointer items-center gap-2 py-1 text-sm">
-                        <input
-                          type="checkbox"
-                          checked={selectedIds().includes((c.id))}
-                          onChange={(e) =>
-                            toggleOne((c.id), e.currentTarget.checked)
-                          }
-                        />
-                        <span class="line-clamp-1">{c.name}</span>
-                      </label>
-                    )}
-                  </For>
-                </Show>
-              </div>
-              <p class="text-xs opacity-70">
-                Tip: Leave all unchecked to include every charity.
-              </p>
-            </div>
-          </FieldRow>
-        </div>
-        <div class="flex flex-1 flex-col">
-          <PreviewFrame
-            url={previewUrl()}
-            visible={p.visible}
-            class={'h-[450px] w-[300px]'}
-          />
-        </div>
-      </div>
-      <LinkPreview url={charities2Url()} />
-    </div>
+    <ConfiguratorBody
+      description="An info panel that cycles through the Jingle Jam charities, with optional header cards, totals, descriptions and a QR code."
+      format={OVERLAY_FORMATS.charities2}
+      previewUrl={previewUrl()}
+      linkUrl={charities2Url()}
+    >
+      <PreviewDataField value={previewData()} onChange={setPreviewData} />
+      <Select
+        label="Theme"
+        showLabel
+        options={['default', 'red', 'blue', 'carousel', 'charity'] as Theme2[]}
+        value={theme2()}
+        onChange={setTheme2}
+        format={titleCase}
+      />
+      <Select
+        label="Header theme"
+        showLabel
+        options={['default', 'red', 'blue'] as HeaderTheme2[]}
+        value={headerTheme2()}
+        onChange={setHeaderTheme2}
+        format={titleCase}
+      />
+      <Select
+        label="Transition"
+        showLabel
+        options={['fade', 'slide', 'flip', 'none'] as TransitionStyle[]}
+        value={transition()}
+        onChange={setTransition}
+        format={titleCase}
+      />
+      <Select
+        label="Interval"
+        showLabel
+        options={['default', 'slow'] as Interval[]}
+        value={rotation()}
+        onChange={setRotation}
+        format={(v) => (v === 'slow' ? 'Slow (20s)' : 'Default (10s)')}
+      />
+      <CurrencySelect value={currency()} onChange={setCurrency} />
+      <Select
+        label="QR code"
+        showLabel
+        options={['none', 'fundraiser', 'charity'] as QrCode[]}
+        value={qrCode()}
+        onChange={setQrCode}
+        format={(v) =>
+          v === 'none' ? 'None' : v === 'fundraiser' ? 'Your fundraiser' : 'Charity website'
+        }
+      />
+      <fieldset class="flex flex-col gap-2">
+        <legend class={`${fieldClass.label} mb-1`}>Header cards</legend>
+        <For each={headerOptions}>
+          {(h) => (
+            <Checkbox
+              label={headerLabels[h]}
+              checked={selectedHeaders().includes(h)}
+              onChange={(checked) => toggleHeader(h, checked)}
+            />
+          )}
+        </For>
+      </fieldset>
+      <fieldset class="flex flex-col gap-2">
+        <legend class={`${fieldClass.label} mb-1`}>Show</legend>
+        <Checkbox
+          label="Totals"
+          checked={includeTotals2()}
+          onChange={setIncludeTotals2}
+        />
+        <Checkbox
+          label="Description"
+          checked={showDesc()}
+          onChange={setShowDesc}
+        />
+        <Checkbox label="URL" checked={showUrl()} onChange={setShowUrl} />
+        <Checkbox
+          label="Position dots"
+          checked={showDots()}
+          onChange={setShowDots}
+        />
+      </fieldset>
+      <fieldset class="flex flex-col gap-1 sm:col-span-2">
+        <legend class={`${fieldClass.label} mb-1`}>Charities</legend>
+        <TileGroup class="flex max-h-60 flex-col gap-2 overflow-y-auto">
+          <Show when={!q.isLoading} fallback={<Spinner label="Loading charities…" />}>
+            <For each={charities()}>
+              {(c) => (
+                <Checkbox
+                  label={c.name}
+                  checked={selectedIds().includes(c.id)}
+                  onChange={(checked) => toggleOne(c.id, checked)}
+                />
+              )}
+            </For>
+          </Show>
+        </TileGroup>
+        <p class={fieldClass.help}>Leave all unchecked to include every charity.</p>
+      </fieldset>
+    </ConfiguratorBody>
   )
 }

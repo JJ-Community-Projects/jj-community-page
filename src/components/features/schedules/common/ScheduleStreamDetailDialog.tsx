@@ -1,15 +1,16 @@
-import { type Component, type JSX, Show } from 'solid-js'
+import { type Component, type JSX, Match, Show, Switch } from 'solid-js'
 import type { Stream } from '../../../../lib/orpc/public/schemas/schedules.ts'
 import { DateTime, Duration } from 'luxon'
 import ical, { ICalAlarmType } from 'ical-generator'
 import { useNow } from '../../../../lib/utils/useNow.ts'
 import { type ModalSignal } from '../../../../lib/createModalSignal.ts'
 import { getStreamColor } from '../../../../functions/jjDatesToColors.ts'
-import { Dialog } from '@kobalte/core'
-import { AiOutlineClose } from 'solid-icons/ai'
+import { Button } from '../../../ui/Button'
+import { Dialog } from '../../../ui/Dialog'
+import { LiveBadge } from '../../../ui/Labels'
 import { getTextColor } from '../../../../lib/utils/textColors.ts'
 import { StreamTags } from './StreamTags'
-import { StreamParticipants } from './StreamParticipants'
+import { StreamParticipants, sectionLabel } from './StreamParticipants'
 import type { UserDisplay } from '../../../../lib/orpc/public/schemas/UserDisplaySchema.ts'
 import {
   FaBrandsTwitch,
@@ -21,11 +22,14 @@ interface ScheduleStreamDetailDialogProps {
   stream: Stream
   modalSignal: ModalSignal
   user?: UserDisplay
+  /** The row's colour (e.g. its day's); the stream's own day colour when unset. */
+  color?: string
 }
 
 /**
- * Dialog component that displays detailed information about a stream
- * Shows title, subtitle, description, time, countdown, and tags
+ * A stream's details, laid out like the extension's slot dialog: header band in the stream colour,
+ * then when (with live / countdown / ended), description, participants, tags, the streamer's links
+ * and the calendar buttons.
  */
 export const ScheduleStreamDetailDialog: Component<
   ScheduleStreamDetailDialogProps
@@ -54,7 +58,7 @@ export const ScheduleStreamDetailDialog: Component<
           href={href}
           target="_blank"
           rel="noopener noreferrer"
-          class="text-twitch-500 underline hover:brightness-110"
+          class="text-twitch-600 font-medium underline"
         >
           {fullMatch}
         </a>,
@@ -67,191 +71,132 @@ export const ScheduleStreamDetailDialog: Component<
     return parts
   }
 
-  // Convert UTC dates from backend to DateTime objects
-  const getStreamStartDateTime = () => {
-    // Create DateTime from JS Date, assuming it's in UTC, then convert to local time
-    return DateTime.fromJSDate(stream().start, { zone: 'utc' }).toLocal()
-  }
+  // UTC dates from the backend, shown in the viewer's time zone
+  const start = () =>
+    DateTime.fromJSDate(stream().start, { zone: 'utc' }).toLocal()
+  const end = () => DateTime.fromJSDate(stream().end, { zone: 'utc' }).toLocal()
 
-  const getStreamEndDateTime = () => {
-    // Create DateTime from JS Date, assuming it's in UTC, then convert to local time
-    return DateTime.fromJSDate(stream().end, { zone: 'utc' }).toLocal()
-  }
+  // The UTC day's colour, like the rows, unless the row passes its own
+  const color = () =>
+    props.color ??
+    getStreamColor(DateTime.fromJSDate(stream().start, { zone: 'utc' }))
 
-  // Calculate the highlight color using getStreamColor
-  const getHighlightColor = () => {
-    // For color calculation, we still use UTC to maintain consistent colors
-    const startDate = DateTime.fromJSDate(stream().start, { zone: 'utc' })
-    return getStreamColor(startDate)
-  }
-
-  const highlightColor = getHighlightColor()
-  const textColor = getTextColor(highlightColor)
-
-  const showCountdown = () => {
-    return getStreamStartDateTime() > now() && !stream().isTimeTBD
-  }
-
-  const isLive = () => {
-    const start = getStreamStartDateTime()
-    const end = getStreamEndDateTime()
-    return start < now() && end > now()
-  }
-
-  const diff = () => {
-    return getStreamStartDateTime().diff(now())
-  }
+  const isLive = () => start() < now() && end() > now()
+  const isOver = () => end() < now()
+  const showCountdown = () => start() > now() && !stream().isTimeTBD
 
   const countdownFormat = () => {
-    const d = diff()
+    const d = start().diff(now())
     if (d.as('day') < 1) {
       return d.toFormat("hh'h' mm'm' ss's'")
     }
     return d.toFormat("dd'd' hh'h' mm'm' ss's'")
   }
 
+  // "Sat 6 Dec · 20:00 – 22:00 GMT"
+  const when = () => {
+    const day = start().toLocaleString({
+      weekday: 'short',
+      day: 'numeric',
+      month: 'short',
+    })
+    if (stream().isTimeTBD) return `${day} · time TBD`
+    const time = (dt: DateTime) => dt.toLocaleString(DateTime.TIME_SIMPLE)
+    return `${day} · ${time(start())} – ${time(end())} ${start().offsetNameShort ?? ''}`
+  }
+
   return (
-    <Dialog.Root
+    <Dialog
       open={props.modalSignal.isOpen()}
       onOpenChange={props.modalSignal.setOpen}
+      title={stream().title}
+      description={stream().subtitle || undefined}
+      accent={{ background: color(), color: getTextColor(color()) }}
     >
-      <Dialog.Portal>
-        <Dialog.Overlay class="fixed inset-0 z-20 bg-black/20 p-2 lg:p-16" />
-        <Dialog.Content class="fixed left-1/2 top-1/2 z-30 flex h-[70vh] w-[calc(100vw_-_24px)] -translate-x-1/2 -translate-y-1/2 transform flex-col rounded-2xl bg-white shadow-xl md:h-[90vh] lg:w-[min(calc(100vw_-_16px),_386px)]">
-          <Dialog.Title
-            class="flex flex-row gap-4 rounded-t-2xl p-2"
-            style={{
-              background: highlightColor,
-              color: textColor,
-            }}
-          >
-            <button
-              class="aspect-square rounded-full hover:bg-accent-200/10"
-              onClick={() => props.modalSignal.close()}
-            >
-              <AiOutlineClose size={24} />
-            </button>
-            <div class="flex flex-col">
-              <p class="text-xl font-bold">{stream().title}</p>
-              <Show when={stream().subtitle}>
-                <p>{stream().subtitle}</p>
-              </Show>
-            </div>
-          </Dialog.Title>
-          <div class="flex h-full flex-1 flex-col overflow-hidden overscroll-none">
-            <div class="flex h-full flex-col overflow-auto overflow-x-hidden scrollbar-thin scrollbar-track-accent-100 scrollbar-thumb-accent-500 scrollbar-corner-primary-100">
-              <div class="flex h-full flex-col justify-between px-2 pb-4 pt-2">
-                <div class="flex flex-col">
-                  <Show when={stream().description}>
-                    <Dialog.Description class="mb-6">
-                      {linkifyTwitch(stream().description as string)}
-                    </Dialog.Description>
-                  </Show>
+      <div class="flex flex-col gap-4 text-sm">
+        <div class="flex flex-col items-start gap-1">
+          <p class="font-semibold">{when()}</p>
+          <Switch>
+            <Match when={isLive()}>
+              <LiveBadge label="Live now" />
+            </Match>
+            <Match when={showCountdown()}>
+              <p class="text-fg-muted text-xs">
+                Starts in{' '}
+                <span class="font-medium tabular-nums">
+                  {countdownFormat()}
+                </span>
+              </p>
+            </Match>
+            <Match when={isOver()}>
+              <p class="text-fg-muted text-xs">Ended</p>
+            </Match>
+          </Switch>
+        </div>
 
-                  <Show when={isLive()}>
-                    <div class="flex flex-row py-1">
-                      <div class="flex flex-row items-center gap-1 rounded-full bg-accent-200/50 px-2 py-0.5 text-black transition-all hover:bg-accent-200">
-                        Watch Live{' '}
-                        <div class="h-2 w-2">
-                          <span class="relative flex h-2 w-2">
-                            <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75 duration-700" />
-                            <span class="relative inline-flex h-full w-full rounded-full bg-red-500" />
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </Show>
-                  <Show
-                    when={!stream().isTimeTBD}
-                    fallback={
-                      <p>
-                        {getStreamStartDateTime().toLocaleString({
-                          weekday: 'short',
-                          month: 'short',
-                          day: 'numeric',
-                        })}{' '}
-                        TBD
-                      </p>
-                    }
-                  >
-                    <p>
-                      {getStreamStartDateTime().toLocaleString({
-                        weekday: 'short',
-                        month: 'short',
-                        day: 'numeric',
-                        hour: 'numeric',
-                        minute: 'numeric',
-                        timeZoneName: 'short',
-                      })}
-                    </p>
-                  </Show>
+        <Show when={stream().description}>
+          <p class="whitespace-pre-line">
+            {linkifyTwitch(stream().description as string)}
+          </p>
+        </Show>
 
-                  <Show when={showCountdown()}>
-                    <p>{countdownFormat()}</p>
-                  </Show>
+        <StreamParticipants participants={stream().participants} />
+        <StreamTags tags={stream().tags} />
 
-                  <Show when={props.user}>
-                    <div class="flex flex-col gap-2 py-4">
-                      <Show when={props.user?.tiltifySlug}>
-                        {(tiltifySlug) => {
-                          return (
-                            <a
-                              href={`/${tiltifySlug()}`}
-                              class="w-fit rounded-full bg-accent-500 px-3 py-1 text-sm font-medium text-white transition-colors hover:brightness-105"
-                            >
-                              Go to user profile
-                            </a>
-                          )
-                        }}
-                      </Show>
-                      <Show when={props.user?.twitchLogin}>
-                        {(twitchLogin) => {
-                          return (
-                            <a
-                              href={`https://twitch.tv/${twitchLogin()}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              class="flex w-fit flex-row items-center justify-center gap-2 rounded-full bg-twitch-500 px-3 py-1 text-sm font-medium text-white transition-colors hover:brightness-105"
-                            >
-                              Open Twitch <FaBrandsTwitch />
-                            </a>
-                          )
-                        }}
-                      </Show>
-                      <Show when={props.user?.youtubeUrl}>
-                        {(url) => {
-                          return (
-                            <a
-                              href={url()}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              class="flex w-fit flex-row items-center justify-center gap-2 rounded-full bg-youtube-500 px-3 py-1 text-sm font-medium text-white transition-colors hover:brightness-105"
-                            >
-                              Open Youtube <FaBrandsYoutube />
-                            </a>
-                          )
-                        }}
-                      </Show>
-                    </div>
-                  </Show>
-                  <Show when={showCountdown()}>
-                    <div class="flex flex-row gap-2 py-1">
-                      <AddToGoogleCalendarButton
-                        stream={stream()}
-                        user={props.user}
-                      />
-                      <DownloadIcsButton stream={stream()} user={props.user} />
-                    </div>
-                  </Show>
-                  <StreamTags tags={stream().tags} />
-                  <StreamParticipants participants={stream().participants} />
-                </div>
+        <Show when={props.user}>
+          {(user) => (
+            <section class="flex flex-col gap-1.5">
+              <h3 class={sectionLabel}>Streamer</h3>
+              <div class="flex flex-wrap gap-2">
+                <Button
+                  href={`/${user().tiltifySlug}`}
+                  size="sm"
+                  variant="accent"
+                >
+                  Go to user profile
+                </Button>
+                <Show when={user().twitchLogin}>
+                  {(twitchLogin) => (
+                    <Button
+                      href={`https://twitch.tv/${twitchLogin()}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      size="sm"
+                      brand="twitch"
+                    >
+                      <FaBrandsTwitch aria-hidden="true" /> Open Twitch
+                    </Button>
+                  )}
+                </Show>
+                <Show when={user().youtubeUrl}>
+                  {(url) => (
+                    <Button
+                      href={url()}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      size="sm"
+                      brand="youtube"
+                    >
+                      <FaBrandsYoutube aria-hidden="true" /> Open YouTube
+                    </Button>
+                  )}
+                </Show>
               </div>
+            </section>
+          )}
+        </Show>
+
+        <Show when={showCountdown()}>
+          <section class="flex flex-col gap-1.5">
+            <h3 class={sectionLabel}>Add to calendar</h3>
+            <div class="flex flex-wrap gap-2">
+              <AddToGoogleCalendarButton stream={stream()} user={props.user} />
+              <DownloadIcsButton stream={stream()} user={props.user} />
             </div>
-          </div>
-        </Dialog.Content>
-      </Dialog.Portal>
-    </Dialog.Root>
+          </section>
+        </Show>
+      </div>
+    </Dialog>
   )
 }
 
@@ -298,18 +243,9 @@ const AddToGoogleCalendarButton: Component<AddToGoogleCalendarButtonProps> = (
   const url = () => buildGoogleCalendarUrl()
 
   return (
-    <div class={'flex flex-row'}>
-      <a
-        target={'_blank'}
-        rel={'noreferrer noopener'}
-        class={
-          'flex flex-row items-center gap-1 rounded-full bg-accent-200/50 px-2 py-1 text-xs text-black no-underline transition-all hover:cursor-pointer hover:bg-accent-200'
-        }
-        href={url()}
-      >
-        Add to Google Calendar <FaRegularCalendarPlus />
-      </a>
-    </div>
+    <Button target="_blank" rel="noreferrer noopener" size="sm" href={url()}>
+      Add to Google Calendar <FaRegularCalendarPlus aria-hidden="true" />
+    </Button>
   )
 }
 
@@ -383,16 +319,8 @@ const DownloadIcsButton: Component<DownloadIcsButtonProps> = (props) => {
   }
 
   return (
-    <div class={'flex flex-row'}>
-      <button
-        type="button"
-        class={
-          'flex flex-row items-center gap-1 rounded-full bg-accent-200/50 px-2 py-1 text-xs text-black transition-all hover:cursor-pointer hover:bg-accent-200'
-        }
-        onClick={download}
-      >
-        Download .ics{''} <FaRegularCalendarPlus />
-      </button>
-    </div>
+    <Button size="sm" onClick={download}>
+      Download .ics <FaRegularCalendarPlus aria-hidden="true" />
+    </Button>
   )
 }

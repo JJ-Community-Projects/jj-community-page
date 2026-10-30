@@ -1,7 +1,8 @@
 ---
 import { serverClientPrivate, serverClientPublic } from '../../lib/orpc/serverClient.ts'
-import BaseLayout from '../../layouts/BaseLayout.astro'
+import PageShell from '../../layouts/PageShell.astro'
 import { CommunityPage } from '../../components/features/community-ssr/CommunityPage.tsx'
+import { PageHeader } from '../../components/ui/PageHeader'
 
 export const prerender = false
 Astro.response.headers.set(
@@ -9,10 +10,8 @@ Astro.response.headers.set(
   'public, s-maxage=60, stale-while-revalidate=600'
 )
 // Server-side load initial data via orpc server client
-const campaignsFn = serverClientPrivate.jj.campaigns
-const causesFn = serverClientPrivate.jj.causes
+const communityListFn = serverClientPrivate.jj.communityList
 const upcomingStreamsFn = serverClientPrivate.jj.upcomingStreams
-const usersFn = serverClientPrivate.jj.getAllUsersWithInfo
 
 const ctx = {
   context: {
@@ -23,26 +22,23 @@ const ctx = {
 
 const [
   { data: community },
-  { data: causes },
   { data: upcomingStreams },
-  { data: users },
   { data: tagCatalog },
 ] = await Promise.all([
-  campaignsFn({}, ctx),
-  causesFn({}, ctx),
+  communityListFn({}, ctx),
   upcomingStreamsFn({}, ctx),
-  usersFn({}, ctx),
   // The tag search gets the catalog from the page (no public HTTP route)
   serverClientPublic.tags.catalog({}, ctx),
 ])
 ---
 
-<BaseLayout
+<PageShell width="wide"
   title="The Jingle Jam Community - Fundraisers & Upcoming Streams"
-  description="Explore community fundraisers and upcoming streams for Jingle Jam 2025 - discover creators and donate."
+  description="Explore community fundraisers and upcoming streams for Jingle Jam - discover creators and donate."
   canonical="https://jinglejam.ostof.dev/community"
 >
-  <div class="w-full flex flex-col justify-center items-stretch gap-4">
-    <CommunityPage initial={{ community, causes, upcomingStreams, users }} tagCatalog={tagCatalog?.tags} client:idle />
+  <div class="flex flex-col gap-3">
+    <PageHeader title="Community" subtitle="Fundraisers and upcoming streams" />
+    <CommunityPage initial={{ community, upcomingStreams }} tagCatalog={tagCatalog?.tags} client:idle />
   </div>
-</BaseLayout>
+</PageShell>

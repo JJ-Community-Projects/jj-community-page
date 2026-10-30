@@ -9,6 +9,7 @@ export const CharityItemSchema = z.object({
   name: z.string(),
   description: z.string(),
   logoUrl: z.string().optional(),
+  color: z.string().optional(),
   tagline: z.string().optional(),
   websiteUrl: z.string().optional(),
   raised: z.number().optional(),

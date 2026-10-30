@@ -1,5 +1,6 @@
 ---
-import BaseLayout4xl from '../layouts/BaseLayout4xl.astro'
+import ErrorPage from '../layouts/ErrorPage.astro'
+import { Button } from '../components/ui/Button'
 
 // Unmatched paths and the pages that rewrite here (unknown user, team, schedule) answer 404.
 export const prerender = false
@@ -12,19 +13,18 @@ const links = [
 ]
 ---
 
-<BaseLayout4xl
+
+<ErrorPage
   title="Page not found | Jingle Jam Community"
   description="This page doesn't exist on the Jingle Jam Community site."
+  heading="Page not found"
+  code="404"
 >
-  <div class="flex w-full flex-col items-center gap-4 rounded-xl border border-white/10 bg-white/5 p-6 text-center text-white">
-    <h1 class="~text-2xl/4xl">Page not found</h1>
-    <p class="text-white/90">
-      The page, creator, team or schedule you're looking for doesn't exist.
-    </p>
-    <nav class="flex flex-wrap justify-center gap-4">
-      {links.map(({ href, label }) => (
-        <a href={href} class="underline hover:text-accent">{label}</a>
-      ))}
-    </nav>
+  The page, creator, team or schedule you're looking for doesn't exist.
+  <!-- Four links: 2×2 on phones (a row wraps 3 + 1), one centred row from sm up -->
+  <div slot="actions" class="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:flex-wrap sm:justify-center">
+    {links.map(({ href, label }, i) => (
+      <Button href={href} size="sm" variant={i === 0 ? 'primary' : 'secondary'}>{label}</Button>
+    ))}
   </div>
-</BaseLayout4xl>
+</ErrorPage>

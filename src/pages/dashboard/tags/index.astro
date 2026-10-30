@@ -1,5 +1,5 @@
 ---
-import BaseLayout from "../../../layouts/BaseLayout.astro";
+import PageShell from '../../../layouts/PageShell.astro'
 import {UserTagsPage} from "../../../components/features/users/user-dashboard/tags/UserTagsPage";
 import {serverClientPublic} from "../../../lib/orpc/serverClient";
 
@@ -14,6 +14,6 @@ const {data: tagCatalog} = await serverClientPublic.tags.catalog(
   {context: {locals: Astro.locals, request: Astro.request}},
 );
 ---
-<BaseLayout>
+<PageShell>
     <UserTagsPage client:only="solid-js" user={user} tagCatalog={tagCatalog?.tags} />
-</BaseLayout>
+</PageShell>
