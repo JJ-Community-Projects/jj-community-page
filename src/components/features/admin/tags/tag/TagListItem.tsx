@@ -16,13 +16,13 @@ interface TagListItemProps {
   tag: Tag & {
     userCount: number;
     streamCount: number;
-    totalUsage: number;
     aliases: TagAlias[];
   }
 }
 
 export const TagListItem: Component<TagListItemProps> = (props) => {
   const tag = props.tag;
+  const totalUsage = tag.userCount + tag.streamCount;
   const client = useQueryClient()
   const [showDeleteConfirm, setShowDeleteConfirm] = createSignal(false);
   const [expanded, setExpanded] = createSignal(false);
@@ -110,11 +110,8 @@ export const TagListItem: Component<TagListItemProps> = (props) => {
         </IconButton>
         <h4 class="min-w-0 flex-1 text-sm font-semibold">
           {tag.name}{' '}
-          <span class="text-fg-muted font-normal">({tag.userCount + tag.streamCount} uses)</span>
+          <span class="text-fg-muted font-normal">({totalUsage} uses)</span>
         </h4>
-        <Show when={tag.totalUsage > 0}>
-          <Chip size="sm">{tag.totalUsage} total uses</Chip>
-        </Show>
         <Show when={tag.aliases.length > 0}>
           <Chip size="sm" tone="accent">{tag.aliases.length} aliases</Chip>
         </Show>
@@ -198,8 +195,8 @@ export const TagListItem: Component<TagListItemProps> = (props) => {
         text={
           <>
             Are you sure you want to delete this tag? This will remove it from all users and streams.
-            <Show when={tag.totalUsage > 0}>
-              {' '}This will affect {tag.totalUsage} usage(s).
+            <Show when={totalUsage > 0}>
+              {' '}This will affect {totalUsage} usage(s).
             </Show>
           </>
         }

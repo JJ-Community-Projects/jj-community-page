@@ -32,7 +32,7 @@
     "test:browser": "astro build && playwright test -c test/browser/playwright.config.ts",
     "test:browser:headed": "astro build && BROWSER_SLOWMO=${BROWSER_SLOWMO:-300} playwright test -c test/browser/playwright.config.ts --headed --workers=1",
     "test:update": "npm run test -- -u",
-    "verify": "npm run test && npm run check:ui && astro build"
+    "verify": "npm run test && npm run check && npm run check:ui && astro build"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.10",

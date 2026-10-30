@@ -10,7 +10,7 @@ export class FriendsListObject extends DurableIteratorObject<{
   friends: UserDisplay[]
   event: 'update'
 }> {
-  constructor(state: DurableObjectState, env: Env) {
+  constructor(state: DurableObjectState<{}>, env: Env) {
     super(state, env, {
       signingKey: env.ORPC_DEI_SIGNING_KEY,
       interceptors: [

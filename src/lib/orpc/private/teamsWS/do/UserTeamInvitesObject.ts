@@ -9,7 +9,7 @@ export class UserTeamInvitesObject extends DurableIteratorObject<{
   invites: { teamId: number; name: string }[]
   event: 'update'
 }> {
-  constructor(state: DurableObjectState, env: Env) {
+  constructor(state: DurableObjectState<{}>, env: Env) {
     super(state, env, {
       signingKey: env.ORPC_DEI_SIGNING_KEY,
       interceptors: [onError((e) => console.error(loggableError(e)))],

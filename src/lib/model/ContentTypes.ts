@@ -26,7 +26,7 @@ export type FullDay = Omit<ContentScheduleDay, 'streams'> & { streams: FullStrea
 export type FullWeek = Omit<ContentScheduleWeek, 'days'> & {
   days: FullDay[], streams: FullStream[],
 };
-export type FullSchedule = Omit<ContentSchedule, 'weeks'> & {
+export type FullSchedule = Omit<ContentSchedule, 'weeks' | 'updatedAt'> & {
   weeks: FullWeek[],
   streams: FullStream[],
   updatedAt: DateTime,

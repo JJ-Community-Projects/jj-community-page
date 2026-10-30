@@ -32,8 +32,14 @@ const demoParam = Astro.url.searchParams.get('demo')
 const demo = demoParam === 'true' || demoParam === '1'
 
 const includeTotals = includeTotalsParam === 'true' || includeTotalsParam === '1'
-const theme = themeParam ?? undefined
-const headerTheme = headerThemeParam ?? undefined
+const theme = (() => {
+  const v = themeParam ?? ''
+  return v === 'default' || v === 'red' || v === 'blue' || v === 'carousel' || v === 'charity' ? v : undefined
+})()
+const headerTheme = (() => {
+  const v = headerThemeParam ?? ''
+  return v === 'default' || v === 'red' || v === 'blue' ? v : undefined
+})()
 const showDesc = showDescParam === 'true' || showDescParam === '1'
 const qrCode = (() => {
   const v = (qrCodeParam ?? 'none').toLowerCase()

@@ -65,7 +65,7 @@ const socketUserId = (websocket: WebSocket) => {
  * editor stops receiving events at the latest when its token expires.
  */
 export class ScheduleEditingObject extends DurableIteratorObject<EditChannelMessage> {
-  constructor(state: DurableObjectState, env: Env) {
+  constructor(state: DurableObjectState<{}>, env: Env) {
     super(state, env, {
       signingKey: env.ORPC_DEI_SIGNING_KEY,
       onSubscribed: async (websocket, lastEventId) => {
