@@ -25,23 +25,27 @@ function createTweenedNumber(
   const [value, setValue] = createSignal(source())
   let raf = 0
 
-  createEffect(() => {
-    const from = value()
-    const to = source()
-    if (from === to) return
+  // Only `source` is tracked; reading `value` here must not re-run the effect.
+  createEffect(
+    on(source, (to) => {
+      const from = value()
+      cancelAnimationFrame(raf)
+      if (from === to) return
 
-    cancelAnimationFrame(raf)
-    const start = performance.now()
+      // Start at the first frame's timestamp: rAF times can be earlier than
+      // performance.now() in the click handler, which made t < 0 and the
+      // eased value overshoot below `from` (e.g. negative raised).
+      let start: number | undefined
+      const tick = (now: number) => {
+        start ??= now
+        const t = Math.min(1, (now - start) / duration)
+        setValue(from + (to - from) * easing(t))
+        if (t < 1) raf = requestAnimationFrame(tick)
+      }
 
-    const tick = (now: number) => {
-      const t = Math.min(1, (now - start) / duration)
-      const k = easing(t)
-      setValue(from + (to - from) * k)
-      if (t < 1) raf = requestAnimationFrame(tick)
-    }
-
-    raf = requestAnimationFrame(tick)
-  })
+      raf = requestAnimationFrame(tick)
+    }),
+  )
 
   onCleanup(() => cancelAnimationFrame(raf))
   return value
