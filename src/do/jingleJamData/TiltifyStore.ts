@@ -21,6 +21,8 @@ import { sameJson } from '../utils/sameJson.ts'
 import type { CurrencyStore } from './CurrencyStore.ts'
 
 const MAX_BOUND_PARAMS = 100
+// DO storage `delete(keys)` takes at most 128 keys per call.
+const MAX_KEYS_PER_DELETE = 128
 
 // Keys of the jj_causes (cause id) and jj_campaign (user slug) rows already inserted for `year`.
 const INSERTED_KEY = 'd1:jj:inserted'
@@ -136,9 +138,7 @@ export class TiltifyStore {
         `Failed to fetch JingleJam campaigns: ${res.status} ${res.statusText}`,
       )
     }
-    const data = (await res.json()) as JingleJamCampaignsResponse
-    console.log('fetchCampaigns', data.campaigns.count)
-    return data
+    return (await res.json()) as JingleJamCampaignsResponse
   }
 
   public async refreshAllCampaigns() {
@@ -148,11 +148,7 @@ export class TiltifyStore {
 
     try {
       while (true) {
-        const res = await this.fetchCampaigns(limit, offset)
-        // Try common shapes: list or campaigns
-        const batch: JJCampaign[] =
-          // @ts-ignore – tolerate different response shapes
-          (res as any)?.list ?? ((res as any)?.campaigns as JJCampaign[]) ?? []
+        const batch = (await this.fetchCampaigns(limit, offset)).campaigns
 
         if (!Array.isArray(batch) || batch.length === 0) break
 
@@ -166,6 +162,8 @@ export class TiltifyStore {
       console.log('refreshAllCampaigns', 'all', all.length)
       await this.setCampaigns(all)
       await this.updateGoalsAfterSetCampaigns(all)
+      // Only after a complete fetch: a partial one (catch below) doesn't say which campaigns are gone.
+      await this.deleteUnlistedCampaigns(all)
     } catch (e) {
       console.error('refreshAllCampaigns failed', e)
       // Best-effort: still persist whatever we have
@@ -178,6 +176,40 @@ export class TiltifyStore {
         }
       }
     }
+  }
+
+  // Campaign and goal keys are written per id, slug and user slug, so a campaign the JJ API no
+  // longer lists (last year's, a deleted one) would stay in storage forever (F-89). Deletes every
+  // such key that `listed` doesn't write. An empty list deletes nothing: the tracker never serves
+  // an empty list in place of a filled one, so that is a failed load, not "no campaigns".
+  private async deleteUnlistedCampaigns(listed: JJCampaign[]) {
+    if (listed.length === 0) return
+    const keep = new Set(listed.flatMap((c) => this.campaignKeys(c)))
+    const stale = (await this.getCampaigns())
+      .flatMap((c) => this.campaignKeys(c))
+      .filter((k) => !keep.has(k))
+    for (const keys of chunk([...new Set(stale)], MAX_KEYS_PER_DELETE)) {
+      await this.storage.delete(keys)
+    }
+  }
+
+  private campaignKeys(c: JJCampaign) {
+    const refs = [
+      [this.campaignKeyId, c.id],
+      [this.campaignKey, c.slug],
+      [this.campaignKeyUserSlug, c.user?.slug],
+      [this.campaignGoalKeyId, c.id],
+      [this.campaignGoalKey, c.slug],
+      [this.campaignGoalKeyUserSlug, c.user?.slug],
+      [this.campaignPreviousGoalKeyId, c.id],
+      [this.campaignPreviousGoalKey, c.slug],
+      [this.campaignPreviousGoalKeyUserSlug, c.user?.slug],
+    ] as const
+    return refs.flatMap(([key, ref]) => (ref ? [key(ref)] : []))
+  }
+
+  public getEventYear() {
+    return this.storage.get<number>('event:year')
   }
 
   // Refresh causes + event metadata from the JJ API. Pushes the USD conversion

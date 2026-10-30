@@ -29,6 +29,8 @@ const refreshJJAPIData = os.refreshJJAPIDataContract.handler(
       await stub.checkLiveStreams()
       await stub.buildAndStoreUserTags()
       await stub.insertIntoDB({ resend: true })
+      // The readers use the display projections, not the raw keys refreshed above (F-21).
+      await stub.buildDisplayData()
     } catch (e: any) {
       throw new ORPCError('INTERNAL_SERVER_ERROR', {
         message: e?.message ?? 'Failed to refresh',

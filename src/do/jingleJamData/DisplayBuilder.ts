@@ -18,6 +18,8 @@ import {
 } from '../utils/twitchLogins.ts'
 import type { TiltifyStore } from './TiltifyStore.ts'
 import type { TwitchTracker } from './TwitchTracker.ts'
+import { chunk } from '../utils/chunk.ts'
+import { sameJson } from '../utils/sameJson.ts'
 
 // Cause colours are entered by hand upstream; only pass on real hex values.
 const HEX_COLOR = /^#[0-9a-f]{3,8}$/i
@@ -28,10 +30,17 @@ import type { DonationMatchStore } from './DonationMatchStore.ts'
 // A TV cause plus the event year of the raw cause it was built from.
 export type StoredTVCause = JJCauseTVType & { year?: number }
 
+// The `campaign:display:*` keys the last build wrote, so the next one can delete the ones it
+// doesn't write again without listing the prefix on every build (F-89).
+const CAMPAIGN_DISPLAY_KEYS = 'campaigns:display:keys'
+const CAMPAIGN_DISPLAY_PREFIX = 'campaign:display:'
+// DO storage `delete(keys)` takes at most 128 keys per call.
+const MAX_KEYS_PER_DELETE = 128
+
 // TV/display projections (the hot read path for the Twitch extension and
 // overlay). Reads from the Tiltify/Twitch/Currency/UserTags modules plus D1.
 //
-// Owns storage keys: `campaign:display:*`, `campaigns:display{,:all}`,
+// Owns storage keys: `campaign:display:*`, `campaigns:display{,:all,:keys}`,
 // `causes:display{,:all}`, `cause:tv:*`, `community:campaigns:display{,:all}`.
 export class DisplayBuilder {
   constructor(
@@ -198,6 +207,7 @@ export class DisplayBuilder {
 
       // Batch write all campaign display entries
       await this.storage.put(displayEntries)
+      await this.deleteUnwrittenCampaignDisplays(Object.keys(displayEntries))
 
       // Create TOP 100 slice by raised GBP descending
       const top100 = [...allDisplayList]
@@ -232,6 +242,7 @@ export class DisplayBuilder {
       const eurRate = await this.currency.getGbpToEurRate()
 
       const rawCauses = await this.tiltify.getCauses()
+      const year = await this.tiltify.getEventYear()
 
       const causes: JJCauseTVType[] = await Promise.all(
         rawCauses.map(async (c) => {
@@ -254,9 +265,12 @@ export class DisplayBuilder {
         causes.map((c, i) => this.setTVCause({ ...c, year: rawCauses[i].year })),
       )
 
+      // `cause:raw:*` keeps past years' causes (and un-stamped ones from before the year stamp);
+      // the extension only lists the current event's (F-89).
+      const current = causes.filter((_, i) => rawCauses[i].year === year)
       const output: CausesDisplayTVType = {
-        count: causes.length,
-        causes,
+        count: current.length,
+        causes: current,
       }
 
       await this.storage.put('causes:display', output)
@@ -394,6 +408,24 @@ export class DisplayBuilder {
       })
     } catch (e) {
       console.error('build display community campaigns', e)
+    }
+  }
+
+  // Deletes the `campaign:display:*` keys the previous build wrote that this one didn't. Without
+  // an index yet (first build after the deploy), lists the prefix once instead.
+  private async deleteUnwrittenCampaignDisplays(written: string[]) {
+    const previous =
+      (await this.storage.get<string[]>(CAMPAIGN_DISPLAY_KEYS)) ??
+      Array.from(
+        (await this.storage.list({ prefix: CAMPAIGN_DISPLAY_PREFIX })).keys(),
+      )
+    const keep = new Set(written)
+    const stale = previous.filter((k) => !keep.has(k))
+    for (const keys of chunk(stale, MAX_KEYS_PER_DELETE)) {
+      await this.storage.delete(keys)
+    }
+    if (!sameJson(previous, written)) {
+      await this.storage.put(CAMPAIGN_DISPLAY_KEYS, written)
     }
   }
 

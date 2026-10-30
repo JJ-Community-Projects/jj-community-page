@@ -407,6 +407,10 @@ const schedulePrimary = os.schedulePrimaryContract
   async ({ input, context }) => {
     const db = context.db
     const slug = input.user
+    // Without a user the slug filter has nothing to bind and D1 rejects the query (F-06).
+    if (!slug) {
+      throw new ORPCError('BAD_REQUEST', { message: 'User is required' })
+    }
     const now = DateTime.now()
     const currentYear = now.year
 

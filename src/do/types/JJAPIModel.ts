@@ -79,8 +79,9 @@ export interface JingleJamResponse {
   campaigns: JJCampaigns;
 }
 
+// One page of the tracker's `/api/campaigns` (F-04): `campaigns` is a plain array.
 export interface JingleJamCampaignsResponse {
-  campaigns: JJCampaigns;
+  campaigns: JJCampaign[];
   total: number;
   limit: number;
   offset: number;
