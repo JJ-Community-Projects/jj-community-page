@@ -13,7 +13,7 @@ const ticker: OverlayFormat = { obs: '1920×80', preview: { width: 1920, height:
 // The campaign goal previews are taller than the overlay: they show the debug controls
 const formats = {
   charities2: panel,
-  'donation-matches': { preview: { width: 480, height: 320 } },
+  'donation-matches': { obs: '480×320', preview: { width: 480, height: 320 } },
   schedule: panel,
   'team-schedule': panel,
   charities: ticker,

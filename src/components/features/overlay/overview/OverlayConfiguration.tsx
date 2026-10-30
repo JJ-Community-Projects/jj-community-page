@@ -28,7 +28,6 @@ type Overlay = {
   group: (typeof GROUPS)[number]
   /** `login`: listed for everyone, configurable when logged in; `account`: only listed when logged in. */
   access: 'public' | 'login' | 'account'
-  experimental?: boolean
   configurator: Component
 }
 
@@ -43,8 +42,8 @@ const OVERLAYS: Overlay[] = [
   { id: 'fundraisers', title: 'All fundraisers ticker', group: 'Tickers', access: 'public', configurator: FundraisersTickerConfigurator },
   { id: 'team-fundraiser', title: 'Fundraisers by team ticker', group: 'Tickers', access: 'login', configurator: FundraisersByTeamConfigurator },
   { id: 'cause-fundraiser', title: 'Fundraisers by charity ticker', group: 'Tickers', access: 'public', configurator: FundraisersByCauseConfigurator },
-  { id: 'campaign-goal', title: 'Campaign goal', group: 'Jingle Jam ribbons', access: 'account', experimental: true, configurator: CampaignGoalConfigurator },
-  { id: 'big-campaign-goal', title: 'Big campaign goal', group: 'Jingle Jam ribbons', access: 'account', experimental: true, configurator: BigCampaignGoalConfigurator },
+  { id: 'campaign-goal', title: 'Campaign goal', group: 'Jingle Jam ribbons', access: 'account', configurator: CampaignGoalConfigurator },
+  { id: 'big-campaign-goal', title: 'Big campaign goal', group: 'Jingle Jam ribbons', access: 'account', configurator: BigCampaignGoalConfigurator },
   { id: 'basic-ribbon-label', title: 'Basic label', group: 'Jingle Jam ribbons', access: 'account', configurator: BasicRibbonLabelConfigurator },
 ]
 
@@ -89,16 +88,9 @@ const Body: Component<{ loggedIn: boolean; level?: 2 | 3 }> = (p) => {
                   title={overlay.title}
                   level={p.level}
                   summary={
-                    <>
-                      <Show when={overlay.experimental}>
-                        <Chip size="sm" tone="primary">
-                          Experimental
-                        </Chip>
-                      </Show>
-                      <Show when={OVERLAY_FORMATS[overlay.id].obs}>
-                        {(obs) => <Chip size="sm">{obs()}</Chip>}
-                      </Show>
-                    </>
+                    <Show when={OVERLAY_FORMATS[overlay.id].obs}>
+                      {(obs) => <Chip size="sm">{obs()}</Chip>}
+                    </Show>
                   }
                 >
                   <Show
