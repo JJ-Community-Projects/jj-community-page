@@ -4,6 +4,7 @@ import { debounce } from "@solid-primitives/scheduled";
 import { TextField } from "@kobalte/core/text-field";
 import { useQuery } from "@tanstack/solid-query";
 import { orpcPrivate } from "../../../../../../lib/orpc/client.ts";
+import { createSlug } from "../../../../../../lib/createSlug.ts";
 import { useEditableField } from "../../../../../../lib/utils/useEditableField";
 import { Section } from "../../../../../ui/Tile";
 import { Checkbox, fieldClass } from "../../../../../ui/Form";
@@ -60,8 +61,8 @@ export const ScheduleEditorSettings: Component = () => {
   });
 
   const debouncedSetValidation = debounce((s: string) => {
-    const sanitized = s.toLowerCase().replace(/[^a-z0-9-]/g, "-");
-    setSlugForValidation(sanitized);
+    // The slug the server stores, so the one checked here is the one that gets saved (F-59)
+    setSlugForValidation(createSlug(s));
   }, 500);
   createEffect(() => {
     const s = slugField.inputValue() ?? "";
@@ -114,7 +115,7 @@ export const ScheduleEditorSettings: Component = () => {
 
   const hasEditedSlug = () => {
     const original = state.schedule?.slug ?? "";
-    const current = slugField.inputValue() ?? "";
+    const current = createSlug(slugField.inputValue() ?? "");
     return current.length > 0 && current !== original;
   };
 

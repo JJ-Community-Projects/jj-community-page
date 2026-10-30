@@ -23,6 +23,7 @@ import { editStreamParticipantsTable } from '../../../../db/schema/edit-stream-p
 import { editStreamTagsTable } from '../../../../db/schema/edit-stream-tags-schema.ts'
 import { streamTagsTable } from '../../../../db/schema/tags-schema.ts'
 import { scheduleEditingChannels } from '../channels.ts'
+import { createSlug, slugFreeFrom, slugLookups } from '../../../../../functions/slug.ts'
 
 const os = implement({
   startEditingSessionContract,
@@ -51,6 +52,28 @@ const startEditingSession = os.startEditingSessionContract
     return { scheduleId, editorId, draftCreated }
   })
 
+/**
+ * The draft slug as `publishDraft` will publish it: normalised, and checked like a create
+ * (another user's username, a reserved name or another schedule's slug), unless it is the
+ * schedule's own published slug (F-59).
+ */
+async function checkedSlug(
+  db: JJDrizzleDatabase,
+  schedule: { slug: string; ownerId: number },
+  slug: string,
+) {
+  const validSlug = createSlug(slug)
+  if (!validSlug) {
+    throw new ORPCError('BAD_REQUEST', { message: 'Invalid slug format' })
+  }
+  if (validSlug === schedule.slug) return validSlug
+  const slugRows = await db.batch(slugLookups(db, 'schedule', schedule.ownerId, [validSlug]))
+  if (!slugFreeFrom(slugRows)(validSlug)) {
+    throw new ORPCError('CONFLICT', { message: 'Slug is already in use' })
+  }
+  return validSlug
+}
+
 const upsertScheduleMeta = os.upsertScheduleMetaContract
   .use(authMiddleware)
   .use(scheduleOwnerOrEditorMiddleware)
@@ -61,7 +84,7 @@ const upsertScheduleMeta = os.upsertScheduleMetaContract
 
     const patch: Record<string, any> = {}
     if (title !== undefined) patch.title = title
-    if (slug !== undefined) patch.slug = slug
+    if (slug !== undefined) patch.slug = await checkedSlug(db, context.schedule, slug)
     if (year !== undefined) patch.year = year
     if (visible !== undefined) patch.visible = visible
 

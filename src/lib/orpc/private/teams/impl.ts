@@ -150,21 +150,16 @@ const update = os.updateContract
     const team = context.team // From teamsOwnerMiddleware
     const { name, slug, visible, description } = input
 
+    // The slug as it will be stored; checked like create, only when it changes (F-59)
+    const validSlug = createSlug(slug)
+    if (!validSlug) {
+      throw new ORPCError('BAD_REQUEST', { message: 'Invalid slug format' })
+    }
+
     try {
-      // Check slug uniqueness if changed
-      if (slug !== team.slug) {
-        const validSlug = createSlug(slug)
-        if (!validSlug) {
-          throw new ORPCError('BAD_REQUEST', { message: 'Invalid slug format' })
-        }
-
-        const existingTeam = await db
-          .select()
-          .from(teamsTable)
-          .where(eq(teamsTable.slug, validSlug))
-          .get()
-
-        if (existingTeam) {
+      if (validSlug !== team.slug) {
+        const slugRows = await db.batch(slugLookups(db, 'team', team.ownerId, [validSlug]))
+        if (!slugFreeFrom(slugRows)(validSlug)) {
           throw new ORPCError('CONFLICT', { message: 'Slug is already in use' })
         }
       }
@@ -174,7 +169,7 @@ const update = os.updateContract
           .update(teamsTable)
           .set({
             name: name,
-            slug: createSlug(slug),
+            slug: validSlug,
             ...(visible !== undefined && { visible: visible }),
             ...(description !== undefined && {
               description: description ?? null,

@@ -10,6 +10,7 @@ import { debounce } from '@solid-primitives/scheduled'
 import { TextField } from '@kobalte/core/text-field'
 import { useQuery } from '@tanstack/solid-query'
 import { orpcPrivate } from '../../../../../../lib/orpc/client.ts'
+import { createSlug } from '../../../../../../lib/createSlug.ts'
 import {
   Checkbox,
   fieldClass,
@@ -41,7 +42,7 @@ export const AdminTeamSettingsSection: Component = () => {
       slug: debounceSlug(),
       tiltifyName: team.data?.name
     },
-    enabled: () => team.data !== undefined && slug().length > 0 && slug() !== team.data?.slug,
+    enabled: () => team.data !== undefined && createSlug(slug()).length > 0 && createSlug(slug()) !== team.data?.slug,
     staleTime: 30 * 1000,
   }))
 
@@ -57,12 +58,14 @@ export const AdminTeamSettingsSection: Component = () => {
 
   // Create debounced function for slug validation using oRPC
   const setSlugDebounce = debounce((slugValue: string) => {
+    // The check uses the slug the server stores (F-59)
+    const normalised = createSlug(slugValue)
     // If slug hasn't changed, it's valid
-    if (team.data && slugValue === team.data.slug) {
+    if (team.data && normalised === team.data.slug) {
       return;
     }
 
-    setDebounceSlug(slugValue)
+    setDebounceSlug(normalised)
 
   }, 500);
 
@@ -80,7 +83,7 @@ export const AdminTeamSettingsSection: Component = () => {
       return false
     }
 
-    return team.data.slug !== slug();
+    return team.data.slug !== createSlug(slug());
   }
 
   const isCheckingSlug = () => {

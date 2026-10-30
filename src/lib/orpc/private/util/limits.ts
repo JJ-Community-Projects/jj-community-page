@@ -2,11 +2,12 @@ import { and, count, eq } from 'drizzle-orm'
 import { teamMembersTable, teamsTable, schedulesTable } from '../../../db/schema/jj-schema.ts'
 import { userTagsTable } from '../../../db/schema/tags-schema.ts'
 import type { JJDrizzleDatabase } from '../../../db/db.ts'
+import { TAGS_PER_STREAM } from '../../../streamTagLimit.ts'
 
 // Centralized limits used across private procedures
 export const SCHEDULES_PER_USER_PER_YEAR = 3
 export const TAGS_PER_USER = 10
-export const TAGS_PER_STREAM = 10
+export { TAGS_PER_STREAM }
 export const TEAMS_PER_USER = 10 // Max teams a user can be a member of
 export const TEAM_OWNER_PER_USER = 5 // Max teams a user can own
 export const STREAMS_PER_DATE = 8

@@ -2,6 +2,7 @@ import { type Component, createSignal, For, type JSX, Show } from 'solid-js'
 import { TextField as KTextField } from '@kobalte/core/text-field'
 import { FaSolidCheck, FaSolidPlus, FaSolidXmark } from 'solid-icons/fa'
 import { useTagSearch } from '../../../../../../../../../lib/useTagSearch.ts'
+import { TAGS_PER_STREAM } from '../../../../../../../../../lib/streamTagLimit.ts'
 import type { DraftTag, LocalDraftStream } from '../types/uiDraftTypes.ts'
 import { Checkbox, fieldClass, Segmented, TextField } from '../../../../../../../../ui/Form'
 import { Button } from '../../../../../../../../ui/Button'
@@ -247,15 +248,17 @@ export const StreamTagsField: Component<{ api: StreamDraftApi }> = (props) => {
   const tags = () => props.api.draft.tags ?? []
   const isAdded = (t: TagSuggestion) =>
     tags().some((et) => (t.id != null && et.id === t.id) || (t.slug && et.slug === t.slug) || (t.name && et.name === t.name))
+  // The server refuses a save over the cap (F-87), so the picker stops there too
+  const full = () => tags().length >= TAGS_PER_STREAM
 
   const onAddSuggestion = (t: TagSuggestion) => {
-    if (isAdded(t)) return
+    if (isAdded(t) || full()) return
     props.api.addTagLocal({ id: t.id, slug: t.slug, name: t.name })
     tagSearch.handleSearchInput('')
   }
 
   return (
-    <FieldGroup title="Tags">
+    <FieldGroup title={`Tags (${tags().length}/${TAGS_PER_STREAM})`}>
       <Show when={tags().length > 0}>
         <div class="flex flex-wrap gap-1.5">
           <For each={tags()}>
@@ -283,6 +286,9 @@ export const StreamTagsField: Component<{ api: StreamDraftApi }> = (props) => {
         placeholder="Search tag"
       />
 
+      <Show when={full()}>
+        <p class={fieldClass.help}>A stream can have up to {TAGS_PER_STREAM} tags. Remove one to add another.</p>
+      </Show>
       <Show when={tagSearch.isLoadingTags?.()}>
         <p class={fieldClass.help}>Loading tags…</p>
       </Show>
@@ -302,7 +308,7 @@ export const StreamTagsField: Component<{ api: StreamDraftApi }> = (props) => {
                     focusRing,
                     'bg-surface-strong text-fg ring-line-strong hover:bg-surface disabled:text-fg-muted disabled:cursor-default disabled:opacity-60 disabled:hover:bg-surface-strong',
                   )}
-                  disabled={isAdded(t)}
+                  disabled={isAdded(t) || full()}
                   onClick={() => onAddSuggestion(t)}
                   aria-label={`Add tag ${label}`}
                 >
