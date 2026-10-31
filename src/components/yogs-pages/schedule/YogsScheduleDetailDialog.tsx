@@ -7,7 +7,6 @@ import {
 } from 'solid-icons/fa'
 import { DateTime, Duration } from 'luxon'
 import ical, { ICalAlarmType } from 'ical-generator'
-import { getTextColor } from '../../../lib/utils/textColors.ts'
 import type {
   YogsCreator,
   YogsStream,
@@ -86,7 +85,7 @@ export const YogsScheduleDetailDialog: Component<
       onOpenChange={props.modalSignal.setOpen}
       title={stream().title}
       description={stream().subtitle || undefined}
-      accent={{ background: color(), color: getTextColor(color()) }}
+      accent={color()}
       aside={<YogsScheduleNotice variant="compact" />}
     >
       <div class="flex flex-col gap-4 text-sm">

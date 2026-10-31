@@ -3,14 +3,20 @@ import type {
   YogsCreator,
   YogsStream,
 } from '../../../../lib/orpc/private/yogs/contract.ts'
-import { getTextColor } from '../../../../lib/utils/textColors.ts'
 import { YogsScheduleDetailDialog } from '../YogsScheduleDetailDialog.tsx'
 import { logSlotClick } from '../../../../lib/analytics.ts'
 import { createModalSignal } from '../../../../lib/createModalSignal.ts'
 import { useYogsSchedule } from '../provider/YogsScheduleProvider.tsx'
 import { useStreamState, VodIcons } from '../YogsStreamParts.tsx'
 import { Avatar } from '../../../ui/Avatar'
-import { cn, dataFill, focusRing, tileSurface } from '../../../ui/cn'
+import {
+  cn,
+  dataColors,
+  dataFill,
+  dataFillInverted,
+  focusRing,
+  tileSurface,
+} from '../../../ui/cn'
 import { CREATOR_FALLBACK_COLOR } from '../../creators/YogsCreatorChip.tsx'
 
 /** Height of one row (`min-h-14`); MobileYogsSchedule reserves a day with it. */
@@ -35,7 +41,6 @@ export const MobileYogsStreamTile: Component<MobileScheduleBodyProps> = (
   const modal = createModalSignal()
 
   const color = () => stream().color
-  const textColor = () => getTextColor(color())
   const time = (date: Date) => toDateTime(date).toFormat('HH:mm')
 
   return (
@@ -55,15 +60,20 @@ export const MobileYogsStreamTile: Component<MobileScheduleBodyProps> = (
         }}
       >
         <span
-          class="flex w-14 shrink-0 flex-col items-center justify-center gap-0.5 px-1 py-2 leading-tight tabular-nums"
-          style={{ 'background-color': dataFill(color()), color: textColor() }}
+          class={cn(
+            'flex w-14 shrink-0 flex-col items-center justify-center gap-0.5 px-1 py-2 leading-tight tabular-nums',
+            dataFill,
+          )}
+          style={dataColors(color())}
         >
           <span class="text-xs font-bold">{time(stream().start)}</span>
           {/* Inverted colours so the label stands out inside the block */}
           <Show when={isLive()}>
             <span
-              class="text-xxs animate-pulse rounded-full px-1.5 font-bold tracking-wide uppercase motion-reduce:animate-none"
-              style={{ 'background-color': textColor(), color: dataFill(color()) }}
+              class={cn(
+                'text-xxs animate-pulse rounded-full px-1.5 font-bold tracking-wide uppercase motion-reduce:animate-none',
+                dataFillInverted,
+              )}
             >
               Live
             </span>

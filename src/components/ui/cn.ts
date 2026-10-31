@@ -1,4 +1,9 @@
 import { extendTailwindMerge } from 'tailwind-merge'
+import {
+  getContrastTextColor,
+  getTextColor,
+  mixWithBlack,
+} from '../../lib/utils/textColors'
 
 /**
  * twMerge that knows the theme's custom sizes from global.css. Plain twMerge reads `text-xxs` as a
@@ -29,9 +34,33 @@ export const tileHover =
 export const focusRing =
   'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent'
 
+// Share of black mixed into data colours in dark mode, so large fills don't glare on the dark canvas.
+// At 33 % white text reaches 4.5 : 1 on every Yogs stream colour (2020–2025).
+const DATA_DIM = 0.33
+
 /**
- * A data colour (Yogs stream, user colour) as a large fill. The colours are picked for the light
- * canvas, so dark mode mixes in black (`--data-dim` in global.css); small swatches keep the raw colour.
+ * A data colour (Yogs stream, user colour) as a large fill: sets the CSS variables for one of the
+ * classes below, on the element or a parent. Light mode shows the colour with its usual text colour;
+ * dark mode a dimmed colour with whichever of black and white contrasts more with it. Small swatches
+ * keep the raw colour.
  */
-export const dataFill = (color: string) =>
-  `color-mix(in srgb, ${color}, black var(--data-dim))`
+export const dataColors = (color: string) => {
+  const dim = mixWithBlack(color, DATA_DIM)
+  return {
+    '--data': color,
+    '--data-fg': getTextColor(color),
+    '--data-dim': dim,
+    '--data-fg-dim': getContrastTextColor(dim),
+  }
+}
+
+/** Fill in the data colour with its text colour (see dataColors). */
+export const dataFill =
+  'bg-(--data) text-(--data-fg) dark:bg-(--data-dim) dark:text-(--data-fg-dim)'
+
+/** Inverted: a label in the text colour inside a data fill (LIVE). */
+export const dataFillInverted =
+  'bg-(--data-fg) text-(--data) dark:bg-(--data-fg-dim) dark:text-(--data-dim)'
+
+/** Border in the data colour (see dataColors). */
+export const dataBorder = 'border-(--data) dark:border-(--data-dim)'

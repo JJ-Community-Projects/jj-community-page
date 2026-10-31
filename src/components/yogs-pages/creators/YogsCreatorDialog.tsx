@@ -1,6 +1,5 @@
 import type { ModalSignal } from '../../../lib/createModalSignal.ts'
 import { type Component, For, type JSX, Show } from 'solid-js'
-import { getTextColor } from '../../../lib/utils/textColors.ts'
 import {
   FaBrandsDiscord,
   FaBrandsInstagram,
@@ -57,7 +56,7 @@ export const YogsCreatorDialog: Component<CreatorDialogProps> = (props) => {
       onOpenChange={props.modalSignal.setOpen}
       title={props.creator.name}
       size="sm"
-      accent={{ background: color(), color: getTextColor(color()) }}
+      accent={color()}
     >
       <div class="flex flex-col gap-4">
         <div class="flex items-center gap-3">

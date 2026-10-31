@@ -2,7 +2,7 @@ import { type Component, createRenderEffect, type JSX, on, Show } from 'solid-js
 import { isServer } from 'solid-js/web'
 import { Dialog as KDialog } from '@kobalte/core/dialog'
 import { FaSolidXmark } from 'solid-icons/fa'
-import { cn, dataFill } from './cn'
+import { cn, dataBorder, dataColors, dataFill } from './cn'
 import { Button, IconButton } from './Button'
 
 const sizes = {
@@ -19,8 +19,8 @@ type DialogProps = {
   size?: keyof typeof sizes
   /** Buttons, right-aligned below the body. */
   footer?: JSX.Element
-  /** Header band and border in a colour (e.g. a stream's), with its readable text colour. */
-  accent?: { background: string; color: string }
+  /** Header band and border in a data colour (e.g. a stream's), with a readable text colour. */
+  accent?: string
   /** Fine print under the body (a notice, not buttons): muted, below a border, after `footer`. */
   aside?: JSX.Element
   children?: JSX.Element
@@ -59,27 +59,15 @@ export const Dialog: Component<DialogProps> = (props) => {
             class={cn(
               'rounded-tile bg-surface-strong text-fg shadow-tile-hover flex max-h-[calc(100dvh-2rem)] w-full flex-col overflow-hidden',
               sizes[props.size ?? 'md'],
-              props.accent && 'border-2',
+              props.accent && ['border-2', dataBorder],
             )}
-            style={
-              props.accent
-                ? { 'border-color': dataFill(props.accent.background) }
-                : undefined
-            }
+            style={props.accent ? dataColors(props.accent) : undefined}
           >
             <div
               class={cn(
                 'flex items-start gap-2 px-4 py-3',
-                !props.accent && 'border-line border-b',
+                props.accent ? dataFill : 'border-line border-b',
               )}
-              style={
-                props.accent
-                  ? {
-                      'background-color': dataFill(props.accent.background),
-                      color: props.accent.color,
-                    }
-                  : undefined
-              }
             >
               <div class="min-w-0 flex-1">
                 <KDialog.Title class="text-lg font-semibold">

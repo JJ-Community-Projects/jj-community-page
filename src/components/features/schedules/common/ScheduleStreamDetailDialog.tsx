@@ -8,7 +8,6 @@ import { getStreamColor } from '../../../../functions/jjDatesToColors.ts'
 import { Button } from '../../../ui/Button'
 import { Dialog } from '../../../ui/Dialog'
 import { LiveBadge } from '../../../ui/Labels'
-import { getTextColor } from '../../../../lib/utils/textColors.ts'
 import { StreamTags } from './StreamTags'
 import { StreamParticipants, sectionLabel } from './StreamParticipants'
 import type { UserDisplay } from '../../../../lib/orpc/public/schemas/UserDisplaySchema.ts'
@@ -111,7 +110,7 @@ export const ScheduleStreamDetailDialog: Component<
       onOpenChange={props.modalSignal.setOpen}
       title={stream().title}
       description={stream().subtitle || undefined}
-      accent={{ background: color(), color: getTextColor(color()) }}
+      accent={color()}
     >
       <div class="flex flex-col gap-4 text-sm">
         <div class="flex flex-col items-start gap-1">

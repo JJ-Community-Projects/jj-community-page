@@ -7,12 +7,11 @@ import {
   Show,
 } from 'solid-js'
 import { YogsScheduleDetailDialog } from './YogsScheduleDetailDialog.tsx'
-import { getTextColor } from '../../../lib/utils/textColors.ts'
 import { useCreatorFilter } from './provider/CreatorFilterProvider.tsx'
 import type { YogsStream } from '../../../lib/orpc/private/yogs/contract.ts'
 import { logSlotClick } from '../../../lib/analytics.ts'
 import { createModalSignal } from '../../../lib/createModalSignal.ts'
-import { cn, dataFill, focusRing } from '../../ui/cn'
+import { cn, dataColors, dataFill, focusRing } from '../../ui/cn'
 import { LiveBadge } from '../../ui/Labels'
 import {
   CountdownChip,
@@ -124,11 +123,9 @@ export const YogsStreamTile: Component<YogsStreamTileProps> = (props) => {
             'focus-visible:outline-white',
             dimmed() ? 'opacity-40 saturate-0' : ended() && 'opacity-80',
             'focus-visible:opacity-100 focus-visible:saturate-100',
+            dataFill,
           )}
-          style={{
-            'background-color': dataFill(color()),
-            color: getTextColor(color()),
-          }}
+          style={dataColors(color())}
           aria-label={label()}
           onClick={() => {
             logSlotClick(stream())

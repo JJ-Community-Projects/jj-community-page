@@ -83,10 +83,7 @@
 @custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
 
 @layer base {
-  :root {
-    /* How much black dataFill() (ui/cn.ts) mixes into stream and user colours */
-    --data-dim: 0%;
-  }
+  /* Stream and user colours get their dark variants from dataColors() in ui/cn.ts */
   [data-theme='dark'] {
     color-scheme: dark;
     --color-canvas: #3a0414;
@@ -97,7 +94,6 @@
     --color-line: rgb(255 255 255 / 0.08);
     --color-line-strong: rgb(255 255 255 / 0.2);
     --color-tint: rgb(255 255 255 / 0.06);
-    --data-dim: 20%;
     --color-primary-text: var(--color-primary-200);
     --color-accent-text: var(--color-accent-200);
     --color-success-text: var(--color-success-300);
