@@ -116,7 +116,7 @@ export const YogsScheduleDetailDialog: Component<
             </Show>
           }
         >
-          <div class="prose prose-sm max-w-none">
+          <div class="prose prose-sm dark:prose-invert max-w-none">
             <SolidMarkdown
               children={stream().markdownDescription}
               renderingStrategy={'reconcile'}

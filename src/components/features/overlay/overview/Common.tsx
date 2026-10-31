@@ -188,7 +188,8 @@ export const OverlayPreview: Component<{
           sandbox="allow-scripts allow-same-origin"
           width={p.size.width}
           height={p.size.height}
-          class="block origin-top-left border-0"
+          // Same scheme as the overlay page: a mismatch in dark mode paints the transparent iframe opaque
+          class="scheme-light block origin-top-left border-0"
           style={{ transform: `scale(${scale()})` }}
         />
       </div>

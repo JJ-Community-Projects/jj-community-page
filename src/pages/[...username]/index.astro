@@ -107,7 +107,7 @@ const accentColor = /^#[0-9a-f]{3,8}$/i.test(userAccentColor)
         <Tile class="flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-4">
           {/* A border (not a ring) in the user's accent colour */}
           <div
-            class="shadow-tile relative size-24 shrink-0 overflow-hidden rounded-full border-4 bg-neutral-200"
+            class="shadow-tile relative size-24 shrink-0 overflow-hidden rounded-full border-4 bg-neutral-200 dark:bg-neutral-700"
             style={`border-color: ${accentColor}`}
           >
             {/* Shows through when the image fails; the img stays in place (and in the a11y tree), just transparent */}

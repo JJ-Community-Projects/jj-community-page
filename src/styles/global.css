@@ -86,6 +86,8 @@
   :root {
     /* How much black dataFill() (ui/cn.ts) mixes into stream and user colours */
     --data-dim: 0%;
+    /* How much white dataText() mixes into user colours used as text */
+    --data-lift: 0%;
   }
   [data-theme='dark'] {
     color-scheme: dark;
@@ -98,6 +100,7 @@
     --color-line-strong: rgb(255 255 255 / 0.2);
     --color-tint: rgb(255 255 255 / 0.06);
     --data-dim: 20%;
+    --data-lift: 45%;
     --color-primary-text: var(--color-primary-200);
     --color-accent-text: var(--color-accent-200);
     --color-success-text: var(--color-success-300);
