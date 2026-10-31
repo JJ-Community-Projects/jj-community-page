@@ -12,7 +12,7 @@ import {
   FaSolidTrash,
 } from 'solid-icons/fa'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/solid-query'
-import { socialUrlRegex } from '../../../../../functions/socialUrlRegex.ts'
+import { toSocialUrl } from '../../../../../functions/toSocialUrl.ts'
 import { orpcPrivate } from '../../../../../lib/orpc/client.ts'
 import { BskyIcon } from '../../../../common/icons/JJIcons.tsx'
 import { PrimaryLivePlatform } from './PrimaryLivePlatform.tsx'
@@ -82,15 +82,16 @@ type Provider = 'twitch' | 'youtube' | 'bsky' | 'twitter' | 'tiktok' | 'instagra
 type Platform = {
   provider: Provider
   name: string
-  /** In the "valid URL" error, when it differs from the name */
+  /** In the "valid username or link" error, when it differs from the name */
   urlName?: string
   icon: Component<{ class?: string }>
   /** Literal class, so Tailwind finds it */
   iconClass: string
-  regex: keyof ReturnType<typeof socialUrlRegex>
-  placeholder: string
-  example: string
+  /** Under the field: every form toSocialUrl takes */
+  help: string
 }
+
+const linkNote = '(https:// and www. optional)'
 
 const platforms: Platform[] = [
   {
@@ -98,29 +99,21 @@ const platforms: Platform[] = [
     name: 'Twitch',
     icon: FaBrandsTwitch,
     iconClass: 'text-twitch',
-    regex: 'twitch',
-    placeholder: 'https://twitch.tv/username',
-    example: 'https://twitch.tv/username',
+    help: `Username, @username, or a twitch.tv/username link ${linkNote}`,
   },
   {
     provider: 'youtube',
     name: 'YouTube',
     icon: FaBrandsYoutube,
     iconClass: 'text-youtube',
-    regex: 'youtube',
-    placeholder: 'https://youtube.com/@username',
-    example:
-      'https://youtube.com/@username or https://youtube.com/channel/CHANNEL_ID',
+    help: `Handle, @handle, channel ID (UC…), or a youtube.com/@handle, youtube.com/channel/…, youtube.com/c/… or youtube.com/user/… link ${linkNote}`,
   },
   {
     provider: 'bsky',
     name: 'Bluesky',
     icon: BskyIcon,
     iconClass: 'text-bluesky',
-    regex: 'bsky',
-    placeholder: 'https://bsky.app/profile/username.bsky.social',
-    example:
-      'https://bsky.app/profile/username.bsky.social, or https://bsky.app/profile/customdomain.com',
+    help: `Handle like username.bsky.social or your own domain, with or without @ (a plain username becomes username.bsky.social), or a bsky.app/profile/handle link ${linkNote}`,
   },
   {
     provider: 'twitter',
@@ -128,56 +121,53 @@ const platforms: Platform[] = [
     urlName: 'Twitter/X',
     icon: FaBrandsTwitter,
     iconClass: 'text-twitter',
-    regex: 'twitter',
-    placeholder: 'https://x.com/username',
-    example: 'https://twitter.com/username or https://x.com/username',
+    help: `Username, @username, or an x.com/username or twitter.com/username link ${linkNote}`,
   },
   {
     provider: 'tiktok',
     name: 'TikTok',
     icon: FaBrandsTiktok,
     iconClass: 'text-fg',
-    regex: 'tiktok',
-    placeholder: 'https://tiktok.com/@username',
-    example: 'https://tiktok.com/@username',
+    help: `Username, @username, or a tiktok.com/@username or vm.tiktok.com/… link ${linkNote}`,
   },
   {
     provider: 'instagram',
     name: 'Instagram',
     icon: FaBrandsInstagram,
     iconClass: 'text-instagram',
-    regex: 'instagram',
-    placeholder: 'https://instagram.com/username',
-    example: 'https://instagram.com/username',
+    help: `Username, @username, or an instagram.com/username link ${linkNote}`,
   },
 ]
 
 /**
- * One platform: brand icon · name (h3) · the linked URL with a remove button, or a URL input with
- * Add. The browser tests scope to the h3's parent, this row.
+ * One platform: brand icon · name (h3) · the linked URL with a remove button, or an input with Add,
+ * the link it will save and the forms it takes. The browser tests scope to the h3's parent, this row.
  */
 const SocialRow: Component<{ platform: Platform }> = (props) => {
   const { socialsQuery, twitchChannelQuery, addMutation, removeMutation } =
     useSocials()
   const [url, setUrl] = createSignal('')
   const [error, setError] = createSignal('')
-  const regexes = socialUrlRegex()
 
   const social = createMemo(() =>
     socialsQuery.data?.find((s) => s.provider === props.platform.provider),
   )
 
+  // The link Add saves; undefined while the input isn't a valid username or link
+  const finalUrl = createMemo(() => toSocialUrl(props.platform.provider, url()))
+
   const handleAdd = async () => {
-    if (url() && !regexes[props.platform.regex].test(url())) {
+    const link = finalUrl()
+    if (!link) {
       setError(
-        `Please enter a valid ${props.platform.urlName ?? props.platform.name} URL (e.g., ${props.platform.example})`,
+        `Please enter a valid ${props.platform.urlName ?? props.platform.name} username or link`,
       )
       return
     }
     try {
       await addMutation.mutateAsync({
         provider: props.platform.provider,
-        url: url(),
+        url: link,
       })
       setUrl('')
       setError('')
@@ -216,14 +206,16 @@ const SocialRow: Component<{ platform: Platform }> = (props) => {
           fallback={
             <TextField
               value={url()}
-              onChange={setUrl}
+              onChange={(value) => {
+                setUrl(value)
+                setError('')
+              }}
               validationState={error() ? 'invalid' : 'valid'}
               class="flex flex-col gap-1"
             >
               <div class="flex items-center gap-2">
                 <TextField.Input
-                  aria-label={`${props.platform.name} URL`}
-                  placeholder={props.platform.placeholder}
+                  aria-label={`${props.platform.name} username or link`}
                   class={cn(fieldClass.input, 'h-9')}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
@@ -244,6 +236,24 @@ const SocialRow: Component<{ platform: Platform }> = (props) => {
               <TextField.ErrorMessage class={fieldClass.error}>
                 {error()}
               </TextField.ErrorMessage>
+              <Show when={finalUrl()}>
+                {(link) => (
+                  <p class={cn(fieldClass.help, 'flex min-w-0 gap-1')}>
+                    <span class="shrink-0">Links to</span>
+                    <a
+                      href={link()}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="text-fg min-w-0 truncate font-medium hover:underline"
+                    >
+                      {link()}
+                    </a>
+                  </p>
+                )}
+              </Show>
+              <TextField.Description class={fieldClass.help}>
+                {props.platform.help}
+              </TextField.Description>
             </TextField>
           }
         >
