@@ -8,6 +8,7 @@ import { SITE_URL } from '../../../lib/utils/canonical.ts'
 import { DonateIcon } from '../../common/icons/JJIcons'
 import { cn, focusRing, tileSurface } from '../../ui/cn'
 import { MobileNav } from './MobileNav'
+import { ThemeMenu } from './ThemeSwitch'
 import { currentHref, isActive, mainNav, pwaNav } from './navItems'
 
 interface Props {
@@ -84,7 +85,7 @@ const linkClass = (active: boolean) =>
                           focusRing,
                           child.href === current
                             ? 'bg-surface-strong text-primary ring-1 ring-line font-medium'
-                            : 'text-fg hover:bg-black/5',
+                            : 'text-fg hover:bg-tint',
                         )}
                         aria-current={child.href === current ? 'page' : undefined}
                       >
@@ -123,6 +124,9 @@ const linkClass = (active: boolean) =>
           ),
         )
       }
+      <li>
+        <ThemeMenu client:load />
+      </li>
     </ul>
   </nav>
   <MobileNav client:load items={items} current={current} />

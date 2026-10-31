@@ -41,6 +41,24 @@ const og = propOg !== false && {
 ---
 
 <head>
+  <script is:inline>
+    // Theme before the first paint: localStorage.theme is 'light' or 'dark', absent means System.
+    // ThemeSwitch.tsx writes the same key. Re-applied when the OS setting or another tab changes it.
+    ;(() => {
+      const media = matchMedia('(prefers-color-scheme: dark)')
+      const apply = () => {
+        let theme = null
+        try {
+          theme = localStorage.getItem('theme')
+        } catch {}
+        const dark = theme === 'dark' || (theme !== 'light' && media.matches)
+        document.documentElement.dataset.theme = dark ? 'dark' : 'light'
+      }
+      apply()
+      media.addEventListener('change', apply)
+      addEventListener('storage', (e) => e.key === 'theme' && apply())
+    })()
+  </script>
   <GoogleAnalytics />
   <link rel="sitemap" type="application/xml" href="/sitemap-index.xml" />
   <meta charset="UTF-8" />

@@ -31,6 +31,11 @@
   --color-on-canvas-muted: rgb(255 255 255 / 0.8);
   /* "Raised" amounts */
   --color-raised: var(--color-primary-600);
+  /* Faint wash on a tile: row hover, skeletons, the open group in a menu */
+  --color-tint: rgb(0 0 0 / 0.05);
+  /* The page background (PageShell): canvas-edge -> canvas -> canvas-edge */
+  --color-canvas: var(--color-primary);
+  --color-canvas-edge: var(--color-primary-shade);
 
   --radius-tile: 1rem;
   --radius-group: 0.75rem;
@@ -58,6 +63,34 @@
     to {
       height: 0;
     }
+  }
+}
+
+/*
+  Dark theme: the inline script in Head.astro sets data-theme on <html> from the visitor's choice (or
+  the OS setting for "System") before the first paint. Overlays and embeds don't load Head.astro and
+  stay light. Components use the tokens; `dark:` is for the few spots a token doesn't cover.
+*/
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
+@layer base {
+  [data-theme='dark'] {
+    color-scheme: dark;
+    --color-canvas: #3a0414;
+    --color-canvas-edge: #1a0309;
+    --color-surface: var(--color-neutral-800);
+    --color-surface-2: var(--color-neutral-900);
+    --color-surface-strong: #283241;
+    --color-line: rgb(255 255 255 / 0.08);
+    --color-line-strong: rgb(255 255 255 / 0.2);
+    --color-tint: rgb(255 255 255 / 0.06);
+    --color-fg: var(--color-neutral-100);
+    --color-fg-muted: var(--color-neutral-400);
+    --color-raised: var(--color-primary-200);
+    --shadow-tile:
+      0 1px 3px 0 rgb(0 0 0 / 0.4), 0 1px 2px -1px rgb(0 0 0 / 0.4);
+    --shadow-tile-hover:
+      0 10px 15px -3px rgb(0 0 0 / 0.5), 0 4px 6px -4px rgb(0 0 0 / 0.5);
   }
 }
 
@@ -370,6 +403,10 @@
   ::backdrop,
   ::file-selector-button {
     border-color: var(--color-gray-200, currentcolor);
+  }
+  [data-theme='dark']
+    :is(*, ::after, ::before, ::backdrop, ::file-selector-button) {
+    border-color: var(--color-line-strong);
   }
 }
 

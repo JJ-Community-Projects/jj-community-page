@@ -5,6 +5,7 @@ import { IconButton } from '../../ui/Button'
 import { cn, focusRing } from '../../ui/cn'
 import { DonateIcon } from '../../common/icons/JJIcons'
 import { type NavItem, isActive } from './navItems'
+import { ThemeSegmented } from './ThemeSwitch'
 
 type MobileNavProps = {
   items: NavItem[]
@@ -18,7 +19,7 @@ const rowClass = (active: boolean) =>
     focusRing,
     active
       ? 'bg-surface-strong text-primary ring-1 ring-line'
-      : 'text-fg hover:bg-black/5',
+      : 'text-fg hover:bg-tint',
   )
 
 /** The menu button and sheet below `md`; the desktop nav lives in SiteHeader.astro. */
@@ -76,7 +77,7 @@ export const MobileNav: Component<MobileNavProps> = (props) => (
                       <div
                         class={cn(
                           'rounded-group py-1',
-                          isActive(item, props.current) && 'bg-black/5',
+                          isActive(item, props.current) && 'bg-tint',
                         )}
                       >
                         <p class="text-fg-muted px-3 pt-1 pb-0.5 text-xs font-semibold">
@@ -115,6 +116,10 @@ export const MobileNav: Component<MobileNavProps> = (props) => (
             </For>
           </ul>
         </nav>
+        <div class="border-line mt-1 flex items-center justify-between gap-2 border-t px-3 pt-2 pb-1">
+          <p class="text-fg-muted text-xs font-semibold">Theme</p>
+          <ThemeSegmented />
+        </div>
       </KDialog.Content>
     </KDialog.Portal>
   </KDialog>
