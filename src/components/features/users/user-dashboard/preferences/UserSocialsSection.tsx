@@ -20,7 +20,6 @@ import { Section } from '../../../../ui/Tile'
 import { Button, IconButton } from '../../../../ui/Button'
 import { fieldClass } from '../../../../ui/Form'
 import { Alert } from '../../../../ui/Status'
-import { Avatar } from '../../../../ui/Avatar'
 import { cn, groupSurface } from '../../../../ui/cn'
 
 const useSocials = () => {
@@ -32,45 +31,31 @@ const useSocials = () => {
     }),
   )
 
-  const twitchChannelQuery = useQuery(() =>
-    orpcPrivate.twitch.getTwitchChannel.queryOptions({
-      staleTime: 30_000,
-    }),
-  )
-
-  // A change to the Twitch link changes the connected channel too
-  const refresh = async (provider?: string) => {
-    await queryClient.invalidateQueries({
+  const refresh = () =>
+    queryClient.invalidateQueries({
       queryKey: orpcPrivate.social.getSocial.queryKey(),
     })
-    if (!provider || provider === 'twitch') {
-      await queryClient.invalidateQueries({
-        queryKey: orpcPrivate.twitch.getTwitchChannel.queryKey(),
-      })
-    }
-  }
 
   const importFromTiltify = useMutation(() =>
     orpcPrivate.social.importFromTiltify.mutationOptions({
-      onSuccess: () => refresh(),
+      onSuccess: refresh,
     }),
   )
 
   const addMutation = useMutation(() =>
     orpcPrivate.social.addSocial.mutationOptions({
-      onSuccess: ({ provider }) => refresh(provider),
+      onSuccess: refresh,
     }),
   )
 
   const removeMutation = useMutation(() =>
     orpcPrivate.social.removeSocial.mutationOptions({
-      onSuccess: ({ provider }) => refresh(provider),
+      onSuccess: refresh,
     }),
   )
 
   return {
     socialsQuery,
-    twitchChannelQuery,
     addMutation,
     removeMutation,
     importFromTiltify,
@@ -144,8 +129,7 @@ const platforms: Platform[] = [
  * the link it will save and the forms it takes. The browser tests scope to the h3's parent, this row.
  */
 const SocialRow: Component<{ platform: Platform }> = (props) => {
-  const { socialsQuery, twitchChannelQuery, addMutation, removeMutation } =
-    useSocials()
+  const { socialsQuery, addMutation, removeMutation } = useSocials()
   const [url, setUrl] = createSignal('')
   const [error, setError] = createSignal('')
 
@@ -179,11 +163,6 @@ const SocialRow: Component<{ platform: Platform }> = (props) => {
       )
     }
   }
-
-  const twitchChannel = () =>
-    props.platform.provider === 'twitch' && twitchChannelQuery.isSuccess
-      ? twitchChannelQuery.data
-      : undefined
 
   return (
     <div
@@ -290,19 +269,6 @@ const SocialRow: Component<{ platform: Platform }> = (props) => {
           <p class={fieldClass.error}>
             {removeMutation.error?.message || 'Failed to remove link'}
           </p>
-        </Show>
-        <Show when={twitchChannel()}>
-          {(channel) => (
-            <p class="text-fg-muted flex items-center gap-2 text-sm">
-              <Avatar
-                src={channel().profileImageUrl?.replace('300x300', '70x70')}
-                alt=""
-                size="xs"
-                shape="circle"
-              />
-              Connected to {channel().displayName}
-            </p>
-          )}
         </Show>
       </div>
     </div>
