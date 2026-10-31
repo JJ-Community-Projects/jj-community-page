@@ -35,7 +35,3 @@ export const focusRing =
  */
 export const dataFill = (color: string) =>
   `color-mix(in srgb, ${color}, black var(--data-dim))`
-
-/** A data colour as text on a tile: dark mode mixes in white (`--data-lift`) so it stays readable. */
-export const dataText = (color: string) =>
-  `color-mix(in srgb, ${color}, white var(--data-lift))`
