@@ -11,7 +11,7 @@ import { getTextColor } from '../../../../lib/utils/textColors.ts'
 import { ScheduleStreamDetailDialog } from './ScheduleStreamDetailDialog.tsx'
 import type { UserDisplay } from '../../../../lib/orpc/public/schemas/UserDisplaySchema.ts'
 import { Avatar } from '../../../ui/Avatar'
-import { cn, focusRing } from '../../../ui/cn'
+import { cn, dataFill, focusRing } from '../../../ui/cn'
 import { LiveBadge } from '../../../ui/Labels'
 
 /**
@@ -227,7 +227,7 @@ export const StreamTimeRow: Component<
       >
         <span
           class="flex w-16 shrink-0 flex-col items-center justify-center gap-0.5 px-1 py-2 text-xs leading-tight font-semibold tabular-nums"
-          style={{ 'background-color': highlightColor, color: textColor }}
+          style={{ 'background-color': dataFill(highlightColor), color: textColor }}
         >
           <Show when={!props.stream.isTimeTBD} fallback="TBD">
             <span>{time(props.stream.start)}</span>
@@ -235,7 +235,7 @@ export const StreamTimeRow: Component<
             <Show when={isLive()}>
               <span
                 class="text-xxs rounded-full px-1.5 leading-tight font-bold tracking-wide uppercase"
-                style={{ 'background-color': textColor, color: highlightColor }}
+                style={{ 'background-color': textColor, color: dataFill(highlightColor) }}
               >
                 Live
               </span>

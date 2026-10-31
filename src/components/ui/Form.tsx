@@ -13,7 +13,7 @@ import { Spinner } from './Status'
 
 const labelClass = 'text-sm font-semibold text-fg'
 const helpClass = 'text-xs text-fg-muted'
-const errorClass = 'text-xs font-semibold text-danger-700'
+const errorClass = 'text-xs font-semibold text-danger-text'
 const inputClass =
   'w-full rounded-group bg-surface-strong px-3 text-sm text-fg ring-1 ring-line-strong outline-none placeholder:text-neutral-400 focus:ring-2 focus:ring-accent disabled:opacity-50 data-invalid:ring-danger-500'
 
@@ -151,7 +151,7 @@ export const SearchField: Component<SearchFieldProps> = (props) => (
             type="button"
             aria-label="Clear search"
             onClick={() => props.onInput('')}
-            class="text-fg-muted hover:text-fg flex size-6 cursor-pointer items-center justify-center rounded-full hover:bg-black/5"
+            class="text-fg-muted hover:text-fg flex size-6 cursor-pointer items-center justify-center rounded-full hover:bg-tint"
           >
             <FaSolidXmark class="size-3" aria-hidden="true" />
           </button>
@@ -220,7 +220,7 @@ export const Switch: Component<ToggleProps> = (props) => (
       </Show>
     </div>
     <KSwitch.Input class="peer" />
-    <KSwitch.Control class="peer-focus-visible:outline-accent data-checked:bg-accent inline-flex h-6 w-10 shrink-0 cursor-pointer items-center rounded-full bg-neutral-300 p-0.5 transition-colors peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2">
+    <KSwitch.Control class="peer-focus-visible:outline-accent data-checked:bg-accent inline-flex h-6 w-10 shrink-0 cursor-pointer items-center rounded-full bg-neutral-300 dark:bg-neutral-600 p-0.5 transition-colors peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2">
       <KSwitch.Thumb class="shadow-tile size-5 rounded-full bg-white transition-transform data-checked:translate-x-4" />
     </KSwitch.Control>
   </KSwitch>

@@ -242,7 +242,7 @@ export const AdminConfigSection: Component = () => {
                             <Button
                               size="sm"
                               variant="ghost"
-                              class="text-danger-700"
+                              class="text-danger-text"
                               onClick={() => setRemovingKey(c.key)}
                             >
                               Remove

@@ -61,7 +61,7 @@ export const CommunityTagSearch: Component<{
           <div class="rounded-group bg-surface-strong text-fg shadow-tile-hover ring-line absolute inset-x-0 z-20 mt-1 max-h-64 overflow-y-auto text-sm ring-1">
             <Switch>
               <Match when={hasTagsError()}>
-                <p class="text-danger-700 p-3">
+                <p class="text-danger-text p-3">
                   {availableTagsError() || 'Error loading tags'}
                 </p>
               </Match>
@@ -86,7 +86,7 @@ export const CommunityTagSearch: Component<{
                         <button
                           type="button"
                           class={cn(
-                            'flex w-full items-center gap-2 px-3 py-2 text-left hover:bg-black/5',
+                            'flex w-full items-center gap-2 px-3 py-2 text-left hover:bg-tint',
                             focusRing,
                           )}
                           // onMouseDown avoids input blur issues

@@ -39,7 +39,7 @@ export const adminTable = {
 }
 
 /** Small text link inside admin bodies. */
-export const adminLink = 'text-accent-700 hover:underline'
+export const adminLink = 'text-accent-text hover:underline'
 
 /** The result of a fire-and-forget admin action, next to its button. */
 export const MutationStatus: Component<{
@@ -50,10 +50,10 @@ export const MutationStatus: Component<{
       <Spinner class="text-fg-muted" />
     </Match>
     <Match when={props.status === 'success'}>
-      <span class="text-success-700 text-xs font-semibold">Done</span>
+      <span class="text-success-text text-xs font-semibold">Done</span>
     </Match>
     <Match when={props.status === 'error'}>
-      <span class="text-danger-700 text-xs font-semibold">Failed</span>
+      <span class="text-danger-text text-xs font-semibold">Failed</span>
     </Match>
   </Switch>
 )

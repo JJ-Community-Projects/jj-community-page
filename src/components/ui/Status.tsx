@@ -16,19 +16,19 @@ import { cn } from './cn'
 
 const alertTones = {
   info: {
-    box: 'bg-accent-50 text-accent-800 ring-accent-200',
+    box: 'bg-accent-50 text-accent-800 ring-accent-200 dark:bg-accent/15 dark:text-accent-200 dark:ring-accent/40',
     icon: FaSolidCircleInfo,
   },
   success: {
-    box: 'bg-success-50 text-success-800 ring-success-200',
+    box: 'bg-success-50 text-success-800 ring-success-200 dark:bg-success/15 dark:text-success-200 dark:ring-success/40',
     icon: FaSolidCircleCheck,
   },
   warning: {
-    box: 'bg-warning-50 text-warning-900 ring-warning-200',
+    box: 'bg-warning-50 text-warning-900 ring-warning-200 dark:bg-warning/15 dark:text-warning-200 dark:ring-warning/40',
     icon: FaSolidTriangleExclamation,
   },
   danger: {
-    box: 'bg-danger-50 text-danger-800 ring-danger-200',
+    box: 'bg-danger-50 text-danger-800 ring-danger-200 dark:bg-danger/15 dark:text-danger-200 dark:ring-danger/40',
     icon: FaSolidCircleExclamation,
   },
 }
@@ -50,7 +50,9 @@ export const Alert: ParentComponent<AlertProps> = (props) => {
     <div
       role={
         props.role ??
-        (props.tone === 'danger' || props.tone === 'warning' ? 'alert' : 'status')
+        (props.tone === 'danger' || props.tone === 'warning'
+          ? 'alert'
+          : 'status')
       }
       class={cn(
         'rounded-group flex items-start gap-2 p-3 text-sm ring-1',
@@ -160,7 +162,7 @@ export const Spinner: Component<SpinnerProps> = (props) => (
 /** Placeholder block; size it with `class` (e.g. `h-4 w-32`). */
 export const Skeleton: Component<{ class?: string }> = (props) => (
   <div
-    class={cn('rounded-media animate-pulse bg-black/5', props.class)}
+    class={cn('rounded-media bg-tint animate-pulse', props.class)}
     aria-hidden="true"
   />
 )

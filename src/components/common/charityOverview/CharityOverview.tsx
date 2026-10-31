@@ -355,7 +355,7 @@ const Socials: Component<{
               rel="noreferrer"
               aria-label={link.label}
               class={cn(
-                'hover:text-fg rounded-full p-1 transition-colors hover:bg-black/5',
+                'hover:text-fg rounded-full p-1 transition-colors hover:bg-tint',
                 focusRing,
               )}
             >

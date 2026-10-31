@@ -133,7 +133,7 @@ const SchedulesListItem: Component<{
         <p class="text-fg-muted">Year {props.schedule.year}</p>
         <a
           href={`/schedules/${props.schedule.slug}`}
-          class="text-accent-700 inline-flex items-center gap-1 font-semibold hover:underline"
+          class="text-accent-text inline-flex items-center gap-1 font-semibold hover:underline"
           target="_blank"
           rel="noopener noreferrer"
         >

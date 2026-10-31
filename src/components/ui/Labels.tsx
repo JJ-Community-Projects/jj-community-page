@@ -2,11 +2,12 @@ import { type Component, type JSX, type ParentComponent, Show } from 'solid-js'
 import { cn } from './cn'
 
 const chipTones = {
-  neutral: 'bg-neutral-100 text-fg ring-1 ring-line-strong',
-  accent: 'bg-accent-50 text-accent-700 ring-1 ring-accent-200',
-  primary: 'bg-primary-50 text-primary-700 ring-1 ring-primary-200',
+  neutral: 'bg-neutral-100 dark:bg-white/10 text-fg ring-1 ring-line-strong',
+  accent: 'bg-accent-soft text-accent-text ring-1 ring-accent-soft-line',
+  primary:
+    'bg-primary-50 text-primary-700 ring-1 ring-primary-200 dark:bg-primary/20 dark:text-primary-text dark:ring-primary/45',
   /** On the red canvas */
-  canvas: 'bg-white text-fg shadow-tile',
+  canvas: 'bg-white dark:bg-surface-strong text-fg shadow-tile',
 }
 
 const chipSizes = {
@@ -74,8 +75,8 @@ export const DateDivider: Component<DateDividerProps> = (props) => {
         class={cn(
           'text-xxs shrink-0 rounded-full px-2 py-0.5 font-bold',
           onCanvas()
-            ? 'text-fg shadow-tile bg-white'
-            : 'text-fg-muted ring-line bg-neutral-100 ring-1',
+            ? 'text-fg shadow-tile dark:bg-surface-strong bg-white'
+            : 'text-fg-muted ring-line bg-neutral-100 ring-1 dark:bg-white/10',
         )}
       >
         {props.children}
@@ -83,7 +84,7 @@ export const DateDivider: Component<DateDividerProps> = (props) => {
       <span
         class={cn(
           'h-px flex-1 rounded-full',
-          onCanvas() ? 'bg-white/70' : 'bg-black/10',
+          onCanvas() ? 'bg-white/70' : 'bg-black/10 dark:bg-white/10',
         )}
       />
     </div>

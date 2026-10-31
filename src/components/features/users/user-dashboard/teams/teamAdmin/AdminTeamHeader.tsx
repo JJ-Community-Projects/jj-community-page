@@ -36,7 +36,7 @@ export const AdminTeamHeader: Component = () => {
             <Show when={team.data}>
               {(data) => (
                 <a
-                  class="text-accent-700 inline-flex items-center gap-1 text-sm font-semibold hover:underline"
+                  class="text-accent-text inline-flex items-center gap-1 text-sm font-semibold hover:underline"
                   href={`/teams/${data().slug}`}
                   target="_blank"
                   rel="noopener noreferrer"

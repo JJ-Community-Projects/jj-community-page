@@ -30,7 +30,7 @@ export const Avatar: Component<AvatarProps> = (props) => {
   return (
     <span
       class={cn(
-        'text-fg-muted inline-flex shrink-0 items-center justify-center overflow-hidden bg-neutral-200 font-semibold',
+        'text-fg-muted inline-flex shrink-0 items-center justify-center overflow-hidden bg-neutral-200 dark:bg-neutral-700 font-semibold',
         sizes[size()],
         props.shape === 'circle'
           ? 'rounded-full'

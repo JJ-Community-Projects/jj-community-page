@@ -28,3 +28,10 @@ export const tileHover =
 
 export const focusRing =
   'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent'
+
+/**
+ * A data colour (Yogs stream, user colour) as a large fill. The colours are picked for the light
+ * canvas, so dark mode mixes in black (`--data-dim` in global.css); small swatches keep the raw colour.
+ */
+export const dataFill = (color: string) =>
+  `color-mix(in srgb, ${color}, black var(--data-dim))`

@@ -7,10 +7,10 @@ const variants = {
   accent: 'bg-accent text-white hover:bg-accent-600',
   secondary:
     'bg-surface-strong text-fg ring-1 ring-line-strong hover:bg-surface',
-  ghost: 'text-fg hover:bg-black/5',
+  ghost: 'text-fg hover:bg-tint',
   danger: 'bg-danger-600 text-white hover:bg-danger-700',
   /** White button for use directly on the red canvas. */
-  canvas: 'bg-white text-fg shadow-tile hover:bg-surface',
+  canvas: 'bg-white text-fg shadow-tile hover:bg-surface dark:bg-surface-strong',
 }
 
 // Literal class names, so Tailwind finds them

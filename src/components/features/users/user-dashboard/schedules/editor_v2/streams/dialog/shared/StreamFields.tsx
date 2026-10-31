@@ -263,11 +263,11 @@ export const StreamTagsField: Component<{ api: StreamDraftApi }> = (props) => {
         <div class="flex flex-wrap gap-1.5">
           <For each={tags()}>
             {(t) => (
-              <span class="bg-accent-50 text-accent-800 ring-accent-200 inline-flex items-center gap-1 rounded-full py-0.5 pr-0.5 pl-2.5 text-xs font-semibold ring-1">
+              <span class="bg-accent-soft text-accent-800 dark:text-accent-text ring-accent-soft-line inline-flex items-center gap-1 rounded-full py-0.5 pr-0.5 pl-2.5 text-xs font-semibold ring-1">
                 {t.slug || t.name}
                 <button
                   type="button"
-                  class={cn('hover:bg-accent-100 flex size-5 cursor-pointer items-center justify-center rounded-full', focusRing)}
+                  class={cn('hover:bg-accent-soft-hover flex size-5 cursor-pointer items-center justify-center rounded-full', focusRing)}
                   onClick={() => props.api.removeTagLocal(t.id)}
                   aria-label={`Remove tag ${t.slug || t.name}`}
                 >

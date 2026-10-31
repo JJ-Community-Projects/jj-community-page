@@ -34,7 +34,7 @@ export const Carousel: Component<{ images: ImageMetadata[]; alt: string }> = (
   const next = () => setIdx((i) => (i + 1) % count())
   return (
     <div class="w-full max-w-xl select-none">
-      <div class="rounded-media ring-line relative aspect-4/3 w-full overflow-hidden bg-black/5 ring-1">
+      <div class="rounded-media ring-line relative aspect-4/3 w-full overflow-hidden bg-tint ring-1">
         <img
           src={props.images[idx()].src}
           alt={`${props.alt} ${idx() + 1}`}
@@ -66,7 +66,7 @@ export const Carousel: Component<{ images: ImageMetadata[]; alt: string }> = (
           {(src, i) => (
             <button
               class={cn(
-                'rounded-media ring-line h-12 w-16 overflow-hidden bg-black/5 opacity-60 ring-1 transition hover:opacity-100',
+                'rounded-media ring-line h-12 w-16 overflow-hidden bg-tint opacity-60 ring-1 transition hover:opacity-100',
                 focusRing,
                 i() === idx() && 'ring-accent opacity-100 ring-2',
               )}

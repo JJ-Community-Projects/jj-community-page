@@ -84,7 +84,7 @@ const linkClass = (active: boolean) =>
                           'block rounded-group px-3 py-1.5 text-sm whitespace-nowrap',
                           focusRing,
                           child.href === current
-                            ? 'bg-surface-strong text-primary ring-1 ring-line font-medium'
+                            ? 'bg-surface-strong text-primary-text ring-1 ring-line font-medium'
                             : 'text-fg hover:bg-tint',
                         )}
                         aria-current={child.href === current ? 'page' : undefined}
@@ -103,7 +103,7 @@ const linkClass = (active: boolean) =>
                 target="_blank"
                 rel="noopener"
                 class={cn(
-                  'flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-sm font-semibold text-primary transition-colors hover:bg-surface',
+                  'flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-sm font-semibold text-primary transition-colors hover:bg-surface dark:hover:bg-neutral-200',
                   focusRing,
                 )}
               >

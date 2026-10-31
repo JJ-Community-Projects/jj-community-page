@@ -41,7 +41,7 @@ export const TagSearchInput: Component = () => {
             <div class="max-h-64 overflow-y-auto">
               <Switch>
                 <Match when={hasTagsError()}>
-                  <p class="text-danger-700 p-3 text-sm">
+                  <p class="text-danger-text p-3 text-sm">
                     {availableTagsError() || 'Error loading suggestions'}
                   </p>
                 </Match>

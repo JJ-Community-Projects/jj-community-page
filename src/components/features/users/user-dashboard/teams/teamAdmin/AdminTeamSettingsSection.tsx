@@ -197,7 +197,7 @@ export const AdminTeamSettingsSection: Component = () => {
                 {(suggestion) => (
                   <button
                     type="button"
-                    class="bg-accent-50 text-accent-700 ring-accent-200 hover:bg-accent-100 cursor-pointer rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1"
+                    class="bg-accent-soft text-accent-text ring-accent-soft-line hover:bg-accent-soft-hover cursor-pointer rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1"
                     onClick={() => setSlug(suggestion)}
                   >
                     {suggestion}

@@ -2,7 +2,7 @@ import { type Component, createRenderEffect, type JSX, on, Show } from 'solid-js
 import { isServer } from 'solid-js/web'
 import { Dialog as KDialog } from '@kobalte/core/dialog'
 import { FaSolidXmark } from 'solid-icons/fa'
-import { cn } from './cn'
+import { cn, dataFill } from './cn'
 import { Button, IconButton } from './Button'
 
 const sizes = {
@@ -63,7 +63,7 @@ export const Dialog: Component<DialogProps> = (props) => {
             )}
             style={
               props.accent
-                ? { 'border-color': props.accent.background }
+                ? { 'border-color': dataFill(props.accent.background) }
                 : undefined
             }
           >
@@ -75,7 +75,7 @@ export const Dialog: Component<DialogProps> = (props) => {
               style={
                 props.accent
                   ? {
-                      'background-color': props.accent.background,
+                      'background-color': dataFill(props.accent.background),
                       color: props.accent.color,
                     }
                   : undefined

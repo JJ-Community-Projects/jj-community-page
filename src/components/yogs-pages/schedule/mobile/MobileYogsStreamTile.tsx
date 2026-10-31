@@ -10,7 +10,7 @@ import { createModalSignal } from '../../../../lib/createModalSignal.ts'
 import { useYogsSchedule } from '../provider/YogsScheduleProvider.tsx'
 import { useStreamState, VodIcons } from '../YogsStreamParts.tsx'
 import { Avatar } from '../../../ui/Avatar'
-import { cn, focusRing, tileSurface } from '../../../ui/cn'
+import { cn, dataFill, focusRing, tileSurface } from '../../../ui/cn'
 import { CREATOR_FALLBACK_COLOR } from '../../creators/YogsCreatorChip.tsx'
 
 /** Height of one row (`min-h-14`); MobileYogsSchedule reserves a day with it. */
@@ -56,14 +56,14 @@ export const MobileYogsStreamTile: Component<MobileScheduleBodyProps> = (
       >
         <span
           class="flex w-14 shrink-0 flex-col items-center justify-center gap-0.5 px-1 py-2 leading-tight tabular-nums"
-          style={{ 'background-color': color(), color: textColor() }}
+          style={{ 'background-color': dataFill(color()), color: textColor() }}
         >
           <span class="text-xs font-bold">{time(stream().start)}</span>
           {/* Inverted colours so the label stands out inside the block */}
           <Show when={isLive()}>
             <span
               class="text-xxs animate-pulse rounded-full px-1.5 font-bold tracking-wide uppercase motion-reduce:animate-none"
-              style={{ 'background-color': textColor(), color: color() }}
+              style={{ 'background-color': textColor(), color: dataFill(color()) }}
             >
               Live
             </span>

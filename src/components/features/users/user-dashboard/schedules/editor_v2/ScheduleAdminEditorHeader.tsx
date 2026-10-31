@@ -123,7 +123,7 @@ export const ScheduleAdminEditorHeader: Component = () => {
             <>
               <Button
                 variant="canvas"
-                class="text-danger-700"
+                class="text-danger-text"
                 onClick={showDeleteDialog.open}
               >
                 Delete Schedule

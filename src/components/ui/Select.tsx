@@ -27,7 +27,7 @@ export const Select = <T extends string>(props: SelectProps<T>) => (
     itemComponent={(item) => (
       <KSelect.Item
         item={item.item}
-        class="text-fg rounded-media flex cursor-pointer items-center justify-between gap-3 px-2.5 py-1.5 text-sm outline-none data-highlighted:bg-black/5"
+        class="text-fg rounded-media flex cursor-pointer items-center justify-between gap-3 px-2.5 py-1.5 text-sm outline-none data-highlighted:bg-tint"
       >
         <KSelect.ItemLabel>
           {props.format(item.item.rawValue)}

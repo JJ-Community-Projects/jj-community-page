@@ -170,7 +170,7 @@ const FilterDialogBody: Component = () => {
               {creator => (
                 <button
                   type="button"
-                  class={cn('bg-accent-50 text-accent-700 ring-accent-200 inline-flex items-center gap-1 rounded-full py-0.5 pr-1.5 pl-2.5 text-xs font-semibold ring-1 hover:brightness-95', focusRing)}
+                  class={cn('bg-accent-soft text-accent-text ring-accent-soft-line inline-flex items-center gap-1 rounded-full py-0.5 pr-1.5 pl-2.5 text-xs font-semibold ring-1 hover:brightness-95', focusRing)}
                   aria-label={`Remove ${creator.name}`}
                   onClick={() => toggleFilter(creator.id)}
                 >
@@ -217,7 +217,7 @@ const CreatorRow: Component<CreatorRowProps> = props => (
     type="button"
     role="checkbox"
     aria-checked={props.checked}
-    class={cn('flex w-full items-center gap-2.5 px-3 py-1.5 text-left text-sm transition-colors hover:bg-black/5 focus-visible:-outline-offset-2', focusRing)}
+    class={cn('flex w-full items-center gap-2.5 px-3 py-1.5 text-left text-sm transition-colors hover:bg-tint focus-visible:-outline-offset-2', focusRing)}
     onClick={() => props.onToggle()}
   >
     <Avatar

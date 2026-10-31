@@ -45,7 +45,7 @@ const StreamCardBody: Component<{ stream: DraftStream }> = (props) => {
           when={s().visible}
           fallback={<FaRegularEyeSlash class="size-3 shrink-0" aria-hidden="true" />}
         >
-          <FaRegularEye class="text-success-700 size-3 shrink-0" aria-hidden="true" />
+          <FaRegularEye class="text-success-text size-3 shrink-0" aria-hidden="true" />
         </Show>
         <span>{formatTimeRange(s().start, s().end)}</span>
         <span class="sr-only">{s().visible ? 'Visible' : 'Hidden'}</span>

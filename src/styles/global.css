@@ -33,6 +33,15 @@
   --color-raised: var(--color-primary-600);
   /* Faint wash on a tile: row hover, skeletons, the open group in a menu */
   --color-tint: rgb(0 0 0 / 0.05);
+  /* Coloured text and icons on a tile: links, errors, states (dark mode lightens them) */
+  --color-primary-text: var(--color-primary);
+  --color-accent-text: var(--color-accent-700);
+  --color-success-text: var(--color-success-700);
+  --color-danger-text: var(--color-danger-700);
+  /* The light accent pill: tag and suggestion chips */
+  --color-accent-soft: var(--color-accent-50);
+  --color-accent-soft-hover: var(--color-accent-100);
+  --color-accent-soft-line: var(--color-accent-200);
   /* The page background (PageShell): canvas-edge -> canvas -> canvas-edge */
   --color-canvas: var(--color-primary);
   --color-canvas-edge: var(--color-primary-shade);
@@ -74,6 +83,10 @@
 @custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
 
 @layer base {
+  :root {
+    /* How much black dataFill() (ui/cn.ts) mixes into stream and user colours */
+    --data-dim: 0%;
+  }
   [data-theme='dark'] {
     color-scheme: dark;
     --color-canvas: #3a0414;
@@ -84,6 +97,14 @@
     --color-line: rgb(255 255 255 / 0.08);
     --color-line-strong: rgb(255 255 255 / 0.2);
     --color-tint: rgb(255 255 255 / 0.06);
+    --data-dim: 20%;
+    --color-primary-text: var(--color-primary-200);
+    --color-accent-text: var(--color-accent-200);
+    --color-success-text: var(--color-success-300);
+    --color-danger-text: var(--color-danger-300);
+    --color-accent-soft: rgb(53 132 191 / 0.18);
+    --color-accent-soft-hover: rgb(53 132 191 / 0.28);
+    --color-accent-soft-line: rgb(53 132 191 / 0.45);
     --color-fg: var(--color-neutral-100);
     --color-fg-muted: var(--color-neutral-400);
     --color-raised: var(--color-primary-200);

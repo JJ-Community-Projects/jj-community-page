@@ -59,7 +59,7 @@ export const YogsScheduleHeader: Component = () => {
         <CalendarDialog modalSignal={calendarModal}/>
       </div>
       <div class={'yogs-cell stream-width h-full'}>
-        <div class={'flex size-full items-center justify-between rounded-tile bg-white px-1 font-sans text-fg shadow-tile'}>
+        <div class={'flex size-full items-center justify-between rounded-tile bg-white dark:bg-surface-strong px-1 font-sans text-fg shadow-tile'}>
           <IconButton
             variant="ghost"
             size="sm"

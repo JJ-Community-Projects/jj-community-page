@@ -171,7 +171,7 @@ export const CalendarDialog: Component<CalendarDialogDialogProps> = props => {
                         role="checkbox"
                         aria-checked={includes(slot)}
                         class={cn(
-                          'flex w-full items-center gap-2.5 px-3 py-1.5 text-left text-sm transition-colors hover:bg-black/5 focus-visible:-outline-offset-2',
+                          'flex w-full items-center gap-2.5 px-3 py-1.5 text-left text-sm transition-colors hover:bg-tint focus-visible:-outline-offset-2',
                           focusRing,
                         )}
                         onClick={() => toggle(slot)}

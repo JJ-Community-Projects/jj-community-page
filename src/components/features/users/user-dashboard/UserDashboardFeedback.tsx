@@ -40,7 +40,7 @@ export const UserDashboardFeedback: Component = () => (
           href={href}
           aria-label={label}
           class={cn(
-            'hover:text-fg rounded-full p-1.5 transition-colors hover:bg-black/5',
+            'hover:text-fg rounded-full p-1.5 transition-colors hover:bg-tint',
             focusRing,
           )}
         >

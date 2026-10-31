@@ -205,12 +205,12 @@ export const AdminKVConfigSection: Component = () => {
                     <li>
                       <button
                         type="button"
-                        class="rounded-media flex w-full cursor-pointer items-center justify-between gap-2 px-2 py-1.5 text-left hover:bg-black/5"
+                        class="rounded-media flex w-full cursor-pointer items-center justify-between gap-2 px-2 py-1.5 text-left hover:bg-tint"
                         onClick={() => selectKey(k)}
                         title={k}
                       >
                         <span class="truncate font-mono text-xs">{k}</span>
-                        <span class="text-accent-700 text-xs font-semibold">select</span>
+                        <span class="text-accent-text text-xs font-semibold">select</span>
                       </button>
                     </li>
                   )}

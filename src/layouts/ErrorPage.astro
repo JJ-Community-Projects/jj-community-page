@@ -17,7 +17,7 @@ const { title, description, heading, code } = Astro.props
 
 <PageShell title={title} description={description}>
   <Tile class="mx-auto mt-4 flex w-full max-w-lg flex-col items-center gap-3 px-6 py-8 text-center sm:mt-8">
-    {code && <p class="text-sm font-semibold tracking-widest text-primary">{code}</p>}
+    {code && <p class="text-sm font-semibold tracking-widest text-primary-text">{code}</p>}
     <h1 class="text-2xl font-bold tracking-tight text-balance">{heading}</h1>
     <div class="text-fg-muted max-w-prose text-sm sm:text-base">
       <slot />

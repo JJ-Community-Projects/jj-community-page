@@ -18,7 +18,7 @@ const rowClass = (active: boolean) =>
     'flex items-center gap-2 rounded-group px-3 py-2 text-sm font-medium',
     focusRing,
     active
-      ? 'bg-surface-strong text-primary ring-1 ring-line'
+      ? 'bg-surface-strong text-primary-text ring-1 ring-line'
       : 'text-fg hover:bg-tint',
   )
 
@@ -68,7 +68,7 @@ export const MobileNav: Component<MobileNavProps> = (props) => (
                       >
                         {item.label}
                         <Show when={item.external}>
-                          <DonateIcon class="text-primary size-4" />
+                          <DonateIcon class="text-primary-text size-4" />
                         </Show>
                       </a>
                     }
