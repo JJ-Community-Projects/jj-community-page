@@ -86,8 +86,8 @@
   /* Stream and user colours get their dark variants from dataColors() in ui/cn.ts */
   [data-theme='dark'] {
     color-scheme: dark;
-    --color-canvas: #3a0414;
-    --color-canvas-edge: #1a0309;
+    --color-canvas: #0b2f52;
+    --color-canvas-edge: #04111f;
     --color-surface: var(--color-neutral-800);
     --color-surface-2: var(--color-neutral-900);
     --color-surface-strong: #283241;

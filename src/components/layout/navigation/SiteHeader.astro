@@ -4,6 +4,7 @@ import { Image } from 'astro:assets'
 import { getCollection } from 'astro:content'
 import { FaSolidChevronDown } from 'solid-icons/fa'
 import jj_image from '../../../images/Jingle_Jam_Logo_White_Large.png'
+import jj_image_dark from '../../../images/Jingle_Jam_Logo_DARK_Large.png'
 import { SITE_URL } from '../../../lib/utils/canonical.ts'
 import { DonateIcon } from '../../common/icons/JJIcons'
 import { cn, focusRing, tileSurface } from '../../ui/cn'
@@ -57,7 +58,15 @@ const linkClass = (active: boolean) =>
       height="96"
       loading="eager"
       fetchpriority="high"
-      class="h-11 w-auto md:h-20"
+      class="h-11 w-auto md:h-20 dark:hidden"
+    />
+    {/* The blue logo for the blue dark-mode canvas */}
+    <Image
+      src={jj_image_dark}
+      alt="Jingle Jam Community home"
+      height="96"
+      loading="eager"
+      class="hidden h-11 w-auto md:h-20 dark:block"
     />
   </a>
   <nav aria-label="Main" class="hidden md:block">
