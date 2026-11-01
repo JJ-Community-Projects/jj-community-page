@@ -20,9 +20,15 @@
   container-type: inline-size;
 }
 
+/* Room for the panel's glow (below all, as it sits low), so the text and tiles around stay clear */
+.desktop-schedule {
+  padding-block: 1rem 2.5rem;
+}
+
 /* The grid sits on a panel like the poster's (--color-schedule with a vignette); its padding comes
    off the units, so the panel keeps the grid's old outer width. The corner follows the tiles' at
-   their distance from the edge, and a glow in the panel's colour softens its edge on the canvas. */
+   their distance from the edge, and a glow in the panel's colour softens its edge on the canvas;
+   it sits low, so it stays off the heading above the grid. */
 .yogs-grid {
   --yogs-pad: 0.5rem;
   --yogs-unit: calc((min(100cqi, 80vw, 1600px) - 2 * var(--yogs-pad)) / 22);
@@ -44,7 +50,7 @@
     transparent 60%,
     rgb(0 0 0 / 0.3)
   );
-  box-shadow: 0 0 32px 12px
+  box-shadow: 0 12px 32px 4px
     color-mix(in srgb, var(--color-schedule) 70%, transparent);
 }
 
