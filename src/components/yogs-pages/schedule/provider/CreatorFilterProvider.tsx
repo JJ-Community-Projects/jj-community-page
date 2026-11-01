@@ -3,6 +3,33 @@ import { useYogsSchedule } from './YogsScheduleProvider.tsx'
 import type { YogsStream } from '../../../../lib/orpc/private/yogs/contract.ts'
 import { log } from '../../../../lib/analytics.ts'
 
+const scrollToSchedule = () => {
+  const target = [
+    ...document.querySelectorAll<HTMLElement>(
+      '.desktop-schedule .yogs-grid, .mobile-schedule',
+    ),
+  ].find((el) => el.getClientRects().length > 0)
+  if (!target) return
+
+  const align = () => {
+    const margin = parseFloat(getComputedStyle(target).scrollMarginTop) || 0
+    const top = target.getBoundingClientRect().top + window.scrollY - margin
+    window.scrollTo({ top, behavior: 'instant' })
+  }
+  align()
+
+  const observer = new ResizeObserver(align)
+  observer.observe(document.body)
+  const events = ['wheel', 'touchstart', 'keydown', 'pointerdown'] as const
+  const stop = () => {
+    observer.disconnect()
+    clearTimeout(timeout)
+    events.forEach((e) => window.removeEventListener(e, stop))
+  }
+  const timeout = setTimeout(stop, 2000)
+  events.forEach((e) => window.addEventListener(e, stop, { passive: true }))
+}
+
 const useCreatorFilterHook = () => {
   const { creators, streams } = useYogsSchedule()
 
@@ -22,6 +49,9 @@ const useCreatorFilterHook = () => {
       setAnd(true)
     } else {
       setAnd(false)
+    }
+    if (filter) {
+      scrollToSchedule()
     }
   })
 
