@@ -58,6 +58,90 @@
     color-mix(in srgb, var(--color-schedule) 70%, transparent);
 }
 
+/* Corner tints: two sets of soft glows in the Jingle Jam red and blue that take turns, so the
+   colour wanders round the panel (red top left and blue bottom right, then blue top right and red
+   bottom left). Half a cycle apart, they always add up to about one set. The brand colours' deep
+   shades, so the tints colour the slate without lightening it. Only opacity animates, so the
+   browser just composites them; below the falling circles. */
+.yogs-grid::before,
+.yogs-grid::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  opacity: 0;
+  animation: yogs-tint 40s ease-in-out infinite;
+}
+
+.yogs-grid::before {
+  background:
+    radial-gradient(
+      circle at 10% 10%,
+      color-mix(in srgb, var(--color-primary-700) 40%, transparent),
+      transparent 55%
+    ),
+    radial-gradient(
+      circle at 90% 90%,
+      color-mix(in srgb, var(--color-accent-shade) 50%, transparent),
+      transparent 55%
+    );
+}
+
+.yogs-grid::after {
+  background:
+    radial-gradient(
+      circle at 90% 10%,
+      color-mix(in srgb, var(--color-accent-600) 40%, transparent),
+      transparent 55%
+    ),
+    radial-gradient(
+      circle at 10% 90%,
+      color-mix(in srgb, var(--color-primary-shade) 50%, transparent),
+      transparent 55%
+    );
+  animation-delay: -20s;
+}
+
+@keyframes yogs-tint {
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Faint soft circles falling behind the tiles (YogsFallingCircles), each at its own speed and
+   drift. The layer measures its own height (cqh), so every circle falls the panel's full height.
+   Radial gradients rather than a blur filter, and only `translate` animates, so the browser just
+   composites them. */
+.yogs-circles {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  container-type: size;
+}
+
+.yogs-circles > span {
+  position: absolute;
+  top: calc(var(--size) * -1);
+  left: var(--x);
+  width: var(--size);
+  height: var(--size);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgb(255 255 255 / var(--opacity)) 0,
+    rgb(255 255 255 / 0) 70%
+  );
+  animation: yogs-fall var(--duration) linear var(--delay) infinite;
+}
+
+@keyframes yogs-fall {
+  to {
+    translate: var(--drift) calc(100cqh + var(--size));
+  }
+}
+
 /* Full screen (ScheduleFullscreenButton): the grid covers the viewport and its unit grows to the
    largest that fits both ways; the padding centres it. The container around it stops being a
    query container, which would otherwise hold the fixed grid. */
@@ -87,7 +171,7 @@ html:has(.yogs-grid[data-fullscreen]) {
 
 /* Idle in full screen (ScheduleFullscreenButton, data-idle): the header row fades out, the rest
    moves up half a row, so the week sits centred, and the cursor hides; moving the mouse brings
-   them all back. */
+   them all back. The falling circles stay put, filling the whole panel. */
 .yogs-grid[data-fullscreen] > * {
   transition:
     translate 0.5s ease,
@@ -95,7 +179,7 @@ html:has(.yogs-grid[data-fullscreen]) {
     visibility 0.5s;
 }
 
-.yogs-grid[data-fullscreen][data-idle] > * {
+.yogs-grid[data-fullscreen][data-idle] > :not(.yogs-circles) {
   translate: 0 calc(var(--yogs-unit) / -2);
 }
 
@@ -117,6 +201,12 @@ html[data-yogs-bg='off'] .yogs-grid {
   box-shadow: none;
 }
 
+html[data-yogs-bg='off'] .yogs-grid::before,
+html[data-yogs-bg='off'] .yogs-grid::after,
+html[data-yogs-bg='off'] .yogs-circles {
+  display: none;
+}
+
 /* Full screen without the panel shows the page's canvas (PageShell) */
 html[data-yogs-bg='off'] .yogs-grid[data-fullscreen] {
   background: linear-gradient(
@@ -132,6 +222,18 @@ html[data-yogs-avatars='off'] .yogs-grid .yogs-avatars {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  /* Both tint sets at half strength, standing still */
+  .yogs-grid::before,
+  .yogs-grid::after {
+    animation: none;
+    opacity: 0.5;
+  }
+
+  /* Stopped, they would all sit above the panel: leave them out */
+  .yogs-circles {
+    display: none;
+  }
+
   .yogs-grid[data-fullscreen] > * {
     transition:
       opacity 0.5s ease,

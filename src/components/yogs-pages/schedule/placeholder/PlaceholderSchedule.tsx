@@ -1,5 +1,6 @@
 import { type Component, For } from 'solid-js'
 import { Skeleton } from '../../../ui/Status'
+import { YogsFallingCircles } from '../YogsFallingCircles'
 import '../yogs-schedule.css'
 
 const DAYS = Array.from({ length: 7 })
@@ -23,6 +24,7 @@ export const PlaceholderSchedule: Component = () => (
         class="yogs-grid flex flex-col"
         style={{ '--yogs-rows': 2 + 3 * SLOTS.length }}
       >
+        <YogsFallingCircles />
         <div class="data-height flex w-full flex-row">
           <div class="data-width" />
           <div class="yogs-cell header-title-card-width h-full">
