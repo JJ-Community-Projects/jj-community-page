@@ -45,7 +45,8 @@
 
   .desktop-schedule .yogs-grid {
     scroll-snap-align: start;
-    scroll-margin-top: 0.75rem;
+    /* None: the text above can sit 8px over the grid; the cells' padding keeps the cards off the edge */
+    scroll-margin-top: 0;
   }
 }
 
