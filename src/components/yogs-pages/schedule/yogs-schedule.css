@@ -2,8 +2,8 @@
   Sizing of the Yogs week grid (YogsScheduleWeek, PlaceholderSchedule) and the desktop / mobile
   switch, for every page that shows the schedule. The grid is 22 units wide (7 days × 3 + the time
   column) and sizes from its container, at most 80vw (as before the redesign) and 1600px. A slot is
-  3 units; every cell keeps half a gap of padding (8px between cells), the stream tiles their own
-  (--yogs-tile-gap, also 8px).
+  3 units; every cell keeps half a gap of padding (12px between cells), the stream tiles their own
+  (--yogs-tile-gap, also 12px).
 */
 
 /* Registered, so the unit is computed once on .yogs-grid (against the schedule container) and
@@ -20,12 +20,70 @@
   container-type: inline-size;
 }
 
+/* The grid sits on a panel like the poster's (--color-schedule with a vignette); its padding comes
+   off the units, so the panel keeps the grid's old outer width. The corner follows the tiles' at
+   their distance from the edge, and a glow in the panel's colour softens its edge on the canvas. */
 .yogs-grid {
-  --yogs-unit: calc(min(100cqi, 80vw, 1600px) / 22);
+  --yogs-pad: 0.5rem;
+  --yogs-unit: calc((min(100cqi, 80vw, 1600px) - 2 * var(--yogs-pad)) / 22);
   --yogs-slot: calc(var(--yogs-unit) * 3);
-  --yogs-gap: 0.5rem;
-  --yogs-tile-gap: 0.5rem;
-  width: calc(var(--yogs-unit) * 22);
+  --yogs-gap: 0.75rem;
+  --yogs-tile-gap: 0.75rem;
+  position: relative;
+  isolation: isolate;
+  overflow: clip;
+  width: calc(var(--yogs-unit) * 22 + 2 * var(--yogs-pad));
+  padding: var(--yogs-pad);
+  border-radius: calc(
+    var(--radius-tile) + var(--yogs-pad) + var(--yogs-gap) / 2
+  );
+  background-color: var(--color-schedule);
+  background-image: radial-gradient(
+    ellipse at center,
+    rgb(255 255 255 / 0.08),
+    transparent 60%,
+    rgb(0 0 0 / 0.3)
+  );
+  box-shadow: 0 0 32px 12px
+    color-mix(in srgb, var(--color-schedule) 70%, transparent);
+}
+
+/* Snow behind the tiles: two layers falling at different speeds. Each starts one tile above the
+   panel and moves down by one tile per loop, so the loop is seamless; the panel clips the rest. */
+.yogs-grid::before,
+.yogs-grid::after {
+  content: '';
+  position: absolute;
+  inset: calc(-1 * var(--yogs-snow-tile)) 0 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: var(--yogs-snow);
+  animation: yogs-snow var(--yogs-snow-duration) linear infinite;
+}
+
+.yogs-grid::before {
+  --yogs-snow: url('./yogs-snow-far.svg');
+  --yogs-snow-tile: 160px;
+  --yogs-snow-duration: 40s;
+}
+
+.yogs-grid::after {
+  --yogs-snow: url('./yogs-snow-near.svg');
+  --yogs-snow-tile: 240px;
+  --yogs-snow-duration: 24s;
+}
+
+@keyframes yogs-snow {
+  to {
+    translate: 0 var(--yogs-snow-tile);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .yogs-grid::before,
+  .yogs-grid::after {
+    animation: none;
+  }
 }
 
 .yogs-cell {
