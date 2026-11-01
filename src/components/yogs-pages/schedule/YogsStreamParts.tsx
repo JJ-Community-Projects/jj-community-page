@@ -1,11 +1,16 @@
-import { type Component, Show } from 'solid-js'
+import { type Component, For, Show } from 'solid-js'
 import { DateTime } from 'luxon'
 import { BiLogosTwitch, BiLogosYoutube } from 'solid-icons/bi'
 import { isColorLight } from '../../../lib/utils/textColors.ts'
 import { YogsStreamUtils } from '../../../lib/utils/YogsStreamUtils.ts'
-import type { YogsStream } from '../../../lib/orpc/private/yogs/contract.ts'
+import type {
+  YogsCreator,
+  YogsStream,
+} from '../../../lib/orpc/private/yogs/contract.ts'
 import { useYogsSchedule } from './provider/YogsScheduleProvider.tsx'
+import { Avatar } from '../../ui/Avatar'
 import { cn } from '../../ui/cn'
+import { CREATOR_FALLBACK_COLOR } from '../creators/YogsCreatorChip.tsx'
 
 /**
  * Clock-based state of one stream, shared by the desktop tile and the mobile row. Everything is
@@ -102,5 +107,46 @@ export const VodIcons: Component<{ stream: YogsStream; class?: string }> = (
         </Show>
       </div>
     </Show>
+  )
+}
+
+/**
+ * Overlapping creator avatars in at most `max` (3) circles: all of them when they fit, else `max - 1`
+ * avatars and a "+N" (so N is always 2 or more, never "+1"). The slot's label carries the text.
+ */
+export const CreatorStack: Component<{
+  creators: YogsCreator[]
+  max?: number
+  class?: string
+}> = (props) => {
+  const max = () => props.max ?? 3
+  const shown = () =>
+    props.creators.length <= max()
+      ? props.creators
+      : props.creators.slice(0, max() - 1)
+  const hidden = () => props.creators.length - shown().length
+  return (
+    <span
+      class={cn('flex items-center -space-x-1.5', props.class)}
+      aria-hidden="true"
+    >
+      <For each={shown()}>
+        {(creator) => (
+          <Avatar
+            src={creator.imageUrl}
+            alt=""
+            fallback={creator.name.charAt(0)}
+            size="xs"
+            shape="circle"
+            ringColor={creator.color ?? CREATOR_FALLBACK_COLOR}
+          />
+        )}
+      </For>
+      <Show when={hidden() > 0}>
+        <span class="bg-surface-strong text-fg ring-line text-xxs flex size-6 items-center justify-center rounded-full font-bold ring-1">
+          +{hidden()}
+        </span>
+      </Show>
+    </span>
   )
 }

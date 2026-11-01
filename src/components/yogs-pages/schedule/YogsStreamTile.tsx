@@ -15,6 +15,7 @@ import { cn, dataColors, dataFill, focusRing } from '../../ui/cn'
 import { LiveBadge } from '../../ui/Labels'
 import {
   CountdownChip,
+  CreatorStack,
   LiveRing,
   useStreamState,
   VodIcons,
@@ -152,9 +153,16 @@ export const YogsStreamTile: Component<YogsStreamTileProps> = (props) => {
               </CountdownChip>
             </Show>
           </div>
-          {/* VODs exist after the start; with a countdown the row would only crowd the tile */}
+          <Show when={tileSize() > 1 && stream().creators?.length}>
+            <CreatorStack
+              creators={stream().creators!}
+              max={5}
+              class="shrink-0 pt-1 pb-0.5"
+            />
+          </Show>
+          {/* VODs exist after the start only; in the corner they take no room from the text */}
           <Show when={tileSize() > 1 && !showCountdown()}>
-            <VodIcons stream={props.stream} class="justify-center" />
+            <VodIcons stream={props.stream} class="absolute top-1 right-1.5" />
           </Show>
         </button>
       </div>

@@ -1,14 +1,14 @@
-import { type Component, For, Show } from 'solid-js'
-import type {
-  YogsCreator,
-  YogsStream,
-} from '../../../../lib/orpc/private/yogs/contract.ts'
+import { type Component, Show } from 'solid-js'
+import type { YogsStream } from '../../../../lib/orpc/private/yogs/contract.ts'
 import { YogsScheduleDetailDialog } from '../YogsScheduleDetailDialog.tsx'
 import { logSlotClick } from '../../../../lib/analytics.ts'
 import { createModalSignal } from '../../../../lib/createModalSignal.ts'
 import { useYogsSchedule } from '../provider/YogsScheduleProvider.tsx'
-import { useStreamState, VodIcons } from '../YogsStreamParts.tsx'
-import { Avatar } from '../../../ui/Avatar'
+import {
+  CreatorStack,
+  useStreamState,
+  VodIcons,
+} from '../YogsStreamParts.tsx'
 import {
   cn,
   dataColors,
@@ -17,7 +17,6 @@ import {
   focusRing,
   tileSurface,
 } from '../../../ui/cn'
-import { CREATOR_FALLBACK_COLOR } from '../../creators/YogsCreatorChip.tsx'
 
 /** Height of one row (`min-h-14`); MobileYogsSchedule reserves a day with it. */
 export const MOBILE_ROW_REM = 3.5
@@ -113,32 +112,5 @@ export const MobileYogsStreamTile: Component<MobileScheduleBodyProps> = (
       </button>
       <YogsScheduleDetailDialog stream={props.stream} modalSignal={modal} />
     </>
-  )
-}
-
-/** Up to three overlapping creator avatars and a "+N" for the rest; the row's label carries the text. */
-const CreatorStack: Component<{ creators: YogsCreator[] }> = (props) => {
-  const shown = () => props.creators.slice(0, 3)
-  const hidden = () => props.creators.length - shown().length
-  return (
-    <span class="flex items-center -space-x-1.5" aria-hidden="true">
-      <For each={shown()}>
-        {(creator) => (
-          <Avatar
-            src={creator.imageUrl}
-            alt=""
-            fallback={creator.name.charAt(0)}
-            size="xs"
-            shape="circle"
-            ringColor={creator.color ?? CREATOR_FALLBACK_COLOR}
-          />
-        )}
-      </For>
-      <Show when={hidden() > 0}>
-        <span class="bg-surface-strong text-fg ring-line text-xxs flex size-6 items-center justify-center rounded-full font-bold ring-1">
-          +{hidden()}
-        </span>
-      </Show>
-    </span>
   )
 }
