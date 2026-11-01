@@ -24,8 +24,9 @@
   padding-block: 1rem 2.5rem;
 }
 
-/* The poster-like panel: --color-schedule with a vignette and a low glow */
-.yogs-grid {
+/* Grid sizes: on the grid, and on the frame around it and the "Updated" pill (YogsSeasonSchedule) */
+.yogs-grid,
+.yogs-frame {
   --yogs-pad: 0.5rem;
   /* No taller than the viewport, so the snapped panel shows the whole week */
   --yogs-unit: min(
@@ -36,6 +37,15 @@
   --yogs-slot: calc(var(--yogs-unit) * 3);
   --yogs-gap: calc(var(--yogs-rem) * 0.75);
   --yogs-tile-gap: calc(var(--yogs-rem) * 0.75);
+}
+
+/* In line with the tiles' right edge: the panel's padding plus the tile cell's */
+.yogs-frame-end {
+  margin-inline-end: calc(var(--yogs-pad) + var(--yogs-tile-gap) / 2);
+}
+
+/* The poster-like panel: --color-schedule with a vignette and a low glow */
+.yogs-grid {
   /* The tiles' (and panel's) corner, in step with the gaps */
   --radius-tile: var(--yogs-rem);
   position: relative;
@@ -53,8 +63,8 @@
     transparent 60%,
     rgb(0 0 0 / 0.3)
   );
-  box-shadow: 0 12px 32px 4px
-    color-mix(in srgb, var(--color-schedule) 70%, transparent);
+  box-shadow: 0 8px 24px 0
+    color-mix(in srgb, var(--color-schedule) 50%, transparent);
 }
 
 /* Corner tints: two sets of red / blue glows cross-fading half a cycle apart (opacity only) */
