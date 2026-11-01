@@ -29,18 +29,43 @@ export const useCopyFilterLink = () => {
   return {copied, copy}
 }
 
-export const FilterResetButton: Component<{class?: string}> = props => {
+interface FilterIconButtonProps {
+  class?: string
+  /** On hover / keyboard focus the button grows into the free width of its row and shows its label. */
+  expand?: boolean
+}
+
+// Hovered, the button takes the rest of the row while its label slides open next to the icon. The row
+// is ~85px free at 1280, so the label is text-xs below 2xl and ends in an ellipsis where even that is too wide.
+const expandButton = 'group overflow-hidden transition-[flex-grow,background-color] duration-200 hover:grow focus-visible:grow 2xl:px-1'
+const expandLabel = 'max-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-xs opacity-0 transition-[max-width,margin,opacity] duration-200 2xl:text-sm group-hover:ml-1 group-hover:max-w-24 group-hover:opacity-100 group-focus-visible:ml-1 group-focus-visible:max-w-24 group-focus-visible:opacity-100 2xl:group-hover:ml-1.5 2xl:group-focus-visible:ml-1.5'
+
+/** The button's label for `expand`; hidden from screen readers, the aria-label already says it. */
+const ExpandLabel: Component<{show?: boolean, children: string}> = props => (
+  <Show when={props.show}>
+    <span class={expandLabel} aria-hidden="true">{props.children}</span>
+  </Show>
+)
+
+export const FilterResetButton: Component<FilterIconButtonProps> = props => {
   const {isEmpty, reset} = useCreatorFilter()
   return (
     <Show when={!isEmpty()}>
-      <IconButton variant="canvas" aria-label="Reset filter" title="Reset filter" class={props.class} onClick={reset}>
-        <BiRegularReset class="size-4"/>
+      <IconButton
+        variant="canvas"
+        aria-label="Reset filter"
+        title="Reset filter"
+        class={cn(props.expand && expandButton, props.class)}
+        onClick={reset}
+      >
+        <BiRegularReset class="size-4 shrink-0"/>
+        <ExpandLabel show={props.expand}>Reset</ExpandLabel>
       </IconButton>
     </Show>
   )
 }
 
-export const FilterShareButton: Component<{class?: string}> = props => {
+export const FilterShareButton: Component<FilterIconButtonProps> = props => {
   const {isEmpty} = useCreatorFilter()
   const {mounted} = useYogsSchedule()
   const {copied, copy} = useCopyFilterLink()
@@ -51,12 +76,13 @@ export const FilterShareButton: Component<{class?: string}> = props => {
         variant="canvas"
         aria-label="Copy filter link"
         title={copied() ? 'Copied' : 'Copy filter link'}
-        class={props.class}
+        class={cn(props.expand && expandButton, props.class)}
         onClick={copy}
       >
-        <Show when={copied()} fallback={<FaSolidShare class="size-4"/>}>
-          <FaSolidCheck class="size-4"/>
+        <Show when={copied()} fallback={<FaSolidShare class="size-4 shrink-0"/>}>
+          <FaSolidCheck class="size-4 shrink-0"/>
         </Show>
+        <ExpandLabel show={props.expand}>{copied() ? 'Copied' : 'Share Link'}</ExpandLabel>
       </IconButton>
       <span class="sr-only" aria-live="polite">{copied() ? 'Link copied' : ''}</span>
     </Show>

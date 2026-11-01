@@ -33,8 +33,8 @@ export const YogsScheduleHeader: Component = () => {
         </div>
       </div>
       <div class={'yogs-cell stream-width flex h-full flex-row justify-end gap-(--yogs-gap)'}>
-        <FilterShareButton class={iconControl}/>
-        <FilterResetButton class={iconControl}/>
+        <FilterShareButton class={iconControl} expand/>
+        <FilterResetButton class={iconControl} expand/>
       </div>
       <div class={'yogs-cell stream-width h-full'}>
         <Button
