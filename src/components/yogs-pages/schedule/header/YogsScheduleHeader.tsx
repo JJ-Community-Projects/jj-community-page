@@ -25,7 +25,7 @@ export const YogsScheduleHeader: Component = () => {
   const week = () => weekIndex() + 1
 
   return (
-    <div class={'data-height flex w-full flex-row'}>
+    <div class={'yogs-header data-height flex w-full flex-row'}>
       <div class={'yogs-cell data-width h-full'}>
         <ScheduleSettingsMenu class={'size-full'}/>
       </div>

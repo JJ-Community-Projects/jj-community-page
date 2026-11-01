@@ -116,6 +116,24 @@ html:has(.yogs-grid[data-fullscreen]) {
   box-shadow: none;
 }
 
+/* Idle in full screen (ScheduleFullscreenButton, data-idle): the header row fades out and the rest
+   moves up half a row, so the week sits centred; moving the mouse brings both back. */
+.yogs-grid[data-fullscreen] > * {
+  transition:
+    translate 0.5s ease,
+    opacity 0.5s ease,
+    visibility 0.5s;
+}
+
+.yogs-grid[data-fullscreen][data-idle] > * {
+  translate: 0 calc(var(--yogs-unit) / -2);
+}
+
+.yogs-grid[data-fullscreen][data-idle] > .yogs-header {
+  opacity: 0;
+  visibility: hidden;
+}
+
 /* Settings (ScheduleSettingsMenu): the plain canvas instead of the panel, tiles without avatars.
    The padding stays, so the grid keeps its size. */
 html[data-yogs-bg='off'] .yogs-grid {
@@ -146,6 +164,12 @@ html[data-yogs-avatars='off'] .yogs-grid .yogs-avatars {
   .yogs-grid::before,
   .yogs-grid::after {
     animation: none;
+  }
+
+  .yogs-grid[data-fullscreen] > * {
+    transition:
+      opacity 0.5s ease,
+      visibility 0.5s;
   }
 }
 
