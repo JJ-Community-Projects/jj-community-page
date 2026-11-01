@@ -18,11 +18,12 @@ import { cn, focusRing, tileSurface } from '../../../ui/cn'
 import { LiveBadge } from '../../../ui/Labels'
 
 /**
- * Sticky header of the mobile timeline: title, then the day with prev / next (D4: arrows only).
+ * Sticky header of the mobile timeline: title and Yogs time, then the day with prev / next (D4: arrows only).
  * While a filter is active the list shows every matching day, so the day row becomes the filter summary.
  */
 export const MobileScheduleHeader: Component = () => {
-  const { schedule, day, toDateTime, isToday, mounted, now } = useYogsSchedule()
+  const { schedule, day, toDateTime, isToday, mounted, now, yogsTime } =
+    useYogsSchedule()
   const { isEmpty } = useCreatorFilter()
 
   const start = () => rangeFromData(day().streams)?.start ?? day().start
@@ -37,10 +38,19 @@ export const MobileScheduleHeader: Component = () => {
 
   return (
     <div class={cn(tileSurface, 'sticky top-2 z-10 flex flex-col gap-1 px-2 py-2')}>
-      <p class="font-babas text-center text-lg leading-none tracking-wider">
-        {schedule.title}
-        <Show when={isEmpty()}> · Week {week()}</Show>
-      </p>
+      <div class="font-babas flex items-center justify-between gap-2 px-1 leading-none tracking-wider">
+        <p class="text-lg">
+          {schedule.title}
+          <Show when={isEmpty()}>
+            {' '}
+            <span class="whitespace-nowrap">· Week {week()}</span>
+          </Show>
+        </p>
+        <p class="flex shrink-0 flex-col items-end" title="Current time in London">
+          <span class="text-fg-muted text-xxs">Yogs time</span>
+          <span class="tabular-nums">{yogsTime()}</span>
+        </p>
+      </div>
       <Show when={isEmpty()} fallback={<FilterSummary />}>
         <DayRow
           date={toDateTime(start()).toFormat("EEE',' MMM d")}

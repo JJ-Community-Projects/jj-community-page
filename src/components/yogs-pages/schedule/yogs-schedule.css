@@ -231,6 +231,28 @@ html[data-yogs-avatars='off'] .yogs-grid .yogs-avatars {
   width: calc(var(--yogs-slot) * 3);
 }
 
+/* Header row text (YogsScheduleHeader), from the units rather than the tiles' cqi, so it scales
+   with the grid: the title at 8% of two day columns, and the Yogs time in two rows that fit the
+   card's height: the label like the timezone tile (30% of a unit cell's content, with its two-line
+   floor), the time below it. */
+.yogs-header {
+  --yogs-header-text: clamp(
+    0.875rem,
+    (var(--yogs-slot) * 2 - var(--yogs-gap)) * 0.08,
+    2.5rem
+  );
+  --yogs-header-label-text: clamp(
+    0.5625rem,
+    (var(--yogs-unit) - var(--yogs-gap)) * 0.3,
+    1.25rem
+  );
+  --yogs-header-time-text: clamp(
+    0.625rem,
+    (var(--yogs-unit) - var(--yogs-gap)) * 0.45,
+    2.5rem
+  );
+}
+
 @media (max-width: 900px) {
   .desktop-schedule {
     display: none;

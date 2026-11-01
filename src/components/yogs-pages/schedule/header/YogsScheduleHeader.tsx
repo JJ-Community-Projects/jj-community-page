@@ -15,9 +15,9 @@ import {ScheduleFullscreenButton} from "./ScheduleFullscreenButton.tsx";
 const control = 'size-full rounded-tile font-sans shadow-tile xl:text-base'
 const iconControl = 'size-auto h-full aspect-square rounded-tile font-sans'
 
-/** The poster's header row: settings over the time column, title card over three days, then share/reset, Filter, Export, the week switch and full screen. */
+/** The poster's header row: settings over the time column, title card (with the Yogs time) over three days, then share/reset, Filter, Export, the week switch and full screen. */
 export const YogsScheduleHeader: Component = () => {
-  const {schedule, nextWeek, prevWeek, weekIndex, numberOfWeeks} = useYogsSchedule()
+  const {schedule, nextWeek, prevWeek, weekIndex, numberOfWeeks, yogsTime} = useYogsSchedule()
   const {isEmpty, filter} = useCreatorFilter()
   const filterModal = createModalSignal()
   const calendarModal = createModalSignal()
@@ -29,10 +29,14 @@ export const YogsScheduleHeader: Component = () => {
       <div class={'yogs-cell data-width h-full'}>
         <ScheduleSettingsMenu class={'size-full'}/>
       </div>
-      <div class={'yogs-cell header-title-card-width h-full @container'}>
-        <div class={cn(tileSurface, 'flex size-full items-center justify-center')}>
-          <p class={'text-center text-[length:clamp(1.25rem,6.5cqi,2.5rem)] leading-none'}>
+      <div class={'yogs-cell header-title-card-width h-full'}>
+        <div class={cn(tileSurface, 'flex size-full items-center justify-between gap-3 px-3')}>
+          <p class={'min-w-0 text-balance text-(length:--yogs-header-text) leading-none'}>
             {schedule.title} | Week {week()}
+          </p>
+          <p class={'flex shrink-0 flex-col items-end leading-none'} title="Current time in London">
+            <span class={'text-fg-muted text-(length:--yogs-header-label-text)'}>Yogs time</span>
+            <span class={'tabular-nums text-(length:--yogs-header-time-text)'}>{yogsTime()}</span>
           </p>
         </div>
       </div>

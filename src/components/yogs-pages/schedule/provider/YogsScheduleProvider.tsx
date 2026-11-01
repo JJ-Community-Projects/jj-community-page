@@ -99,6 +99,9 @@ const useYogsScheduleHook = (
   const clock = useNow()
   const scheduleStart = Math.min(...schedule.streams.map((s) => s.start.getTime()))
   const scheduleEnd = Math.max(...schedule.streams.map((s) => s.end.getTime()))
+  /** The current time in London ("Yogs time"), the schedule's own timezone; blank until mounted. */
+  const yogsTime = () =>
+    mounted() ? clock().setZone('Europe/London').toFormat('HH:mm') : '--:--'
   /** Between the schedule's first start and last end (so never on archive pages). */
   const isRunning = () =>
     mounted() &&
@@ -125,6 +128,7 @@ const useYogsScheduleHook = (
     mounted,
     toDateTime,
     now: clock,
+    yogsTime,
     isRunning,
     isToday,
     schedule,
