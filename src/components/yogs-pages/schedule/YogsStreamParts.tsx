@@ -127,7 +127,7 @@ export const CreatorStack: Component<{
   const hidden = () => props.creators.length - shown().length
   return (
     <span
-      class={cn('flex items-center -space-x-1.5', props.class)}
+      class={cn('flex items-center -space-x-1', props.class)}
       aria-hidden="true"
     >
       <For each={shown()}>
@@ -139,11 +139,12 @@ export const CreatorStack: Component<{
             size="xs"
             shape="circle"
             ringColor={creator.color ?? CREATOR_FALLBACK_COLOR}
+            class="size-5"
           />
         )}
       </For>
       <Show when={hidden() > 0}>
-        <span class="bg-surface-strong text-fg ring-line text-xxs flex size-6 items-center justify-center rounded-full font-bold ring-1">
+        <span class="bg-surface-strong text-fg ring-line text-xxs flex size-5 items-center justify-center rounded-full font-bold ring-1">
           +{hidden()}
         </span>
       </Show>
