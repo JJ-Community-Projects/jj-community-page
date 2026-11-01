@@ -43,8 +43,8 @@ const titleClass = (size: number, hasSubtitle: boolean) => {
 
 const subtitleClass = (size: number) =>
   size <= 2
-    ? 'text-pretty uppercase text-[length:calc(clamp(0.75rem,9.7cqi,0.875rem)*var(--fit,1))] tracking-wide'
-    : 'text-pretty uppercase text-[length:calc(clamp(0.75rem,10.7cqi,1rem)*var(--fit,1))] tracking-widest'
+    ? 'text-pretty uppercase leading-tight text-[length:calc(clamp(0.75rem,9.7cqi,0.875rem)*var(--fit,1))] tracking-wide'
+    : 'text-pretty uppercase leading-tight text-[length:calc(clamp(0.75rem,10.7cqi,1rem)*var(--fit,1))] tracking-widest'
 
 /** Smallest `--fit`: below it the title gets hard to read, so the rest is cut as before. */
 const MIN_FIT = 0.6
@@ -95,6 +95,9 @@ export const YogsStreamTile: Component<YogsStreamTileProps> = (props) => {
   const subtitle = () => stream().subtitle
   const tileSize = () => stream().size
   const color = () => stream().color
+  // VODs exist after the start only
+  const showVods = () =>
+    tileSize() > 1 && !showCountdown() && !!stream().vods?.length
   // Filtered-out tiles stay clickable and focusable, only dimmed
   const dimmed = () => !isSlotPartOfFilter(stream())
 
@@ -138,12 +141,21 @@ export const YogsStreamTile: Component<YogsStreamTileProps> = (props) => {
           </Show>
           <div
             ref={content}
-            class="flex min-h-0 w-full flex-1 flex-col items-center justify-center gap-0.5"
+            class={cn(
+              'flex min-h-0 w-full flex-1 flex-col items-center justify-center gap-0',
+              // Keeps the text below the VOD icons; fitText shrinks it into the rest
+              showVods() && 'mt-3',
+            )}
           >
             <Show when={isLive() && tileSize() > 1}>
               <LiveBadge />
             </Show>
-            <p class={titleClass(tileSize(), !!subtitle())}>{title()}</p>
+            {/* After the size class: cn drops a leading-* that comes before a text size */}
+            <p
+              class={cn(titleClass(tileSize(), !!subtitle()), 'leading-tight')}
+            >
+              {title()}
+            </p>
             <Show when={subtitle() && tileSize() > 1}>
               <p class={subtitleClass(tileSize())}>{subtitle()}</p>
             </Show>
@@ -160,8 +172,7 @@ export const YogsStreamTile: Component<YogsStreamTileProps> = (props) => {
               class="shrink-0 pt-1 pb-0.5"
             />
           </Show>
-          {/* VODs exist after the start only; in the corner they take no room from the text */}
-          <Show when={tileSize() > 1 && !showCountdown()}>
+          <Show when={showVods()}>
             <VodIcons stream={props.stream} class="absolute top-1 right-1.5" />
           </Show>
         </button>
