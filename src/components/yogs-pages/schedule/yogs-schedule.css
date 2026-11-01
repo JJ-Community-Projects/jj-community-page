@@ -142,6 +142,13 @@
   }
 }
 
+/* Scrolled out of view (data-offscreen, set by YogsFallingCircles), the decoration stands still */
+.yogs-grid[data-offscreen]::before,
+.yogs-grid[data-offscreen]::after,
+.yogs-grid[data-offscreen] .yogs-circles > span {
+  animation-play-state: paused;
+}
+
 /* Full screen (ScheduleFullscreenButton): the grid covers the viewport and its unit grows to the
    largest that fits both ways; the padding centres it. The container around it stops being a
    query container, which would otherwise hold the fixed grid. */

@@ -1,4 +1,4 @@
-import { type Component, For } from 'solid-js'
+import { type Component, For, onCleanup, onMount } from 'solid-js'
 
 /** Seeded PRNG (mulberry32): the server and the hydrating client draw the same circles. */
 function rng(seed: number) {
@@ -28,21 +28,37 @@ const CIRCLES = Array.from({ length: 26 }, () => ({
 }))
 
 /** Faint soft circles falling behind the schedule tiles (yogs-schedule.css). Decoration only. */
-export const YogsFallingCircles: Component = () => (
-  <div class="yogs-circles" aria-hidden="true">
-    <For each={CIRCLES}>
-      {(c) => (
-        <span
-          style={{
-            '--x': `${c.x}%`,
-            '--size': `${c.size}px`,
-            '--duration': `${c.duration}s`,
-            '--delay': `-${c.delay}s`,
-            '--drift': `${c.drift}px`,
-            '--opacity': c.opacity,
-          }}
-        />
-      )}
-    </For>
-  </div>
-)
+export const YogsFallingCircles: Component = () => {
+  let layer!: HTMLDivElement
+
+  // While the panel is scrolled out of view, `data-offscreen` on it pauses its decoration (the
+  // circles and the corner tints); the browser already pauses hidden tabs
+  onMount(() => {
+    const grid = layer.parentElement
+    if (!grid) return
+    const observer = new IntersectionObserver(([entry]) =>
+      grid.toggleAttribute('data-offscreen', !entry.isIntersecting),
+    )
+    observer.observe(grid)
+    onCleanup(() => observer.disconnect())
+  })
+
+  return (
+    <div ref={layer} class="yogs-circles" aria-hidden="true">
+      <For each={CIRCLES}>
+        {(c) => (
+          <span
+            style={{
+              '--x': `${c.x}%`,
+              '--size': `${c.size}px`,
+              '--duration': `${c.duration}s`,
+              '--delay': `-${c.delay}s`,
+              '--drift': `${c.drift}px`,
+              '--opacity': c.opacity,
+            }}
+          />
+        )}
+      </For>
+    </div>
+  )
+}
