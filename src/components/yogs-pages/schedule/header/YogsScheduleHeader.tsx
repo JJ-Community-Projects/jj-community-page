@@ -9,12 +9,13 @@ import {CalendarDialog} from "../provider/ScheduleCalendarExportButton.tsx";
 import {Button, IconButton} from "../../../ui/Button";
 import {cn, tileSurface} from "../../../ui/cn";
 import {ScheduleSettingsMenu} from "./ScheduleSettingsMenu.tsx";
+import {ScheduleFullscreenButton} from "./ScheduleFullscreenButton.tsx";
 
 // Controls fill their grid cell; the system font, not the grid's Bebas
 const control = 'size-full rounded-tile font-sans shadow-tile xl:text-base'
 const iconControl = 'size-auto h-full aspect-square rounded-tile font-sans'
 
-/** The poster's header row: settings over the time column, title card over three days, then share/reset, Filter, Export and the week switch. */
+/** The poster's header row: settings over the time column, title card over three days, then share/reset, Filter, Export, the week switch and full screen. */
 export const YogsScheduleHeader: Component = () => {
   const {schedule, nextWeek, prevWeek, weekIndex, numberOfWeeks} = useYogsSchedule()
   const {isEmpty, filter} = useCreatorFilter()
@@ -61,8 +62,8 @@ export const YogsScheduleHeader: Component = () => {
         </Button>
         <CalendarDialog modalSignal={calendarModal}/>
       </div>
-      <div class={'yogs-cell stream-width h-full'}>
-        <div class={'flex size-full items-center justify-between rounded-tile bg-white dark:bg-surface-strong px-1 font-sans text-fg shadow-tile'}>
+      <div class={'yogs-cell stream-width flex h-full flex-row gap-(--yogs-gap)'}>
+        <div class={'flex h-full min-w-0 flex-1 items-center justify-between rounded-tile bg-white dark:bg-surface-strong px-1 font-sans text-fg shadow-tile'}>
           <IconButton
             variant="ghost"
             size="sm"
@@ -74,7 +75,7 @@ export const YogsScheduleHeader: Component = () => {
             <FaSolidChevronLeft/>
           </IconButton>
           <span class={'text-sm font-semibold whitespace-nowrap tabular-nums xl:text-base'}>
-            <span class={'max-xl:sr-only'}>Week </span>{week()}/{numberOfWeeks()}
+            <span class={'sr-only'}>Week </span>{week()}/{numberOfWeeks()}
           </span>
           <IconButton
             variant="ghost"
@@ -87,6 +88,7 @@ export const YogsScheduleHeader: Component = () => {
             <FaSolidChevronRight/>
           </IconButton>
         </div>
+        <ScheduleFullscreenButton class={iconControl}/>
       </div>
     </div>
   );

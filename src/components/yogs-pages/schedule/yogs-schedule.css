@@ -79,6 +79,33 @@
   }
 }
 
+/* Full screen (ScheduleFullscreenButton): the grid covers the viewport and its unit grows to the
+   largest that fits both ways; the padding centres it. The container around it stops being a
+   query container, which would otherwise hold the fixed grid. */
+.desktop-schedule:has(.yogs-grid[data-fullscreen]) {
+  container-type: normal;
+}
+
+html:has(.yogs-grid[data-fullscreen]) {
+  overflow: hidden;
+}
+
+.yogs-grid[data-fullscreen] {
+  --yogs-unit: min(
+    (100vw - 2 * var(--yogs-pad)) / 22,
+    (100vh - 2 * var(--yogs-pad)) / var(--yogs-rows)
+  );
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  width: 100vw;
+  height: 100vh;
+  padding: calc((100vh - var(--yogs-rows) * var(--yogs-unit)) / 2)
+    calc((100vw - 22 * var(--yogs-unit)) / 2);
+  border-radius: 0;
+  box-shadow: none;
+}
+
 /* Settings (ScheduleSettingsMenu): the plain canvas instead of the panel, tiles without avatars.
    The padding stays, so the grid keeps its size. */
 html[data-yogs-bg='off'] .yogs-grid {
@@ -89,6 +116,16 @@ html[data-yogs-bg='off'] .yogs-grid {
 html[data-yogs-bg='off'] .yogs-grid::before,
 html[data-yogs-bg='off'] .yogs-grid::after {
   display: none;
+}
+
+/* Full screen without the panel shows the page's canvas (PageShell) */
+html[data-yogs-bg='off'] .yogs-grid[data-fullscreen] {
+  background: linear-gradient(
+    to bottom right,
+    var(--color-canvas-edge),
+    var(--color-canvas),
+    var(--color-canvas-edge)
+  );
 }
 
 html[data-yogs-avatars='off'] .yogs-grid .yogs-avatars {
