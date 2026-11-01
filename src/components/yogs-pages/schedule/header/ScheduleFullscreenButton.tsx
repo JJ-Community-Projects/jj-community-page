@@ -15,7 +15,7 @@ const IDLE_MS = 4_000
  * cover the viewport with it, and the page (not the grid) goes full screen, so the dialogs and
  * menus, which portal to <body>, still show above it. Leaving the browser's full screen (Esc)
  * shrinks the grid again. After IDLE_MS without the mouse moving, `data-idle` on the grid fades
- * the header row out (yogs-schedule.css); moving the mouse brings it back.
+ * the header row out and hides the cursor (yogs-schedule.css); moving the mouse brings both back.
  */
 export const ScheduleFullscreenButton: Component<{ class?: string }> = (
   props,

@@ -116,8 +116,9 @@ html:has(.yogs-grid[data-fullscreen]) {
   box-shadow: none;
 }
 
-/* Idle in full screen (ScheduleFullscreenButton, data-idle): the header row fades out and the rest
-   moves up half a row, so the week sits centred; moving the mouse brings both back. */
+/* Idle in full screen (ScheduleFullscreenButton, data-idle): the header row fades out, the rest
+   moves up half a row, so the week sits centred, and the cursor hides; moving the mouse brings
+   them all back. */
 .yogs-grid[data-fullscreen] > * {
   transition:
     translate 0.5s ease,
@@ -132,6 +133,12 @@ html:has(.yogs-grid[data-fullscreen]) {
 .yogs-grid[data-fullscreen][data-idle] > .yogs-header {
   opacity: 0;
   visibility: hidden;
+}
+
+/* The tiles set their own (pointer) cursor, so every element in the grid needs it */
+.yogs-grid[data-fullscreen][data-idle],
+.yogs-grid[data-fullscreen][data-idle] * {
+  cursor: none;
 }
 
 /* Settings (ScheduleSettingsMenu): the plain canvas instead of the panel, tiles without avatars.
