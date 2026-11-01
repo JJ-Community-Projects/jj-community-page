@@ -223,9 +223,14 @@ html[data-yogs-bg='off'] .yogs-grid {
   box-shadow: none;
 }
 
+/* Without the background or its animation (yogs-motion), no corner tints and no falling circles:
+   the plain panel as it was before them */
 html[data-yogs-bg='off'] .yogs-grid::before,
 html[data-yogs-bg='off'] .yogs-grid::after,
-html[data-yogs-bg='off'] .yogs-circles {
+html[data-yogs-bg='off'] .yogs-circles,
+html[data-yogs-motion='off'] .yogs-grid::before,
+html[data-yogs-motion='off'] .yogs-grid::after,
+html[data-yogs-motion='off'] .yogs-circles {
   display: none;
 }
 

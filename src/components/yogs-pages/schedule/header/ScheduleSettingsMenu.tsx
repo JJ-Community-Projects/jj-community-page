@@ -10,6 +10,7 @@ import { cn, focusRing } from '../../../ui/cn'
  */
 const settings = [
   { key: 'yogs-bg', label: 'Show background' },
+  { key: 'yogs-motion', label: 'Animate background' },
   { key: 'yogs-avatars', label: 'Show avatars' },
 ] as const
 
@@ -32,6 +33,7 @@ const apply = (key: SettingKey, on: boolean) => {
 export const ScheduleSettingsMenu: Component<{ class?: string }> = (props) => {
   const [state, setState] = createSignal<Record<SettingKey, boolean>>({
     'yogs-bg': true,
+    'yogs-motion': true,
     'yogs-avatars': true,
   })
 
@@ -39,6 +41,7 @@ export const ScheduleSettingsMenu: Component<{ class?: string }> = (props) => {
   onMount(() => {
     const stored = {
       'yogs-bg': isOn('yogs-bg'),
+      'yogs-motion': isOn('yogs-motion'),
       'yogs-avatars': isOn('yogs-avatars'),
     }
     setState(stored)
@@ -76,8 +79,10 @@ export const ScheduleSettingsMenu: Component<{ class?: string }> = (props) => {
               <DropdownMenu.CheckboxItem
                 checked={state()[setting.key]}
                 onChange={(on) => toggle(setting.key, on)}
+                // Without the background there is nothing to animate
+                disabled={setting.key === 'yogs-motion' && !state()['yogs-bg']}
                 closeOnSelect={false}
-                class="text-fg rounded-media data-highlighted:bg-tint flex cursor-pointer items-center gap-2 px-2.5 py-1.5 text-sm outline-none"
+                class="text-fg rounded-media data-highlighted:bg-tint flex cursor-pointer items-center gap-2 px-2.5 py-1.5 text-sm outline-none data-disabled:cursor-default data-disabled:opacity-50"
               >
                 <DropdownMenu.ItemLabel class="flex-1">
                   {setting.label}
