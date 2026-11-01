@@ -106,7 +106,7 @@ export const MobileYogsStreamTile: Component<MobileScheduleBodyProps> = (
             </span>
           </Show>
           <Show when={stream().creators?.length}>
-            <CreatorStack creators={stream().creators!} />
+            <CreatorStack creators={stream().creators!} compact />
           </Show>
         </span>
       </button>

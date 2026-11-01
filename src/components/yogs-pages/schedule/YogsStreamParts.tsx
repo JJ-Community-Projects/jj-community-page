@@ -113,13 +113,16 @@ export const VodIcons: Component<{ stream: YogsStream; class?: string }> = (
 /**
  * Overlapping creator avatars in at most `max` (3) circles: all of them when they fit, else `max - 1`
  * avatars and a "+N" (so N is always 2 or more, never "+1"). The slot's label carries the text.
+ * `compact` shrinks the circles from 20px to 16px for the mobile rows.
  */
 export const CreatorStack: Component<{
   creators: YogsCreator[]
   max?: number
+  compact?: boolean
   class?: string
 }> = (props) => {
   const max = () => props.max ?? 3
+  const circle = () => (props.compact ? 'size-4 text-xxxs' : 'size-5')
   const shown = () =>
     props.creators.length <= max()
       ? props.creators
@@ -127,7 +130,11 @@ export const CreatorStack: Component<{
   const hidden = () => props.creators.length - shown().length
   return (
     <span
-      class={cn('flex items-center -space-x-1', props.class)}
+      class={cn(
+        'flex items-center',
+        props.compact ? '-space-x-0.5' : '-space-x-1',
+        props.class,
+      )}
       aria-hidden="true"
     >
       <For each={shown()}>
@@ -139,12 +146,17 @@ export const CreatorStack: Component<{
             size="xs"
             shape="circle"
             ringColor={creator.color ?? CREATOR_FALLBACK_COLOR}
-            class="size-5"
+            class={circle()}
           />
         )}
       </For>
       <Show when={hidden() > 0}>
-        <span class="bg-surface-strong text-fg ring-line text-xxs flex size-5 items-center justify-center rounded-full font-bold ring-1">
+        <span
+          class={cn(
+            'bg-surface-strong text-fg ring-line text-xxs flex items-center justify-center rounded-full font-bold ring-1',
+            circle(),
+          )}
+        >
           +{hidden()}
         </span>
       </Show>
