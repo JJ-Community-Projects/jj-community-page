@@ -58,37 +58,6 @@
     color-mix(in srgb, var(--color-schedule) 70%, transparent);
 }
 
-/* Snow behind the tiles: two layers falling at different speeds. Each starts one tile above the
-   panel and moves down by one tile per loop, so the loop is seamless; the panel clips the rest. */
-.yogs-grid::before,
-.yogs-grid::after {
-  content: '';
-  position: absolute;
-  inset: calc(-1 * var(--yogs-snow-tile)) 0 0;
-  z-index: -1;
-  pointer-events: none;
-  background-image: var(--yogs-snow);
-  animation: yogs-snow var(--yogs-snow-duration) linear infinite;
-}
-
-.yogs-grid::before {
-  --yogs-snow: url('./yogs-snow-far.svg');
-  --yogs-snow-tile: 160px;
-  --yogs-snow-duration: 40s;
-}
-
-.yogs-grid::after {
-  --yogs-snow: url('./yogs-snow-near.svg');
-  --yogs-snow-tile: 240px;
-  --yogs-snow-duration: 24s;
-}
-
-@keyframes yogs-snow {
-  to {
-    translate: 0 var(--yogs-snow-tile);
-  }
-}
-
 /* Full screen (ScheduleFullscreenButton): the grid covers the viewport and its unit grows to the
    largest that fits both ways; the padding centres it. The container around it stops being a
    query container, which would otherwise hold the fixed grid. */
@@ -148,11 +117,6 @@ html[data-yogs-bg='off'] .yogs-grid {
   box-shadow: none;
 }
 
-html[data-yogs-bg='off'] .yogs-grid::before,
-html[data-yogs-bg='off'] .yogs-grid::after {
-  display: none;
-}
-
 /* Full screen without the panel shows the page's canvas (PageShell) */
 html[data-yogs-bg='off'] .yogs-grid[data-fullscreen] {
   background: linear-gradient(
@@ -168,11 +132,6 @@ html[data-yogs-avatars='off'] .yogs-grid .yogs-avatars {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .yogs-grid::before,
-  .yogs-grid::after {
-    animation: none;
-  }
-
   .yogs-grid[data-fullscreen] > * {
     transition:
       opacity 0.5s ease,
