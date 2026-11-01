@@ -169,7 +169,7 @@ export const YogsStreamTile: Component<YogsStreamTileProps> = (props) => {
             <CreatorStack
               creators={stream().creators!}
               max={5}
-              class="shrink-0 pt-1 pb-0.5"
+              class="yogs-avatars shrink-0 pt-1 pb-0.5"
             />
           </Show>
           <Show when={showVods()}>

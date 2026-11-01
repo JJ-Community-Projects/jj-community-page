@@ -8,12 +8,13 @@ import {FaRegularCalendar, FaSolidChevronLeft, FaSolidChevronRight} from "solid-
 import {CalendarDialog} from "../provider/ScheduleCalendarExportButton.tsx";
 import {Button, IconButton} from "../../../ui/Button";
 import {cn, tileSurface} from "../../../ui/cn";
+import {ScheduleSettingsMenu} from "./ScheduleSettingsMenu.tsx";
 
 // Controls fill their grid cell; the system font, not the grid's Bebas
 const control = 'size-full rounded-tile font-sans shadow-tile xl:text-base'
 const iconControl = 'size-auto h-full aspect-square rounded-tile font-sans'
 
-/** The poster's header row: title card over three days, then share/reset, Filter, Export and the week switch. */
+/** The poster's header row: settings over the time column, title card over three days, then share/reset, Filter, Export and the week switch. */
 export const YogsScheduleHeader: Component = () => {
   const {schedule, nextWeek, prevWeek, weekIndex, numberOfWeeks} = useYogsSchedule()
   const {isEmpty, filter} = useCreatorFilter()
@@ -24,7 +25,9 @@ export const YogsScheduleHeader: Component = () => {
 
   return (
     <div class={'data-height flex w-full flex-row'}>
-      <div class={'data-width'}/>
+      <div class={'yogs-cell data-width h-full'}>
+        <ScheduleSettingsMenu class={'size-full'}/>
+      </div>
       <div class={'yogs-cell header-title-card-width h-full @container'}>
         <div class={cn(tileSurface, 'flex size-full items-center justify-center')}>
           <p class={'text-center text-[length:clamp(1.25rem,6.5cqi,2.5rem)] leading-none'}>
