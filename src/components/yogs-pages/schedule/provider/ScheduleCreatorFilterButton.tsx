@@ -37,8 +37,8 @@ interface FilterIconButtonProps {
 
 // Hovered, the button takes the rest of the row while its label slides open next to the icon. The row
 // is ~85px free at 1280, so the label is text-xs below 2xl and ends in an ellipsis where even that is too wide.
-const expandButton = 'group overflow-hidden transition-[flex-grow,background-color] duration-200 hover:grow focus-visible:grow 2xl:px-1'
-const expandLabel = 'max-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-xs opacity-0 transition-[max-width,margin,opacity] duration-200 2xl:text-sm group-hover:ml-1 group-hover:max-w-24 group-hover:opacity-100 group-focus-visible:ml-1 group-focus-visible:max-w-24 group-focus-visible:opacity-100 2xl:group-hover:ml-1.5 2xl:group-focus-visible:ml-1.5'
+const expandButton = 'group overflow-hidden transition-[flex-grow,background-color] duration-200 hover:grow focus-visible:grow 2xl:px-[calc(var(--yogs-rem,1rem)*0.25)]'
+const expandLabel = 'max-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-[length:calc(var(--yogs-rem,1rem)*0.75)]/[1.333] opacity-0 transition-[max-width,margin,opacity] duration-200 2xl:text-[length:calc(var(--yogs-rem,1rem)*0.875)]/[1.429] group-hover:ml-[calc(var(--yogs-rem,1rem)*0.25)] group-hover:max-w-[calc(var(--yogs-rem,1rem)*6)] group-hover:opacity-100 group-focus-visible:ml-[calc(var(--yogs-rem,1rem)*0.25)] group-focus-visible:max-w-[calc(var(--yogs-rem,1rem)*6)] group-focus-visible:opacity-100 2xl:group-hover:ml-[calc(var(--yogs-rem,1rem)*0.375)] 2xl:group-focus-visible:ml-[calc(var(--yogs-rem,1rem)*0.375)]'
 
 /** The button's label for `expand`; hidden from screen readers, the aria-label already says it. */
 const ExpandLabel: Component<{show?: boolean, children: string}> = props => (
@@ -58,7 +58,7 @@ export const FilterResetButton: Component<FilterIconButtonProps> = props => {
         class={cn(props.expand && expandButton, props.class)}
         onClick={reset}
       >
-        <BiRegularReset class="size-4 shrink-0"/>
+        <BiRegularReset class="size-[var(--yogs-rem,1rem)] shrink-0"/>
         <ExpandLabel show={props.expand}>Reset</ExpandLabel>
       </IconButton>
     </Show>
@@ -79,8 +79,8 @@ export const FilterShareButton: Component<FilterIconButtonProps> = props => {
         class={cn(props.expand && expandButton, props.class)}
         onClick={copy}
       >
-        <Show when={copied()} fallback={<FaSolidShare class="size-4 shrink-0"/>}>
-          <FaSolidCheck class="size-4 shrink-0"/>
+        <Show when={copied()} fallback={<FaSolidShare class="size-[var(--yogs-rem,1rem)] shrink-0"/>}>
+          <FaSolidCheck class="size-[var(--yogs-rem,1rem)] shrink-0"/>
         </Show>
         <ExpandLabel show={props.expand}>{copied() ? 'Copied' : 'Share Link'}</ExpandLabel>
       </IconButton>

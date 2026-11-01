@@ -1,9 +1,11 @@
 /*
   Sizing of the Yogs week grid (YogsScheduleWeek, PlaceholderSchedule) and the desktop / mobile
   switch, for every page that shows the schedule. The grid is 22 units wide (7 days × 3 + the time
-  column) and sizes from its container, at most 80vw (as before the redesign) and 1600px, and no
-  taller than the viewport. A slot is 3 units; every cell keeps half a gap of padding (12px between
-  cells), the stream tiles their own (--yogs-tile-gap, also 12px).
+  column) and sizes from its container, at most 80vw (as before the redesign) and 1600px (60vw on
+  screens wider than 2667px, such as 4K), and no taller than the viewport. A slot is 3 units;
+  every cell keeps half a gap of padding (12px between cells), the stream tiles their own
+  (--yogs-tile-gap, also 12px). Gaps, corners, paddings, text and icons grow with big grids
+  (--yogs-rem); only the panel's own padding stays fixed, as the unit is worked out from it.
 */
 
 /* Registered, so the unit is computed once on .yogs-grid (against the schedule container) and
@@ -13,6 +15,16 @@
   syntax: '<length>';
   inherits: true;
   initial-value: 0px;
+}
+
+/* A rem that grows with the grid: 1rem up to a 72px unit (the grid at 1600px), then in step with
+   the unit, so the schedule keeps its proportions on 4K screens and in full screen. Its text
+   sizes, gaps, corners, paddings and icons are multiples of it. Registered like the unit; outside
+   the grid (the mobile rows share some parts) it is the initial 16px. */
+@property --yogs-rem {
+  syntax: '<length>';
+  inherits: true;
+  initial-value: 16px;
 }
 
 .desktop-schedule,
@@ -33,12 +45,15 @@
   --yogs-pad: 0.5rem;
   /* Also no taller than the viewport, so the snapped panel shows the whole week (--yogs-rows units) */
   --yogs-unit: min(
-    (min(100cqi, 80vw, 1600px) - 2 * var(--yogs-pad)) / 22,
+    (min(100cqi, 80vw, max(1600px, 60vw)) - 2 * var(--yogs-pad)) / 22,
     (100vh - 2 * var(--yogs-pad)) / var(--yogs-rows)
   );
+  --yogs-rem: max(1rem, var(--yogs-unit) / 4.5);
   --yogs-slot: calc(var(--yogs-unit) * 3);
-  --yogs-gap: 0.75rem;
-  --yogs-tile-gap: 0.75rem;
+  --yogs-gap: calc(var(--yogs-rem) * 0.75);
+  --yogs-tile-gap: calc(var(--yogs-rem) * 0.75);
+  /* The tiles' corner (rounded-tile, also the panel's below), in step with the gaps */
+  --radius-tile: var(--yogs-rem);
   position: relative;
   isolation: isolate;
   overflow: clip;
@@ -309,22 +324,22 @@ html[data-yogs-avatars='off'] .yogs-grid .yogs-avatars {
 /* Header row text (YogsScheduleHeader), from the units rather than the tiles' cqi, so it scales
    with the grid: the title at 8% of two day columns, and the Yogs time in two rows that fit the
    card's height: the label like the timezone tile (30% of a unit cell's content, with its two-line
-   floor), the time below it. */
+   floor), the time below it. The caps grow with the grid (--yogs-rem). */
 .yogs-header {
   --yogs-header-text: clamp(
     0.875rem,
     (var(--yogs-slot) * 2 - var(--yogs-gap)) * 0.08,
-    2.5rem
+    var(--yogs-rem) * 2.5
   );
   --yogs-header-label-text: clamp(
     0.5625rem,
     (var(--yogs-unit) - var(--yogs-gap)) * 0.3,
-    1.25rem
+    var(--yogs-rem) * 1.25
   );
   --yogs-header-time-text: clamp(
     0.625rem,
     (var(--yogs-unit) - var(--yogs-gap)) * 0.45,
-    2.5rem
+    var(--yogs-rem) * 2.5
   );
 }
 

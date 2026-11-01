@@ -67,7 +67,7 @@ export const ScheduleSettingsMenu: Component<{ class?: string }> = (props) => {
           props.class,
         )}
       >
-        <FaSolidGear class="size-4" aria-hidden="true" />
+        <FaSolidGear class="size-(--yogs-rem)" aria-hidden="true" />
       </DropdownMenu.Trigger>
       <DropdownMenu.Portal>
         <DropdownMenu.Content class="rounded-group bg-surface-strong shadow-tile-hover ring-line z-50 min-w-44 p-1 font-sans ring-1 outline-none">

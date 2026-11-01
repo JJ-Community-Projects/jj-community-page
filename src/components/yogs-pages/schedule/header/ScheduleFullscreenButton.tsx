@@ -92,8 +92,8 @@ export const ScheduleFullscreenButton: Component<{ class?: string }> = (
       class={props.class}
       onClick={toggle}
     >
-      <Show when={active()} fallback={<FaSolidExpand class="size-4" />}>
-        <FaSolidCompress class="size-4" />
+      <Show when={active()} fallback={<FaSolidExpand class="size-(--yogs-rem)" />}>
+        <FaSolidCompress class="size-(--yogs-rem)" />
       </Show>
     </IconButton>
   )

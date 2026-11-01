@@ -46,7 +46,7 @@ export const YogsAndFriends: Component<YogsAndFriendsProps> = (props) => {
     <Show when={props.creators.length > 0}>
       {/* Collapsed by default; forceMount keeps the names in the server HTML while closed */}
       {/* As wide as the schedule: the timeline's max-w-2xl, then the grid's cap (yogs-schedule.css) */}
-      <Accordion collapsible class="w-full max-w-2xl min-[901px]:max-w-[min(80vw,1600px)]">
+      <Accordion collapsible class="w-full max-w-2xl min-[901px]:max-w-[min(80vw,max(1600px,60vw))]">
         <AccordionItem value="yogs-and-friends" title="Yogs & Friends" level={2} forceMount>
           <Tile>
             {/* At least 11rem per chip, so names like "The Longest Johns" fit */}

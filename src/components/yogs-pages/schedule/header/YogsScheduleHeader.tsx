@@ -12,8 +12,10 @@ import {ScheduleSettingsMenu} from "./ScheduleSettingsMenu.tsx";
 import {ScheduleFullscreenButton} from "./ScheduleFullscreenButton.tsx";
 
 // Controls fill their grid cell; the system font, not the grid's Bebas
-const control = 'size-full rounded-tile font-sans shadow-tile xl:text-base'
+const control = 'size-full rounded-tile font-sans shadow-tile gap-[calc(var(--yogs-rem)*0.5)] px-(--yogs-rem) xl:text-(length:--yogs-rem)'
 const iconControl = 'size-auto h-full aspect-square rounded-tile font-sans'
+// IconButton sm (size-8 text-xs) in --yogs-rem, so the arrows grow with the grid
+const weekArrow = 'size-[calc(var(--yogs-rem)*2)] text-[length:calc(var(--yogs-rem)*0.75)]'
 
 /** The poster's header row: settings over the time column, title card (with the Yogs time) over three days, then share/reset, Filter, Export, the week switch and full screen. */
 export const YogsScheduleHeader: Component = () => {
@@ -30,7 +32,7 @@ export const YogsScheduleHeader: Component = () => {
         <ScheduleSettingsMenu class={'size-full'}/>
       </div>
       <div class={'yogs-cell header-title-card-width h-full'}>
-        <div class={cn(tileSurface, 'flex size-full items-center justify-between gap-3 px-3')}>
+        <div class={cn(tileSurface, 'flex size-full items-center justify-between gap-[calc(var(--yogs-rem)*0.75)] px-[calc(var(--yogs-rem)*0.75)]')}>
           <p class={'min-w-0 text-balance text-(length:--yogs-header-text) leading-none'}>
             {schedule.title} | Week {week()}
           </p>
@@ -51,7 +53,7 @@ export const YogsScheduleHeader: Component = () => {
           aria-haspopup="dialog"
           onClick={filterModal.open}
         >
-          <BsPeopleFill class={'size-4'}/>
+          <BsPeopleFill class={'size-(--yogs-rem)'}/>
           Filter
           <Show when={!isEmpty()}>
             <span class={'tabular-nums'}>· {filter().length}</span>
@@ -61,16 +63,17 @@ export const YogsScheduleHeader: Component = () => {
       </div>
       <div class={'yogs-cell stream-width h-full'}>
         <Button variant="canvas" class={control} aria-haspopup="dialog" onClick={calendarModal.open}>
-          <FaRegularCalendar class={'size-4'}/>
+          <FaRegularCalendar class={'size-(--yogs-rem)'}/>
           Export
         </Button>
         <CalendarDialog modalSignal={calendarModal}/>
       </div>
       <div class={'yogs-cell stream-width flex h-full flex-row gap-(--yogs-gap)'}>
-        <div class={'flex h-full min-w-0 flex-1 items-center justify-between rounded-tile bg-white dark:bg-surface-strong px-1 font-sans text-fg shadow-tile'}>
+        <div class={'flex h-full min-w-0 flex-1 items-center justify-between rounded-tile bg-white dark:bg-surface-strong px-[calc(var(--yogs-rem)*0.25)] font-sans text-fg shadow-tile'}>
           <IconButton
             variant="ghost"
             size="sm"
+            class={weekArrow}
             aria-label="Previous week"
             title="Previous week"
             disabled={numberOfWeeks() < 2}
@@ -78,12 +81,13 @@ export const YogsScheduleHeader: Component = () => {
           >
             <FaSolidChevronLeft/>
           </IconButton>
-          <span class={'text-sm font-semibold whitespace-nowrap tabular-nums xl:text-base'}>
+          <span class={'text-sm font-semibold whitespace-nowrap tabular-nums xl:text-(length:--yogs-rem)'}>
             <span class={'sr-only'}>Week </span>{week()}/{numberOfWeeks()}
           </span>
           <IconButton
             variant="ghost"
             size="sm"
+            class={weekArrow}
             aria-label="Next week"
             title="Next week"
             disabled={numberOfWeeks() < 2}
