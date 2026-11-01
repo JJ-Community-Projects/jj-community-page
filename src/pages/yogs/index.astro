@@ -1,5 +1,6 @@
 ---
 import YogsBanner from '../../components/yogs-pages/common/YogsBanner.astro'
+import YogsSuggestionsAd from '../../components/yogs-pages/common/YogsSuggestionsAd.astro'
 export const prerender = false
 import PageShell from '../../layouts/PageShell.astro'
 import { getYogsScheduleFromContent } from '../../content/getYogsScheduleFromContent.ts'
@@ -220,6 +221,7 @@ const ogImage = preRenderdImageExists
   }}
   jsonLd={jsonLd}
 >
+  <YogsSuggestionsAd />
   <YogsBanner/>
 
   {scheduleAvailable ? (

@@ -1,0 +1,27 @@
+---
+import { RedditIcon } from '../../common/icons/JJIcons.tsx'
+
+// Layout of the Jingle Jam strip on yogs.ostof.dev, in Reddit colours
+const href =
+  'https://www.reddit.com/r/Yogscast/comments/1xkz72j/december_livestreams_suggestions_megathread/'
+---
+
+<div
+  class="mx-auto mb-3 flex w-fit max-w-full flex-col items-center justify-center gap-x-4 gap-y-1.5 rounded-tile border-2 border-white bg-linear-to-b from-reddit-400 via-reddit-500 via-55% to-reddit-600 px-4 py-2.5 text-center shadow-tile sm:flex-row sm:px-6"
+>
+  <span
+    class="font-babas text-xl leading-none tracking-wider text-white uppercase drop-shadow-[2px_2px_0_rgb(87_23_0/0.9)] sm:text-2xl"
+  >
+    Yogscast December Livestreams
+  </span>
+  <a
+    href={href}
+    target="_blank"
+    rel="noopener"
+    title="December Livestreams Suggestions Megathread"
+    class="inline-flex items-center gap-1.5 rounded-md border border-white/70 bg-white/10 px-3 py-[3px] text-xs font-bold tracking-wide whitespace-nowrap text-white uppercase transition-colors hover:bg-white/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white motion-safe:animate-nudge-right sm:text-sm"
+  >
+    Suggestions Megathread
+    <RedditIcon class="size-3.5 shrink-0 sm:size-4" />
+  </a>
+</div>
