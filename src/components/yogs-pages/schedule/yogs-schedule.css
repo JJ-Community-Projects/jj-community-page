@@ -67,7 +67,7 @@
     color-mix(in srgb, var(--color-schedule) 50%, transparent);
 }
 
-/* Corner tints: two sets of red / blue glows cross-fading half a cycle apart (opacity only) */
+/* Corner tints: two sets of JJ blue glows cross-fading half a cycle apart (opacity only) */
 .yogs-grid::before,
 .yogs-grid::after {
   content: '';
@@ -83,7 +83,7 @@
   background:
     radial-gradient(
       circle at 10% 10%,
-      color-mix(in srgb, var(--color-primary-700) 40%, transparent),
+      color-mix(in srgb, var(--color-accent-500) 40%, transparent),
       transparent 55%
     ),
     radial-gradient(
@@ -97,12 +97,12 @@
   background:
     radial-gradient(
       circle at 90% 10%,
-      color-mix(in srgb, var(--color-accent-600) 40%, transparent),
+      color-mix(in srgb, var(--color-accent-400) 40%, transparent),
       transparent 55%
     ),
     radial-gradient(
       circle at 10% 90%,
-      color-mix(in srgb, var(--color-primary-shade) 50%, transparent),
+      color-mix(in srgb, var(--color-accent-700) 50%, transparent),
       transparent 55%
     );
   animation-delay: -20s;
@@ -110,7 +110,7 @@
 
 @keyframes yogs-tint {
   50% {
-    opacity: 1;
+    opacity: 0.8;
   }
 }
 
