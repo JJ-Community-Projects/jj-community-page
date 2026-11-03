@@ -96,7 +96,7 @@ const joinNamesGrammatically = (names: string[], max = names.length) => {
 }
 
 // Base values
-const baseTitle = `Yogscast Jingle Jam ${year} Schedule & Timetable`
+const baseTitle = `Yogscast Jingle Jam ${year} Schedule`
 const baseDescription = `Yogscast Jingle Jam ${year} schedule and timetable in your timezone: every stream with participants, VODs and more - maintained by the community.`
 
 // Build dynamic title/description when filtered
@@ -121,7 +121,7 @@ if (filteredCreators && filteredCreators.length > 0) {
 
 // Hub until the new schedule is announced: title/description target the upcoming year
 if (!scheduleAvailable) {
-  title = `Yogscast Jingle Jam ${upcomingYear} Schedule & Timetable`
+  title = `Yogscast Jingle Jam ${upcomingYear} Schedule`
   description = lastYear
     ? `Yogscast Jingle Jam ${upcomingYear} schedule: countdown to the start and the ${lastYear} schedule until the new one is announced - maintained by the community.`
     : `Yogscast Jingle Jam ${upcomingYear} schedule: countdown to the start until the new schedule is announced - maintained by the community.`
