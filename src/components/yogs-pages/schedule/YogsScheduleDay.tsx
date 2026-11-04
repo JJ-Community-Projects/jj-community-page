@@ -35,16 +35,16 @@ const ScheduleDayHeader: Component<ScheduleDayHeaderProps> = (props) => {
       <div
         class={cn(
           tileSurface,
-          'flex size-full items-center justify-center gap-1.5',
-          today() && 'ring-accent ring-2',
+          'flex size-full items-center justify-center gap-[calc(var(--yogs-rem)*0.375)]',
+          today() && 'ring-accent ring-[length:calc(var(--yogs-rem)*0.125)]',
         )}
         aria-current={today() ? 'date' : undefined}
       >
-        <p class="text-[length:clamp(1rem,13cqi,1.625rem)] leading-none tracking-wider">
+        <p class="text-[length:clamp(1rem,13cqi,var(--yogs-rem)*1.625)] leading-none tracking-wider">
           {toDateTime(start()).toFormat("EEE',' MMM d")}
         </p>
         <Show when={today()}>
-          <span class="bg-accent size-1.5 shrink-0 rounded-full" aria-hidden="true" />
+          <span class="bg-accent size-[calc(var(--yogs-rem)*0.375)] shrink-0 rounded-full" aria-hidden="true" />
           <span class="sr-only">(today)</span>
         </Show>
       </div>

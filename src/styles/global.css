@@ -45,6 +45,8 @@
   /* The page background (PageShell): canvas-edge -> canvas -> canvas-edge */
   --color-canvas: var(--color-primary);
   --color-canvas-edge: var(--color-primary-shade);
+  /* The panel behind the Yogs week grid (yogs-schedule.css): the poster's slate on the red canvas */
+  --color-schedule: #24364a;
 
   --radius-tile: 1rem;
   --radius-group: 0.75rem;
@@ -100,6 +102,8 @@
     color-scheme: dark;
     --color-canvas: #0b2f52;
     --color-canvas-edge: #04111f;
+    /* A lighter slate: a blue panel swallows the dimmed blue stream tiles */
+    --color-schedule: #34465b;
     --color-surface: var(--color-neutral-800);
     --color-surface-2: var(--color-neutral-900);
     --color-surface-strong: #283241;

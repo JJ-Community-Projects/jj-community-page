@@ -77,10 +77,10 @@ if (user !== undefined) {
 const name = user?.user.username
 const scheduleYear = user?.primarySchedule?.year
 const pageTitle = !name
-  ? 'Profile | Jingle Jam Community'
+  ? 'Jingle Jam Profile'
   : scheduleYear
-    ? `${name} - Jingle Jam ${scheduleYear} Schedule | Jingle Jam Community`
-    : `${name} - Jingle Jam Streams | Jingle Jam Community`
+    ? `${name} - Jingle Jam ${scheduleYear} Schedule`
+    : `${name} - Jingle Jam Streams`
 const pageDescription = !name
   ? undefined
   : scheduleYear

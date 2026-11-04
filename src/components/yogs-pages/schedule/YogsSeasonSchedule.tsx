@@ -1,6 +1,8 @@
 import { type Component, Show } from 'solid-js'
 import { Countdown } from '../../ui/Countdown'
 import { Tile } from '../../ui/Tile'
+import { Chip } from '../../ui/Labels'
+import { cn } from '../../ui/cn'
 import { QueryClientProvider } from '@tanstack/solid-query'
 import { QueryClient } from '@tanstack/query-core'
 import {
@@ -49,15 +51,11 @@ export const YogsSeasonBody: Component<{ schedule: YogsSchedule }> = (props) => 
         <div class={'flex w-full flex-col items-center justify-center gap-4'}>
           <CollectionCountdown />
           <div class="desktop-schedule flex w-full flex-col items-center justify-center">
-            {/* Shrinks to the grid, so the line ends at its right edge */}
-            <div class="flex flex-col items-end gap-1">
-              <YogsScheduleWeek />
-              <UpdatedAt year class="text-on-canvas-muted px-1 text-xs" />
-            </div>
+            <DesktopWeek />
           </div>
           <div class="mobile-schedule flex w-full flex-col items-center justify-center gap-2">
             <MobileYogsSchedule />
-            <UpdatedAt class="text-on-canvas-muted text-center text-xs" />
+            <UpdatedAt />
           </div>
           <Ticker />
           <YogsAndFriends creators={schedule.creators} />
@@ -65,6 +63,23 @@ export const YogsSeasonBody: Component<{ schedule: YogsSchedule }> = (props) => 
         </div>
       </CreatorFilterProvider>
     </YogsScheduleProvider>
+  )
+}
+
+/**
+ * The week grid with "Updated" below. Shrinks to the grid; .yogs-frame gets the grid's sizes, so
+ * the pill lines up with the tiles' right edge at any grid size.
+ */
+const DesktopWeek: Component = () => {
+  const { times } = useYogsSchedule()
+  return (
+    <div
+      class="yogs-frame flex flex-col items-end gap-1"
+      style={{ '--yogs-rows': 2 + 3 * times().length }}
+    >
+      <YogsScheduleWeek />
+      <UpdatedAt year class="yogs-frame-end" />
+    </div>
   )
 }
 
@@ -107,12 +122,17 @@ const Ticker: Component = () => {
   )
 }
 
-const UpdatedAt: Component<{ year?: boolean; class: string }> = (props) => {
-  const { schedule, toDateTime } = useYogsSchedule()
+/**
+ * White pill so it stays readable over the canvas glow; positioned, so it paints above the grid
+ * panel's shadow (the panel is positioned too). Hidden (space kept) until mounted: the server
+ * render is in London time and the line should only ever show the viewer's timezone.
+ */
+const UpdatedAt: Component<{ year?: boolean; class?: string }> = (props) => {
+  const { schedule, toDateTime, mounted } = useYogsSchedule()
   return (
     <Show when={schedule.updatedAt}>
       {(updatedAt) => (
-        <p class={props.class}>
+        <Chip tone="canvas" size="sm" class={cn('relative', !mounted() && 'invisible', props.class)}>
           Updated{' '}
           {toDateTime(updatedAt()).toLocaleString({
             ...(props.year && { year: 'numeric' }),
@@ -122,7 +142,7 @@ const UpdatedAt: Component<{ year?: boolean; class: string }> = (props) => {
             minute: 'numeric',
             timeZoneName: 'short',
           })}
-        </p>
+        </Chip>
       )}
     </Show>
   )

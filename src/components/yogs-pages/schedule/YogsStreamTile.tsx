@@ -15,6 +15,7 @@ import { cn, dataColors, dataFill, focusRing } from '../../ui/cn'
 import { LiveBadge } from '../../ui/Labels'
 import {
   CountdownChip,
+  CreatorStack,
   LiveRing,
   useStreamState,
   VodIcons,
@@ -27,23 +28,24 @@ interface YogsStreamTileProps {
 const text = 'text-pretty font-bold uppercase'
 
 // Font sizes by slot size, in container units of the tile: at 1280px they match the old fluid sizes.
+// Their caps are multiples of --yogs-rem (yogs-schedule.css), so they keep growing with big grids.
 // `--fit` (set by fitText) shrinks a long title and subtitle together until they fit the tile.
 const titleClass = (size: number, hasSubtitle: boolean) => {
-  if (size === 1) return cn(text, 'line-clamp-1 text-base tracking-wide')
+  if (size === 1) return cn(text, 'line-clamp-1 text-(length:--yogs-rem) tracking-wide')
   if (size === 2) {
     return hasSubtitle
-      ? cn(text, 'line-clamp-2 text-[length:calc(clamp(0.75rem,10.7cqi,1rem)*var(--fit,1))] tracking-wide')
-      : cn(text, 'line-clamp-2 text-[length:calc(clamp(1rem,15.6cqi,1.5rem)*var(--fit,1))] tracking-wide')
+      ? cn(text, 'line-clamp-2 text-[length:calc(clamp(0.75rem,10.7cqi,var(--yogs-rem))*var(--fit,1))] tracking-wide')
+      : cn(text, 'line-clamp-2 text-[length:calc(clamp(1rem,15.6cqi,var(--yogs-rem)*1.5)*var(--fit,1))] tracking-wide')
   }
-  if (size === 3) return cn(text, 'text-[length:calc(clamp(0.875rem,15.2cqi,1.5rem)*var(--fit,1))] tracking-widest')
-  if (size === 4) return cn(text, 'line-clamp-3 text-[length:calc(clamp(0.875rem,15.2cqi,1.5rem)*var(--fit,1))] tracking-widest')
-  return cn(text, 'text-[length:calc(clamp(0.875rem,18.3cqi,1.875rem)*var(--fit,1))] tracking-widest')
+  if (size === 3) return cn(text, 'text-[length:calc(clamp(0.875rem,15.2cqi,var(--yogs-rem)*1.5)*var(--fit,1))] tracking-widest')
+  if (size === 4) return cn(text, 'line-clamp-3 text-[length:calc(clamp(0.875rem,15.2cqi,var(--yogs-rem)*1.5)*var(--fit,1))] tracking-widest')
+  return cn(text, 'text-[length:calc(clamp(0.875rem,18.3cqi,var(--yogs-rem)*1.875)*var(--fit,1))] tracking-widest')
 }
 
 const subtitleClass = (size: number) =>
   size <= 2
-    ? 'text-pretty uppercase text-[length:calc(clamp(0.75rem,9.7cqi,0.875rem)*var(--fit,1))] tracking-wide'
-    : 'text-pretty uppercase text-[length:calc(clamp(0.75rem,10.7cqi,1rem)*var(--fit,1))] tracking-widest'
+    ? 'text-pretty uppercase leading-tight text-[length:calc(clamp(0.75rem,9.7cqi,var(--yogs-rem)*0.875)*var(--fit,1))] tracking-wide'
+    : 'text-pretty uppercase leading-tight text-[length:calc(clamp(0.75rem,10.7cqi,var(--yogs-rem))*var(--fit,1))] tracking-widest'
 
 /** Smallest `--fit`: below it the title gets hard to read, so the rest is cut as before. */
 const MIN_FIT = 0.6
@@ -78,8 +80,17 @@ const fitText = (el: HTMLElement) => {
   }
 }
 
+// The shared LiveBadge's text-xxs, padding, gap and dot in --yogs-rem, so it grows with the tile
+const liveBadgeSize =
+  'text-[length:calc(var(--yogs-rem)*0.625)]/[1.2] gap-[calc(var(--yogs-rem)*0.25)] px-[calc(var(--yogs-rem)*0.5)] py-[calc(var(--yogs-rem)*0.125)] [&>span]:size-[calc(var(--yogs-rem)*0.375)]'
+
+// text-xxs, text-xs and text-sm (sizes and line heights) in --yogs-rem
 const countdownSize = (size: number) =>
-  size <= 1 ? 'text-xxs' : size <= 2 ? 'text-xs' : 'text-sm'
+  size <= 1
+    ? 'text-[length:calc(var(--yogs-rem)*0.625)]/[1.2]'
+    : size <= 2
+      ? 'text-[length:calc(var(--yogs-rem)*0.75)]/[1.333]'
+      : 'text-[length:calc(var(--yogs-rem)*0.875)]/[1.429]'
 
 export const YogsStreamTile: Component<YogsStreamTileProps> = (props) => {
   const modal = createModalSignal()
@@ -94,6 +105,9 @@ export const YogsStreamTile: Component<YogsStreamTileProps> = (props) => {
   const subtitle = () => stream().subtitle
   const tileSize = () => stream().size
   const color = () => stream().color
+  // VODs exist after the start only
+  const showVods = () =>
+    tileSize() > 1 && !showCountdown() && !!stream().vods?.length
   // Filtered-out tiles stay clickable and focusable, only dimmed
   const dimmed = () => !isSlotPartOfFilter(stream())
 
@@ -116,7 +130,7 @@ export const YogsStreamTile: Component<YogsStreamTileProps> = (props) => {
         <button
           type="button"
           class={cn(
-            'rounded-tile relative flex size-full flex-col items-center justify-center overflow-hidden p-1 text-center @container',
+            'rounded-tile relative flex size-full flex-col items-center justify-center overflow-hidden p-[calc(var(--yogs-rem)*0.25)] text-center @container',
             'hover:shadow-tile-hover transition-[filter,box-shadow,opacity] duration-200 hover:brightness-105',
             // White on the canvas reads better than accent next to the data colours; focus undims
             focusRing,
@@ -137,12 +151,21 @@ export const YogsStreamTile: Component<YogsStreamTileProps> = (props) => {
           </Show>
           <div
             ref={content}
-            class="flex min-h-0 w-full flex-1 flex-col items-center justify-center gap-0.5"
+            class={cn(
+              'flex min-h-0 w-full flex-1 flex-col items-center justify-center gap-0',
+              // Keeps the text below the VOD icons; fitText shrinks it into the rest
+              showVods() && 'mt-[calc(var(--yogs-rem)*0.75)]',
+            )}
           >
             <Show when={isLive() && tileSize() > 1}>
-              <LiveBadge />
+              <LiveBadge class={liveBadgeSize} />
             </Show>
-            <p class={titleClass(tileSize(), !!subtitle())}>{title()}</p>
+            {/* After the size class: cn drops a leading-* that comes before a text size */}
+            <p
+              class={cn(titleClass(tileSize(), !!subtitle()), 'leading-tight')}
+            >
+              {title()}
+            </p>
             <Show when={subtitle() && tileSize() > 1}>
               <p class={subtitleClass(tileSize())}>{subtitle()}</p>
             </Show>
@@ -152,9 +175,18 @@ export const YogsStreamTile: Component<YogsStreamTileProps> = (props) => {
               </CountdownChip>
             </Show>
           </div>
-          {/* VODs exist after the start; with a countdown the row would only crowd the tile */}
-          <Show when={tileSize() > 1 && !showCountdown()}>
-            <VodIcons stream={props.stream} class="justify-center" />
+          <Show when={tileSize() > 1 && stream().creators?.length}>
+            <CreatorStack
+              creators={stream().creators!}
+              max={5}
+              class="yogs-avatars shrink-0 pt-[calc(var(--yogs-rem)*0.25)] pb-[calc(var(--yogs-rem)*0.125)]"
+            />
+          </Show>
+          <Show when={showVods()}>
+            <VodIcons
+              stream={props.stream}
+              class="absolute top-[calc(var(--yogs-rem)*0.25)] right-[calc(var(--yogs-rem)*0.375)]"
+            />
           </Show>
         </button>
       </div>

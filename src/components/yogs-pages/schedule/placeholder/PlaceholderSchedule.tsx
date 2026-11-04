@@ -1,5 +1,6 @@
 import { type Component, For } from 'solid-js'
 import { Skeleton } from '../../../ui/Status'
+import { YogsFallingCircles } from '../YogsFallingCircles'
 import '../yogs-schedule.css'
 
 const DAYS = Array.from({ length: 7 })
@@ -13,9 +14,17 @@ const block = 'rounded-tile size-full bg-white/20'
  * the timeline's (mobile), sized by yogs-schedule.css like the real grid. Needs no data.
  */
 export const PlaceholderSchedule: Component = () => (
-  <div class="flex w-full flex-col items-center" aria-busy="true" aria-label="Loading the schedule">
+  <div
+    class="flex w-full flex-col items-center"
+    aria-busy="true"
+    aria-label="Loading the schedule"
+  >
     <div class="desktop-schedule flex w-full justify-center">
-      <div class="yogs-grid flex flex-col">
+      <div
+        class="yogs-grid flex flex-col"
+        style={{ '--yogs-rows': 2 + 3 * SLOTS.length }}
+      >
+        <YogsFallingCircles />
         <div class="data-height flex w-full flex-row">
           <div class="data-width" />
           <div class="yogs-cell header-title-card-width h-full">
@@ -52,7 +61,10 @@ export const PlaceholderSchedule: Component = () => (
                 {/* Not `.time`: its width is the time column's (one unit) */}
                 <For each={SLOTS}>
                   {() => (
-                    <div class="yogs-cell w-full" style={{ height: 'var(--yogs-slot)' }}>
+                    <div
+                      class="yogs-cell w-full"
+                      style={{ height: 'var(--yogs-slot)' }}
+                    >
                       <Skeleton class={block} />
                     </div>
                   )}

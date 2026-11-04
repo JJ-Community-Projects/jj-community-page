@@ -11,7 +11,7 @@ export const YogsScheduleTimeColumn: Component = () => {
       <For each={times()}>
         {({start, end}) => (
           <div class="yogs-cell time @container">
-            <div class={cn(tileSurface, 'flex size-full flex-col items-center justify-between py-2 text-[length:clamp(0.75rem,30cqi,1.25rem)] leading-none')}>
+            <div class={cn(tileSurface, 'flex size-full flex-col items-center justify-between py-[calc(var(--yogs-rem)*0.5)] text-[length:clamp(0.75rem,30cqi,var(--yogs-rem)*1.25)] leading-none')}>
               <p>{toDateTime(start).toFormat('HH:mm')}</p>
               <p class="text-fg-muted">{toDateTime(end).toFormat('HH:mm')}</p>
             </div>
@@ -35,7 +35,7 @@ const Timezone: Component = () => {
           tileSurface,
           'text-fg-muted flex size-full flex-col items-center justify-center leading-tight',
           // Two lines need a lower floor in the small cell of narrow grids
-          parts() ? 'text-[length:clamp(0.5625rem,30cqi,1.25rem)]' : 'text-[length:clamp(0.75rem,30cqi,1.25rem)]',
+          parts() ? 'text-[length:clamp(0.5625rem,30cqi,var(--yogs-rem)*1.25)]' : 'text-[length:clamp(0.75rem,30cqi,var(--yogs-rem)*1.25)]',
         )}
       >
         <Show when={parts()} fallback={name()}>

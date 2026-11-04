@@ -58,6 +58,14 @@ const og = propOg !== false && {
       media.addEventListener('change', apply)
       addEventListener('storage', (e) => e.key === 'theme' && apply())
     })()
+    // Yogs grid settings before the first paint: 'off' hides the background, stops its animation
+    // or hides the avatars. ScheduleSettingsMenu.tsx writes the same keys.
+    for (const key of ['yogs-bg', 'yogs-motion', 'yogs-avatars']) {
+      try {
+        if (localStorage.getItem(key) === 'off')
+          document.documentElement.setAttribute(`data-${key}`, 'off')
+      } catch {}
+    }
   </script>
   <GoogleAnalytics />
   <link rel="sitemap" type="application/xml" href="/sitemap-index.xml" />

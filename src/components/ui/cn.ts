@@ -36,7 +36,7 @@ export const focusRing =
 
 // Share of black mixed into data colours in dark mode, so large fills don't glare on the dark canvas.
 // At 33 % white text reaches 4.5 : 1 on every Yogs stream colour (2020–2025).
-const DATA_DIM = 0.33
+const DATA_DIM = 0.20
 
 /**
  * A data colour (Yogs stream, user colour) as a large fill: sets the CSS variables for one of the

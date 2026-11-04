@@ -1,18 +1,17 @@
-/*
-  Sizing of the Yogs week grid (YogsScheduleWeek, PlaceholderSchedule) and the desktop / mobile
-  switch, for every page that shows the schedule. The grid is 22 units wide (7 days × 3 + the time
-  column) and sizes from its container, at most 80vw (as before the redesign) and 1600px. A slot is
-  3 units; every cell keeps half a gap of padding (8px between cells), the stream tiles their own
-  (--yogs-tile-gap, also 8px).
-*/
+/* Yogs week grid sizing (22 units wide: 7 days × 3 + time column) and the desktop / mobile switch */
 
-/* Registered, so the unit is computed once on .yogs-grid (against the schedule container) and
-   inherited as a length: the tiles are containers themselves and would otherwise resolve cqi
-   against their own width. */
+/* Registered, so it is computed once on .yogs-grid and inherited as a length, not per tile */
 @property --yogs-unit {
   syntax: '<length>';
   inherits: true;
   initial-value: 0px;
+}
+
+/* A rem that grows with the grid past 1600px (4K, full screen); 16px outside the grid */
+@property --yogs-rem {
+  syntax: '<length>';
+  inherits: true;
+  initial-value: 16px;
 }
 
 .desktop-schedule,
@@ -20,12 +19,234 @@
   container-type: inline-size;
 }
 
-.yogs-grid {
-  --yogs-unit: calc(min(100cqi, 80vw, 1600px) / 22);
+/* Room for the panel's glow */
+.desktop-schedule {
+  padding-block: 1rem 2.5rem;
+}
+
+/* Grid sizes: on the grid, and on the frame around it and the "Updated" pill (YogsSeasonSchedule) */
+.yogs-grid,
+.yogs-frame {
+  --yogs-pad: 0.5rem;
+  /* No taller than the viewport, so the snapped panel shows the whole week */
+  --yogs-unit: min(
+    (min(100cqi, 80vw, max(1600px, 60vw)) - 2 * var(--yogs-pad)) / 22,
+    (100vh - 2 * var(--yogs-pad)) / var(--yogs-rows)
+  );
+  --yogs-rem: max(1rem, var(--yogs-unit) / 4.5);
   --yogs-slot: calc(var(--yogs-unit) * 3);
-  --yogs-gap: 0.5rem;
-  --yogs-tile-gap: 0.5rem;
-  width: calc(var(--yogs-unit) * 22);
+  --yogs-gap: calc(var(--yogs-rem) * 0.75);
+  --yogs-tile-gap: calc(var(--yogs-rem) * 0.75);
+}
+
+/* In line with the tiles' right edge: the panel's padding plus the tile cell's */
+.yogs-frame-end {
+  margin-inline-end: calc(var(--yogs-pad) + var(--yogs-tile-gap) / 2);
+}
+
+/* The poster-like panel: --color-schedule with a vignette and a low glow */
+.yogs-grid {
+  /* The tiles' (and panel's) corner, in step with the gaps */
+  --radius-tile: var(--yogs-rem);
+  position: relative;
+  isolation: isolate;
+  overflow: clip;
+  width: calc(var(--yogs-unit) * 22 + 2 * var(--yogs-pad));
+  padding: var(--yogs-pad);
+  border-radius: calc(
+    var(--radius-tile) + var(--yogs-pad) + var(--yogs-gap) / 2
+  );
+  background-color: var(--color-schedule);
+  background-image: radial-gradient(
+    ellipse at center,
+    rgb(255 255 255 / 0.08),
+    transparent 60%,
+    rgb(0 0 0 / 0.3)
+  );
+  box-shadow: 0 8px 24px 0
+    color-mix(in srgb, var(--color-schedule) 50%, transparent);
+}
+
+/* Corner tints: two sets of JJ blue glows cross-fading half a cycle apart (opacity only) */
+.yogs-grid::before,
+.yogs-grid::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  opacity: 0;
+  animation: yogs-tint 40s ease-in-out infinite;
+}
+
+.yogs-grid::before {
+  background:
+    radial-gradient(
+      circle at 10% 10%,
+      color-mix(in srgb, var(--color-accent-500) 40%, transparent),
+      transparent 55%
+    ),
+    radial-gradient(
+      circle at 90% 90%,
+      color-mix(in srgb, var(--color-accent-shade) 50%, transparent),
+      transparent 55%
+    );
+}
+
+.yogs-grid::after {
+  background:
+    radial-gradient(
+      circle at 90% 10%,
+      color-mix(in srgb, var(--color-accent-400) 40%, transparent),
+      transparent 55%
+    ),
+    radial-gradient(
+      circle at 10% 90%,
+      color-mix(in srgb, var(--color-accent-700) 50%, transparent),
+      transparent 55%
+    );
+  animation-delay: -20s;
+}
+
+@keyframes yogs-tint {
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Soft circles falling the panel's full height (cqh) behind the tiles (YogsFallingCircles) */
+.yogs-circles {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  container-type: size;
+}
+
+.yogs-circles > span {
+  position: absolute;
+  top: calc(var(--size) * -1);
+  left: var(--x);
+  width: var(--size);
+  height: var(--size);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgb(255 255 255 / var(--opacity)) 0,
+    rgb(255 255 255 / 0) 70%
+  );
+  animation: yogs-fall var(--duration) linear var(--delay) infinite;
+}
+
+@keyframes yogs-fall {
+  to {
+    translate: var(--drift) calc(100cqh + var(--size));
+  }
+}
+
+/* Out of view (data-offscreen), the decoration pauses */
+.yogs-grid[data-offscreen]::before,
+.yogs-grid[data-offscreen]::after,
+.yogs-grid[data-offscreen] .yogs-circles > span {
+  animation-play-state: paused;
+}
+
+/* Full screen (ScheduleFullscreenButton): the grid fills the viewport, centred by its padding */
+.desktop-schedule:has(.yogs-grid[data-fullscreen]) {
+  container-type: normal;
+}
+
+html:has(.yogs-grid[data-fullscreen]) {
+  overflow: hidden;
+}
+
+.yogs-grid[data-fullscreen] {
+  --yogs-unit: min(
+    (100vw - 2 * var(--yogs-pad)) / 22,
+    (100vh - 2 * var(--yogs-pad)) / var(--yogs-rows)
+  );
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  width: 100vw;
+  height: 100vh;
+  padding: calc((100vh - var(--yogs-rows) * var(--yogs-unit)) / 2)
+    calc((100vw - 22 * var(--yogs-unit)) / 2);
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* Idle in full screen (data-idle): header fades out, the week moves up half a row, cursor hides */
+.yogs-grid[data-fullscreen] > * {
+  transition:
+    translate 0.5s ease,
+    opacity 0.5s ease,
+    visibility 0.5s;
+}
+
+.yogs-grid[data-fullscreen][data-idle] > :not(.yogs-circles) {
+  translate: 0 calc(var(--yogs-unit) / -2);
+}
+
+.yogs-grid[data-fullscreen][data-idle] > .yogs-header {
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* On every element, as the tiles set their own cursor */
+.yogs-grid[data-fullscreen][data-idle],
+.yogs-grid[data-fullscreen][data-idle] * {
+  cursor: none;
+}
+
+/* Settings (ScheduleSettingsMenu): no panel (padding stays, so the size doesn't change) */
+html[data-yogs-bg='off'] .yogs-grid {
+  background: none;
+  box-shadow: none;
+}
+
+/* No background or no animation: no corner tints, no falling circles */
+html[data-yogs-bg='off'] .yogs-grid::before,
+html[data-yogs-bg='off'] .yogs-grid::after,
+html[data-yogs-bg='off'] .yogs-circles,
+html[data-yogs-motion='off'] .yogs-grid::before,
+html[data-yogs-motion='off'] .yogs-grid::after,
+html[data-yogs-motion='off'] .yogs-circles {
+  display: none;
+}
+
+/* Full screen without the panel shows the page's canvas (PageShell) */
+html[data-yogs-bg='off'] .yogs-grid[data-fullscreen] {
+  background: linear-gradient(
+    to bottom right,
+    var(--color-canvas-edge),
+    var(--color-canvas),
+    var(--color-canvas-edge)
+  );
+}
+
+html[data-yogs-avatars='off'] .yogs-grid .yogs-avatars {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Both tint sets at half strength, standing still */
+  .yogs-grid::before,
+  .yogs-grid::after {
+    animation: none;
+    opacity: 0.5;
+  }
+
+  /* Stopped, they would all sit above the panel */
+  .yogs-circles {
+    display: none;
+  }
+
+  .yogs-grid[data-fullscreen] > * {
+    transition:
+      opacity 0.5s ease,
+      visibility 0.5s;
+  }
 }
 
 .yogs-cell {
@@ -36,8 +257,7 @@
   padding: calc(var(--yogs-tile-gap) / 2);
 }
 
-/* Scrolling close to the schedule snaps its header row (title, controls) to the top, so the whole
-   week is in view. Desktop only: the mobile timeline has its sticky header. */
+/* Desktop: scrolling near the grid snaps it to the top, so the whole week is in view */
 @media (min-width: 901px) {
   html:has(.desktop-schedule .yogs-grid) {
     scroll-snap-type: y proximity;
@@ -45,7 +265,7 @@
 
   .desktop-schedule .yogs-grid {
     scroll-snap-align: start;
-    /* None: the text above can sit 8px over the grid; the cells' padding keeps the cards off the edge */
+    /* None: the cells' padding keeps the cards off the edge */
     scroll-margin-top: 0;
   }
 }
@@ -86,9 +306,33 @@
   width: calc(var(--yogs-slot) * 3);
 }
 
+/* Header row text sizes (YogsScheduleHeader), from the units so they scale with the grid */
+.yogs-header {
+  --yogs-header-text: clamp(
+    0.875rem,
+    (var(--yogs-slot) * 2 - var(--yogs-gap)) * 0.08,
+    var(--yogs-rem) * 2.5
+  );
+  --yogs-header-label-text: clamp(
+    0.5625rem,
+    (var(--yogs-unit) - var(--yogs-gap)) * 0.3,
+    var(--yogs-rem) * 1.25
+  );
+  --yogs-header-time-text: clamp(
+    0.625rem,
+    (var(--yogs-unit) - var(--yogs-gap)) * 0.45,
+    var(--yogs-rem) * 2.5
+  );
+}
+
 @media (max-width: 900px) {
   .desktop-schedule {
     display: none;
+  }
+
+  /* Filter links scroll here, the sticky header at its top-2 resting place */
+  .mobile-schedule {
+    scroll-margin-top: 0.5rem;
   }
 }
 
