@@ -6,11 +6,11 @@ import {
   FilterShareButton,
 } from '../provider/ScheduleCreatorFilterButton.tsx'
 import { rangeFromData } from '../../../../lib/utils/rangeFromData.ts'
-import { BsPeopleFill } from 'solid-icons/bs'
 import {
   FaRegularCalendar,
   FaSolidChevronLeft,
   FaSolidChevronRight,
+  FaSolidFilter,
   FaSolidRotateLeft,
 } from 'solid-icons/fa'
 import { Button, IconButton } from '../../../ui/Button'
@@ -152,7 +152,7 @@ export const MobileScheduleControls: Component = () => {
         aria-haspopup="dialog"
         onClick={filterModalSignal.open}
       >
-        <BsPeopleFill class="size-4" />
+        <FaSolidFilter class="size-4" />
         Filter
         <Show when={!isEmpty()}>
           <span class="tabular-nums">· {filter().length}</span>

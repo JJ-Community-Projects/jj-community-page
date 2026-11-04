@@ -3,8 +3,7 @@ import {useYogsSchedule} from "../provider/YogsScheduleProvider.tsx";
 import {FilterDialog, FilterResetButton, FilterShareButton} from "../provider/ScheduleCreatorFilterButton.tsx";
 import {useCreatorFilter} from "../provider/CreatorFilterProvider.tsx";
 import {createModalSignal} from "../../../../lib/createModalSignal.ts";
-import {BsPeopleFill} from "solid-icons/bs";
-import {FaRegularCalendar, FaSolidChevronLeft, FaSolidChevronRight} from "solid-icons/fa";
+import {FaRegularCalendar, FaSolidChevronLeft, FaSolidChevronRight, FaSolidFilter} from "solid-icons/fa";
 import {CalendarDialog} from "../provider/ScheduleCalendarExportButton.tsx";
 import {Button, IconButton} from "../../../ui/Button";
 import {cn, tileSurface} from "../../../ui/cn";
@@ -53,7 +52,7 @@ export const YogsScheduleHeader: Component = () => {
           aria-haspopup="dialog"
           onClick={filterModal.open}
         >
-          <BsPeopleFill class={'size-(--yogs-rem)'}/>
+          <FaSolidFilter class={'size-(--yogs-rem)'}/>
           Filter
           <Show when={!isEmpty()}>
             <span class={'tabular-nums'}>· {filter().length}</span>
