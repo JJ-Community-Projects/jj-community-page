@@ -46,8 +46,8 @@ const ownerSlug = schedule?.owner?.tiltifySlug ?? ''
 
 // Title and description from the schedule and its owner
 const pageTitle = ownerName
-  ? `${pageTitleBase} by ${ownerName} | Jingle Jam Community`
-  : `${pageTitleBase} | Jingle Jam Community`
+  ? `${pageTitleBase} by ${ownerName}`
+  : schedule ? pageTitleBase : 'Jingle Jam Schedule'
 const streamCount = schedule?.streams.length ?? 0
 const pageDescription = schedule
   ? `${ownerName ? `${ownerName}'s ` : ''}Jingle Jam ${schedule.data.year} stream schedule "${pageTitleBase}": ${streamCount} ${streamCount === 1 ? 'stream' : 'streams'} with times in your timezone and the next streams coming up.`

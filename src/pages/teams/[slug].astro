@@ -40,7 +40,7 @@ const { data: members, error: membersError } = m;
 const { data: nextStreams, error: streamsError } = s;
 
 // Title and description from the team; a long team description is cut to snippet length
-const pageTitle = team ? `${team.name} - Jingle Jam Team | Jingle Jam Community` : 'Team | Jingle Jam Community';
+const pageTitle = team ? `${team.name} - Jingle Jam Team` : 'Jingle Jam Team';
 const teamDescription = team?.description?.replace(/\s+/g, ' ').trim() || undefined;
 const pageDescription = teamDescription
   ? teamDescription.length > 155 ? `${teamDescription.slice(0, 154).trimEnd()}…` : teamDescription
