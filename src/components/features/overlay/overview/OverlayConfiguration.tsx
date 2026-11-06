@@ -26,8 +26,8 @@ type Overlay = {
   id: OverlayId
   title: string
   group: (typeof GROUPS)[number]
-  /** `login`: listed for everyone, configurable when logged in; `account`: only listed when logged in. */
-  access: 'public' | 'login' | 'account'
+  /** `login`: listed for everyone, configurable when logged in. */
+  access: 'public' | 'login'
   configurator: Component
 }
 
@@ -42,9 +42,9 @@ const OVERLAYS: Overlay[] = [
   { id: 'fundraisers', title: 'All fundraisers ticker', group: 'Tickers', access: 'public', configurator: FundraisersTickerConfigurator },
   { id: 'team-fundraiser', title: 'Fundraisers by team ticker', group: 'Tickers', access: 'login', configurator: FundraisersByTeamConfigurator },
   { id: 'cause-fundraiser', title: 'Fundraisers by charity ticker', group: 'Tickers', access: 'public', configurator: FundraisersByCauseConfigurator },
-  { id: 'campaign-goal', title: 'Campaign goal', group: 'Jingle Jam ribbons', access: 'account', configurator: CampaignGoalConfigurator },
-  { id: 'big-campaign-goal', title: 'Big campaign goal', group: 'Jingle Jam ribbons', access: 'account', configurator: BigCampaignGoalConfigurator },
-  { id: 'basic-ribbon-label', title: 'Basic label', group: 'Jingle Jam ribbons', access: 'account', configurator: BasicRibbonLabelConfigurator },
+  { id: 'campaign-goal', title: 'Campaign goal', group: 'Jingle Jam ribbons', access: 'login', configurator: CampaignGoalConfigurator },
+  { id: 'big-campaign-goal', title: 'Big campaign goal', group: 'Jingle Jam ribbons', access: 'login', configurator: BigCampaignGoalConfigurator },
+  { id: 'basic-ribbon-label', title: 'Basic label', group: 'Jingle Jam ribbons', access: 'public', configurator: BasicRibbonLabelConfigurator },
 ]
 
 const LoginCallToAction: Component = () => (
@@ -57,7 +57,7 @@ const LoginCallToAction: Component = () => (
         </Button>
       }
     >
-      It shows your own schedule or teams, so it needs your account.
+      It shows your own schedule, teams or fundraiser, so it needs your account.
     </EmptyState>
   </Tile>
 )
@@ -66,9 +66,7 @@ const Body: Component<{ loggedIn: boolean; level?: 2 | 3 }> = (p) => {
   // One overlay open at a time: each open configurator runs a live preview
   const [expanded, setExpanded] = createSignal<string[]>([])
   const listed = (group: Overlay['group']) =>
-    OVERLAYS.filter(
-      (o) => o.group === group && (p.loggedIn || o.access !== 'account'),
-    )
+    OVERLAYS.filter((o) => o.group === group)
 
   return (
     <Accordion
