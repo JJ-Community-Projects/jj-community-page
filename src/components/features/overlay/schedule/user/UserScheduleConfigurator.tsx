@@ -18,13 +18,19 @@ export const UserScheduleConfigurator: Component = () => {
   const [streamStyle, setStreamStyle] = createSignal<StreamStyle>('filled')
   const [limit, setLimit] = createSignal<number>(4)
   const { user } = useUser()
-  const scheduleUrl = createMemo(() =>
+  const params = () => ({
+    user: user?.tiltifySlug,
+    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    theme: theme(),
+    style: streamStyle(),
+    limit: limit(),
+  })
+  const scheduleUrl = createMemo(() => buildUrl('/overlays/schedule', params()))
+  // Sample streams when logged out; the OBS link never has `demo`
+  const previewUrl = createMemo(() =>
     buildUrl('/overlays/schedule', {
-      user: user?.tiltifySlug,
-      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-      theme: theme(),
-      style: streamStyle(),
-      limit: limit(),
+      ...params(),
+      demo: !user?.tiltifySlug || undefined,
     }),
   )
 
@@ -32,7 +38,7 @@ export const UserScheduleConfigurator: Component = () => {
     <ConfiguratorBody
       description="Your upcoming streams from your primary schedule in a compact panel, as slot rows like in the Twitch extension. Choose a theme, a filled or striped header, and how many streams to show."
       format={OVERLAY_FORMATS.schedule}
-      previewUrl={scheduleUrl()}
+      previewUrl={previewUrl()}
       linkUrl={scheduleUrl()}
     >
       <Select

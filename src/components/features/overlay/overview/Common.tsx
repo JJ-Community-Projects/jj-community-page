@@ -1,5 +1,6 @@
 import {
   type Component,
+  createContext,
   createEffect,
   createSignal,
   createUniqueId,
@@ -9,12 +10,14 @@ import {
   onMount,
   type ParentComponent,
   Show,
+  useContext,
 } from 'solid-js'
 import { FaSolidCheck, FaSolidCopy } from 'solid-icons/fa'
 import { Button } from '../../../ui/Button'
 import { cn } from '../../../ui/cn'
 import { fieldClass, Segmented } from '../../../ui/Form'
 import { Select } from '../../../ui/Select'
+import { EmptyState } from '../../../ui/Status'
 import { Tile } from '../../../ui/Tile'
 import type { OverlayFormat, OverlaySize } from './formats'
 
@@ -201,6 +204,23 @@ export const OverlayPreview: Component<{
   )
 }
 
+/** True while the overlay needs an account the visitor isn't logged in with: options and preview stay, the link becomes a login prompt. */
+export const LinkNeedsLoginContext = createContext(false)
+
+const LoginForLink: Component = () => (
+  <EmptyState
+    title="Log in to get the link"
+    action={
+      <Button variant="accent" href="/login">
+        Log in
+      </Button>
+    }
+  >
+    This overlay shows your own schedule, teams or fundraiser, so its OBS link
+    needs your account. You can still try the options in the preview.
+  </EmptyState>
+)
+
 /** One configurator: description, options next to (or above) the preview, then the link. */
 export const ConfiguratorBody: ParentComponent<{
   description: JSX.Element
@@ -210,6 +230,7 @@ export const ConfiguratorBody: ParentComponent<{
   linkUrl?: string
   noLink?: JSX.Element
 }> = (p) => {
+  const needsLogin = useContext(LinkNeedsLoginContext)
   // Strips (tickers, ribbons) get the full width below the options
   const wide = () => p.format.preview.width > 640
   return (
@@ -227,8 +248,10 @@ export const ConfiguratorBody: ParentComponent<{
           class="shrink-0"
         />
       </div>
-      <Show when={p.linkUrl} fallback={p.noLink}>
-        {(url) => <CopyLink url={url()} />}
+      <Show when={!needsLogin} fallback={<LoginForLink />}>
+        <Show when={p.linkUrl} fallback={p.noLink}>
+          {(url) => <CopyLink url={url()} />}
+        </Show>
       </Show>
     </Tile>
   )

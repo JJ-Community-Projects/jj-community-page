@@ -15,18 +15,16 @@ import { TeamScheduleConfigurator } from '../schedule/team/TeamScheduleConfigura
 import { CampaignGoalConfigurator } from '../jjRibbons/campaignGoal/CampaignGoalConfigurator.tsx'
 import { BasicRibbonLabelConfigurator } from '../jjRibbons/basicRibbonLabel/BasicRibbonLabelConfigurator.tsx'
 import { BigCampaignGoalConfigurator } from '../jjRibbons/bigCampaignGoal/BigCampaignGoalConfigurator.tsx'
+import { LinkNeedsLoginContext } from './Common'
 import { OVERLAY_FORMATS, type OverlayId } from './formats'
 import { Accordion, AccordionItem } from '../../../ui/Accordion'
-import { Button } from '../../../ui/Button'
 import { Chip, DateDivider } from '../../../ui/Labels'
-import { EmptyState } from '../../../ui/Status'
-import { Tile } from '../../../ui/Tile'
 
 type Overlay = {
   id: OverlayId
   title: string
   group: (typeof GROUPS)[number]
-  /** `login`: listed for everyone, configurable when logged in. */
+  /** `login`: options and preview for everyone, the OBS link only when logged in. */
   access: 'public' | 'login'
   configurator: Component
 }
@@ -46,21 +44,6 @@ const OVERLAYS: Overlay[] = [
   { id: 'big-campaign-goal', title: 'Big campaign goal', group: 'Jingle Jam ribbons', access: 'login', configurator: BigCampaignGoalConfigurator },
   { id: 'basic-ribbon-label', title: 'Basic label', group: 'Jingle Jam ribbons', access: 'public', configurator: BasicRibbonLabelConfigurator },
 ]
-
-const LoginCallToAction: Component = () => (
-  <Tile>
-    <EmptyState
-      title="Log in to set up this overlay"
-      action={
-        <Button variant="accent" href="/login">
-          Log in
-        </Button>
-      }
-    >
-      It shows your own schedule, teams or fundraiser, so it needs your account.
-    </EmptyState>
-  </Tile>
-)
 
 const Body: Component<{ loggedIn: boolean; level?: 2 | 3 }> = (p) => {
   // One overlay open at a time: each open configurator runs a live preview
@@ -91,12 +74,11 @@ const Body: Component<{ loggedIn: boolean; level?: 2 | 3 }> = (p) => {
                     </Show>
                   }
                 >
-                  <Show
-                    when={p.loggedIn || overlay.access === 'public'}
-                    fallback={<LoginCallToAction />}
+                  <LinkNeedsLoginContext.Provider
+                    value={!p.loggedIn && overlay.access === 'login'}
                   >
                     <Dynamic component={overlay.configurator} />
-                  </Show>
+                  </LinkNeedsLoginContext.Provider>
                 </AccordionItem>
               )}
             </For>
@@ -107,7 +89,7 @@ const Body: Component<{ loggedIn: boolean; level?: 2 | 3 }> = (p) => {
   )
 }
 
-/** The overlay list with a configurator per overlay; logged-out visitors get a login prompt where an overlay needs the account. */
+/** The overlay list with a configurator per overlay; logged-out visitors get a login prompt instead of the link where an overlay needs the account. */
 export const OverlayConfiguration: Component<{
   user: User | null
   /** Heading level of the overlay rows: 2 on `/overlays`, 3 (default) inside another accordion. */

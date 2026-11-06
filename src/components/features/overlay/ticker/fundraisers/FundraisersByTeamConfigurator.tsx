@@ -12,6 +12,7 @@ import {
 } from '../../overview/Common.tsx'
 import { OVERLAY_FORMATS } from '../../overview/formats.ts'
 import { orpcPrivate } from '../../../../../lib/orpc/client.ts'
+import { useUser } from '../../../users/user-dashboard/providers/UserProvider.tsx'
 import { Checkbox } from '../../../../ui/Form'
 import { Select } from '../../../../ui/Select'
 import { Alert, Spinner } from '../../../../ui/Status'
@@ -24,9 +25,11 @@ export const FundraisersByTeamConfigurator: Component = () => {
   const [teamSlug, setTeamSlug] = createSignal<string>('')
   const [currency, setCurrency] = createSignal<Currency>('GBP')
   const [previewData, setPreviewData] = createSignal<PreviewDataMode>('test')
+  const { user } = useUser()
 
   const qTeams = useQuery(() =>
     orpcPrivate.teams.getUserTeams.queryOptions({
+      enabled: Boolean(user),
       staleTime: 60_000 * 10,
       refetchOnWindowFocus: false,
     }),
@@ -65,21 +68,26 @@ export const FundraisersByTeamConfigurator: Component = () => {
       linkUrl={url()}
     >
       <PreviewDataField value={previewData()} onChange={setPreviewData} />
-      <Show when={!qTeams.isLoading} fallback={<Spinner label="Loading your teams…" />}>
-        <Show when={teams().length === 0}>
-          <Alert tone="warning" role="status" class="sm:col-span-2">
-            You are not part of any team yet. Create or join a team to filter
-            by team.
-          </Alert>
+      <Show when={user}>
+        <Show
+          when={!qTeams.isLoading}
+          fallback={<Spinner label="Loading your teams…" />}
+        >
+          <Show when={teams().length === 0}>
+            <Alert tone="warning" role="status" class="sm:col-span-2">
+              You are not part of any team yet. Create or join a team to filter
+              by team.
+            </Alert>
+          </Show>
+          <Select
+            label="Team"
+            showLabel
+            options={[NO_CHOICE, ...teams().map((t) => t.slug)]}
+            value={teamSlug() || NO_CHOICE}
+            onChange={(v) => setTeamSlug(v === NO_CHOICE ? '' : v)}
+            format={teamName}
+          />
         </Show>
-        <Select
-          label="Team"
-          showLabel
-          options={[NO_CHOICE, ...teams().map((t) => t.slug)]}
-          value={teamSlug() || NO_CHOICE}
-          onChange={(v) => setTeamSlug(v === NO_CHOICE ? '' : v)}
-          format={teamName}
-        />
       </Show>
       <Select
         label="Theme"

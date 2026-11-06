@@ -8,6 +8,7 @@ import {
 } from '../../overview/Common.tsx'
 import { OVERLAY_FORMATS } from '../../overview/formats.ts'
 import { orpcPrivate } from '../../../../../lib/orpc/client.ts'
+import { useUser } from '../../../users/user-dashboard/providers/UserProvider.tsx'
 import { Select } from '../../../../ui/Select'
 import { Alert, Spinner } from '../../../../ui/Status'
 
@@ -20,9 +21,11 @@ export const TeamScheduleConfigurator: Component = () => {
   const [theme, setTheme] = createSignal<Theme>('default')
   const [streamStyle, setStreamStyle] = createSignal<StreamStyle>('filled')
   const [limit, setLimit] = createSignal<number>(4)
+  const { user } = useUser()
 
   const qTeams = useQuery(() =>
     orpcPrivate.teams.getUserTeams.queryOptions({
+      enabled: Boolean(user),
       staleTime: 60_000 * 10,
       refetchOnWindowFocus: false,
     }),
@@ -30,13 +33,21 @@ export const TeamScheduleConfigurator: Component = () => {
 
   const [teamId, setTeamId] = createSignal<number | undefined>(undefined)
 
+  const params = () => ({
+    teamId: teamId(),
+    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    theme: theme(),
+    style: streamStyle(),
+    limit: limit(),
+  })
   const scheduleUrl = createMemo(() =>
+    buildUrl('/overlays/team-schedule', params()),
+  )
+  // Sample streams until a team is chosen (always when logged out); the OBS link never has `demo`
+  const previewUrl = createMemo(() =>
     buildUrl('/overlays/team-schedule', {
-      teamId: teamId(),
-      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-      theme: theme(),
-      style: streamStyle(),
-      limit: limit(),
+      ...params(),
+      demo: !teamId() || undefined,
     }),
   )
   const teams = () => qTeams.data ?? []
@@ -47,27 +58,34 @@ export const TeamScheduleConfigurator: Component = () => {
     <ConfiguratorBody
       description="A team's upcoming streams in a compact panel, as slot rows like in the Twitch extension. Choose the team, a theme, a filled or striped header, and how many streams to show."
       format={OVERLAY_FORMATS['team-schedule']}
-      previewUrl={scheduleUrl()}
+      previewUrl={previewUrl()}
       linkUrl={scheduleUrl()}
     >
-      <Show when={!qTeams.isLoading} fallback={<Spinner label="Loading your teams…" />}>
+      <Show when={user}>
         <Show
-          when={teams().length > 0}
-          fallback={
-            <Alert tone="warning" role="status" class="sm:col-span-2">
-              You are not part of any team yet. Create or join a team to use
-              the Team Schedule overlay.
-            </Alert>
-          }
+          when={!qTeams.isLoading}
+          fallback={<Spinner label="Loading your teams…" />}
         >
-          <Select
-            label="Team"
-            showLabel
-            options={[NO_CHOICE, ...teams().map((t) => String(t.id))]}
-            value={teamId() ? String(teamId()) : NO_CHOICE}
-            onChange={(v) => setTeamId(v === NO_CHOICE ? undefined : Number(v))}
-            format={teamName}
-          />
+          <Show
+            when={teams().length > 0}
+            fallback={
+              <Alert tone="warning" role="status" class="sm:col-span-2">
+                You are not part of any team yet. Create or join a team to use
+                the Team Schedule overlay.
+              </Alert>
+            }
+          >
+            <Select
+              label="Team"
+              showLabel
+              options={[NO_CHOICE, ...teams().map((t) => String(t.id))]}
+              value={teamId() ? String(teamId()) : NO_CHOICE}
+              onChange={(v) =>
+                setTeamId(v === NO_CHOICE ? undefined : Number(v))
+              }
+              format={teamName}
+            />
+          </Show>
         </Show>
       </Show>
       <Select

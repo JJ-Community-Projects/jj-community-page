@@ -19,6 +19,7 @@ const timezoneParam = Astro.url.searchParams.get('timezone')
 const themeParam = Astro.url.searchParams.get('theme')
 const styleParam = Astro.url.searchParams.get('style')
 const limitParam = Astro.url.searchParams.get('limit')
+const demoParam = Astro.url.searchParams.get('demo')
 
 const user = userParam ?? undefined
 const timezone = timezoneParam ?? undefined
@@ -28,6 +29,7 @@ const style = styleParam === 'stripe' || styleParam === 'striped' ? 'striped' : 
 const limitRaw = Number(limitParam)
 const limit = Number.isFinite(limitRaw) ? Math.min(100, Math.max(1, Math.floor(limitRaw))) : undefined
 
+const demo = demoParam === 'true' || demoParam === '1'
 ---
 
 <div class="min-h-screen bg-transparent text-white">
@@ -41,6 +43,7 @@ const limit = Number.isFinite(limitRaw) ? Math.min(100, Math.max(1, Math.floor(l
       theme={theme}
       style={style}
       limit={limit}
+      demo={demo}
     />
   )}
 </div>

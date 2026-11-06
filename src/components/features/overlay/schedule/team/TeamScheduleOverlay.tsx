@@ -3,6 +3,7 @@ import { QueryClientProvider, useQuery } from '@tanstack/solid-query'
 import { QueryClient } from '@tanstack/query-core'
 import { orpcPrivate } from '../../../../../lib/orpc/client.ts'
 import { OverlayStreamCard } from '../common/OverlayStreamCard.tsx'
+import { demoTeamSchedule } from '../common/demoData.ts'
 import {
   TeamScheduleOverlayHeader,
   TeamScheduleOverlayHeaderSidebar,
@@ -14,6 +15,8 @@ export type TeamScheduleOverlayProps = {
   theme?: 'default' | 'red' | 'blue'
   style?: 'filled' | 'striped'
   limit?: number
+  /** Sample streams instead of a fetch: the editor preview without a user or team. */
+  demo?: boolean
 }
 
 const Body: Component<TeamScheduleOverlayProps> = (props) => {
@@ -28,11 +31,15 @@ const Body: Component<TeamScheduleOverlayProps> = (props) => {
   const q = useQuery(() =>
     orpcPrivate.overlay.scheduleByTeamId.queryOptions({
       input: input(),
-      enabled: hasParam(),
+      enabled: hasParam() && !props.demo,
       staleTime: 60_000 * 5,
       refetchInterval: 60_000 * 5,
       refetchOnWindowFocus: false,
     }),
+  )
+
+  const data = createMemo(() =>
+    props.demo ? demoTeamSchedule(props.timezone ?? 'UTC', props.limit ?? 4) : q.data,
   )
 
   const theme = () => props.theme ?? 'default'
@@ -40,7 +47,7 @@ const Body: Component<TeamScheduleOverlayProps> = (props) => {
 
   return (
     <div class="p-2">
-      <Show when={hasParam()}>
+      <Show when={hasParam() || props.demo}>
         <Show when={q.isLoading}>
           <p class="opacity-80">Loading schedule…</p>
         </Show>
@@ -49,7 +56,7 @@ const Body: Component<TeamScheduleOverlayProps> = (props) => {
             {q.error?.message ?? 'Failed to load schedule'}
           </p>
         </Show>
-        <Show when={q.data}>
+        <Show when={data()}>
           {(data) => (
             <div class="flex flex-col gap-2">
               <Show
