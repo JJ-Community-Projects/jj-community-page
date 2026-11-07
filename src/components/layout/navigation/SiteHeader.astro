@@ -1,10 +1,13 @@
 ---
 import { env } from 'cloudflare:workers'
-import { Image } from 'astro:assets'
 import { getCollection } from 'astro:content'
 import { FaSolidChevronDown } from 'solid-icons/fa'
-import jj_image from '../../../images/Jingle_Jam_Logo_White_Large.png'
-import jj_image_dark from '../../../images/Jingle_Jam_Logo_DARK_Large.png'
+// Pre-sized from the *_Large.png originals: SSR pages get no runtime image resizing (imageService 'compile'),
+// so <Image> would serve the 1500px original. Plain <img> loads these from /_astro/ as immutable static assets.
+import jj_image from '../../../images/Jingle_Jam_Logo_White_84.webp'
+import jj_image_2x from '../../../images/Jingle_Jam_Logo_White_168.webp'
+import jj_image_dark from '../../../images/Jingle_Jam_Logo_DARK_84.webp'
+import jj_image_dark_2x from '../../../images/Jingle_Jam_Logo_DARK_168.webp'
 import { SITE_URL } from '../../../lib/utils/canonical.ts'
 import { DonateIcon } from '../../common/icons/JJIcons'
 import { cn, focusRing, tileSurface } from '../../ui/cn'
@@ -52,19 +55,23 @@ const linkClass = (active: boolean) =>
   class="mx-auto flex w-full max-w-6xl items-center justify-between gap-2 px-2 pt-2 sm:px-4 md:flex-col md:justify-center md:gap-1 md:pt-3"
 >
   <a href={home} class={cn('shrink-0 rounded-group', focusRing)}>
-    <Image
-      src={jj_image}
+    <img
+      src={jj_image.src}
+      srcset={`${jj_image.src} 1x, ${jj_image_2x.src} 2x`}
       alt="Jingle Jam Community home"
-      height="96"
+      width={jj_image.width}
+      height={jj_image.height}
       loading="eager"
       fetchpriority="high"
       class="h-11 w-auto md:h-20 dark:hidden"
     />
     {/* The blue logo for the blue dark-mode canvas */}
-    <Image
-      src={jj_image_dark}
+    <img
+      src={jj_image_dark.src}
+      srcset={`${jj_image_dark.src} 1x, ${jj_image_dark_2x.src} 2x`}
       alt="Jingle Jam Community home"
-      height="96"
+      width={jj_image_dark.width}
+      height={jj_image_dark.height}
       loading="eager"
       class="hidden h-11 w-auto md:h-20 dark:block"
     />
