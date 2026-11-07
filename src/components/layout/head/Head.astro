@@ -41,6 +41,9 @@ const og = propOg !== false && {
 ---
 
 <head>
+  {/* charset must be within the first 1024 bytes, so it goes before the inline scripts */}
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width" />
   <script is:inline>
     // Theme before the first paint: localStorage.theme is 'light' or 'dark', absent means System.
     // ThemeSwitch.tsx writes the same key. Re-applied when the OS setting or another tab changes it.
@@ -69,10 +72,8 @@ const og = propOg !== false && {
   </script>
   <GoogleAnalytics />
   <link rel="sitemap" type="application/xml" href="/sitemap-index.xml" />
-  <meta charset="UTF-8" />
   {description && <meta name="description" content={description} />}
   {robots && <meta name="robots" content={robots} />}
-  <meta name="viewport" content="width=device-width" />
   <Fonts />
   <link rel="icon" type="image/svg+xml" href="/jj-favicon.svg" />
   <link rel="shortcut icon" href="/favicon.ico" />
