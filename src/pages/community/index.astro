@@ -5,7 +5,7 @@ import PageShell from '../../layouts/PageShell.astro'
 import { CommunityPage } from '../../components/features/community/CommunityPage.tsx'
 import { PageHeader } from '../../components/ui/PageHeader'
 import { Tile } from '../../components/ui/Tile'
-import { JJStartCountdown, JJStartTimes } from '../../components/ui/Countdown'
+import JJStartInfo from '../../components/common/JJStartInfo.astro'
 import { serverClientPublic } from '../../lib/orpc/serverClient'
 import { getConfigYear } from '../../lib/utils/configYear'
 import { upcomingJJYear } from '../../lib/utils/jjYear'
@@ -58,8 +58,7 @@ const tagCatalog = HIDE_CONTENT
           fundraisers with their totals and the community streams coming up next. Until then, see the{' '}
           <a class="font-medium underline" href="/yogs">Yogscast Jingle Jam schedule</a>.
         </p>
-        <JJStartCountdown client:only="solid-js" />
-        <JJStartTimes client:only="solid-js" class="max-w-lg" />
+        <JJStartInfo timesClass="max-w-lg" />
       </Tile>
     ) : (
       <CommunityPage

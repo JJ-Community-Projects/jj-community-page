@@ -11,7 +11,7 @@ import PageShell from '../layouts/PageShell.astro'
 import { PageHeader } from '../components/ui/PageHeader'
 import { Section, Tile } from '../components/ui/Tile'
 import { Button } from '../components/ui/Button'
-import { JJStartCountdown, JJStartTimes } from '../components/ui/Countdown'
+import JJStartInfo from '../components/common/JJStartInfo.astro'
 import { serverClientPublic } from '../lib/orpc/serverClient'
 import { getConfigYear } from '../lib/utils/configYear'
 import { upcomingJJYear } from '../lib/utils/jjYear'
@@ -38,8 +38,7 @@ const year = upcomingJJYear(configYear, contentHidden ?? true)
     />
 
     <Tile class="flex flex-col items-center gap-3">
-      <JJStartCountdown client:only="solid-js" />
-      <JJStartTimes client:only="solid-js" class="max-w-lg" />
+      <JJStartInfo timesClass="max-w-lg" />
     </Tile>
 
     <Section title="What is this site?">

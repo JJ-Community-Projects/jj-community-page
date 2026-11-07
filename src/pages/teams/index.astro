@@ -5,11 +5,8 @@ import PageShell from '../../layouts/PageShell.astro'
 import { PageHeader } from '../../components/ui/PageHeader'
 import { Tile } from '../../components/ui/Tile'
 import { Alert, EmptyState } from '../../components/ui/Status'
-import {
-  JJStartCountdown,
-  JJStartCountdownTile,
-  JJStartTimes,
-} from '../../components/ui/Countdown'
+import { JJStartCountdownTile } from '../../components/ui/Countdown'
+import JJStartInfo from '../../components/common/JJStartInfo.astro'
 import { getConfigYear } from '../../lib/utils/configYear'
 import { upcomingJJYear } from '../../lib/utils/jjYear'
 
@@ -55,8 +52,7 @@ const { data: teams, error } = await serverClientPublic.teams.findVisible(
           When Jingle Jam {year} starts on 1 December, this page lists every team, and each team's page
           shows its members and upcoming streams.
         </p>
-        <JJStartCountdown client:only="solid-js" />
-        <JJStartTimes client:only="solid-js" class="max-w-lg" />
+        <JJStartInfo timesClass="max-w-lg" />
       </Tile>
     ) : (
       <>
