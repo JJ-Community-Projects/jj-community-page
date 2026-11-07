@@ -28,9 +28,16 @@
 .yogs-grid,
 .yogs-frame {
   --yogs-pad: 0.5rem;
+  /* 100vw leaves out the scrollbar while html scrolls, but takes it back under a dialog's scroll lock,
+     which sets --scrollbar-width while it lasts: subtract it so the grid doesn't grow behind dialogs */
+  --yogs-vw: calc(100vw - var(--scrollbar-width, 0px));
   /* No taller than the viewport, so the snapped panel shows the whole week */
   --yogs-unit: min(
-    (min(100cqi, 80vw, max(1600px, 60vw)) - 2 * var(--yogs-pad)) / 22,
+    (
+        min(100cqi, var(--yogs-vw) * 0.8, max(1600px, var(--yogs-vw) * 0.6)) -
+          2 * var(--yogs-pad)
+      ) /
+      22,
     (100vh - 2 * var(--yogs-pad)) / var(--yogs-rows)
   );
   --yogs-rem: max(1rem, var(--yogs-unit) / 4.5);

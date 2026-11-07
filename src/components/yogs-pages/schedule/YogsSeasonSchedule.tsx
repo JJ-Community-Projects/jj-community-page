@@ -112,7 +112,7 @@ const CollectionCountdown: Component = () => {
 const Ticker: Component = () => {
   const { mounted } = useYogsSchedule()
   return (
-    <div class={'max-w-[80vw]'}>
+    <div class={'max-w-[calc((100vw-var(--scrollbar-width,0px))*0.8)]'}>
       <Show when={mounted()}>
         <QueryClientProvider client={new QueryClient()}>
           <HeadlinerTicker />
