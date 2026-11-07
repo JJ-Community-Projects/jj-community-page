@@ -28,7 +28,8 @@ export const sidebarNeighbour = morphStyle('charity-main')
  * is in global.css. Without View Transitions support or with reduced motion the layout switches at once.
  */
 export const CommunityCharitiesOverview: Component = () => {
-  const { mergedCharityItems, overview, charityOpen } = useCharityOverview()
+  const { mergedCharityItems, overview, cause, charityOpen } =
+    useCharityOverview()
   // The layout on screen; follows charityOpen() inside the view transition.
   const [shownOpen, setShownOpen] = createSignal(charityOpen())
 
@@ -49,33 +50,37 @@ export const CommunityCharitiesOverview: Component = () => {
     ),
   )
 
+  // The column keeps its width while the causes load, so the page column next to it doesn't jump
+  // sideways when they arrive. The tiles wait for the totals too, which would otherwise push them down.
   return (
-    <Show when={mergedCharityItems().length > 0}>
+    <Show when={cause.isPending || mergedCharityItems().length > 0}>
       <div
         class="flex flex-col items-stretch gap-2"
         classList={{ 'w-64': shownOpen(), 'w-24': !shownOpen() }}
       >
         <Toggle />
-        <Show when={overview.data}>
-          {(ov) => (
-            <Show
-              when={shownOpen()}
-              fallback={<OverviewComponentClosed overview={ov()} morph />}
-            >
-              <OverviewComponent overview={ov()} morph />
-            </Show>
-          )}
+        <Show when={mergedCharityItems().length > 0 && !overview.isPending}>
+          <Show when={overview.data}>
+            {(ov) => (
+              <Show
+                when={shownOpen()}
+                fallback={<OverviewComponentClosed overview={ov()} morph />}
+              >
+                <OverviewComponent overview={ov()} morph />
+              </Show>
+            )}
+          </Show>
+          <For each={mergedCharityItems()}>
+            {(it, index) => (
+              <Show
+                when={shownOpen()}
+                fallback={<CharityItemClosed item={it} morph={index()} />}
+              >
+                <CharityItem item={it} morph={index()} />
+              </Show>
+            )}
+          </For>
         </Show>
-        <For each={mergedCharityItems()}>
-          {(it, index) => (
-            <Show
-              when={shownOpen()}
-              fallback={<CharityItemClosed item={it} morph={index()} />}
-            >
-              <CharityItem item={it} morph={index()} />
-            </Show>
-          )}
-        </For>
       </div>
     </Show>
   )
