@@ -6,6 +6,7 @@ import type {
   UserWithInfo,
 } from '../orpc/private/jjData/contract.ts'
 import { normalizeTwitchLogin } from '../../do/utils/twitchLogins.ts'
+import { tiltifyThumbnail } from '../utils/tiltifyImages.ts'
 import { twitchThumbnail } from '../utils/twitchImages.ts'
 
 // The community page lists the top N campaigns by raised, plus every account holder.
@@ -24,6 +25,9 @@ export interface CommunityListSources {
 }
 
 const slugKey = (slug: string) => slug.trim().toLowerCase()
+
+// The tiles show a 40px avatar: Twitch's 70x70 and a resized Tiltify upload instead of the originals
+const tileAvatar = (url: string) => tiltifyThumbnail(twitchThumbnail(url))
 
 // Tiltify's placeholder for users without an avatar
 export const isDefaultAvatar = (url: string | null | undefined) =>
@@ -104,8 +108,7 @@ export function buildCommunityList(
     items.set(key, {
       key,
       name: u.username,
-      // The tiles show a 40px avatar: Twitch's 70x70 instead of the stored 300x300
-      avatar: twitchThumbnail(memberAvatar(u, c)),
+      avatar: tileAvatar(memberAvatar(u, c)),
       charity: c ? charityOf(c) : null,
       raised: c?.raised ?? null,
       tiltifyUrl: c?.tiltifyUrl ?? u.tiltifyUrl,
@@ -131,7 +134,7 @@ export function buildCommunityList(
     items.set(key, {
       key,
       name: c.tiltifyName,
-      avatar: twitchThumbnail(c.avatar),
+      avatar: tileAvatar(c.avatar),
       charity: charityOf(c),
       raised: c.raised,
       tiltifyUrl: c.tiltifyUrl,
