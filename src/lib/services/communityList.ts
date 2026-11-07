@@ -6,6 +6,7 @@ import type {
   UserWithInfo,
 } from '../orpc/private/jjData/contract.ts'
 import { normalizeTwitchLogin } from '../../do/utils/twitchLogins.ts'
+import { twitchThumbnail } from '../utils/twitchImages.ts'
 
 // The community page lists the top N campaigns by raised, plus every account holder.
 export const COMMUNITY_TOP_N = 100
@@ -103,7 +104,8 @@ export function buildCommunityList(
     items.set(key, {
       key,
       name: u.username,
-      avatar: memberAvatar(u, c),
+      // The tiles show a 40px avatar: Twitch's 70x70 instead of the stored 300x300
+      avatar: twitchThumbnail(memberAvatar(u, c)),
       charity: c ? charityOf(c) : null,
       raised: c?.raised ?? null,
       tiltifyUrl: c?.tiltifyUrl ?? u.tiltifyUrl,
@@ -129,7 +131,7 @@ export function buildCommunityList(
     items.set(key, {
       key,
       name: c.tiltifyName,
-      avatar: c.avatar,
+      avatar: twitchThumbnail(c.avatar),
       charity: charityOf(c),
       raised: c.raised,
       tiltifyUrl: c.tiltifyUrl,
