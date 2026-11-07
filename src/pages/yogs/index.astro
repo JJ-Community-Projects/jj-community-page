@@ -13,7 +13,7 @@ import { YogsResponsiveSchedule } from '../../components/yogs-pages/schedule/Yog
 import { YogsSeasonSchedule } from '../../components/yogs-pages/schedule/YogsSeasonSchedule.tsx'
 import { YogsScheduleNotice } from '../../components/yogs-pages/common/YogsScheduleNotice.tsx'
 import YogsArchiveNav from '../../components/yogs-pages/common/YogsArchiveNav.astro'
-import { JJStartCountdown, JJStartTimes } from '../../components/ui/Countdown'
+import JJStartInfo from '../../components/common/JJStartInfo.astro'
 import { PageHeader } from '../../components/ui/PageHeader'
 import { Tile } from '../../components/ui/Tile'
 import { compactYogsSchedule } from '../../lib/utils/compactYogsSchedule.ts'
@@ -220,6 +220,7 @@ const ogImage = preRenderdImageExists
     image: ogImage,
   }}
   jsonLd={jsonLd}
+  preloadDisplayFont
 >
   <YogsSuggestionsAd />
   <YogsBanner/>
@@ -240,8 +241,7 @@ const ogImage = preRenderdImageExists
         </div>
       ) : (
         <Tile class="flex w-full max-w-2xl flex-col items-center gap-3 text-center">
-          <JJStartCountdown client:only="solid-js" />
-          <JJStartTimes client:only="solid-js" />
+          <JJStartInfo />
           <p class="text-sm sm:text-base">
             The <span class="font-bold">Yogscast Jingle Jam {year} Schedule</span>
             will be shown once it is announced on social media.
@@ -259,8 +259,7 @@ const ogImage = preRenderdImageExists
         subtitle="The Yogscast Jingle Jam in your timezone with links to participants, VODs and more."
       />
       <Tile class="flex w-full max-w-2xl flex-col items-center gap-3 text-center">
-        <JJStartCountdown client:only="solid-js" />
-        <JJStartTimes client:only="solid-js" />
+        <JJStartInfo />
         <p class="text-sm sm:text-base">
           The <span class="font-bold">Yogscast Jingle Jam {upcomingYear} Schedule</span>
           will appear here once it is announced.

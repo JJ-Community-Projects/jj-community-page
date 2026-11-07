@@ -4,6 +4,7 @@ import Fonts from './Fonts.astro'
 import YogsJsonLd from '../../yogs-pages/common/YogsJsonLd.astro'
 import type { JsonLd } from '../../../content/getJingleJamEventSeries.ts'
 import { canonicalUrl, SITE_URL } from '../../../lib/utils/canonical'
+import bebasUrl from '../../../fonts/BebasNeues/BebasNeue-Regular.woff2?url'
 
 export type OgProps = {
   title?: string
@@ -24,9 +25,19 @@ export interface Props {
   og?: OgProps | false
   /** Structured data (EventSeries, BreadcrumbList); undefined entries are skipped. */
   jsonLd?: (JsonLd | undefined)[]
+  /** Preload Bebas, the Yogs grid's display font, so its swap doesn't shift the page. Only for pages that use it. */
+  preloadDisplayFont?: boolean
 }
 
-const { title, description, canonical: propCanonical, robots, og: propOg, jsonLd } = Astro.props
+const {
+  title,
+  description,
+  canonical: propCanonical,
+  robots,
+  og: propOg,
+  jsonLd,
+  preloadDisplayFont,
+} = Astro.props
 const t = title || 'Jingle Jam Community'
 const canonical = propCanonical ?? canonicalUrl(Astro.url)
 
@@ -74,6 +85,11 @@ const og = propOg !== false && {
   <link rel="sitemap" type="application/xml" href="/sitemap-index.xml" />
   {description && <meta name="description" content={description} />}
   {robots && <meta name="robots" content={robots} />}
+  {
+    preloadDisplayFont && (
+      <link rel="preload" href={bebasUrl} as="font" type="font/woff2" crossorigin />
+    )
+  }
   <Fonts />
   <link rel="icon" type="image/svg+xml" href="/jj-favicon.svg" />
   <link rel="shortcut icon" href="/favicon.ico" />

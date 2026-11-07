@@ -1,0 +1,28 @@
+---
+import { JJStartCountdown, JJStartTimes } from '../ui/Countdown'
+
+interface Props {
+  /** Passed on to JJStartTimes, e.g. `max-w-lg`. */
+  timesClass?: string
+}
+
+// Both islands are client:only and render nothing on the server. The boxes keep their measured
+// height so the tile doesn't grow and push the page down when they hydrate (layout shift).
+// JJStartTimes shows one row on mobile for UK visitors and two (local + UK) for everyone else;
+// Cloudflare's IP time zone predicts which. The page is rendered per request, not edge-cached.
+const timezone = (Astro.request as Request & { cf?: { timezone?: string } }).cf?.timezone
+const ukVisitor = timezone === 'Europe/London'
+---
+
+<div class="flex min-h-[5.25rem] w-full justify-center sm:min-h-[5.5rem]">
+  <JJStartCountdown client:only="solid-js" />
+</div>
+<div
+  class:list={[
+    'w-full sm:min-h-[4.75rem]',
+    ukVisitor ? 'min-h-8' : 'min-h-[4.5rem]',
+    Astro.props.timesClass,
+  ]}
+>
+  <JJStartTimes client:only="solid-js" />
+</div>
