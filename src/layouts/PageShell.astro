@@ -18,9 +18,14 @@ interface Props extends HeadProps {
   width?: keyof typeof widths
   /** `pwa` swaps in the slim PWA nav and leaves out the feedback banner. */
   nav?: 'main' | 'pwa'
+  /**
+   * Main is at least one (large) viewport tall, so the footer starts below the fold. For pages whose
+   * content renders on the client: it can grow without moving the footer on screen (layout shift).
+   */
+  fillViewport?: boolean
 }
 
-const { width = 'content', nav = 'main', ...head } = Astro.props
+const { width = 'content', nav = 'main', fillViewport = false, ...head } = Astro.props
 ---
 
 <html lang="en">
@@ -34,7 +39,13 @@ const { width = 'content', nav = 'main', ...head } = Astro.props
     <div class="flex min-h-dvh flex-col">
       <SiteHeader nav={nav} />
       {nav === 'main' && <FeedbackBanner />}
-      <main class:list={['mx-auto flex w-full flex-1 flex-col px-2 pt-4 sm:px-4', widths[width]]}>
+      <main
+        class:list={[
+          'mx-auto flex w-full flex-1 flex-col px-2 pt-4 sm:px-4',
+          widths[width],
+          fillViewport && 'min-h-lvh',
+        ]}
+      >
         <slot />
       </main>
       <Footer />
