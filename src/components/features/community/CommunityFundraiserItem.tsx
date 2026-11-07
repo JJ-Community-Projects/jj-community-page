@@ -32,10 +32,13 @@ export const CommunityFundraiserItem: Component<{
   const dono = () => f().hasActiveDonationMatch
 
   return (
+    // The list renders all ~240 fundraisers: off-screen tiles skip layout and paint until scrolled
+    // near (content-visibility). 100px is a typical tile; `auto` keeps a tile's real height once shown.
     <div
       class={cn(
         dono() ? donoMatchSurface : f().isLive ? liveSurface : tileSurface,
         'flex min-w-0 flex-col gap-2 p-2.5',
+        '[content-visibility:auto] [contain-intrinsic-size:auto_100px]',
       )}
     >
       <div class="flex min-w-0 items-start gap-2.5">
