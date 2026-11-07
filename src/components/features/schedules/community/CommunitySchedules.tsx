@@ -83,9 +83,12 @@ const Body: Component = () => {
           </Show>
         </div>
       </div>
-      <div class="w-full lg:hidden">
-        <CommunityCharitiesOverviewMobile />
-      </div>
+      {/* Below the schedule on mobile: shown once the schedule is in, so the long list doesn't push it down */}
+      <Show when={!scheduleQuery.isLoading}>
+        <div class="w-full lg:hidden">
+          <CommunityCharitiesOverviewMobile />
+        </div>
+      </Show>
     </div>
   )
 }
