@@ -322,6 +322,10 @@ async function getCreatorFromRef(
     cd?.profileImage?.medium ||
     cd?.profileImage?.large ||
     cd?.profileImage?.small
+  const thumbnailUrl: string | undefined =
+    cd?.profileImage?.small ||
+    cd?.profileImage?.medium ||
+    cd?.profileImage?.large
   const links = cd.links?.filter((c) => c.type === 'twitch').at(0)
   const url: string = links?.url ?? '' // cd?.link || (Array.isArray(cd?.links) && cd.links[0]?.url) || ''
   const color: string = cd?.style?.primaryColor || '#E30E50'
@@ -331,6 +335,7 @@ async function getCreatorFromRef(
     name: cd?.name ?? '',
     url,
     imageUrl,
+    thumbnailUrl,
     color,
     links: cd.links?.map((link) => {
       return {

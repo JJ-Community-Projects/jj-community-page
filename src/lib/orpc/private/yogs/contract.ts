@@ -17,6 +17,8 @@ export const CreatorSchema = z.object({
   name: z.string(),
   url: z.string(),
   imageUrl: z.string().optional(),
+  /** Small avatar (~70px) for chips and schedule tiles; `imageUrl` is the large one. */
+  thumbnailUrl: z.string().optional(),
   color: z.string(),
   links: z.array(CreatorLink).optional(),
 })

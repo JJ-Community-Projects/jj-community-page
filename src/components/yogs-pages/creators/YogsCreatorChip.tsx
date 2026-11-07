@@ -24,7 +24,7 @@ export const YogsCreatorChip: Component<YogsCreatorChipProps> = (props) => (
     onClick={() => props.onClick()}
   >
     <Avatar
-      src={props.creator.imageUrl}
+      src={props.creator.thumbnailUrl ?? props.creator.imageUrl}
       alt=""
       fallback={props.creator.name.charAt(0)}
       size="xs"

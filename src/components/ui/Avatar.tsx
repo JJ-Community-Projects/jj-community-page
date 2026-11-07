@@ -58,6 +58,7 @@ export const Avatar: Component<AvatarProps> = (props) => {
             src={src()}
             alt={props.alt}
             loading="lazy"
+            decoding="async"
             onError={() => setFailedSrc(src())}
             class="size-full object-cover"
           />

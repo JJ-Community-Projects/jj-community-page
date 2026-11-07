@@ -247,7 +247,7 @@ const CreatorRow: Component<CreatorRowProps> = props => (
     onClick={() => props.onToggle()}
   >
     <Avatar
-      src={props.creator.imageUrl}
+      src={props.creator.thumbnailUrl ?? props.creator.imageUrl}
       alt=""
       fallback={props.creator.name.charAt(0)}
       size="xs"

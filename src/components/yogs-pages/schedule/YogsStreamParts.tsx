@@ -149,7 +149,7 @@ export const CreatorStack: Component<{
       <For each={shown()}>
         {(creator) => (
           <Avatar
-            src={creator.imageUrl}
+            src={creator.thumbnailUrl ?? creator.imageUrl}
             alt=""
             fallback={creator.name.charAt(0)}
             size="xs"
