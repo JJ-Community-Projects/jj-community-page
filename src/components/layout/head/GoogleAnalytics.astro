@@ -9,7 +9,6 @@ const isProd = env.ENVIRONMENT === 'PROD'
 
 {
   isProd && (
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-P6MYGN62FW" />
     <script is:inline>
       window.dataLayer = window.dataLayer || [];
 
@@ -27,6 +26,15 @@ const isProd = env.ENVIRONMENT === 'PROD'
       });
       gtag('config', 'G-P6MYGN62FW', {anonymize_ip: true, cookie_flags: 'max-age=7200;secure;samesite=none'});
       window.gtag = gtag;
+
+      // gtag.js (~170 kB) loads after the page so it doesn't compete with the page's own requests.
+      // Calls made before then wait in dataLayer, so the page view is still sent.
+      addEventListener('load', () => {
+        const script = document.createElement('script');
+        script.async = true;
+        script.src = 'https://www.googletagmanager.com/gtag/js?id=G-P6MYGN62FW';
+        document.head.appendChild(script);
+      }, { once: true });
     </script>
   )
 }
