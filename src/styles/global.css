@@ -455,5 +455,15 @@
   }
 }
 
+/* Always show the vertical scrollbar: pages that grow after hydration (community list, schedules) would
+   otherwise jump sideways when it appears. Not `scrollbar-gutter: stable`: the dialogs' scroll lock pads
+   <html> by the scrollbar width on top of the gutter and shifts the page. Overlay scrollbars (macOS, mobile)
+   take no space either way. */
+@layer base {
+  html {
+    overflow-y: scroll;
+  }
+}
+
 /* TODO(tw4-compat): v3 hover (also fires on tap on touch devices) */
 @custom-variant hover (&:hover);
