@@ -58,6 +58,8 @@ export const CommunityCharitiesOverview: Component = () => {
         class="flex flex-col items-stretch gap-2"
         classList={{ 'w-64': shownOpen(), 'w-24': !shownOpen() }}
       >
+        {/* The charity tiles are h3s; the mobile list shows this heading */}
+        <h2 class="sr-only">Charities</h2>
         <Toggle />
         <Show when={mergedCharityItems().length > 0 && !overview.isPending}>
           <Show when={overview.data}>
@@ -115,13 +117,9 @@ const Toggle: Component = () => {
         size="sm"
         variant="canvas"
         aria-expanded={charityOpen()}
-        aria-label={
-          charityOpen()
-            ? 'Collapse charities overview'
-            : 'Expand charities overview'
-        }
         onClick={() => setCharityOpen(!charityOpen())}
       >
+        {/* The name starts with the visible word, so voice control can say "Close" or "Open" */}
         <Show
           when={charityOpen()}
           fallback={
@@ -132,6 +130,7 @@ const Toggle: Component = () => {
         >
           <FaSolidArrowLeftLong class="size-3" aria-hidden="true" /> Close
         </Show>
+        <span class="sr-only"> charities overview</span>
       </Button>
     </span>
   )

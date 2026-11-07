@@ -78,7 +78,7 @@ export const MobileYogsStreamTile: Component<MobileScheduleBodyProps> = (
             </span>
           </Show>
           <Show when={stream().size > 1}>
-            <span class="text-xxs opacity-80">{time(stream().end)}</span>
+            <span class="text-xxs opacity-90">{time(stream().end)}</span>
           </Show>
         </span>
         <span class="flex min-w-0 flex-1 flex-col justify-center px-3 py-2">

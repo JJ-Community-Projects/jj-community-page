@@ -213,7 +213,8 @@
   --color-accent-800: #10293b;
   --color-accent-900: #040b0f;
   --color-accent-950: #000000;
-  --color-accent: #3584bf;
+  /* A shade darker than accent-500 so white text on it reaches 4.5:1 (the overlays keep accent-500) */
+  --color-accent: #2e78ae;
   --color-accent-shade: #09437a;
 
   /* The OBS overlays' black theme (ribbons, donation matches) */

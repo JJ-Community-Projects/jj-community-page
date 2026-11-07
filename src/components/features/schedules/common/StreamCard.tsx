@@ -242,7 +242,7 @@ export const StreamTimeRow: Component<
                 Live
               </span>
             </Show>
-            <span class="opacity-80">{time(props.stream.end)}</span>
+            <span class="opacity-90">{time(props.stream.end)}</span>
           </Show>
         </span>
         <span class="flex min-w-0 flex-1 flex-col justify-center py-2">
