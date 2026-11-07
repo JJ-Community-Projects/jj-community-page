@@ -19,6 +19,24 @@ export async function getYogsScheduleFromContent(
   )
 }
 
+// Content is fixed per deploy and a past year's schedule doesn't depend on the date, so each isolate
+// builds it once. Callers must treat the result as read-only.
+const pastSchedules = new Map<number, Promise<YogsSchedule>>()
+
+/** `getYogsScheduleFromContent` for a finished year, cached per isolate. */
+export function getPastYogsScheduleFromContent(
+  year: number,
+): Promise<YogsSchedule> {
+  let schedule = pastSchedules.get(year)
+  if (!schedule) {
+    schedule = getYogsScheduleFromContent(year)
+    pastSchedules.set(year, schedule)
+    // A failed build is retried on the next request instead of being cached
+    schedule.catch(() => pastSchedules.delete(year))
+  }
+  return schedule
+}
+
 export async function getScheduleFromContent(
   id: string,
   title: string = 'Schedule',

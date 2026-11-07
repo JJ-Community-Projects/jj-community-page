@@ -3,7 +3,10 @@ import YogsBanner from '../../components/yogs-pages/common/YogsBanner.astro'
 import YogsSuggestionsAd from '../../components/yogs-pages/common/YogsSuggestionsAd.astro'
 export const prerender = false
 import PageShell from '../../layouts/PageShell.astro'
-import { getYogsScheduleFromContent } from '../../content/getYogsScheduleFromContent.ts'
+import {
+  getPastYogsScheduleFromContent,
+  getYogsScheduleFromContent,
+} from '../../content/getYogsScheduleFromContent.ts'
 import {
   serverClientPrivate,
   serverClientPublic,
@@ -33,14 +36,16 @@ const context = {
   },
 }
 
-const { data: contentHidden } =
-  await serverClientPublic.overlays.visibility.getHidden({}, context)
+// Independent lookups (KV, ConfigDO, content), so they run in parallel
+const [{ data: contentHidden }, year, schedules] = await Promise.all([
+  serverClientPublic.overlays.visibility.getHidden({}, context),
+  getConfigYear(),
+  getCollection('schedules'),
+])
 const HIDE_CONTENT = contentHidden ?? true
 
-const year = await getConfigYear()
-
 // Years with a visible schedule in the content collection, newest first
-const contentYears = (await getCollection('schedules'))
+const contentYears = schedules
   .filter((schedule) => schedule.data.visible && /^\d{4}$/.test(schedule.id))
   .map((schedule) => Number(schedule.id))
   .sort((a, b) => b - a)
@@ -66,7 +71,7 @@ if (scheduleAvailable) {
   currentSchedule = live.data ?? (await getYogsScheduleFromContent(year))
 }
 const lastSchedule = lastYear
-  ? await getYogsScheduleFromContent(lastYear)
+  ? await getPastYogsScheduleFromContent(lastYear)
   : undefined
 const creators = (currentSchedule ?? lastSchedule)?.creators ?? []
 const scheduleYear = scheduleAvailable ? year : (lastYear ?? year)
