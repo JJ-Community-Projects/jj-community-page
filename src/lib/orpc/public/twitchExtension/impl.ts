@@ -2,9 +2,11 @@ import { implement, ORPCError, os as server } from '@orpc/server'
 import {
   contracts,
   type ExtensionConfigTVType,
+  type JJCampaignTVType,
   type JJCampaignsTVType,
   type StreamTVType,
 } from './contract.ts'
+import { twitchThumbnail } from '../../../utils/twitchImages.ts'
 import { getCollection, getEntries, getEntry } from 'astro:content'
 import { hasAstroContext } from '../../middleware/hasAstroContext.ts'
 import { getStreamColors } from '../../../../functions/jjDatesToColors.ts'
@@ -117,6 +119,15 @@ const yogsMembers = [
   '32155062',
   '1012950837',
 ]
+// The precomputed campaign display carries the 300x300 Twitch avatar; the panel shows it small
+const withTwitchThumbnail = <T extends JJCampaignTVType>(campaign: T): T =>
+  campaign.twitch
+    ? {
+        ...campaign,
+        twitch: { ...campaign.twitch, avatar: twitchThumbnail(campaign.twitch.avatar) },
+      }
+    : campaign
+
 const yogsId = '20786541'
 const ostofbot = '960814823'
 
@@ -445,15 +456,15 @@ const campaigns = os.campaignsContract
       const mergedList = campaignsDisplay.campaigns.map((item) => {
         if (item?.twitch?.name) {
           const name = String(item.twitch.name).toLowerCase()
-          return {
+          return withTwitchThumbnail({
             ...item,
             twitch: {
               ...item.twitch,
               isLive: liveSet.has(name),
             },
-          }
+          })
         }
-        return item
+        return withTwitchThumbnail(item)
       })
 
       // Sort before the cut, so live and matched campaigns make the first 100
@@ -654,10 +665,11 @@ async function scheduleForExtension(
             const cEntry = await getEntry(cRef)
             if (!cEntry) continue
             const cd = cEntry.data
-            const imageUrl: string | undefined =
+            const imageUrl: string | undefined = twitchThumbnail(
               cd?.profileImage?.medium ||
-              cd?.profileImage?.large ||
-              cd?.profileImage?.small
+                cd?.profileImage?.large ||
+                cd?.profileImage?.small,
+            )
             const links = cd.links?.filter((c) => c.type === 'twitch').at(0)
             const url: string = links?.url ?? ''
             const color: string = cd?.style?.primaryColor || '#000000'
@@ -855,10 +867,11 @@ const userData = os.userDataContract
     const stubID = DO.idFromName('JJ_API_CACHE')
     const stub = DO.get(stubID)
 
-    const userData = await loadUserData(context.env.KV, input.channelId)
-    if (isCachedNotFound(userData)) {
-      throw notFoundError(userData.message)
+    const cachedUserData = await loadUserData(context.env.KV, input.channelId)
+    if (isCachedNotFound(cachedUserData)) {
+      throw notFoundError(cachedUserData.message)
     }
+    const userData = cachedUserData && withTwitchThumbnail(cachedUserData)
     if (userData) {
       if (userData.tiltifyCauseId) {
         const cachedCause = await loadCause(
@@ -897,7 +910,8 @@ const userData = os.userDataContract
       throw new ORPCError('NOT_FOUND', { message: 'JJ campaign not found' })
     }*/
 
-    const campaign = await stub.getCampaignDisplay(input.channelId)
+    const display = await stub.getCampaignDisplay(input.channelId)
+    const campaign = display && withTwitchThumbnail(display)
 
     if (!campaign) {
       await storeNotFound(
@@ -991,7 +1005,9 @@ async function getYogsStream(channelId: string): Promise<{
         markdownDescription: s.markdownDescription,
         start: s.start,
         end: s.end,
-        creators: s.creators?.toSorted((a,b) => a.name.localeCompare(b.name)),
+        creators: s.creators
+          ?.map((c) => ({ ...c, imageUrl: twitchThumbnail(c.imageUrl) }))
+          .toSorted((a, b) => a.name.localeCompare(b.name)),
         vods: s.vods,
         color: s.color,
       }
@@ -1162,7 +1178,7 @@ const userSchedule = os.userScheduleContract
         id: String(u.userId),
         name: u.username,
         url: u.twitchLogin ? `https://twitch.tv/${u.twitchLogin}` : '',
-        imageUrl: u.profileImage ?? undefined,
+        imageUrl: twitchThumbnail(u.profileImage) ?? undefined,
         color: u.primaryColor ?? '#000000',
       })).toSorted((a,b) => a.name.localeCompare(b.name))
       const colorMap = getStreamColors(DateTime.fromJSDate(s.start as any))
@@ -1267,7 +1283,11 @@ const userRelations = os.userRelationsContract
       .all()
 
     // Cast createdAt to Date
-    const mapped = friends.map((f) => ({ ...f, createdAt: f.createdAt as any }))
+    const mapped = friends.map((f) => ({
+      ...f,
+      profileImage: twitchThumbnail(f.profileImage),
+      createdAt: f.createdAt as any,
+    }))
     const result = { friends: mapped }
 
     await storeUserRelations(context.env.KV, input.channelId, result, 600)
@@ -1389,7 +1409,7 @@ const userRelatedSchedule = os.userRelatedScheduleContract
         id: String(u.userId),
         name: u.username,
         url: u.twitchLogin ? `https://twitch.tv/${u.twitchLogin}` : '',
-        imageUrl: u.profileImage ?? undefined,
+        imageUrl: twitchThumbnail(u.profileImage) ?? undefined,
         color: u.primaryColor ?? '#000000',
       }))
       const colorMap = getStreamColors(DateTime.fromJSDate(s.start as any))
