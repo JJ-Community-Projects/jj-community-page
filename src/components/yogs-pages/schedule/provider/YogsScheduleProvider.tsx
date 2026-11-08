@@ -94,6 +94,14 @@ const useYogsScheduleHook = (
     mounted()
       ? DateTime.fromJSDate(date)
       : DateTime.fromJSDate(date, { zone: 'Europe/London' }).setLocale('en-US')
+  /** A time of day in the viewer's 12/24-hour convention; 24-hour until mounted (hydration). */
+  const formatTime = (date: Date) =>
+    (mounted() ? toDateTime(date) : toDateTime(date).setLocale('en-GB'))
+      .toLocaleString(DateTime.TIME_SIMPLE)
+      .replace(/ /g, ' ') // some browsers put a no-break space before "PM", which stops it wrapping
+  /** formatTime for narrow cells: the day period ("8:00 PM", "오후 8:00") gets its own line (needs preserved newlines). */
+  const formatTimeStacked = (date: Date) =>
+    formatTime(date).replace(/^(\D+?)\s*(\d.*)$/, '$1\n$2').replace(/^(.*\d)\s*(\D+)$/, '$1\n$2')
 
   // One clock for the grid; the states below stay false until mounted, like everything clock-based
   const clock = useNow()
@@ -101,7 +109,7 @@ const useYogsScheduleHook = (
   const scheduleEnd = Math.max(...schedule.streams.map((s) => s.end.getTime()))
   /** The current time in London ("Yogs time"), the schedule's own timezone; blank until mounted. */
   const yogsTime = () =>
-    mounted() ? clock().setZone('Europe/London').toFormat('HH:mm') : '--:--'
+    mounted() ? clock().setZone('Europe/London').toLocaleString(DateTime.TIME_SIMPLE) : '--:--'
   /** Between the schedule's first start and last end (so never on archive pages). */
   const isRunning = () =>
     mounted() &&
@@ -127,6 +135,8 @@ const useYogsScheduleHook = (
   return {
     mounted,
     toDateTime,
+    formatTime,
+    formatTimeStacked,
     now: clock,
     yogsTime,
     isRunning,

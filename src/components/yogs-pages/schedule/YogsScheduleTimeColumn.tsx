@@ -4,16 +4,17 @@ import {useNextJJStartDate} from "../../../lib/utils/jjDates.ts";
 import {cn, tileSurface} from "../../ui/cn";
 
 export const YogsScheduleTimeColumn: Component = () => {
-  const {times, toDateTime} = useYogsSchedule()
+  const {times, formatTimeStacked} = useYogsSchedule()
   return (
     <div class="data-width flex flex-col">
       <Timezone/>
       <For each={times()}>
         {({start, end}) => (
           <div class="yogs-cell time @container">
-            <div class={cn(tileSurface, 'flex size-full flex-col items-center justify-between py-[calc(var(--yogs-rem)*0.5)] text-[length:clamp(0.75rem,30cqi,var(--yogs-rem)*1.25)] leading-none')}>
-              <p>{toDateTime(start).toFormat('HH:mm')}</p>
-              <p class="text-fg-muted">{toDateTime(end).toFormat('HH:mm')}</p>
+            <div class={cn(tileSurface, 'flex size-full flex-col items-center justify-between py-(--radius-tile) text-center text-[length:clamp(0.75rem,36cqi,var(--yogs-rem)*1.25)] leading-none whitespace-pre-line')}>
+              <p>{formatTimeStacked(start)}</p>
+              {/* The line box has more empty space under the glyphs than above: evens out the visible top and bottom gaps */}
+              <p class="text-fg-muted -mb-[0.12em]">{formatTimeStacked(end)}</p>
             </div>
           </div>
         )}

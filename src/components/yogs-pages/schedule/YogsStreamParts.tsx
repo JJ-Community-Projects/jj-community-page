@@ -17,7 +17,7 @@ import { CREATOR_FALLBACK_COLOR } from '../creators/YogsCreatorChip.tsx'
  * false until the island is mounted (see YogsScheduleProvider).
  */
 export const useStreamState = (stream: () => YogsStream) => {
-  const { mounted, now, isRunning, toDateTime } = useYogsSchedule()
+  const { mounted, now, isRunning, toDateTime, formatTime } = useYogsSchedule()
 
   const start = () => DateTime.fromJSDate(stream().start)
   const end = () => DateTime.fromJSDate(stream().end)
@@ -49,7 +49,7 @@ export const useStreamState = (stream: () => YogsStream) => {
     [
       stream().title,
       stream().subtitle,
-      `${toDateTime(stream().start).toFormat('EEE d MMM, HH:mm')} – ${toDateTime(stream().end).toFormat('HH:mm')}`,
+      `${toDateTime(stream().start).toFormat('EEE d MMM')}, ${formatTime(stream().start)} – ${formatTime(stream().end)}`,
       isLive() && 'live now',
     ]
       .filter(Boolean)

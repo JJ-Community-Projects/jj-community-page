@@ -34,13 +34,12 @@ export const MobileYogsStreamTile: Component<MobileScheduleBodyProps> = (
   props,
 ) => {
   const stream = () => props.stream
-  const { toDateTime } = useYogsSchedule()
+  const { formatTimeStacked: time } = useYogsSchedule()
   const { isLive, showCountdown, ended, shortCountdown, label } =
     useStreamState(stream)
   const modal = createModalSignal()
 
   const color = () => stream().color
-  const time = (date: Date) => toDateTime(date).toFormat('HH:mm')
 
   return (
     <>
@@ -60,7 +59,7 @@ export const MobileYogsStreamTile: Component<MobileScheduleBodyProps> = (
       >
         <span
           class={cn(
-            'flex w-14 shrink-0 flex-col items-center justify-center gap-0.5 px-1 py-2 leading-tight tabular-nums',
+            'flex w-14 shrink-0 flex-col items-center justify-center gap-0.5 px-1 py-2 text-center leading-tight tabular-nums whitespace-pre',
             dataFill,
           )}
           style={dataColors(color())}
