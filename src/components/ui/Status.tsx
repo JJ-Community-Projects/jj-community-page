@@ -7,30 +7,21 @@ import {
 } from 'solid-js'
 import { Dynamic } from 'solid-js/web'
 import {
-  FaSolidCircleCheck,
+  FaSolidCheck,
   FaSolidCircleExclamation,
-  FaSolidCircleInfo,
   FaSolidTriangleExclamation,
 } from 'solid-icons/fa'
 import { cn } from './cn'
 
+// Only the icon carries the tone; an info alert is a plain note without one
 const alertTones = {
-  info: {
-    box: 'bg-accent-50 text-accent-800 ring-accent-200 dark:bg-accent/15 dark:text-accent-200 dark:ring-accent/40',
-    icon: FaSolidCircleInfo,
-  },
-  success: {
-    box: 'bg-success-50 text-success-800 ring-success-200 dark:bg-success/15 dark:text-success-200 dark:ring-success/40',
-    icon: FaSolidCircleCheck,
-  },
+  info: { icon: null, iconColor: '' },
+  success: { icon: FaSolidCheck, iconColor: 'text-success-text' },
   warning: {
-    box: 'bg-warning-50 text-warning-900 ring-warning-200 dark:bg-warning/15 dark:text-warning-200 dark:ring-warning/40',
     icon: FaSolidTriangleExclamation,
+    iconColor: 'text-warning-700 dark:text-warning-300',
   },
-  danger: {
-    box: 'bg-danger-50 text-danger-800 ring-danger-200 dark:bg-danger/15 dark:text-danger-200 dark:ring-danger/40',
-    icon: FaSolidCircleExclamation,
-  },
+  danger: { icon: FaSolidCircleExclamation, iconColor: 'text-danger-text' },
 }
 
 type AlertProps = {
@@ -55,16 +46,19 @@ export const Alert: ParentComponent<AlertProps> = (props) => {
           : 'status')
       }
       class={cn(
-        'rounded-group flex items-start gap-2 p-3 text-sm ring-1',
-        tone().box,
+        'rounded-group bg-surface-2 text-fg flex items-start gap-2 p-3 text-sm',
         props.class,
       )}
     >
-      <Dynamic
-        component={tone().icon}
-        class="mt-0.5 size-4 shrink-0"
-        aria-hidden="true"
-      />
+      <Show when={tone().icon}>
+        {(icon) => (
+          <Dynamic
+            component={icon()}
+            class={cn('mt-0.5 size-4 shrink-0', tone().iconColor)}
+            aria-hidden="true"
+          />
+        )}
+      </Show>
       <div class="min-w-0 flex-1">
         <Show when={props.title}>
           <p class="font-semibold">{props.title}</p>
