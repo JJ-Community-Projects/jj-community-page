@@ -39,7 +39,7 @@ const LINKS: Record<
   discord: { label: 'Discord', icon: () => <FaBrandsDiscord />, brand: 'discord' },
   tiktok: { label: 'TikTok', icon: () => <FaBrandsTiktok />, brand: 'tiktok' },
   instagram: { label: 'Instagram', icon: () => <FaBrandsInstagram />, brand: 'instagram' },
-  twitter: { label: 'X', icon: () => <FaBrandsTwitter />, brand: 'twitter' },
+  twitter: { label: 'Twitter', icon: () => <FaBrandsTwitter />, brand: 'twitter' },
 }
 const LINK_ORDER = Object.keys(LINKS)
 
