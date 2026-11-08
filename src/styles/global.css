@@ -75,18 +75,6 @@
       height: 0;
     }
   }
-
-  /* Ad banner link (YogsSuggestionsAd) nudges right to draw the eye */
-  --animate-nudge-right: nudge-right 1.5s ease-in-out infinite;
-  @keyframes nudge-right {
-    0%,
-    100% {
-      transform: translateX(0);
-    }
-    50% {
-      transform: translateX(4px);
-    }
-  }
 }
 
 /*
