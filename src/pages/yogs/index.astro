@@ -238,7 +238,7 @@ const ogImage = preRenderdImageExists
       />
 
       {showSchedule && currentSchedule ? (
-        <div class="min-h-32 w-full">
+        <div id="schedule" class="min-h-32 w-full scroll-mt-3">
           <YogsSeasonSchedule
             schedule={compactYogsSchedule(currentSchedule)}
             client:load
@@ -273,7 +273,7 @@ const ogImage = preRenderdImageExists
       </Tile>
 
       {lastSchedule && (
-        <section class="flex w-full flex-col items-center gap-2">
+        <section id="schedule" class="flex w-full scroll-mt-3 flex-col items-center gap-2">
           <h2 class="text-on-canvas text-center text-xl font-bold">
             Jingle Jam {lastYear} Schedule
           </h2>
