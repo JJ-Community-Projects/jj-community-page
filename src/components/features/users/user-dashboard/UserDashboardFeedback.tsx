@@ -14,7 +14,7 @@ const links = [
     Icon: DiscordIcon,
   },
   {
-    href: 'https://bsky.app/profile/ostof.bsky.social',
+    href: 'https://bsky.app/profile/ostof.dev',
     label: 'Feedback on Bluesky',
     Icon: BskyIcon,
   },
