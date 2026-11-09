@@ -1,0 +1,129 @@
+---
+import { env } from 'cloudflare:workers'
+import { Button } from '../../ui/Button'
+
+const { user } = Astro.locals
+const isDeployed = env.ENVIRONMENT === 'PROD' || env.ENVIRONMENT === 'BETA'
+const showBanner = isDeployed && user?.tiltifySlug !== 'ostof'
+---
+
+{
+  showBanner && (
+    <>
+      <div
+        id="analytics-consent"
+        role="region"
+        aria-label="Analytics choice"
+        class="fixed inset-x-2 bottom-2 z-40 mx-auto hidden max-w-xl flex-wrap items-center gap-x-3 gap-y-2 rounded-tile bg-linear-to-b from-surface to-surface-2 p-3 text-fg shadow-tile ring-1 ring-line sm:right-4 sm:bottom-4 sm:left-auto"
+      >
+        <p class="min-w-0 flex-1 basis-60 text-sm text-fg-muted">
+          We'd like to use analytics, including cookies from Google Analytics, to see which pages
+          people use. Nothing runs unless you accept.{' '}
+          <a class="font-semibold text-fg underline" href="/privacy">Privacy</a>
+        </p>
+        <div class="flex items-center gap-2">
+          <Button id="analytics-consent-accept" size="sm" variant="secondary">Accept</Button>
+          <Button id="analytics-consent-decline" size="sm" variant="secondary">Decline</Button>
+        </div>
+      </div>
+
+      <script is:inline>
+        // In the browser because prerendered pages can't vary per visitor.
+        ;(() => {
+          const KEY = 'analytics-consent'
+          const AT_KEY = 'analytics-consent-at'
+          const MAX_AGE_MS = 365 * 24 * 60 * 60 * 1000
+          const banner = document.getElementById('analytics-consent')
+
+          const read = () => {
+            try {
+              const value = localStorage.getItem(KEY)
+              const age = Date.now() - Date.parse(localStorage.getItem(AT_KEY) ?? '')
+              return (value === 'granted' || value === 'denied') && age < MAX_AGE_MS ? value : null
+            } catch {
+              return null
+            }
+          }
+
+          const show = () => {
+            banner.classList.remove('hidden')
+            banner.classList.add('flex')
+            // Room to scroll the end of the page, the footer links, out from under the banner
+            document.body.style.paddingBottom = `${banner.offsetHeight + 16}px`
+          }
+
+          const hide = () => {
+            banner.classList.add('hidden')
+            banner.classList.remove('flex')
+            document.body.style.paddingBottom = ''
+          }
+
+          const clearGoogleCookies = () => {
+            const parts = location.hostname.split('.')
+            const domains = parts.map((_, i) => `; domain=${parts.slice(i).join('.')}`)
+            for (const cookie of document.cookie.split('; ')) {
+              const name = cookie.split('=')[0]
+              if (!name.startsWith('_ga')) continue
+              for (const domain of ['', ...domains]) {
+                document.cookie = `${name}=; Max-Age=0; path=/${domain}`
+              }
+            }
+          }
+
+          let consent = read()
+
+          const apply = (next) => {
+            const previous = consent
+            consent = next
+            hide()
+            if (next === 'granted') {
+              window.startCounterscale?.()
+              window.startGoogleAnalytics?.()
+              return
+            }
+            if (previous !== 'granted') return
+            clearGoogleCookies()
+            // A reload is the only way to stop a tracker that has already started
+            location.reload()
+          }
+
+          const choose = (next) => {
+            try {
+              localStorage.setItem(AT_KEY, new Date().toISOString())
+              localStorage.setItem(KEY, next)
+            } catch {
+              // Can't remember the choice, so nothing starts and a reload wouldn't help
+              hide()
+              return
+            }
+            apply(next)
+          }
+
+          if (consent === 'granted') {
+            window.startCounterscale?.()
+            window.startGoogleAnalytics?.()
+          }
+          if (consent === null) show()
+
+          document
+            .getElementById('analytics-consent-accept')
+            .addEventListener('click', () => choose('granted'))
+          document
+            .getElementById('analytics-consent-decline')
+            .addEventListener('click', () => choose('denied'))
+          // The footer link stays hidden where no banner is rendered (admin, local)
+          for (const link of document.querySelectorAll('[data-analytics-settings]')) {
+            link.classList.remove('hidden')
+            link.addEventListener('click', () => {
+              show()
+              document.getElementById('analytics-consent-accept').focus()
+            })
+          }
+          addEventListener('storage', (e) => {
+            if (e.key === KEY && e.newValue) apply(e.newValue)
+          })
+        })()
+      </script>
+    </>
+  )
+}

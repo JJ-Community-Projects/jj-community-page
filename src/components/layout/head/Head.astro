@@ -5,6 +5,7 @@ import YogsJsonLd from '../../yogs-pages/common/YogsJsonLd.astro'
 import type { JsonLd } from '../../../content/getJingleJamEventSeries.ts'
 import { canonicalUrl, SITE_URL } from '../../../lib/utils/canonical'
 import bebasUrl from '../../../fonts/BebasNeues/BebasNeue-Regular.woff2?url'
+import { env } from 'cloudflare:workers'
 
 export type OgProps = {
   title?: string
@@ -49,6 +50,11 @@ const og = propOg !== false && {
   imageWidth: propOg?.imageWidth ?? '1200',
   imageHeight: propOg?.imageHeight ?? '630',
 }
+
+const isProd = env.ENVIRONMENT === 'PROD'
+const { user } = Astro.locals
+const isAdmin = user?.tiltifySlug === 'ostof'
+const showAnalytics = isProd && !isAdmin
 ---
 
 <head>
@@ -81,15 +87,35 @@ const og = propOg !== false && {
       } catch {}
     }
   </script>
-  <GoogleAnalytics />
+  {showAnalytics && (
+    <>
+      <script is:inline>
+        // Only defines the loader: ConsentBanner.astro calls it once the visitor has accepted.
+        // The tracker finds its settings through this id.
+        window.startCounterscale = () => {
+          if (document.getElementById('counterscale-script')) return
+          const script = document.createElement('script')
+          script.id = 'counterscale-script'
+          script.dataset.siteId = 'jj-community-page'
+          script.src = 'https://analytics.ostof.dev/tracker.js'
+          document.head.appendChild(script)
+        }
+      </script>
+      <GoogleAnalytics />
+    </>
+  )}
   <link rel="sitemap" type="application/xml" href="/sitemap-index.xml" />
   {description && <meta name="description" content={description} />}
   {robots && <meta name="robots" content={robots} />}
-  {
-    preloadDisplayFont && (
-      <link rel="preload" href={bebasUrl} as="font" type="font/woff2" crossorigin />
-    )
-  }
+  {preloadDisplayFont && (
+    <link
+      rel="preload"
+      href={bebasUrl}
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+  )}
   <Fonts />
   <link rel="icon" type="image/svg+xml" href="/jj-favicon.svg" />
   <link rel="shortcut icon" href="/favicon.ico" />
@@ -99,25 +125,27 @@ const og = propOg !== false && {
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
   <link rel="manifest" href="/site.webmanifest" />
 
-  {
-    og && (
-      <>
-        <meta property="og:type" content="website" />
-        <meta property="og:site_name" content="Jingle Jam Community" />
-        <meta property="og:title" content={og.title} />
-        {og.description && <meta property="og:description" content={og.description} />}
-        <meta property="og:url" content={og.url} />
-        <meta property="og:image" content={og.image} />
-        <meta property="og:image:width" content={og.imageWidth} />
-        <meta property="og:image:height" content={og.imageHeight} />
+  {og && (
+    <>
+      <meta property="og:type" content="website" />
+      <meta property="og:site_name" content="Jingle Jam Community" />
+      <meta property="og:title" content={og.title} />
+      {og.description && (
+        <meta property="og:description" content={og.description} />
+      )}
+      <meta property="og:url" content={og.url} />
+      <meta property="og:image" content={og.image} />
+      <meta property="og:image:width" content={og.imageWidth} />
+      <meta property="og:image:height" content={og.imageHeight} />
 
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={og.title} />
-        {og.description && <meta name="twitter:description" content={og.description} />}
-        <meta name="twitter:image" content={og.image} />
-      </>
-    )
-  }
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:title" content={og.title} />
+      {og.description && (
+        <meta name="twitter:description" content={og.description} />
+      )}
+      <meta name="twitter:image" content={og.image} />
+    </>
+  )}
 
   {jsonLd && <YogsJsonLd data={jsonLd} />}
 

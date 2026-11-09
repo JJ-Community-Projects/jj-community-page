@@ -70,6 +70,7 @@ const SITEMAP_PAGES = {
   '/about': {},
   '/twitch-extension': {},
   '/is-the-collection-live': {},
+  '/privacy': {},
 }
 // Prerendered archive pages, one per visible schedule year.
 const SITEMAP_ARCHIVE = /^\/yogs\/archive\/(\d{4})$/

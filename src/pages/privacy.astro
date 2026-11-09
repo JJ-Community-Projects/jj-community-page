@@ -1,0 +1,85 @@
+---
+import PageShell from '../layouts/PageShell.astro'
+import { PageHeader } from '../components/ui/PageHeader'
+import { Tile } from '../components/ui/Tile'
+
+const link = 'font-medium underline'
+const heading = 'font-semibold'
+---
+
+<PageShell
+  title="Privacy - Jingle Jam Community"
+  description="What the Jingle Jam Community site collects, which analytics it uses, how long data is kept and how to change your choice."
+  canonical="https://jinglejam.ostof.dev/privacy"
+>
+  <div class="flex flex-col gap-3">
+    <PageHeader title="Privacy" />
+    <Tile>
+      <div class="flex max-w-prose flex-col gap-3 text-sm sm:text-base">
+        <p class="font-semibold">Last updated: November 2026</p>
+        <p>
+          jinglejam.ostof.dev is a community project run by Ostof. You can get in touch at
+          <a class={link} href="mailto:ostof13@gmail.com">ostof13@gmail.com</a>. The Twitch
+          extension has <a class={link} href="/twitch-extension/privacy">its own privacy policy</a>.
+        </p>
+
+        <h2 class={heading}>Your choice</h2>
+        <p>
+          A banner asks whether you accept analytics. The two tools below only run if you accept,
+          and declining turns both off. Your choice is kept in your browser for 12 months. You can
+          change it at any time with <strong>Analytics settings</strong> at the bottom of every
+          page.
+        </p>
+
+        <h2 class={heading}>Visit counter (Counterscale)</h2>
+        <p>
+          A self-hosted counter shows how the site is used, so it can be improved. It records the
+          page, the referring site, campaign tags in the link, your
+          country, and your browser and device type, including the browser's user agent. It sets no
+          cookies and doesn't store your IP address. To avoid counting the same visitor twice in a
+          day, it relies on your browser's cache. The data stays in the site's own Cloudflare
+          account and isn't shared for any other purpose. The dashboard shows the last 90 days, and
+          a longer-term copy may be kept in the same account.
+        </p>
+
+        <h2 class={heading}>Google Analytics</h2>
+        <p>
+          Google Analytics sets cookies named <code>_ga</code> and
+          <code>_ga_*</code>, configured to last about two hours, and records the pages you view,
+          how you reached them and some actions, such as opening a stream or exporting a schedule.
+          Advertising features are turned off. Google provides this service and may process the
+          data outside the UK and EU, including in the United States. Google keeps this data for no
+          longer than 14 months. If you withdraw your choice, the cookies are removed.
+        </p>
+
+        <h2 class={heading}>Logging in</h2>
+        <p>
+          If you log in, a <code>session</code> cookie keeps you logged in, and a
+          <code>tiltify_oauth_state</code> cookie protects the login and expires after 10 minutes.
+          Your account details are stored to run your profile and schedules. These are needed for
+          logging in, so they aren't part of the analytics choice.
+        </p>
+
+        <h2 class={heading}>Stored in your browser</h2>
+        <p>
+          The site uses your browser's local storage for your theme, schedule display settings,
+          dismissed banners and your analytics choice. This stays on your device.
+        </p>
+
+        <h2 class={heading}>Hosting</h2>
+        <p>
+          The site runs on Cloudflare, which handles every request, including your IP address, to
+          deliver and protect the site.
+        </p>
+
+        <h2 class={heading}>Your rights</h2>
+        <p>
+          You can ask for a copy of your data, or ask to have it corrected or deleted, by emailing
+          the address above. You can turn analytics off at any time with Analytics settings. In the UK you can complain to
+          the <a class={link} href="https://ico.org.uk/make-a-complaint/">Information Commissioner's
+          Office</a>, and in the EU to your national data protection authority.
+        </p>
+      </div>
+    </Tile>
+  </div>
+</PageShell>
