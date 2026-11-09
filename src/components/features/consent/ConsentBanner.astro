@@ -81,10 +81,8 @@ const showBanner = isDeployed && user?.tiltifySlug !== 'ostof'
               window.startGoogleAnalytics?.()
               return
             }
-            if (previous !== 'granted') return
-            clearGoogleCookies()
             // A reload is the only way to stop a tracker that has already started
-            location.reload()
+            if (previous === 'granted') location.reload()
           }
 
           const choose = (next) => {
@@ -103,6 +101,8 @@ const showBanner = isDeployed && user?.tiltifySlug !== 'ostof'
             window.startCounterscale?.()
             window.startGoogleAnalytics?.()
           }
+          // On load, not on withdrawal: Google writes its cookies again while the old page unloads
+          else clearGoogleCookies()
           if (consent === null) show()
 
           document
