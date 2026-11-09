@@ -47,7 +47,7 @@ const setTheme = (next: Theme) => {
   document.documentElement.dataset.theme = dark ? 'dark' : 'light'
 }
 
-/** Round icon button on the red canvas with a Light / Dark / System menu (desktop nav). */
+/** Labelled pill button on the red canvas with a Light / Dark / System menu (desktop nav). */
 export const ThemeMenu: Component = () => {
   onMount(() => setThemeSignal(readTheme()))
   const current = () => themes.find((t) => t.value === theme()) ?? themes[2]
@@ -56,10 +56,11 @@ export const ThemeMenu: Component = () => {
       <DropdownMenu.Trigger
         aria-label={`Theme: ${current().label}`}
         class={cn(
-          'text-on-canvas-muted hover:text-on-canvas flex size-8 items-center justify-center rounded-full transition-colors hover:bg-white/10',
+          'text-on-canvas-muted hover:text-on-canvas flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition-colors hover:bg-white/10',
           focusRing,
         )}
       >
+        Theme
         <Dynamic
           component={current().icon}
           class="size-3.5"
