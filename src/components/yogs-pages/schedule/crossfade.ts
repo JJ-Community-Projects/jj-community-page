@@ -1,7 +1,20 @@
 import { onCleanup } from 'solid-js'
 
-/** Wraps a week / day switch (`update`) in a crossfade. */
-export type Crossfade = (update: () => void) => void
+/** Wraps a week / day switch (`update`) in an animation. */
+export type SwitchTransition = (update: () => void) => void
+
+/** "Animate week switch" is off (ScheduleSettingsMenu). */
+export const transitionsOff = () =>
+  document.documentElement.dataset.yogsTransitions === 'off'
+
+/** Registers `transition` with the provider while the component lives. */
+export const useSwitchTransition = (
+  register: (transition?: SwitchTransition) => void,
+  transition: SwitchTransition,
+) => {
+  register(transition)
+  onCleanup(() => register(undefined))
+}
 
 const DURATION_MS = 250
 
@@ -12,15 +25,11 @@ interface CrossfadeOptions {
   fade?: string
 }
 
-/**
- * A frozen copy of the old content fades out on top while the new fades in. The element's parent
- * must be a `relative` wrapper around just the element.
- */
-export const useCrossfade = (
+/** A frozen copy of the old content fades out over the new. The parent must be a `relative` wrapper. */
+export const createCrossfade = (
   el: () => HTMLElement | undefined,
-  register: (crossfade?: Crossfade) => void,
   options: CrossfadeOptions = {},
-) => {
+): SwitchTransition => {
   let running: Animation[] = []
   let ghost: HTMLElement | undefined
 
@@ -31,11 +40,11 @@ export const useCrossfade = (
     ghost = undefined
   }
 
-  const crossfade: Crossfade = (update) => {
+  const crossfade: SwitchTransition = (update) => {
     finish()
     const target = el()
     const wrapper = target?.parentElement
-    if (!target || !wrapper) return update()
+    if (!target || !wrapper || transitionsOff()) return update()
 
     const copy = target.cloneNode(true) as HTMLElement
     copy.inert = true
@@ -51,7 +60,7 @@ export const useCrossfade = (
       for (const part of copy.querySelectorAll<HTMLElement>(options.keep)) {
         part.style.visibility = 'hidden'
       }
-      // Visible children of a hidden parent (the header's date) still fade out
+      // Children can be visible inside a hidden parent
       if (options.fade) {
         for (const part of copy.querySelectorAll<HTMLElement>(options.fade)) {
           part.style.visibility = 'visible'
@@ -75,9 +84,6 @@ export const useCrossfade = (
     void out.finished.then(finish, () => {})
   }
 
-  register(crossfade)
-  onCleanup(() => {
-    register(undefined)
-    finish()
-  })
+  onCleanup(finish)
+  return crossfade
 }

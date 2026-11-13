@@ -11,7 +11,7 @@ import { FilterDialog } from '../provider/ScheduleCreatorFilterButton.tsx'
 import { CalendarDialog } from '../provider/ScheduleCalendarExportButton.tsx'
 import { rangeFromData } from '../../../../lib/utils/rangeFromData.ts'
 import { DateDivider } from '../../../ui/Labels'
-import { useCrossfade } from '../crossfade.ts'
+import { createCrossfade, useSwitchTransition } from '../crossfade.ts'
 import type { YogsScheduleDay } from '../../../../lib/orpc/private/yogs/contract.ts'
 
 /** Gap between rows, in rem (`gap-2`) */
@@ -32,10 +32,10 @@ export const MobileYogsSchedule: Component = () => {
 }
 
 const MobileScheduleBody: Component = () => {
-  const { day, days, toDateTime, setDayCrossfade } = useYogsSchedule()
+  const { day, days, toDateTime, setDayTransition } = useYogsSchedule()
   const { isEmpty, isSlotPartOfFilter } = useCreatorFilter()
   let dayList: HTMLDivElement | undefined
-  useCrossfade(() => dayList, setDayCrossfade)
+  useSwitchTransition(setDayTransition, createCrossfade(() => dayList))
 
   // The day with the most rows, reserved so the page doesn't jump between days (a floor: rows
   // with a two-line title grow a little)

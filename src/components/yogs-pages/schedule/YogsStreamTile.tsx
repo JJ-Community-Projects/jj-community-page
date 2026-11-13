@@ -152,6 +152,7 @@ export const YogsStreamTile: Component<YogsStreamTileProps> = (props) => {
           </Show>
           <div
             ref={content}
+            data-slot-text
             class={cn(
               'flex min-h-0 w-full flex-1 flex-col items-center justify-center gap-0',
               // Keeps the text below the VOD icons; fitText shrinks it into the rest

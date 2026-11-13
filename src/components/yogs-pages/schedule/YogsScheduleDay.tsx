@@ -40,8 +40,11 @@ const ScheduleDayHeader: Component<ScheduleDayHeaderProps> = (props) => {
         )}
         aria-current={today() ? 'date' : undefined}
       >
+        {/* In parts for the week switch (slotMorph.ts) */}
         <p class="text-[length:clamp(1rem,13cqi,var(--yogs-rem)*1.625)] leading-none tracking-wider">
-          {toDateTime(start()).toFormat("EEE',' MMM d")}
+          <span data-date-part="weekday">{toDateTime(start()).toFormat("EEE','")}</span>{' '}
+          <span data-date-part="month">{toDateTime(start()).toFormat('MMM')}</span>{' '}
+          <span data-date-part="day">{toDateTime(start()).toFormat('d')}</span>
         </p>
         <Show when={today()}>
           <span class="bg-accent size-[calc(var(--yogs-rem)*0.375)] shrink-0 rounded-full" aria-hidden="true" />

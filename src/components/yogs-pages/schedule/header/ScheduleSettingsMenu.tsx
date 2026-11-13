@@ -12,6 +12,7 @@ const settings = [
   { key: 'yogs-bg', label: 'Show background' },
   { key: 'yogs-motion', label: 'Animate background' },
   { key: 'yogs-avatars', label: 'Show avatars' },
+  { key: 'yogs-transitions', label: 'Animate week switch' },
 ] as const
 
 type SettingKey = (typeof settings)[number]['key']
@@ -35,6 +36,7 @@ export const ScheduleSettingsMenu: Component<{ class?: string }> = (props) => {
     'yogs-bg': true,
     'yogs-motion': true,
     'yogs-avatars': true,
+    'yogs-transitions': true,
   })
 
   // Read after mount (the server knows no storage); also covers pages without Head.astro (embed)
@@ -43,6 +45,7 @@ export const ScheduleSettingsMenu: Component<{ class?: string }> = (props) => {
       'yogs-bg': isOn('yogs-bg'),
       'yogs-motion': isOn('yogs-motion'),
       'yogs-avatars': isOn('yogs-avatars'),
+      'yogs-transitions': isOn('yogs-transitions'),
     }
     setState(stored)
     for (const { key } of settings) apply(key, stored[key])

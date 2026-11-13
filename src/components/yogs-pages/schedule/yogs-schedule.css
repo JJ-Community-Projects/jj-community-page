@@ -348,3 +348,64 @@ html[data-yogs-avatars='off'] .yogs-grid .yogs-avatars {
     display: none;
   }
 }
+
+/* Week switch (slotMorph.ts): tile backgrounds stretch, their parts move unscaled */
+::view-transition-group(.yogs-slot),
+::view-transition-group(.yogs-slot-part) {
+  animation-duration: 300ms;
+  animation-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+::view-transition-group(.yogs-slot) {
+  border-radius: var(--yogs-slot-radius);
+  overflow: clip;
+}
+
+::view-transition-old(.yogs-slot),
+::view-transition-new(.yogs-slot) {
+  height: 100%;
+}
+
+::view-transition-old(.yogs-slot-part),
+::view-transition-new(.yogs-slot-part) {
+  width: 100%;
+  height: 100%;
+  object-fit: none;
+  overflow: visible;
+}
+
+/* Even crossfade, added up (plus-lighter) so it never dips */
+::view-transition-old(.yogs-slot-fade) {
+  animation: yogs-text-out 300ms ease-in-out both;
+}
+
+::view-transition-new(.yogs-slot-fade) {
+  animation: yogs-text-in 300ms ease-in-out both;
+}
+
+::view-transition-old(.yogs-slot-fade),
+::view-transition-new(.yogs-slot-fade) {
+  mix-blend-mode: plus-lighter;
+}
+
+@keyframes yogs-text-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes yogs-text-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* The tile's dimming, lost by parts captured alone */
+::view-transition-group(.yogs-slot-dimmed) {
+  opacity: 0.4;
+  filter: saturate(0);
+}
+
+::view-transition-group(.yogs-slot-ended) {
+  opacity: 0.8;
+}

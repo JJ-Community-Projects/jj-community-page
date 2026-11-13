@@ -5,7 +5,7 @@ import { useNextJJEndDate } from '../../../../lib/utils/jjDates.ts'
 import { createModalSignal } from '../../../../lib/createModalSignal.ts'
 import { useNow } from '../../../../lib/utils/useNow.ts'
 import { rangeFromData } from '../../../../lib/utils/rangeFromData.ts'
-import type { Crossfade } from '../crossfade.ts'
+import type { SwitchTransition } from '../crossfade.ts'
 
 const useYogsScheduleHook = (
   schedule: YogsSchedule,
@@ -20,15 +20,15 @@ const useYogsScheduleHook = (
   const numberOfWeeks = () => schedule.weeks.length
   const numberOfDays = () =>
     schedule.weeks.reduce((acc, week) => acc + week.days.length, 0)
-  // Registered by the week grid / mobile day list to wrap a switch in a crossfade
-  let weekCrossfade: Crossfade | undefined
-  let dayCrossfade: Crossfade | undefined
-  const setWeekCrossfade = (crossfade?: Crossfade) => (weekCrossfade = crossfade)
-  const setDayCrossfade = (crossfade?: Crossfade) => (dayCrossfade = crossfade)
+  // Registered by the week grid / mobile day list to animate a switch
+  let weekTransition: SwitchTransition | undefined
+  let dayTransition: SwitchTransition | undefined
+  const setWeekTransition = (t?: SwitchTransition) => (weekTransition = t)
+  const setDayTransition = (t?: SwitchTransition) => (dayTransition = t)
   const moveWeek = (update: () => void) =>
-    weekCrossfade ? weekCrossfade(update) : update()
+    weekTransition ? weekTransition(update) : update()
   const moveDay = (update: () => void) =>
-    dayCrossfade ? dayCrossfade(update) : update()
+    dayTransition ? dayTransition(update) : update()
   const nextWeek = () =>
     moveWeek(() => setWeekIndex((prev) => (prev + 1) % numberOfWeeks()))
   const prevWeek = () =>
@@ -170,8 +170,8 @@ const useYogsScheduleHook = (
     nextWeek,
     prevWeek,
     weekIndex,
-    setWeekCrossfade,
-    setDayCrossfade,
+    setWeekTransition,
+    setDayTransition,
     numberOfWeeks,
     nextDay,
     prevDay,
