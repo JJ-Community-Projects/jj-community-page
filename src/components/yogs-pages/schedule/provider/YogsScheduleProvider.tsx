@@ -5,6 +5,7 @@ import { useNextJJEndDate } from '../../../../lib/utils/jjDates.ts'
 import { createModalSignal } from '../../../../lib/createModalSignal.ts'
 import { useNow } from '../../../../lib/utils/useNow.ts'
 import { rangeFromData } from '../../../../lib/utils/rangeFromData.ts'
+import type { Crossfade } from '../crossfade.ts'
 
 const useYogsScheduleHook = (
   schedule: YogsSchedule,
@@ -19,12 +20,27 @@ const useYogsScheduleHook = (
   const numberOfWeeks = () => schedule.weeks.length
   const numberOfDays = () =>
     schedule.weeks.reduce((acc, week) => acc + week.days.length, 0)
-  const nextWeek = () => setWeekIndex((prev) => (prev + 1) % numberOfWeeks())
+  // Registered by the week grid / mobile day list to wrap a switch in a crossfade
+  let weekCrossfade: Crossfade | undefined
+  let dayCrossfade: Crossfade | undefined
+  const setWeekCrossfade = (crossfade?: Crossfade) => (weekCrossfade = crossfade)
+  const setDayCrossfade = (crossfade?: Crossfade) => (dayCrossfade = crossfade)
+  const moveWeek = (update: () => void) =>
+    weekCrossfade ? weekCrossfade(update) : update()
+  const moveDay = (update: () => void) =>
+    dayCrossfade ? dayCrossfade(update) : update()
+  const nextWeek = () =>
+    moveWeek(() => setWeekIndex((prev) => (prev + 1) % numberOfWeeks()))
   const prevWeek = () =>
-    setWeekIndex((prev) => (prev - 1 + numberOfWeeks()) % numberOfWeeks())
-  const nextDay = () => setDayIndex((prev) => (prev + 1) % numberOfDays())
+    moveWeek(() =>
+      setWeekIndex((prev) => (prev - 1 + numberOfWeeks()) % numberOfWeeks()),
+    )
+  const nextDay = () =>
+    moveDay(() => setDayIndex((prev) => (prev + 1) % numberOfDays()))
   const prevDay = () =>
-    setDayIndex((prev) => (prev - 1 + numberOfDays()) % numberOfDays())
+    moveDay(() =>
+      setDayIndex((prev) => (prev - 1 + numberOfDays()) % numberOfDays()),
+    )
 
   const firstDay = DateTime.fromJSDate(days()[0].start, {
     zone: 'Europe/London',
@@ -127,7 +143,8 @@ const useYogsScheduleHook = (
   const todayIndex = () => days().findIndex((_, i) => isToday(dayStart(i)))
   const goToToday = () => {
     const i = todayIndex()
-    if (i >= 0) setDayIndex(i)
+    if (i < 0 || i === dayIndex()) return
+    moveDay(() => setDayIndex(i))
   }
 
   const filterModalSignal = createModalSignal()
@@ -153,6 +170,8 @@ const useYogsScheduleHook = (
     nextWeek,
     prevWeek,
     weekIndex,
+    setWeekCrossfade,
+    setDayCrossfade,
     numberOfWeeks,
     nextDay,
     prevDay,

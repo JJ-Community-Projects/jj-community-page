@@ -6,6 +6,7 @@ import { createModalSignal } from '../../../../lib/createModalSignal.ts'
 import { useYogsSchedule } from '../provider/YogsScheduleProvider.tsx'
 import {
   CreatorStack,
+  livePop,
   useStreamState,
   VodIcons,
 } from '../YogsStreamParts.tsx'
@@ -35,7 +36,7 @@ export const MobileYogsStreamTile: Component<MobileScheduleBodyProps> = (
 ) => {
   const stream = () => props.stream
   const { formatTimeStacked: time } = useYogsSchedule()
-  const { isLive, showCountdown, ended, shortCountdown, label } =
+  const { isLive, wentLive, showCountdown, ended, shortCountdown, label } =
     useStreamState(stream)
   const modal = createModalSignal()
 
@@ -48,7 +49,7 @@ export const MobileYogsStreamTile: Component<MobileScheduleBodyProps> = (
         class={cn(
           tileSurface,
           focusRing,
-          'flex min-h-14 w-full overflow-hidden text-left transition-[box-shadow,opacity] duration-200 hover:shadow-tile-hover focus-visible:outline-white',
+          'flex min-h-14 w-full overflow-hidden text-left transition-[box-shadow,opacity,scale] duration-200 hover:shadow-tile-hover active:scale-[0.98] focus-visible:outline-white',
           ended() && 'opacity-80',
         )}
         aria-label={label()}
@@ -67,13 +68,16 @@ export const MobileYogsStreamTile: Component<MobileScheduleBodyProps> = (
           <span class="text-xs font-bold">{time(stream().start)}</span>
           {/* Inverted colours so the label stands out inside the block */}
           <Show when={isLive()}>
-            <span
-              class={cn(
-                'text-xxs animate-pulse rounded-full px-1.5 font-bold tracking-wide uppercase motion-reduce:animate-none',
-                dataFillInverted,
-              )}
-            >
-              Live
+            {/* On a wrapper, so the pop doesn't replace the pulse */}
+            <span class={cn('inline-flex', wentLive() && livePop)}>
+              <span
+                class={cn(
+                  'text-xxs animate-pulse rounded-full px-1.5 font-bold tracking-wide uppercase motion-reduce:animate-none',
+                  dataFillInverted,
+                )}
+              >
+                Live
+              </span>
             </span>
           </Show>
           <Show when={stream().size > 1}>

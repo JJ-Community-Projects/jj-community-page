@@ -52,12 +52,13 @@ export const Dialog: Component<DialogProps> = (props) => {
   return (
     <KDialog open={props.open} onOpenChange={props.onOpenChange}>
       <KDialog.Portal>
-        <KDialog.Overlay class="fixed inset-0 z-50 bg-black/50" />
+        <KDialog.Overlay class="data-expanded:animate-fade-in data-closed:animate-fade-out fixed inset-0 z-50 bg-black/50" />
         <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
           <KDialog.Content
             onCloseAutoFocus={returnFocus}
             class={cn(
               'rounded-tile bg-surface-strong text-fg shadow-tile-hover flex max-h-[calc(100dvh-2rem)] w-full flex-col overflow-hidden',
+              'motion-safe:data-expanded:animate-dialog-in motion-safe:data-closed:animate-dialog-out motion-reduce:data-expanded:animate-fade-in motion-reduce:data-closed:animate-fade-out',
               sizes[props.size ?? 'md'],
               props.accent && ['border-2', dataBorder],
             )}

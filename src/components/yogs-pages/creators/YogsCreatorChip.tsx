@@ -1,4 +1,4 @@
-import { type Component } from 'solid-js'
+import { type Component, type JSX } from 'solid-js'
 import type { YogsCreator } from '../../../lib/orpc/private/yogs/contract.ts'
 import { Avatar } from '../../ui/Avatar'
 import { cn, focusRing } from '../../ui/cn'
@@ -10,6 +10,7 @@ interface YogsCreatorChipProps {
   creator: YogsCreator
   onClick: () => void
   class?: string
+  style?: JSX.CSSProperties
 }
 
 /** A creator as a white chip; the creator's colour survives as the avatar ring (D3). */
@@ -21,6 +22,7 @@ export const YogsCreatorChip: Component<YogsCreatorChipProps> = (props) => (
       focusRing,
       props.class,
     )}
+    style={props.style}
     onClick={() => props.onClick()}
   >
     <Avatar

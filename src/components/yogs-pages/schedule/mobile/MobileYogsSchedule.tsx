@@ -11,6 +11,7 @@ import { FilterDialog } from '../provider/ScheduleCreatorFilterButton.tsx'
 import { CalendarDialog } from '../provider/ScheduleCalendarExportButton.tsx'
 import { rangeFromData } from '../../../../lib/utils/rangeFromData.ts'
 import { DateDivider } from '../../../ui/Labels'
+import { useCrossfade } from '../crossfade.ts'
 import type { YogsScheduleDay } from '../../../../lib/orpc/private/yogs/contract.ts'
 
 /** Gap between rows, in rem (`gap-2`) */
@@ -31,8 +32,10 @@ export const MobileYogsSchedule: Component = () => {
 }
 
 const MobileScheduleBody: Component = () => {
-  const { day, days, toDateTime } = useYogsSchedule()
+  const { day, days, toDateTime, setDayCrossfade } = useYogsSchedule()
   const { isEmpty, isSlotPartOfFilter } = useCreatorFilter()
+  let dayList: HTMLDivElement | undefined
+  useCrossfade(() => dayList, setDayCrossfade)
 
   // The day with the most rows, reserved so the page doesn't jump between days (a floor: rows
   // with a two-line title grow a little)
@@ -53,10 +56,12 @@ const MobileScheduleBody: Component = () => {
     <Show
       when={!isEmpty()}
       fallback={
-        <div class="flex flex-col gap-2" style={{ 'min-height': reservedHeight() }}>
-          <For each={day().streams}>
-            {(stream) => <MobileYogsStreamTile stream={stream} />}
-          </For>
+        <div class="relative">
+          <div ref={dayList} class="flex flex-col gap-2" style={{ 'min-height': reservedHeight() }}>
+            <For each={day().streams}>
+              {(stream) => <MobileYogsStreamTile stream={stream} />}
+            </For>
+          </div>
         </div>
       }
     >

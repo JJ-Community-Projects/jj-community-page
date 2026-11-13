@@ -51,11 +51,13 @@ export const YogsAndFriends: Component<YogsAndFriendsProps> = (props) => {
           <Tile>
             {/* At least 11rem per chip, so names like "The Longest Johns" fit */}
             <div class="grid grid-cols-2 gap-2 sm:grid-cols-[repeat(auto-fill,minmax(11rem,1fr))]">
+              {/* Staggered chip entrance, capped at 240ms */}
               <For each={creators()}>
-                {(creator) => (
+                {(creator, i) => (
                   <YogsCreatorChip
                     creator={creator}
-                    class="w-full"
+                    class="w-full in-data-expanded:motion-safe:animate-chip-in"
+                    style={{ 'animation-delay': `${Math.min(i() * 12, 240)}ms` }}
                     onClick={() => open(creator)}
                   />
                 )}

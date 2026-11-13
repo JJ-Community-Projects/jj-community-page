@@ -73,7 +73,7 @@ export const ScheduleSettingsMenu: Component<{ class?: string }> = (props) => {
         <FaSolidGear class="size-(--yogs-rem)" aria-hidden="true" />
       </DropdownMenu.Trigger>
       <DropdownMenu.Portal>
-        <DropdownMenu.Content class="rounded-group bg-surface-strong shadow-tile-hover ring-line z-50 min-w-44 p-1 font-sans ring-1 outline-none">
+        <DropdownMenu.Content class="rounded-group bg-surface-strong shadow-tile-hover ring-line z-50 min-w-44 origin-(--kb-menu-content-transform-origin) p-1 font-sans ring-1 outline-none motion-safe:data-expanded:animate-menu-in motion-reduce:data-expanded:animate-fade-in data-closed:animate-menu-out">
           <For each={settings}>
             {(setting) => (
               <DropdownMenu.CheckboxItem

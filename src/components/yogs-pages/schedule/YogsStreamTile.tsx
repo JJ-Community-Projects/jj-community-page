@@ -17,6 +17,7 @@ import {
   CountdownChip,
   CreatorStack,
   LiveRing,
+  livePop,
   useStreamState,
   VodIcons,
 } from './YogsStreamParts.tsx'
@@ -96,7 +97,7 @@ export const YogsStreamTile: Component<YogsStreamTileProps> = (props) => {
   const modal = createModalSignal()
 
   const { isSlotPartOfFilter } = useCreatorFilter()
-  const { isLive, showCountdown, ended, countdown, label } = useStreamState(
+  const { isLive, wentLive, showCountdown, ended, countdown, label } = useStreamState(
     () => props.stream,
   )
 
@@ -131,7 +132,7 @@ export const YogsStreamTile: Component<YogsStreamTileProps> = (props) => {
           type="button"
           class={cn(
             'rounded-tile relative flex size-full flex-col items-center justify-center overflow-hidden p-[calc(var(--yogs-rem)*0.25)] text-center @container',
-            'hover:shadow-tile-hover transition-[filter,box-shadow,opacity] duration-200 hover:brightness-105',
+            'hover:shadow-tile-hover transition-[filter,box-shadow,opacity,scale] duration-200 hover:brightness-105 active:scale-[0.98]',
             // White on the canvas reads better than accent next to the data colours; focus undims
             focusRing,
             'focus-visible:outline-white',
@@ -158,7 +159,9 @@ export const YogsStreamTile: Component<YogsStreamTileProps> = (props) => {
             )}
           >
             <Show when={isLive() && tileSize() > 1}>
-              <LiveBadge class={liveBadgeSize} />
+              <LiveBadge
+                class={cn(liveBadgeSize, wentLive() && livePop)}
+              />
             </Show>
             {/* After the size class: cn drops a leading-* that comes before a text size */}
             <p

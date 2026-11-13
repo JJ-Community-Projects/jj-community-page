@@ -37,7 +37,7 @@ interface FilterIconButtonProps {
 
 // Hovered, the button takes the rest of the row while its label slides open next to the icon. The row
 // is ~85px free at 1280, so the label is text-xs below 2xl and ends in an ellipsis where even that is too wide.
-const expandButton = 'group overflow-hidden transition-[flex-grow,background-color] duration-200 hover:grow focus-visible:grow 2xl:px-[calc(var(--yogs-rem,1rem)*0.25)]'
+const expandButton = 'group overflow-hidden transition-[flex-grow,background-color,scale] duration-200 hover:grow focus-visible:grow 2xl:px-[calc(var(--yogs-rem,1rem)*0.25)]'
 const expandLabel = 'max-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-[length:calc(var(--yogs-rem,1rem)*0.75)]/[1.333] opacity-0 transition-[max-width,margin,opacity] duration-200 2xl:text-[length:calc(var(--yogs-rem,1rem)*0.875)]/[1.429] group-hover:ml-[calc(var(--yogs-rem,1rem)*0.25)] group-hover:max-w-[calc(var(--yogs-rem,1rem)*6)] group-hover:opacity-100 group-focus-visible:ml-[calc(var(--yogs-rem,1rem)*0.25)] group-focus-visible:max-w-[calc(var(--yogs-rem,1rem)*6)] group-focus-visible:opacity-100 2xl:group-hover:ml-[calc(var(--yogs-rem,1rem)*0.375)] 2xl:group-focus-visible:ml-[calc(var(--yogs-rem,1rem)*0.375)]'
 
 /** The button's label for `expand`; hidden from screen readers, the aria-label already says it. */

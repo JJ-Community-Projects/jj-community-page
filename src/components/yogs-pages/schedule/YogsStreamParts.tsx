@@ -1,4 +1,4 @@
-import { type Component, For, Show } from 'solid-js'
+import { type Component, createMemo, For, Show } from 'solid-js'
 import { DateTime } from 'luxon'
 import { BiLogosTwitch, BiLogosYoutube } from 'solid-icons/bi'
 import { isColorLight } from '../../../lib/utils/textColors.ts'
@@ -24,6 +24,11 @@ export const useStreamState = (stream: () => YogsStream) => {
   const isLive = () => mounted() && start() < now() && end() > now()
   const showCountdown = () =>
     mounted() && YogsStreamUtils.isBefore(stream(), now())
+  const liveOnArrival = createMemo<boolean | undefined>(
+    (prev) => prev ?? (mounted() ? isLive() : undefined),
+  )
+  /** Went live while the page was open (not on arrival). */
+  const wentLive = () => isLive() && liveOnArrival() === false
   /** Ended while the schedule is running (so never on archive pages). */
   const ended = () => isRunning() && end() < now()
 
@@ -55,8 +60,20 @@ export const useStreamState = (stream: () => YogsStream) => {
       .filter(Boolean)
       .join(', ')
 
-  return { isLive, showCountdown, ended, countdown, shortCountdown, label }
+  return {
+    isLive,
+    wentLive,
+    showCountdown,
+    ended,
+    countdown,
+    shortCountdown,
+    label,
+  }
 }
+
+/** Pops the live badge in when `wentLive`. */
+export const livePop =
+  'motion-safe:animate-live-pop motion-reduce:animate-fade-in'
 
 /** The countdown as a chip, readable on light and dark stream colours. */
 export const CountdownChip: Component<{

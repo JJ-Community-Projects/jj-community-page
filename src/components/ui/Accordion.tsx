@@ -13,6 +13,14 @@ export const Accordion = KAccordion
 export const accordionContentMotion =
   '-m-1 overflow-hidden p-1 motion-safe:data-closed:animate-accordion-up motion-safe:data-expanded:animate-accordion-down'
 
+/** Expand for `forceMount` content (Kobalte measures its height only at mount): grid rows 0fr → 1fr. */
+const forceMountMotion = {
+  content:
+    'grid grid-rows-[1fr] transition-[grid-template-rows,margin-top,visibility] duration-200 ease-(--ease-out-strong) data-closed:invisible data-closed:-mt-2 data-closed:grid-rows-[0fr] motion-reduce:transition-[visibility]',
+  inner:
+    '-m-1 min-h-0 overflow-hidden p-1 transition-opacity duration-200 ease-(--ease-out-strong) group-data-closed/content:opacity-0',
+}
+
 /** One accordion row: a tile-styled trigger; the content below picks its own surface. */
 export const AccordionItem: ParentComponent<{
   value: string
@@ -48,17 +56,23 @@ export const AccordionItem: ParentComponent<{
             <span class="flex shrink-0 items-center gap-2">{summary()}</span>
           </Show>
           <FaSolidChevronDown
-            class="text-fg-muted size-3.5 shrink-0 transition-transform group-data-expanded:rotate-180"
+            class="text-fg-muted size-3.5 shrink-0 transition-transform duration-200 ease-(--ease-out-strong) group-data-expanded:rotate-180"
             aria-hidden="true"
           />
         </KAccordion.Trigger>
       </KAccordion.Header>
-      {/* Always-mounted content just hides when closed; the rest slides */}
-      <KAccordion.Content
-        class={props.forceMount ? 'data-closed:hidden' : accordionContentMotion}
+      <Show
+        when={props.forceMount}
+        fallback={
+          <KAccordion.Content class={accordionContentMotion}>
+            {props.children}
+          </KAccordion.Content>
+        }
       >
-        {props.children}
-      </KAccordion.Content>
+        <KAccordion.Content class={cn('group/content', forceMountMotion.content)}>
+          <div class={forceMountMotion.inner}>{props.children}</div>
+        </KAccordion.Content>
+      </Show>
     </KAccordion.Item>
   )
 }
