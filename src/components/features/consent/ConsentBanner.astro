@@ -17,12 +17,12 @@ const showBanner = isDeployed && user?.tiltifySlug !== 'ostof'
         class="fixed inset-x-2 bottom-2 z-40 mx-auto hidden max-w-xl flex-wrap items-center gap-x-3 gap-y-2 rounded-tile bg-linear-to-b from-surface to-surface-2 p-3 text-fg shadow-tile ring-1 ring-line sm:right-4 sm:bottom-4 sm:left-auto"
       >
         <p class="min-w-0 flex-1 basis-60 text-sm text-fg-muted">
-          We'd like to use analytics, including cookies from Google Analytics, to see which pages
-          people use. Nothing runs unless you accept.{' '}
+          Help us make the site better. We'd like to use Google Analytics (with cookies) and our own
+          visit counter to see which pages people use and how they find us. No ads, and we never share your data. Nothing runs unless you accept.{' '}
           <a class="font-semibold text-fg underline" href="/privacy">Privacy</a>
         </p>
         <div class="flex items-center gap-2">
-          <Button id="analytics-consent-accept" size="sm" variant="secondary">Accept</Button>
+          <Button id="analytics-consent-accept" size="sm" variant="accent">Accept</Button>
           <Button id="analytics-consent-decline" size="sm" variant="secondary">Decline</Button>
         </div>
       </div>
