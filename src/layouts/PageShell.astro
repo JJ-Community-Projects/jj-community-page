@@ -39,7 +39,7 @@ const { width = 'content', nav = 'main', fillViewport = false, ...head } = Astro
       class="fixed inset-0 -z-10 bg-linear-to-br from-canvas-edge via-canvas to-canvas-edge"
     >
     </div>
-    <div class="flex min-h-dvh flex-col">
+    <div class="page-frame flex min-h-dvh flex-col">
       <SiteHeader nav={nav} />
       {nav === 'main' && <FeedbackBanner />}
       <main

@@ -28,13 +28,11 @@
 .yogs-grid,
 .yogs-frame {
   --yogs-pad: 0.5rem;
-  /* 100vw leaves out the scrollbar while html scrolls, but takes it back under a dialog's scroll lock,
-     which sets --scrollbar-width while it lasts: subtract it so the grid doesn't grow behind dialogs */
-  --yogs-vw: calc(100vw - var(--scrollbar-width, 0px));
-  /* No taller than the viewport, so the snapped panel shows the whole week */
+  /* No taller than the viewport, so the snapped panel shows the whole week. --page-w, not 100vw, so
+     the grid doesn't change size behind dialogs (global.css) */
   --yogs-unit: min(
     (
-        min(100cqi, var(--yogs-vw) * 0.8, max(1600px, var(--yogs-vw) * 0.6)) -
+        min(100cqi, var(--page-w) * 0.8, max(1600px, var(--page-w) * 0.6)) -
           2 * var(--yogs-pad)
       ) /
       22,
@@ -350,7 +348,7 @@ html[data-yogs-avatars='off'] .yogs-grid .yogs-avatars {
 }
 
 /* Week switch (slotMorph.ts): tiles crossfade in place; one that changes size stretches, and its
-   text moves unscaled */
+   text and VOD icons (both .yogs-slot-text) move unscaled */
 
 /* The tiles' corner, set on <html> for each switch. Not inherited (the pseudo-elements ask for it),
    or setting it would recalculate the style of every element on the page */

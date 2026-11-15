@@ -4,9 +4,10 @@ import { type SwitchTransition, transitionsOff } from './crossfade.ts'
 interface Slot {
   tile: HTMLElement
   text: HTMLElement | null
+  vods: HTMLElement | null
   /** Day column and start row. */
   key: string
-  /** Not a `steady` slot: the text gets a name of its own. */
+  /** Not a `steady` slot: the text and the VOD icons get names of their own. */
   split: boolean
   width: number
   height: number
@@ -65,12 +66,14 @@ export const createSlotMorph = (
         const tile = cell.querySelector<HTMLElement>(':scope > button')
         if (!tile) continue
         const text = tile.querySelector<HTMLElement>('[data-slot-text]')
+        const vods = tile.querySelector<HTMLElement>('.yogs-vods')
         const split = !steady.has(`${slot}-${size}`)
         const box = tile.getBoundingClientRect()
         const textBox = split ? text?.getBoundingClientRect() : undefined
         slots.push({
           tile,
           text,
+          vods,
           key: `yogs-slot-${slot}`,
           split,
           width: box.width,
@@ -93,9 +96,9 @@ export const createSlotMorph = (
   }
 
   // Each name is one more snapshot, so there are as few as it takes. Where the tile stretches, comes
-  // or goes (not a steady slot), the text gets its own: it moves unscaled and fades evenly. Its classes
-  // carry the old and the new tile's dimming, which it loses when captured alone. Everything else
-  // stays in the tile's snapshot (avatars and VOD icons always).
+  // or goes (not a steady slot), the text and the VOD icons get their own: they move unscaled and fade
+  // evenly. Their classes carry the old and the new tile's dimming, which they lose when captured
+  // alone. Everything else stays in the tile's snapshot (avatars always).
   //
   // The groups sit at their new place and size: the browser's own animation is off (yogs-schedule.css),
   // as it animates width and height, on the main thread. Returned are the moves of the parts that
@@ -104,7 +107,7 @@ export const createSlotMorph = (
   const name = (slots: Slot[], before?: Map<string, Slot>) => {
     const moves: Move[] = []
     for (const slot of slots) {
-      const { tile, text, key, split, width, height } = slot
+      const { tile, text, vods, key, split, width, height } = slot
       // Before the switch, a slot is its own old state
       const was = before ? before.get(key) : slot
       const x = was ? was.width / width : 1
@@ -117,17 +120,19 @@ export const createSlotMorph = (
         resized && (x > 1 || y > 1) && 'yogs-slot-unclipped',
       ])
       if (resized) moves.push({ name: key, from: `scale(${x}, ${y})` })
+      const dimming = [
+        !!slot.dimming && `yogs-slot-${slot.dimming}`,
+        !!was?.dimming && `yogs-slot-was-${was.dimming}`,
+      ]
+      // In the tile's top right corner, which stays put (same column, same start row): no move
+      if (vods) set(vods, split ? `${key}-vods` : '', split ? ['yogs-slot-text', ...dimming] : [])
       if (!text) continue
       // Tiles are reused by position in their column: an old name must not stay
       if (!split) {
         set(text, '', [])
         continue
       }
-      set(text, `${key}-text`, [
-        'yogs-slot-text',
-        !!slot.dimming && `yogs-slot-${slot.dimming}`,
-        !!was?.dimming && `yogs-slot-was-${was.dimming}`,
-      ])
+      set(text, `${key}-text`, ['yogs-slot-text', ...dimming])
       const shift = was?.split ? was.textCentre - slot.textCentre : 0
       if (Math.abs(shift) > 0.5) moves.push({ name: `${key}-text`, from: `translateY(${shift}px)` })
     }
@@ -148,7 +153,7 @@ export const createSlotMorph = (
   }
 
   const clear = (body: HTMLElement) => {
-    for (const part of body.querySelectorAll<HTMLElement>('.yogs-tile-cell > button, [data-slot-text]')) {
+    for (const part of body.querySelectorAll<HTMLElement>('.yogs-tile-cell > button, [data-slot-text], .yogs-vods')) {
       set(part, '', [])
     }
   }

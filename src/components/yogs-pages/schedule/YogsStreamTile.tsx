@@ -194,7 +194,7 @@ export const YogsStreamTile: Component<YogsStreamTileProps> = (props) => {
           <Show when={showVods()}>
             <VodIcons
               stream={props.stream}
-              class="absolute top-[calc(var(--yogs-rem)*0.25)] right-[calc(var(--yogs-rem)*0.375)]"
+              class="yogs-vods absolute top-[calc(var(--yogs-rem)*0.25)] right-[calc(var(--yogs-rem)*0.375)]"
             />
           </Show>
         </button>

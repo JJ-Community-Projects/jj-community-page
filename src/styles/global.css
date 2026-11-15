@@ -506,5 +506,26 @@
   }
 }
 
+/* --page-w: the page width without the scrollbar, for sizes that would otherwise use 100vw. 100vw counts
+   the scrollbar in Firefox and Safari but not in Chrome (html scrolls), and a dialog's scroll lock hides it
+   and pads <html> instead, so 100vw changes behind dialogs. The page's width doesn't: measure that on
+   PageShell's full-width wrapper (not <body>: containment there stops its background reaching the canvas
+   and hides the gradient). Registered, so 100cqi resolves on the wrapper's children and is inherited as a
+   length. */
+@property --page-w {
+  syntax: '<length>';
+  inherits: true;
+  initial-value: 100vw;
+}
+
+@layer base {
+  .page-frame {
+    container-type: inline-size;
+  }
+  .page-frame > * {
+    --page-w: 100cqi;
+  }
+}
+
 /* TODO(tw4-compat): v3 hover (also fires on tap on touch devices) */
 @custom-variant hover (&:hover);
