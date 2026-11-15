@@ -119,8 +119,13 @@ export const YogsStreamTile: Component<YogsStreamTileProps> = (props) => {
     onCleanup(() => observer.disconnect())
     void document.fonts.ready.then(() => fitText(content))
   })
-  // The live badge and the countdown chip take room too
-  createEffect(on([isLive, showCountdown], () => fitText(content), { defer: true }))
+  // The live badge and the countdown chip take room too; a week switch reuses the tile for another
+  // stream, and fitting right away puts the fitted text into the switch's new snapshot
+  createEffect(
+    on([isLive, showCountdown, title, subtitle, tileSize, showVods], () => fitText(content), {
+      defer: true,
+    }),
+  )
 
   return (
     <>

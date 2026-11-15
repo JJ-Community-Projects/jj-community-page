@@ -1,4 +1,4 @@
-import { type Component, For, Show } from 'solid-js'
+import { type Component, Index, Show } from 'solid-js'
 import { YogsStreamTile } from './YogsStreamTile.tsx'
 import type { YogsScheduleDay as Day } from '../../../lib/orpc/private/yogs/contract.ts'
 import { rangeFromData } from '../../../lib/utils/rangeFromData.ts'
@@ -13,9 +13,9 @@ export const YogsScheduleDay: Component<YogsScheduleDayProps> = (props) => {
   return (
     <div class="day-container flex flex-col">
       <ScheduleDayHeader day={props.day} />
-      <For each={props.day.streams}>
-        {(stream) => <YogsStreamTile stream={stream} />}
-      </For>
+      <Index each={props.day.streams}>
+        {(stream) => <YogsStreamTile stream={stream()} />}
+      </Index>
     </div>
   )
 }

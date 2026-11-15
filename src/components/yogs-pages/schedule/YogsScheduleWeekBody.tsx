@@ -1,4 +1,4 @@
-import {type Component, For} from "solid-js";
+import {type Component, Index} from "solid-js";
 import {useYogsSchedule} from "./provider/YogsScheduleProvider.tsx";
 import {YogsScheduleDay} from "./YogsScheduleDay.tsx";
 import {createCrossfade, useSwitchTransition} from "./crossfade.ts";
@@ -13,9 +13,10 @@ export const YogsScheduleWeekBody: Component = (props) => {
   return (
     <div class="relative">
       <div ref={body} class="flex flex-row">
-        <For each={week().days}>
-          {day => <YogsScheduleDay day={day}/>}
-        </For>
+        {/* By position: a week switch updates the columns and tiles instead of rebuilding them */}
+        <Index each={week().days}>
+          {day => <YogsScheduleDay day={day()}/>}
+        </Index>
       </div>
     </div>
   );

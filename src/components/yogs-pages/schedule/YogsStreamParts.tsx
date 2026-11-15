@@ -24,9 +24,15 @@ export const useStreamState = (stream: () => YogsStream) => {
   const isLive = () => mounted() && start() < now() && end() > now()
   const showCountdown = () =>
     mounted() && YogsStreamUtils.isBefore(stream(), now())
-  const liveOnArrival = createMemo<boolean | undefined>(
-    (prev) => prev ?? (mounted() ? isLive() : undefined),
-  )
+  // Per stream: a tile reused for another stream (week switch) arrives anew
+  let arrivedFor: YogsStream | undefined
+  const liveOnArrival = createMemo<boolean | undefined>((prev) => {
+    if (stream() !== arrivedFor) {
+      arrivedFor = stream()
+      prev = undefined
+    }
+    return prev ?? (mounted() ? isLive() : undefined)
+  })
   /** Went live while the page was open (not on arrival). */
   const wentLive = () => isLive() && liveOnArrival() === false
   /** Ended while the schedule is running (so never on archive pages). */
