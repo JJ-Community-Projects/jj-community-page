@@ -17,8 +17,9 @@ export const createSlotMorph = (
     el.style.setProperty('view-transition-class', on ? cls : '')
   }
 
-  // Named by column and offset (same start row, same offset). The parts get their own names to move
-  // unscaled; their class carries the tile's dimming, which they lose when captured alone.
+  // Named by column and offset (same start row, same offset). The text gets its own name to move
+  // unscaled; its class carries the tile's dimming, which it loses when captured alone. Avatars and
+  // VOD icons stay in the tile's snapshot: every named part is restyled on each frame.
   const name = (body: HTMLElement, on: boolean) => {
     body.querySelectorAll<HTMLElement>('.day-container').forEach((column, c) => {
       for (const tile of column.querySelectorAll<HTMLElement>('.yogs-tile-cell > button')) {
@@ -30,13 +31,6 @@ export const createSlotMorph = (
             : 'yogs-slot-part'
         set(tile, key, 'yogs-slot', on)
         set(tile.querySelector('[data-slot-text]'), `${key}-text`, `${part} yogs-slot-fade`, on)
-        set(tile.querySelector('.yogs-avatars'), `${key}-avatars`, `${part} yogs-slot-fade`, on)
-        // VodIcons
-        set(tile.querySelector(':scope > div.absolute'), `${key}-vods`, part, on)
-      }
-      // Unchanged parts ("Wed,", "Dec") only glide; the number crossfades
-      for (const date of column.querySelectorAll<HTMLElement>('.day [data-date-part]')) {
-        set(date, `yogs-day-${c}-${date.dataset.datePart}`, 'yogs-slot-part yogs-slot-fade', on)
       }
     })
   }
