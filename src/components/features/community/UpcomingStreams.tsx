@@ -1,7 +1,7 @@
 import { type Component, createSignal, For, Show } from 'solid-js'
 import { FaSolidCalendarWeek } from 'solid-icons/fa'
 import { useCommunityPage } from './CommunityPageProvider.tsx'
-import { UpcomingStreamRow } from '../schedules/common/StreamCard.tsx'
+import { StreamTimeRow } from '../schedules/common/StreamCard.tsx'
 import { Button } from '../../ui/Button'
 import { Alert, Spinner } from '../../ui/Status'
 import { Section } from '../../ui/Tile'
@@ -37,7 +37,7 @@ export const UpcomingStreams: Component = () => {
         <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
           <For each={visibleItems()}>
             {(item) => (
-              <UpcomingStreamRow stream={item.stream} user={item.owner} />
+              <StreamTimeRow stream={item.stream} user={item.owner} showDay />
             )}
           </For>
         </div>

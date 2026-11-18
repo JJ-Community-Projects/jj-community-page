@@ -197,10 +197,11 @@ export const UpcomingStreamRow: Component<
 /**
  * A stream inside a day list (public and community schedule), in the extension's slot layout: a time
  * block in the day colour with start and end (LIVE joins it while live), title and subline, then the
- * countdown and the owner's avatar on the right. Opens the stream's detail dialog.
+ * countdown and the owner's avatar on the right. Opens the stream's detail dialog. `showDay` adds the
+ * stream's day to the subline, for lists that span several days without day headings.
  */
 export const StreamTimeRow: Component<
-  ScheduleStreamCardProps & { class?: string }
+  ScheduleStreamCardProps & { class?: string; showDay?: boolean }
 > = (props) => {
   const { modal, showCountdown, isLive, countdown, highlightColor } =
     useScheduleStreamState(props.stream, props.streamColor)
@@ -208,8 +209,14 @@ export const StreamTimeRow: Component<
     DateTime.fromJSDate(date, { zone: 'utc' })
       .toLocal()
       .toLocaleString(DateTime.TIME_SIMPLE)
+  const day = () =>
+    DateTime.fromJSDate(props.stream.start, { zone: 'utc' })
+      .toLocal()
+      .toLocaleString({ weekday: 'short', month: 'short', day: 'numeric' })
   const subline = () =>
-    [props.user?.username, props.stream.subtitle].filter(Boolean).join(' · ')
+    [props.user?.username, props.showDay && day(), props.stream.subtitle]
+      .filter(Boolean)
+      .join(' · ')
 
   return (
     <>
