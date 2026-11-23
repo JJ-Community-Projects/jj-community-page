@@ -1,0 +1,58 @@
+---
+import '../../styles/global.css'
+import { IncentivesOverlay } from '../../components/features/overlay/incentives/IncentivesOverlay.tsx'
+import {
+  BG_PRESETS,
+  type BgPreset,
+} from '../../components/features/overlay/donationMatches/presets.ts'
+import {
+  ITEM_PARAM,
+  parseFlag,
+  parseItems,
+  parseOrder,
+  parseShowCount,
+} from '../../components/features/overlay/goals/goalItems.ts'
+import { serverClientPublic } from '../../lib/orpc/serverClient'
+
+const { data: contentHidden } = await serverClientPublic.overlays.visibility.getHidden(
+  {},
+  {
+    context: {
+      locals: Astro.locals,
+      request: Astro.request,
+    },
+  },
+)
+const HIDE_CONTENT = contentHidden ?? true
+
+const params = Astro.url.searchParams
+const themeParam = params.get('theme')
+const theme: BgPreset =
+  themeParam && themeParam in BG_PRESETS ? (themeParam as BgPreset) : 'red'
+const currency = (() => {
+  const v = (params.get('currency') ?? 'GBP').toUpperCase()
+  return v === 'USD' ? 'USD' : v === 'EUR' ? 'EUR' : 'GBP'
+})()
+const order = parseOrder(params.get('order'))
+const show = parseShowCount(params.get('show'))
+const itemBg = parseFlag(params.get('itemBg'), true)
+const title = (params.get('title') ?? '').slice(0, 40)
+const items = parseItems(params.getAll(ITEM_PARAM))
+---
+
+<div class="min-h-screen bg-transparent text-white">
+  {HIDE_CONTENT ? (
+    <p class="bg-black/70 p-4 text-center text-sm text-white/60">Overlay currently unavailable</p>
+  ) : (
+    <IncentivesOverlay
+      client:only="solid-js"
+      theme={theme}
+      currency={currency}
+      order={order}
+      show={show}
+      itemBg={itemBg}
+      title={title}
+      items={items}
+    />
+  )}
+</div>

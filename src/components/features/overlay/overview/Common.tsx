@@ -74,6 +74,8 @@ export type PreviewDataMode = 'test' | 'live'
 export const PreviewDataField: Component<{
   value: PreviewDataMode
   onChange: (v: PreviewDataMode) => void
+  /** Replaces the default help text about sample charities and fundraisers. */
+  help?: JSX.Element
 }> = (p) => (
   <div class="flex flex-col items-start gap-1 sm:col-span-2">
     <span class={fieldClass.label} aria-hidden="true">
@@ -90,8 +92,12 @@ export const PreviewDataField: Component<{
       onChange={(v) => p.onChange(v as PreviewDataMode)}
     />
     <p class={fieldClass.help}>
-      Example data is fake sample charities and fundraisers, shown only in this
-      preview. Your copied OBS link always shows live data.
+      {p.help ?? (
+        <>
+          Example data is fake sample charities and fundraisers, shown only in
+          this preview. Your copied OBS link always shows live data.
+        </>
+      )}
     </p>
   </div>
 )

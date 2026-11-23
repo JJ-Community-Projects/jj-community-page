@@ -14,6 +14,9 @@ const ticker: OverlayFormat = { obs: '1920×80', preview: { width: 1920, height:
 const formats = {
   charities2: panel,
   'donation-matches': { obs: '480×320', preview: { width: 480, height: 320 } },
+  // The configurator estimates the height from the items and options; the preview follows it
+  milestones: { obs: '400 × varies', preview: { width: 400, height: 450 } },
+  incentives: { obs: '400 × varies', preview: { width: 400, height: 450 } },
   schedule: panel,
   'team-schedule': panel,
   charities: ticker,
