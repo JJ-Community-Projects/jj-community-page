@@ -1,0 +1,12 @@
+---
+import PageShell from '../../../layouts/PageShell.astro'
+import { WheelSpinPage } from '../../../components/features/users/user-dashboard/wheel/WheelSpinPage'
+
+const { session } = Astro.locals
+if (session === null) {
+  return Astro.redirect('/')
+}
+---
+<PageShell>
+  <WheelSpinPage client:only="solid-js" />
+</PageShell>
