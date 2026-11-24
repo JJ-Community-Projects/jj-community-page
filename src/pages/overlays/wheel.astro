@@ -1,0 +1,43 @@
+---
+import '../../styles/global.css'
+import { WheelOverlay } from '../../components/features/overlay/wheel/WheelOverlay.tsx'
+import {
+  parseWheelItems,
+  parseWheelKey,
+  parseWheelTheme,
+  parseWheelUser,
+  WHEEL_ITEM_PARAM,
+} from '../../components/features/overlay/wheel/wheel.ts'
+import { serverClientPublic } from '../../lib/orpc/serverClient'
+
+const { data: contentHidden } = await serverClientPublic.overlays.visibility.getHidden(
+  {},
+  {
+    context: {
+      locals: Astro.locals,
+      request: Astro.request,
+    },
+  },
+)
+const HIDE_CONTENT = contentHidden ?? true
+
+const params = Astro.url.searchParams
+const items = parseWheelItems(params.getAll(WHEEL_ITEM_PARAM))
+const theme = parseWheelTheme(params.get('theme'))
+const user = parseWheelUser(params.get('user'))
+const wheelKey = parseWheelKey(params.get('key'))
+---
+
+<div class="min-h-screen bg-transparent text-white">
+  {HIDE_CONTENT ? (
+    <p class="bg-black/70 p-4 text-center text-sm text-white/60">Overlay currently unavailable</p>
+  ) : (
+    <WheelOverlay
+      client:only="solid-js"
+      items={items}
+      theme={theme}
+      user={user}
+      wheelKey={wheelKey}
+    />
+  )}
+</div>

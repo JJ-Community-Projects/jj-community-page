@@ -19,6 +19,7 @@ const formats = {
   incentives: { obs: '400 × varies', preview: { width: 400, height: 450 } },
   // Fits any size; the configurator picks the preview shape
   'charity-logos': { obs: 'any size', preview: { width: 450, height: 450 } },
+  wheel: { obs: '600×600', preview: { width: 600, height: 600 } },
   schedule: panel,
   'team-schedule': panel,
   charities: ticker,
