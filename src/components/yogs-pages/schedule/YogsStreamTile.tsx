@@ -97,7 +97,7 @@ export const YogsStreamTile: Component<YogsStreamTileProps> = (props) => {
   const modal = createModalSignal()
 
   const { isSlotPartOfFilter } = useCreatorFilter()
-  const { isLive, wentLive, showCountdown, ended, countdown, label } = useStreamState(
+  const { isLive, wentLive, showCountdown, ended, isTBA, countdown, label } = useStreamState(
     () => props.stream,
   )
 
@@ -133,11 +133,14 @@ export const YogsStreamTile: Component<YogsStreamTileProps> = (props) => {
         class="yogs-tile-cell"
         style={{ height: `calc(${tileSize()} * var(--yogs-unit))` }}
       >
+        {/* A TBA tile stays a <button> (slotMorph finds tiles by it), disabled: no hover, no dialog */}
         <button
           type="button"
+          disabled={isTBA()}
           class={cn(
             'rounded-tile relative flex size-full flex-col items-center justify-center overflow-hidden p-[calc(var(--yogs-rem)*0.25)] text-center @container',
-            'hover:shadow-tile-hover transition-[filter,box-shadow,opacity,scale] duration-200 hover:brightness-105 active:scale-[0.98]',
+            'transition-[filter,box-shadow,opacity,scale] duration-200',
+            !isTBA() && 'hover:shadow-tile-hover hover:brightness-105 active:scale-[0.98]',
             // White on the canvas reads better than accent next to the data colours; focus undims
             focusRing,
             'focus-visible:outline-white',
@@ -148,6 +151,7 @@ export const YogsStreamTile: Component<YogsStreamTileProps> = (props) => {
           style={dataColors(color())}
           aria-label={label()}
           onClick={() => {
+            if (isTBA()) return
             logSlotClick(stream())
             modal.open()
           }}
@@ -199,7 +203,9 @@ export const YogsStreamTile: Component<YogsStreamTileProps> = (props) => {
           </Show>
         </button>
       </div>
-      <YogsScheduleDetailDialog stream={props.stream} modalSignal={modal} />
+      <Show when={!isTBA()}>
+        <YogsScheduleDetailDialog stream={props.stream} modalSignal={modal} />
+      </Show>
     </>
   )
 }

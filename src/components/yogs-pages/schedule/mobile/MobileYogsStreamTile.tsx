@@ -36,7 +36,7 @@ export const MobileYogsStreamTile: Component<MobileScheduleBodyProps> = (
 ) => {
   const stream = () => props.stream
   const { formatTimeStacked: time } = useYogsSchedule()
-  const { isLive, wentLive, showCountdown, ended, shortCountdown, label } =
+  const { isLive, wentLive, showCountdown, ended, isTBA, shortCountdown, label } =
     useStreamState(stream)
   const modal = createModalSignal()
 
@@ -44,16 +44,20 @@ export const MobileYogsStreamTile: Component<MobileScheduleBodyProps> = (
 
   return (
     <>
+      {/* A TBA row is disabled: no hover, no dialog */}
       <button
         type="button"
+        disabled={isTBA()}
         class={cn(
           tileSurface,
           focusRing,
-          'flex min-h-14 w-full overflow-hidden text-left transition-[box-shadow,opacity,scale] duration-200 hover:shadow-tile-hover active:scale-[0.98] focus-visible:outline-white',
+          'flex min-h-14 w-full overflow-hidden text-left transition-[box-shadow,opacity,scale] duration-200 focus-visible:outline-white',
+          !isTBA() && 'hover:shadow-tile-hover active:scale-[0.98]',
           ended() && 'opacity-80',
         )}
         aria-label={label()}
         onClick={() => {
+          if (isTBA()) return
           logSlotClick(stream())
           modal.open()
         }}
@@ -113,7 +117,9 @@ export const MobileYogsStreamTile: Component<MobileScheduleBodyProps> = (
           </Show>
         </span>
       </button>
-      <YogsScheduleDetailDialog stream={props.stream} modalSignal={modal} />
+      <Show when={!isTBA()}>
+        <YogsScheduleDetailDialog stream={props.stream} modalSignal={modal} />
+      </Show>
     </>
   )
 }

@@ -22,8 +22,10 @@ export const useStreamState = (stream: () => YogsStream) => {
   const start = () => DateTime.fromJSDate(stream().start)
   const end = () => DateTime.fromJSDate(stream().end)
   const isLive = () => mounted() && start() < now() && end() > now()
+  /** A "TBA" placeholder: no countdown, and the tiles don't open the details. */
+  const isTBA = () => YogsStreamUtils.isTBA(stream())
   const showCountdown = () =>
-    mounted() && YogsStreamUtils.isBefore(stream(), now())
+    mounted() && !isTBA() && YogsStreamUtils.isBefore(stream(), now())
   // Per stream: a tile reused for another stream (week switch) arrives anew
   let arrivedFor: YogsStream | undefined
   const liveOnArrival = createMemo<boolean | undefined>((prev) => {
@@ -71,6 +73,7 @@ export const useStreamState = (stream: () => YogsStream) => {
     wentLive,
     showCountdown,
     ended,
+    isTBA,
     countdown,
     shortCountdown,
     label,

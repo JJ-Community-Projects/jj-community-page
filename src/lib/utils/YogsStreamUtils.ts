@@ -2,6 +2,11 @@ import { DateTime } from 'luxon'
 import type { YogsStream } from '../orpc/private/yogs/contract.ts'
 
 export class YogsStreamUtils {
+  /** A placeholder slot ("TBA"): no countdown, not clickable. */
+  static isTBA(slot: YogsStream) {
+    return slot.title?.trim().toUpperCase() === 'TBA'
+  }
+
   static duration(slot: YogsStream) {
     const start = DateTime.fromJSDate(slot.start)
     const end = DateTime.fromJSDate(slot.end)
