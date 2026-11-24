@@ -1,0 +1,45 @@
+---
+import '../../styles/global.css'
+import { CharityLogosOverlay } from '../../components/features/overlay/charityLogos/CharityLogosOverlay.tsx'
+import {
+  BG_PRESETS,
+  type BgPreset,
+} from '../../components/features/overlay/donationMatches/presets.ts'
+import { serverClientPublic } from '../../lib/orpc/serverClient'
+
+const { data: contentHidden } = await serverClientPublic.overlays.visibility.getHidden(
+  {},
+  {
+    context: {
+      locals: Astro.locals,
+      request: Astro.request,
+    },
+  },
+)
+const HIDE_CONTENT = contentHidden ?? true
+
+const params = Astro.url.searchParams
+const themeParam = params.get('theme')
+const theme: BgPreset =
+  themeParam && themeParam in BG_PRESETS ? (themeParam as BgPreset) : 'transparent'
+const logoBgParam = params.get('logoBg')
+const logoBg = logoBgParam === null || logoBgParam === 'true' || logoBgParam === '1'
+const namesParam = params.get('names')
+const names = namesParam === 'true' || namesParam === '1'
+const demoParam = params.get('demo')
+const demo = demoParam === 'true' || demoParam === '1'
+---
+
+<div class="h-screen bg-transparent text-white">
+  {HIDE_CONTENT ? (
+    <p class="bg-black/70 p-4 text-center text-sm text-white/60">Overlay currently unavailable</p>
+  ) : (
+    <CharityLogosOverlay
+      client:only="solid-js"
+      theme={theme}
+      logoBg={logoBg}
+      names={names}
+      demo={demo}
+    />
+  )}
+</div>
