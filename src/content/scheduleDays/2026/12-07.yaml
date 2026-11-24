@@ -1,42 +1,48 @@
 date: '2026-12-07'
 streams:
-  - creators: []
-    duration_hours: 3
-    end: '2026-12-07T14:00:00Z'
+  - creators: [rythian, nilesy]
     start: '2026-12-07T11:00:00Z'
+    end: '2026-12-07T14:00:00Z'
     style:
       background:
         colors:
-          - '#F07700'
-          - '#F07700'
+          - '#EF7801'
+          - '#EF7801'
         orientation: TD
       tileSize: 3
-    title: TBA
-    vods: []
-  - creators: []
-    duration_hours: 3
-    end: '2026-12-07T17:00:00Z'
+    title: 'RYTHIAN & NILESY FIGHT SOME DEMONS'
+  - creators: [rtgame, lewis, lolipopgi, boba]
     start: '2026-12-07T14:00:00Z'
+    end: '2026-12-07T17:00:00Z'
     style:
       background:
         colors:
-          - '#F07700'
-          - '#F07700'
+          - '#EF7801'
+          - '#EF7801'
         orientation: TD
       tileSize: 3
-    title: TBA
-    vods: []
+    title: 'RTGAME''S WII SH%T'
+    subtitle: 'RTGAME, LEWIS, LOLIP & BOBA'
   - creators: []
-    duration_hours: 6
-    end: '2026-12-07T23:00:00Z'
     start: '2026-12-07T17:00:00Z'
+    end: '2026-12-07T20:00:00Z'
     style:
       background:
         colors:
-          - '#F07700'
-          - '#F07700'
+          - '#EF7801'
+          - '#EF7801'
         orientation: TD
-      tileSize: 6
-    title: TBA
-
-    vods: []
+      tileSize: 3
+    title: 'ULTIMATE YOGSCAST GEOGUESSR TOURNEY'
+  - creators: [pedguin, osie, duncan, lolipopgi, pyrion]
+    start: '2026-12-07T20:00:00Z'
+    end: '2026-12-07T23:00:00Z'
+    style:
+      background:
+        colors:
+          - '#EF7801'
+          - '#EF7801'
+        orientation: TD
+      tileSize: 3
+    title: 'FARMING SIM IN PROJECT ZOMBOID'
+    subtitle: 'PEDGUIN, OSIE, DUNCAN, LOLIP & PYRION'

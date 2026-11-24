@@ -1,41 +1,39 @@
 date: '2026-12-05'
 streams:
-  - creators: []
-    duration_hours: 3
-    end: '2026-12-05T14:00:00Z'
+  - creators: [zylus, boba]
     start: '2026-12-05T11:00:00Z'
+    end: '2026-12-05T14:00:00Z'
     style:
       background:
         colors:
-          - '#05B8AA'
-          - '#05B8AA'
+          - '#06B8A8'
+          - '#06B8A8'
         orientation: TD
       tileSize: 3
-    title: TBA
-    vods: []
-  - creators: []
-    duration_hours: 3
-    end: '2026-12-05T17:00:00Z'
+    title: 'SIM SATURDAY'
+    subtitle: 'ZYLUS & BOBA'
+  - creators: [rtgame, sips, ravs, boba]
     start: '2026-12-05T14:00:00Z'
+    end: '2026-12-05T17:00:00Z'
     style:
       background:
         colors:
-          - '#05B8AA'
-          - '#05B8AA'
+          - '#06B8A8'
+          - '#06B8A8'
         orientation: TD
       tileSize: 3
-    title: TBA
-    vods: []
-  - creators: []
-    duration_hours: 9
-    end: '2026-12-05T23:26:00Z'
+    title: 'RTGAME''S HOUSE FLIPPER TOURNAMENT'
+    subtitle: 'SIPS, RAVS & BOBA POVS'
+  - creators: [lewis, duncan, spiff, kirsty, daltos, rythian]
     start: '2026-12-05T17:00:00Z'
+    end: '2026-12-05T23:00:00Z'
     style:
       background:
         colors:
-          - '#05B8AA'
-          - '#05B8AA'
+          - '#06B8A8'
+          - '#06B8A8'
         orientation: TD
       tileSize: 6
-    title: TBA
-    vods: []
+    title: 'SID MEIER''S CIV 5 ON THE 5TH'
+    subtitle: 'LEWIS, DUNCAN, SPIFF, KIRSTY, DALTOS, RYTHIAN'
+    description: '13TH ANNIVERSARY'

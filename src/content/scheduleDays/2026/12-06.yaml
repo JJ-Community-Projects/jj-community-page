@@ -1,54 +1,39 @@
 date: '2026-12-06'
 streams:
-  - creators: []
-    duration_hours: 3
-    end: '2026-12-06T14:00:00Z'
+  - creators: [pyrion, sips]
     start: '2026-12-06T11:00:00Z'
+    end: '2026-12-06T14:00:00Z'
     style:
       background:
         colors:
-          - '#D23D99'
-          - '#D23D99'
+          - '#D23E98'
+          - '#D23E98'
         orientation: TD
       tileSize: 3
-    title: TBA
-    vods: []
-  - creators: []
-    duration_hours: 3
-    end: '2026-12-06T17:00:00Z'
+    title: 'DAD STUFF'
+    subtitle: 'PYRION & SIPS'
+  - creators: [sarah, ravs, osie, bouphe]
     start: '2026-12-06T14:00:00Z'
+    end: '2026-12-06T17:00:00Z'
     style:
       background:
         colors:
-          - '#D23D99'
-          - '#D23D99'
+          - '#D23E98'
+          - '#D23E98'
         orientation: TD
       tileSize: 3
-    title: TBA
-    vods: []
-  - creators: []
-    duration_hours: 4.5
-    end: '2026-12-06T20:30:00Z'
+    title: 'PRE-POKER PICO PARTY GAMES'
+    subtitle: 'SARAH, RAVS, OSIE & BOUPHE'
+  - creators: [tom, pyrion]
     start: '2026-12-06T17:00:00Z'
+    end: '2026-12-06T23:00:00Z'
     style:
       background:
         colors:
-          - '#D23D99'
-          - '#D23D99'
+          - '#D23E98'
+          - '#D23E98'
         orientation: TD
-      tileSize: 4
-    title: TBA
-    vods: []
-  - creators: []
-    duration_hours: 3
-    end: '2026-12-07T00:00:00Z'
-    start: '2026-12-06T20:30:00Z'
-    style:
-      background:
-        colors:
-          - '#D23D99'
-          - '#D23D99'
-        orientation: TD
-      tileSize: 2
-    title: TBA
-    vods: []
+      tileSize: 6
+    title: 'HIDDEN ROLES POKER'
+    subtitle: 'HOSTED BY ANGORYTOM & PYRIONFLAX'
+    description: 'LOTS OF YOGS & FRIENDS'
