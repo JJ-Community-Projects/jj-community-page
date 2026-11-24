@@ -1,6 +1,6 @@
 date: '2026-12-01'
 streams:
-  - creators: []
+  - creators: [boba,nina]
     start: '2026-12-01T11:00:00Z'
     end: '2026-12-01T14:00:00Z'
     style:

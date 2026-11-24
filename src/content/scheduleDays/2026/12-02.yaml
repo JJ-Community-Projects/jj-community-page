@@ -24,7 +24,7 @@ streams:
       tileSize: 3
     title: 'TABS'
     subtitle: 'WITH TOM WHEEL BOY & FRIENDS'
-  - creators: []
+  - creators: [boba]
     start: '2026-12-02T17:00:00Z'
     end: '2026-12-02T20:00:00Z'
     style:
