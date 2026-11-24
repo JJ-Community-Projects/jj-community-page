@@ -29,6 +29,7 @@ type Overlay = {
   /** `login`: options and preview for everyone, the OBS link only when logged in. */
   access: 'public' | 'login'
   configurator: Component
+  isNew?: boolean
 }
 
 const GROUPS = ['Panels', 'Tickers', 'Jingle Jam ribbons'] as const
@@ -36,8 +37,8 @@ const GROUPS = ['Panels', 'Tickers', 'Jingle Jam ribbons'] as const
 const OVERLAYS: Overlay[] = [
   { id: 'charities2', title: 'Charities panel', group: 'Panels', access: 'public', configurator: CharitiesConfigurator },
   { id: 'donation-matches', title: 'Active donation matches', group: 'Panels', access: 'public', configurator: DonationMatchesConfigurator },
-  { id: 'milestones', title: 'Milestones panel', group: 'Panels', access: 'login', configurator: MilestonesConfigurator },
-  { id: 'incentives', title: 'Incentives panel', group: 'Panels', access: 'public', configurator: IncentivesConfigurator },
+  { id: 'milestones', title: 'Milestones panel', group: 'Panels', access: 'login', configurator: MilestonesConfigurator, isNew: true },
+  { id: 'incentives', title: 'Incentives panel', group: 'Panels', access: 'public', configurator: IncentivesConfigurator, isNew: true },
   { id: 'schedule', title: 'Your schedule panel', group: 'Panels', access: 'login', configurator: UserScheduleConfigurator },
   { id: 'team-schedule', title: 'Team schedule panel', group: 'Panels', access: 'login', configurator: TeamScheduleConfigurator },
   { id: 'charities', title: 'Charities ticker', group: 'Tickers', access: 'public', configurator: CharitiesTickerConfigurator },
@@ -73,9 +74,16 @@ const Body: Component<{ loggedIn: boolean; level?: 2 | 3 }> = (p) => {
                   title={overlay.title}
                   level={p.level}
                   summary={
-                    <Show when={OVERLAY_FORMATS[overlay.id].obs}>
-                      {(obs) => <Chip size="sm">{obs()}</Chip>}
-                    </Show>
+                    <span class="flex items-center gap-1.5">
+                      <Show when={overlay.isNew}>
+                        <Chip size="sm" tone="primary">
+                          New
+                        </Chip>
+                      </Show>
+                      <Show when={OVERLAY_FORMATS[overlay.id].obs}>
+                        {(obs) => <Chip size="sm">{obs()}</Chip>}
+                      </Show>
+                    </span>
                   }
                 >
                   <LinkNeedsLoginContext.Provider
