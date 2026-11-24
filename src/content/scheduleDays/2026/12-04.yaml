@@ -36,7 +36,7 @@ streams:
       tileSize: 3
     title: 'DR SIMON CLARK''S POINTLESS GAME SHOW'
     subtitle: 'WITH LOADS OF YOGS'
-  - creators: [nilesy]
+  - creators: [nilesy, rythian]
     start: '2026-12-04T20:00:00Z'
     end: '2026-12-04T23:00:00Z'
     style:

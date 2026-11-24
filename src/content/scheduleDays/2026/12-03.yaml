@@ -22,7 +22,7 @@ streams:
         orientation: TD
       tileSize: 3
     title: 'THE VERY SERIOUS SCREWBALL SCRAMBLE 2 SPEEDRUN TOURNAMENT'
-  - creators: []
+  - creators: [lewis, zylus, rythian]
     start: '2026-12-03T17:00:00Z'
     end: '2026-12-03T23:00:00Z'
     style:

@@ -36,7 +36,7 @@ streams:
       tileSize: 3
     title: 'JINGLE CATS'
     subtitle: 'LEWIS & SIMON'
-  - creators: [lewis, duncan, spiff]
+  - creators: [lewis, duncan, spiff, rythian]
     start: '2026-12-01T20:00:00Z'
     end: '2026-12-01T23:00:00Z'
     style:
