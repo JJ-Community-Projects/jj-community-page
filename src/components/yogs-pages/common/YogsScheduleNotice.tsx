@@ -1,4 +1,4 @@
-import { type Component, For, Show } from 'solid-js'
+import { type Component, For, type JSX, Show } from 'solid-js'
 import { IconButton } from '../../ui/Button'
 import { cn } from '../../ui/cn'
 import {
@@ -20,20 +20,25 @@ const YOGSCAST_LINKS = [
 ]
 
 const variants = {
-  /** Below the schedule, light text on the red canvas; the only one with the contact line (D8). */
+  /** Below the schedule, light text on the red canvas; with the contact line (D8), like `panel`. */
   canvas: 'text-on-canvas-muted mx-auto max-w-3xl items-center text-center text-sm',
   /** Inside a tile (the schedule isn't shown yet). */
   tile: 'text-fg-muted items-center text-center text-sm',
   /** The stream dialog's fine print (Dialog `aside`). */
   compact: 'items-start',
+  /** The small panel below the season schedule, with "Updated" on top; has the contact line too. */
+  panel: 'text-fg-muted items-center text-center text-xs',
 }
 
 /** The schedule's disclaimer and the Yogscast's social links, in one wording for every place. */
 export const YogsScheduleNotice: Component<{
   variant: keyof typeof variants
   class?: string
+  /** Shown above the disclaimer (the panel's "Updated" line). */
+  children?: JSX.Element
 }> = (props) => (
   <div class={cn('flex flex-col gap-1 text-pretty', variants[props.variant], props.class)}>
+    {props.children}
     <p>
       The schedule is subject to change: not all participants are confirmed, and streams can move or be
       cancelled. For news, follow the Yogscast.
@@ -58,8 +63,8 @@ export const YogsScheduleNotice: Component<{
     <Show when={props.variant !== 'compact'}>
       <p>
         This schedule is maintained by the community.{' '}
-        <Show when={props.variant === 'canvas'}>
-          Found an error or a missing stream? Use the contact info below or message @ostof on Discord.{' '}
+        <Show when={props.variant === 'canvas' || props.variant === 'panel'}>
+          Found an error or a missing stream? Use the contact info below or message <b>@ostof on Discord</b>.{' '}
         </Show>
         This is a community project, not associated with the Jingle Jam, the Yogscast or their partners.
       </p>

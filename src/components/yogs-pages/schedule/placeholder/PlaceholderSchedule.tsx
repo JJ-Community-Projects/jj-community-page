@@ -19,7 +19,7 @@ export const PlaceholderSchedule: Component = () => (
     aria-busy="true"
     aria-label="Loading the schedule"
   >
-    <div class="desktop-schedule flex w-full justify-center">
+    <div class="desktop-schedule season-schedule flex w-full justify-center">
       <div
         class="yogs-grid flex flex-col"
         style={{ '--yogs-rows': 2 + 3 * SLOTS.length }}

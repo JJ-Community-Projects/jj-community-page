@@ -24,7 +24,13 @@
   padding-block: 1rem 2.5rem;
 }
 
-/* Grid sizes: on the grid, and on the frame around it and the "Updated" pill (YogsSeasonSchedule) */
+/* The season layout (and its loading placeholder) already has a 1rem gap: just enough extra for the
+   glow below (8px offset + 24px blur), so the countdown and the notice panel sit close */
+.desktop-schedule.season-schedule {
+  padding-block: 0 0.5rem;
+}
+
+/* Grid sizes: on the grid and on the frame around it (YogsSeasonSchedule) */
 .yogs-grid,
 .yogs-frame {
   --yogs-pad: 0.5rem;
@@ -42,11 +48,6 @@
   --yogs-slot: calc(var(--yogs-unit) * 3);
   --yogs-gap: calc(var(--yogs-rem) * 0.75);
   --yogs-tile-gap: calc(var(--yogs-rem) * 0.75);
-}
-
-/* In line with the tiles' right edge: the panel's padding plus the tile cell's */
-.yogs-frame-end {
-  margin-inline-end: calc(var(--yogs-pad) + var(--yogs-tile-gap) / 2);
 }
 
 /* The poster-like panel: --color-schedule with a vignette and a low glow */

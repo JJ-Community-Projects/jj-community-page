@@ -1,7 +1,6 @@
 import { type Component, Show } from 'solid-js'
 import { Countdown } from '../../ui/Countdown'
 import { Tile } from '../../ui/Tile'
-import { Chip } from '../../ui/Labels'
 import { cn } from '../../ui/cn'
 import { QueryClientProvider } from '@tanstack/solid-query'
 import { QueryClient } from '@tanstack/query-core'
@@ -40,8 +39,9 @@ export const YogsSeasonSchedule: Component<YogsSeasonScheduleProps> = (
 ) => <YogsSeasonBody schedule={expandYogsSchedule(props.schedule)} />
 
 /**
- * The season layout: countdown, grid / timeline with "Updated", headliner ticker, Yogs & Friends,
- * notice. Shared by /yogs and by the PWA / embed loader, which fetches the schedule first.
+ * The season layout: countdown, grid / timeline, a panel with "Updated" + disclaimer + Yogscast
+ * links + community note, headliner ticker, Yogs & Friends. Shared by /yogs and by the PWA / embed
+ * loader, which fetches the schedule first.
  */
 export const YogsSeasonBody: Component<{ schedule: YogsSchedule }> = (props) => {
   const schedule = props.schedule
@@ -50,35 +50,34 @@ export const YogsSeasonBody: Component<{ schedule: YogsSchedule }> = (props) => 
       <CreatorFilterProvider>
         <div class={'flex w-full flex-col items-center justify-center gap-4'}>
           <CollectionCountdown />
-          <div class="desktop-schedule flex w-full flex-col items-center justify-center">
+          <div class="desktop-schedule season-schedule flex w-full flex-col items-center justify-center">
             <DesktopWeek />
           </div>
-          <div class="mobile-schedule flex w-full flex-col items-center justify-center gap-2">
+          <div class="mobile-schedule flex w-full flex-col items-center justify-center">
             <MobileYogsSchedule />
-            <UpdatedAt />
           </div>
+          <Tile pad="md" class="w-full max-w-2xl">
+            <YogsScheduleNotice variant="panel">
+              <UpdatedAt />
+            </YogsScheduleNotice>
+          </Tile>
           <Ticker />
           <YogsAndFriends creators={schedule.creators} />
-          <YogsScheduleNotice variant="canvas" />
         </div>
       </CreatorFilterProvider>
     </YogsScheduleProvider>
   )
 }
 
-/**
- * The week grid with "Updated" below. Shrinks to the grid; .yogs-frame gets the grid's sizes, so
- * the pill lines up with the tiles' right edge at any grid size.
- */
+/** The week grid. Shrinks to the grid; .yogs-frame gets the grid's sizes. */
 const DesktopWeek: Component = () => {
   const { times } = useYogsSchedule()
   return (
     <div
-      class="yogs-frame flex flex-col items-end gap-1"
+      class="yogs-frame flex flex-col items-end"
       style={{ '--yogs-rows': 2 + 3 * times().length }}
     >
       <YogsScheduleWeek />
-      <UpdatedAt year class="yogs-frame-end" />
     </div>
   )
 }
@@ -123,26 +122,25 @@ const Ticker: Component = () => {
 }
 
 /**
- * White pill so it stays readable over the canvas glow; positioned, so it paints above the grid
- * panel's shadow (the panel is positioned too). Hidden (space kept) until mounted: the server
- * render is in London time and the line should only ever show the viewer's timezone.
+ * The panel's first line. Hidden (space kept) until mounted: the server render is in London time
+ * and the line should only ever show the viewer's timezone.
  */
-const UpdatedAt: Component<{ year?: boolean; class?: string }> = (props) => {
+const UpdatedAt: Component = () => {
   const { schedule, toDateTime, mounted } = useYogsSchedule()
   return (
     <Show when={schedule.updatedAt}>
       {(updatedAt) => (
-        <Chip tone="canvas" size="sm" class={cn('relative', !mounted() && 'invisible', props.class)}>
+        <p class={cn('font-semibold text-fg', !mounted() && 'invisible')}>
           Updated{' '}
           {toDateTime(updatedAt()).toLocaleString({
-            ...(props.year && { year: 'numeric' }),
+            year: 'numeric',
             month: 'short',
             day: 'numeric',
             hour: 'numeric',
             minute: 'numeric',
             timeZoneName: 'short',
           })}
-        </Chip>
+        </p>
       )}
     </Show>
   )
