@@ -201,12 +201,19 @@ const Body: Component<MilestonesOverlayProps> = (props) => {
       }),
     )
   }
+  // While the window moves, the rows carry translate animations and their rects are where
+  // they are drawn, not where they sit. The list resizing then (rows of other heights came
+  // in) must not measure: the bar would keep those offsets. The move measures once it ends.
+  let moving = false
+  const measureIfSettled = () => {
+    if (!moving) measure()
+  }
   onMount(() => {
     if (!list) return
-    const observer = new ResizeObserver(measure)
+    const observer = new ResizeObserver(measureIfSettled)
     observer.observe(list)
     onCleanup(() => observer.disconnect())
-    void document.fonts?.ready.then(measure)
+    void document.fonts?.ready.then(measureIfSettled)
   })
 
   // The milestones on screen trail `visible`: a reached milestone stays a moment so its
@@ -215,7 +222,6 @@ const Body: Component<MilestonesOverlayProps> = (props) => {
   // A change during the hold restarts it, so a run of donations moves the list once.
   const [shown, setShown] = createSignal(visible())
   let holdTimer: ReturnType<typeof setTimeout> | undefined
-  let moving = false
 
   const moveWindow = async () => {
     const next = visible()
@@ -259,6 +265,7 @@ const Body: Component<MilestonesOverlayProps> = (props) => {
       })
 
     setShown(next)
+    // Before any animation starts: the rows are at their new places, untransformed
     measure()
     leaving.forEach((copy) => el.appendChild(copy))
 
@@ -312,6 +319,8 @@ const Body: Component<MilestonesOverlayProps> = (props) => {
     } finally {
       leaving.forEach((copy) => copy.remove())
       moving = false
+      // Catches a resize skipped during the move (fonts, OBS source resized)
+      measure()
     }
     if (!sameRows(visible(), shown())) scheduleMove()
   }
