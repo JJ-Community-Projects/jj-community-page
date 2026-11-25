@@ -1,4 +1,4 @@
-import { type Component, createEffect, createMemo, For, Show } from 'solid-js'
+import { type Component, createEffect, createMemo, Index, Show } from 'solid-js'
 import { createStore } from 'solid-js/store'
 import { FaSolidPlus, FaSolidTrash } from 'solid-icons/fa'
 import { Button, IconButton } from '../../../ui/Button'
@@ -46,31 +46,31 @@ export const WheelItemsEditor: Component<{
         fallback={<p class={fieldClass.help}>No items yet.</p>}
       >
         <ol class="flex flex-col gap-2">
-          <For each={rows()}>
+          <Index each={rows()}>
             {(row, index) => (
               <li class="flex items-center gap-2">
                 <span class="text-fg-muted w-6 shrink-0 text-right text-sm tabular-nums">
-                  {index() + 1}
+                  {index + 1}
                 </span>
                 <input
                   type="text"
-                  aria-label={`Item ${index() + 1}`}
+                  aria-label={`Item ${index + 1}`}
                   placeholder="What the wheel can land on"
                   maxLength={WHEEL_MAX_TEXT}
-                  value={row}
-                  onInput={(e) => p.state.setRows(index(), e.currentTarget.value)}
+                  value={row()}
+                  onInput={(e) => p.state.setRows(index, e.currentTarget.value)}
                   class={cn(fieldClass.input, 'h-10 min-w-0 flex-1')}
                 />
                 <IconButton
                   variant="ghost"
-                  aria-label={`Remove item ${index() + 1}`}
-                  onClick={() => remove(index())}
+                  aria-label={`Remove item ${index + 1}`}
+                  onClick={() => remove(index)}
                 >
                   <FaSolidTrash class="size-3.5" aria-hidden="true" />
                 </IconButton>
               </li>
             )}
-          </For>
+          </Index>
         </ol>
       </Show>
       <Button
