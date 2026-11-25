@@ -12,7 +12,7 @@ streams:
       tileSize: 3
     title: 'PIXEL PIXIES'
     subtitle: 'BOUPHE & GEE'
-  - creators: [bouphe]
+  - creators: [bouphe, kirsty]
     start: '2026-12-04T14:00:00Z'
     end: '2026-12-04T17:00:00Z'
     style:
@@ -24,7 +24,7 @@ streams:
       tileSize: 3
     title: 'THE SECRET SANTA SHOW'
     subtitle: 'WITH SANTA BOUPHE & FRIENDS'
-  - creators: [simon_clark]
+  - creators: [simon_clark, kirsty]
     start: '2026-12-04T17:00:00Z'
     end: '2026-12-04T20:00:00Z'
     style:
@@ -36,7 +36,7 @@ streams:
       tileSize: 3
     title: 'DR SIMON CLARK''S POINTLESS GAME SHOW'
     subtitle: 'WITH LOADS OF YOGS'
-  - creators: [nilesy, rythian, zylus]
+  - creators: [nilesy, rythian, zylus, kirsty]
     start: '2026-12-04T20:00:00Z'
     end: '2026-12-04T23:00:00Z'
     style:
