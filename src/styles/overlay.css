@@ -1,0 +1,6 @@
+/* OBS overlay pages: no scrollbar. global.css forces one on <html> for the site, which shows as a bar
+   at the right edge where scrollbars take space (OBS on Windows, the preview iframe). Unlayered, so it
+   wins over that @layer base rule. */
+html {
+  overflow: hidden;
+}
