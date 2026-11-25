@@ -132,7 +132,7 @@ export const MilestonesConfigurator: Component = () => {
   const sendTestRaised = createDemoRaisedSender()
   createEffect(on(testRaised, sendTestRaised, { defer: true }))
 
-  const params = () => ({
+  const params = (items: GoalItem[]) => ({
     user: user?.tiltifySlug,
     theme: theme(),
     currency: currency(),
@@ -143,12 +143,13 @@ export const MilestonesConfigurator: Component = () => {
     crossOut: crossOut(),
     itemBg: itemBg(),
     title: title(),
-    [ITEM_PARAM]: list.items().map(encodeItem),
+    [ITEM_PARAM]: items.map(encodeItem),
   })
-  const url = createMemo(() => buildUrl('/overlays/milestones', params()))
+  const url = createMemo(() => buildUrl('/overlays/milestones', params(list.items())))
+  // Preview size and URL follow the items after a pause in typing, so the box resizes with the reload
   const size = createMemo(() =>
     estimateSize({
-      items: list.items(),
+      items: list.previewItems(),
       show: show(),
       currency: currency(),
       title: title().trim() !== '',
@@ -159,7 +160,7 @@ export const MilestonesConfigurator: Component = () => {
   // Untracked: a new amount goes to the open preview by message instead of reloading it
   const previewUrl = createMemo(() =>
     buildUrl('/overlays/milestones', {
-      ...params(),
+      ...params(list.previewItems()),
       demoRaised: previewData() === 'test' ? untrack(testRaised) : undefined,
     }),
   )

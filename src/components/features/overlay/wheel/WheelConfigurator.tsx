@@ -45,7 +45,9 @@ export const WheelConfigurator: Component = () => {
     [WHEEL_ITEM_PARAM]: list.items(),
   })
   // The preview spins on click only: without the key it doesn't count as one of your overlays
-  const previewUrl = createMemo(() => buildUrl('/overlays/wheel', params()))
+  const previewUrl = createMemo(() =>
+    buildUrl('/overlays/wheel', { theme: theme(), [WHEEL_ITEM_PARAM]: list.previewItems() }),
+  )
   const url = createMemo(() => {
     const data = link.data
     if (!data || list.items().length < WHEEL_MIN_ITEMS) return undefined

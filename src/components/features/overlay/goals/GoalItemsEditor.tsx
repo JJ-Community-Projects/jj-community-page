@@ -1,5 +1,14 @@
-import { type Component, createEffect, createMemo, For, Show } from 'solid-js'
+import {
+  type Component,
+  createEffect,
+  createMemo,
+  createSignal,
+  For,
+  Show,
+  untrack,
+} from 'solid-js'
 import { createStore } from 'solid-js/store'
+import { debounce } from '@solid-primitives/scheduled'
 import { FaSolidPlus, FaSolidTrash } from 'solid-icons/fa'
 import { Button, IconButton } from '../../../ui/Button'
 import { cn } from '../../../ui/cn'
@@ -63,7 +72,15 @@ export function createGoalItems(storageKey: string, examples: GoalItem[]) {
     ),
   )
 
-  return { rows, setRows, items }
+  // The preview iframe reloads on every change: typing reaches it after a pause, other edits at once
+  const [previewItems, setPreviewItems] = createSignal(untrack(items))
+  const syncPreviewSoon = debounce(() => setPreviewItems(items()), 400)
+  const syncPreview = () => {
+    syncPreviewSoon.clear()
+    setPreviewItems(items())
+  }
+
+  return { rows, setRows, items, previewItems, syncPreview, syncPreviewSoon }
 }
 
 export const GoalItemsEditor: Component<{
@@ -76,8 +93,14 @@ export const GoalItemsEditor: Component<{
 }> = (p) => {
   const rows = () => p.state.rows
   const add = () => p.state.setRows(rows().length, { value: '', text: '' })
-  const remove = (index: number) =>
+  const remove = (index: number) => {
     p.state.setRows((all) => all.filter((_, i) => i !== index))
+    p.state.syncPreview()
+  }
+  const edit = (index: number, field: keyof Row, value: string) => {
+    p.state.setRows(index, field, value)
+    p.state.syncPreviewSoon()
+  }
 
   return (
     <div class="flex flex-col gap-2 sm:col-span-2">
@@ -98,9 +121,7 @@ export const GoalItemsEditor: Component<{
                   aria-label={`Amount of ${p.noun} ${index() + 1}`}
                   placeholder="Amount"
                   value={row.value}
-                  onInput={(e) =>
-                    p.state.setRows(index(), 'value', e.currentTarget.value)
-                  }
+                  onInput={(e) => edit(index(), 'value', e.currentTarget.value)}
                   data-invalid={isInvalid(row) ? '' : undefined}
                   aria-invalid={isInvalid(row)}
                   class={cn(
@@ -114,9 +135,7 @@ export const GoalItemsEditor: Component<{
                   placeholder={p.placeholder}
                   maxLength={MAX_TEXT}
                   value={row.text}
-                  onInput={(e) =>
-                    p.state.setRows(index(), 'text', e.currentTarget.value)
-                  }
+                  onInput={(e) => edit(index(), 'text', e.currentTarget.value)}
                   class={cn(fieldClass.input, 'h-10 min-w-0 flex-1')}
                 />
                 <IconButton

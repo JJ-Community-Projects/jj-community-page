@@ -47,7 +47,7 @@ export const IncentivesConfigurator: Component = () => {
   const [title, setTitle] = createSignal('Incentives')
   const [itemBg, setItemBg] = createSignal(true)
 
-  const url = createMemo(() =>
+  const buildLink = (items: GoalItem[]) =>
     buildUrl('/overlays/incentives', {
       theme: theme(),
       currency: currency(),
@@ -55,18 +55,20 @@ export const IncentivesConfigurator: Component = () => {
       show: String(show()),
       itemBg: itemBg(),
       title: title(),
-      [ITEM_PARAM]: list.items().map(encodeItem),
-    }),
-  )
+      [ITEM_PARAM]: items.map(encodeItem),
+    })
+  const url = createMemo(() => buildLink(list.items()))
+  // Preview size and URL follow the items after a pause in typing, so the box resizes with the reload
+  const previewUrl = createMemo(() => buildLink(list.previewItems()))
 
   const size = createMemo(() =>
     estimateSize({
-      items: list.items(),
+      items: list.previewItems(),
       show: show(),
       currency: currency(),
       title: title().trim() !== '',
       itemBg: itemBg(),
-      pageDots: pageCount(list.items().length, show()) > 1,
+      pageDots: pageCount(list.previewItems().length, show()) > 1,
     }),
   )
 
@@ -74,7 +76,7 @@ export const IncentivesConfigurator: Component = () => {
     <ConfiguratorBody
       description="A list of your donation incentives. When more are set than are shown at a time, the overlay switches to the next ones every 8 seconds."
       format={{ ...OVERLAY_FORMATS.incentives, preview: size() }}
-      previewUrl={url()}
+      previewUrl={previewUrl()}
       linkUrl={url()}
     >
       <GoalItemsEditor
