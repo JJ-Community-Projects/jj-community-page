@@ -5,6 +5,7 @@ import { useQuery, useQueryClient } from '@tanstack/solid-query'
 import {
   FaRegularPenToSquare,
   FaSolidCalendarDays,
+  FaSolidChartPie,
   FaSolidTag,
   FaSolidUser,
   FaSolidUserGroup,
@@ -239,6 +240,26 @@ const BlockedCard: Component = () => {
   )
 }
 
+const WheelCard: Component = () => (
+  <a
+    href={`/dashboard/wheel`}
+    class="rounded-tile from-surface to-surface-2 text-fg shadow-tile ring-line hover:shadow-tile-hover group focus:ring-accent relative overflow-hidden bg-linear-to-b px-4 py-3 ring-1 transition-all duration-200 hover:brightness-105 focus:ring-2 focus:ring-offset-2 active:scale-[0.98]"
+  >
+    <div class="flex h-full flex-col">
+      <div class="mb-2 flex items-center gap-2">
+        <FaSolidChartPie class="text-accent-600 h-5 w-5" />
+        <h2 class="text-fg text-base font-semibold">The Wheel</h2>
+      </div>
+      <p class="text-fg-muted mb-4 text-sm">
+        Spin the wheel overlay on your stream
+      </p>
+      <div class="mt-auto">
+        <span class="text-accent-600 font-medium">Spin the Wheel →</span>
+      </div>
+    </div>
+  </a>
+)
+
 export const UserDashboardCards: Component = () => {
   return (
     <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -253,6 +274,8 @@ export const UserDashboardCards: Component = () => {
       <FriendsCard />
 
       <BlockedCard />
+
+      <WheelCard />
     </div>
   )
 }

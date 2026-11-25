@@ -37,11 +37,12 @@ interface __BaseEnv_Env {
 	ScheduleEditingObject: DurableObjectNamespace<import("./src/worker").ScheduleEditingObject>;
 	ConfigDO: DurableObjectNamespace<import("./src/worker").ConfigDO>;
 	TwitchExtensionRateLimiter: DurableObjectNamespace<import("./src/worker").TwitchExtensionRateLimiter>;
+	WheelObject: DurableObjectNamespace<import("./src/worker").WheelObject>;
 }
 declare namespace Cloudflare {
 	interface GlobalProps {
 		mainModule: typeof import("./src/worker");
-		durableNamespaces: "JingleJamData" | "UserRateLimiter" | "FriendRequestIncomingObject" | "FriendRequestSentObject" | "FriendsListObject" | "UserTeamInvitesObject" | "UserTeamsObject" | "TeamAdminInvitesObject" | "TeamAdminMembersObject" | "ScheduleEditingObject" | "ConfigDO" | "TwitchExtensionRateLimiter";
+		durableNamespaces: "JingleJamData" | "UserRateLimiter" | "FriendRequestIncomingObject" | "FriendRequestSentObject" | "FriendsListObject" | "UserTeamInvitesObject" | "UserTeamsObject" | "TeamAdminInvitesObject" | "TeamAdminMembersObject" | "ScheduleEditingObject" | "ConfigDO" | "TwitchExtensionRateLimiter" | "WheelObject";
 	}
 	interface ProdEnv {
 		KV: KVNamespace;
@@ -79,6 +80,7 @@ declare namespace Cloudflare {
 		ScheduleEditingObject: DurableObjectNamespace<import("./src/worker").ScheduleEditingObject>;
 		ConfigDO: DurableObjectNamespace<import("./src/worker").ConfigDO>;
 		TwitchExtensionRateLimiter: DurableObjectNamespace<import("./src/worker").TwitchExtensionRateLimiter>;
+		WheelObject: DurableObjectNamespace<import("./src/worker").WheelObject>;
 	}
 	interface BetaEnv {
 		KV: KVNamespace;
@@ -116,6 +118,7 @@ declare namespace Cloudflare {
 		ScheduleEditingObject: DurableObjectNamespace<import("./src/worker").ScheduleEditingObject>;
 		ConfigDO: DurableObjectNamespace<import("./src/worker").ConfigDO>;
 		TwitchExtensionRateLimiter: DurableObjectNamespace<import("./src/worker").TwitchExtensionRateLimiter>;
+		WheelObject: DurableObjectNamespace<import("./src/worker").WheelObject>;
 	}
 	interface Env extends __BaseEnv_Env {}
 }

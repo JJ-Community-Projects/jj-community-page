@@ -7,6 +7,10 @@ import { FundraisersTickerConfigurator } from '../ticker/fundraisers/Fundraisers
 import { CharitiesTickerConfigurator } from '../ticker/charities/CharitiesTickerConfigurator.tsx'
 import { CharitiesConfigurator } from '../charities/CharitiesConfigurator.tsx'
 import { DonationMatchesConfigurator } from '../donationMatches/DonationMatchesConfigurator.tsx'
+import { MilestonesConfigurator } from '../milestones/MilestonesConfigurator.tsx'
+import { IncentivesConfigurator } from '../incentives/IncentivesConfigurator.tsx'
+import { CharityLogosConfigurator } from '../charityLogos/CharityLogosConfigurator.tsx'
+import { WheelConfigurator } from '../wheel/WheelConfigurator.tsx'
 import { FundraisersByTeamConfigurator } from '../ticker/fundraisers/FundraisersByTeamConfigurator.tsx'
 import { FundraisersByCauseConfigurator } from '../ticker/fundraisers/FundraisersByCauseConfigurator.tsx'
 import { UserProvider } from '../../users/user-dashboard/providers/UserProvider.tsx'
@@ -27,22 +31,122 @@ type Overlay = {
   /** `login`: options and preview for everyone, the OBS link only when logged in. */
   access: 'public' | 'login'
   configurator: Component
+  isNew?: boolean
 }
 
 const GROUPS = ['Panels', 'Tickers', 'Jingle Jam ribbons'] as const
 
 const OVERLAYS: Overlay[] = [
-  { id: 'charities2', title: 'Charities panel', group: 'Panels', access: 'public', configurator: CharitiesConfigurator },
-  { id: 'donation-matches', title: 'Active donation matches', group: 'Panels', access: 'public', configurator: DonationMatchesConfigurator },
-  { id: 'schedule', title: 'Your schedule panel', group: 'Panels', access: 'login', configurator: UserScheduleConfigurator },
-  { id: 'team-schedule', title: 'Team schedule panel', group: 'Panels', access: 'login', configurator: TeamScheduleConfigurator },
-  { id: 'charities', title: 'Charities ticker', group: 'Tickers', access: 'public', configurator: CharitiesTickerConfigurator },
-  { id: 'fundraisers', title: 'All fundraisers ticker', group: 'Tickers', access: 'public', configurator: FundraisersTickerConfigurator },
-  { id: 'team-fundraiser', title: 'Fundraisers by team ticker', group: 'Tickers', access: 'login', configurator: FundraisersByTeamConfigurator },
-  { id: 'cause-fundraiser', title: 'Fundraisers by charity ticker', group: 'Tickers', access: 'public', configurator: FundraisersByCauseConfigurator },
-  { id: 'campaign-goal', title: 'Campaign goal', group: 'Jingle Jam ribbons', access: 'login', configurator: CampaignGoalConfigurator },
-  { id: 'big-campaign-goal', title: 'Big campaign goal', group: 'Jingle Jam ribbons', access: 'login', configurator: BigCampaignGoalConfigurator },
-  { id: 'basic-ribbon-label', title: 'Basic label', group: 'Jingle Jam ribbons', access: 'public', configurator: BasicRibbonLabelConfigurator },
+  {
+    id: 'charities2',
+    title: 'Charities panel',
+    group: 'Panels',
+    access: 'public',
+    configurator: CharitiesConfigurator,
+  },
+  {
+    id: 'schedule',
+    title: 'Your schedule panel',
+    group: 'Panels',
+    access: 'login',
+    configurator: UserScheduleConfigurator,
+  },
+  {
+    id: 'team-schedule',
+    title: 'Team schedule panel',
+    group: 'Panels',
+    access: 'login',
+    configurator: TeamScheduleConfigurator,
+  },
+  {
+    id: 'donation-matches',
+    title: 'Active donation matches',
+    group: 'Panels',
+    access: 'public',
+    configurator: DonationMatchesConfigurator,
+    isNew: true,
+  },
+  {
+    id: 'milestones',
+    title: 'Milestones panel',
+    group: 'Panels',
+    access: 'login',
+    configurator: MilestonesConfigurator,
+    isNew: true,
+  },
+  {
+    id: 'incentives',
+    title: 'Incentives panel',
+    group: 'Panels',
+    access: 'public',
+    configurator: IncentivesConfigurator,
+    isNew: true,
+  },
+  {
+    id: 'charity-logos',
+    title: 'Charity logo grid',
+    group: 'Panels',
+    access: 'public',
+    configurator: CharityLogosConfigurator,
+    isNew: true,
+  },
+  {
+    id: 'wheel',
+    title: 'The Wheel',
+    group: 'Panels',
+    access: 'login',
+    configurator: WheelConfigurator,
+    isNew: true,
+  },
+  {
+    id: 'charities',
+    title: 'Charities ticker',
+    group: 'Tickers',
+    access: 'public',
+    configurator: CharitiesTickerConfigurator,
+  },
+  {
+    id: 'fundraisers',
+    title: 'All fundraisers ticker',
+    group: 'Tickers',
+    access: 'public',
+    configurator: FundraisersTickerConfigurator,
+  },
+  {
+    id: 'team-fundraiser',
+    title: 'Fundraisers by team ticker',
+    group: 'Tickers',
+    access: 'login',
+    configurator: FundraisersByTeamConfigurator,
+  },
+  {
+    id: 'cause-fundraiser',
+    title: 'Fundraisers by charity ticker',
+    group: 'Tickers',
+    access: 'public',
+    configurator: FundraisersByCauseConfigurator,
+  },
+  {
+    id: 'campaign-goal',
+    title: 'Campaign goal',
+    group: 'Jingle Jam ribbons',
+    access: 'login',
+    configurator: CampaignGoalConfigurator,
+  },
+  {
+    id: 'big-campaign-goal',
+    title: 'Big campaign goal',
+    group: 'Jingle Jam ribbons',
+    access: 'login',
+    configurator: BigCampaignGoalConfigurator,
+  },
+  {
+    id: 'basic-ribbon-label',
+    title: 'Basic label',
+    group: 'Jingle Jam ribbons',
+    access: 'public',
+    configurator: BasicRibbonLabelConfigurator,
+  },
 ]
 
 const Body: Component<{ loggedIn: boolean; level?: 2 | 3 }> = (p) => {
@@ -69,9 +173,16 @@ const Body: Component<{ loggedIn: boolean; level?: 2 | 3 }> = (p) => {
                   title={overlay.title}
                   level={p.level}
                   summary={
-                    <Show when={OVERLAY_FORMATS[overlay.id].obs}>
-                      {(obs) => <Chip size="sm">{obs()}</Chip>}
-                    </Show>
+                    <span class="flex items-center gap-1.5">
+                      <Show when={overlay.isNew}>
+                        <Chip size="sm" tone="primary">
+                          New
+                        </Chip>
+                      </Show>
+                      <Show when={OVERLAY_FORMATS[overlay.id].obs}>
+                        {(obs) => <Chip size="sm">{obs()}</Chip>}
+                      </Show>
+                    </span>
                   }
                 >
                   <LinkNeedsLoginContext.Provider

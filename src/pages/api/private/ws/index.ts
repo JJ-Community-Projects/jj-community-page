@@ -21,6 +21,8 @@ function resolveNamespaceByChannel(
   if (chn.startsWith('teams:admin:members:')) return env.TeamAdminMembersObject
   // Schedule Editing
   if (chn.startsWith('schedule:edit:')) return env.ScheduleEditingObject
+  // Overlay wheel
+  if (chn.startsWith('wheel:')) return env.WheelObject
   return null
 }
 

@@ -44,3 +44,4 @@ export { ScheduleEditingObject } from './lib/orpc/private/scheduleEditingWS/do/S
 
 export { ConfigDO } from './do/ConfigDO.ts'
 export { TwitchExtensionRateLimiter } from './do/rateLimiter/TwitchExtensionRateLimiter.ts'
+export { WheelObject } from './lib/orpc/private/wheelWS/do/WheelObject.ts'

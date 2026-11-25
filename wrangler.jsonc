@@ -64,6 +64,12 @@
         "ConfigDO",
         "TwitchExtensionRateLimiter"
       ]
+    },
+    {
+      "tag": "v5",
+      "new_sqlite_classes": [
+        "WheelObject"
+      ]
     }
   ],
   "durable_objects": {
@@ -115,6 +121,10 @@
       {
         "name": "TwitchExtensionRateLimiter",
         "class_name": "TwitchExtensionRateLimiter"
+      },
+      {
+        "name": "WheelObject",
+        "class_name": "WheelObject"
       }
     ]
   },
@@ -223,6 +233,12 @@
             "ConfigDO",
             "TwitchExtensionRateLimiter"
           ]
+        },
+        {
+          "tag": "v2",
+          "new_sqlite_classes": [
+            "WheelObject"
+          ]
         }
       ],
       "durable_objects": {
@@ -280,6 +296,10 @@
           {
             "name": "TwitchExtensionRateLimiter",
             "class_name": "TwitchExtensionRateLimiter"
+          },
+          {
+            "name": "WheelObject",
+            "class_name": "WheelObject"
           }
         ]
       },
@@ -397,6 +417,12 @@
             "ConfigDO",
             "TwitchExtensionRateLimiter"
           ]
+        },
+        {
+          "tag": "v4",
+          "new_sqlite_classes": [
+            "WheelObject"
+          ]
         }
       ],
       "durable_objects": {
@@ -454,6 +480,10 @@
           {
             "name": "TwitchExtensionRateLimiter",
             "class_name": "TwitchExtensionRateLimiter"
+          },
+          {
+            "name": "WheelObject",
+            "class_name": "WheelObject"
           }
         ]
       },
