@@ -12,7 +12,7 @@ streams:
       tileSize: 3
     title: 'PIXEL PIXIES'
     subtitle: 'BOUPHE & GEE'
-  - creators: [bouphe, kirsty, briony, pedguin]
+  - creators: [bouphe, kirsty, briony, pedguin, sips]
     start: '2026-12-04T14:00:00Z'
     end: '2026-12-04T17:00:00Z'
     style:
@@ -24,7 +24,7 @@ streams:
       tileSize: 3
     title: 'THE SECRET SANTA SHOW'
     subtitle: 'WITH SANTA BOUPHE & FRIENDS'
-  - creators: [simon_clark, kirsty, briony, rtgame]
+  - creators: [simon_clark, kirsty, briony, rtgame, sips]
     start: '2026-12-04T17:00:00Z'
     end: '2026-12-04T20:00:00Z'
     style:
