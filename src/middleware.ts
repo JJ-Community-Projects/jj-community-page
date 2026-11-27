@@ -2,6 +2,7 @@ import {defineMiddleware, sequence} from "astro:middleware";
 import {env} from "cloudflare:workers";
 import {deleteSessionTokenCookie, setSessionTokenCookie, validateSessionToken} from "./functions/session.ts";
 import {loggableError} from "./lib/db/loggableError.ts";
+import {recordOverlayHit} from "./lib/services/overlayHits.ts";
 
 /** API routes that never read `locals.user` / `locals.session`. */
 const SESSIONLESS_PREFIXES = [
@@ -136,4 +137,11 @@ const session = defineMiddleware(async (context, next) => {
   return next();
 });
 
-export const onRequest = sequence(robotsTag, session);
+/** Counts overlay page loads (OBS browser sources) per overlay and streamer; see overlayHits.ts. */
+const overlayHits = defineMiddleware(async (context, next) => {
+  const response = await next();
+  recordOverlayHit(env.OVERLAY_HITS, context.request, response.status);
+  return response;
+});
+
+export const onRequest = sequence(robotsTag, overlayHits, session);

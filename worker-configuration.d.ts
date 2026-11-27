@@ -4,6 +4,7 @@
 interface __BaseEnv_Env {
 	KV: KVNamespace;
 	DB: D1Database;
+	OVERLAY_HITS: AnalyticsEngineDataset;
 	TWITCH_LIVE_CHECK: Queue;
 	YOUTUBE_LIVE_CHECK: Queue;
 	TWITCH_LIVE_NOTIFIER: Queue;
@@ -47,6 +48,7 @@ declare namespace Cloudflare {
 	interface ProdEnv {
 		KV: KVNamespace;
 		DB: D1Database;
+		OVERLAY_HITS: AnalyticsEngineDataset;
 		TWITCH_LIVE_CHECK: Queue;
 		YOUTUBE_LIVE_CHECK: Queue;
 		TWITCH_LIVE_NOTIFIER: Queue;
@@ -85,6 +87,7 @@ declare namespace Cloudflare {
 	interface BetaEnv {
 		KV: KVNamespace;
 		DB: D1Database;
+		OVERLAY_HITS: AnalyticsEngineDataset;
 		TWITCH_LIVE_CHECK: Queue;
 		YOUTUBE_LIVE_CHECK: Queue;
 		TWITCH_LIVE_NOTIFIER: Queue;

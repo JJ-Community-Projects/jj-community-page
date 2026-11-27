@@ -176,6 +176,10 @@
       }
     ]
   },
+  // Overlay page loads per overlay and streamer (src/lib/services/overlayHits.ts)
+  "analytics_engine_datasets": [
+    { "binding": "OVERLAY_HITS", "dataset": "jj_overlay_hits_dev" }
+  ],
   "vars": {
     "ENVIRONMENT": "DEV",
     "TWITCH_CLIENT_ID": "<PLACEHOLDER>",
@@ -350,6 +354,10 @@
           }
         ]
       },
+      // Overlay page loads per overlay and streamer (src/lib/services/overlayHits.ts)
+      "analytics_engine_datasets": [
+        { "binding": "OVERLAY_HITS", "dataset": "jj_overlay_hits" }
+      ],
       "vars": {
         "ENVIRONMENT": "PROD"
       }
@@ -534,6 +542,10 @@
           }
         ]
       },
+      // Overlay page loads per overlay and streamer (src/lib/services/overlayHits.ts)
+      "analytics_engine_datasets": [
+        { "binding": "OVERLAY_HITS", "dataset": "jj_overlay_hits_beta" }
+      ],
       "vars": {
         "ENVIRONMENT": "BETA"
       }
